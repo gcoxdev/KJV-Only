@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react"
+import { Fragment, useEffect, useMemo, useState } from "react"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
 import { type Book, type Chapter, type VerseToken } from "@/types/bible"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -10,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -18,6 +20,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Switch } from "@/components/ui/switch"
 
 type Reference = {
   bookIndex: number
@@ -28,17 +36,80 @@ type ReaderPayload = {
   books?: Book[]
 }
 
-function renderToken(token: VerseToken, tokenIndex: number) {
+function hasTokenMetadata(token: VerseToken) {
+  return Boolean(token.strong || token.lemma || token.morph || token.divineName)
+}
+
+function isPunctuationToken(tokenText: string) {
+  return /^[,.;:!?)]/.test(tokenText)
+}
+
+function renderToken(token: VerseToken, isStudyMode: boolean) {
+  const tokenClassName = cn(token.added && "italic")
+  const showMetadata = isStudyMode && hasTokenMetadata(token)
+
+  if (!showMetadata) {
+    return <span className={tokenClassName}>{token.text}</span>
+  }
+
   return (
-    <span key={`${token.text}-${tokenIndex}`} className="mr-1.5 inline-flex items-start gap-0.5">
-      <span>{token.text}</span>
-      {token.strong ? (
-        <sup className="rounded-sm bg-muted px-1 py-0.5 text-[0.62rem] leading-none text-muted-foreground">
-          {token.strong}
-        </sup>
-      ) : null}
-    </span>
+    <Popover>
+      <PopoverTrigger
+        render={<span />}
+        className="cursor-pointer rounded-sm px-0.5 py-0.5 underline decoration-dotted underline-offset-3 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring/60"
+        aria-label={`Details for ${token.text}`}
+      >
+        <span className={tokenClassName}>{token.text}</span>
+      </PopoverTrigger>
+      <PopoverContent align="start">
+        <div className="space-y-2 text-sm">
+          <p className="font-medium">{token.text}</p>
+          {token.added ? (
+            <p className="text-xs text-muted-foreground">
+              Added word (italic in KJV typography)
+            </p>
+          ) : null}
+          {token.strong ? (
+            <p>
+              <span className="text-muted-foreground">Strong&apos;s:</span>{" "}
+              <span className="font-mono">{token.strong}</span>
+            </p>
+          ) : null}
+          {token.lemma ? (
+            <p>
+              <span className="text-muted-foreground">Lemma:</span>{" "}
+              <span className="font-mono">{token.lemma}</span>
+            </p>
+          ) : null}
+          {token.morph ? (
+            <p>
+              <span className="text-muted-foreground">Morph:</span>{" "}
+              <span className="font-mono">{token.morph}</span>
+            </p>
+          ) : null}
+          {token.divineName ? (
+            <p>
+              <span className="text-muted-foreground">Divine Name:</span>{" "}
+              Tagged in OSIS as <span className="font-mono">divineName</span>
+            </p>
+          ) : null}
+        </div>
+      </PopoverContent>
+    </Popover>
   )
+}
+
+function renderVerseTokens(tokens: VerseToken[], isStudyMode: boolean) {
+  return tokens.map((token, tokenIndex) => {
+    const leadingSpace = tokenIndex > 0 && !isPunctuationToken(token.text)
+
+    return (
+      <Fragment key={`${token.text}-${tokenIndex}`}>
+        {leadingSpace ? " " : null}
+        {renderToken(token, isStudyMode)}
+      </Fragment>
+    )
+  })
 }
 
 function parseBooks(input: unknown): Book[] | null {
@@ -62,6 +133,25 @@ export function KJVReader() {
   const [chapterIndex, setChapterIndex] = useState(0)
   const [isLoaded, setIsLoaded] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [isStudyMode, setIsStudyMode] = useState(true)
+  const [theme, setTheme] = useState<"light" | "dark">("light")
+
+  useEffect(() => {
+    const storedTheme = window.localStorage.getItem("theme")
+    if (storedTheme === "dark" || storedTheme === "light") {
+      setTheme(storedTheme)
+      return
+    }
+
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setTheme("dark")
+    }
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark")
+    window.localStorage.setItem("theme", theme)
+  }, [theme])
 
   useEffect(() => {
     let cancelled = false
@@ -191,7 +281,7 @@ export function KJVReader() {
         <CardHeader>
           <CardTitle className="text-xl">KJV Only</CardTitle>
           <CardDescription>
-            Basic offline-first reader scaffold with red letters and Strong&apos;s tagging.
+            Offline-first KJV reader with red letters, study tools, and read mode.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -242,7 +332,10 @@ export function KJVReader() {
               <SelectContent>
                 <SelectGroup>
                   {book.chapters.map((chapterItem) => (
-                    <SelectItem key={`${book.name}-${chapterItem.chapter}`} value={String(chapterItem.chapter)}>
+                    <SelectItem
+                      key={`${book.name}-${chapterItem.chapter}`}
+                      value={String(chapterItem.chapter)}
+                    >
                       Chapter {chapterItem.chapter}
                     </SelectItem>
                   ))}
@@ -261,6 +354,27 @@ export function KJVReader() {
               <ChevronRightIcon />
             </Button>
           </div>
+
+          <div className="flex flex-wrap items-center gap-6">
+            <div className="flex items-center gap-2">
+              <Switch
+                id="study-mode"
+                checked={isStudyMode}
+                onCheckedChange={(checked) => setIsStudyMode(checked)}
+              />
+              <Label htmlFor="study-mode">Study Mode</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="theme-mode"
+                checked={theme === "dark"}
+                onCheckedChange={(checked) =>
+                  setTheme(checked ? "dark" : "light")
+                }
+              />
+              <Label htmlFor="theme-mode">Dark Mode</Label>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -270,17 +384,25 @@ export function KJVReader() {
             {book.name} {chapter.chapter}
           </CardTitle>
           <CardDescription>
-            Red text marks Jesus&apos; words. Superscript tags show Strong&apos;s numbers.
+            {isStudyMode
+              ? "Red text marks Jesus' words. Click marked words for study details."
+              : "Read mode: plain flowing text with paragraph indentation."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           {chapter.verses.map((verse) => (
             <article key={`${book.name}-${chapter.chapter}-${verse.verse}`}>
-              <p className={verse.redLetter ? "text-pretty leading-7 text-red-700" : "text-pretty leading-7"}>
+              <p
+                className={cn(
+                  "text-pretty leading-7",
+                  verse.redLetter && "text-red-700",
+                  !isStudyMode && verse.paragraphStart && "pl-4 sm:pl-6"
+                )}
+              >
                 <span className="mr-2 align-top text-xs font-semibold text-muted-foreground">
                   {verse.verse}
                 </span>
-                {verse.tokens.map(renderToken)}
+                {renderVerseTokens(verse.tokens, isStudyMode)}
               </p>
             </article>
           ))}

@@ -164,6 +164,10 @@ BOOK_INDEX = {code: i + 1 for i, code in enumerate(BOOK_ORDER)}
 class Token:
     text: str
     strong: str | None
+    lemma: str | None
+    morph: str | None
+    added: bool
+    divine_name: bool
     red_letter: bool
 
 
@@ -191,6 +195,49 @@ def extract_strong(value: str | None) -> str | None:
     return strong
 
 
+def normalize_ref_value(value: str | None) -> str | None:
+    if not value:
+        return None
+    return " ".join(value.split())
+
+
+def flatten_text(elem: ET.Element) -> str:
+    parts: list[str] = []
+    if elem.text:
+        parts.append(elem.text)
+
+    for child in list(elem):
+        parts.append(flatten_text(child))
+        if child.tail:
+            parts.append(child.tail)
+
+    return " ".join(" ".join(parts).split())
+
+
+def parse_note(note_elem: ET.Element) -> dict[str, Any]:
+    note_type = note_elem.attrib.get("type") or "unknown"
+    catch_word: str | None = None
+    readings: list[dict[str, str]] = []
+
+    for child in note_elem.iter():
+        tag = local_tag(child.tag)
+        if tag == "catchWord" and not catch_word:
+            catch_word = normalize_ref_value(child.text)
+        if tag == "rdg":
+            rdg_type = child.attrib.get("type") or "unspecified"
+            rdg_text = normalize_ref_value(flatten_text(child))
+            if rdg_text:
+                readings.append({"type": rdg_type, "text": rdg_text})
+
+    note_text = normalize_ref_value(flatten_text(note_elem)) or ""
+    payload: dict[str, Any] = {"type": note_type, "text": note_text}
+    if catch_word:
+        payload["catchWord"] = catch_word
+    if readings:
+        payload["readings"] = readings
+    return payload
+
+
 def is_red_quote(elem: ET.Element) -> bool:
     if local_tag(elem.tag) != "q":
         return False
@@ -198,14 +245,32 @@ def is_red_quote(elem: ET.Element) -> bool:
     return "jesus" in who or "christ" in who or "messiah" in who
 
 
-def tokenize(text: str | None, strong: str | None, red_letter: bool) -> list[Token]:
+def tokenize(
+    text: str | None,
+    strong: str | None,
+    lemma: str | None,
+    morph: str | None,
+    added: bool,
+    divine_name: bool,
+    red_letter: bool,
+) -> list[Token]:
     if not text:
         return []
     tokens: list[Token] = []
     for part in re.split(r"\s+", text.strip()):
         if not part:
             continue
-        tokens.append(Token(text=part, strong=strong, red_letter=red_letter))
+        tokens.append(
+            Token(
+                text=part,
+                strong=strong,
+                lemma=lemma,
+                morph=morph,
+                added=added,
+                divine_name=divine_name,
+                red_letter=red_letter,
+            )
+        )
     return tokens
 
 
@@ -220,27 +285,71 @@ def parse_osis_ref(osis_id: str) -> tuple[str, int, int] | None:
     return parts[0], chapter_num, verse_num
 
 
-SKIP_TAGS = {"note", "header"}
+SKIP_TAGS = {"header"}
 
 
 def collect_chapter_tokens(
     chapter_elem: ET.Element, osis_book: str, chapter_num: int
-) -> dict[int, list[Token]]:
-    verses: dict[int, list[Token]] = {}
-    state = {"current_verse": None}
+) -> dict[int, dict[str, Any]]:
+    verses: dict[int, dict[str, Any]] = {}
+    state = {"current_verse": None, "pending_paragraph_marker": None}
 
-    def push_text(text: str | None, strong: str | None, red: bool) -> None:
+    def ensure_verse(verse_num: int) -> dict[str, Any]:
+        if verse_num not in verses:
+            verses[verse_num] = {
+                "tokens": [],
+                "notes": [],
+                "paragraphStart": False,
+                "paragraphMarker": None,
+            }
+        return verses[verse_num]
+
+    def push_text(
+        text: str | None,
+        strong: str | None,
+        lemma: str | None,
+        morph: str | None,
+        added: bool,
+        divine_name: bool,
+        red: bool,
+    ) -> None:
         current_verse = state["current_verse"]
         if current_verse is None:
             return
-        for token in tokenize(text, strong, red):
-            verses.setdefault(current_verse, []).append(token)
+        verse_data = ensure_verse(current_verse)
+        for token in tokenize(text, strong, lemma, morph, added, divine_name, red):
+            verse_data["tokens"].append(token)
 
-    def visit(elem: ET.Element, red_context: bool, strong_hint: str | None) -> None:
+    def visit(
+        elem: ET.Element,
+        red_context: bool,
+        strong_hint: str | None,
+        lemma_hint: str | None,
+        morph_hint: str | None,
+        added_context: bool,
+        divine_context: bool,
+    ) -> None:
         tag = local_tag(elem.tag)
 
         if tag in SKIP_TAGS:
             return
+
+        if tag == "note":
+            current_verse = state["current_verse"]
+            if current_verse is not None:
+                verse_data = ensure_verse(current_verse)
+                verse_data["notes"].append(parse_note(elem))
+            return
+
+        if tag == "milestone" and (elem.attrib.get("type") or "") == "x-p":
+            marker = normalize_ref_value(elem.attrib.get("marker")) or "¶"
+            current_verse = state["current_verse"]
+            if current_verse is None:
+                state["pending_paragraph_marker"] = marker
+            else:
+                verse_data = ensure_verse(current_verse)
+                verse_data["paragraphStart"] = True
+                verse_data["paragraphMarker"] = marker
 
         container_verse = False
         restore_verse = None
@@ -259,6 +368,12 @@ def collect_chapter_tokens(
                     if parsed_book == osis_book and parsed_chapter == chapter_num:
                         restore_verse = state["current_verse"]
                         state["current_verse"] = parsed_verse
+                        verse_data = ensure_verse(parsed_verse)
+                        pending_marker = state["pending_paragraph_marker"]
+                        if pending_marker:
+                            verse_data["paragraphStart"] = True
+                            verse_data["paragraphMarker"] = pending_marker
+                            state["pending_paragraph_marker"] = None
                         has_sid = "sID" in elem.attrib
                         has_direct_text = bool(elem.text and elem.text.strip())
                         has_children = len(list(elem)) > 0
@@ -267,20 +382,53 @@ def collect_chapter_tokens(
 
         current_red = red_context or is_red_quote(elem)
         current_strong = strong_hint
+        current_lemma = lemma_hint
+        current_morph = morph_hint
+        current_added = added_context
+        current_divine = divine_context or tag == "divineName"
 
         if tag == "w":
-            current_strong = extract_strong(elem.attrib.get("lemma"))
+            lemma_value = normalize_ref_value(elem.attrib.get("lemma"))
+            current_lemma = lemma_value
+            current_strong = extract_strong(lemma_value)
+            current_morph = normalize_ref_value(elem.attrib.get("morph"))
+        elif tag == "transChange" and (elem.attrib.get("type") or "").lower() == "added":
+            current_added = True
 
-        push_text(elem.text, current_strong, current_red)
+        push_text(
+            elem.text,
+            current_strong,
+            current_lemma,
+            current_morph,
+            current_added,
+            current_divine,
+            current_red,
+        )
 
         for child in list(elem):
-            visit(child, current_red, current_strong)
-            push_text(child.tail, current_strong, current_red)
+            visit(
+                child,
+                current_red,
+                current_strong,
+                current_lemma,
+                current_morph,
+                current_added,
+                current_divine,
+            )
+            push_text(
+                child.tail,
+                current_strong,
+                current_lemma,
+                current_morph,
+                current_added,
+                current_divine,
+                current_red,
+            )
 
         if container_verse:
             state["current_verse"] = restore_verse
 
-    visit(chapter_elem, False, None)
+    visit(chapter_elem, False, None, None, None, False, False)
     return verses
 
 
@@ -317,15 +465,26 @@ def parse_osis(input_path: Path) -> list[dict[str, Any]]:
             verses_by_number: dict[int, dict[str, Any]] = {}
             chapter_tokens = collect_chapter_tokens(chapter, osis_book, chapter_num)
 
-            for verse_num, tokens in chapter_tokens.items():
+            for verse_num, verse_data in chapter_tokens.items():
+                tokens = verse_data["tokens"]
                 if not tokens:
                     continue
                 red_letter = any(token.red_letter for token in tokens)
                 verses_by_number[verse_num] = {
                     "verse": verse_num,
                     "redLetter": red_letter,
+                    "paragraphStart": bool(verse_data["paragraphStart"]),
+                    "paragraphMarker": verse_data["paragraphMarker"],
+                    "notes": verse_data["notes"],
                     "tokens": [
-                        {"text": token.text, **({"strong": token.strong} if token.strong else {})}
+                        {
+                            "text": token.text,
+                            **({"strong": token.strong} if token.strong else {}),
+                            **({"lemma": token.lemma} if token.lemma else {}),
+                            **({"morph": token.morph} if token.morph else {}),
+                            **({"added": True} if token.added else {}),
+                            **({"divineName": True} if token.divine_name else {}),
+                        }
                         for token in tokens
                     ],
                     "text": " ".join(token.text for token in tokens),
@@ -333,6 +492,10 @@ def parse_osis(input_path: Path) -> list[dict[str, Any]]:
                         {
                             "text": token.text,
                             "strong": token.strong,
+                            "lemma": token.lemma,
+                            "morph": token.morph,
+                            "added": token.added,
+                            "divineName": token.divine_name,
                             "redLetter": token.red_letter,
                         }
                         for token in tokens
@@ -371,6 +534,7 @@ def write_sqlite(db_path: Path, books: list[dict[str, Any]]) -> None:
     conn.executescript(
         """
         DROP TABLE IF EXISTS verse_fts;
+        DROP TABLE IF EXISTS verse_notes;
         DROP TABLE IF EXISTS tokens;
         DROP TABLE IF EXISTS verses;
         DROP TABLE IF EXISTS chapters;
@@ -396,6 +560,8 @@ def write_sqlite(db_path: Path, books: list[dict[str, Any]]) -> None:
           chapter_id INTEGER NOT NULL REFERENCES chapters(id) ON DELETE CASCADE,
           verse_num INTEGER NOT NULL,
           text TEXT NOT NULL,
+          paragraph_start INTEGER NOT NULL DEFAULT 0,
+          paragraph_marker TEXT,
           red_letter INTEGER NOT NULL DEFAULT 0,
           UNIQUE(chapter_id, verse_num)
         );
@@ -406,7 +572,21 @@ def write_sqlite(db_path: Path, books: list[dict[str, Any]]) -> None:
           token_index INTEGER NOT NULL,
           token_text TEXT NOT NULL,
           strong TEXT,
+          lemma TEXT,
+          morph TEXT,
+          added INTEGER NOT NULL DEFAULT 0,
+          divine_name INTEGER NOT NULL DEFAULT 0,
           red_letter INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE verse_notes (
+          id INTEGER PRIMARY KEY,
+          verse_id INTEGER NOT NULL REFERENCES verses(id) ON DELETE CASCADE,
+          note_index INTEGER NOT NULL,
+          note_type TEXT NOT NULL,
+          catch_word TEXT,
+          note_text TEXT NOT NULL,
+          readings_json TEXT
         );
 
         CREATE VIRTUAL TABLE verse_fts USING fts5(
@@ -419,6 +599,8 @@ def write_sqlite(db_path: Path, books: list[dict[str, Any]]) -> None:
         CREATE INDEX idx_verses_chapter_verse ON verses(chapter_id, verse_num);
         CREATE INDEX idx_tokens_verse_token ON tokens(verse_id, token_index);
         CREATE INDEX idx_tokens_strong ON tokens(strong);
+        CREATE INDEX idx_tokens_divine_name ON tokens(divine_name);
+        CREATE INDEX idx_notes_verse ON verse_notes(verse_id, note_index);
         """
     )
 
@@ -438,11 +620,23 @@ def write_sqlite(db_path: Path, books: list[dict[str, Any]]) -> None:
 
             for verse in chapter["verses"]:
                 verse_cur = conn.execute(
-                    "INSERT INTO verses (chapter_id, verse_num, text, red_letter) VALUES (?, ?, ?, ?)",
+                    """
+                    INSERT INTO verses (
+                      chapter_id,
+                      verse_num,
+                      text,
+                      paragraph_start,
+                      paragraph_marker,
+                      red_letter
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
                     (
                         chapter_id,
                         verse["verse"],
                         verse["text"],
+                        1 if verse.get("paragraphStart") else 0,
+                        verse.get("paragraphMarker"),
                         1 if verse["redLetter"] else 0,
                     ),
                 )
@@ -457,15 +651,52 @@ def write_sqlite(db_path: Path, books: list[dict[str, Any]]) -> None:
                 for token_idx, token in enumerate(verse["tokenRows"]):
                     conn.execute(
                         """
-                        INSERT INTO tokens (verse_id, token_index, token_text, strong, red_letter)
-                        VALUES (?, ?, ?, ?, ?)
+                        INSERT INTO tokens (
+                          verse_id,
+                          token_index,
+                          token_text,
+                          strong,
+                          lemma,
+                          morph,
+                          added,
+                          divine_name,
+                          red_letter
+                        )
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
                         (
                             verse_id,
                             token_idx,
                             token["text"],
                             token["strong"],
+                            token["lemma"],
+                            token["morph"],
+                            1 if token["added"] else 0,
+                            1 if token["divineName"] else 0,
                             1 if token["redLetter"] else 0,
+                        ),
+                    )
+
+                for note_idx, note in enumerate(verse.get("notes", [])):
+                    conn.execute(
+                        """
+                        INSERT INTO verse_notes (
+                          verse_id,
+                          note_index,
+                          note_type,
+                          catch_word,
+                          note_text,
+                          readings_json
+                        )
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            verse_id,
+                            note_idx,
+                            note.get("type", "unknown"),
+                            note.get("catchWord"),
+                            note.get("text", ""),
+                            json.dumps(note.get("readings", []), ensure_ascii=True),
                         ),
                     )
 
@@ -488,6 +719,13 @@ def write_reader_json(json_path: Path, books: list[dict[str, Any]], source: str)
                             {
                                 "verse": verse["verse"],
                                 "redLetter": verse["redLetter"],
+                                "paragraphStart": verse.get("paragraphStart", False),
+                                **(
+                                    {"paragraphMarker": verse["paragraphMarker"]}
+                                    if verse.get("paragraphMarker")
+                                    else {}
+                                ),
+                                **({"notes": verse["notes"]} if verse.get("notes") else {}),
                                 "tokens": verse["tokens"],
                             }
                             for verse in chapter["verses"]
