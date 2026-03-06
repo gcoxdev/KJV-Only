@@ -44,12 +44,27 @@ function isPunctuationToken(tokenText: string) {
   return /^[,.;:!?)]/.test(tokenText)
 }
 
+function formatDisplayTokenText(token: VerseToken) {
+  if (!token.divineName) {
+    return token.text
+  }
+
+  const possessiveMatch = token.text.match(/^(.+?)(['’])([sS])$/)
+  if (possessiveMatch) {
+    const [, base, apostrophe] = possessiveMatch
+    return `${base.toUpperCase()}${apostrophe}s`
+  }
+
+  return token.text.toUpperCase()
+}
+
 function renderToken(token: VerseToken, isStudyMode: boolean) {
   const tokenClassName = cn(token.added && "italic")
+  const displayText = formatDisplayTokenText(token)
   const showMetadata = isStudyMode && hasTokenMetadata(token)
 
   if (!showMetadata) {
-    return <span className={tokenClassName}>{token.text}</span>
+    return <span className={tokenClassName}>{displayText}</span>
   }
 
   return (
@@ -57,13 +72,13 @@ function renderToken(token: VerseToken, isStudyMode: boolean) {
       <PopoverTrigger
         render={<span />}
         className="cursor-pointer rounded-sm px-0.5 py-0.5 underline decoration-dotted underline-offset-3 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring/60"
-        aria-label={`Details for ${token.text}`}
+        aria-label={`Details for ${displayText}`}
       >
-        <span className={tokenClassName}>{token.text}</span>
+        <span className={tokenClassName}>{displayText}</span>
       </PopoverTrigger>
       <PopoverContent align="start">
         <div className="space-y-2 text-sm">
-          <p className="font-medium">{token.text}</p>
+          <p className="font-medium">{displayText}</p>
           {token.added ? (
             <p className="text-xs text-muted-foreground">
               Added word (italic in KJV typography)
