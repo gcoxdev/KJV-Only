@@ -1,5 +1,11 @@
 import { Fragment, useEffect, useMemo, useState } from "react"
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
+import {
+  BookOpenIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  MenuIcon,
+  SettingsIcon,
+} from "lucide-react"
 
 import { type Book, type Chapter, type VerseToken } from "@/types/bible"
 import { cn } from "@/lib/utils"
@@ -7,11 +13,16 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Select,
   SelectContent,
@@ -25,6 +36,21 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
 import { Switch } from "@/components/ui/switch"
 
 type Reference = {
@@ -150,6 +176,8 @@ export function KJVReader() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [isStudyMode, setIsStudyMode] = useState(true)
   const [theme, setTheme] = useState<"light" | "dark">("light")
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false)
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme")
@@ -249,7 +277,7 @@ export function KJVReader() {
         <Card className="w-full max-w-xl">
           <CardHeader>
             <CardTitle className="text-xl">KJV Only</CardTitle>
-            <CardDescription>Loading Bible data...</CardDescription>
+            <p className="text-sm text-muted-foreground">Loading Bible data...</p>
           </CardHeader>
         </Card>
       </main>
@@ -262,9 +290,9 @@ export function KJVReader() {
         <Card className="w-full max-w-xl">
           <CardHeader>
             <CardTitle className="text-xl">KJV Only</CardTitle>
-            <CardDescription>
+            <p className="text-sm text-muted-foreground">
               {loadError ?? "No Bible data available. Run npm run build:data."}
-            </CardDescription>
+            </p>
           </CardHeader>
         </Card>
       </main>
@@ -291,138 +319,187 @@ export function KJVReader() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">KJV Only</CardTitle>
-          <CardDescription>
-            Offline-first KJV reader with red letters, study tools, and read mode.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Select
-              items={books.map((bookItem) => ({ label: bookItem.name, value: bookItem.name }))}
-              value={book.name}
-              onValueChange={(value) => {
-                const nextBookIndex = books.findIndex((bookItem) => bookItem.name === value)
-                if (nextBookIndex >= 0) {
-                  setBookIndex(nextBookIndex)
-                  setChapterIndex(0)
-                }
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {books.map((bookItem) => (
-                    <SelectItem key={bookItem.name} value={bookItem.name}>
-                      {bookItem.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-
-            <Select
-              items={book.chapters.map((chapterItem) => ({
-                label: `Chapter ${chapterItem.chapter}`,
-                value: String(chapterItem.chapter),
-              }))}
-              value={String(chapter.chapter)}
-              onValueChange={(value) => {
-                const nextChapterIndex = book.chapters.findIndex(
-                  (chapterItem) => String(chapterItem.chapter) === value
-                )
-                if (nextChapterIndex >= 0) {
-                  setChapterIndex(nextChapterIndex)
-                }
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {book.chapters.map((chapterItem) => (
-                    <SelectItem
-                      key={`${book.name}-${chapterItem.chapter}`}
-                      value={String(chapterItem.chapter)}
-                    >
-                      Chapter {chapterItem.chapter}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={goToPrevChapter} disabled={!hasPrev}>
-              <ChevronLeftIcon />
-              Previous Chapter
-            </Button>
-            <Button variant="outline" onClick={goToNextChapter} disabled={!hasNext}>
-              Next Chapter
-              <ChevronRightIcon />
-            </Button>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-6">
+    <main className="min-h-screen w-full bg-background">
+      <SidebarProvider open={isRightSidebarOpen} onOpenChange={setIsRightSidebarOpen}>
+        <SidebarInset className="min-h-screen">
+          <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-6">
             <div className="flex items-center gap-2">
-              <Switch
-                id="study-mode"
-                checked={isStudyMode}
-                onCheckedChange={(checked) => setIsStudyMode(checked)}
-              />
-              <Label htmlFor="study-mode">Study Mode</Label>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={<Button variant="ghost" size="icon" aria-label="Open menu" />}
+                >
+                  <MenuIcon />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem onClick={() => setIsSettingsOpen(true)}>
+                    <SettingsIcon />
+                    Settings
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <div className="flex items-center gap-2">
+                <BookOpenIcon className="text-primary" />
+                <p className="font-semibold">KJV Only</p>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Switch
-                id="theme-mode"
-                checked={theme === "dark"}
-                onCheckedChange={(checked) =>
-                  setTheme(checked ? "dark" : "light")
-                }
-              />
-              <Label htmlFor="theme-mode">Dark Mode</Label>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {book.name} {chapter.chapter}
-          </CardTitle>
-          <CardDescription>
-            {isStudyMode
-              ? "Red text marks Jesus' words. Click marked words for study details."
-              : "Read mode: plain flowing text with paragraph indentation."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          {chapter.verses.map((verse) => (
-            <article key={`${book.name}-${chapter.chapter}-${verse.verse}`}>
-              <p
-                className={cn(
-                  "text-pretty leading-7",
-                  verse.redLetter && "text-red-700",
-                  !isStudyMode && verse.paragraphStart && "pl-4 sm:pl-6"
-                )}
-              >
-                <span className="mr-2 align-top text-xs font-semibold text-muted-foreground">
-                  {verse.verse}
-                </span>
-                {renderVerseTokens(verse.tokens, isStudyMode)}
-              </p>
-            </article>
-          ))}
-        </CardContent>
-      </Card>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="study-mode" className="text-sm">
+                  Study
+                </Label>
+                <Switch
+                  id="study-mode"
+                  checked={isStudyMode}
+                  onCheckedChange={(checked) => setIsStudyMode(checked)}
+                />
+              </div>
+              <SidebarTrigger side="right" />
+            </div>
+          </header>
+
+          <div className="space-y-6 p-4 sm:p-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">
+                {book.name} {chapter.chapter}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Select
+                  items={books.map((bookItem) => ({
+                    label: bookItem.name,
+                    value: bookItem.name,
+                  }))}
+                  value={book.name}
+                  onValueChange={(value) => {
+                    const nextBookIndex = books.findIndex(
+                      (bookItem) => bookItem.name === value
+                    )
+                    if (nextBookIndex >= 0) {
+                      setBookIndex(nextBookIndex)
+                      setChapterIndex(0)
+                    }
+                  }}
+                >
+                  <SelectTrigger className="min-w-40 sm:min-w-52">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {books.map((bookItem) => (
+                        <SelectItem key={bookItem.name} value={bookItem.name}>
+                          {bookItem.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  items={book.chapters.map((chapterItem) => ({
+                    label: `Chapter ${chapterItem.chapter}`,
+                    value: String(chapterItem.chapter),
+                  }))}
+                  value={String(chapter.chapter)}
+                  onValueChange={(value) => {
+                    const nextChapterIndex = book.chapters.findIndex(
+                      (chapterItem) => String(chapterItem.chapter) === value
+                    )
+                    if (nextChapterIndex >= 0) {
+                      setChapterIndex(nextChapterIndex)
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-36">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {book.chapters.map((chapterItem) => (
+                        <SelectItem
+                          key={`${book.name}-${chapterItem.chapter}`}
+                          value={String(chapterItem.chapter)}
+                        >
+                          Chapter {chapterItem.chapter}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+
+                <Button variant="outline" onClick={goToPrevChapter} disabled={!hasPrev}>
+                  <ChevronLeftIcon />
+                  Prev
+                </Button>
+                <Button variant="outline" onClick={goToNextChapter} disabled={!hasNext}>
+                  Next
+                  <ChevronRightIcon />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="space-y-5 pt-6">
+              {chapter.verses.map((verse) => (
+                <article key={`${book.name}-${chapter.chapter}-${verse.verse}`}>
+                  <p
+                    className={cn(
+                      "text-pretty leading-7",
+                      verse.redLetter && "text-red-700",
+                      !isStudyMode && verse.paragraphStart && "pl-4 sm:pl-6"
+                    )}
+                  >
+                    <span className="mr-2 align-top text-xs font-semibold text-muted-foreground">
+                      {verse.verse}
+                    </span>
+                    {renderVerseTokens(verse.tokens, isStudyMode)}
+                  </p>
+                </article>
+              ))}
+            </CardContent>
+          </Card>
+          </div>
+        </SidebarInset>
+
+        <Sidebar side="right" className="min-h-screen">
+          <SidebarHeader>
+            <h2 className="text-base font-semibold">Sidebar</h2>
+            <p className="text-sm text-muted-foreground">
+              Placeholder for future tools.
+            </p>
+          </SidebarHeader>
+          <SidebarContent className="text-muted-foreground">
+            This right sidebar is ready for study tools, notes, and references.
+          </SidebarContent>
+        </Sidebar>
+      </SidebarProvider>
+
+      <AlertDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Settings</AlertDialogTitle>
+            <AlertDialogDescription>
+              Reader preferences for this device.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex items-center justify-between gap-3">
+            <Label htmlFor="theme-mode">Dark Mode</Label>
+            <Switch
+              id="theme-mode"
+              checked={theme === "dark"}
+              onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+            />
+          </div>
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={() => setIsSettingsOpen(false)}>
+              Close
+            </Button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   )
 }
