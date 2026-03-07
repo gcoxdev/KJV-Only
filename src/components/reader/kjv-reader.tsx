@@ -821,7 +821,10 @@ export function KJVReader() {
         <CardContent className="min-h-0 flex-1 overflow-auto p-3 sm:p-4">
           <div className="space-y-5">
             {chapter.verses.map((verse) => (
-              <article key={`${book.name}-${chapter.chapter}-${verse.verse}`}>
+              <article
+                key={`${book.name}-${chapter.chapter}-${verse.verse}`}
+                className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
+              >
                 <p
                   className={cn(
                     "text-pretty leading-7",
@@ -879,17 +882,23 @@ export function KJVReader() {
     return (
       <ResizablePanelGroup
         orientation={node.orientation}
+        onLayoutChanged={(layout) => {
+          const nextSize = layout[`${node.id}-first`]
+          if (typeof nextSize === "number") {
+            updateSplitSize(node.id, nextSize)
+          }
+        }}
         className="min-h-0 min-w-0 flex-1"
       >
         <ResizablePanel
+          id={`${node.id}-first`}
           defaultSize={node.ratio}
           minSize={15}
-          onResize={(size) => updateSplitSize(node.id, size.asPercentage)}
         >
           {renderNode(node.first)}
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={100 - node.ratio} minSize={15}>
+        <ResizablePanel id={`${node.id}-second`} defaultSize={100 - node.ratio} minSize={15}>
           {renderNode(node.second)}
         </ResizablePanel>
       </ResizablePanelGroup>
@@ -989,7 +998,8 @@ export function KJVReader() {
                       onClick={() => setActiveTabId(tab.id)}
                       className={cn(
                         "min-w-24 justify-start",
-                        active && "bg-accent text-accent-foreground",
+                        active &&
+                          "!border-foreground !bg-foreground !text-background hover:!bg-foreground/90 hover:!text-background",
                       )}
                     >
                       {tab.title}
@@ -1001,7 +1011,8 @@ export function KJVReader() {
                             variant="outline"
                             size="icon-sm"
                             className={cn(
-                              active && "bg-accent text-accent-foreground",
+                              active &&
+                                "!border-foreground !bg-foreground !text-background hover:!bg-foreground/90 hover:!text-background",
                             )}
                             aria-label={`Tab options for ${tab.title}`}
                           >
