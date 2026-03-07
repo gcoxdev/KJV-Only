@@ -127,3 +127,20 @@
     @apply font-sans;
     }
 }
+
+/* Base UI scroll area visibility: hidden when idle, visible on hover/scroll/drag */
+[data-slot="scroll-area-scrollbar"] {
+    opacity: 0;
+    transition: opacity 180ms ease;
+}
+
+[data-slot="scroll-area-scrollbar"][data-hovering],
+[data-slot="scroll-area-scrollbar"][data-scrolling],
+[data-slot="scroll-area-scrollbar"][data-dragging] {
+    opacity: 1;
+}
+
+
+.tab-strip-scroll-active::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklch, var(--muted-foreground) 45%, transparent);
+}

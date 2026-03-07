@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   BookOpenIcon,
   ChevronLeftIcon,
@@ -61,6 +61,10 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import {
+  ScrollArea,
+  ScrollBar,
+} from "@/components/ui/scroll-area";
 
 type ReaderPayload = {
   books?: Book[];
@@ -371,6 +375,7 @@ export function KJVReader() {
   const [renameTabId, setRenameTabId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [fullscreenLeafId, setFullscreenLeafId] = useState<string | null>(null);
+  const tabEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -589,6 +594,13 @@ export function KJVReader() {
     const nextTab = createInitialTab(tabs.length + 1);
     setTabs((currentTabs) => [...currentTabs, nextTab]);
     setActiveTabId(nextTab.id);
+    requestAnimationFrame(() => {
+      tabEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "end",
+      });
+    });
   }
 
   function closeTab(tabId: string) {
@@ -818,33 +830,35 @@ export function KJVReader() {
           </div>
         </CardHeader>
 
-        <CardContent className="min-h-0 flex-1 overflow-auto p-3 sm:p-4">
-          <div className="space-y-5">
-            {chapter.verses.map((verse) => (
-              <article
-                key={`${book.name}-${chapter.chapter}-${verse.verse}`}
-                className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
-              >
-                <p
-                  className={cn(
-                    "text-pretty leading-7",
-                    verse.redLetter && "text-red-700",
-                    !isStudyMode && verse.paragraphStart && "pl-4 sm:pl-6",
-                  )}
+        <CardContent className="min-h-0 flex-1 p-0">
+          <ScrollArea className="h-full">
+            <div className="space-y-5 p-3 sm:p-4">
+              {chapter.verses.map((verse) => (
+                <article
+                  key={`${book.name}-${chapter.chapter}-${verse.verse}`}
+                  className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
                 >
-                  <span className="mr-2 align-top text-xs font-semibold text-muted-foreground">
-                    {verse.verse}
-                  </span>
-                  {renderVerseTokens(
-                    verse.tokens,
-                    isStudyMode,
-                    (element, token) =>
-                      openTokenDetailsFromElement(element, token),
-                  )}
-                </p>
-              </article>
-            ))}
-          </div>
+                  <p
+                    className={cn(
+                      "text-pretty leading-7",
+                      verse.redLetter && "text-red-700",
+                      !isStudyMode && verse.paragraphStart && "pl-4 sm:pl-6",
+                    )}
+                  >
+                    <span className="mr-2 align-top text-xs font-semibold text-muted-foreground">
+                      {verse.verse}
+                    </span>
+                    {renderVerseTokens(
+                      verse.tokens,
+                      isStudyMode,
+                      (element, token) =>
+                        openTokenDetailsFromElement(element, token),
+                    )}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </ScrollArea>
         </CardContent>
 
         <div className="flex items-center justify-between border-t p-2">
@@ -985,89 +999,98 @@ export function KJVReader() {
           </header>
 
           <div className="shrink-0 border-b px-4 py-2 sm:px-6">
-            <div className="flex items-center gap-2 overflow-x-auto">
-              {tabs.map((tab, index) => {
-                const active = tab.id === activeTabId;
-                const canMoveLeft = tabs.length > 1 && index > 0;
-                const canMoveRight = tabs.length > 1 && index < tabs.length - 1;
-                return (
-                  <ButtonGroup key={tab.id}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setActiveTabId(tab.id)}
-                      className={cn(
-                        "min-w-24 justify-start",
-                        active &&
-                          "!border-foreground !bg-foreground !text-background hover:!bg-foreground/90 hover:!text-background",
-                      )}
-                    >
-                      {tab.title}
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        render={
-                          <Button
-                            variant="outline"
-                            size="icon-sm"
-                            className={cn(
-                              active &&
-                                "!border-foreground !bg-foreground !text-background hover:!bg-foreground/90 hover:!text-background",
-                            )}
-                            aria-label={`Tab options for ${tab.title}`}
-                          >
-                            <EllipsisIcon />
-                          </Button>
-                        }
-                      />
-                      <DropdownMenuContent align="start" className="w-40">
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem
-                            onClick={() => openRenameDialog(tab.id)}
-                          >
-                            Rename Tab
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        {tabs.length > 1 ? (
-                          <>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
-                              {canMoveLeft ? (
+            <ScrollArea className="w-full">
+              <div className="flex w-max items-center gap-2 px-1 py-1">
+                {tabs.map((tab, index) => {
+                  const active = tab.id === activeTabId;
+                  const canMoveLeft = tabs.length > 1 && index > 0;
+                  const canMoveRight =
+                    tabs.length > 1 && index < tabs.length - 1;
+                  return (
+                    <ButtonGroup key={tab.id}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setActiveTabId(tab.id)}
+                        className={cn(
+                          "min-w-24 justify-start",
+                          active &&
+                            "!border-foreground !bg-foreground !text-background hover:!bg-foreground/90 hover:!text-background",
+                        )}
+                      >
+                        {tab.title}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="outline"
+                              size="icon-sm"
+                              className={cn(
+                                active &&
+                                  "!border-foreground !bg-foreground !text-background hover:!bg-foreground/90 hover:!text-background",
+                              )}
+                              aria-label={`Tab options for ${tab.title}`}
+                            >
+                              <EllipsisIcon />
+                            </Button>
+                          }
+                        />
+                        <DropdownMenuContent align="start" className="w-40">
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              onClick={() => openRenameDialog(tab.id)}
+                            >
+                              Rename Tab
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                          {tabs.length > 1 ? (
+                            <>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuGroup>
+                                {canMoveLeft ? (
+                                  <DropdownMenuItem
+                                    onClick={() => moveTab(tab.id, -1)}
+                                  >
+                                    Move Left
+                                  </DropdownMenuItem>
+                                ) : null}
+                                {canMoveRight ? (
+                                  <DropdownMenuItem
+                                    onClick={() => moveTab(tab.id, 1)}
+                                  >
+                                    Move Right
+                                  </DropdownMenuItem>
+                                ) : null}
+                              </DropdownMenuGroup>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuGroup>
                                 <DropdownMenuItem
-                                  onClick={() => moveTab(tab.id, -1)}
+                                  onClick={() => closeTab(tab.id)}
                                 >
-                                  Move Left
+                                  Close Tab
                                 </DropdownMenuItem>
-                              ) : null}
-                              {canMoveRight ? (
-                                <DropdownMenuItem
-                                  onClick={() => moveTab(tab.id, 1)}
-                                >
-                                  Move Right
-                                </DropdownMenuItem>
-                              ) : null}
-                            </DropdownMenuGroup>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
-                              <DropdownMenuItem
-                                onClick={() => closeTab(tab.id)}
-                              >
-                                Close Tab
-                              </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                          </>
-                        ) : null}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </ButtonGroup>
-                );
-              })}
+                              </DropdownMenuGroup>
+                            </>
+                          ) : null}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </ButtonGroup>
+                  );
+                })}
 
-              <Button variant="outline" size="sm" onClick={addTab}>
-                <PlusIcon />
-                New Tab
-              </Button>
-            </div>
+                <Button
+                  variant="outline"
+                  size="icon-sm"
+                  onClick={addTab}
+                  aria-label="New Tab"
+                >
+                  <PlusIcon />
+                </Button>
+                <div ref={tabEndRef} />
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           </div>
 
           <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
