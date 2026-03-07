@@ -395,6 +395,7 @@ export function KJVReader() {
   const [renameValue, setRenameValue] = useState("");
   const [fullscreenLeafId, setFullscreenLeafId] = useState<string | null>(null);
   const tabEndRef = useRef<HTMLDivElement>(null);
+  const panelElementRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -508,22 +509,18 @@ export function KJVReader() {
     () => tabs.find((tab) => tab.id === activeTabId) ?? null,
     [activeTabId, tabs],
   );
-  const fullscreenLeaf = useMemo(() => {
-    if (!activeTab || !fullscreenLeafId) {
-      return null;
-    }
-    return findLeafNode(activeTab.root, fullscreenLeafId);
-  }, [activeTab, fullscreenLeafId]);
-
   useEffect(() => {
-    if (!activeTab || !fullscreenLeafId) {
-      return;
+    function onFullscreenChange() {
+      const element = document.fullscreenElement as HTMLElement | null;
+      const leafId = element?.dataset.panelLeafId ?? null;
+      setFullscreenLeafId(leafId);
     }
 
-    if (!findLeafNode(activeTab.root, fullscreenLeafId)) {
-      setFullscreenLeafId(null);
-    }
-  }, [activeTab, fullscreenLeafId]);
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+    };
+  }, []);
 
   function chapterFromLeaf(leaf: LeafNode): Chapter | null {
     const book = books[leaf.bookIndex];
@@ -559,8 +556,8 @@ export function KJVReader() {
       const result = removeLeafNode(tab.root, leafId);
       return result.next ? { ...tab, root: result.next } : tab;
     });
-    if (fullscreenLeafId === leafId) {
-      setFullscreenLeafId(null);
+    if (fullscreenLeafId === leafId && document.fullscreenElement) {
+      void document.exitFullscreen();
     }
   }
 
@@ -723,8 +720,26 @@ function updateLeafLocation(
     setRenameTabId(null);
   }
 
-  function toggleFullscreenLeaf(leafId: string) {
-    setFullscreenLeafId((current) => (current === leafId ? null : leafId));
+  async function toggleFullscreenLeaf(leafId: string) {
+    const element = panelElementRefs.current[leafId];
+    if (!element) {
+      return;
+    }
+
+    try {
+      if (document.fullscreenElement === element) {
+        await document.exitFullscreen();
+        return;
+      }
+
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      }
+
+      await element.requestFullscreen();
+    } catch {
+      // Ignore fullscreen rejections (browser policy/user gesture edge cases).
+    }
   }
 
   function renderLeaf(leaf: LeafNode) {
@@ -741,7 +756,14 @@ function updateLeafLocation(
     const hasNext = refIndex >= 0 && refIndex < chapterRefs.length - 1;
 
     return (
-      <Card className="flex h-full min-h-0 flex-col rounded-none">
+      <div
+        data-panel-leaf-id={leaf.id}
+        ref={(element) => {
+          panelElementRefs.current[leaf.id] = element;
+        }}
+        className="h-full bg-background"
+      >
+        <Card className="flex h-full min-h-0 flex-col rounded-none">
         <CardHeader className="border-b p-2 sm:p-3">
           <div className="flex flex-wrap items-center gap-2">
             {leaf.view === "reader" && chapter ? (
@@ -828,6 +850,17 @@ function updateLeafLocation(
                 Panel
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => void toggleFullscreenLeaf(leaf.id)}>
+                  {fullscreenLeafId === leaf.id ? (
+                    <MinimizeIcon />
+                  ) : (
+                    <ExpandIcon />
+                  )}
+                  {fullscreenLeafId === leaf.id
+                    ? "Exit Full Screen"
+                    : "Full Screen"}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => splitLeaf(leaf.id, "left")}>
                   <SplitSquareHorizontalIcon />
                   Split Left
@@ -844,16 +877,7 @@ function updateLeafLocation(
                   <SplitSquareVerticalIcon className="rotate-180" />
                   Split Down
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => toggleFullscreenLeaf(leaf.id)}>
-                  {fullscreenLeafId === leaf.id ? (
-                    <MinimizeIcon />
-                  ) : (
-                    <ExpandIcon />
-                  )}
-                  {fullscreenLeafId === leaf.id
-                    ? "Exit Full Screen"
-                    : "Full Screen"}
-                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => closeLeaf(leaf.id)}>
                   <XIcon />
                   Close Panel
@@ -958,7 +982,8 @@ function updateLeafLocation(
             />
           </CardContent>
         )}
-      </Card>
+        </Card>
+      </div>
     );
   }
 
@@ -1168,9 +1193,7 @@ function updateLeafLocation(
           </div>
 
           <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
-            {fullscreenLeaf
-              ? renderLeaf(fullscreenLeaf)
-              : renderNode(activeTab.root)}
+            {renderNode(activeTab.root)}
           </div>
         </SidebarInset>
 
