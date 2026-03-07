@@ -14,6 +14,7 @@ import {
   MinimizeIcon,
   MenuIcon,
   PlusIcon,
+  RotateCwIcon,
   SettingsIcon,
   SquareChevronDownIcon,
   SquareChevronLeftIcon,
@@ -418,6 +419,32 @@ function updateSplitRatio(
   return node;
 }
 
+function updateSplitOrientation(
+  node: PanelNode,
+  splitId: string,
+  orientation: SplitOrientation,
+): PanelNode {
+  if (node.type === "leaf") {
+    return node;
+  }
+
+  if (node.id === splitId) {
+    return { ...node, orientation };
+  }
+
+  const nextFirst = updateSplitOrientation(node.first, splitId, orientation);
+  if (nextFirst !== node.first) {
+    return { ...node, first: nextFirst };
+  }
+
+  const nextSecond = updateSplitOrientation(node.second, splitId, orientation);
+  if (nextSecond !== node.second) {
+    return { ...node, second: nextSecond };
+  }
+
+  return node;
+}
+
 function countLeaves(node: PanelNode): number {
   if (node.type === "leaf") {
     return 1;
@@ -749,6 +776,16 @@ function findGroupTargetNodeId(
   return null;
 }
 
+function findParentSplitForLeaf(root: PanelNode, leafId: string): SplitNode | null {
+  const path = pathToLeaf(root, leafId);
+  if (!path || path.length < 2) {
+    return null;
+  }
+
+  const parent = path[path.length - 2];
+  return parent.type === "split" ? parent : null;
+}
+
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -779,6 +816,7 @@ export function KJVReader() {
   const addPreviewLeafIdsRef = useRef<string[]>([]);
   const addPreviewDirectionRef = useRef<PanelDirection | null>(null);
   const addPreviewIsGroupRef = useRef(false);
+  const orientationPreviewLeafIdsRef = useRef<string[]>([]);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -1182,9 +1220,24 @@ export function KJVReader() {
     addPreviewIsGroupRef.current = false;
   }
 
+  function clearOrientationPreview() {
+    const leafIds = orientationPreviewLeafIdsRef.current;
+    if (leafIds.length === 0) {
+      return;
+    }
+
+    for (const leafId of leafIds) {
+      const previewSurface = panelCardElement(leafId);
+      previewSurface?.classList.remove("panel-orientation-preview");
+    }
+
+    orientationPreviewLeafIdsRef.current = [];
+  }
+
   function clearAllPanelPreviews() {
     clearMovePreview();
     clearAddPreview();
+    clearOrientationPreview();
   }
 
   function applyAddPreview(
@@ -1218,17 +1271,20 @@ export function KJVReader() {
 
   function setMovePreviewTarget(leafId: string, direction: PanelDirection) {
     clearAddPreview();
+    clearOrientationPreview();
     const targetLeafId = neighborsForLeaf(leafId)[direction] ?? null;
     applyMovePreview(targetLeafId);
   }
 
   function setAddPreviewTarget(leafId: string, direction: PanelDirection) {
     clearMovePreview();
+    clearOrientationPreview();
     applyAddPreview([leafId], direction, false);
   }
 
   function setGroupAddPreviewTarget(leafId: string, direction: PanelDirection) {
     clearMovePreview();
+    clearOrientationPreview();
     if (!activeTab) {
       return;
     }
@@ -1278,6 +1334,27 @@ export function KJVReader() {
     applyAddPreview(edgeLeafIds, direction, true);
   }
 
+  function setOrientationPreviewTarget(leafId: string) {
+    clearMovePreview();
+    clearAddPreview();
+    clearOrientationPreview();
+    if (!activeTab) {
+      return;
+    }
+
+    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
+    if (!parentSplit) {
+      return;
+    }
+
+    const leafIds = collectLeafIds(parentSplit);
+    for (const id of leafIds) {
+      const previewSurface = panelCardElement(id);
+      previewSurface?.classList.add("panel-orientation-preview");
+    }
+    orientationPreviewLeafIdsRef.current = leafIds;
+  }
+
   function splitPanelGroup(leafId: string, direction: PanelDirection) {
     if (!activeTab) {
       return;
@@ -1292,6 +1369,25 @@ export function KJVReader() {
       const result = splitNodeById(tab.root, targetNodeId, direction);
       return result.changed ? { ...tab, root: result.next } : tab;
     });
+  }
+
+  function toggleParentGroupOrientation(leafId: string) {
+    if (!activeTab) {
+      return;
+    }
+
+    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
+    if (!parentSplit) {
+      return;
+    }
+
+    const nextOrientation: SplitOrientation =
+      parentSplit.orientation === "horizontal" ? "vertical" : "horizontal";
+
+    updateActiveTab((tab) => ({
+      ...tab,
+      root: updateSplitOrientation(tab.root, parentSplit.id, nextOrientation),
+    }));
   }
 
   function moveLeaf(leafId: string, direction: PanelDirection) {
@@ -1616,6 +1712,12 @@ function updateLeafLocation(
           down: findGroupTargetNodeId(activeTab.root, leaf.id, "down"),
         }
       : { left: null, right: null, up: null, down: null };
+    const parentSplit = activeTab ? findParentSplitForLeaf(activeTab.root, leaf.id) : null;
+    const nextOrientationLabel = parentSplit
+      ? parentSplit.orientation === "horizontal"
+        ? "Make Group Vertical"
+        : "Make Group Horizontal"
+      : null;
     const hasGroupAddOptions = Boolean(
       groupTargets.left ||
         groupTargets.right ||
@@ -1737,6 +1839,16 @@ function updateLeafLocation(
                     ? "Exit Full Screen"
                     : "Full Screen"}
                 </DropdownMenuItem>
+                {parentSplit ? (
+                  <DropdownMenuItem
+                    onClick={() => toggleParentGroupOrientation(leaf.id)}
+                    onPointerEnter={() => setOrientationPreviewTarget(leaf.id)}
+                    onPointerLeave={() => clearOrientationPreview()}
+                  >
+                    <RotateCwIcon />
+                    {nextOrientationLabel}
+                  </DropdownMenuItem>
+                ) : null}
                 <DropdownMenuSeparator />
                 {moveDirections.length > 0 ? (
                   <>
@@ -2187,7 +2299,7 @@ function updateLeafLocation(
                         className={cn(
                           "min-w-24 justify-start",
                           active &&
-                            "!border-foreground !bg-foreground !text-background hover:!bg-foreground/90 hover:!text-background",
+                            "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background!",
                         )}
                       >
                         {tab.title}
@@ -2201,7 +2313,7 @@ function updateLeafLocation(
                               className={cn(
                                 "relative",
                                 active &&
-                                  "!border-foreground !bg-foreground !text-background hover:!bg-foreground/90 hover:!text-background before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-background/45 before:content-['']",
+                                  "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background! before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-background/45 before:content-['']",
                               )}
                               aria-label={`Tab options for ${tab.title}`}
                             >

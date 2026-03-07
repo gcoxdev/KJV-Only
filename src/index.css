@@ -222,3 +222,8 @@
 .panel-add-preview-group {
     box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--primary) 45%, transparent);
 }
+
+.panel-orientation-preview {
+    box-shadow: inset 0 0 0 2px color-mix(in oklch, var(--chart-2) 55%, transparent);
+    background-color: color-mix(in oklch, var(--chart-2) 10%, transparent);
+}
