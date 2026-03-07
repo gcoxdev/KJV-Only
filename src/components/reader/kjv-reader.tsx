@@ -957,6 +957,7 @@ export function KJVReader() {
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [renameTabId, setRenameTabId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  const [renameError, setRenameError] = useState<string | null>(null);
   const [fullscreenLeafId, setFullscreenLeafId] = useState<string | null>(null);
   const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(null);
   const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
@@ -1845,6 +1846,7 @@ export function KJVReader() {
 
     setRenameTabId(tabId);
     setRenameValue(tab.title);
+    setRenameError(null);
     setIsRenameDialogOpen(true);
   }
 
@@ -1855,6 +1857,7 @@ export function KJVReader() {
 
     const nextTitle = renameValue.trim();
     if (!nextTitle) {
+      setRenameError("Tab label must be at least 1 character.");
       return;
     }
 
@@ -1865,6 +1868,56 @@ export function KJVReader() {
     );
     setIsRenameDialogOpen(false);
     setRenameTabId(null);
+    setRenameError(null);
+  }
+
+  function moveLeafToExistingTab(leafId: string, targetTabId: string) {
+    if (!activeTabId || targetTabId === activeTabId) {
+      return;
+    }
+
+    setTabs((currentTabs) => {
+      const sourceIndex = currentTabs.findIndex((tab) => tab.id === activeTabId);
+      const targetIndex = currentTabs.findIndex((tab) => tab.id === targetTabId);
+      if (sourceIndex < 0 || targetIndex < 0) {
+        return currentTabs;
+      }
+
+      const sourceTab = currentTabs[sourceIndex];
+      const extraction = extractLeafNode(sourceTab.root, leafId);
+      if (!extraction.extracted) {
+        return currentTabs;
+      }
+
+      const nextTabs = [...currentTabs];
+      nextTabs[sourceIndex] = {
+        ...sourceTab,
+        root: extraction.next ?? createLeaf(),
+      };
+
+      const nextTargetIndex = nextTabs.findIndex((tab) => tab.id === targetTabId);
+      if (nextTargetIndex < 0) {
+        return currentTabs;
+      }
+
+      const targetTab = nextTabs[nextTargetIndex];
+      nextTabs[nextTargetIndex] = {
+        ...targetTab,
+        root: {
+          id: createId(),
+          type: "split",
+          orientation: "horizontal",
+          ratio: 50,
+          first: targetTab.root,
+          second: extraction.extracted,
+        },
+      };
+
+      return nextTabs;
+    });
+
+    setActiveTabId(targetTabId);
+    clearAllPanelPreviews();
   }
 
   async function toggleFullscreenLeaf(leafId: string) {
@@ -1944,6 +1997,13 @@ export function KJVReader() {
         groupTargets.up ||
         groupTargets.down,
     );
+    const existingTabTargets = tabs
+      .map((tab, index) => ({
+        id: tab.id,
+        index,
+        title: tab.title,
+      }))
+      .filter((tab) => tab.id !== activeTabId);
     const refIndex = chapterRefIndex.get(key) ?? -1;
     const hasPrev = refIndex > 0;
     const hasNext = refIndex >= 0 && refIndex < chapterRefs.length - 1;
@@ -2226,6 +2286,22 @@ export function KJVReader() {
                       </>
                     ) : null}
                     <DropdownMenuSeparator />
+                    {existingTabTargets.length > 0 ? (
+                      <>
+                        <DropdownMenuGroup>
+                          {existingTabTargets.map((targetTab) => (
+                            <DropdownMenuItem
+                              key={`move-panel-${leaf.id}-${targetTab.id}`}
+                              onClick={() => moveLeafToExistingTab(leaf.id, targetTab.id)}
+                            >
+                              <ExternalLinkIcon />
+                              {`Move to Tab ${targetTab.index + 1}) ${targetTab.title}`}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                      </>
+                    ) : null}
                     <DropdownMenuItem onClick={() => moveLeafToNewTab(leaf.id)}>
                       <ExternalLinkIcon />
                       Move to New Tab
@@ -2538,7 +2614,7 @@ export function KJVReader() {
                             <DropdownMenuItem
                               onClick={() => openRenameDialog(tab.id)}
                             >
-                              Rename Tab
+                              Relabel Tab
                             </DropdownMenuItem>
                           </DropdownMenuGroup>
                           {tabs.length > 1 ? (
@@ -2617,32 +2693,48 @@ export function KJVReader() {
           setIsRenameDialogOpen(open);
           if (!open) {
             setRenameTabId(null);
+            setRenameError(null);
           }
         }}
       >
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>Rename Tab</AlertDialogTitle>
+            <AlertDialogTitle>Relabel Tab</AlertDialogTitle>
             <AlertDialogDescription>
-              Update the current tab label.
+              Update the current tab label (minimum 1 character).
             </AlertDialogDescription>
           </AlertDialogHeader>
           <Input
             value={renameValue}
-            onChange={(event) => setRenameValue(event.target.value)}
+            onChange={(event) => {
+              const value = event.target.value;
+              setRenameValue(value);
+              setRenameError(
+                value.trim().length > 0
+                  ? null
+                  : "Tab label must be at least 1 character.",
+              );
+            }}
             placeholder="Tab name"
             autoFocus
           />
+          {renameError ? (
+            <p className="text-sm text-destructive">{renameError}</p>
+          ) : null}
           <AlertDialogFooter>
             <AlertDialogCancel
               onClick={() => {
                 setIsRenameDialogOpen(false);
                 setRenameTabId(null);
+                setRenameError(null);
               }}
             >
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmRenameTab}>
+            <AlertDialogAction
+              onClick={confirmRenameTab}
+              disabled={renameValue.trim().length < 1}
+            >
               Save
             </AlertDialogAction>
           </AlertDialogFooter>
