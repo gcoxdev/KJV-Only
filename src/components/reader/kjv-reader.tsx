@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
@@ -124,6 +124,34 @@ type TokenPopupState = {
   y: number;
 };
 
+let kjvBooksPromise: Promise<Book[]> | null = null;
+
+function loadKjvBooks() {
+  if (!kjvBooksPromise) {
+    kjvBooksPromise = fetch("/data/kjv.json", { cache: "force-cache" })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /data/kjv.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => {
+        const parsedBooks = parseBooks(payload);
+        if (!parsedBooks || parsedBooks.length === 0) {
+          throw new Error("Invalid reader data format in /data/kjv.json");
+        }
+        return parsedBooks;
+      })
+      .catch((error) => {
+        // Allow retry if the request fails for any reason.
+        kjvBooksPromise = null;
+        throw error;
+      });
+  }
+
+  return kjvBooksPromise;
+}
+
 function hasTokenMetadata(token: VerseToken) {
   return Boolean(
     token.strong || token.lemma || token.morph || token.divineName,
@@ -197,6 +225,124 @@ function renderVerseTokens(
   });
 }
 
+type ChapterTextContentProps = {
+  bookName: string;
+  chapterNumber: number;
+  verses: Verse[];
+  flowVersesByParagraph: boolean;
+  readModeParagraphIndent: boolean;
+  showVerseNumbers: boolean;
+  isStudyMode: boolean;
+  verseSpacing: number;
+  onOpenTokenDetails: (element: HTMLElement, token: VerseToken) => void;
+};
+
+const ChapterTextContent = memo(function ChapterTextContent({
+  bookName,
+  chapterNumber,
+  verses,
+  flowVersesByParagraph,
+  readModeParagraphIndent,
+  showVerseNumbers,
+  isStudyMode,
+  verseSpacing,
+  onOpenTokenDetails,
+}: ChapterTextContentProps) {
+  const paragraphGroups: Verse[][] = [];
+  let currentGroup: Verse[] = [];
+  for (const verse of verses) {
+    if (currentGroup.length === 0 || verse.paragraphStart) {
+      if (currentGroup.length > 0) {
+        paragraphGroups.push(currentGroup);
+      }
+      currentGroup = [verse];
+    } else {
+      currentGroup.push(verse);
+    }
+  }
+  if (currentGroup.length > 0) {
+    paragraphGroups.push(currentGroup);
+  }
+
+  return (
+    <div className="flex w-full flex-col p-3 sm:p-4" style={{ rowGap: `${verseSpacing}px` }}>
+      {flowVersesByParagraph
+        ? paragraphGroups.map((group, groupIndex) => (
+            <article
+              key={`${bookName}-${chapterNumber}-paragraph-${groupIndex}`}
+              className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
+            >
+              <p
+                className="text-pretty leading-7"
+                style={
+                  readModeParagraphIndent &&
+                  (groupIndex === 0 || group[0]?.paragraphStart)
+                    ? { textIndent: "1.5rem" }
+                    : undefined
+                }
+              >
+                {group.map((verse, verseIndex) => (
+                  <Fragment key={`${bookName}-${chapterNumber}-${verse.verse}`}>
+                    {verseIndex > 0 ? " " : null}
+                    <span className={cn(verse.redLetter && "text-red-700")}>
+                      {showVerseNumbers ? (
+                        <span className="mr-2 inline-flex w-7 shrink-0 justify-end align-top text-xs font-semibold tabular-nums text-muted-foreground">
+                          {verse.verse}
+                        </span>
+                      ) : null}
+                      {renderVerseTokens(
+                        verse.tokens,
+                        isStudyMode,
+                        onOpenTokenDetails,
+                      )}
+                    </span>
+                  </Fragment>
+                ))}
+              </p>
+            </article>
+          ))
+        : verses.map((verse) => (
+            <article
+              key={`${bookName}-${chapterNumber}-${verse.verse}`}
+              className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
+            >
+              <p
+                className={cn(
+                  "leading-7",
+                  showVerseNumbers &&
+                    "grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-x-2",
+                )}
+              >
+                {showVerseNumbers ? (
+                  <span className="inline-flex w-7 shrink-0 justify-start align-top text-xs font-semibold tabular-nums text-muted-foreground">
+                    {verse.verse}
+                  </span>
+                ) : null}
+                <span
+                  className={cn(
+                    "text-pretty",
+                    verse.redLetter && "text-red-700",
+                  )}
+                  style={
+                    readModeParagraphIndent &&
+                    (verse.verse === 1 || verse.paragraphStart)
+                      ? { textIndent: "1.5rem" }
+                      : undefined
+                  }
+                >
+                  {renderVerseTokens(
+                    verse.tokens,
+                    isStudyMode,
+                    onOpenTokenDetails,
+                  )}
+                </span>
+              </p>
+            </article>
+          ))}
+    </div>
+  );
+});
+
 function parseBooks(input: unknown): Book[] | null {
   if (Array.isArray(input)) {
     return input as Book[];
@@ -224,6 +370,12 @@ function createId() {
 
 function chapterProgressKey(bookIndex: number, chapterIndex: number) {
   return `${bookIndex}:${chapterIndex}`;
+}
+
+function panelViewportElement(panelElement: HTMLDivElement | null | undefined) {
+  return panelElement?.querySelector<HTMLElement>(
+    '[data-panel-content-scroll] [data-slot="scroll-area-viewport"]',
+  ) ?? null;
 }
 
 function createLeaf(
@@ -937,22 +1089,8 @@ export function KJVReader() {
 
     async function loadGeneratedData() {
       try {
-        const response = await fetch("/data/kjv.json");
-        if (!response.ok) {
-          if (!cancelled) {
-            setLoadError("Could not load /data/kjv.json");
-            setIsLoaded(true);
-          }
-          return;
-        }
-
-        const payload = (await response.json()) as unknown;
-        const parsedBooks = parseBooks(payload);
-        if (!parsedBooks || parsedBooks.length === 0 || cancelled) {
-          if (!cancelled) {
-            setLoadError("Invalid reader data format in /data/kjv.json");
-            setIsLoaded(true);
-          }
+        const parsedBooks = await loadKjvBooks();
+        if (cancelled) {
           return;
         }
 
@@ -962,9 +1100,13 @@ export function KJVReader() {
         setActiveTabId(initialTab.id);
         setLoadError(null);
         setIsLoaded(true);
-      } catch {
+      } catch (error) {
         if (!cancelled) {
-          setLoadError("Failed to load generated reader data");
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Failed to load generated reader data";
+          setLoadError(message);
           setIsLoaded(true);
         }
       }
@@ -1003,13 +1145,6 @@ export function KJVReader() {
   const modelLeafNeighbors = useMemo(
     () => (activeTab ? buildLeafNeighborMap(activeTab.root) : new Map()),
     [activeTab],
-  );
-  const domLeafNeighbors = useMemo(
-    () =>
-      activeTab
-        ? buildLeafNeighborMapFromDom(activeTab.root, panelElementRefs.current)
-        : new Map(),
-    [activeTab, tabs],
   );
   const progressByTestament = useMemo(() => {
     const oldBooks = books.slice(0, 39);
@@ -1106,14 +1241,38 @@ export function KJVReader() {
     collectLeafIds(activeTab.root);
 
     const cleanups: Array<() => void> = [];
+    const viewports = new Map<string, HTMLElement>();
+    const pendingProgress: Record<string, number> = {};
+    let rafId: number | null = null;
 
-    const updateProgressForLeaf = (leafId: string, value: number) => {
+    const flushPendingProgress = () => {
+      rafId = null;
       setLeafScrollProgress((current) => {
-        if (current[leafId] === value) {
-          return current;
+        let changed = false;
+        const next = { ...current };
+        for (const [leafId, value] of Object.entries(pendingProgress)) {
+          if (next[leafId] !== value) {
+            next[leafId] = value;
+            changed = true;
+          }
+          delete pendingProgress[leafId];
         }
-        return { ...current, [leafId]: value };
+        return changed ? next : current;
       });
+    };
+
+    const queueProgressForLeaf = (leafId: string, value: number) => {
+      pendingProgress[leafId] = value;
+      if (rafId === null) {
+        rafId = window.requestAnimationFrame(flushPendingProgress);
+      }
+    };
+
+    const calculateProgress = (viewport: HTMLElement) => {
+      const maxScroll = viewport.scrollHeight - viewport.clientHeight;
+      return maxScroll <= 0
+        ? 0
+        : Math.round((viewport.scrollTop / maxScroll) * 100);
     };
 
     for (const leafId of leafIds) {
@@ -1126,23 +1285,33 @@ export function KJVReader() {
         continue;
       }
 
+      viewports.set(leafId, viewport);
+
       const update = () => {
-        const maxScroll = viewport.scrollHeight - viewport.clientHeight;
-        const next =
-          maxScroll <= 0
-            ? 0
-            : Math.round((viewport.scrollTop / maxScroll) * 100);
-        updateProgressForLeaf(leafId, next);
+        const next = calculateProgress(viewport);
+        queueProgressForLeaf(leafId, next);
       };
 
       update();
       viewport.addEventListener("scroll", update, { passive: true });
-      window.addEventListener("resize", update);
       cleanups.push(() => {
         viewport.removeEventListener("scroll", update);
-        window.removeEventListener("resize", update);
       });
     }
+
+    const onResize = () => {
+      for (const [leafId, viewport] of viewports.entries()) {
+        queueProgressForLeaf(leafId, calculateProgress(viewport));
+      }
+    };
+    window.addEventListener("resize", onResize);
+    cleanups.push(() => {
+      window.removeEventListener("resize", onResize);
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    });
 
     return () => {
       cleanups.forEach((cleanup) => cleanup());
@@ -1176,15 +1345,7 @@ export function KJVReader() {
   }
 
   function neighborsForLeaf(leafId: string): LeafNeighbors {
-    const modelNeighbors = modelLeafNeighbors.get(leafId) ?? {};
-    const domNeighbors = domLeafNeighbors.get(leafId) ?? {};
-
-    return {
-      left: modelNeighbors.left ?? domNeighbors.left,
-      right: modelNeighbors.right ?? domNeighbors.right,
-      up: modelNeighbors.up ?? domNeighbors.up,
-      down: modelNeighbors.down ?? domNeighbors.down,
-    };
+    return modelLeafNeighbors.get(leafId) ?? {};
   }
 
   function neighborForDirection(leafId: string, direction: PanelDirection) {
@@ -1193,19 +1354,15 @@ export function KJVReader() {
       return modelNeighbor;
     }
 
-    const domNeighbor = domLeafNeighbors.get(leafId)?.[direction];
-    if (domNeighbor) {
-      return domNeighbor;
-    }
-
     if (!activeTab) {
       return null;
     }
 
-    return (
-      buildLeafNeighborMapFromDom(activeTab.root, panelElementRefs.current)
-        .get(leafId)?.[direction] ?? null
+    const freshDomNeighbors = buildLeafNeighborMapFromDom(
+      activeTab.root,
+      panelElementRefs.current,
     );
+    return freshDomNeighbors.get(leafId)?.[direction] ?? null;
   }
 
   function panelCardElement(leafId: string) {
@@ -1464,7 +1621,7 @@ export function KJVReader() {
     }
   }
 
-function updateLeafLocation(
+  function updateLeafLocation(
     leafId: string,
     patch: Partial<
       Pick<
@@ -1473,10 +1630,33 @@ function updateLeafLocation(
       >
     >,
   ) {
+    const shouldResetScroll =
+      patch.bookIndex !== undefined || patch.chapterIndex !== undefined;
+
     updateActiveTab((tab) => ({
       ...tab,
       root: updateLeafNode(tab.root, leafId, patch),
     }));
+
+    if (!shouldResetScroll) {
+      return;
+    }
+
+    setLeafScrollProgress((current) => {
+      if (current[leafId] === 0) {
+        return current;
+      }
+      return { ...current, [leafId]: 0 };
+    });
+
+    // Wait for React to commit the chapter/book change before forcing scroll top.
+    requestAnimationFrame(() => {
+      const panelElement = panelElementRefs.current[leafId];
+      const viewport = panelViewportElement(panelElement);
+      if (viewport) {
+        viewport.scrollTo({ top: 0, behavior: "auto" });
+      }
+    });
   }
 
   function moveLeafChapter(leafId: string, direction: -1 | 1) {
@@ -1639,10 +1819,10 @@ function updateLeafLocation(
     });
   }
 
-  function openTokenDetailsFromElement(
+  const openTokenDetailsFromElement = useCallback((
     element: HTMLElement,
     token: VerseToken,
-  ) {
+  ) => {
     const rect = element.getBoundingClientRect();
     const popupWidth = 280;
     const safeX = Math.max(
@@ -1655,7 +1835,7 @@ function updateLeafLocation(
       x: safeX,
       y: safeY,
     });
-  }
+  }, []);
 
   function openRenameDialog(tabId: string) {
     const tab = tabs.find((item) => item.id === tabId);
@@ -1739,23 +1919,6 @@ function updateLeafLocation(
     const isChapterRead = readChapters.has(chapterReadKey);
     const readingProgress = leafScrollProgress[leaf.id] ?? 0;
     const showVerseNumbers = !hideReadModeVerseNumbers;
-    const paragraphGroups: Verse[][] = [];
-    if (chapter) {
-      let currentGroup: Verse[] = [];
-      for (const verse of chapter.verses) {
-        if (currentGroup.length === 0 || verse.paragraphStart) {
-          if (currentGroup.length > 0) {
-            paragraphGroups.push(currentGroup);
-          }
-          currentGroup = [verse];
-        } else {
-          currentGroup.push(verse);
-        }
-      }
-      if (currentGroup.length > 0) {
-        paragraphGroups.push(currentGroup);
-      }
-    }
     const neighbors =
       modelLeafNeighbors.get(leaf.id) ?? neighborsForLeaf(leaf.id);
     const moveDirections = (["left", "right", "up", "down"] as PanelDirection[]).filter(
@@ -2083,85 +2246,17 @@ function updateLeafLocation(
           <>
             <CardContent className="min-h-0 flex-1 p-0">
               <ScrollArea className="h-full w-full" data-panel-content-scroll>
-                <div className="flex w-full flex-col p-3 sm:p-4" style={{ rowGap: `${verseSpacing}px` }}>
-                  {flowVersesByParagraph
-                    ? paragraphGroups.map((group, groupIndex) => (
-                        <article
-                          key={`${book.name}-${chapter.chapter}-paragraph-${groupIndex}`}
-                          className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
-                        >
-                          <p
-                            className={cn(
-                              "text-pretty leading-7",
-                            )}
-                            style={
-                              readModeParagraphIndent &&
-                              (groupIndex === 0 || group[0]?.paragraphStart)
-                                ? { textIndent: "1.5rem" }
-                                : undefined
-                            }
-                          >
-                            {group.map((verse, verseIndex) => (
-                              <Fragment key={`${book.name}-${chapter.chapter}-${verse.verse}`}>
-                                {verseIndex > 0 ? " " : null}
-                                <span className={cn(verse.redLetter && "text-red-700")}>
-                                  {showVerseNumbers ? (
-                                    <span className="mr-2 inline-flex w-7 shrink-0 justify-end align-top text-xs font-semibold tabular-nums text-muted-foreground">
-                                      {verse.verse}
-                                    </span>
-                                  ) : null}
-                                  {renderVerseTokens(
-                                    verse.tokens,
-                                    isStudyMode,
-                                    (element, token) =>
-                                      openTokenDetailsFromElement(element, token),
-                                  )}
-                                </span>
-                              </Fragment>
-                            ))}
-                          </p>
-                        </article>
-                      ))
-                    : chapter.verses.map((verse) => (
-                        <article
-                          key={`${book.name}-${chapter.chapter}-${verse.verse}`}
-                          className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
-                        >
-                          <p
-                            className={cn(
-                              "leading-7",
-                              showVerseNumbers &&
-                                "grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-x-2",
-                            )}
-                          >
-                            {showVerseNumbers ? (
-                              <span className="inline-flex w-7 shrink-0 justify-start align-top text-xs font-semibold tabular-nums text-muted-foreground">
-                                {verse.verse}
-                              </span>
-                            ) : null}
-                            <span
-                              className={cn(
-                                "text-pretty",
-                                verse.redLetter && "text-red-700",
-                              )}
-                              style={
-                                readModeParagraphIndent &&
-                                (verse.verse === 1 || verse.paragraphStart)
-                                  ? { textIndent: "1.5rem" }
-                                  : undefined
-                              }
-                            >
-                              {renderVerseTokens(
-                                verse.tokens,
-                                isStudyMode,
-                                (element, token) =>
-                                  openTokenDetailsFromElement(element, token),
-                              )}
-                            </span>
-                          </p>
-                        </article>
-                      ))}
-                </div>
+                <ChapterTextContent
+                  bookName={book.name}
+                  chapterNumber={chapter.chapter}
+                  verses={chapter.verses}
+                  flowVersesByParagraph={flowVersesByParagraph}
+                  readModeParagraphIndent={readModeParagraphIndent}
+                  showVerseNumbers={showVerseNumbers}
+                  isStudyMode={isStudyMode}
+                  verseSpacing={verseSpacing}
+                  onOpenTokenDetails={openTokenDetailsFromElement}
+                />
               </ScrollArea>
             </CardContent>
 
