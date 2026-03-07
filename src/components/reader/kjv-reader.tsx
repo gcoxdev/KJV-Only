@@ -65,6 +65,7 @@ import {
   ScrollArea,
   ScrollBar,
 } from "@/components/ui/scroll-area";
+import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 
 type ReaderPayload = {
   books?: Book[];
@@ -76,8 +77,11 @@ type SplitOrientation = "horizontal" | "vertical";
 type LeafNode = {
   id: string;
   type: "leaf";
+  view: "reader" | "picker";
   bookIndex: number;
   chapterIndex: number;
+  pickerTestament: "old" | "new" | null;
+  pickerBookIndex: number | null;
 };
 
 type SplitNode = {
@@ -201,20 +205,30 @@ function createId() {
   return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-function createLeaf(bookIndex = 0, chapterIndex = 0): LeafNode {
+function createLeaf(
+  bookIndex = 0,
+  chapterIndex = 0,
+  view: LeafNode["view"] = "picker",
+): LeafNode {
   return {
     id: createId(),
     type: "leaf",
+    view,
     bookIndex,
     chapterIndex,
+    pickerTestament: null,
+    pickerBookIndex: null,
   };
 }
 
-function createInitialTab(index: number): ReaderTab {
+function createInitialTab(
+  index: number,
+  view: LeafNode["view"] = "reader",
+): ReaderTab {
   return {
     id: createId(),
     title: `Tab ${index}`,
-    root: createLeaf(),
+    root: createLeaf(0, 0, view),
   };
 }
 
@@ -228,7 +242,7 @@ function splitPanelNode(
       return { next: node, createdLeafId: null };
     }
 
-    const newLeaf = createLeaf(node.bookIndex, node.chapterIndex);
+    const newLeaf = createLeaf();
     const orientation: SplitOrientation =
       direction === "left" || direction === "right" ? "horizontal" : "vertical";
 
@@ -297,7 +311,12 @@ function removeLeafNode(
 function updateLeafNode(
   node: PanelNode,
   targetLeafId: string,
-  patch: Partial<Pick<LeafNode, "bookIndex" | "chapterIndex">>,
+  patch: Partial<
+    Pick<
+      LeafNode,
+      "bookIndex" | "chapterIndex" | "view" | "pickerTestament" | "pickerBookIndex"
+    >
+  >,
 ): PanelNode {
   if (node.type === "leaf") {
     if (node.id !== targetLeafId) {
@@ -545,9 +564,14 @@ export function KJVReader() {
     }
   }
 
-  function updateLeafLocation(
+function updateLeafLocation(
     leafId: string,
-    patch: Partial<Pick<LeafNode, "bookIndex" | "chapterIndex">>,
+    patch: Partial<
+      Pick<
+        LeafNode,
+        "bookIndex" | "chapterIndex" | "view" | "pickerTestament" | "pickerBookIndex"
+      >
+    >,
   ) {
     updateActiveTab((tab) => ({
       ...tab,
@@ -591,7 +615,7 @@ export function KJVReader() {
   }
 
   function addTab() {
-    const nextTab = createInitialTab(tabs.length + 1);
+    const nextTab = createInitialTab(tabs.length + 1, "picker");
     setTabs((currentTabs) => [...currentTabs, nextTab]);
     setActiveTabId(nextTab.id);
     requestAnimationFrame(() => {
@@ -705,10 +729,11 @@ export function KJVReader() {
 
   function renderLeaf(leaf: LeafNode) {
     const book = books[leaf.bookIndex];
-    const chapter = chapterFromLeaf(leaf);
-    if (!book || !chapter) {
+    if (!book) {
       return null;
     }
+
+    const chapter = chapterFromLeaf(leaf);
 
     const key = `${leaf.bookIndex}-${leaf.chapterIndex}`;
     const refIndex = chapterRefIndex.get(key) ?? -1;
@@ -719,71 +744,79 @@ export function KJVReader() {
       <Card className="flex h-full min-h-0 flex-col rounded-none">
         <CardHeader className="border-b p-2 sm:p-3">
           <div className="flex flex-wrap items-center gap-2">
-            <Select
-              items={books.map((bookItem) => ({
-                label: bookItem.name,
-                value: bookItem.name,
-              }))}
-              value={book.name}
-              onValueChange={(value) => {
-                const nextBookIndex = books.findIndex(
-                  (bookItem) => bookItem.name === value,
-                );
-                if (nextBookIndex >= 0) {
-                  updateLeafLocation(leaf.id, {
-                    bookIndex: nextBookIndex,
-                    chapterIndex: 0,
-                  });
-                }
-              }}
-            >
-              <SelectTrigger className="min-w-36 sm:min-w-44">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {books.map((bookItem) => (
-                    <SelectItem key={bookItem.name} value={bookItem.name}>
-                      {bookItem.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            {leaf.view === "reader" && chapter ? (
+              <>
+                <Select
+                  items={books.map((bookItem) => ({
+                    label: bookItem.name,
+                    value: bookItem.name,
+                  }))}
+                  value={book.name}
+                  onValueChange={(value) => {
+                    const nextBookIndex = books.findIndex(
+                      (bookItem) => bookItem.name === value,
+                    );
+                    if (nextBookIndex >= 0) {
+                      updateLeafLocation(leaf.id, {
+                        bookIndex: nextBookIndex,
+                        chapterIndex: 0,
+                      });
+                    }
+                  }}
+                >
+                  <SelectTrigger className="min-w-36 sm:min-w-44">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {books.map((bookItem) => (
+                        <SelectItem key={bookItem.name} value={bookItem.name}>
+                          {bookItem.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
 
-            <Select
-              items={book.chapters.map((chapterItem) => ({
-                label: `Chapter ${chapterItem.chapter}`,
-                value: String(chapterItem.chapter),
-              }))}
-              value={String(chapter.chapter)}
-              onValueChange={(value) => {
-                const nextChapterIndex = book.chapters.findIndex(
-                  (chapterItem) => String(chapterItem.chapter) === value,
-                );
-                if (nextChapterIndex >= 0) {
-                  updateLeafLocation(leaf.id, {
-                    chapterIndex: nextChapterIndex,
-                  });
-                }
-              }}
-            >
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {book.chapters.map((chapterItem) => (
-                    <SelectItem
-                      key={`${book.name}-${chapterItem.chapter}`}
-                      value={String(chapterItem.chapter)}
-                    >
-                      Chapter {chapterItem.chapter}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+                <Select
+                  items={book.chapters.map((chapterItem) => ({
+                    label: `Chapter ${chapterItem.chapter}`,
+                    value: String(chapterItem.chapter),
+                  }))}
+                  value={String(chapter.chapter)}
+                  onValueChange={(value) => {
+                    const nextChapterIndex = book.chapters.findIndex(
+                      (chapterItem) => String(chapterItem.chapter) === value,
+                    );
+                    if (nextChapterIndex >= 0) {
+                      updateLeafLocation(leaf.id, {
+                        chapterIndex: nextChapterIndex,
+                      });
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {book.chapters.map((chapterItem) => (
+                        <SelectItem
+                          key={`${book.name}-${chapterItem.chapter}`}
+                          value={String(chapterItem.chapter)}
+                        >
+                          Chapter {chapterItem.chapter}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Choose a book and chapter
+              </p>
+            )}
 
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -830,60 +863,101 @@ export function KJVReader() {
           </div>
         </CardHeader>
 
-        <CardContent className="min-h-0 flex-1 p-0">
-          <ScrollArea className="h-full">
-            <div className="space-y-5 p-3 sm:p-4">
-              {chapter.verses.map((verse) => (
-                <article
-                  key={`${book.name}-${chapter.chapter}-${verse.verse}`}
-                  className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
-                >
-                  <p
-                    className={cn(
-                      "text-pretty leading-7",
-                      verse.redLetter && "text-red-700",
-                      !isStudyMode && verse.paragraphStart && "pl-4 sm:pl-6",
-                    )}
-                  >
-                    <span className="mr-2 align-top text-xs font-semibold text-muted-foreground">
-                      {verse.verse}
-                    </span>
-                    {renderVerseTokens(
-                      verse.tokens,
-                      isStudyMode,
-                      (element, token) =>
-                        openTokenDetailsFromElement(element, token),
-                    )}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </ScrollArea>
-        </CardContent>
+        {leaf.view === "reader" && chapter ? (
+          <>
+            <CardContent className="min-h-0 flex-1 p-0">
+              <ScrollArea className="h-full">
+                <div className="space-y-5 p-3 sm:p-4">
+                  {chapter.verses.map((verse) => (
+                    <article
+                      key={`${book.name}-${chapter.chapter}-${verse.verse}`}
+                      className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
+                    >
+                      <p
+                        className={cn(
+                          "text-pretty leading-7",
+                          verse.redLetter && "text-red-700",
+                          !isStudyMode && verse.paragraphStart && "pl-4 sm:pl-6",
+                        )}
+                      >
+                        <span className="mr-2 align-top text-xs font-semibold text-muted-foreground">
+                          {verse.verse}
+                        </span>
+                        {renderVerseTokens(
+                          verse.tokens,
+                          isStudyMode,
+                          (element, token) =>
+                            openTokenDetailsFromElement(element, token),
+                        )}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
 
-        <div className="flex items-center justify-between border-t p-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => moveLeafChapter(leaf.id, -1)}
-            disabled={!hasPrev}
-          >
-            <ChevronLeftIcon />
-            Prev
-          </Button>
-          <div className="text-xs text-muted-foreground">
-            {book.name} {chapter.chapter}
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => moveLeafChapter(leaf.id, 1)}
-            disabled={!hasNext}
-          >
-            Next
-            <ChevronRightIcon />
-          </Button>
-        </div>
+            <div className="flex items-center justify-between border-t p-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => moveLeafChapter(leaf.id, -1)}
+                disabled={!hasPrev}
+              >
+                <ChevronLeftIcon />
+                Prev
+              </Button>
+              <div className="text-xs text-muted-foreground">
+                {book.name} {chapter.chapter}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => moveLeafChapter(leaf.id, 1)}
+                disabled={!hasNext}
+              >
+                Next
+                <ChevronRightIcon />
+              </Button>
+            </div>
+          </>
+        ) : (
+          <CardContent className="min-h-0 flex-1 overflow-auto p-3 sm:p-4">
+            <BookChapterPicker
+              books={books}
+              selectedTestament={leaf.pickerTestament}
+              selectedBookIndex={leaf.pickerBookIndex}
+              onSelectTestament={(testament) =>
+                updateLeafLocation(leaf.id, {
+                  pickerTestament: testament,
+                  pickerBookIndex: null,
+                })
+              }
+              onBackToTestaments={() =>
+                updateLeafLocation(leaf.id, {
+                  pickerTestament: null,
+                  pickerBookIndex: null,
+                })
+              }
+              onSelectBook={(bookIndex) =>
+                updateLeafLocation(leaf.id, {
+                  pickerBookIndex: bookIndex,
+                })
+              }
+              onBackToBooks={() =>
+                updateLeafLocation(leaf.id, { pickerBookIndex: null })
+              }
+              onSelectChapter={(bookIndex, chapterIndex) =>
+                updateLeafLocation(leaf.id, {
+                  bookIndex,
+                  chapterIndex,
+                  view: "reader",
+                  pickerTestament: null,
+                  pickerBookIndex: null,
+                })
+              }
+            />
+          </CardContent>
+        )}
       </Card>
     );
   }
