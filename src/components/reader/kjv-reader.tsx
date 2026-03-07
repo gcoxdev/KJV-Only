@@ -435,6 +435,18 @@ function collectLeafIds(node: PanelNode, ids: string[] = []) {
   return ids;
 }
 
+function findNodeById(node: PanelNode, nodeId: string): PanelNode | null {
+  if (node.id === nodeId) {
+    return node;
+  }
+
+  if (node.type === "leaf") {
+    return null;
+  }
+
+  return findNodeById(node.first, nodeId) ?? findNodeById(node.second, nodeId);
+}
+
 function findLeafNode(node: PanelNode, leafId: string): LeafNode | null {
   if (node.type === "leaf") {
     return node.id === leafId ? node : null;
@@ -759,6 +771,9 @@ export function KJVReader() {
   const tabEndRef = useRef<HTMLDivElement>(null);
   const panelElementRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const previewLeafIdRef = useRef<string | null>(null);
+  const addPreviewLeafIdsRef = useRef<string[]>([]);
+  const addPreviewDirectionRef = useRef<PanelDirection | null>(null);
+  const addPreviewIsGroupRef = useRef(false);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -1059,16 +1074,18 @@ export function KJVReader() {
     );
   }
 
+  function panelCardElement(leafId: string) {
+    const panelElement = panelElementRefs.current[leafId];
+    return panelElement?.querySelector<HTMLElement>(':scope > [data-slot="card"]') ?? null;
+  }
+
   function clearMovePreview() {
     const previewId = previewLeafIdRef.current;
     if (!previewId) {
       return;
     }
 
-    const panelElement = panelElementRefs.current[previewId];
-    const previewSurface = panelElement?.querySelector<HTMLElement>(
-      ':scope > [data-slot="card"]',
-    );
+    const previewSurface = panelCardElement(previewId);
     previewSurface?.classList.remove("panel-move-preview-surface");
     previewLeafIdRef.current = null;
   }
@@ -1079,10 +1096,7 @@ export function KJVReader() {
       return;
     }
 
-    const panelElement = panelElementRefs.current[targetLeafId];
-    const previewSurface = panelElement?.querySelector<HTMLElement>(
-      ':scope > [data-slot="card"]',
-    );
+    const previewSurface = panelCardElement(targetLeafId);
     if (!previewSurface) {
       return;
     }
@@ -1091,9 +1105,94 @@ export function KJVReader() {
     previewLeafIdRef.current = targetLeafId;
   }
 
+  function clearAddPreview() {
+    const leafIds = addPreviewLeafIdsRef.current;
+    const direction = addPreviewDirectionRef.current;
+    const isGroup = addPreviewIsGroupRef.current;
+
+    if (leafIds.length === 0 || !direction) {
+      return;
+    }
+
+    for (const leafId of leafIds) {
+      const previewSurface = panelCardElement(leafId);
+      if (!previewSurface) {
+        continue;
+      }
+      previewSurface.classList.remove("panel-add-preview-target");
+      previewSurface.classList.remove(`panel-add-preview-${direction}`);
+      if (isGroup) {
+        previewSurface.classList.remove("panel-add-preview-group");
+      }
+    }
+
+    addPreviewLeafIdsRef.current = [];
+    addPreviewDirectionRef.current = null;
+    addPreviewIsGroupRef.current = false;
+  }
+
+  function clearAllPanelPreviews() {
+    clearMovePreview();
+    clearAddPreview();
+  }
+
+  function applyAddPreview(
+    leafIds: string[],
+    direction: PanelDirection,
+    isGroup: boolean,
+  ) {
+    clearAddPreview();
+    if (leafIds.length === 0) {
+      return;
+    }
+
+    const appliedLeafIds: string[] = [];
+    for (const leafId of leafIds) {
+      const previewSurface = panelCardElement(leafId);
+      if (!previewSurface) {
+        continue;
+      }
+      previewSurface.classList.add("panel-add-preview-target");
+      previewSurface.classList.add(`panel-add-preview-${direction}`);
+      if (isGroup) {
+        previewSurface.classList.add("panel-add-preview-group");
+      }
+      appliedLeafIds.push(leafId);
+    }
+
+    addPreviewLeafIdsRef.current = appliedLeafIds;
+    addPreviewDirectionRef.current = direction;
+    addPreviewIsGroupRef.current = isGroup;
+  }
+
   function setMovePreviewTarget(leafId: string, direction: PanelDirection) {
+    clearAddPreview();
     const targetLeafId = neighborsForLeaf(leafId)[direction] ?? null;
     applyMovePreview(targetLeafId);
+  }
+
+  function setAddPreviewTarget(leafId: string, direction: PanelDirection) {
+    clearMovePreview();
+    applyAddPreview([leafId], direction, false);
+  }
+
+  function setGroupAddPreviewTarget(leafId: string, direction: PanelDirection) {
+    clearMovePreview();
+    if (!activeTab) {
+      return;
+    }
+
+    const targetNodeId = findGroupTargetNodeId(activeTab.root, leafId, direction);
+    if (!targetNodeId) {
+      return;
+    }
+
+    const targetNode = findNodeById(activeTab.root, targetNodeId);
+    if (!targetNode) {
+      return;
+    }
+
+    applyAddPreview(collectLeafIds(targetNode), direction, true);
   }
 
   function splitPanelGroup(leafId: string, direction: PanelDirection) {
@@ -1131,7 +1230,7 @@ export function KJVReader() {
       ...tab,
       root: swapLeafContent(tab.root, leafId, targetLeafId),
     }));
-    clearMovePreview();
+    clearAllPanelPreviews();
   }
 
   function closeLeaf(leafId: string) {
@@ -1250,7 +1349,7 @@ function updateLeafLocation(
 
     if (shouldActivate) {
       setActiveTabId(nextTabId);
-      clearMovePreview();
+      clearAllPanelPreviews();
       requestAnimationFrame(() => {
         tabEndRef.current?.scrollIntoView({
           behavior: "smooth",
@@ -1514,7 +1613,7 @@ function updateLeafLocation(
             <DropdownMenu
               onOpenChange={(open) => {
                 if (!open) {
-                  clearMovePreview();
+                  clearAllPanelPreviews();
                 }
               }}
             >
@@ -1585,19 +1684,35 @@ function updateLeafLocation(
                     <DropdownMenuSeparator />
                   </>
                 ) : null}
-                <DropdownMenuItem onClick={() => splitLeaf(leaf.id, "left")}>
+                <DropdownMenuItem
+                  onClick={() => splitLeaf(leaf.id, "left")}
+                  onPointerEnter={() => setAddPreviewTarget(leaf.id, "left")}
+                  onPointerLeave={() => clearAddPreview()}
+                >
                   <SplitSquareHorizontalIcon />
                   Add Panel Left
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => splitLeaf(leaf.id, "right")}>
+                <DropdownMenuItem
+                  onClick={() => splitLeaf(leaf.id, "right")}
+                  onPointerEnter={() => setAddPreviewTarget(leaf.id, "right")}
+                  onPointerLeave={() => clearAddPreview()}
+                >
                   <SplitSquareHorizontalIcon className="rotate-180" />
                   Add Panel Right
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => splitLeaf(leaf.id, "up")}>
+                <DropdownMenuItem
+                  onClick={() => splitLeaf(leaf.id, "up")}
+                  onPointerEnter={() => setAddPreviewTarget(leaf.id, "up")}
+                  onPointerLeave={() => clearAddPreview()}
+                >
                   <SplitSquareVerticalIcon />
                   Add Panel Above
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => splitLeaf(leaf.id, "down")}>
+                <DropdownMenuItem
+                  onClick={() => splitLeaf(leaf.id, "down")}
+                  onPointerEnter={() => setAddPreviewTarget(leaf.id, "down")}
+                  onPointerLeave={() => clearAddPreview()}
+                >
                   <SplitSquareVerticalIcon className="rotate-180" />
                   Add Panel Below
                 </DropdownMenuItem>
@@ -1608,6 +1723,10 @@ function updateLeafLocation(
                       {groupTargets.left ? (
                         <DropdownMenuItem
                           onClick={() => splitPanelGroup(leaf.id, "left")}
+                          onPointerEnter={() =>
+                            setGroupAddPreviewTarget(leaf.id, "left")
+                          }
+                          onPointerLeave={() => clearAddPreview()}
                         >
                           <SquareChevronLeftIcon />
                           Add Panel Left (Group)
@@ -1616,6 +1735,10 @@ function updateLeafLocation(
                       {groupTargets.right ? (
                         <DropdownMenuItem
                           onClick={() => splitPanelGroup(leaf.id, "right")}
+                          onPointerEnter={() =>
+                            setGroupAddPreviewTarget(leaf.id, "right")
+                          }
+                          onPointerLeave={() => clearAddPreview()}
                         >
                           <SquareChevronRightIcon />
                           Add Panel Right (Group)
@@ -1624,6 +1747,10 @@ function updateLeafLocation(
                       {groupTargets.up ? (
                         <DropdownMenuItem
                           onClick={() => splitPanelGroup(leaf.id, "up")}
+                          onPointerEnter={() =>
+                            setGroupAddPreviewTarget(leaf.id, "up")
+                          }
+                          onPointerLeave={() => clearAddPreview()}
                         >
                           <SquareChevronUpIcon />
                           Add Panel Above (Group)
@@ -1632,6 +1759,10 @@ function updateLeafLocation(
                       {groupTargets.down ? (
                         <DropdownMenuItem
                           onClick={() => splitPanelGroup(leaf.id, "down")}
+                          onPointerEnter={() =>
+                            setGroupAddPreviewTarget(leaf.id, "down")
+                          }
+                          onPointerLeave={() => clearAddPreview()}
                         >
                           <SquareChevronDownIcon />
                           Add Panel Below (Group)
