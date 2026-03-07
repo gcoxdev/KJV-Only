@@ -1192,7 +1192,39 @@ export function KJVReader() {
       return;
     }
 
-    applyAddPreview(collectLeafIds(targetNode), direction, true);
+    const targetLeafIds = collectLeafIds(targetNode);
+    const edgeLeafIds = targetLeafIds.filter((targetLeafId) => {
+      const panelElement = panelElementRefs.current[targetLeafId];
+      const rect = panelElement?.getBoundingClientRect();
+      if (!rect) {
+        return false;
+      }
+
+      const allRects = targetLeafIds
+        .map((id) => panelElementRefs.current[id]?.getBoundingClientRect())
+        .filter((item): item is DOMRect => Boolean(item));
+      if (allRects.length === 0) {
+        return false;
+      }
+
+      const epsilon = 0.5;
+      if (direction === "left") {
+        const minLeft = Math.min(...allRects.map((item) => item.left));
+        return Math.abs(rect.left - minLeft) <= epsilon;
+      }
+      if (direction === "right") {
+        const maxRight = Math.max(...allRects.map((item) => item.right));
+        return Math.abs(rect.right - maxRight) <= epsilon;
+      }
+      if (direction === "up") {
+        const minTop = Math.min(...allRects.map((item) => item.top));
+        return Math.abs(rect.top - minTop) <= epsilon;
+      }
+      const maxBottom = Math.max(...allRects.map((item) => item.bottom));
+      return Math.abs(rect.bottom - maxBottom) <= epsilon;
+    });
+
+    applyAddPreview(edgeLeafIds, direction, true);
   }
 
   function splitPanelGroup(leafId: string, direction: PanelDirection) {

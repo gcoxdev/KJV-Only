@@ -154,7 +154,10 @@
 .panel-add-preview-target::after {
     content: "";
     position: absolute;
-    background-color: color-mix(in oklch, var(--primary) 30%, transparent);
+    background-color: color-mix(in oklch, var(--primary) 18%, transparent);
+    border: 1px dashed color-mix(in oklch, var(--primary) 55%, transparent);
+    border-radius: calc(var(--radius) - 2px);
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary) 25%, transparent);
     pointer-events: none;
 }
 
@@ -162,28 +165,40 @@
     left: 0;
     top: 0;
     bottom: 0;
-    width: 8px;
+    width: 56px;
+    border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .panel-add-preview-right::after {
     right: 0;
     top: 0;
     bottom: 0;
-    width: 8px;
+    width: 56px;
+    border-left: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 .panel-add-preview-up::after {
     left: 0;
     right: 0;
     top: 0;
-    height: 8px;
+    height: 44px;
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .panel-add-preview-down::after {
     left: 0;
     right: 0;
     bottom: 0;
-    height: 8px;
+    height: 44px;
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 .panel-add-preview-group {
