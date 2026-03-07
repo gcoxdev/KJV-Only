@@ -758,6 +758,7 @@ export function KJVReader() {
   >({});
   const tabEndRef = useRef<HTMLDivElement>(null);
   const panelElementRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const previewLeafIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -1058,6 +1059,43 @@ export function KJVReader() {
     );
   }
 
+  function clearMovePreview() {
+    const previewId = previewLeafIdRef.current;
+    if (!previewId) {
+      return;
+    }
+
+    const panelElement = panelElementRefs.current[previewId];
+    const previewSurface = panelElement?.querySelector<HTMLElement>(
+      ':scope > [data-slot="card"]',
+    );
+    previewSurface?.classList.remove("panel-move-preview-surface");
+    previewLeafIdRef.current = null;
+  }
+
+  function applyMovePreview(targetLeafId: string | null) {
+    clearMovePreview();
+    if (!targetLeafId) {
+      return;
+    }
+
+    const panelElement = panelElementRefs.current[targetLeafId];
+    const previewSurface = panelElement?.querySelector<HTMLElement>(
+      ':scope > [data-slot="card"]',
+    );
+    if (!previewSurface) {
+      return;
+    }
+
+    previewSurface.classList.add("panel-move-preview-surface");
+    previewLeafIdRef.current = targetLeafId;
+  }
+
+  function setMovePreviewTarget(leafId: string, direction: PanelDirection) {
+    const targetLeafId = neighborsForLeaf(leafId)[direction] ?? null;
+    applyMovePreview(targetLeafId);
+  }
+
   function splitPanelGroup(leafId: string, direction: PanelDirection) {
     if (!activeTab) {
       return;
@@ -1093,6 +1131,7 @@ export function KJVReader() {
       ...tab,
       root: swapLeafContent(tab.root, leafId, targetLeafId),
     }));
+    clearMovePreview();
   }
 
   function closeLeaf(leafId: string) {
@@ -1211,6 +1250,7 @@ function updateLeafLocation(
 
     if (shouldActivate) {
       setActiveTabId(nextTabId);
+      clearMovePreview();
       requestAnimationFrame(() => {
         tabEndRef.current?.scrollIntoView({
           behavior: "smooth",
@@ -1471,7 +1511,13 @@ function updateLeafLocation(
               </p>
             )}
 
-            <DropdownMenu>
+            <DropdownMenu
+              onOpenChange={(open) => {
+                if (!open) {
+                  clearMovePreview();
+                }
+              }}
+            >
               <DropdownMenuTrigger
                 render={
                   <Button variant="outline" size="sm" className="ml-auto" />
@@ -1496,25 +1542,41 @@ function updateLeafLocation(
                   <>
                     <DropdownMenuGroup>
                       {moveDirections.includes("left") ? (
-                        <DropdownMenuItem onClick={() => moveLeaf(leaf.id, "left")}>
+                        <DropdownMenuItem
+                          onClick={() => moveLeaf(leaf.id, "left")}
+                          onPointerEnter={() => setMovePreviewTarget(leaf.id, "left")}
+                          onPointerLeave={() => clearMovePreview()}
+                        >
                           <ArrowLeftIcon />
                           Move Left
                         </DropdownMenuItem>
                       ) : null}
                       {moveDirections.includes("right") ? (
-                        <DropdownMenuItem onClick={() => moveLeaf(leaf.id, "right")}>
+                        <DropdownMenuItem
+                          onClick={() => moveLeaf(leaf.id, "right")}
+                          onPointerEnter={() => setMovePreviewTarget(leaf.id, "right")}
+                          onPointerLeave={() => clearMovePreview()}
+                        >
                           <ArrowRightIcon />
                           Move Right
                         </DropdownMenuItem>
                       ) : null}
                       {moveDirections.includes("up") ? (
-                        <DropdownMenuItem onClick={() => moveLeaf(leaf.id, "up")}>
+                        <DropdownMenuItem
+                          onClick={() => moveLeaf(leaf.id, "up")}
+                          onPointerEnter={() => setMovePreviewTarget(leaf.id, "up")}
+                          onPointerLeave={() => clearMovePreview()}
+                        >
                           <ArrowUpIcon />
                           Move Up
                         </DropdownMenuItem>
                       ) : null}
                       {moveDirections.includes("down") ? (
-                        <DropdownMenuItem onClick={() => moveLeaf(leaf.id, "down")}>
+                        <DropdownMenuItem
+                          onClick={() => moveLeaf(leaf.id, "down")}
+                          onPointerEnter={() => setMovePreviewTarget(leaf.id, "down")}
+                          onPointerLeave={() => clearMovePreview()}
+                        >
                           <ArrowDownIcon />
                           Move Down
                         </DropdownMenuItem>

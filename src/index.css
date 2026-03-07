@@ -140,7 +140,9 @@
     opacity: 1;
 }
 
-
-.tab-strip-scroll-active::-webkit-scrollbar-thumb {
-    background-color: color-mix(in oklch, var(--muted-foreground) 45%, transparent);
+.panel-move-preview-surface {
+    box-shadow:
+      inset 0 0 0 2px color-mix(in oklch, var(--primary) 75%, transparent),
+      0 0 0 1px color-mix(in oklch, var(--primary) 30%, transparent);
+    background-color: color-mix(in oklch, var(--primary) 7%, transparent);
 }
