@@ -1,15 +1,24 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
+  ArrowDownIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowUpIcon,
   BookOpenIcon,
   ChartBarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   EllipsisIcon,
+  ExternalLinkIcon,
   ExpandIcon,
   MinimizeIcon,
   MenuIcon,
   PlusIcon,
   SettingsIcon,
+  SquareChevronDownIcon,
+  SquareChevronLeftIcon,
+  SquareChevronRightIcon,
+  SquareChevronUpIcon,
   SplitSquareHorizontalIcon,
   SplitSquareVerticalIcon,
   XIcon,
@@ -242,6 +251,27 @@ function createInitialTab(
   };
 }
 
+function directionOrientation(direction: PanelDirection): SplitOrientation {
+  return direction === "left" || direction === "right"
+    ? "horizontal"
+    : "vertical";
+}
+
+function wrapNodeWithNewPanel(node: PanelNode, direction: PanelDirection): SplitNode {
+  const newLeaf = createLeaf();
+  const orientation = directionOrientation(direction);
+  const placeNewFirst = direction === "left" || direction === "up";
+
+  return {
+    id: createId(),
+    type: "split",
+    orientation,
+    ratio: 50,
+    first: placeNewFirst ? newLeaf : node,
+    second: placeNewFirst ? node : newLeaf,
+  };
+}
+
 function splitPanelNode(
   node: PanelNode,
   targetLeafId: string,
@@ -251,22 +281,9 @@ function splitPanelNode(
     if (node.id !== targetLeafId) {
       return { next: node, createdLeafId: null };
     }
-
-    const newLeaf = createLeaf();
-    const orientation: SplitOrientation =
-      direction === "left" || direction === "right" ? "horizontal" : "vertical";
-
-    const placeNewFirst = direction === "left" || direction === "up";
-    const split: SplitNode = {
-      id: createId(),
-      type: "split",
-      orientation,
-      ratio: 50,
-      first: placeNewFirst ? newLeaf : node,
-      second: placeNewFirst ? node : newLeaf,
-    };
-
-    return { next: split, createdLeafId: newLeaf.id };
+    const split = wrapNodeWithNewPanel(node, direction);
+    const createdLeaf = split.first.type === "leaf" ? split.first : split.second;
+    return { next: split, createdLeafId: createdLeaf.id };
   }
 
   const firstResult = splitPanelNode(node.first, targetLeafId, direction);
@@ -286,6 +303,32 @@ function splitPanelNode(
   }
 
   return { next: node, createdLeafId: null };
+}
+
+function splitNodeById(
+  node: PanelNode,
+  targetNodeId: string,
+  direction: PanelDirection,
+): { next: PanelNode; changed: boolean } {
+  if (node.id === targetNodeId) {
+    return { next: wrapNodeWithNewPanel(node, direction), changed: true };
+  }
+
+  if (node.type === "leaf") {
+    return { next: node, changed: false };
+  }
+
+  const first = splitNodeById(node.first, targetNodeId, direction);
+  if (first.changed) {
+    return { next: { ...node, first: first.next }, changed: true };
+  }
+
+  const second = splitNodeById(node.second, targetNodeId, direction);
+  if (second.changed) {
+    return { next: { ...node, second: second.next }, changed: true };
+  }
+
+  return { next: node, changed: false };
 }
 
 function removeLeafNode(
@@ -381,12 +424,316 @@ function countLeaves(node: PanelNode): number {
   return countLeaves(node.first) + countLeaves(node.second);
 }
 
+function collectLeafIds(node: PanelNode, ids: string[] = []) {
+  if (node.type === "leaf") {
+    ids.push(node.id);
+    return ids;
+  }
+
+  collectLeafIds(node.first, ids);
+  collectLeafIds(node.second, ids);
+  return ids;
+}
+
 function findLeafNode(node: PanelNode, leafId: string): LeafNode | null {
   if (node.type === "leaf") {
     return node.id === leafId ? node : null;
   }
 
   return findLeafNode(node.first, leafId) ?? findLeafNode(node.second, leafId);
+}
+
+function extractLeafNode(
+  node: PanelNode,
+  targetLeafId: string,
+): { next: PanelNode | null; extracted: LeafNode | null } {
+  if (node.type === "leaf") {
+    if (node.id !== targetLeafId) {
+      return { next: node, extracted: null };
+    }
+    return { next: null, extracted: node };
+  }
+
+  const first = extractLeafNode(node.first, targetLeafId);
+  if (first.extracted) {
+    if (!first.next) {
+      return { next: node.second, extracted: first.extracted };
+    }
+    return {
+      next: { ...node, first: first.next },
+      extracted: first.extracted,
+    };
+  }
+
+  const second = extractLeafNode(node.second, targetLeafId);
+  if (second.extracted) {
+    if (!second.next) {
+      return { next: node.first, extracted: second.extracted };
+    }
+    return {
+      next: { ...node, second: second.next },
+      extracted: second.extracted,
+    };
+  }
+
+  return { next: node, extracted: null };
+}
+
+function swapLeafContent(
+  node: PanelNode,
+  sourceLeafId: string,
+  targetLeafId: string,
+): PanelNode {
+  const sourceLeaf = findLeafNode(node, sourceLeafId);
+  const targetLeaf = findLeafNode(node, targetLeafId);
+  if (!sourceLeaf || !targetLeaf) {
+    return node;
+  }
+
+  const sourceContent = {
+    view: sourceLeaf.view,
+    bookIndex: sourceLeaf.bookIndex,
+    chapterIndex: sourceLeaf.chapterIndex,
+    pickerTestament: sourceLeaf.pickerTestament,
+    pickerBookIndex: sourceLeaf.pickerBookIndex,
+  };
+  const targetContent = {
+    view: targetLeaf.view,
+    bookIndex: targetLeaf.bookIndex,
+    chapterIndex: targetLeaf.chapterIndex,
+    pickerTestament: targetLeaf.pickerTestament,
+    pickerBookIndex: targetLeaf.pickerBookIndex,
+  };
+
+  return updateLeafNode(
+    updateLeafNode(node, sourceLeafId, targetContent),
+    targetLeafId,
+    sourceContent,
+  );
+}
+
+type LeafRect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+type LeafNeighbors = Partial<Record<PanelDirection, string>>;
+
+function collectLeafRects(
+  node: PanelNode,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  rects: Map<string, LeafRect>,
+) {
+  if (node.type === "leaf") {
+    rects.set(node.id, { x, y, width, height });
+    return;
+  }
+
+  const ratio = Math.min(90, Math.max(10, node.ratio)) / 100;
+  if (node.orientation === "horizontal") {
+    const firstWidth = width * ratio;
+    collectLeafRects(node.first, x, y, firstWidth, height, rects);
+    collectLeafRects(
+      node.second,
+      x + firstWidth,
+      y,
+      width - firstWidth,
+      height,
+      rects,
+    );
+    return;
+  }
+
+  const firstHeight = height * ratio;
+  collectLeafRects(node.first, x, y, width, firstHeight, rects);
+  collectLeafRects(node.second, x, y + firstHeight, width, height - firstHeight, rects);
+}
+
+function overlapSize(startA: number, endA: number, startB: number, endB: number) {
+  return Math.max(0, Math.min(endA, endB) - Math.max(startA, startB));
+}
+
+function neighborForDirection(
+  sourceId: string,
+  direction: PanelDirection,
+  rects: Map<string, LeafRect>,
+) {
+  const source = rects.get(sourceId);
+  if (!source) {
+    return null;
+  }
+
+  const epsilon = 0.001;
+  let bestId: string | null = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  let bestOverlap = -1;
+
+  for (const [candidateId, rect] of rects.entries()) {
+    if (candidateId === sourceId) {
+      continue;
+    }
+
+    let distance = Number.POSITIVE_INFINITY;
+    let overlap = 0;
+
+    if (direction === "left") {
+      if (rect.x + rect.width > source.x + epsilon) {
+        continue;
+      }
+      overlap = overlapSize(
+        source.y,
+        source.y + source.height,
+        rect.y,
+        rect.y + rect.height,
+      );
+      if (overlap <= 0) {
+        continue;
+      }
+      distance = source.x - (rect.x + rect.width);
+    } else if (direction === "right") {
+      if (rect.x < source.x + source.width - epsilon) {
+        continue;
+      }
+      overlap = overlapSize(
+        source.y,
+        source.y + source.height,
+        rect.y,
+        rect.y + rect.height,
+      );
+      if (overlap <= 0) {
+        continue;
+      }
+      distance = rect.x - (source.x + source.width);
+    } else if (direction === "up") {
+      if (rect.y + rect.height > source.y + epsilon) {
+        continue;
+      }
+      overlap = overlapSize(
+        source.x,
+        source.x + source.width,
+        rect.x,
+        rect.x + rect.width,
+      );
+      if (overlap <= 0) {
+        continue;
+      }
+      distance = source.y - (rect.y + rect.height);
+    } else {
+      if (rect.y < source.y + source.height - epsilon) {
+        continue;
+      }
+      overlap = overlapSize(
+        source.x,
+        source.x + source.width,
+        rect.x,
+        rect.x + rect.width,
+      );
+      if (overlap <= 0) {
+        continue;
+      }
+      distance = rect.y - (source.y + source.height);
+    }
+
+    if (
+      distance < bestDistance - epsilon ||
+      (Math.abs(distance - bestDistance) <= epsilon && overlap > bestOverlap)
+    ) {
+      bestDistance = distance;
+      bestOverlap = overlap;
+      bestId = candidateId;
+    }
+  }
+
+  return bestId;
+}
+
+function buildLeafNeighborMap(root: PanelNode) {
+  const rects = new Map<string, LeafRect>();
+  collectLeafRects(root, 0, 0, 1, 1, rects);
+
+  const map = new Map<string, LeafNeighbors>();
+  for (const leafId of rects.keys()) {
+    map.set(leafId, {
+      left: neighborForDirection(leafId, "left", rects) ?? undefined,
+      right: neighborForDirection(leafId, "right", rects) ?? undefined,
+      up: neighborForDirection(leafId, "up", rects) ?? undefined,
+      down: neighborForDirection(leafId, "down", rects) ?? undefined,
+    });
+  }
+
+  return map;
+}
+
+function buildLeafNeighborMapFromDom(
+  root: PanelNode,
+  panelElements: Record<string, HTMLDivElement | null>,
+) {
+  const rects = new Map<string, LeafRect>();
+  const leafIds = collectLeafIds(root);
+
+  for (const leafId of leafIds) {
+    const element = panelElements[leafId];
+    if (!element) {
+      continue;
+    }
+    const rect = element.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) {
+      continue;
+    }
+    rects.set(leafId, {
+      x: rect.left,
+      y: rect.top,
+      width: rect.width,
+      height: rect.height,
+    });
+  }
+
+  const map = new Map<string, LeafNeighbors>();
+  for (const leafId of rects.keys()) {
+    map.set(leafId, {
+      left: neighborForDirection(leafId, "left", rects) ?? undefined,
+      right: neighborForDirection(leafId, "right", rects) ?? undefined,
+      up: neighborForDirection(leafId, "up", rects) ?? undefined,
+      down: neighborForDirection(leafId, "down", rects) ?? undefined,
+    });
+  }
+
+  return map;
+}
+
+function pathToLeaf(node: PanelNode, leafId: string, path: PanelNode[] = []): PanelNode[] | null {
+  const nextPath = [...path, node];
+  if (node.type === "leaf") {
+    return node.id === leafId ? nextPath : null;
+  }
+
+  return pathToLeaf(node.first, leafId, nextPath) ?? pathToLeaf(node.second, leafId, nextPath);
+}
+
+function findGroupTargetNodeId(
+  root: PanelNode,
+  leafId: string,
+  direction: PanelDirection,
+) {
+  const desiredOrientation = directionOrientation(direction);
+  const path = pathToLeaf(root, leafId);
+  if (!path) {
+    return null;
+  }
+
+  for (let index = path.length - 2; index >= 0; index -= 1) {
+    const node = path[index];
+    if (node.type === "split" && node.orientation !== desiredOrientation) {
+      return node.id;
+    }
+  }
+
+  return null;
 }
 
 export function KJVReader() {
@@ -546,6 +893,17 @@ export function KJVReader() {
     () => tabs.find((tab) => tab.id === activeTabId) ?? null,
     [activeTabId, tabs],
   );
+  const modelLeafNeighbors = useMemo(
+    () => (activeTab ? buildLeafNeighborMap(activeTab.root) : new Map()),
+    [activeTab],
+  );
+  const domLeafNeighbors = useMemo(
+    () =>
+      activeTab
+        ? buildLeafNeighborMapFromDom(activeTab.root, panelElementRefs.current)
+        : new Map(),
+    [activeTab, tabs],
+  );
   const progressByTestament = useMemo(() => {
     const oldBooks = books.slice(0, 39);
     const newBooks = books.slice(39);
@@ -692,6 +1050,51 @@ export function KJVReader() {
     });
   }
 
+  function neighborsForLeaf(leafId: string): LeafNeighbors {
+    return (
+      domLeafNeighbors.get(leafId) ??
+      modelLeafNeighbors.get(leafId) ??
+      {}
+    );
+  }
+
+  function splitPanelGroup(leafId: string, direction: PanelDirection) {
+    if (!activeTab) {
+      return;
+    }
+
+    const targetNodeId = findGroupTargetNodeId(activeTab.root, leafId, direction);
+    if (!targetNodeId) {
+      return;
+    }
+
+    updateActiveTab((tab) => {
+      const result = splitNodeById(tab.root, targetNodeId, direction);
+      return result.changed ? { ...tab, root: result.next } : tab;
+    });
+  }
+
+  function moveLeaf(leafId: string, direction: PanelDirection) {
+    if (!activeTab) {
+      return;
+    }
+    const freshDomNeighbors = buildLeafNeighborMapFromDom(
+      activeTab.root,
+      panelElementRefs.current,
+    );
+    const targetLeafId =
+      freshDomNeighbors.get(leafId)?.[direction] ??
+      neighborsForLeaf(leafId)[direction];
+    if (!targetLeafId) {
+      return;
+    }
+
+    updateActiveTab((tab) => ({
+      ...tab,
+      root: swapLeafContent(tab.root, leafId, targetLeafId),
+    }));
+  }
+
   function closeLeaf(leafId: string) {
     updateActiveTab((tab) => {
       if (countLeaves(tab.root) <= 1) {
@@ -770,6 +1173,52 @@ function updateLeafLocation(
 
   function resetAllProgress() {
     setReadChapters(new Set());
+  }
+
+  function moveLeafToNewTab(leafId: string) {
+    if (!activeTabId) {
+      return;
+    }
+
+    const nextTabId = createId();
+    let shouldActivate = false;
+
+    setTabs((currentTabs) => {
+      const activeIndex = currentTabs.findIndex((tab) => tab.id === activeTabId);
+      if (activeIndex < 0) {
+        return currentTabs;
+      }
+
+      const active = currentTabs[activeIndex];
+      const result = extractLeafNode(active.root, leafId);
+      if (!result.extracted) {
+        return currentTabs;
+      }
+
+      const sourceRoot = result.next ?? createLeaf();
+      const newTab: ReaderTab = {
+        id: nextTabId,
+        title: `Tab ${currentTabs.length + 1}`,
+        root: result.extracted,
+      };
+
+      const nextTabs = [...currentTabs];
+      nextTabs[activeIndex] = { ...active, root: sourceRoot };
+      nextTabs.push(newTab);
+      shouldActivate = true;
+      return nextTabs;
+    });
+
+    if (shouldActivate) {
+      setActiveTabId(nextTabId);
+      requestAnimationFrame(() => {
+        tabEndRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "end",
+        });
+      });
+    }
   }
 
   function addTab() {
@@ -915,6 +1364,24 @@ function updateLeafLocation(
     const chapterReadKey = chapterProgressKey(leaf.bookIndex, leaf.chapterIndex);
     const isChapterRead = readChapters.has(chapterReadKey);
     const readingProgress = leafScrollProgress[leaf.id] ?? 0;
+    const neighbors = neighborsForLeaf(leaf.id);
+    const moveDirections = (["left", "right", "up", "down"] as PanelDirection[]).filter(
+      (direction) => Boolean(neighbors[direction]),
+    );
+    const groupTargets = activeTab
+      ? {
+          left: findGroupTargetNodeId(activeTab.root, leaf.id, "left"),
+          right: findGroupTargetNodeId(activeTab.root, leaf.id, "right"),
+          up: findGroupTargetNodeId(activeTab.root, leaf.id, "up"),
+          down: findGroupTargetNodeId(activeTab.root, leaf.id, "down"),
+        }
+      : { left: null, right: null, up: null, down: null };
+    const hasGroupAddOptions = Boolean(
+      groupTargets.left ||
+        groupTargets.right ||
+        groupTargets.up ||
+        groupTargets.down,
+    );
     const refIndex = chapterRefIndex.get(key) ?? -1;
     const hasPrev = refIndex > 0;
     const hasNext = refIndex >= 0 && refIndex < chapterRefs.length - 1;
@@ -1013,7 +1480,7 @@ function updateLeafLocation(
                 <PlusIcon />
                 Panel
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem onClick={() => void toggleFullscreenLeaf(leaf.id)}>
                   {fullscreenLeafId === leaf.id ? (
                     <MinimizeIcon />
@@ -1025,21 +1492,96 @@ function updateLeafLocation(
                     : "Full Screen"}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                {moveDirections.length > 0 ? (
+                  <>
+                    <DropdownMenuGroup>
+                      {moveDirections.includes("left") ? (
+                        <DropdownMenuItem onClick={() => moveLeaf(leaf.id, "left")}>
+                          <ArrowLeftIcon />
+                          Move Left
+                        </DropdownMenuItem>
+                      ) : null}
+                      {moveDirections.includes("right") ? (
+                        <DropdownMenuItem onClick={() => moveLeaf(leaf.id, "right")}>
+                          <ArrowRightIcon />
+                          Move Right
+                        </DropdownMenuItem>
+                      ) : null}
+                      {moveDirections.includes("up") ? (
+                        <DropdownMenuItem onClick={() => moveLeaf(leaf.id, "up")}>
+                          <ArrowUpIcon />
+                          Move Up
+                        </DropdownMenuItem>
+                      ) : null}
+                      {moveDirections.includes("down") ? (
+                        <DropdownMenuItem onClick={() => moveLeaf(leaf.id, "down")}>
+                          <ArrowDownIcon />
+                          Move Down
+                        </DropdownMenuItem>
+                      ) : null}
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                  </>
+                ) : null}
                 <DropdownMenuItem onClick={() => splitLeaf(leaf.id, "left")}>
                   <SplitSquareHorizontalIcon />
-                  Split Left
+                  Add Panel Left
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => splitLeaf(leaf.id, "right")}>
                   <SplitSquareHorizontalIcon className="rotate-180" />
-                  Split Right
+                  Add Panel Right
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => splitLeaf(leaf.id, "up")}>
                   <SplitSquareVerticalIcon />
-                  Split Up
+                  Add Panel Above
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => splitLeaf(leaf.id, "down")}>
                   <SplitSquareVerticalIcon className="rotate-180" />
-                  Split Down
+                  Add Panel Below
+                </DropdownMenuItem>
+                {hasGroupAddOptions ? (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      {groupTargets.left ? (
+                        <DropdownMenuItem
+                          onClick={() => splitPanelGroup(leaf.id, "left")}
+                        >
+                          <SquareChevronLeftIcon />
+                          Add Panel Left (Group)
+                        </DropdownMenuItem>
+                      ) : null}
+                      {groupTargets.right ? (
+                        <DropdownMenuItem
+                          onClick={() => splitPanelGroup(leaf.id, "right")}
+                        >
+                          <SquareChevronRightIcon />
+                          Add Panel Right (Group)
+                        </DropdownMenuItem>
+                      ) : null}
+                      {groupTargets.up ? (
+                        <DropdownMenuItem
+                          onClick={() => splitPanelGroup(leaf.id, "up")}
+                        >
+                          <SquareChevronUpIcon />
+                          Add Panel Above (Group)
+                        </DropdownMenuItem>
+                      ) : null}
+                      {groupTargets.down ? (
+                        <DropdownMenuItem
+                          onClick={() => splitPanelGroup(leaf.id, "down")}
+                        >
+                          <SquareChevronDownIcon />
+                          Add Panel Below (Group)
+                        </DropdownMenuItem>
+                      ) : null}
+                    </DropdownMenuGroup>
+                  </>
+                ) : null}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => moveLeafToNewTab(leaf.id)}>
+                  <ExternalLinkIcon />
+                  Move to New Tab
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => closeLeaf(leaf.id)}>
