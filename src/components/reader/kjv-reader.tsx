@@ -806,6 +806,7 @@ export function KJVReader() {
   const [renameTabId, setRenameTabId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [fullscreenLeafId, setFullscreenLeafId] = useState<string | null>(null);
+  const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(null);
   const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
   const [leafScrollProgress, setLeafScrollProgress] = useState<
     Record<string, number>
@@ -817,6 +818,7 @@ export function KJVReader() {
   const addPreviewDirectionRef = useRef<PanelDirection | null>(null);
   const addPreviewIsGroupRef = useRef(false);
   const orientationPreviewLeafIdsRef = useRef<string[]>([]);
+  const fullscreenRequestedLeafIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -1059,8 +1061,15 @@ export function KJVReader() {
   useEffect(() => {
     function onFullscreenChange() {
       const element = document.fullscreenElement as HTMLElement | null;
-      const leafId = element?.dataset.panelLeafId ?? null;
+      const leafId = element
+        ? (fullscreenRequestedLeafIdRef.current ?? null)
+        : null;
       setFullscreenLeafId(leafId);
+      setPanelMenuOpenLeafId(null);
+      clearAllPanelPreviews();
+      if (!element) {
+        fullscreenRequestedLeafIdRef.current = null;
+      }
     }
 
     document.addEventListener("fullscreenchange", onFullscreenChange);
@@ -1068,6 +1077,17 @@ export function KJVReader() {
       document.removeEventListener("fullscreenchange", onFullscreenChange);
     };
   }, []);
+
+  useEffect(() => {
+    if (!panelMenuOpenLeafId || !activeTab) {
+      return;
+    }
+
+    if (!findLeafNode(activeTab.root, panelMenuOpenLeafId)) {
+      setPanelMenuOpenLeafId(null);
+      clearAllPanelPreviews();
+    }
+  }, [activeTab, panelMenuOpenLeafId]);
 
   useEffect(() => {
     if (!activeTab) {
@@ -1668,24 +1688,41 @@ function updateLeafLocation(
   }
 
   async function toggleFullscreenLeaf(leafId: string) {
-    const element = panelElementRefs.current[leafId];
-    if (!element) {
-      return;
-    }
-
     try {
-      if (document.fullscreenElement === element) {
-        await document.exitFullscreen();
+      if (document.fullscreenElement) {
+        if (fullscreenLeafId === leafId) {
+          fullscreenRequestedLeafIdRef.current = null;
+          setPanelMenuOpenLeafId(null);
+          clearAllPanelPreviews();
+          await document.exitFullscreen();
+          return;
+        }
+
+        // Already in browser fullscreen: just switch the active fullscreen panel.
+        fullscreenRequestedLeafIdRef.current = leafId;
+        setFullscreenLeafId(leafId);
+        setPanelMenuOpenLeafId(null);
+        clearAllPanelPreviews();
         return;
       }
 
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
+      fullscreenRequestedLeafIdRef.current = leafId;
+      setFullscreenLeafId(leafId);
+      setPanelMenuOpenLeafId(null);
+      clearAllPanelPreviews();
+      if (!document.documentElement.requestFullscreen) {
+        setFullscreenLeafId(null);
+        fullscreenRequestedLeafIdRef.current = null;
+        return;
       }
 
-      await element.requestFullscreen();
+      await document.documentElement.requestFullscreen();
     } catch {
       // Ignore fullscreen rejections (browser policy/user gesture edge cases).
+      if (!document.fullscreenElement) {
+        setFullscreenLeafId(null);
+        fullscreenRequestedLeafIdRef.current = null;
+      }
     }
   }
 
@@ -1747,6 +1784,11 @@ function updateLeafLocation(
     const refIndex = chapterRefIndex.get(key) ?? -1;
     const hasPrev = refIndex > 0;
     const hasNext = refIndex >= 0 && refIndex < chapterRefs.length - 1;
+    const isFullscreenLeaf = fullscreenLeafId === leaf.id;
+    const closePanelMenu = () => {
+      setPanelMenuOpenLeafId(null);
+      clearAllPanelPreviews();
+    };
 
     return (
       <div
@@ -1754,7 +1796,10 @@ function updateLeafLocation(
         ref={(element) => {
           panelElementRefs.current[leaf.id] = element;
         }}
-        className="h-full w-full min-w-0 bg-background"
+        className={cn(
+          "h-full w-full min-w-0 bg-background",
+          isFullscreenLeaf && "fixed inset-0 z-40 h-screen w-screen",
+        )}
       >
         <Card className="flex h-full min-h-0 w-full min-w-0 flex-col rounded-none">
         <CardHeader className="border-b p-2 sm:p-3">
@@ -1834,10 +1879,16 @@ function updateLeafLocation(
             )}
 
             <DropdownMenu
+              open={panelMenuOpenLeafId === leaf.id}
               onOpenChange={(open) => {
-                if (!open) {
-                  clearAllPanelPreviews();
+                if (open) {
+                  setPanelMenuOpenLeafId(leaf.id);
+                  return;
                 }
+                if (panelMenuOpenLeafId === leaf.id) {
+                  setPanelMenuOpenLeafId(null);
+                }
+                clearAllPanelPreviews();
               }}
             >
               <DropdownMenuTrigger
@@ -1849,171 +1900,180 @@ function updateLeafLocation(
                 Panel
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => void toggleFullscreenLeaf(leaf.id)}>
-                  {fullscreenLeafId === leaf.id ? (
+                <DropdownMenuItem
+                  onClick={() => {
+                    closePanelMenu();
+                    void toggleFullscreenLeaf(leaf.id);
+                  }}
+                >
+                  {isFullscreenLeaf ? (
                     <MinimizeIcon />
                   ) : (
                     <ExpandIcon />
                   )}
-                  {fullscreenLeafId === leaf.id
+                  {isFullscreenLeaf
                     ? "Exit Full Screen"
                     : "Full Screen"}
                 </DropdownMenuItem>
-                {parentSplit ? (
-                  <DropdownMenuItem
-                    onClick={() => toggleParentGroupOrientation(leaf.id)}
-                    onPointerEnter={() => setOrientationPreviewTarget(leaf.id)}
-                    onPointerLeave={() => clearOrientationPreview()}
-                  >
-                    <RotateCwIcon />
-                    {nextOrientationLabel}
-                  </DropdownMenuItem>
-                ) : null}
-                <DropdownMenuSeparator />
-                {moveDirections.length > 0 ? (
+                {!isFullscreenLeaf ? (
                   <>
-                    <DropdownMenuGroup>
-                      {moveDirections.includes("left") ? (
-                        <DropdownMenuItem
-                          onClick={() => moveLeaf(leaf.id, "left")}
-                          onPointerEnter={() => setMovePreviewTarget(leaf.id, "left")}
-                          onPointerLeave={() => clearMovePreview()}
-                        >
-                          <ArrowLeftIcon />
-                          Move Left
-                        </DropdownMenuItem>
-                      ) : null}
-                      {moveDirections.includes("right") ? (
-                        <DropdownMenuItem
-                          onClick={() => moveLeaf(leaf.id, "right")}
-                          onPointerEnter={() => setMovePreviewTarget(leaf.id, "right")}
-                          onPointerLeave={() => clearMovePreview()}
-                        >
-                          <ArrowRightIcon />
-                          Move Right
-                        </DropdownMenuItem>
-                      ) : null}
-                      {moveDirections.includes("up") ? (
-                        <DropdownMenuItem
-                          onClick={() => moveLeaf(leaf.id, "up")}
-                          onPointerEnter={() => setMovePreviewTarget(leaf.id, "up")}
-                          onPointerLeave={() => clearMovePreview()}
-                        >
-                          <ArrowUpIcon />
-                          Move Up
-                        </DropdownMenuItem>
-                      ) : null}
-                      {moveDirections.includes("down") ? (
-                        <DropdownMenuItem
-                          onClick={() => moveLeaf(leaf.id, "down")}
-                          onPointerEnter={() => setMovePreviewTarget(leaf.id, "down")}
-                          onPointerLeave={() => clearMovePreview()}
-                        >
-                          <ArrowDownIcon />
-                          Move Down
-                        </DropdownMenuItem>
-                      ) : null}
-                    </DropdownMenuGroup>
+                    {parentSplit ? (
+                      <DropdownMenuItem
+                        onClick={() => toggleParentGroupOrientation(leaf.id)}
+                        onPointerEnter={() => setOrientationPreviewTarget(leaf.id)}
+                        onPointerLeave={() => clearOrientationPreview()}
+                      >
+                        <RotateCwIcon />
+                        {nextOrientationLabel}
+                      </DropdownMenuItem>
+                    ) : null}
                     <DropdownMenuSeparator />
+                    {moveDirections.length > 0 ? (
+                      <>
+                        <DropdownMenuGroup>
+                          {moveDirections.includes("left") ? (
+                            <DropdownMenuItem
+                              onClick={() => moveLeaf(leaf.id, "left")}
+                              onPointerEnter={() => setMovePreviewTarget(leaf.id, "left")}
+                              onPointerLeave={() => clearMovePreview()}
+                            >
+                              <ArrowLeftIcon />
+                              Move Left
+                            </DropdownMenuItem>
+                          ) : null}
+                          {moveDirections.includes("right") ? (
+                            <DropdownMenuItem
+                              onClick={() => moveLeaf(leaf.id, "right")}
+                              onPointerEnter={() => setMovePreviewTarget(leaf.id, "right")}
+                              onPointerLeave={() => clearMovePreview()}
+                            >
+                              <ArrowRightIcon />
+                              Move Right
+                            </DropdownMenuItem>
+                          ) : null}
+                          {moveDirections.includes("up") ? (
+                            <DropdownMenuItem
+                              onClick={() => moveLeaf(leaf.id, "up")}
+                              onPointerEnter={() => setMovePreviewTarget(leaf.id, "up")}
+                              onPointerLeave={() => clearMovePreview()}
+                            >
+                              <ArrowUpIcon />
+                              Move Up
+                            </DropdownMenuItem>
+                          ) : null}
+                          {moveDirections.includes("down") ? (
+                            <DropdownMenuItem
+                              onClick={() => moveLeaf(leaf.id, "down")}
+                              onPointerEnter={() => setMovePreviewTarget(leaf.id, "down")}
+                              onPointerLeave={() => clearMovePreview()}
+                            >
+                              <ArrowDownIcon />
+                              Move Down
+                            </DropdownMenuItem>
+                          ) : null}
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                      </>
+                    ) : null}
+                    <DropdownMenuItem
+                      onClick={() => splitLeaf(leaf.id, "left")}
+                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "left")}
+                      onPointerLeave={() => clearAddPreview()}
+                    >
+                      <SplitSquareHorizontalIcon />
+                      Add Panel Left
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => splitLeaf(leaf.id, "right")}
+                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "right")}
+                      onPointerLeave={() => clearAddPreview()}
+                    >
+                      <SplitSquareHorizontalIcon className="rotate-180" />
+                      Add Panel Right
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => splitLeaf(leaf.id, "up")}
+                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "up")}
+                      onPointerLeave={() => clearAddPreview()}
+                    >
+                      <SplitSquareVerticalIcon />
+                      Add Panel Above
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => splitLeaf(leaf.id, "down")}
+                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "down")}
+                      onPointerLeave={() => clearAddPreview()}
+                    >
+                      <SplitSquareVerticalIcon className="rotate-180" />
+                      Add Panel Below
+                    </DropdownMenuItem>
+                    {hasGroupAddOptions ? (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          {groupTargets.left ? (
+                            <DropdownMenuItem
+                              onClick={() => splitPanelGroup(leaf.id, "left")}
+                              onPointerEnter={() =>
+                                setGroupAddPreviewTarget(leaf.id, "left")
+                              }
+                              onPointerLeave={() => clearAddPreview()}
+                            >
+                              <SquareChevronLeftIcon />
+                              Add Panel Left (Group)
+                            </DropdownMenuItem>
+                          ) : null}
+                          {groupTargets.right ? (
+                            <DropdownMenuItem
+                              onClick={() => splitPanelGroup(leaf.id, "right")}
+                              onPointerEnter={() =>
+                                setGroupAddPreviewTarget(leaf.id, "right")
+                              }
+                              onPointerLeave={() => clearAddPreview()}
+                            >
+                              <SquareChevronRightIcon />
+                              Add Panel Right (Group)
+                            </DropdownMenuItem>
+                          ) : null}
+                          {groupTargets.up ? (
+                            <DropdownMenuItem
+                              onClick={() => splitPanelGroup(leaf.id, "up")}
+                              onPointerEnter={() =>
+                                setGroupAddPreviewTarget(leaf.id, "up")
+                              }
+                              onPointerLeave={() => clearAddPreview()}
+                            >
+                              <SquareChevronUpIcon />
+                              Add Panel Above (Group)
+                            </DropdownMenuItem>
+                          ) : null}
+                          {groupTargets.down ? (
+                            <DropdownMenuItem
+                              onClick={() => splitPanelGroup(leaf.id, "down")}
+                              onPointerEnter={() =>
+                                setGroupAddPreviewTarget(leaf.id, "down")
+                              }
+                              onPointerLeave={() => clearAddPreview()}
+                            >
+                              <SquareChevronDownIcon />
+                              Add Panel Below (Group)
+                            </DropdownMenuItem>
+                          ) : null}
+                        </DropdownMenuGroup>
+                      </>
+                    ) : null}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => moveLeafToNewTab(leaf.id)}>
+                      <ExternalLinkIcon />
+                      Move to New Tab
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => closeLeaf(leaf.id)}>
+                      <XIcon />
+                      Close Panel
+                    </DropdownMenuItem>
                   </>
                 ) : null}
-                <DropdownMenuItem
-                  onClick={() => splitLeaf(leaf.id, "left")}
-                  onPointerEnter={() => setAddPreviewTarget(leaf.id, "left")}
-                  onPointerLeave={() => clearAddPreview()}
-                >
-                  <SplitSquareHorizontalIcon />
-                  Add Panel Left
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => splitLeaf(leaf.id, "right")}
-                  onPointerEnter={() => setAddPreviewTarget(leaf.id, "right")}
-                  onPointerLeave={() => clearAddPreview()}
-                >
-                  <SplitSquareHorizontalIcon className="rotate-180" />
-                  Add Panel Right
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => splitLeaf(leaf.id, "up")}
-                  onPointerEnter={() => setAddPreviewTarget(leaf.id, "up")}
-                  onPointerLeave={() => clearAddPreview()}
-                >
-                  <SplitSquareVerticalIcon />
-                  Add Panel Above
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => splitLeaf(leaf.id, "down")}
-                  onPointerEnter={() => setAddPreviewTarget(leaf.id, "down")}
-                  onPointerLeave={() => clearAddPreview()}
-                >
-                  <SplitSquareVerticalIcon className="rotate-180" />
-                  Add Panel Below
-                </DropdownMenuItem>
-                {hasGroupAddOptions ? (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      {groupTargets.left ? (
-                        <DropdownMenuItem
-                          onClick={() => splitPanelGroup(leaf.id, "left")}
-                          onPointerEnter={() =>
-                            setGroupAddPreviewTarget(leaf.id, "left")
-                          }
-                          onPointerLeave={() => clearAddPreview()}
-                        >
-                          <SquareChevronLeftIcon />
-                          Add Panel Left (Group)
-                        </DropdownMenuItem>
-                      ) : null}
-                      {groupTargets.right ? (
-                        <DropdownMenuItem
-                          onClick={() => splitPanelGroup(leaf.id, "right")}
-                          onPointerEnter={() =>
-                            setGroupAddPreviewTarget(leaf.id, "right")
-                          }
-                          onPointerLeave={() => clearAddPreview()}
-                        >
-                          <SquareChevronRightIcon />
-                          Add Panel Right (Group)
-                        </DropdownMenuItem>
-                      ) : null}
-                      {groupTargets.up ? (
-                        <DropdownMenuItem
-                          onClick={() => splitPanelGroup(leaf.id, "up")}
-                          onPointerEnter={() =>
-                            setGroupAddPreviewTarget(leaf.id, "up")
-                          }
-                          onPointerLeave={() => clearAddPreview()}
-                        >
-                          <SquareChevronUpIcon />
-                          Add Panel Above (Group)
-                        </DropdownMenuItem>
-                      ) : null}
-                      {groupTargets.down ? (
-                        <DropdownMenuItem
-                          onClick={() => splitPanelGroup(leaf.id, "down")}
-                          onPointerEnter={() =>
-                            setGroupAddPreviewTarget(leaf.id, "down")
-                          }
-                          onPointerLeave={() => clearAddPreview()}
-                        >
-                          <SquareChevronDownIcon />
-                          Add Panel Below (Group)
-                        </DropdownMenuItem>
-                      ) : null}
-                    </DropdownMenuGroup>
-                  </>
-                ) : null}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => moveLeafToNewTab(leaf.id)}>
-                  <ExternalLinkIcon />
-                  Move to New Tab
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => closeLeaf(leaf.id)}>
-                  <XIcon />
-                  Close Panel
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -2248,6 +2308,43 @@ function updateLeafLocation(
     );
   }
 
+  const tokenPopupCard = tokenPopup ? (
+    <Card
+      data-token-popup
+      className="fixed z-50 w-[280px] shadow-lg"
+      style={{ left: tokenPopup.x, top: tokenPopup.y }}
+    >
+      <CardContent className="space-y-2 p-3 text-sm">
+        <p className="font-medium">
+          {formatDisplayTokenText(tokenPopup.token)}
+        </p>
+        {tokenPopup.token.added ? (
+          <p className="text-xs text-muted-foreground">
+            Added word (italic in KJV typography)
+          </p>
+        ) : null}
+        {tokenPopup.token.strong ? (
+          <p>
+            <span className="text-muted-foreground">Strong&apos;s:</span>{" "}
+            <span className="font-mono">{tokenPopup.token.strong}</span>
+          </p>
+        ) : null}
+        {tokenPopup.token.lemma ? (
+          <p>
+            <span className="text-muted-foreground">Lemma:</span>{" "}
+            <span className="font-mono">{tokenPopup.token.lemma}</span>
+          </p>
+        ) : null}
+        {tokenPopup.token.morph ? (
+          <p>
+            <span className="text-muted-foreground">Morph:</span>{" "}
+            <span className="font-mono">{tokenPopup.token.morph}</span>
+          </p>
+        ) : null}
+      </CardContent>
+    </Card>
+  ) : null;
+
   return (
     <main className="h-screen w-full overflow-hidden bg-background">
       <SidebarProvider
@@ -2417,42 +2514,7 @@ function updateLeafLocation(
         </Sidebar>
       </SidebarProvider>
 
-      {tokenPopup ? (
-        <Card
-          data-token-popup
-          className="fixed z-50 w-[280px] shadow-lg"
-          style={{ left: tokenPopup.x, top: tokenPopup.y }}
-        >
-          <CardContent className="space-y-2 p-3 text-sm">
-            <p className="font-medium">
-              {formatDisplayTokenText(tokenPopup.token)}
-            </p>
-            {tokenPopup.token.added ? (
-              <p className="text-xs text-muted-foreground">
-                Added word (italic in KJV typography)
-              </p>
-            ) : null}
-            {tokenPopup.token.strong ? (
-              <p>
-                <span className="text-muted-foreground">Strong&apos;s:</span>{" "}
-                <span className="font-mono">{tokenPopup.token.strong}</span>
-              </p>
-            ) : null}
-            {tokenPopup.token.lemma ? (
-              <p>
-                <span className="text-muted-foreground">Lemma:</span>{" "}
-                <span className="font-mono">{tokenPopup.token.lemma}</span>
-              </p>
-            ) : null}
-            {tokenPopup.token.morph ? (
-              <p>
-                <span className="text-muted-foreground">Morph:</span>{" "}
-                <span className="font-mono">{tokenPopup.token.morph}</span>
-              </p>
-            ) : null}
-          </CardContent>
-        </Card>
-      ) : null}
+      {tokenPopupCard}
 
       <AlertDialog
         open={isRenameDialogOpen}
