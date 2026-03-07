@@ -971,7 +971,7 @@ export function KJVReader() {
                   onCheckedChange={(checked) => setIsStudyMode(checked)}
                 />
               </div>
-              <SidebarTrigger side="right" />
+              <SidebarTrigger />
             </div>
           </header>
 
