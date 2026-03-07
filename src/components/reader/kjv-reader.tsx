@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   BookOpenIcon,
+  ChartBarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   EllipsisIcon,
@@ -66,6 +67,11 @@ import {
   ScrollBar,
 } from "@/components/ui/scroll-area";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
+import {
+  Progress,
+  ProgressLabel,
+  ProgressValue,
+} from "@/components/ui/progress";
 
 type ReaderPayload = {
   books?: Book[];
@@ -203,6 +209,10 @@ function createId() {
     return crypto.randomUUID();
   }
   return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function chapterProgressKey(bookIndex: number, chapterIndex: number) {
+  return `${bookIndex}:${chapterIndex}`;
 }
 
 function createLeaf(
@@ -386,6 +396,7 @@ export function KJVReader() {
   const [isStudyMode, setIsStudyMode] = useState(true);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isProgressOpen, setIsProgressOpen] = useState(false);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
   const [tabs, setTabs] = useState<ReaderTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
@@ -394,6 +405,10 @@ export function KJVReader() {
   const [renameTabId, setRenameTabId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [fullscreenLeafId, setFullscreenLeafId] = useState<string | null>(null);
+  const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
+  const [leafScrollProgress, setLeafScrollProgress] = useState<
+    Record<string, number>
+  >({});
   const tabEndRef = useRef<HTMLDivElement>(null);
   const panelElementRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -440,6 +455,28 @@ export function KJVReader() {
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [tokenPopup]);
+
+  useEffect(() => {
+    try {
+      const storedProgress = window.localStorage.getItem("kjv-read-chapters-v1");
+      if (!storedProgress) {
+        return;
+      }
+      const parsed = JSON.parse(storedProgress) as string[];
+      if (Array.isArray(parsed)) {
+        setReadChapters(new Set(parsed));
+      }
+    } catch {
+      // Ignore malformed local progress.
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      "kjv-read-chapters-v1",
+      JSON.stringify(Array.from(readChapters)),
+    );
+  }, [readChapters]);
 
   useEffect(() => {
     let cancelled = false;
@@ -509,6 +546,53 @@ export function KJVReader() {
     () => tabs.find((tab) => tab.id === activeTabId) ?? null,
     [activeTabId, tabs],
   );
+  const progressByTestament = useMemo(() => {
+    const oldBooks = books.slice(0, 39);
+    const newBooks = books.slice(39);
+
+    const makeBookProgress = (book: Book, bookIndex: number) => {
+      const total = book.chapters.length;
+      let read = 0;
+      for (let chapterIndex = 0; chapterIndex < total; chapterIndex += 1) {
+        if (readChapters.has(chapterProgressKey(bookIndex, chapterIndex))) {
+          read += 1;
+        }
+      }
+      return { name: book.name, read, total };
+    };
+
+    const oldBookProgress = oldBooks.map((book, index) =>
+      makeBookProgress(book, index),
+    );
+    const newBookProgress = newBooks.map((book, index) =>
+      makeBookProgress(book, index + 39),
+    );
+
+    const summarize = (items: { read: number; total: number }[]) =>
+      items.reduce(
+        (acc, item) => ({ read: acc.read + item.read, total: acc.total + item.total }),
+        { read: 0, total: 0 },
+      );
+
+    const oldSummary = summarize(oldBookProgress);
+    const newSummary = summarize(newBookProgress);
+    const totalSummary = {
+      read: oldSummary.read + newSummary.read,
+      total: oldSummary.total + newSummary.total,
+    };
+
+    return {
+      old: { label: "Old Testament", ...oldSummary, books: oldBookProgress },
+      new: { label: "New Testament", ...newSummary, books: newBookProgress },
+      total: totalSummary,
+    };
+  }, [books, readChapters]);
+  const totalProgressPercent =
+    progressByTestament.total.total > 0
+      ? Math.round(
+          (progressByTestament.total.read / progressByTestament.total.total) * 100,
+        )
+      : 0;
   useEffect(() => {
     function onFullscreenChange() {
       const element = document.fullscreenElement as HTMLElement | null;
@@ -521,6 +605,66 @@ export function KJVReader() {
       document.removeEventListener("fullscreenchange", onFullscreenChange);
     };
   }, []);
+
+  useEffect(() => {
+    if (!activeTab) {
+      return;
+    }
+
+    const leafIds: string[] = [];
+    const collectLeafIds = (node: PanelNode) => {
+      if (node.type === "leaf") {
+        leafIds.push(node.id);
+        return;
+      }
+      collectLeafIds(node.first);
+      collectLeafIds(node.second);
+    };
+    collectLeafIds(activeTab.root);
+
+    const cleanups: Array<() => void> = [];
+
+    const updateProgressForLeaf = (leafId: string, value: number) => {
+      setLeafScrollProgress((current) => {
+        if (current[leafId] === value) {
+          return current;
+        }
+        return { ...current, [leafId]: value };
+      });
+    };
+
+    for (const leafId of leafIds) {
+      const panelElement = panelElementRefs.current[leafId];
+      const viewport = panelElement?.querySelector<HTMLElement>(
+        '[data-panel-content-scroll] [data-slot="scroll-area-viewport"]',
+      );
+
+      if (!viewport) {
+        continue;
+      }
+
+      const update = () => {
+        const maxScroll = viewport.scrollHeight - viewport.clientHeight;
+        const next =
+          maxScroll <= 0
+            ? 0
+            : Math.round((viewport.scrollTop / maxScroll) * 100);
+        updateProgressForLeaf(leafId, next);
+      };
+
+      update();
+      viewport.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", update);
+      cleanups.push(() => {
+        viewport.removeEventListener("scroll", update);
+        window.removeEventListener("resize", update);
+      });
+    }
+
+    return () => {
+      cleanups.forEach((cleanup) => cleanup());
+    };
+  }, [activeTab]);
 
   function chapterFromLeaf(leaf: LeafNode): Chapter | null {
     const book = books[leaf.bookIndex];
@@ -609,6 +753,23 @@ function updateLeafLocation(
       ...tab,
       root: updateSplitRatio(tab.root, splitId, ratio),
     }));
+  }
+
+  function toggleChapterRead(bookIndex: number, chapterIndex: number) {
+    const key = chapterProgressKey(bookIndex, chapterIndex);
+    setReadChapters((current) => {
+      const next = new Set(current);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  }
+
+  function resetAllProgress() {
+    setReadChapters(new Set());
   }
 
   function addTab() {
@@ -751,6 +912,9 @@ function updateLeafLocation(
     const chapter = chapterFromLeaf(leaf);
 
     const key = `${leaf.bookIndex}-${leaf.chapterIndex}`;
+    const chapterReadKey = chapterProgressKey(leaf.bookIndex, leaf.chapterIndex);
+    const isChapterRead = readChapters.has(chapterReadKey);
+    const readingProgress = leafScrollProgress[leaf.id] ?? 0;
     const refIndex = chapterRefIndex.get(key) ?? -1;
     const hasPrev = refIndex > 0;
     const hasNext = refIndex >= 0 && refIndex < chapterRefs.length - 1;
@@ -761,9 +925,9 @@ function updateLeafLocation(
         ref={(element) => {
           panelElementRefs.current[leaf.id] = element;
         }}
-        className="h-full bg-background"
+        className="h-full w-full min-w-0 bg-background"
       >
-        <Card className="flex h-full min-h-0 flex-col rounded-none">
+        <Card className="flex h-full min-h-0 w-full min-w-0 flex-col rounded-none">
         <CardHeader className="border-b p-2 sm:p-3">
           <div className="flex flex-wrap items-center gap-2">
             {leaf.view === "reader" && chapter ? (
@@ -890,8 +1054,8 @@ function updateLeafLocation(
         {leaf.view === "reader" && chapter ? (
           <>
             <CardContent className="min-h-0 flex-1 p-0">
-              <ScrollArea className="h-full">
-                <div className="space-y-5 p-3 sm:p-4">
+              <ScrollArea className="h-full w-full" data-panel-content-scroll>
+                <div className="w-full space-y-5 p-3 sm:p-4">
                   {chapter.verses.map((verse) => (
                     <article
                       key={`${book.name}-${chapter.chapter}-${verse.verse}`}
@@ -920,28 +1084,43 @@ function updateLeafLocation(
               </ScrollArea>
             </CardContent>
 
-            <div className="flex items-center justify-between border-t p-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => moveLeafChapter(leaf.id, -1)}
-                disabled={!hasPrev}
-              >
-                <ChevronLeftIcon />
-                Prev
-              </Button>
-              <div className="text-xs text-muted-foreground">
-                {book.name} {chapter.chapter}
+            <div className="border-t">
+              <Progress
+                value={readingProgress}
+                className="w-full"
+                aria-label={`Reading progress for ${book.name} ${chapter.chapter}`}
+              />
+              <div className="flex items-center justify-between p-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => moveLeafChapter(leaf.id, -1)}
+                  disabled={!hasPrev}
+                >
+                  <ChevronLeftIcon />
+                  Prev
+                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={isChapterRead ? "default" : "outline"}
+                    size="sm"
+                    onClick={() =>
+                      toggleChapterRead(leaf.bookIndex, leaf.chapterIndex)
+                    }
+                  >
+                    {isChapterRead ? "Read" : "Mark Read"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => moveLeafChapter(leaf.id, 1)}
+                    disabled={!hasNext}
+                  >
+                    Next
+                    <ChevronRightIcon />
+                  </Button>
+                </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => moveLeafChapter(leaf.id, 1)}
-                disabled={!hasNext}
-              >
-                Next
-                <ChevronRightIcon />
-              </Button>
             </div>
           </>
         ) : (
@@ -1069,7 +1248,12 @@ function updateLeafLocation(
                 >
                   <MenuIcon />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem onClick={() => setIsProgressOpen(true)}>
+                    <ChartBarIcon />
+                    Reading Progress
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setIsSettingsOpen(true)}>
                     <SettingsIcon />
                     Settings
@@ -1126,8 +1310,9 @@ function updateLeafLocation(
                               variant="outline"
                               size="icon-sm"
                               className={cn(
+                                "relative",
                                 active &&
-                                  "!border-foreground !bg-foreground !text-background hover:!bg-foreground/90 hover:!text-background",
+                                  "!border-foreground !bg-foreground !text-background hover:!bg-foreground/90 hover:!text-background before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-background/45 before:content-['']",
                               )}
                               aria-label={`Tab options for ${tab.title}`}
                             >
@@ -1309,6 +1494,76 @@ function updateLeafLocation(
               Close
             </Button>
           </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isProgressOpen} onOpenChange={setIsProgressOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reading Progress</AlertDialogTitle>
+            <AlertDialogDescription>
+              Track chapter completion across the whole Bible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="max-h-[65vh] space-y-3 overflow-auto pr-1 text-sm">
+            <Progress value={totalProgressPercent}>
+              <ProgressLabel className="font-semibold">Whole Bible</ProgressLabel>
+              <ProgressValue>
+                {() =>
+                  `${progressByTestament.total.read}/${progressByTestament.total.total} (${totalProgressPercent}%)`
+                }
+              </ProgressValue>
+            </Progress>
+
+            {[progressByTestament.old, progressByTestament.new].map((testament) => {
+              const testamentPercent =
+                testament.total > 0
+                  ? Math.round((testament.read / testament.total) * 100)
+                  : 0;
+
+              return (
+                <details key={testament.label} className="rounded-md border p-3">
+                  <summary className="cursor-pointer">
+                    <Progress value={testamentPercent}>
+                      <ProgressLabel>{testament.label}</ProgressLabel>
+                      <ProgressValue>
+                        {() => `${testament.read}/${testament.total} (${testamentPercent}%)`}
+                      </ProgressValue>
+                    </Progress>
+                  </summary>
+                  <div className="mt-3 space-y-2">
+                    {testament.books.map((book) => {
+                      const bookPercent =
+                        book.total > 0 ? Math.round((book.read / book.total) * 100) : 0;
+                      return (
+                        <Progress key={book.name} value={bookPercent}>
+                          <ProgressLabel className="text-xs">{book.name}</ProgressLabel>
+                          <ProgressValue className="text-xs">
+                            {() => `${book.read}/${book.total} (${bookPercent}%)`}
+                          </ProgressValue>
+                        </Progress>
+                      );
+                    })}
+                  </div>
+                </details>
+              );
+            })}
+          </div>
+          <AlertDialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (window.confirm("Reset all reading progress?")) {
+                  resetAllProgress();
+                }
+              }}
+            >
+              Reset Progress
+            </Button>
+            <AlertDialogAction onClick={() => setIsProgressOpen(false)}>
+              Close
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </main>
