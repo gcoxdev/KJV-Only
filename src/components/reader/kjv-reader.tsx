@@ -1156,10 +1156,35 @@ export function KJVReader() {
   }
 
   function neighborsForLeaf(leafId: string): LeafNeighbors {
+    const modelNeighbors = modelLeafNeighbors.get(leafId) ?? {};
+    const domNeighbors = domLeafNeighbors.get(leafId) ?? {};
+
+    return {
+      left: modelNeighbors.left ?? domNeighbors.left,
+      right: modelNeighbors.right ?? domNeighbors.right,
+      up: modelNeighbors.up ?? domNeighbors.up,
+      down: modelNeighbors.down ?? domNeighbors.down,
+    };
+  }
+
+  function neighborForDirection(leafId: string, direction: PanelDirection) {
+    const modelNeighbor = modelLeafNeighbors.get(leafId)?.[direction];
+    if (modelNeighbor) {
+      return modelNeighbor;
+    }
+
+    const domNeighbor = domLeafNeighbors.get(leafId)?.[direction];
+    if (domNeighbor) {
+      return domNeighbor;
+    }
+
+    if (!activeTab) {
+      return null;
+    }
+
     return (
-      domLeafNeighbors.get(leafId) ??
-      modelLeafNeighbors.get(leafId) ??
-      {}
+      buildLeafNeighborMapFromDom(activeTab.root, panelElementRefs.current)
+        .get(leafId)?.[direction] ?? null
     );
   }
 
@@ -1272,7 +1297,7 @@ export function KJVReader() {
   function setMovePreviewTarget(leafId: string, direction: PanelDirection) {
     clearAddPreview();
     clearOrientationPreview();
-    const targetLeafId = neighborsForLeaf(leafId)[direction] ?? null;
+    const targetLeafId = neighborForDirection(leafId, direction);
     applyMovePreview(targetLeafId);
   }
 
@@ -1394,13 +1419,7 @@ export function KJVReader() {
     if (!activeTab) {
       return;
     }
-    const freshDomNeighbors = buildLeafNeighborMapFromDom(
-      activeTab.root,
-      panelElementRefs.current,
-    );
-    const targetLeafId =
-      freshDomNeighbors.get(leafId)?.[direction] ??
-      neighborsForLeaf(leafId)[direction];
+    const targetLeafId = neighborForDirection(leafId, direction);
     if (!targetLeafId) {
       return;
     }
@@ -1700,7 +1719,8 @@ function updateLeafLocation(
         paragraphGroups.push(currentGroup);
       }
     }
-    const neighbors = neighborsForLeaf(leaf.id);
+    const neighbors =
+      modelLeafNeighbors.get(leaf.id) ?? neighborsForLeaf(leaf.id);
     const moveDirections = (["left", "right", "up", "down"] as PanelDirection[]).filter(
       (direction) => Boolean(neighbors[direction]),
     );
