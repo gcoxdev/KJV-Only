@@ -24,7 +24,7 @@ import {
   XIcon,
 } from "lucide-react";
 
-import { type Book, type Chapter, type VerseToken } from "@/types/bible";
+import { type Book, type Chapter, type Verse, type VerseToken } from "@/types/bible";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -66,6 +66,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -754,6 +755,10 @@ export function KJVReader() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isStudyMode, setIsStudyMode] = useState(true);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [verseSpacing, setVerseSpacing] = useState(0);
+  const [hideReadModeVerseNumbers, setHideReadModeVerseNumbers] = useState(false);
+  const [readModeParagraphIndent, setReadModeParagraphIndent] = useState(false);
+  const [flowVersesByParagraph, setFlowVersesByParagraph] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isProgressOpen, setIsProgressOpen] = useState(false);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
@@ -791,6 +796,52 @@ export function KJVReader() {
     document.documentElement.classList.toggle("dark", theme === "dark");
     window.localStorage.setItem("theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem("kjv-display-settings-v1");
+      if (!stored) {
+        return;
+      }
+      const parsed = JSON.parse(stored) as {
+        verseSpacing?: number;
+        hideReadModeVerseNumbers?: boolean;
+        readModeParagraphIndent?: boolean;
+        flowVersesByParagraph?: boolean;
+      };
+      if (typeof parsed.verseSpacing === "number") {
+        setVerseSpacing(Math.max(0, Math.min(24, Math.round(parsed.verseSpacing))));
+      }
+      if (typeof parsed.hideReadModeVerseNumbers === "boolean") {
+        setHideReadModeVerseNumbers(parsed.hideReadModeVerseNumbers);
+      }
+      if (typeof parsed.readModeParagraphIndent === "boolean") {
+        setReadModeParagraphIndent(parsed.readModeParagraphIndent);
+      }
+      if (typeof parsed.flowVersesByParagraph === "boolean") {
+        setFlowVersesByParagraph(parsed.flowVersesByParagraph);
+      }
+    } catch {
+      // Ignore malformed persisted display settings.
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      "kjv-display-settings-v1",
+      JSON.stringify({
+        verseSpacing,
+        hideReadModeVerseNumbers,
+        readModeParagraphIndent,
+        flowVersesByParagraph,
+      }),
+    );
+  }, [
+    verseSpacing,
+    hideReadModeVerseNumbers,
+    readModeParagraphIndent,
+    flowVersesByParagraph,
+  ]);
 
   useEffect(() => {
     if (!tokenPopup) {
@@ -1535,6 +1586,24 @@ function updateLeafLocation(
     const chapterReadKey = chapterProgressKey(leaf.bookIndex, leaf.chapterIndex);
     const isChapterRead = readChapters.has(chapterReadKey);
     const readingProgress = leafScrollProgress[leaf.id] ?? 0;
+    const showVerseNumbers = !hideReadModeVerseNumbers;
+    const paragraphGroups: Verse[][] = [];
+    if (chapter) {
+      let currentGroup: Verse[] = [];
+      for (const verse of chapter.verses) {
+        if (currentGroup.length === 0 || verse.paragraphStart) {
+          if (currentGroup.length > 0) {
+            paragraphGroups.push(currentGroup);
+          }
+          currentGroup = [verse];
+        } else {
+          currentGroup.push(verse);
+        }
+      }
+      if (currentGroup.length > 0) {
+        paragraphGroups.push(currentGroup);
+      }
+    }
     const neighbors = neighborsForLeaf(leaf.id);
     const moveDirections = (["left", "right", "up", "down"] as PanelDirection[]).filter(
       (direction) => Boolean(neighbors[direction]),
@@ -1822,31 +1891,84 @@ function updateLeafLocation(
           <>
             <CardContent className="min-h-0 flex-1 p-0">
               <ScrollArea className="h-full w-full" data-panel-content-scroll>
-                <div className="w-full space-y-5 p-3 sm:p-4">
-                  {chapter.verses.map((verse) => (
-                    <article
-                      key={`${book.name}-${chapter.chapter}-${verse.verse}`}
-                      className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
-                    >
-                      <p
-                        className={cn(
-                          "text-pretty leading-7",
-                          verse.redLetter && "text-red-700",
-                          !isStudyMode && verse.paragraphStart && "pl-4 sm:pl-6",
-                        )}
-                      >
-                        <span className="mr-2 align-top text-xs font-semibold text-muted-foreground">
-                          {verse.verse}
-                        </span>
-                        {renderVerseTokens(
-                          verse.tokens,
-                          isStudyMode,
-                          (element, token) =>
-                            openTokenDetailsFromElement(element, token),
-                        )}
-                      </p>
-                    </article>
-                  ))}
+                <div className="flex w-full flex-col p-3 sm:p-4" style={{ rowGap: `${verseSpacing}px` }}>
+                  {flowVersesByParagraph
+                    ? paragraphGroups.map((group, groupIndex) => (
+                        <article
+                          key={`${book.name}-${chapter.chapter}-paragraph-${groupIndex}`}
+                          className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
+                        >
+                          <p
+                            className={cn(
+                              "text-pretty leading-7",
+                            )}
+                            style={
+                              readModeParagraphIndent &&
+                              (groupIndex === 0 || group[0]?.paragraphStart)
+                                ? { textIndent: "1.5rem" }
+                                : undefined
+                            }
+                          >
+                            {group.map((verse, verseIndex) => (
+                              <Fragment key={`${book.name}-${chapter.chapter}-${verse.verse}`}>
+                                {verseIndex > 0 ? " " : null}
+                                <span className={cn(verse.redLetter && "text-red-700")}>
+                                  {showVerseNumbers ? (
+                                    <span className="mr-2 inline-flex w-7 shrink-0 justify-end align-top text-xs font-semibold tabular-nums text-muted-foreground">
+                                      {verse.verse}
+                                    </span>
+                                  ) : null}
+                                  {renderVerseTokens(
+                                    verse.tokens,
+                                    isStudyMode,
+                                    (element, token) =>
+                                      openTokenDetailsFromElement(element, token),
+                                  )}
+                                </span>
+                              </Fragment>
+                            ))}
+                          </p>
+                        </article>
+                      ))
+                    : chapter.verses.map((verse) => (
+                        <article
+                          key={`${book.name}-${chapter.chapter}-${verse.verse}`}
+                          className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
+                        >
+                          <p
+                            className={cn(
+                              "leading-7",
+                              showVerseNumbers &&
+                                "grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-x-2",
+                            )}
+                          >
+                            {showVerseNumbers ? (
+                              <span className="inline-flex w-7 shrink-0 justify-start align-top text-xs font-semibold tabular-nums text-muted-foreground">
+                                {verse.verse}
+                              </span>
+                            ) : null}
+                            <span
+                              className={cn(
+                                "text-pretty",
+                                verse.redLetter && "text-red-700",
+                              )}
+                              style={
+                                readModeParagraphIndent &&
+                                (verse.verse === 1 || verse.paragraphStart)
+                                  ? { textIndent: "1.5rem" }
+                                  : undefined
+                              }
+                            >
+                              {renderVerseTokens(
+                                verse.tokens,
+                                isStudyMode,
+                                (element, token) =>
+                                  openTokenDetailsFromElement(element, token),
+                              )}
+                            </span>
+                          </p>
+                        </article>
+                      ))}
                 </div>
               </ScrollArea>
             </CardContent>
@@ -2254,6 +2376,51 @@ function updateLeafLocation(
               onCheckedChange={(checked) =>
                 setTheme(checked ? "dark" : "light")
               }
+            />
+          </div>
+          <div className="space-y-2 border-t pt-3">
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor="verse-spacing">Verse Spacing</Label>
+              <span className="text-xs text-muted-foreground">{verseSpacing}px</span>
+            </div>
+            <Slider
+              id="verse-spacing"
+              min={0}
+              max={24}
+              step={1}
+              value={[verseSpacing]}
+              onValueChange={(value) => {
+                const nextValue = Array.isArray(value) ? value[0] : value;
+                setVerseSpacing(
+                  Math.max(0, Math.min(24, Math.round(nextValue ?? 0))),
+                );
+              }}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-3 border-t pt-3">
+            <Label htmlFor="hide-read-mode-verse-numbers">
+              Hide Verse Numbers
+            </Label>
+            <Switch
+              id="hide-read-mode-verse-numbers"
+              checked={hideReadModeVerseNumbers}
+              onCheckedChange={(checked) => setHideReadModeVerseNumbers(checked)}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-3 border-t pt-3">
+            <Label htmlFor="read-mode-indents">Paragraph Indents</Label>
+            <Switch
+              id="read-mode-indents"
+              checked={readModeParagraphIndent}
+              onCheckedChange={(checked) => setReadModeParagraphIndent(checked)}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-3 border-t pt-3">
+            <Label htmlFor="flow-verses">Flow Verses by Paragraph</Label>
+            <Switch
+              id="flow-verses"
+              checked={flowVersesByParagraph}
+              onCheckedChange={(checked) => setFlowVersesByParagraph(checked)}
             />
           </div>
           <div className="flex justify-end">
