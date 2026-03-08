@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import L from "leaflet";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
@@ -107,6 +108,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  GeoJSON as LeafletGeoJSON,
+  MapContainer,
+  TileLayer,
+  useMap,
+} from "react-leaflet";
 
 type ReaderPayload = {
   books?: Book[];
@@ -166,6 +173,49 @@ type StrongsEntry = {
   kjv_refs?: Record<string, string[]>;
 };
 type StrongsPayload = Record<string, StrongsEntry>;
+type AncientMapRole = {
+  description?: string;
+  score?: number;
+};
+type AncientMapEntry = {
+  verses: string[];
+  translations: string[];
+  types: string[];
+  geojson_file: string;
+  geojson_roles?: Record<string, AncientMapRole>;
+};
+type AncientMapPayload = AncientMapEntry[];
+type MapGeoJsonPayload = {
+  type?: string;
+  bbox?: number[];
+  features?: Array<{
+    type?: string;
+    geometry?: {
+      type?: string;
+      coordinates?: unknown;
+    };
+  }>;
+};
+type MapImageThumbnail = {
+  file?: string;
+  description?: string;
+};
+type MapImageEntry = {
+  id: string;
+  credit?: string;
+  credit_url?: string;
+  url?: string;
+  file_url?: string;
+  license?: string;
+  descriptions?: Record<string, string>;
+  thumbnails?: Record<string, MapImageThumbnail>;
+};
+type MapPhotoDialogItem = {
+  id: string;
+  src: string;
+  alt: string;
+  caption: string;
+};
 
 type PanelDirection = "left" | "right" | "up" | "down";
 type SplitOrientation = "horizontal" | "vertical";
@@ -214,6 +264,9 @@ let genealogyPromise: Promise<GenealogyPayload> | null = null;
 let webstersPromise: Promise<WebstersPayload> | null = null;
 let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
+let ancientMapPromise: Promise<AncientMapPayload> | null = null;
+const mapGeoJsonPromiseCache = new Map<string, Promise<MapGeoJsonPayload>>();
+let mapImagesPromise: Promise<MapImageEntry[]> | null = null;
 
 function loadKjvBooks() {
   if (!kjvBooksPromise) {
@@ -405,6 +458,73 @@ function loadStrongsHebrew() {
       });
   }
   return strongsHebrewPromise;
+}
+
+function loadAncientMap() {
+  if (!ancientMapPromise) {
+    ancientMapPromise = fetch("/references/ancient_map.json", {
+      cache: "force-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/ancient_map.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as AncientMapPayload)
+      .catch((error) => {
+        ancientMapPromise = null;
+        throw error;
+      });
+  }
+  return ancientMapPromise;
+}
+
+function loadMapGeoJson(geojsonFile: string) {
+  const cached = mapGeoJsonPromiseCache.get(geojsonFile);
+  if (cached) {
+    return cached;
+  }
+  const promise = fetch(`/maps/geometry/${geojsonFile}`, { cache: "force-cache" })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Could not load /maps/geometry/${geojsonFile}`);
+      }
+      return response.json() as Promise<unknown>;
+    })
+    .then((payload) => payload as MapGeoJsonPayload)
+    .catch((error) => {
+      mapGeoJsonPromiseCache.delete(geojsonFile);
+      throw error;
+    });
+  mapGeoJsonPromiseCache.set(geojsonFile, promise);
+  return promise;
+}
+
+function parseJsonl<T>(text: string) {
+  return text
+    .split(/\r?\n/g)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => JSON.parse(line) as T);
+}
+
+function loadMapImages() {
+  if (!mapImagesPromise) {
+    mapImagesPromise = fetch("/maps/data/image.jsonl", { cache: "force-cache" })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /maps/data/image.jsonl");
+        }
+        return response.text();
+      })
+      .then((text) => parseJsonl<MapImageEntry>(text))
+      .catch((error) => {
+        mapImagesPromise = null;
+        throw error;
+      });
+  }
+  return mapImagesPromise;
 }
 
 function isPunctuationToken(tokenText: string) {
@@ -836,6 +956,111 @@ function resolveOldEnglishKey(oldEnglish: OldEnglishPayload, rawWord: string) {
     (key) => key.toLowerCase() === lowered,
   );
   return fallback ?? null;
+}
+
+function mapEntryLabel(entry: AncientMapEntry) {
+  return entry.translations[0] ?? entry.geojson_file.replace(".geojson", "");
+}
+
+function matchesMapWord(entry: AncientMapEntry, rawWord: string) {
+  const cleaned = normalizeConcordanceWord(rawWord).toLowerCase();
+  if (!cleaned) {
+    return false;
+  }
+
+  return entry.translations.some(
+    (name) => normalizeConcordanceWord(name).toLowerCase() === cleaned,
+  );
+}
+
+function mapEntrySearchableText(entry: AncientMapEntry) {
+  return [
+    ...entry.translations,
+    ...entry.types,
+    ...entry.verses,
+    entry.geojson_file,
+  ]
+    .join(" ")
+    .toLowerCase();
+}
+
+function cleanMapMarkup(input: string) {
+  return input
+    .replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function modernIdsForMapEntry(entry: AncientMapEntry) {
+  const ids = new Set<string>();
+  for (const roleKey of Object.keys(entry.geojson_roles ?? {})) {
+    const [root] = roleKey.split(".");
+    if (/^m[0-9a-f]{6}$/i.test(root)) {
+      ids.add(root);
+    }
+  }
+  return [...ids];
+}
+
+function extractCoordinateBounds(
+  coordinates: unknown,
+  accumulator: { minLat: number; maxLat: number; minLng: number; maxLng: number },
+) {
+  if (!Array.isArray(coordinates)) {
+    return;
+  }
+
+  if (
+    coordinates.length >= 2 &&
+    typeof coordinates[0] === "number" &&
+    typeof coordinates[1] === "number"
+  ) {
+    const lng = coordinates[0];
+    const lat = coordinates[1];
+    accumulator.minLat = Math.min(accumulator.minLat, lat);
+    accumulator.maxLat = Math.max(accumulator.maxLat, lat);
+    accumulator.minLng = Math.min(accumulator.minLng, lng);
+    accumulator.maxLng = Math.max(accumulator.maxLng, lng);
+    return;
+  }
+
+  for (const item of coordinates) {
+    extractCoordinateBounds(item, accumulator);
+  }
+}
+
+function boundsForGeoJson(payload: MapGeoJsonPayload) {
+  if (Array.isArray(payload.bbox) && payload.bbox.length >= 4) {
+    return [
+      [payload.bbox[1], payload.bbox[0]],
+      [payload.bbox[3], payload.bbox[2]],
+    ] as [[number, number], [number, number]];
+  }
+
+  const bounds = {
+    minLat: Number.POSITIVE_INFINITY,
+    maxLat: Number.NEGATIVE_INFINITY,
+    minLng: Number.POSITIVE_INFINITY,
+    maxLng: Number.NEGATIVE_INFINITY,
+  };
+
+  for (const feature of payload.features ?? []) {
+    extractCoordinateBounds(feature.geometry?.coordinates, bounds);
+  }
+
+  if (
+    !Number.isFinite(bounds.minLat) ||
+    !Number.isFinite(bounds.maxLat) ||
+    !Number.isFinite(bounds.minLng) ||
+    !Number.isFinite(bounds.maxLng)
+  ) {
+    return null;
+  }
+
+  return [
+    [bounds.minLat, bounds.minLng],
+    [bounds.maxLat, bounds.maxLng],
+  ] as [[number, number], [number, number]];
 }
 
 function normalizeStrongsCode(value: string) {
@@ -1576,6 +1801,24 @@ function findParentSplitForLeaf(
   return parent.type === "split" ? parent : null;
 }
 
+const MapBoundsSync = memo(function MapBoundsSync({
+  geojson,
+}: {
+  geojson: MapGeoJsonPayload;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    const bounds = boundsForGeoJson(geojson);
+    if (!bounds) {
+      return;
+    }
+    map.fitBounds(bounds, { padding: [24, 24], maxZoom: 12 });
+  }, [geojson, map]);
+
+  return null;
+});
+
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -1686,6 +1929,32 @@ export function KJVReader() {
     testament: "greek" | "hebrew";
     entry: StrongsEntry;
   } | null>(null);
+  const [ancientMaps, setAncientMaps] = useState<AncientMapPayload | null>(null);
+  const [mapsSearchTerm, setMapsSearchTerm] = useState("");
+  const [isMapsSearching, setIsMapsSearching] = useState(false);
+  const [isMapsLoading, setIsMapsLoading] = useState(false);
+  const [mapsError, setMapsError] = useState<string | null>(null);
+  const [selectedMapsEntries, setSelectedMapsEntries] = useState<
+    AncientMapEntry[]
+  >([]);
+  const [mapsWordAccordionValue, setMapsWordAccordionValue] = useState<
+    string[]
+  >([]);
+  const [isMapDialogOpen, setIsMapDialogOpen] = useState(false);
+  const [activeMapDialogEntry, setActiveMapDialogEntry] =
+    useState<AncientMapEntry | null>(null);
+  const [mapDialogGeoJson, setMapDialogGeoJson] =
+    useState<MapGeoJsonPayload | null>(null);
+  const [isMapDialogLoading, setIsMapDialogLoading] = useState(false);
+  const [mapDialogError, setMapDialogError] = useState<string | null>(null);
+  const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
+  const [photoDialogItems, setPhotoDialogItems] = useState<MapPhotoDialogItem[]>(
+    [],
+  );
+  const [photoDialogIndex, setPhotoDialogIndex] = useState(0);
+  const [mapImages, setMapImages] = useState<MapImageEntry[] | null>(null);
+  const [isMapImagesLoading, setIsMapImagesLoading] = useState(false);
+  const [mapImagesError, setMapImagesError] = useState<string | null>(null);
   const [pendingVerseHighlights, setPendingVerseHighlights] = useState<
     Record<string, { start: number; end: number }>
   >({});
@@ -1751,6 +2020,20 @@ export function KJVReader() {
     setIsStrongsSearching(false);
     setStrongsWordAccordionValue([]);
     setSelectedStrongsEntry(null);
+    setMapsError(null);
+    setIsMapsLoading(false);
+    setIsMapsSearching(false);
+    setMapsWordAccordionValue([]);
+    setSelectedMapsEntries([]);
+    setIsMapDialogOpen(false);
+    setIsPhotoDialogOpen(false);
+    setPhotoDialogItems([]);
+    setPhotoDialogIndex(0);
+    setActiveMapDialogEntry(null);
+    setMapDialogGeoJson(null);
+    setMapDialogError(null);
+    setIsMapImagesLoading(false);
+    setMapImagesError(null);
   }, [isStudyMode]);
 
   useEffect(() => {
@@ -2615,6 +2898,174 @@ export function KJVReader() {
     [ensureStrongsLoaded],
   );
 
+  const ensureAncientMapsLoaded = useCallback(async () => {
+    if (ancientMaps) {
+      return ancientMaps;
+    }
+    setMapsError(null);
+    setIsMapsLoading(true);
+    try {
+      const data = await loadAncientMap();
+      setAncientMaps(data);
+      return data;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to load ancient map data";
+      setMapsError(message);
+      throw error;
+    } finally {
+      setIsMapsLoading(false);
+    }
+  }, [ancientMaps]);
+
+  const ensureMapImagesLoaded = useCallback(async () => {
+    if (mapImages) {
+      return mapImages;
+    }
+    setMapImagesError(null);
+    setIsMapImagesLoading(true);
+    try {
+      const data = await loadMapImages();
+      setMapImages(data);
+      return data;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to load map images";
+      setMapImagesError(message);
+      throw error;
+    } finally {
+      setIsMapImagesLoading(false);
+    }
+  }, [mapImages]);
+
+  const mapImagesByLocationId = useMemo(() => {
+    const index = new Map<string, MapImageEntry[]>();
+    for (const image of mapImages ?? []) {
+      const ids = new Set<string>([
+        ...Object.keys(image.thumbnails ?? {}),
+        ...Object.keys(image.descriptions ?? {}),
+      ]);
+      for (const id of ids) {
+        const existing = index.get(id);
+        if (existing) {
+          existing.push(image);
+        } else {
+          index.set(id, [image]);
+        }
+      }
+    }
+    return index;
+  }, [mapImages]);
+
+  const mapsSearchResults = useMemo(() => {
+    const term = mapsSearchTerm.trim().toLowerCase();
+    if (!term) {
+      return selectedMapsEntries;
+    }
+    if (!ancientMaps) {
+      return [] as AncientMapEntry[];
+    }
+    return ancientMaps
+      .filter((entry) => mapEntrySearchableText(entry).includes(term))
+      .sort((a, b) => mapEntryLabel(a).localeCompare(mapEntryLabel(b)));
+  }, [ancientMaps, mapsSearchTerm, selectedMapsEntries]);
+
+  const applyMapsSearch = useCallback(
+    (rawValue?: string) => {
+      const nextTerm = (rawValue ?? "").trim();
+      setMapsSearchTerm(nextTerm);
+      setMapsWordAccordionValue([]);
+      if (!nextTerm) {
+        setIsMapsSearching(false);
+        return;
+      }
+      setIsMapsSearching(true);
+      void Promise.all([ensureAncientMapsLoaded(), ensureMapImagesLoaded()])
+        .catch(() => {
+          // Error state is set by ensure loaders.
+        })
+        .finally(() => {
+          window.requestAnimationFrame(() => {
+            setIsMapsSearching(false);
+          });
+        });
+    },
+    [ensureAncientMapsLoaded, ensureMapImagesLoaded],
+  );
+
+  const openMapDialog = useCallback(
+    (entry: AncientMapEntry) => {
+      setActiveMapDialogEntry(entry);
+      setIsMapDialogOpen(true);
+      void ensureMapImagesLoaded().catch(() => {
+        // Error state is set by ensureMapImagesLoaded.
+      });
+    },
+    [ensureMapImagesLoaded],
+  );
+
+  const openPhotoDialog = useCallback(
+    (items: MapPhotoDialogItem[], startIndex: number) => {
+      if (items.length === 0) {
+        return;
+      }
+      const clampedIndex = Math.max(0, Math.min(items.length - 1, startIndex));
+      setPhotoDialogItems(items);
+      setPhotoDialogIndex(clampedIndex);
+      setIsPhotoDialogOpen(true);
+    },
+    [],
+  );
+
+  const movePhotoDialog = useCallback((direction: -1 | 1) => {
+    setPhotoDialogIndex((current) => {
+      if (photoDialogItems.length === 0) {
+        return 0;
+      }
+      return (current + direction + photoDialogItems.length) % photoDialogItems.length;
+    });
+  }, [photoDialogItems.length]);
+
+  useEffect(() => {
+    if (!isMapDialogOpen || !activeMapDialogEntry) {
+      setMapDialogGeoJson(null);
+      setMapDialogError(null);
+      setIsMapDialogLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setMapDialogError(null);
+    setIsMapDialogLoading(true);
+    void loadMapGeoJson(activeMapDialogEntry.geojson_file)
+      .then((payload) => {
+        if (cancelled) {
+          return;
+        }
+        setMapDialogGeoJson(payload);
+      })
+      .catch((error) => {
+        if (cancelled) {
+          return;
+        }
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to load map geometry data";
+        setMapDialogError(message);
+        setMapDialogGeoJson(null);
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsMapDialogLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeMapDialogEntry, isMapDialogOpen]);
+
   function chapterFromLeaf(leaf: LeafNode): Chapter | null {
     const book = books[leaf.bookIndex];
     if (!book) {
@@ -3418,6 +3869,22 @@ export function KJVReader() {
         setIsGenealogyLoading(false);
       };
 
+      const applyMapsSelection = (data: AncientMapPayload) => {
+        const matches = data.filter((entry) => matchesMapWord(entry, rawWord));
+        setMapsWordAccordionValue([]);
+        setSelectedMapsEntries(matches);
+        setConcordanceAccordionValue((current) => {
+          const withoutMaps = current.filter((value) => value !== "maps");
+          if (matches.length === 0) {
+            return withoutMaps;
+          }
+          return withoutMaps.includes("concordance")
+            ? [...withoutMaps, "maps"]
+            : ["concordance", ...withoutMaps, "maps"];
+        });
+        setIsMapsLoading(false);
+      };
+
       const applyStrongsSelection = (
         greek: StrongsPayload,
         hebrew: StrongsPayload,
@@ -3571,10 +4038,35 @@ export function KJVReader() {
             setIsGenealogyLoading(false);
           });
       }
+
+      setMapsError(null);
+      setIsMapsLoading(true);
+      void ensureMapImagesLoaded().catch(() => {
+        // Error state is set by ensureMapImagesLoaded.
+      });
+      if (ancientMaps) {
+        applyMapsSelection(ancientMaps);
+      } else {
+        void ensureAncientMapsLoaded()
+          .then((data) => {
+            applyMapsSelection(data);
+          })
+          .catch((error) => {
+            const message =
+              error instanceof Error
+                ? error.message
+                : "Failed to load ancient map data";
+            setMapsError(message);
+            setIsMapsLoading(false);
+          });
+      }
     },
     [
+      ancientMaps,
       concordance,
       ensureConcordanceLoaded,
+      ensureAncientMapsLoaded,
+      ensureMapImagesLoaded,
       ensureHitchcocksLoaded,
       ensureGenealogyLoaded,
       ensureOldEnglishLoaded,
@@ -4885,6 +5377,7 @@ export function KJVReader() {
     "concordance",
     "websters",
     "strongs",
+    "maps",
     "hitchcocks",
     "old-english",
     "genealogy",
@@ -4898,6 +5391,7 @@ export function KJVReader() {
   const hasConcordanceInfo = concordanceSearchResults.length > 0;
   const hasWebstersInfo = webstersSearchResults.length > 0;
   const hasStrongsInfo = strongsSearchResults.length > 0;
+  const hasMapsInfo = mapsSearchResults.length > 0;
   const hasHitchcocksInfo = hitchcocksSearchResults.length > 0;
   const hasOldEnglishInfo = oldEnglishSearchResults.length > 0;
   const hasGenealogyInfo = genealogySearchResults.length > 0;
@@ -4909,6 +5403,8 @@ export function KJVReader() {
   const isBookPickerDialogOpen = Boolean(
     bookPickerDialogLeafId && bookPickerDialogLeaf,
   );
+  const currentPhotoDialogItem =
+    photoDialogItems.length > 0 ? photoDialogItems[photoDialogIndex] : null;
 
   return (
     <main className="h-screen w-full overflow-hidden bg-background">
@@ -5564,6 +6060,273 @@ export function KJVReader() {
                     )}
                   </AccordionContent>
                 </AccordionItem>
+                <AccordionItem value="maps">
+                  <AccordionTrigger
+                    className={cn(
+                      hasMapsInfo && "text-emerald-600 dark:text-emerald-400",
+                    )}
+                  >
+                    Maps &amp; Photos
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-2 overflow-visible">
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        const value = formData.get("maps-search");
+                        applyMapsSearch(typeof value === "string" ? value : "");
+                      }}
+                    >
+                      <InputGroup>
+                        <InputGroupInput
+                          name="maps-search"
+                          placeholder="Search maps and photos..."
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupButton
+                            type="submit"
+                            size="icon-sm"
+                            variant="ghost"
+                            aria-label="Search maps"
+                            disabled={isMapsLoading || isMapsSearching}
+                          >
+                            {isMapsLoading || isMapsSearching ? (
+                              <LoaderCircleIcon className="animate-spin" />
+                            ) : (
+                              <SearchIcon />
+                            )}
+                          </InputGroupButton>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </form>
+                    {isMapsLoading || isMapsSearching ? (
+                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <LoaderCircleIcon className="size-4 animate-spin" />
+                        {isMapsLoading ? "Loading maps..." : "Searching maps..."}
+                      </p>
+                    ) : mapsError ? (
+                      <p className="text-sm text-destructive">{mapsError}</p>
+                    ) : mapsSearchResults.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        {mapsSearchTerm.trim()
+                          ? "No matching places found."
+                          : "Click a word in the text or search maps."}
+                      </p>
+                    ) : (
+                      <Accordion
+                        className="w-full rounded-md border px-2"
+                        multiple
+                        value={mapsWordAccordionValue}
+                        onValueChange={(value) =>
+                          setMapsWordAccordionValue(
+                            value.filter(Boolean) as string[],
+                          )
+                        }
+                      >
+                        {mapsSearchResults.map((entry, index) => {
+                          const itemKey = `${entry.geojson_file}-${index}`;
+                          const title = mapEntryLabel(entry);
+                          const modernIds = modernIdsForMapEntry(entry);
+                          const imageCandidates = modernIds.flatMap(
+                            (id) => mapImagesByLocationId.get(id) ?? [],
+                          );
+                          const seenImageIds = new Set<string>();
+                          const photoEntries = imageCandidates.filter((image) => {
+                            if (seenImageIds.has(image.id)) {
+                              return false;
+                            }
+                            seenImageIds.add(image.id);
+                            return true;
+                          });
+                          const linkedPlaces = Object.entries(
+                            entry.geojson_roles ?? {},
+                          ).map(([roleKey, role]) => ({
+                            roleKey,
+                            text: cleanMapMarkup(role.description ?? roleKey),
+                          }));
+                          return (
+                            <AccordionItem key={itemKey} value={itemKey}>
+                              <AccordionTrigger>
+                                {title}
+                              </AccordionTrigger>
+                              <AccordionContent className="space-y-2 text-sm">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => openMapDialog(entry)}
+                                  >
+                                    Open Map
+                                  </Button>
+                                  {entry.types.length > 0 ? (
+                                    <span className="text-xs text-muted-foreground">
+                                      {entry.types.join(", ")}
+                                    </span>
+                                  ) : null}
+                                </div>
+                                {entry.translations.length > 1 ? (
+                                  <p className="text-muted-foreground">
+                                    Also: {entry.translations.slice(1).join(", ")}
+                                  </p>
+                                ) : null}
+                                {linkedPlaces.length > 0 ? (
+                                  <div className="space-y-1">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                      Linked Places ({linkedPlaces.length})
+                                    </p>
+                                    <div className="flex flex-wrap gap-1">
+                                      {linkedPlaces.map((place) => (
+                                        <span
+                                          key={`${itemKey}-${place.roleKey}`}
+                                          className="rounded-sm bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground"
+                                        >
+                                          {place.text}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ) : null}
+                                <Accordion className="w-full rounded-md border px-2" multiple>
+                                  <AccordionItem value={`${itemKey}-references`}>
+                                    <AccordionTrigger>
+                                      {`References (${entry.verses.length})`}
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                      <p className="leading-7">
+                                        {entry.verses.map((reference, verseIndex) => (
+                                          <Fragment key={`${itemKey}-${reference}`}>
+                                            <ConcordanceReferencePopover
+                                              reference={reference}
+                                              highlightWord={title}
+                                            />
+                                            {verseIndex < entry.verses.length - 1
+                                              ? ", "
+                                              : null}
+                                          </Fragment>
+                                        ))}
+                                      </p>
+                                    </AccordionContent>
+                                  </AccordionItem>
+                                </Accordion>
+                                {isMapImagesLoading ? (
+                                  <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <LoaderCircleIcon className="size-3.5 animate-spin" />
+                                    Loading photos...
+                                  </p>
+                                ) : mapImagesError ? (
+                                  <p className="text-xs text-destructive">
+                                    {mapImagesError}
+                                  </p>
+                                ) : photoEntries.length > 0 ? (
+                                  <div className="space-y-1">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                      Photos ({photoEntries.length})
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                                      {photoEntries.slice(0, 9).map((image) => {
+                                        const imageLocationKey = modernIds.find((id) =>
+                                          Boolean(
+                                            image.thumbnails?.[id]?.file ??
+                                              image.descriptions?.[id],
+                                          ),
+                                        );
+                                        const thumbFile = imageLocationKey
+                                          ? image.thumbnails?.[imageLocationKey]?.file
+                                          : undefined;
+                                        const thumbDescription = imageLocationKey
+                                          ? (image.thumbnails?.[imageLocationKey]
+                                              ?.description ??
+                                            image.descriptions?.[imageLocationKey])
+                                          : undefined;
+                                        const dialogPhotos = photoEntries
+                                          .slice(0, 9)
+                                          .map((item) => {
+                                            const locationId = modernIds.find((id) =>
+                                              Boolean(
+                                                item.thumbnails?.[id]?.file ??
+                                                  item.descriptions?.[id],
+                                              ),
+                                            );
+                                            const file = locationId
+                                              ? item.thumbnails?.[locationId]?.file
+                                              : undefined;
+                                            if (!file) {
+                                              return null;
+                                            }
+                                            const description = cleanMapMarkup(
+                                              (locationId
+                                                ? (item.thumbnails?.[locationId]
+                                                    ?.description ??
+                                                  item.descriptions?.[locationId])
+                                                : undefined) ??
+                                                item.credit ??
+                                                title,
+                                            );
+                                            return {
+                                              id: item.id,
+                                              src: `/maps/thumbnails/${file}`,
+                                              alt: description,
+                                              caption: description,
+                                            } satisfies MapPhotoDialogItem;
+                                          })
+                                          .filter(
+                                            (item): item is MapPhotoDialogItem =>
+                                              Boolean(item),
+                                          );
+
+                                        const clickedIndex = dialogPhotos.findIndex(
+                                          (item) => item.id === image.id,
+                                        );
+
+                                        return (
+                                          <button
+                                            key={`${itemKey}-${image.id}`}
+                                            type="button"
+                                            className="group block overflow-hidden rounded border bg-muted/30 text-left"
+                                            onClick={() =>
+                                              openPhotoDialog(
+                                                dialogPhotos,
+                                                Math.max(0, clickedIndex),
+                                              )
+                                            }
+                                            disabled={!thumbFile}
+                                          >
+                                            {thumbFile ? (
+                                              <img
+                                                src={`/maps/thumbnails/${thumbFile}`}
+                                                alt={cleanMapMarkup(
+                                                  thumbDescription ?? title,
+                                                )}
+                                                className="aspect-4/3 w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+                                                loading="lazy"
+                                              />
+                                            ) : (
+                                              <div className="flex aspect-4/3 items-center justify-center text-[11px] text-muted-foreground">
+                                                No local thumbnail
+                                              </div>
+                                            )}
+                                            <div className="px-1.5 py-1 text-[11px] text-muted-foreground">
+                                              {cleanMapMarkup(
+                                                thumbDescription ??
+                                                  image.credit ??
+                                                  title,
+                                              )}
+                                            </div>
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                ) : null}
+                              </AccordionContent>
+                            </AccordionItem>
+                          );
+                        })}
+                      </Accordion>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
                 <AccordionItem value="genealogy">
                   <AccordionTrigger
                     className={cn(
@@ -5733,6 +6496,164 @@ export function KJVReader() {
       </SidebarProvider>
 
       {tokenPopupCard}
+
+      <AlertDialog
+        open={isMapDialogOpen}
+        onOpenChange={(open) => {
+          setIsMapDialogOpen(open);
+          if (!open) {
+            setActiveMapDialogEntry(null);
+            setMapDialogGeoJson(null);
+            setMapDialogError(null);
+          }
+        }}
+      >
+        <AlertDialogContent className="h-[min(86vh,900px)] w-[min(98vw,1700px)] max-w-none">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {activeMapDialogEntry ? mapEntryLabel(activeMapDialogEntry) : "Map"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {activeMapDialogEntry?.types.length
+                ? activeMapDialogEntry.types.join(", ")
+                : "Ancient map view"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-3">
+            {isMapDialogLoading ? (
+              <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                <LoaderCircleIcon className="size-4 animate-spin" />
+                Loading map...
+              </p>
+            ) : mapDialogError ? (
+              <p className="text-sm text-destructive">{mapDialogError}</p>
+            ) : mapDialogGeoJson ? (
+              <MapContainer
+                center={[31.5, 35]}
+                zoom={6}
+                className="h-[calc(min(86vh,900px)-12rem)] min-h-96 w-full rounded-md border"
+                scrollWheelZoom
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <LeafletGeoJSON
+                  data={mapDialogGeoJson as never}
+                  style={() => ({
+                    color: "#2563eb",
+                    weight: 2,
+                    opacity: 0.9,
+                    fillColor: "#60a5fa",
+                    fillOpacity: 0.25,
+                  })}
+                  pointToLayer={(
+                    _feature: unknown,
+                    latlng: { lat: number; lng: number },
+                  ) =>
+                    L.circleMarker([latlng.lat, latlng.lng], {
+                      radius: 5,
+                      color: "#1d4ed8",
+                      weight: 2,
+                      fillColor: "#60a5fa",
+                      fillOpacity: 0.8,
+                    })
+                  }
+                />
+                <MapBoundsSync geojson={mapDialogGeoJson} />
+              </MapContainer>
+            ) : (
+              <p className="text-sm text-muted-foreground">No map data found.</p>
+            )}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => {
+                setIsMapDialogOpen(false);
+                setActiveMapDialogEntry(null);
+                setMapDialogGeoJson(null);
+                setMapDialogError(null);
+              }}
+            >
+              Close
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={isPhotoDialogOpen}
+        onOpenChange={(open) => {
+          setIsPhotoDialogOpen(open);
+          if (!open) {
+            setPhotoDialogItems([]);
+            setPhotoDialogIndex(0);
+          }
+        }}
+      >
+        <AlertDialogContent className="w-[min(98vw,1600px)] max-w-none">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Photo</AlertDialogTitle>
+            <AlertDialogDescription>
+              {currentPhotoDialogItem
+                ? `${photoDialogIndex + 1} of ${photoDialogItems.length}`
+                : "No photo selected"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {currentPhotoDialogItem ? (
+            <div className="space-y-3">
+              <div className="relative overflow-hidden rounded-md border bg-muted/20">
+                <img
+                  src={currentPhotoDialogItem.src}
+                  alt={currentPhotoDialogItem.alt}
+                  className="max-h-[70vh] w-full object-contain"
+                />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {currentPhotoDialogItem.caption}
+              </p>
+              <div className="flex items-center justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => movePhotoDialog(-1)}
+                  disabled={photoDialogItems.length <= 1}
+                >
+                  <ChevronLeftIcon className="size-4" />
+                  Previous
+                </Button>
+                <div className="text-xs text-muted-foreground">
+                  {photoDialogIndex + 1} / {photoDialogItems.length}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => movePhotoDialog(1)}
+                  disabled={photoDialogItems.length <= 1}
+                >
+                  Next
+                  <ChevronRightIcon className="size-4" />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">No photo available.</p>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => {
+                setIsPhotoDialogOpen(false);
+                setPhotoDialogItems([]);
+                setPhotoDialogIndex(0);
+              }}
+            >
+              Close
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog
         open={isBookPickerDialogOpen}
