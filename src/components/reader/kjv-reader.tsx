@@ -1,4 +1,12 @@
-import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
@@ -25,7 +33,12 @@ import {
   XIcon,
 } from "lucide-react";
 
-import { type Book, type Chapter, type Verse, type VerseToken } from "@/types/bible";
+import {
+  type Book,
+  type Chapter,
+  type Verse,
+  type VerseToken,
+} from "@/types/bible";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -73,10 +86,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import {
-  ScrollArea,
-  ScrollBar,
-} from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 import {
   Progress,
@@ -90,6 +100,7 @@ type ReaderPayload = {
 
 type PanelDirection = "left" | "right" | "up" | "down";
 type SplitOrientation = "horizontal" | "vertical";
+type TabsOrientation = "horizontal" | "vertical";
 
 type LeafNode = {
   id: string;
@@ -265,7 +276,10 @@ const ChapterTextContent = memo(function ChapterTextContent({
   }
 
   return (
-    <div className="flex w-full flex-col p-3 sm:p-4" style={{ rowGap: `${verseSpacing}px` }}>
+    <div
+      className="flex w-full flex-col p-3 sm:p-4"
+      style={{ rowGap: `${verseSpacing}px` }}
+    >
       {flowVersesByParagraph
         ? paragraphGroups.map((group, groupIndex) => (
             <article
@@ -373,9 +387,11 @@ function chapterProgressKey(bookIndex: number, chapterIndex: number) {
 }
 
 function panelViewportElement(panelElement: HTMLDivElement | null | undefined) {
-  return panelElement?.querySelector<HTMLElement>(
-    '[data-panel-content-scroll] [data-slot="scroll-area-viewport"]',
-  ) ?? null;
+  return (
+    panelElement?.querySelector<HTMLElement>(
+      '[data-panel-content-scroll] [data-slot="scroll-area-viewport"]',
+    ) ?? null
+  );
 }
 
 function createLeaf(
@@ -411,7 +427,10 @@ function directionOrientation(direction: PanelDirection): SplitOrientation {
     : "vertical";
 }
 
-function wrapNodeWithNewPanel(node: PanelNode, direction: PanelDirection): SplitNode {
+function wrapNodeWithNewPanel(
+  node: PanelNode,
+  direction: PanelDirection,
+): SplitNode {
   const newLeaf = createLeaf();
   const orientation = directionOrientation(direction);
   const placeNewFirst = direction === "left" || direction === "up";
@@ -436,7 +455,8 @@ function splitPanelNode(
       return { next: node, createdLeafId: null };
     }
     const split = wrapNodeWithNewPanel(node, direction);
-    const createdLeaf = split.first.type === "leaf" ? split.first : split.second;
+    const createdLeaf =
+      split.first.type === "leaf" ? split.first : split.second;
     return { next: split, createdLeafId: createdLeaf.id };
   }
 
@@ -521,7 +541,11 @@ function updateLeafNode(
   patch: Partial<
     Pick<
       LeafNode,
-      "bookIndex" | "chapterIndex" | "view" | "pickerTestament" | "pickerBookIndex"
+      | "bookIndex"
+      | "chapterIndex"
+      | "view"
+      | "pickerTestament"
+      | "pickerBookIndex"
     >
   >,
 ): PanelNode {
@@ -743,10 +767,22 @@ function collectLeafRects(
 
   const firstHeight = height * ratio;
   collectLeafRects(node.first, x, y, width, firstHeight, rects);
-  collectLeafRects(node.second, x, y + firstHeight, width, height - firstHeight, rects);
+  collectLeafRects(
+    node.second,
+    x,
+    y + firstHeight,
+    width,
+    height - firstHeight,
+    rects,
+  );
 }
 
-function overlapSize(startA: number, endA: number, startB: number, endB: number) {
+function overlapSize(
+  startA: number,
+  endA: number,
+  startB: number,
+  endB: number,
+) {
   return Math.max(0, Math.min(endA, endB) - Math.max(startA, startB));
 }
 
@@ -898,13 +934,20 @@ function buildLeafNeighborMapFromDom(
   return map;
 }
 
-function pathToLeaf(node: PanelNode, leafId: string, path: PanelNode[] = []): PanelNode[] | null {
+function pathToLeaf(
+  node: PanelNode,
+  leafId: string,
+  path: PanelNode[] = [],
+): PanelNode[] | null {
   const nextPath = [...path, node];
   if (node.type === "leaf") {
     return node.id === leafId ? nextPath : null;
   }
 
-  return pathToLeaf(node.first, leafId, nextPath) ?? pathToLeaf(node.second, leafId, nextPath);
+  return (
+    pathToLeaf(node.first, leafId, nextPath) ??
+    pathToLeaf(node.second, leafId, nextPath)
+  );
 }
 
 function findGroupTargetNodeId(
@@ -928,7 +971,10 @@ function findGroupTargetNodeId(
   return null;
 }
 
-function findParentSplitForLeaf(root: PanelNode, leafId: string): SplitNode | null {
+function findParentSplitForLeaf(
+  root: PanelNode,
+  leafId: string,
+): SplitNode | null {
   const path = pathToLeaf(root, leafId);
   if (!path || path.length < 2) {
     return null;
@@ -945,9 +991,12 @@ export function KJVReader() {
   const [isStudyMode, setIsStudyMode] = useState(true);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [verseSpacing, setVerseSpacing] = useState(0);
-  const [hideReadModeVerseNumbers, setHideReadModeVerseNumbers] = useState(false);
+  const [hideReadModeVerseNumbers, setHideReadModeVerseNumbers] =
+    useState(false);
   const [readModeParagraphIndent, setReadModeParagraphIndent] = useState(false);
   const [flowVersesByParagraph, setFlowVersesByParagraph] = useState(false);
+  const [tabsOrientation, setTabsOrientation] =
+    useState<TabsOrientation>("horizontal");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isProgressOpen, setIsProgressOpen] = useState(false);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
@@ -959,7 +1008,9 @@ export function KJVReader() {
   const [renameValue, setRenameValue] = useState("");
   const [renameError, setRenameError] = useState<string | null>(null);
   const [fullscreenLeafId, setFullscreenLeafId] = useState<string | null>(null);
-  const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(null);
+  const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(
+    null,
+  );
   const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
   const [leafScrollProgress, setLeafScrollProgress] = useState<
     Record<string, number>
@@ -1001,9 +1052,12 @@ export function KJVReader() {
         hideReadModeVerseNumbers?: boolean;
         readModeParagraphIndent?: boolean;
         flowVersesByParagraph?: boolean;
+        tabsOrientation?: TabsOrientation;
       };
       if (typeof parsed.verseSpacing === "number") {
-        setVerseSpacing(Math.max(0, Math.min(24, Math.round(parsed.verseSpacing))));
+        setVerseSpacing(
+          Math.max(0, Math.min(24, Math.round(parsed.verseSpacing))),
+        );
       }
       if (typeof parsed.hideReadModeVerseNumbers === "boolean") {
         setHideReadModeVerseNumbers(parsed.hideReadModeVerseNumbers);
@@ -1013,6 +1067,12 @@ export function KJVReader() {
       }
       if (typeof parsed.flowVersesByParagraph === "boolean") {
         setFlowVersesByParagraph(parsed.flowVersesByParagraph);
+      }
+      if (
+        parsed.tabsOrientation === "horizontal" ||
+        parsed.tabsOrientation === "vertical"
+      ) {
+        setTabsOrientation(parsed.tabsOrientation);
       }
     } catch {
       // Ignore malformed persisted display settings.
@@ -1027,6 +1087,7 @@ export function KJVReader() {
         hideReadModeVerseNumbers,
         readModeParagraphIndent,
         flowVersesByParagraph,
+        tabsOrientation,
       }),
     );
   }, [
@@ -1034,6 +1095,7 @@ export function KJVReader() {
     hideReadModeVerseNumbers,
     readModeParagraphIndent,
     flowVersesByParagraph,
+    tabsOrientation,
   ]);
 
   useEffect(() => {
@@ -1065,7 +1127,9 @@ export function KJVReader() {
 
   useEffect(() => {
     try {
-      const storedProgress = window.localStorage.getItem("kjv-read-chapters-v1");
+      const storedProgress = window.localStorage.getItem(
+        "kjv-read-chapters-v1",
+      );
       if (!storedProgress) {
         return;
       }
@@ -1171,7 +1235,10 @@ export function KJVReader() {
 
     const summarize = (items: { read: number; total: number }[]) =>
       items.reduce(
-        (acc, item) => ({ read: acc.read + item.read, total: acc.total + item.total }),
+        (acc, item) => ({
+          read: acc.read + item.read,
+          total: acc.total + item.total,
+        }),
         { read: 0, total: 0 },
       );
 
@@ -1191,7 +1258,8 @@ export function KJVReader() {
   const totalProgressPercent =
     progressByTestament.total.total > 0
       ? Math.round(
-          (progressByTestament.total.read / progressByTestament.total.total) * 100,
+          (progressByTestament.total.read / progressByTestament.total.total) *
+            100,
         )
       : 0;
   useEffect(() => {
@@ -1368,7 +1436,10 @@ export function KJVReader() {
 
   function panelCardElement(leafId: string) {
     const panelElement = panelElementRefs.current[leafId];
-    return panelElement?.querySelector<HTMLElement>(':scope > [data-slot="card"]') ?? null;
+    return (
+      panelElement?.querySelector<HTMLElement>(':scope > [data-slot="card"]') ??
+      null
+    );
   }
 
   function clearMovePreview() {
@@ -1492,7 +1563,11 @@ export function KJVReader() {
       return;
     }
 
-    const targetNodeId = findGroupTargetNodeId(activeTab.root, leafId, direction);
+    const targetNodeId = findGroupTargetNodeId(
+      activeTab.root,
+      leafId,
+      direction,
+    );
     if (!targetNodeId) {
       return;
     }
@@ -1563,7 +1638,11 @@ export function KJVReader() {
       return;
     }
 
-    const targetNodeId = findGroupTargetNodeId(activeTab.root, leafId, direction);
+    const targetNodeId = findGroupTargetNodeId(
+      activeTab.root,
+      leafId,
+      direction,
+    );
     if (!targetNodeId) {
       return;
     }
@@ -1627,7 +1706,11 @@ export function KJVReader() {
     patch: Partial<
       Pick<
         LeafNode,
-        "bookIndex" | "chapterIndex" | "view" | "pickerTestament" | "pickerBookIndex"
+        | "bookIndex"
+        | "chapterIndex"
+        | "view"
+        | "pickerTestament"
+        | "pickerBookIndex"
       >
     >,
   ) {
@@ -1721,7 +1804,9 @@ export function KJVReader() {
     let shouldActivate = false;
 
     setTabs((currentTabs) => {
-      const activeIndex = currentTabs.findIndex((tab) => tab.id === activeTabId);
+      const activeIndex = currentTabs.findIndex(
+        (tab) => tab.id === activeTabId,
+      );
       if (activeIndex < 0) {
         return currentTabs;
       }
@@ -1752,8 +1837,8 @@ export function KJVReader() {
       requestAnimationFrame(() => {
         tabEndRef.current?.scrollIntoView({
           behavior: "smooth",
-          block: "nearest",
-          inline: "end",
+          block: tabsOrientation === "vertical" ? "end" : "nearest",
+          inline: tabsOrientation === "vertical" ? "nearest" : "end",
         });
       });
     }
@@ -1766,8 +1851,8 @@ export function KJVReader() {
     requestAnimationFrame(() => {
       tabEndRef.current?.scrollIntoView({
         behavior: "smooth",
-        block: "nearest",
-        inline: "end",
+        block: tabsOrientation === "vertical" ? "end" : "nearest",
+        inline: tabsOrientation === "vertical" ? "nearest" : "end",
       });
     });
   }
@@ -1820,23 +1905,23 @@ export function KJVReader() {
     });
   }
 
-  const openTokenDetailsFromElement = useCallback((
-    element: HTMLElement,
-    token: VerseToken,
-  ) => {
-    const rect = element.getBoundingClientRect();
-    const popupWidth = 280;
-    const safeX = Math.max(
-      8,
-      Math.min(window.innerWidth - popupWidth - 8, rect.left),
-    );
-    const safeY = Math.min(window.innerHeight - 180, rect.bottom + 8);
-    setTokenPopup({
-      token,
-      x: safeX,
-      y: safeY,
-    });
-  }, []);
+  const openTokenDetailsFromElement = useCallback(
+    (element: HTMLElement, token: VerseToken) => {
+      const rect = element.getBoundingClientRect();
+      const popupWidth = 280;
+      const safeX = Math.max(
+        8,
+        Math.min(window.innerWidth - popupWidth - 8, rect.left),
+      );
+      const safeY = Math.min(window.innerHeight - 180, rect.bottom + 8);
+      setTokenPopup({
+        token,
+        x: safeX,
+        y: safeY,
+      });
+    },
+    [],
+  );
 
   function openRenameDialog(tabId: string) {
     const tab = tabs.find((item) => item.id === tabId);
@@ -1877,8 +1962,12 @@ export function KJVReader() {
     }
 
     setTabs((currentTabs) => {
-      const sourceIndex = currentTabs.findIndex((tab) => tab.id === activeTabId);
-      const targetIndex = currentTabs.findIndex((tab) => tab.id === targetTabId);
+      const sourceIndex = currentTabs.findIndex(
+        (tab) => tab.id === activeTabId,
+      );
+      const targetIndex = currentTabs.findIndex(
+        (tab) => tab.id === targetTabId,
+      );
       if (sourceIndex < 0 || targetIndex < 0) {
         return currentTabs;
       }
@@ -1895,7 +1984,9 @@ export function KJVReader() {
         root: extraction.next ?? createLeaf(),
       };
 
-      const nextTargetIndex = nextTabs.findIndex((tab) => tab.id === targetTabId);
+      const nextTargetIndex = nextTabs.findIndex(
+        (tab) => tab.id === targetTabId,
+      );
       if (nextTargetIndex < 0) {
         return currentTabs;
       }
@@ -1968,15 +2059,18 @@ export function KJVReader() {
     const chapter = chapterFromLeaf(leaf);
 
     const key = `${leaf.bookIndex}-${leaf.chapterIndex}`;
-    const chapterReadKey = chapterProgressKey(leaf.bookIndex, leaf.chapterIndex);
+    const chapterReadKey = chapterProgressKey(
+      leaf.bookIndex,
+      leaf.chapterIndex,
+    );
     const isChapterRead = readChapters.has(chapterReadKey);
     const readingProgress = leafScrollProgress[leaf.id] ?? 0;
     const showVerseNumbers = !hideReadModeVerseNumbers;
     const neighbors =
       modelLeafNeighbors.get(leaf.id) ?? neighborsForLeaf(leaf.id);
-    const moveDirections = (["left", "right", "up", "down"] as PanelDirection[]).filter(
-      (direction) => Boolean(neighbors[direction]),
-    );
+    const moveDirections = (
+      ["left", "right", "up", "down"] as PanelDirection[]
+    ).filter((direction) => Boolean(neighbors[direction]));
     const groupTargets = activeTab
       ? {
           left: findGroupTargetNodeId(activeTab.root, leaf.id, "left"),
@@ -1985,7 +2079,9 @@ export function KJVReader() {
           down: findGroupTargetNodeId(activeTab.root, leaf.id, "down"),
         }
       : { left: null, right: null, up: null, down: null };
-    const parentSplit = activeTab ? findParentSplitForLeaf(activeTab.root, leaf.id) : null;
+    const parentSplit = activeTab
+      ? findParentSplitForLeaf(activeTab.root, leaf.id)
+      : null;
     const nextOrientationLabel = parentSplit
       ? parentSplit.orientation === "horizontal"
         ? "Make Group Vertical"
@@ -1993,9 +2089,9 @@ export function KJVReader() {
       : null;
     const hasGroupAddOptions = Boolean(
       groupTargets.left ||
-        groupTargets.right ||
-        groupTargets.up ||
-        groupTargets.down,
+      groupTargets.right ||
+      groupTargets.up ||
+      groupTargets.down,
     );
     const existingTabTargets = tabs
       .map((tab, index) => ({
@@ -2025,394 +2121,412 @@ export function KJVReader() {
         )}
       >
         <Card className="flex h-full min-h-0 w-full min-w-0 flex-col rounded-none">
-        <CardHeader className="border-b p-2 sm:p-3">
-          <div className="flex flex-wrap items-center gap-2">
-            {leaf.view === "reader" && chapter ? (
-              <>
-                <Select
-                  items={books.map((bookItem) => ({
-                    label: bookItem.name,
-                    value: bookItem.name,
-                  }))}
-                  value={book.name}
-                  onValueChange={(value) => {
-                    const nextBookIndex = books.findIndex(
-                      (bookItem) => bookItem.name === value,
-                    );
-                    if (nextBookIndex >= 0) {
-                      updateLeafLocation(leaf.id, {
-                        bookIndex: nextBookIndex,
-                        chapterIndex: 0,
-                      });
-                    }
-                  }}
-                >
-                  <SelectTrigger className="min-w-36 sm:min-w-44">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {books.map((bookItem) => (
-                        <SelectItem key={bookItem.name} value={bookItem.name}>
-                          {bookItem.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  items={book.chapters.map((chapterItem) => ({
-                    label: `Chapter ${chapterItem.chapter}`,
-                    value: String(chapterItem.chapter),
-                  }))}
-                  value={String(chapter.chapter)}
-                  onValueChange={(value) => {
-                    const nextChapterIndex = book.chapters.findIndex(
-                      (chapterItem) => String(chapterItem.chapter) === value,
-                    );
-                    if (nextChapterIndex >= 0) {
-                      updateLeafLocation(leaf.id, {
-                        chapterIndex: nextChapterIndex,
-                      });
-                    }
-                  }}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {book.chapters.map((chapterItem) => (
-                        <SelectItem
-                          key={`${book.name}-${chapterItem.chapter}`}
-                          value={String(chapterItem.chapter)}
-                        >
-                          Chapter {chapterItem.chapter}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Choose a book and chapter
-              </p>
-            )}
-
-            <DropdownMenu
-              open={panelMenuOpenLeafId === leaf.id}
-              onOpenChange={(open) => {
-                if (open) {
-                  setPanelMenuOpenLeafId(leaf.id);
-                  return;
-                }
-                if (panelMenuOpenLeafId === leaf.id) {
-                  setPanelMenuOpenLeafId(null);
-                }
-                clearAllPanelPreviews();
-              }}
-            >
-              <DropdownMenuTrigger
-                render={
-                  <Button variant="outline" size="sm" className="ml-auto" />
-                }
-              >
-                <PlusIcon />
-                Panel
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem
-                  onClick={() => {
-                    closePanelMenu();
-                    void toggleFullscreenLeaf(leaf.id);
-                  }}
-                >
-                  {isFullscreenLeaf ? (
-                    <MinimizeIcon />
-                  ) : (
-                    <ExpandIcon />
-                  )}
-                  {isFullscreenLeaf
-                    ? "Exit Full Screen"
-                    : "Full Screen"}
-                </DropdownMenuItem>
-                {!isFullscreenLeaf ? (
-                  <>
-                    {parentSplit ? (
-                      <DropdownMenuItem
-                        onClick={() => toggleParentGroupOrientation(leaf.id)}
-                        onPointerEnter={() => setOrientationPreviewTarget(leaf.id)}
-                        onPointerLeave={() => clearOrientationPreview()}
-                      >
-                        <RotateCwIcon />
-                        {nextOrientationLabel}
-                      </DropdownMenuItem>
-                    ) : null}
-                    <DropdownMenuSeparator />
-                    {moveDirections.length > 0 ? (
-                      <>
-                        <DropdownMenuGroup>
-                          {moveDirections.includes("left") ? (
-                            <DropdownMenuItem
-                              onClick={() => moveLeaf(leaf.id, "left")}
-                              onPointerEnter={() => setMovePreviewTarget(leaf.id, "left")}
-                              onPointerLeave={() => clearMovePreview()}
-                            >
-                              <ArrowLeftIcon />
-                              Move Left
-                            </DropdownMenuItem>
-                          ) : null}
-                          {moveDirections.includes("right") ? (
-                            <DropdownMenuItem
-                              onClick={() => moveLeaf(leaf.id, "right")}
-                              onPointerEnter={() => setMovePreviewTarget(leaf.id, "right")}
-                              onPointerLeave={() => clearMovePreview()}
-                            >
-                              <ArrowRightIcon />
-                              Move Right
-                            </DropdownMenuItem>
-                          ) : null}
-                          {moveDirections.includes("up") ? (
-                            <DropdownMenuItem
-                              onClick={() => moveLeaf(leaf.id, "up")}
-                              onPointerEnter={() => setMovePreviewTarget(leaf.id, "up")}
-                              onPointerLeave={() => clearMovePreview()}
-                            >
-                              <ArrowUpIcon />
-                              Move Up
-                            </DropdownMenuItem>
-                          ) : null}
-                          {moveDirections.includes("down") ? (
-                            <DropdownMenuItem
-                              onClick={() => moveLeaf(leaf.id, "down")}
-                              onPointerEnter={() => setMovePreviewTarget(leaf.id, "down")}
-                              onPointerLeave={() => clearMovePreview()}
-                            >
-                              <ArrowDownIcon />
-                              Move Down
-                            </DropdownMenuItem>
-                          ) : null}
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                      </>
-                    ) : null}
-                    <DropdownMenuItem
-                      onClick={() => splitLeaf(leaf.id, "left")}
-                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "left")}
-                      onPointerLeave={() => clearAddPreview()}
-                    >
-                      <SplitSquareHorizontalIcon />
-                      Add Panel Left
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => splitLeaf(leaf.id, "right")}
-                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "right")}
-                      onPointerLeave={() => clearAddPreview()}
-                    >
-                      <SplitSquareHorizontalIcon className="rotate-180" />
-                      Add Panel Right
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => splitLeaf(leaf.id, "up")}
-                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "up")}
-                      onPointerLeave={() => clearAddPreview()}
-                    >
-                      <SplitSquareVerticalIcon />
-                      Add Panel Above
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => splitLeaf(leaf.id, "down")}
-                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "down")}
-                      onPointerLeave={() => clearAddPreview()}
-                    >
-                      <SplitSquareVerticalIcon className="rotate-180" />
-                      Add Panel Below
-                    </DropdownMenuItem>
-                    {hasGroupAddOptions ? (
-                      <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                          {groupTargets.left ? (
-                            <DropdownMenuItem
-                              onClick={() => splitPanelGroup(leaf.id, "left")}
-                              onPointerEnter={() =>
-                                setGroupAddPreviewTarget(leaf.id, "left")
-                              }
-                              onPointerLeave={() => clearAddPreview()}
-                            >
-                              <SquareChevronLeftIcon />
-                              Add Panel Left (Group)
-                            </DropdownMenuItem>
-                          ) : null}
-                          {groupTargets.right ? (
-                            <DropdownMenuItem
-                              onClick={() => splitPanelGroup(leaf.id, "right")}
-                              onPointerEnter={() =>
-                                setGroupAddPreviewTarget(leaf.id, "right")
-                              }
-                              onPointerLeave={() => clearAddPreview()}
-                            >
-                              <SquareChevronRightIcon />
-                              Add Panel Right (Group)
-                            </DropdownMenuItem>
-                          ) : null}
-                          {groupTargets.up ? (
-                            <DropdownMenuItem
-                              onClick={() => splitPanelGroup(leaf.id, "up")}
-                              onPointerEnter={() =>
-                                setGroupAddPreviewTarget(leaf.id, "up")
-                              }
-                              onPointerLeave={() => clearAddPreview()}
-                            >
-                              <SquareChevronUpIcon />
-                              Add Panel Above (Group)
-                            </DropdownMenuItem>
-                          ) : null}
-                          {groupTargets.down ? (
-                            <DropdownMenuItem
-                              onClick={() => splitPanelGroup(leaf.id, "down")}
-                              onPointerEnter={() =>
-                                setGroupAddPreviewTarget(leaf.id, "down")
-                              }
-                              onPointerLeave={() => clearAddPreview()}
-                            >
-                              <SquareChevronDownIcon />
-                              Add Panel Below (Group)
-                            </DropdownMenuItem>
-                          ) : null}
-                        </DropdownMenuGroup>
-                      </>
-                    ) : null}
-                    <DropdownMenuSeparator />
-                    {existingTabTargets.length > 0 ? (
-                      <>
-                        <DropdownMenuGroup>
-                          {existingTabTargets.map((targetTab) => (
-                            <DropdownMenuItem
-                              key={`move-panel-${leaf.id}-${targetTab.id}`}
-                              onClick={() => moveLeafToExistingTab(leaf.id, targetTab.id)}
-                            >
-                              <ExternalLinkIcon />
-                              {`Move to Tab ${targetTab.index + 1}) ${targetTab.title}`}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                      </>
-                    ) : null}
-                    <DropdownMenuItem onClick={() => moveLeafToNewTab(leaf.id)}>
-                      <ExternalLinkIcon />
-                      Move to New Tab
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => closeLeaf(leaf.id)}>
-                      <XIcon />
-                      Close Panel
-                    </DropdownMenuItem>
-                  </>
-                ) : null}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </CardHeader>
-
-        {leaf.view === "reader" && chapter ? (
-          <>
-            <CardContent className="min-h-0 flex-1 p-0">
-              <ScrollArea className="h-full w-full" data-panel-content-scroll>
-                <ChapterTextContent
-                  bookName={book.name}
-                  chapterNumber={chapter.chapter}
-                  verses={chapter.verses}
-                  flowVersesByParagraph={flowVersesByParagraph}
-                  readModeParagraphIndent={readModeParagraphIndent}
-                  showVerseNumbers={showVerseNumbers}
-                  isStudyMode={isStudyMode}
-                  verseSpacing={verseSpacing}
-                  onOpenTokenDetails={openTokenDetailsFromElement}
-                />
-              </ScrollArea>
-            </CardContent>
-
-            <div className="border-t">
-              <Progress
-                value={readingProgress}
-                className="w-full"
-                aria-label={`Reading progress for ${book.name} ${chapter.chapter}`}
-              />
-              <div className="flex items-center justify-between p-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => moveLeafChapter(leaf.id, -1)}
-                  disabled={!hasPrev}
-                >
-                  <ChevronLeftIcon />
-                  Prev
-                </Button>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={isChapterRead ? "default" : "outline"}
-                    size="sm"
-                    onClick={() =>
-                      toggleChapterRead(leaf.bookIndex, leaf.chapterIndex)
-                    }
+          <CardHeader className="border-b p-2 sm:p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              {leaf.view === "reader" && chapter ? (
+                <>
+                  <Select
+                    items={books.map((bookItem) => ({
+                      label: bookItem.name,
+                      value: bookItem.name,
+                    }))}
+                    value={book.name}
+                    onValueChange={(value) => {
+                      const nextBookIndex = books.findIndex(
+                        (bookItem) => bookItem.name === value,
+                      );
+                      if (nextBookIndex >= 0) {
+                        updateLeafLocation(leaf.id, {
+                          bookIndex: nextBookIndex,
+                          chapterIndex: 0,
+                        });
+                      }
+                    }}
                   >
-                    {isChapterRead ? "Read" : "Mark Read"}
-                  </Button>
+                    <SelectTrigger className="min-w-36 sm:min-w-44">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {books.map((bookItem) => (
+                          <SelectItem key={bookItem.name} value={bookItem.name}>
+                            {bookItem.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    items={book.chapters.map((chapterItem) => ({
+                      label: `Chapter ${chapterItem.chapter}`,
+                      value: String(chapterItem.chapter),
+                    }))}
+                    value={String(chapter.chapter)}
+                    onValueChange={(value) => {
+                      const nextChapterIndex = book.chapters.findIndex(
+                        (chapterItem) => String(chapterItem.chapter) === value,
+                      );
+                      if (nextChapterIndex >= 0) {
+                        updateLeafLocation(leaf.id, {
+                          chapterIndex: nextChapterIndex,
+                        });
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {book.chapters.map((chapterItem) => (
+                          <SelectItem
+                            key={`${book.name}-${chapterItem.chapter}`}
+                            value={String(chapterItem.chapter)}
+                          >
+                            Chapter {chapterItem.chapter}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Choose a book and chapter
+                </p>
+              )}
+
+              <DropdownMenu
+                open={panelMenuOpenLeafId === leaf.id}
+                onOpenChange={(open) => {
+                  if (open) {
+                    setPanelMenuOpenLeafId(leaf.id);
+                    return;
+                  }
+                  if (panelMenuOpenLeafId === leaf.id) {
+                    setPanelMenuOpenLeafId(null);
+                  }
+                  clearAllPanelPreviews();
+                }}
+              >
+                <DropdownMenuTrigger
+                  render={
+                    <Button variant="outline" size="sm" className="ml-auto" />
+                  }
+                >
+                  <PlusIcon />
+                  Panel
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      closePanelMenu();
+                      void toggleFullscreenLeaf(leaf.id);
+                    }}
+                  >
+                    {isFullscreenLeaf ? <MinimizeIcon /> : <ExpandIcon />}
+                    {isFullscreenLeaf ? "Exit Full Screen" : "Full Screen"}
+                  </DropdownMenuItem>
+                  {!isFullscreenLeaf ? (
+                    <>
+                      {parentSplit ? (
+                        <DropdownMenuItem
+                          onClick={() => toggleParentGroupOrientation(leaf.id)}
+                          onPointerEnter={() =>
+                            setOrientationPreviewTarget(leaf.id)
+                          }
+                          onPointerLeave={() => clearOrientationPreview()}
+                        >
+                          <RotateCwIcon />
+                          {nextOrientationLabel}
+                        </DropdownMenuItem>
+                      ) : null}
+                      <DropdownMenuSeparator />
+                      {moveDirections.length > 0 ? (
+                        <>
+                          <DropdownMenuGroup>
+                            {moveDirections.includes("left") ? (
+                              <DropdownMenuItem
+                                onClick={() => moveLeaf(leaf.id, "left")}
+                                onPointerEnter={() =>
+                                  setMovePreviewTarget(leaf.id, "left")
+                                }
+                                onPointerLeave={() => clearMovePreview()}
+                              >
+                                <ArrowLeftIcon />
+                                Move Left
+                              </DropdownMenuItem>
+                            ) : null}
+                            {moveDirections.includes("right") ? (
+                              <DropdownMenuItem
+                                onClick={() => moveLeaf(leaf.id, "right")}
+                                onPointerEnter={() =>
+                                  setMovePreviewTarget(leaf.id, "right")
+                                }
+                                onPointerLeave={() => clearMovePreview()}
+                              >
+                                <ArrowRightIcon />
+                                Move Right
+                              </DropdownMenuItem>
+                            ) : null}
+                            {moveDirections.includes("up") ? (
+                              <DropdownMenuItem
+                                onClick={() => moveLeaf(leaf.id, "up")}
+                                onPointerEnter={() =>
+                                  setMovePreviewTarget(leaf.id, "up")
+                                }
+                                onPointerLeave={() => clearMovePreview()}
+                              >
+                                <ArrowUpIcon />
+                                Move Up
+                              </DropdownMenuItem>
+                            ) : null}
+                            {moveDirections.includes("down") ? (
+                              <DropdownMenuItem
+                                onClick={() => moveLeaf(leaf.id, "down")}
+                                onPointerEnter={() =>
+                                  setMovePreviewTarget(leaf.id, "down")
+                                }
+                                onPointerLeave={() => clearMovePreview()}
+                              >
+                                <ArrowDownIcon />
+                                Move Down
+                              </DropdownMenuItem>
+                            ) : null}
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                        </>
+                      ) : null}
+                      <DropdownMenuItem
+                        onClick={() => splitLeaf(leaf.id, "left")}
+                        onPointerEnter={() =>
+                          setAddPreviewTarget(leaf.id, "left")
+                        }
+                        onPointerLeave={() => clearAddPreview()}
+                      >
+                        <SplitSquareHorizontalIcon />
+                        Add Panel Left
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => splitLeaf(leaf.id, "right")}
+                        onPointerEnter={() =>
+                          setAddPreviewTarget(leaf.id, "right")
+                        }
+                        onPointerLeave={() => clearAddPreview()}
+                      >
+                        <SplitSquareHorizontalIcon className="rotate-180" />
+                        Add Panel Right
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => splitLeaf(leaf.id, "up")}
+                        onPointerEnter={() =>
+                          setAddPreviewTarget(leaf.id, "up")
+                        }
+                        onPointerLeave={() => clearAddPreview()}
+                      >
+                        <SplitSquareVerticalIcon />
+                        Add Panel Above
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => splitLeaf(leaf.id, "down")}
+                        onPointerEnter={() =>
+                          setAddPreviewTarget(leaf.id, "down")
+                        }
+                        onPointerLeave={() => clearAddPreview()}
+                      >
+                        <SplitSquareVerticalIcon className="rotate-180" />
+                        Add Panel Below
+                      </DropdownMenuItem>
+                      {hasGroupAddOptions ? (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            {groupTargets.left ? (
+                              <DropdownMenuItem
+                                onClick={() => splitPanelGroup(leaf.id, "left")}
+                                onPointerEnter={() =>
+                                  setGroupAddPreviewTarget(leaf.id, "left")
+                                }
+                                onPointerLeave={() => clearAddPreview()}
+                              >
+                                <SquareChevronLeftIcon />
+                                Add Panel Left (Group)
+                              </DropdownMenuItem>
+                            ) : null}
+                            {groupTargets.right ? (
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  splitPanelGroup(leaf.id, "right")
+                                }
+                                onPointerEnter={() =>
+                                  setGroupAddPreviewTarget(leaf.id, "right")
+                                }
+                                onPointerLeave={() => clearAddPreview()}
+                              >
+                                <SquareChevronRightIcon />
+                                Add Panel Right (Group)
+                              </DropdownMenuItem>
+                            ) : null}
+                            {groupTargets.up ? (
+                              <DropdownMenuItem
+                                onClick={() => splitPanelGroup(leaf.id, "up")}
+                                onPointerEnter={() =>
+                                  setGroupAddPreviewTarget(leaf.id, "up")
+                                }
+                                onPointerLeave={() => clearAddPreview()}
+                              >
+                                <SquareChevronUpIcon />
+                                Add Panel Above (Group)
+                              </DropdownMenuItem>
+                            ) : null}
+                            {groupTargets.down ? (
+                              <DropdownMenuItem
+                                onClick={() => splitPanelGroup(leaf.id, "down")}
+                                onPointerEnter={() =>
+                                  setGroupAddPreviewTarget(leaf.id, "down")
+                                }
+                                onPointerLeave={() => clearAddPreview()}
+                              >
+                                <SquareChevronDownIcon />
+                                Add Panel Below (Group)
+                              </DropdownMenuItem>
+                            ) : null}
+                          </DropdownMenuGroup>
+                        </>
+                      ) : null}
+                      <DropdownMenuSeparator />
+                      {existingTabTargets.length > 0 ? (
+                        <>
+                          <DropdownMenuGroup>
+                            {existingTabTargets.map((targetTab) => (
+                              <DropdownMenuItem
+                                key={`move-panel-${leaf.id}-${targetTab.id}`}
+                                onClick={() =>
+                                  moveLeafToExistingTab(leaf.id, targetTab.id)
+                                }
+                              >
+                                <ExternalLinkIcon />
+                                {`Move to Tab ${targetTab.index + 1}) ${targetTab.title}`}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                        </>
+                      ) : null}
+                      <DropdownMenuItem
+                        onClick={() => moveLeafToNewTab(leaf.id)}
+                      >
+                        <ExternalLinkIcon />
+                        Move to New Tab
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => closeLeaf(leaf.id)}>
+                        <XIcon />
+                        Close Panel
+                      </DropdownMenuItem>
+                    </>
+                  ) : null}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </CardHeader>
+
+          {leaf.view === "reader" && chapter ? (
+            <>
+              <CardContent className="min-h-0 flex-1 p-0">
+                <ScrollArea className="h-full w-full" data-panel-content-scroll>
+                  <ChapterTextContent
+                    bookName={book.name}
+                    chapterNumber={chapter.chapter}
+                    verses={chapter.verses}
+                    flowVersesByParagraph={flowVersesByParagraph}
+                    readModeParagraphIndent={readModeParagraphIndent}
+                    showVerseNumbers={showVerseNumbers}
+                    isStudyMode={isStudyMode}
+                    verseSpacing={verseSpacing}
+                    onOpenTokenDetails={openTokenDetailsFromElement}
+                  />
+                </ScrollArea>
+              </CardContent>
+
+              <div className="border-t">
+                <Progress
+                  value={readingProgress}
+                  className="w-full"
+                  aria-label={`Reading progress for ${book.name} ${chapter.chapter}`}
+                />
+                <div className="flex items-center justify-between p-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => moveLeafChapter(leaf.id, 1)}
-                    disabled={!hasNext}
+                    onClick={() => moveLeafChapter(leaf.id, -1)}
+                    disabled={!hasPrev}
                   >
-                    Next
-                    <ChevronRightIcon />
+                    <ChevronLeftIcon />
+                    Prev
                   </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant={isChapterRead ? "default" : "outline"}
+                      size="sm"
+                      onClick={() =>
+                        toggleChapterRead(leaf.bookIndex, leaf.chapterIndex)
+                      }
+                    >
+                      {isChapterRead ? "Read" : "Mark Read"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => moveLeafChapter(leaf.id, 1)}
+                      disabled={!hasNext}
+                    >
+                      Next
+                      <ChevronRightIcon />
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </>
-        ) : (
-          <CardContent className="min-h-0 flex-1 overflow-auto p-3 sm:p-4">
-            <BookChapterPicker
-              books={books}
-              selectedTestament={leaf.pickerTestament}
-              selectedBookIndex={leaf.pickerBookIndex}
-              onSelectTestament={(testament) =>
-                updateLeafLocation(leaf.id, {
-                  pickerTestament: testament,
-                  pickerBookIndex: null,
-                })
-              }
-              onBackToTestaments={() =>
-                updateLeafLocation(leaf.id, {
-                  pickerTestament: null,
-                  pickerBookIndex: null,
-                })
-              }
-              onSelectBook={(bookIndex) =>
-                updateLeafLocation(leaf.id, {
-                  pickerBookIndex: bookIndex,
-                })
-              }
-              onBackToBooks={() =>
-                updateLeafLocation(leaf.id, { pickerBookIndex: null })
-              }
-              onSelectChapter={(bookIndex, chapterIndex) =>
-                updateLeafLocation(leaf.id, {
-                  bookIndex,
-                  chapterIndex,
-                  view: "reader",
-                  pickerTestament: null,
-                  pickerBookIndex: null,
-                })
-              }
-            />
-          </CardContent>
-        )}
+            </>
+          ) : (
+            <CardContent className="min-h-0 flex-1 overflow-auto p-3 sm:p-4">
+              <BookChapterPicker
+                books={books}
+                selectedTestament={leaf.pickerTestament}
+                selectedBookIndex={leaf.pickerBookIndex}
+                onSelectTestament={(testament) =>
+                  updateLeafLocation(leaf.id, {
+                    pickerTestament: testament,
+                    pickerBookIndex: null,
+                  })
+                }
+                onBackToTestaments={() =>
+                  updateLeafLocation(leaf.id, {
+                    pickerTestament: null,
+                    pickerBookIndex: null,
+                  })
+                }
+                onSelectBook={(bookIndex) =>
+                  updateLeafLocation(leaf.id, {
+                    pickerBookIndex: bookIndex,
+                  })
+                }
+                onBackToBooks={() =>
+                  updateLeafLocation(leaf.id, { pickerBookIndex: null })
+                }
+                onSelectChapter={(bookIndex, chapterIndex) =>
+                  updateLeafLocation(leaf.id, {
+                    bookIndex,
+                    chapterIndex,
+                    view: "reader",
+                    pickerTestament: null,
+                    pickerBookIndex: null,
+                  })
+                }
+              />
+            </CardContent>
+          )}
         </Card>
       </div>
     );
@@ -2427,9 +2541,9 @@ export function KJVReader() {
       <ResizablePanelGroup
         orientation={node.orientation}
         onLayoutChanged={(layout) => {
-          const nextSize = layout[`${node.id}-first`]
+          const nextSize = layout[`${node.id}-first`];
           if (typeof nextSize === "number") {
-            updateSplitSize(node.id, nextSize)
+            updateSplitSize(node.id, nextSize);
           }
         }}
         className="min-h-0 min-w-0 flex-1"
@@ -2442,7 +2556,11 @@ export function KJVReader() {
           {renderNode(node.first)}
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel id={`${node.id}-second`} defaultSize={100 - node.ratio} minSize={15}>
+        <ResizablePanel
+          id={`${node.id}-second`}
+          defaultSize={100 - node.ratio}
+          minSize={15}
+        >
           {renderNode(node.second)}
         </ResizablePanel>
       </ResizablePanelGroup>
@@ -2516,6 +2634,107 @@ export function KJVReader() {
     </Card>
   ) : null;
 
+  const tabsStrip = (
+    <ScrollArea className="h-full w-full">
+      <div
+        className={cn(
+          "p-1",
+          tabsOrientation === "vertical"
+            ? "flex flex-col items-stretch gap-2"
+            : "flex w-max items-center gap-2",
+        )}
+      >
+        {tabs.map((tab, index) => {
+          const active = tab.id === activeTabId;
+          const canMoveLeft = tabs.length > 1 && index > 0;
+          const canMoveRight = tabs.length > 1 && index < tabs.length - 1;
+          return (
+            <ButtonGroup
+              key={tab.id}
+              className={cn(tabsOrientation === "vertical" && "w-full")}
+            >
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveTabId(tab.id)}
+                className={cn(
+                  "min-w-24 justify-start",
+                  tabsOrientation === "vertical" && "w-full min-w-0 flex-1",
+                  active &&
+                    "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background!",
+                )}
+              >
+                {tab.title}
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant="outline"
+                      size="icon-sm"
+                      className={cn(
+                        "relative",
+                        active &&
+                          "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background! before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-background/45 before:content-['']",
+                      )}
+                      aria-label={`Tab options for ${tab.title}`}
+                    >
+                      <EllipsisIcon />
+                    </Button>
+                  }
+                />
+                <DropdownMenuContent align="start" className="w-40">
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onClick={() => openRenameDialog(tab.id)}>
+                      Relabel Tab
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  {tabs.length > 1 ? (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        {canMoveLeft ? (
+                          <DropdownMenuItem onClick={() => moveTab(tab.id, -1)}>
+                            Move Left
+                          </DropdownMenuItem>
+                        ) : null}
+                        {canMoveRight ? (
+                          <DropdownMenuItem onClick={() => moveTab(tab.id, 1)}>
+                            Move Right
+                          </DropdownMenuItem>
+                        ) : null}
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem onClick={() => closeTab(tab.id)}>
+                          Close Tab
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </>
+                  ) : null}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </ButtonGroup>
+          );
+        })}
+
+        <Button
+          variant="outline"
+          size="icon-sm"
+          onClick={addTab}
+          aria-label="New Tab"
+          className={cn(tabsOrientation === "vertical" && "w-full")}
+        >
+          <PlusIcon />
+        </Button>
+        <div ref={tabEndRef} />
+      </div>
+      <ScrollBar
+        orientation={tabsOrientation === "vertical" ? "vertical" : "horizontal"}
+      />
+    </ScrollArea>
+  );
+
   return (
     <main className="h-screen w-full overflow-hidden bg-background">
       <SidebarProvider
@@ -2570,105 +2789,37 @@ export function KJVReader() {
             </div>
           </header>
 
-          <div className="shrink-0 border-b px-4 py-2 sm:px-6">
-            <ScrollArea className="w-full">
-              <div className="flex w-max items-center gap-2 px-1 py-1">
-                {tabs.map((tab, index) => {
-                  const active = tab.id === activeTabId;
-                  const canMoveLeft = tabs.length > 1 && index > 0;
-                  const canMoveRight =
-                    tabs.length > 1 && index < tabs.length - 1;
-                  return (
-                    <ButtonGroup key={tab.id}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setActiveTabId(tab.id)}
-                        className={cn(
-                          "min-w-24 justify-start",
-                          active &&
-                            "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background!",
-                        )}
-                      >
-                        {tab.title}
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          render={
-                            <Button
-                              variant="outline"
-                              size="icon-sm"
-                              className={cn(
-                                "relative",
-                                active &&
-                                  "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background! before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-background/45 before:content-['']",
-                              )}
-                              aria-label={`Tab options for ${tab.title}`}
-                            >
-                              <EllipsisIcon />
-                            </Button>
-                          }
-                        />
-                        <DropdownMenuContent align="start" className="w-40">
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem
-                              onClick={() => openRenameDialog(tab.id)}
-                            >
-                              Relabel Tab
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                          {tabs.length > 1 ? (
-                            <>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuGroup>
-                                {canMoveLeft ? (
-                                  <DropdownMenuItem
-                                    onClick={() => moveTab(tab.id, -1)}
-                                  >
-                                    Move Left
-                                  </DropdownMenuItem>
-                                ) : null}
-                                {canMoveRight ? (
-                                  <DropdownMenuItem
-                                    onClick={() => moveTab(tab.id, 1)}
-                                  >
-                                    Move Right
-                                  </DropdownMenuItem>
-                                ) : null}
-                              </DropdownMenuGroup>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuGroup>
-                                <DropdownMenuItem
-                                  onClick={() => closeTab(tab.id)}
-                                >
-                                  Close Tab
-                                </DropdownMenuItem>
-                              </DropdownMenuGroup>
-                            </>
-                          ) : null}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </ButtonGroup>
-                  );
-                })}
-
-                <Button
-                  variant="outline"
-                  size="icon-sm"
-                  onClick={addTab}
-                  aria-label="New Tab"
-                >
-                  <PlusIcon />
-                </Button>
-                <div ref={tabEndRef} />
+          {tabsOrientation === "horizontal" ? (
+            <>
+              <div className="shrink-0 border-b px-4 py-2 sm:px-6">
+                {tabsStrip}
               </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-          </div>
-
-          <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
-            {renderNode(activeTab.root)}
-          </div>
+              <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
+                {renderNode(activeTab.root)}
+              </div>
+            </>
+          ) : (
+            <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
+              <ResizablePanelGroup orientation="horizontal">
+                <ResizablePanel
+                  id="tabs-sidebar"
+                  defaultSize={150}
+                  minSize={150}
+                  maxSize={300}
+                  collapsible
+                  className="min-h-0 min-w-0 border-r"
+                >
+                  <div className="h-full w-full px-2 py-2">{tabsStrip}</div>
+                </ResizablePanel>
+                <ResizableHandle withHandle />
+                <ResizablePanel id="reader-content" minSize={15}>
+                  <div className="flex h-full min-h-0 min-w-0 overflow-hidden">
+                    {renderNode(activeTab.root)}
+                  </div>
+                </ResizablePanel>
+              </ResizablePanelGroup>
+            </div>
+          )}
         </SidebarInset>
 
         <Sidebar side="right" className="h-screen">
@@ -2762,7 +2913,9 @@ export function KJVReader() {
           <div className="space-y-2 border-t pt-3">
             <div className="flex items-center justify-between gap-3">
               <Label htmlFor="verse-spacing">Verse Spacing</Label>
-              <span className="text-xs text-muted-foreground">{verseSpacing}px</span>
+              <span className="text-xs text-muted-foreground">
+                {verseSpacing}px
+              </span>
             </div>
             <Slider
               id="verse-spacing"
@@ -2785,7 +2938,9 @@ export function KJVReader() {
             <Switch
               id="hide-read-mode-verse-numbers"
               checked={hideReadModeVerseNumbers}
-              onCheckedChange={(checked) => setHideReadModeVerseNumbers(checked)}
+              onCheckedChange={(checked) =>
+                setHideReadModeVerseNumbers(checked)
+              }
             />
           </div>
           <div className="flex items-center justify-between gap-3 border-t pt-3">
@@ -2802,6 +2957,16 @@ export function KJVReader() {
               id="flow-verses"
               checked={flowVersesByParagraph}
               onCheckedChange={(checked) => setFlowVersesByParagraph(checked)}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-3 border-t pt-3">
+            <Label htmlFor="vertical-tabs">Vertical Tabs</Label>
+            <Switch
+              id="vertical-tabs"
+              checked={tabsOrientation === "vertical"}
+              onCheckedChange={(checked) =>
+                setTabsOrientation(checked ? "vertical" : "horizontal")
+              }
             />
           </div>
           <div className="flex justify-end">
@@ -2822,7 +2987,9 @@ export function KJVReader() {
           </AlertDialogHeader>
           <div className="max-h-[65vh] space-y-3 overflow-auto pr-1 text-sm">
             <Progress value={totalProgressPercent}>
-              <ProgressLabel className="font-semibold">Whole Bible</ProgressLabel>
+              <ProgressLabel className="font-semibold">
+                Whole Bible
+              </ProgressLabel>
               <ProgressValue>
                 {() =>
                   `${progressByTestament.total.read}/${progressByTestament.total.total} (${totalProgressPercent}%)`
@@ -2830,39 +2997,52 @@ export function KJVReader() {
               </ProgressValue>
             </Progress>
 
-            {[progressByTestament.old, progressByTestament.new].map((testament) => {
-              const testamentPercent =
-                testament.total > 0
-                  ? Math.round((testament.read / testament.total) * 100)
-                  : 0;
+            {[progressByTestament.old, progressByTestament.new].map(
+              (testament) => {
+                const testamentPercent =
+                  testament.total > 0
+                    ? Math.round((testament.read / testament.total) * 100)
+                    : 0;
 
-              return (
-                <details key={testament.label} className="rounded-md border p-3">
-                  <summary className="cursor-pointer">
-                    <Progress value={testamentPercent}>
-                      <ProgressLabel>{testament.label}</ProgressLabel>
-                      <ProgressValue>
-                        {() => `${testament.read}/${testament.total} (${testamentPercent}%)`}
-                      </ProgressValue>
-                    </Progress>
-                  </summary>
-                  <div className="mt-3 space-y-2">
-                    {testament.books.map((book) => {
-                      const bookPercent =
-                        book.total > 0 ? Math.round((book.read / book.total) * 100) : 0;
-                      return (
-                        <Progress key={book.name} value={bookPercent}>
-                          <ProgressLabel className="text-xs">{book.name}</ProgressLabel>
-                          <ProgressValue className="text-xs">
-                            {() => `${book.read}/${book.total} (${bookPercent}%)`}
-                          </ProgressValue>
-                        </Progress>
-                      );
-                    })}
-                  </div>
-                </details>
-              );
-            })}
+                return (
+                  <details
+                    key={testament.label}
+                    className="rounded-md border p-3"
+                  >
+                    <summary className="cursor-pointer">
+                      <Progress value={testamentPercent}>
+                        <ProgressLabel>{testament.label}</ProgressLabel>
+                        <ProgressValue>
+                          {() =>
+                            `${testament.read}/${testament.total} (${testamentPercent}%)`
+                          }
+                        </ProgressValue>
+                      </Progress>
+                    </summary>
+                    <div className="mt-3 space-y-2">
+                      {testament.books.map((book) => {
+                        const bookPercent =
+                          book.total > 0
+                            ? Math.round((book.read / book.total) * 100)
+                            : 0;
+                        return (
+                          <Progress key={book.name} value={bookPercent}>
+                            <ProgressLabel className="text-xs">
+                              {book.name}
+                            </ProgressLabel>
+                            <ProgressValue className="text-xs">
+                              {() =>
+                                `${book.read}/${book.total} (${bookPercent}%)`
+                              }
+                            </ProgressValue>
+                          </Progress>
+                        );
+                      })}
+                    </div>
+                  </details>
+                );
+              },
+            )}
           </div>
           <AlertDialogFooter>
             <Button
