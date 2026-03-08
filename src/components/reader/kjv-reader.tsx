@@ -1,7 +1,5 @@
 import {
   Fragment,
-  lazy,
-  Suspense,
   type ReactNode,
   useCallback,
   useEffect,
@@ -26,7 +24,6 @@ import {
   PlusIcon,
   RotateCwIcon,
   LoaderCircleIcon,
-  SearchIcon,
   SettingsIcon,
   SquareChevronDownIcon,
   SquareChevronLeftIcon,
@@ -52,15 +49,26 @@ import {
   mapEntrySearchableText,
   matchesMapWord,
   modernIdsForMapEntry,
-  parseJsonl,
   type MapGeoJsonPayload,
   type MapImageEntry,
   type MapPhotoDialogItem,
 } from "@/lib/maps";
 import {
-  BOOK_ICON_CODES,
+  loadAncientMap,
+  loadConcordance,
+  loadCrossRefs,
+  loadGenealogy,
+  loadHitchcocks,
+  loadKjvBooks,
+  loadMapGeoJson,
+  loadMapImages,
+  loadOldEnglish,
+  loadStrongsGreek,
+  loadStrongsHebrew,
+  loadWebsters,
+} from "@/lib/reader-data";
+import {
   chapterVerseKey,
-  escapeRegExp,
   normalizeConcordanceWord,
   normalizeStrongsCode,
   parseBibleReference,
@@ -69,6 +77,13 @@ import {
   resolveOldEnglishKey,
   resolveWebstersKey,
 } from "@/lib/references";
+import {
+  bookCodeForIndex,
+  chapterProgressKey,
+  iconPath,
+  panelViewportElement,
+  renderHighlightedText,
+} from "@/lib/reader-view";
 import {
   collectLeafIds,
   countLeaves,
@@ -99,12 +114,10 @@ import type {
   GenealogyPayload,
   GenealogyPerson,
   HitchcocksPayload,
-  IconVariant,
   LeafNode,
   OldEnglishPayload,
   PanelDirection,
   PanelNode,
-  ReaderPayload,
   ReaderTab,
   SplitOrientation,
   StrongsEntry,
@@ -128,33 +141,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import { Slider } from "@/components/ui/slider";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -162,6 +156,13 @@ import {
 } from "@/components/ui/resizable";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
+import { SidebarOpenRequestSync } from "@/components/reader/sidebar-open-request-sync";
+import { MapAndPhotoDialogs } from "@/components/reader/map-and-photo-dialogs";
+import { BookPickerDialog } from "@/components/reader/book-picker-dialog";
+import { RenameTabDialog } from "@/components/reader/rename-tab-dialog";
+import { SettingsDialog } from "@/components/reader/settings-dialog";
+import { ProgressDialog } from "@/components/reader/progress-dialog";
+import { StudySearchForm } from "@/components/reader/study-search-form";
 import {
   ChapterTextContent,
   formatDisplayTokenText,
@@ -170,8 +171,6 @@ import {
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
 import {
   Progress,
-  ProgressLabel,
-  ProgressValue,
 } from "@/components/ui/progress";
 import {
   Accordion,
@@ -179,368 +178,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
-const LazyMapGeoJsonView = lazy(async () => {
-  const module = await import("@/components/reader/map-geojson-view");
-  return { default: module.MapGeoJsonView };
-});
-
-let kjvBooksPromise: Promise<Book[]> | null = null;
-let concordancePromise: Promise<ConcordancePayload> | null = null;
-let crossRefsPromise: Promise<CrossRefsPayload> | null = null;
-let hitchcocksPromise: Promise<HitchcocksPayload> | null = null;
-let oldEnglishPromise: Promise<OldEnglishPayload> | null = null;
-let genealogyPromise: Promise<GenealogyPayload> | null = null;
-let webstersPromise: Promise<WebstersPayload> | null = null;
-let strongsGreekPromise: Promise<StrongsPayload> | null = null;
-let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
-let ancientMapPromise: Promise<AncientMapPayload> | null = null;
-const mapGeoJsonPromiseCache = new Map<string, Promise<MapGeoJsonPayload>>();
-let mapImagesPromise: Promise<MapImageEntry[]> | null = null;
-
-function loadKjvBooks() {
-  if (!kjvBooksPromise) {
-    kjvBooksPromise = fetch("/data/kjv.json", { cache: "force-cache" })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /data/kjv.json");
-        }
-        return response.json() as Promise<unknown>;
-      })
-      .then((payload) => {
-        const parsedBooks = parseBooks(payload);
-        if (!parsedBooks || parsedBooks.length === 0) {
-          throw new Error("Invalid reader data format in /data/kjv.json");
-        }
-        return parsedBooks;
-      })
-      .catch((error) => {
-        // Allow retry if the request fails for any reason.
-        kjvBooksPromise = null;
-        throw error;
-      });
-  }
-
-  return kjvBooksPromise;
-}
-
-function loadConcordance() {
-  if (!concordancePromise) {
-    concordancePromise = fetch("/references/concordance.json", {
-      cache: "force-cache",
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /references/concordance.json");
-        }
-        return response.json() as Promise<unknown>;
-      })
-      .then((payload) => payload as ConcordancePayload)
-      .catch((error) => {
-        concordancePromise = null;
-        throw error;
-      });
-  }
-
-  return concordancePromise;
-}
-
-function loadCrossRefs() {
-  if (!crossRefsPromise) {
-    crossRefsPromise = fetch("/references/cross-refs.json", {
-      cache: "force-cache",
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /references/cross-refs.json");
-        }
-        return response.json() as Promise<unknown>;
-      })
-      .then((payload) => payload as CrossRefsPayload)
-      .catch((error) => {
-        crossRefsPromise = null;
-        throw error;
-      });
-  }
-
-  return crossRefsPromise;
-}
-
-function loadWebsters() {
-  if (!webstersPromise) {
-    webstersPromise = fetch("/references/websters.json", {
-      cache: "force-cache",
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /references/websters.json");
-        }
-        return response.json() as Promise<unknown>;
-      })
-      .then((payload) => payload as WebstersPayload)
-      .catch((error) => {
-        webstersPromise = null;
-        throw error;
-      });
-  }
-
-  return webstersPromise;
-}
-
-function loadHitchcocks() {
-  if (!hitchcocksPromise) {
-    hitchcocksPromise = fetch("/references/hitchcocks.json", {
-      cache: "force-cache",
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /references/hitchcocks.json");
-        }
-        return response.json() as Promise<unknown>;
-      })
-      .then((payload) => payload as HitchcocksPayload)
-      .catch((error) => {
-        hitchcocksPromise = null;
-        throw error;
-      });
-  }
-
-  return hitchcocksPromise;
-}
-
-function loadOldEnglish() {
-  if (!oldEnglishPromise) {
-    oldEnglishPromise = fetch("/references/old-english.json", {
-      cache: "force-cache",
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /references/old-english.json");
-        }
-        return response.json() as Promise<unknown>;
-      })
-      .then((payload) => payload as OldEnglishPayload)
-      .catch((error) => {
-        oldEnglishPromise = null;
-        throw error;
-      });
-  }
-
-  return oldEnglishPromise;
-}
-
-function loadGenealogy() {
-  if (!genealogyPromise) {
-    genealogyPromise = fetch("/references/genealogy.json", {
-      cache: "force-cache",
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /references/genealogy.json");
-        }
-        return response.json() as Promise<unknown>;
-      })
-      .then((payload) => payload as GenealogyPayload)
-      .catch((error) => {
-        genealogyPromise = null;
-        throw error;
-      });
-  }
-
-  return genealogyPromise;
-}
-
-function loadStrongsGreek() {
-  if (!strongsGreekPromise) {
-    strongsGreekPromise = fetch("/references/strongs-greek.json", {
-      cache: "force-cache",
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /references/strongs-greek.json");
-        }
-        return response.json() as Promise<unknown>;
-      })
-      .then((payload) => payload as StrongsPayload)
-      .catch((error) => {
-        strongsGreekPromise = null;
-        throw error;
-      });
-  }
-  return strongsGreekPromise;
-}
-
-function loadStrongsHebrew() {
-  if (!strongsHebrewPromise) {
-    strongsHebrewPromise = fetch("/references/strongs-hebrew.json", {
-      cache: "force-cache",
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /references/strongs-hebrew.json");
-        }
-        return response.json() as Promise<unknown>;
-      })
-      .then((payload) => payload as StrongsPayload)
-      .catch((error) => {
-        strongsHebrewPromise = null;
-        throw error;
-      });
-  }
-  return strongsHebrewPromise;
-}
-
-function loadAncientMap() {
-  if (!ancientMapPromise) {
-    ancientMapPromise = fetch("/references/ancient_map.json", {
-      cache: "force-cache",
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /references/ancient_map.json");
-        }
-        return response.json() as Promise<unknown>;
-      })
-      .then((payload) => payload as AncientMapPayload)
-      .catch((error) => {
-        ancientMapPromise = null;
-        throw error;
-      });
-  }
-  return ancientMapPromise;
-}
-
-function loadMapGeoJson(geojsonFile: string) {
-  const cached = mapGeoJsonPromiseCache.get(geojsonFile);
-  if (cached) {
-    return cached;
-  }
-  const promise = fetch(`/maps/geometry/${geojsonFile}`, { cache: "force-cache" })
-    .then(async (response) => {
-      if (!response.ok) {
-        throw new Error(`Could not load /maps/geometry/${geojsonFile}`);
-      }
-      return response.json() as Promise<unknown>;
-    })
-    .then((payload) => payload as MapGeoJsonPayload)
-    .catch((error) => {
-      mapGeoJsonPromiseCache.delete(geojsonFile);
-      throw error;
-    });
-  mapGeoJsonPromiseCache.set(geojsonFile, promise);
-  return promise;
-}
-
-function loadMapImages() {
-  if (!mapImagesPromise) {
-    mapImagesPromise = fetch("/maps/data/image.jsonl", { cache: "force-cache" })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /maps/data/image.jsonl");
-        }
-        return response.text();
-      })
-      .then((text) => parseJsonl<MapImageEntry>(text))
-      .catch((error) => {
-        mapImagesPromise = null;
-        throw error;
-      });
-  }
-  return mapImagesPromise;
-}
-
-function renderHighlightedText(
-  text: string,
-  needle: string,
-  keyPrefix: string,
-): ReactNode {
-  if (!needle) {
-    return text;
-  }
-
-  const matcher = new RegExp(`(${escapeRegExp(needle)})`, "ig");
-  const parts = text.split(matcher);
-  if (parts.length <= 1) {
-    return text;
-  }
-
-  return parts.map((part, index) =>
-    part.toLowerCase() === needle.toLowerCase() ? (
-      <span
-        key={`${keyPrefix}-highlight-${index}`}
-        className="bg-[#fafac5] text-black"
-      >
-        {part}
-      </span>
-    ) : (
-      <span key={`${keyPrefix}-text-${index}`}>{part}</span>
-    ),
-  );
-}
-
-function parseBooks(input: unknown): Book[] | null {
-  if (Array.isArray(input)) {
-    return input as Book[];
-  }
-
-  if (typeof input === "object" && input !== null) {
-    const payload = input as ReaderPayload;
-    if (Array.isArray(payload.books)) {
-      return payload.books;
-    }
-  }
-
-  return null;
-}
-
-function chapterProgressKey(bookIndex: number, chapterIndex: number) {
-  return `${bookIndex}:${chapterIndex}`;
-}
-
-function bookCodeForIndex(bookIndex: number) {
-  return BOOK_ICON_CODES[bookIndex] ?? "GEN";
-}
-
-function iconPath(variant: IconVariant, code: string) {
-  return `/icons/${variant}/${code}.png`;
-}
-
-function panelViewportElement(panelElement: HTMLDivElement | null | undefined) {
-  return (
-    panelElement?.querySelector<HTMLElement>(
-      '[data-panel-content-scroll] [data-slot="scroll-area-viewport"]',
-    ) ?? null
-  );
-}
-
-function SidebarOpenRequestSync({
-  requestKey,
-  enabled,
-}: {
-  requestKey: number;
-  enabled: boolean;
-}) {
-  const { isMobile, setOpen, setOpenMobile } = useSidebar();
-  const previousRequestKeyRef = useRef(requestKey);
-
-  useEffect(() => {
-    if (!enabled) {
-      previousRequestKeyRef.current = requestKey;
-      return;
-    }
-    if (previousRequestKeyRef.current === requestKey) {
-      return;
-    }
-    previousRequestKeyRef.current = requestKey;
-    if (isMobile) {
-      setOpenMobile(true);
-    } else {
-      setOpen(true);
-    }
-  }, [enabled, isMobile, requestKey, setOpen, setOpenMobile]);
-
-  return null;
-}
 
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -4321,40 +3958,13 @@ export function KJVReader() {
                   <AccordionContent className="space-y-2 overflow-visible">
                     {isConcordanceSectionOpen ? (
                       <>
-                        <form
-                          onSubmit={(event) => {
-                            event.preventDefault();
-                            const formData = new FormData(event.currentTarget);
-                            const value = formData.get("concordance-search");
-                            applyConcordanceSearch(
-                              typeof value === "string" ? value : "",
-                            );
-                          }}
-                        >
-                          <InputGroup>
-                            <InputGroupInput
-                              name="concordance-search"
-                              placeholder="Search concordance..."
-                            />
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupButton
-                                type="submit"
-                                size="icon-sm"
-                                variant="ghost"
-                                aria-label="Search concordance"
-                                disabled={
-                                  isConcordanceLoading || isConcordanceSearching
-                                }
-                              >
-                                {isConcordanceLoading || isConcordanceSearching ? (
-                                  <LoaderCircleIcon className="animate-spin" />
-                                ) : (
-                                  <SearchIcon />
-                                )}
-                              </InputGroupButton>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </form>
+                        <StudySearchForm
+                          name="concordance-search"
+                          placeholder="Search concordance..."
+                          ariaLabel="Search concordance"
+                          loading={isConcordanceLoading || isConcordanceSearching}
+                          onSearch={applyConcordanceSearch}
+                        />
                         {isConcordanceLoading || isConcordanceSearching ? (
                           <p className="flex items-center gap-2 text-sm text-muted-foreground">
                             <LoaderCircleIcon className="size-4 animate-spin" />
@@ -4433,38 +4043,13 @@ export function KJVReader() {
                   <AccordionContent className="space-y-2 overflow-visible">
                     {isWebstersSectionOpen ? (
                       <>
-                        <form
-                          onSubmit={(event) => {
-                            event.preventDefault();
-                            const formData = new FormData(event.currentTarget);
-                            const value = formData.get("websters-search");
-                            applyWebstersSearch(
-                              typeof value === "string" ? value : "",
-                            );
-                          }}
-                        >
-                          <InputGroup>
-                            <InputGroupInput
-                              name="websters-search"
-                              placeholder="Search Webster's..."
-                            />
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupButton
-                                type="submit"
-                                size="icon-sm"
-                                variant="ghost"
-                                aria-label="Search Webster's dictionary"
-                                disabled={isWebstersLoading || isWebstersSearching}
-                              >
-                                {isWebstersLoading || isWebstersSearching ? (
-                                  <LoaderCircleIcon className="animate-spin" />
-                                ) : (
-                                  <SearchIcon />
-                                )}
-                              </InputGroupButton>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </form>
+                        <StudySearchForm
+                          name="websters-search"
+                          placeholder="Search Webster's..."
+                          ariaLabel="Search Webster's dictionary"
+                          loading={isWebstersLoading || isWebstersSearching}
+                          onSearch={applyWebstersSearch}
+                        />
                         {isWebstersLoading || isWebstersSearching ? (
                           <p className="flex items-center gap-2 text-sm text-muted-foreground">
                             <LoaderCircleIcon className="size-4 animate-spin" />
@@ -4548,37 +4133,14 @@ export function KJVReader() {
                   <AccordionContent className="space-y-2 overflow-visible">
                     {isStrongsSectionOpen ? (
                       <>
-                        <form
-                          onSubmit={(event) => {
-                            event.preventDefault();
-                            const formData = new FormData(event.currentTarget);
-                            const value = formData.get("strongs-search");
-                            applyStrongsSearch(typeof value === "string" ? value : "");
-                          }}
-                        >
-                          <InputGroup>
-                            <InputGroupInput
-                              ref={strongsSearchInputRef}
-                              name="strongs-search"
-                              placeholder="Search Strong's..."
-                            />
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupButton
-                                type="submit"
-                                size="icon-sm"
-                                variant="ghost"
-                                aria-label="Search Strong's dictionary"
-                                disabled={isStrongsLoading || isStrongsSearching}
-                              >
-                                {isStrongsLoading || isStrongsSearching ? (
-                                  <LoaderCircleIcon className="animate-spin" />
-                                ) : (
-                                  <SearchIcon />
-                                )}
-                              </InputGroupButton>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </form>
+                        <StudySearchForm
+                          inputRef={strongsSearchInputRef}
+                          name="strongs-search"
+                          placeholder="Search Strong's..."
+                          ariaLabel="Search Strong's dictionary"
+                          loading={isStrongsLoading || isStrongsSearching}
+                          onSearch={applyStrongsSearch}
+                        />
                         {isStrongsLoading || isStrongsSearching ? (
                           <p className="flex items-center gap-2 text-sm text-muted-foreground">
                             <LoaderCircleIcon className="size-4 animate-spin" />
@@ -4706,40 +4268,13 @@ export function KJVReader() {
                   <AccordionContent className="space-y-2 overflow-visible">
                     {isOldEnglishSectionOpen ? (
                       <>
-                        <form
-                          onSubmit={(event) => {
-                            event.preventDefault();
-                            const formData = new FormData(event.currentTarget);
-                            const value = formData.get("old-english-search");
-                            applyOldEnglishSearch(
-                              typeof value === "string" ? value : "",
-                            );
-                          }}
-                        >
-                          <InputGroup>
-                            <InputGroupInput
-                              name="old-english-search"
-                              placeholder="Search Old English..."
-                            />
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupButton
-                                type="submit"
-                                size="icon-sm"
-                                variant="ghost"
-                                aria-label="Search Old English dictionary"
-                                disabled={
-                                  isOldEnglishLoading || isOldEnglishSearching
-                                }
-                              >
-                                {isOldEnglishLoading || isOldEnglishSearching ? (
-                                  <LoaderCircleIcon className="animate-spin" />
-                                ) : (
-                                  <SearchIcon />
-                                )}
-                              </InputGroupButton>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </form>
+                        <StudySearchForm
+                          name="old-english-search"
+                          placeholder="Search Old English..."
+                          ariaLabel="Search Old English dictionary"
+                          loading={isOldEnglishLoading || isOldEnglishSearching}
+                          onSearch={applyOldEnglishSearch}
+                        />
                         {isOldEnglishLoading || isOldEnglishSearching ? (
                           <p className="flex items-center gap-2 text-sm text-muted-foreground">
                             <LoaderCircleIcon className="size-4 animate-spin" />
@@ -4783,36 +4318,13 @@ export function KJVReader() {
                   <AccordionContent className="space-y-2 overflow-visible">
                     {isMapsSectionOpen ? (
                       <>
-                    <form
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const value = formData.get("maps-search");
-                        applyMapsSearch(typeof value === "string" ? value : "");
-                      }}
-                    >
-                      <InputGroup>
-                        <InputGroupInput
-                          name="maps-search"
-                          placeholder="Search maps and photos..."
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            type="submit"
-                            size="icon-sm"
-                            variant="ghost"
-                            aria-label="Search maps"
-                            disabled={isMapsLoading || isMapsSearching}
-                          >
-                            {isMapsLoading || isMapsSearching ? (
-                              <LoaderCircleIcon className="animate-spin" />
-                            ) : (
-                              <SearchIcon />
-                            )}
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </form>
+                    <StudySearchForm
+                      name="maps-search"
+                      placeholder="Search maps and photos..."
+                      ariaLabel="Search maps"
+                      loading={isMapsLoading || isMapsSearching}
+                      onSearch={applyMapsSearch}
+                    />
                     {isMapsLoading || isMapsSearching ? (
                       <p className="flex items-center gap-2 text-sm text-muted-foreground">
                         <LoaderCircleIcon className="size-4 animate-spin" />
@@ -5019,38 +4531,13 @@ export function KJVReader() {
                   <AccordionContent className="space-y-2 overflow-visible">
                     {isGenealogySectionOpen ? (
                       <>
-                    <form
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const value = formData.get("genealogy-search");
-                        applyGenealogySearch(
-                          typeof value === "string" ? value : "",
-                        );
-                      }}
-                    >
-                      <InputGroup>
-                        <InputGroupInput
-                          name="genealogy-search"
-                          placeholder="Search genealogy..."
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            type="submit"
-                            size="icon-sm"
-                            variant="ghost"
-                            aria-label="Search genealogy"
-                            disabled={isGenealogyLoading || isGenealogySearching}
-                          >
-                            {isGenealogyLoading || isGenealogySearching ? (
-                              <LoaderCircleIcon className="animate-spin" />
-                            ) : (
-                              <SearchIcon />
-                            )}
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </form>
+                    <StudySearchForm
+                      name="genealogy-search"
+                      placeholder="Search genealogy..."
+                      ariaLabel="Search genealogy"
+                      loading={isGenealogyLoading || isGenealogySearching}
+                      onSearch={applyGenealogySearch}
+                    />
                     {isGenealogyLoading || isGenealogySearching ? (
                       <p className="flex items-center gap-2 text-sm text-muted-foreground">
                         <LoaderCircleIcon className="size-4 animate-spin" />
@@ -5112,40 +4599,13 @@ export function KJVReader() {
                   <AccordionContent className="space-y-2 overflow-visible">
                     {isHitchcocksSectionOpen ? (
                       <>
-                    <form
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const value = formData.get("hitchcocks-search");
-                        applyHitchcocksSearch(
-                          typeof value === "string" ? value : "",
-                        );
-                      }}
-                    >
-                      <InputGroup>
-                        <InputGroupInput
-                          name="hitchcocks-search"
-                          placeholder="Search Hitchcock's..."
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            type="submit"
-                            size="icon-sm"
-                            variant="ghost"
-                            aria-label="Search Hitchcock's Bible Names"
-                            disabled={
-                              isHitchcocksLoading || isHitchcocksSearching
-                            }
-                          >
-                            {isHitchcocksLoading || isHitchcocksSearching ? (
-                              <LoaderCircleIcon className="animate-spin" />
-                            ) : (
-                              <SearchIcon />
-                            )}
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </form>
+                    <StudySearchForm
+                      name="hitchcocks-search"
+                      placeholder="Search Hitchcock's..."
+                      ariaLabel="Search Hitchcock's Bible Names"
+                      loading={isHitchcocksLoading || isHitchcocksSearching}
+                      onSearch={applyHitchcocksSearch}
+                    />
                     {isHitchcocksLoading || isHitchcocksSearching ? (
                       <p className="flex items-center gap-2 text-sm text-muted-foreground">
                         <LoaderCircleIcon className="size-4 animate-spin" />
@@ -5186,9 +4646,13 @@ export function KJVReader() {
 
       {tokenPopupCard}
 
-      <AlertDialog
-        open={isMapDialogOpen}
-        onOpenChange={(open) => {
+      <MapAndPhotoDialogs
+        isMapDialogOpen={isMapDialogOpen}
+        activeMapDialogEntry={activeMapDialogEntry}
+        isMapDialogLoading={isMapDialogLoading}
+        mapDialogError={mapDialogError}
+        mapDialogGeoJson={mapDialogGeoJson}
+        onMapDialogOpenChange={(open) => {
           setIsMapDialogOpen(open);
           if (!open) {
             setActiveMapDialogEntry(null);
@@ -5196,531 +4660,134 @@ export function KJVReader() {
             setMapDialogError(null);
           }
         }}
-      >
-        <AlertDialogContent className="h-[min(86vh,900px)] w-[min(98vw,1700px)] max-w-none">
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {activeMapDialogEntry ? mapEntryLabel(activeMapDialogEntry) : "Map"}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {activeMapDialogEntry?.types.length
-                ? activeMapDialogEntry.types.join(", ")
-                : "Ancient map view"}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="space-y-3">
-            {isMapDialogLoading ? (
-              <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                <LoaderCircleIcon className="size-4 animate-spin" />
-                Loading map...
-              </p>
-            ) : mapDialogError ? (
-              <p className="text-sm text-destructive">{mapDialogError}</p>
-            ) : mapDialogGeoJson ? (
-              <Suspense
-                fallback={
-                  <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <LoaderCircleIcon className="size-4 animate-spin" />
-                    Loading map renderer...
-                  </p>
-                }
-              >
-                <LazyMapGeoJsonView
-                  geojson={mapDialogGeoJson}
-                  className="h-[calc(min(86vh,900px)-12rem)] min-h-96 w-full rounded-md border"
-                />
-              </Suspense>
-            ) : (
-              <p className="text-sm text-muted-foreground">No map data found.</p>
-            )}
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogAction
-              onClick={() => {
-                setIsMapDialogOpen(false);
-                setActiveMapDialogEntry(null);
-                setMapDialogGeoJson(null);
-                setMapDialogError(null);
-              }}
-            >
-              Close
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog
-        open={isPhotoDialogOpen}
-        onOpenChange={(open) => {
+        onCloseMapDialog={() => {
+          setIsMapDialogOpen(false);
+          setActiveMapDialogEntry(null);
+          setMapDialogGeoJson(null);
+          setMapDialogError(null);
+        }}
+        isPhotoDialogOpen={isPhotoDialogOpen}
+        currentPhotoDialogItem={currentPhotoDialogItem}
+        photoDialogIndex={photoDialogIndex}
+        photoDialogItemsLength={photoDialogItems.length}
+        onPhotoDialogOpenChange={(open) => {
           setIsPhotoDialogOpen(open);
           if (!open) {
             setPhotoDialogItems([]);
             setPhotoDialogIndex(0);
           }
         }}
-      >
-        <AlertDialogContent className="w-[min(98vw,1600px)] max-w-none">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Photo</AlertDialogTitle>
-            <AlertDialogDescription>
-              {currentPhotoDialogItem
-                ? `${photoDialogIndex + 1} of ${photoDialogItems.length}`
-                : "No photo selected"}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          {currentPhotoDialogItem ? (
-            <div className="space-y-3">
-              <div className="relative overflow-hidden rounded-md border bg-muted/20">
-                <img
-                  src={currentPhotoDialogItem.src}
-                  alt={currentPhotoDialogItem.alt}
-                  className="max-h-[70vh] w-full object-contain"
-                />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {currentPhotoDialogItem.caption}
-              </p>
-              <div className="flex items-center justify-between">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => movePhotoDialog(-1)}
-                  disabled={photoDialogItems.length <= 1}
-                >
-                  <ChevronLeftIcon className="size-4" />
-                  Previous
-                </Button>
-                <div className="text-xs text-muted-foreground">
-                  {photoDialogIndex + 1} / {photoDialogItems.length}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => movePhotoDialog(1)}
-                  disabled={photoDialogItems.length <= 1}
-                >
-                  Next
-                  <ChevronRightIcon className="size-4" />
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">No photo available.</p>
-          )}
-          <AlertDialogFooter>
-            <AlertDialogAction
-              onClick={() => {
-                setIsPhotoDialogOpen(false);
-                setPhotoDialogItems([]);
-                setPhotoDialogIndex(0);
-              }}
-            >
-              Close
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onClosePhotoDialog={() => {
+          setIsPhotoDialogOpen(false);
+          setPhotoDialogItems([]);
+          setPhotoDialogIndex(0);
+        }}
+        onPreviousPhoto={() => movePhotoDialog(-1)}
+        onNextPhoto={() => movePhotoDialog(1)}
+      />
 
-      <AlertDialog
+      <BookPickerDialog
         open={isBookPickerDialogOpen}
-        onOpenChange={(open) => {
-          if (!open) {
-            setBookPickerDialogLeafId(null);
-          }
+        books={books}
+        leaf={bookPickerDialogLeaf}
+        onClose={() => {
+          setBookPickerDialogLeafId(null);
         }}
-      >
-        <AlertDialogContent className="sm:max-w-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Choose Book and Chapter</AlertDialogTitle>
-          </AlertDialogHeader>
-          {bookPickerDialogLeaf ? (
-            <div className="max-h-[70vh] overflow-y-auto pr-1">
-              <BookChapterPicker
-                books={books}
-                selectedTestament={bookPickerDialogLeaf.pickerTestament}
-                selectedBookIndex={bookPickerDialogLeaf.pickerBookIndex}
-                onSelectTestament={(testament) =>
-                  updateLeafLocation(bookPickerDialogLeaf.id, {
-                    pickerTestament: testament,
-                    pickerBookIndex: null,
-                  })
-                }
-                onBackToTestaments={() =>
-                  updateLeafLocation(bookPickerDialogLeaf.id, {
-                    pickerTestament: null,
-                    pickerBookIndex: null,
-                  })
-                }
-                onSelectBook={(bookIndex) =>
-                  updateLeafLocation(bookPickerDialogLeaf.id, {
-                    pickerBookIndex: bookIndex,
-                  })
-                }
-                onBackToBooks={() =>
-                  updateLeafLocation(bookPickerDialogLeaf.id, {
-                    pickerBookIndex: null,
-                  })
-                }
-                onSelectChapter={(bookIndex, chapterIndex) => {
-                  updateLeafLocation(bookPickerDialogLeaf.id, {
-                    bookIndex,
-                    chapterIndex,
-                    view: "reader",
-                  });
-                  setBookPickerDialogLeafId(null);
-                }}
-              />
-            </div>
-          ) : null}
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                setBookPickerDialogLeafId(null);
-              }}
-            >
-              Close
-            </AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onSelectTestament={(testament) => {
+          if (!bookPickerDialogLeaf) {
+            return;
+          }
+          updateLeafLocation(bookPickerDialogLeaf.id, {
+            pickerTestament: testament,
+            pickerBookIndex: null,
+          });
+        }}
+        onBackToTestaments={() => {
+          if (!bookPickerDialogLeaf) {
+            return;
+          }
+          updateLeafLocation(bookPickerDialogLeaf.id, {
+            pickerTestament: null,
+            pickerBookIndex: null,
+          });
+        }}
+        onSelectBook={(bookIndex) => {
+          if (!bookPickerDialogLeaf) {
+            return;
+          }
+          updateLeafLocation(bookPickerDialogLeaf.id, {
+            pickerBookIndex: bookIndex,
+          });
+        }}
+        onBackToBooks={() => {
+          if (!bookPickerDialogLeaf) {
+            return;
+          }
+          updateLeafLocation(bookPickerDialogLeaf.id, {
+            pickerBookIndex: null,
+          });
+        }}
+        onSelectChapter={(bookIndex, chapterIndex) => {
+          if (!bookPickerDialogLeaf) {
+            return;
+          }
+          updateLeafLocation(bookPickerDialogLeaf.id, {
+            bookIndex,
+            chapterIndex,
+            view: "reader",
+          });
+          setBookPickerDialogLeafId(null);
+        }}
+      />
 
-      <AlertDialog
+      <RenameTabDialog
         open={isRenameDialogOpen}
-        onOpenChange={(open) => {
-          setIsRenameDialogOpen(open);
-          if (!open) {
-            setRenameTabId(null);
-            setRenameError(null);
-          }
+        value={renameValue}
+        error={renameError}
+        onOpenChange={setIsRenameDialogOpen}
+        onValueChange={(value) => {
+          setRenameValue(value);
+          setRenameError(
+            value.trim().length > 0
+              ? null
+              : "Tab label must be at least 1 character.",
+          );
         }}
-      >
-        <AlertDialogContent size="sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Relabel Tab</AlertDialogTitle>
-            <AlertDialogDescription>
-              Update the current tab label (minimum 1 character).
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <Input
-            value={renameValue}
-            onChange={(event) => {
-              const value = event.target.value;
-              setRenameValue(value);
-              setRenameError(
-                value.trim().length > 0
-                  ? null
-                  : "Tab label must be at least 1 character.",
-              );
-            }}
-            placeholder="Tab name"
-            autoFocus
-          />
-          {renameError ? (
-            <p className="text-sm text-destructive">{renameError}</p>
-          ) : null}
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                setIsRenameDialogOpen(false);
-                setRenameTabId(null);
-                setRenameError(null);
-              }}
-            >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmRenameTab}
-              disabled={renameValue.trim().length < 1}
-            >
-              Save
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onCancel={() => {
+          setIsRenameDialogOpen(false);
+          setRenameTabId(null);
+          setRenameError(null);
+        }}
+        onConfirm={confirmRenameTab}
+      />
 
-      <AlertDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <AlertDialogContent
-          size="sm"
-          className="flex max-h-[calc(100vh-1.5rem)] flex-col gap-2 overflow-hidden"
-        >
-          <AlertDialogHeader>
-            <AlertDialogTitle>Settings</AlertDialogTitle>
-            <AlertDialogDescription>
-              Reader preferences for this device.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto px-2 py-2">
-            <div className="flex min-w-0 items-center justify-between gap-3">
-              <Label htmlFor="theme-mode">Dark Mode</Label>
-              <Switch
-                id="theme-mode"
-                checked={theme === "dark"}
-                onCheckedChange={(checked) =>
-                  setTheme(checked ? "dark" : "light")
-                }
-              />
-            </div>
-            <div className="space-y-2 border-t pt-3">
-              <div className="flex min-w-0 items-center justify-between gap-3">
-                <Label htmlFor="verse-spacing">Verse Spacing</Label>
-                <span className="text-xs text-muted-foreground">
-                  {verseSpacing}px
-                </span>
-              </div>
-              <Slider
-                id="verse-spacing"
-                min={0}
-                max={24}
-                step={1}
-                value={[verseSpacing]}
-                onValueChange={(value) => {
-                  const nextValue = Array.isArray(value) ? value[0] : value;
-                  setVerseSpacing(
-                    Math.max(0, Math.min(24, Math.round(nextValue ?? 0))),
-                  );
-                }}
-              />
-            </div>
-            <div className="flex min-w-0 items-center justify-between gap-3 border-t pt-3">
-              <Label htmlFor="hide-read-mode-verse-numbers">
-                Hide Verse Numbers
-              </Label>
-              <Switch
-                id="hide-read-mode-verse-numbers"
-                checked={hideReadModeVerseNumbers}
-                onCheckedChange={(checked) =>
-                  setHideReadModeVerseNumbers(checked)
-                }
-              />
-            </div>
-            <div className="flex min-w-0 items-center justify-between gap-3 border-t pt-3">
-              <Label htmlFor="read-mode-indents">Paragraph Indents</Label>
-              <Switch
-                id="read-mode-indents"
-                checked={readModeParagraphIndent}
-                onCheckedChange={(checked) =>
-                  setReadModeParagraphIndent(checked)
-                }
-              />
-            </div>
-            <div className="flex min-w-0 items-center justify-between gap-3 border-t pt-3">
-              <Label htmlFor="flow-verses">Flow Verses by Paragraph</Label>
-              <Switch
-                id="flow-verses"
-                checked={flowVersesByParagraph}
-                onCheckedChange={(checked) => setFlowVersesByParagraph(checked)}
-              />
-            </div>
-            <div className="flex min-w-0 items-center justify-between gap-3 border-t pt-3">
-              <Label htmlFor="vertical-tabs">Vertical Tabs</Label>
-              <Switch
-                id="vertical-tabs"
-                checked={tabsOrientation === "vertical"}
-                onCheckedChange={(checked) =>
-                  setTabsOrientation(checked ? "vertical" : "horizontal")
-                }
-              />
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={() => setIsSettingsOpen(false)}>
-              Close
-            </Button>
-          </div>
-        </AlertDialogContent>
-      </AlertDialog>
+      <SettingsDialog
+        open={isSettingsOpen}
+        onOpenChange={setIsSettingsOpen}
+        theme={theme}
+        onThemeChange={setTheme}
+        verseSpacing={verseSpacing}
+        onVerseSpacingChange={setVerseSpacing}
+        hideReadModeVerseNumbers={hideReadModeVerseNumbers}
+        onHideReadModeVerseNumbersChange={setHideReadModeVerseNumbers}
+        readModeParagraphIndent={readModeParagraphIndent}
+        onReadModeParagraphIndentChange={setReadModeParagraphIndent}
+        flowVersesByParagraph={flowVersesByParagraph}
+        onFlowVersesByParagraphChange={setFlowVersesByParagraph}
+        tabsOrientation={tabsOrientation}
+        onTabsOrientationChange={setTabsOrientation}
+      />
 
-      <AlertDialog open={isProgressOpen} onOpenChange={setIsProgressOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Reading Progress</AlertDialogTitle>
-            <AlertDialogDescription>
-              Track chapter completion across the whole Bible.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="max-h-[65vh] space-y-3 overflow-auto pr-1 text-sm">
-            <Progress value={totalProgressPercent} className="w-full">
-              <ProgressLabel className="font-semibold">
-                Whole Bible
-              </ProgressLabel>
-              <ProgressValue>
-                {() =>
-                  `${progressByTestament.total.read}/${progressByTestament.total.total} (${totalProgressPercent}%)`
-                }
-              </ProgressValue>
-            </Progress>
-
-            <Accordion
-              className="w-full rounded-md border px-3"
-              multiple
-              defaultValue={[]}
-            >
-              {[progressByTestament.old, progressByTestament.new].map(
-                (testament) => {
-                  const testamentPercent =
-                    testament.total > 0
-                      ? Math.round((testament.read / testament.total) * 100)
-                      : 0;
-                  const testamentCode = testament.label.startsWith("Old")
-                    ? "OT"
-                    : "NT";
-                  const testamentIconSrc = iconPath(
-                    testamentPercent === 100 ? "color" : "bw",
-                    testamentCode,
-                  );
-
-                  return (
-                    <AccordionItem
-                      key={testament.label}
-                      value={testament.label}
-                      className="w-full"
-                    >
-                      <AccordionTrigger className="w-full">
-                        <div className="flex w-full items-center gap-3">
-                          <img
-                            src={testamentIconSrc}
-                            alt={`${testament.label} icon`}
-                            className="size-10 shrink-0"
-                          />
-                          <Progress value={testamentPercent} className="w-full">
-                            <ProgressLabel>{testament.label}</ProgressLabel>
-                            <ProgressValue>
-                              {() =>
-                                `${testament.read}/${testament.total} (${testamentPercent}%)`
-                              }
-                            </ProgressValue>
-                          </Progress>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-3">
-                        <Accordion
-                          className="w-full rounded-md border px-2"
-                          multiple
-                          defaultValue={[]}
-                        >
-                          {testament.books.map((book) => {
-                            const bookPercent =
-                              book.total > 0
-                                ? Math.round((book.read / book.total) * 100)
-                                : 0;
-                            const bookIconSrc = iconPath(
-                              bookPercent === 100 ? "color" : "bw",
-                              bookCodeForIndex(book.bookIndex),
-                            );
-                            return (
-                              <AccordionItem
-                                key={book.name}
-                                value={`${testament.label}-${book.name}`}
-                                className="w-full"
-                              >
-                                <AccordionTrigger className="w-full px-1">
-                                  <div className="flex w-full items-center gap-3">
-                                    <img
-                                      src={bookIconSrc}
-                                      alt={`${book.name} icon`}
-                                      className="size-10 shrink-0"
-                                    />
-                                    <Progress
-                                      value={bookPercent}
-                                      className="w-full"
-                                    >
-                                      <ProgressLabel className="text-xs">
-                                        {book.name}
-                                      </ProgressLabel>
-                                      <ProgressValue className="text-xs">
-                                        {() =>
-                                          `${book.read}/${book.total} (${bookPercent}%)`
-                                        }
-                                      </ProgressValue>
-                                    </Progress>
-                                  </div>
-                                </AccordionTrigger>
-                                <AccordionContent className="space-y-2 px-1">
-                                  <div className="flex justify-end">
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() =>
-                                        setAllBookChaptersRead(
-                                          book.bookIndex,
-                                          book.read !== book.total,
-                                        )
-                                      }
-                                    >
-                                      {book.read === book.total
-                                        ? "Mark all incomplete"
-                                        : "Mark all complete"}
-                                    </Button>
-                                  </div>
-                                  <div className="space-y-1">
-                                    {book.chapters.map((chapter) => (
-                                      <div
-                                        key={`${book.name}-${chapter.chapterNumber}`}
-                                        className="flex items-center gap-2"
-                                      >
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          className="flex-1 justify-start"
-                                          onClick={() =>
-                                            openChapterInNewTab(
-                                              book.bookIndex,
-                                              chapter.chapterIndex,
-                                            )
-                                          }
-                                        >
-                                          {`Chapter ${chapter.chapterNumber}`}
-                                        </Button>
-                                        <Button
-                                          variant={
-                                            chapter.read
-                                              ? "secondary"
-                                              : "outline"
-                                          }
-                                          size="sm"
-                                          onClick={() =>
-                                            toggleChapterRead(
-                                              book.bookIndex,
-                                              chapter.chapterIndex,
-                                            )
-                                          }
-                                        >
-                                          {chapter.read ? "Read" : "Mark Read"}
-                                        </Button>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </AccordionContent>
-                              </AccordionItem>
-                            );
-                          })}
-                        </Accordion>
-                      </AccordionContent>
-                    </AccordionItem>
-                  );
-                },
-              )}
-            </Accordion>
-          </div>
-          <AlertDialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (window.confirm("Reset all reading progress?")) {
-                  resetAllProgress();
-                }
-              }}
-            >
-              Reset Progress
-            </Button>
-            <AlertDialogAction onClick={() => setIsProgressOpen(false)}>
-              Close
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ProgressDialog
+        open={isProgressOpen}
+        onOpenChange={setIsProgressOpen}
+        totalProgressPercent={totalProgressPercent}
+        progressByTestament={progressByTestament}
+        onSetAllBookChaptersRead={setAllBookChaptersRead}
+        onOpenChapterInNewTab={openChapterInNewTab}
+        onToggleChapterRead={toggleChapterRead}
+        onResetAllProgress={resetAllProgress}
+      />
     </main>
   );
 }
