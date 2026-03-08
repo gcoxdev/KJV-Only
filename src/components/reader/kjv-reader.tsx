@@ -23,7 +23,6 @@ import {
   MenuIcon,
   PlusIcon,
   RotateCwIcon,
-  LoaderCircleIcon,
   SettingsIcon,
   SquareChevronDownIcon,
   SquareChevronLeftIcon,
@@ -44,7 +43,6 @@ import {
   type AncientMapEntry,
   type AncientMapPayload,
   cleanMapMarkup,
-  deriveMapPhotoDialogItems,
   mapEntryLabel,
   mapEntrySearchableText,
   matchesMapWord,
@@ -162,7 +160,14 @@ import { BookPickerDialog } from "@/components/reader/book-picker-dialog";
 import { RenameTabDialog } from "@/components/reader/rename-tab-dialog";
 import { SettingsDialog } from "@/components/reader/settings-dialog";
 import { ProgressDialog } from "@/components/reader/progress-dialog";
-import { StudySearchForm } from "@/components/reader/study-search-form";
+import { CrossRefsTool } from "@/components/reader/study-tools/cross-refs-tool";
+import { ConcordanceTool } from "@/components/reader/study-tools/concordance-tool";
+import { WebstersTool } from "@/components/reader/study-tools/websters-tool";
+import { StrongsTool } from "@/components/reader/study-tools/strongs-tool";
+import { OldEnglishTool } from "@/components/reader/study-tools/old-english-tool";
+import { MapsTool } from "@/components/reader/study-tools/maps-tool";
+import { GenealogyTool } from "@/components/reader/study-tools/genealogy-tool";
+import { HitchcocksTool } from "@/components/reader/study-tools/hitchcocks-tool";
 import {
   ChapterTextContent,
   formatDisplayTokenText,
@@ -3863,781 +3868,111 @@ export function KJVReader() {
                   )
                 }
               >
-                <AccordionItem value="cross-refs">
-                  <AccordionTrigger
-                    className={cn(
-                      hasCrossRefsInfo && "text-emerald-600 dark:text-emerald-400",
-                    )}
-                  >
-                    Cross References
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-2 overflow-visible">
-                    {isCrossRefsSectionOpen ? (
-                      <>
-                        {isCrossRefsLoading ? (
-                          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <LoaderCircleIcon className="size-4 animate-spin" />
-                            Loading cross references...
-                          </p>
-                        ) : crossRefsError ? (
-                          <p className="text-sm text-destructive">
-                            {crossRefsError}
-                          </p>
-                        ) : !selectedCrossReferences ? (
-                          <p className="text-sm text-muted-foreground">
-                            Click a word or verse to load cross references.
-                          </p>
-                        ) : selectedCrossReferences.references.length === 0 ? (
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium">
-                              {(() => {
-                                const parsed = parseBibleReference(
-                                  selectedCrossReferences.key,
-                                );
-                                if (!parsed) {
-                                  return selectedCrossReferences.key;
-                                }
-                                const book = books[parsed.bookIndex];
-                                return `${book?.name ?? parsed.bookCode} ${parsed.startChapterIndex + 1}:${parsed.startVerse}`;
-                              })()}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              No cross references found.
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <p className="text-sm font-medium">
-                              {(() => {
-                                const parsed = parseBibleReference(
-                                  selectedCrossReferences.key,
-                                );
-                                if (!parsed) {
-                                  return selectedCrossReferences.key;
-                                }
-                                const book = books[parsed.bookIndex];
-                                return `${book?.name ?? parsed.bookCode} ${parsed.startChapterIndex + 1}:${parsed.startVerse}`;
-                              })()}
-                            </p>
-                            <p className="text-sm leading-7">
-                              {selectedCrossReferences.references.map(
-                                (reference, index) => (
-                                  <Fragment
-                                    key={`${selectedCrossReferences.key}-${reference}-${index}`}
-                                  >
-                                    <ConcordanceReferencePopover
-                                      reference={reference}
-                                      highlightWord=""
-                                      renderPreview={referencePreviewContent}
-                                      onOpenReference={openConcordanceReference}
-                                      onCloseSidebar={closeRightSidebarForMobile}
-                                    />
-                                    {index <
-                                    selectedCrossReferences.references.length - 1
-                                      ? ", "
-                                      : null}
-                                  </Fragment>
-                                ),
-                              )}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    ) : null}
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="concordance">
-                  <AccordionTrigger
-                    className={cn(
-                      hasConcordanceInfo &&
-                        "text-emerald-600 dark:text-emerald-400",
-                    )}
-                  >
-                    Concordance
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-2 overflow-visible">
-                    {isConcordanceSectionOpen ? (
-                      <>
-                        <StudySearchForm
-                          name="concordance-search"
-                          placeholder="Search concordance..."
-                          ariaLabel="Search concordance"
-                          loading={isConcordanceLoading || isConcordanceSearching}
-                          onSearch={applyConcordanceSearch}
-                        />
-                        {isConcordanceLoading || isConcordanceSearching ? (
-                          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <LoaderCircleIcon className="size-4 animate-spin" />
-                            {isConcordanceLoading
-                              ? "Loading concordance..."
-                              : "Searching concordance..."}
-                          </p>
-                        ) : concordanceError ? (
-                          <p className="text-sm text-destructive">
-                            {concordanceError}
-                          </p>
-                        ) : concordanceSearchResults.length === 0 ? (
-                          <p className="text-sm text-muted-foreground">
-                            {concordanceSearchTerm.trim()
-                              ? "No matching words found."
-                              : "Click a word in the text or search concordance."}
-                          </p>
-                        ) : (
-                          <Accordion
-                            className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
-                            multiple
-                            value={concordanceWordAccordionValue}
-                            onValueChange={(value) =>
-                              setConcordanceWordAccordionValue(
-                                value.filter(Boolean) as string[],
-                              )
-                            }
-                          >
-                            {concordanceSearchResults.map((entry) => (
-                              <AccordionItem key={entry.key} value={entry.key}>
-                                <AccordionTrigger>
-                                  {`${entry.key} (${entry.references.length})`}
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                  {entry.references.length === 0 ? (
-                                    <p className="text-sm text-muted-foreground">
-                                      No references found.
-                                    </p>
-                                  ) : (
-                                    <p className="text-sm leading-7">
-                                      {entry.references.map((reference, index) => (
-                                        <Fragment
-                                          key={`${entry.key}-${reference}-${index}`}
-                                        >
-                                          <ConcordanceReferencePopover
-                                            reference={reference}
-                                            highlightWord={entry.key}
-                                            renderPreview={referencePreviewContent}
-                                            onOpenReference={openConcordanceReference}
-                                            onCloseSidebar={closeRightSidebarForMobile}
-                                          />
-                                          {index < entry.references.length - 1
-                                            ? ", "
-                                            : null}
-                                        </Fragment>
-                                      ))}
-                                    </p>
-                                  )}
-                                </AccordionContent>
-                              </AccordionItem>
-                            ))}
-                          </Accordion>
-                        )}
-                      </>
-                    ) : null}
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="websters">
-                  <AccordionTrigger
-                    className={cn(
-                      hasWebstersInfo && "text-emerald-600 dark:text-emerald-400",
-                    )}
-                  >
-                    Webster&apos;s 1828 Dictionary
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-2 overflow-visible">
-                    {isWebstersSectionOpen ? (
-                      <>
-                        <StudySearchForm
-                          name="websters-search"
-                          placeholder="Search Webster's..."
-                          ariaLabel="Search Webster's dictionary"
-                          loading={isWebstersLoading || isWebstersSearching}
-                          onSearch={applyWebstersSearch}
-                        />
-                        {isWebstersLoading || isWebstersSearching ? (
-                          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <LoaderCircleIcon className="size-4 animate-spin" />
-                            {isWebstersLoading
-                              ? "Loading Webster's..."
-                              : "Searching Webster's..."}
-                          </p>
-                        ) : webstersError ? (
-                          <p className="text-sm text-destructive">
-                            {webstersError}
-                          </p>
-                        ) : webstersSearchResults.length === 0 ? (
-                          <p className="text-sm text-muted-foreground">
-                            {webstersSearchTerm.trim()
-                              ? "No matching words found."
-                              : "Search Webster's 1828 dictionary."}
-                          </p>
-                        ) : (
-                          <Accordion
-                            className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
-                            multiple
-                            value={webstersWordAccordionValue}
-                            onValueChange={(value) =>
-                              setWebstersWordAccordionValue(
-                                value.filter(Boolean) as string[],
-                              )
-                            }
-                          >
-                            {webstersSearchResults.map(({ key, entry }) => (
-                              <AccordionItem key={key} value={key}>
-                                <AccordionTrigger>{key}</AccordionTrigger>
-                                <AccordionContent className="space-y-2">
-                                  {entry.pronunciation ? (
-                                    <p className="text-sm text-muted-foreground">
-                                      {entry.pronunciation}
-                                    </p>
-                                  ) : null}
-                                  {entry.definitions.length > 0 ? (
-                                    <div className="space-y-2 text-sm">
-                                      {entry.definitions.map(
-                                        (definition, index) => (
-                                          <div
-                                            key={`${key}-definition-${index}`}
-                                            className="space-y-1"
-                                          >
-                                            <p className="font-medium capitalize">
-                                              {definition.type}
-                                            </p>
-                                            <p
-                                              className="leading-relaxed"
-                                              dangerouslySetInnerHTML={{
-                                                __html: definition.text,
-                                              }}
-                                            />
-                                          </div>
-                                        ),
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <p className="text-sm text-muted-foreground">
-                                      No definitions found.
-                                    </p>
-                                  )}
-                                </AccordionContent>
-                              </AccordionItem>
-                            ))}
-                          </Accordion>
-                        )}
-                      </>
-                    ) : null}
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="strongs">
-                  <AccordionTrigger
-                    className={cn(
-                      hasStrongsInfo && "text-emerald-600 dark:text-emerald-400",
-                    )}
-                  >
-                    Strong&apos;s Dictionary
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-2 overflow-visible">
-                    {isStrongsSectionOpen ? (
-                      <>
-                        <StudySearchForm
-                          inputRef={strongsSearchInputRef}
-                          name="strongs-search"
-                          placeholder="Search Strong's..."
-                          ariaLabel="Search Strong's dictionary"
-                          loading={isStrongsLoading || isStrongsSearching}
-                          onSearch={applyStrongsSearch}
-                        />
-                        {isStrongsLoading || isStrongsSearching ? (
-                          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <LoaderCircleIcon className="size-4 animate-spin" />
-                            {isStrongsLoading
-                              ? "Loading Strong's..."
-                              : "Searching Strong's..."}
-                          </p>
-                        ) : strongsError ? (
-                          <p className="text-sm text-destructive">{strongsError}</p>
-                        ) : strongsSearchResults.length === 0 ? (
-                          <p className="text-sm text-muted-foreground">
-                            {strongsSearchTerm.trim()
-                              ? "No matching entries found."
-                              : "Click a Strong's-tagged word or search Strong's dictionary."}
-                          </p>
-                        ) : (
-                          <Accordion
-                            className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
-                            multiple
-                            value={strongsWordAccordionValue}
-                            onValueChange={(value) =>
-                              setStrongsWordAccordionValue(
-                                value.filter(Boolean) as string[],
-                              )
-                            }
-                          >
-                            {strongsSearchResults.map(({ code, testament, entry }) => (
-                              <AccordionItem key={code} value={code}>
-                                <AccordionTrigger>{`${code} (${testament})`}</AccordionTrigger>
-                                <AccordionContent className="space-y-2 text-sm">
-                                  {entry.kjv_def ? (
-                                    <p>
-                                      <span className="text-muted-foreground">
-                                        KJV Definition:
-                                      </span>{" "}
-                                      {entry.kjv_def}
-                                    </p>
-                                  ) : null}
-                                  {entry.kjv_refs && Object.keys(entry.kjv_refs).length > 0 ? (
-                                    <div className="space-y-1">
-                                      <p className="text-muted-foreground">KJV References</p>
-                                      <Accordion className="w-full rounded-md border px-2" multiple>
-                                        {Object.entries(entry.kjv_refs).map(
-                                          ([word, references]) => (
-                                            <AccordionItem
-                                              key={`${code}-${word}`}
-                                              value={`${code}-${word}`}
-                                            >
-                                              <AccordionTrigger>{`${word} (${references.length})`}</AccordionTrigger>
-                                              <AccordionContent>
-                                                <p className="leading-7">
-                                                  {references.map((reference, index) => (
-                                                    <Fragment key={`${code}-${word}-${reference}-${index}`}>
-                                                      <ConcordanceReferencePopover
-                                                        reference={reference}
-                                                        highlightWord={word}
-                                                        renderPreview={referencePreviewContent}
-                                                        onOpenReference={openConcordanceReference}
-                                                        onCloseSidebar={closeRightSidebarForMobile}
-                                                      />
-                                                      {index < references.length - 1
-                                                        ? ", "
-                                                        : null}
-                                                    </Fragment>
-                                                  ))}
-                                                </p>
-                                              </AccordionContent>
-                                            </AccordionItem>
-                                          ),
-                                        )}
-                                      </Accordion>
-                                    </div>
-                                  ) : null}
-                                  {entry.strongs_def ? (
-                                    <p>
-                                      <span className="text-muted-foreground">
-                                        Strong&apos;s Definition:
-                                      </span>{" "}
-                                      {entry.strongs_def}
-                                    </p>
-                                  ) : null}
-                                  {entry.lemma ? (
-                                    <p>
-                                      <span className="text-muted-foreground">Lemma:</span>{" "}
-                                      <span className="font-mono">{entry.lemma}</span>
-                                    </p>
-                                  ) : null}
-                                  {entry.translit ? (
-                                    <p>
-                                      <span className="text-muted-foreground">
-                                        Transliteration:
-                                      </span>{" "}
-                                      <span className="font-mono">{entry.translit}</span>
-                                    </p>
-                                  ) : null}
-                                  {entry.pron ? (
-                                    <p>
-                                      <span className="text-muted-foreground">Pronunciation:</span>{" "}
-                                      {entry.pron}
-                                    </p>
-                                  ) : null}
-                                  {entry.derivation ? (
-                                    <p>
-                                      <span className="text-muted-foreground">Derivation:</span>{" "}
-                                      {entry.derivation}
-                                    </p>
-                                  ) : null}
-                                </AccordionContent>
-                              </AccordionItem>
-                            ))}
-                          </Accordion>
-                        )}
-                      </>
-                    ) : null}
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="old-english">
-                  <AccordionTrigger
-                    className={cn(
-                      hasOldEnglishInfo && "text-emerald-600 dark:text-emerald-400",
-                    )}
-                  >
-                    Old English Dictionary
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-2 overflow-visible">
-                    {isOldEnglishSectionOpen ? (
-                      <>
-                        <StudySearchForm
-                          name="old-english-search"
-                          placeholder="Search Old English..."
-                          ariaLabel="Search Old English dictionary"
-                          loading={isOldEnglishLoading || isOldEnglishSearching}
-                          onSearch={applyOldEnglishSearch}
-                        />
-                        {isOldEnglishLoading || isOldEnglishSearching ? (
-                          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <LoaderCircleIcon className="size-4 animate-spin" />
-                            {isOldEnglishLoading
-                              ? "Loading Old English..."
-                              : "Searching Old English..."}
-                          </p>
-                        ) : oldEnglishError ? (
-                          <p className="text-sm text-destructive">
-                            {oldEnglishError}
-                          </p>
-                        ) : oldEnglishSearchResults.length === 0 ? (
-                          <p className="text-sm text-muted-foreground">
-                            {oldEnglishSearchTerm.trim()
-                              ? "No matching words found."
-                              : "Click a word in the text or search Old English dictionary."}
-                          </p>
-                        ) : (
-                          <div className="space-y-2 text-sm leading-relaxed">
-                            {oldEnglishSearchResults.map(({ key, definitions }) => (
-                              <p key={key}>
-                                <span className="font-semibold">{key}</span>
-                                {": "}
-                                {definitions.join("; ")}
-                              </p>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    ) : null}
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="maps">
-                  <AccordionTrigger
-                    className={cn(
-                      hasMapsInfo && "text-emerald-600 dark:text-emerald-400",
-                    )}
-                  >
-                    Maps &amp; Photos
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-2 overflow-visible">
-                    {isMapsSectionOpen ? (
-                      <>
-                    <StudySearchForm
-                      name="maps-search"
-                      placeholder="Search maps and photos..."
-                      ariaLabel="Search maps"
-                      loading={isMapsLoading || isMapsSearching}
-                      onSearch={applyMapsSearch}
-                    />
-                    {isMapsLoading || isMapsSearching ? (
-                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <LoaderCircleIcon className="size-4 animate-spin" />
-                        {isMapsLoading ? "Loading maps..." : "Searching maps..."}
-                      </p>
-                    ) : mapsError ? (
-                      <p className="text-sm text-destructive">{mapsError}</p>
-                    ) : mapsSearchResults.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">
-                        {mapsSearchTerm.trim()
-                          ? "No matching places found."
-                          : "Click a word in the text or search maps."}
-                      </p>
-                    ) : (
-                      <Accordion
-                        className="w-full rounded-md border px-2"
-                        multiple
-                        value={mapsWordAccordionValue}
-                        onValueChange={(value) =>
-                          setMapsWordAccordionValue(
-                            value.filter(Boolean) as string[],
-                          )
-                        }
-                      >
-                        {mapsDisplayEntries.map(
-                          ({
-                            entry,
-                            itemKey,
-                            title,
-                            modernIds,
-                            photoEntries,
-                            linkedPlaces,
-                          }) => (
-                            <AccordionItem key={itemKey} value={itemKey}>
-                              <AccordionTrigger>
-                                {title}
-                              </AccordionTrigger>
-                              <AccordionContent className="space-y-2 text-sm">
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <Button
-                                    type="button"
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => openMapDialog(entry)}
-                                  >
-                                    Open Map
-                                  </Button>
-                                  {entry.types.length > 0 ? (
-                                    <span className="text-xs text-muted-foreground">
-                                      {entry.types.join(", ")}
-                                    </span>
-                                  ) : null}
-                                </div>
-                                {entry.translations.length > 1 ? (
-                                  <p className="text-muted-foreground">
-                                    Also: {entry.translations.slice(1).join(", ")}
-                                  </p>
-                                ) : null}
-                                {linkedPlaces.length > 0 ? (
-                                  <div className="space-y-1">
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                                      Linked Places ({linkedPlaces.length})
-                                    </p>
-                                    <div className="flex flex-wrap gap-1">
-                                      {linkedPlaces.map((place) => (
-                                        <span
-                                          key={`${itemKey}-${place.roleKey}`}
-                                          className="rounded-sm bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground"
-                                        >
-                                          {place.text}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  </div>
-                                ) : null}
-                                <Accordion className="w-full rounded-md border px-2" multiple>
-                                  <AccordionItem value={`${itemKey}-references`}>
-                                    <AccordionTrigger>
-                                      {`References (${entry.verses.length})`}
-                                    </AccordionTrigger>
-                                    <AccordionContent>
-                                      <p className="leading-7">
-                                        {entry.verses.map((reference, verseIndex) => (
-                                          <Fragment key={`${itemKey}-${reference}`}>
-                                            <ConcordanceReferencePopover
-                                              reference={reference}
-                                              highlightWord={title}
-                                              renderPreview={referencePreviewContent}
-                                              onOpenReference={openConcordanceReference}
-                                              onCloseSidebar={closeRightSidebarForMobile}
-                                            />
-                                            {verseIndex < entry.verses.length - 1
-                                              ? ", "
-                                              : null}
-                                          </Fragment>
-                                        ))}
-                                      </p>
-                                    </AccordionContent>
-                                  </AccordionItem>
-                                </Accordion>
-                                {isMapImagesLoading ? (
-                                  <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <LoaderCircleIcon className="size-3.5 animate-spin" />
-                                    Loading photos...
-                                  </p>
-                                ) : mapImagesError ? (
-                                  <p className="text-xs text-destructive">
-                                    {mapImagesError}
-                                  </p>
-                                ) : photoEntries.length > 0 ? (
-                                  <div className="space-y-1">
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                                      Photos ({photoEntries.length})
-                                    </p>
-                                    {(() => {
-                                      const dialogPhotos = deriveMapPhotoDialogItems(
-                                        photoEntries.slice(0, 9),
-                                        modernIds,
-                                        title,
-                                      );
-
-                                      return (
-                                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                                      {photoEntries.slice(0, 9).map((image) => {
-                                        const imageLocationKey = modernIds.find((id) =>
-                                          Boolean(
-                                            image.thumbnails?.[id]?.file ??
-                                              image.descriptions?.[id],
-                                          ),
-                                        );
-                                        const thumbFile = imageLocationKey
-                                          ? image.thumbnails?.[imageLocationKey]?.file
-                                          : undefined;
-                                        const thumbDescription = imageLocationKey
-                                          ? (image.thumbnails?.[imageLocationKey]
-                                              ?.description ??
-                                            image.descriptions?.[imageLocationKey])
-                                          : undefined;
-
-                                        const clickedIndex = dialogPhotos.findIndex(
-                                          (item) => item.id === image.id,
-                                        );
-
-                                        return (
-                                          <button
-                                            key={`${itemKey}-${image.id}`}
-                                            type="button"
-                                            className="group block overflow-hidden rounded border bg-muted/30 text-left"
-                                            onClick={() =>
-                                              openPhotoDialog(
-                                                dialogPhotos,
-                                                Math.max(0, clickedIndex),
-                                              )
-                                            }
-                                            disabled={!thumbFile}
-                                          >
-                                            {thumbFile ? (
-                                              <img
-                                                src={`/maps/thumbnails/${thumbFile}`}
-                                                alt={cleanMapMarkup(
-                                                  thumbDescription ?? title,
-                                                )}
-                                                className="aspect-4/3 w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
-                                                loading="lazy"
-                                              />
-                                            ) : (
-                                              <div className="flex aspect-4/3 items-center justify-center text-[11px] text-muted-foreground">
-                                                No local thumbnail
-                                              </div>
-                                            )}
-                                            <div className="px-1.5 py-1 text-[11px] text-muted-foreground">
-                                              {cleanMapMarkup(
-                                                thumbDescription ??
-                                                  image.credit ??
-                                                  title,
-                                              )}
-                                            </div>
-                                          </button>
-                                        );
-                                      })}
-                                    </div>
-                                      );
-                                    })()}
-                                  </div>
-                                ) : null}
-                              </AccordionContent>
-                            </AccordionItem>
-                          ),
-                        )}
-                      </Accordion>
-                    )}
-                      </>
-                    ) : null}
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="genealogy">
-                  <AccordionTrigger
-                    className={cn(
-                      hasGenealogyInfo && "text-emerald-600 dark:text-emerald-400",
-                    )}
-                  >
-                    Genealogy
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-2 overflow-visible">
-                    {isGenealogySectionOpen ? (
-                      <>
-                    <StudySearchForm
-                      name="genealogy-search"
-                      placeholder="Search genealogy..."
-                      ariaLabel="Search genealogy"
-                      loading={isGenealogyLoading || isGenealogySearching}
-                      onSearch={applyGenealogySearch}
-                    />
-                    {isGenealogyLoading || isGenealogySearching ? (
-                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <LoaderCircleIcon className="size-4 animate-spin" />
-                        {isGenealogyLoading
-                          ? "Loading genealogy..."
-                          : "Searching genealogy..."}
-                      </p>
-                    ) : genealogyError ? (
-                      <p className="text-sm text-destructive">
-                        {genealogyError}
-                      </p>
-                    ) : genealogySearchResults.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">
-                        {genealogySearchTerm.trim()
-                          ? "No matching people found."
-                          : "Click a name in the text or search genealogy."}
-                      </p>
-                    ) : (
-                      genealogySearchTerm.trim() &&
-                      genealogySearchResults.length > 1 ? (
-                        <Accordion className="w-full rounded-md border px-2" multiple>
-                          {genealogySearchResults.map((person) => (
-                            <AccordionItem
-                              key={person.id}
-                              value={`genealogy-${person.id}`}
-                            >
-                              <AccordionTrigger>
-                                {person.names[0] ?? person.id}
-                              </AccordionTrigger>
-                              <AccordionContent>
-                                {renderGenealogyPersonDetails(person)}
-                              </AccordionContent>
-                            </AccordionItem>
-                          ))}
-                        </Accordion>
-                      ) : (
-                        <div className="space-y-2">
-                          {genealogySearchResults.map((person) => (
-                            <Fragment key={person.id}>
-                              {renderGenealogyPersonDetails(person)}
-                            </Fragment>
-                          ))}
-                        </div>
-                      )
-                    )}
-                      </>
-                    ) : null}
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="hitchcocks">
-                  <AccordionTrigger
-                    className={cn(
-                      hasHitchcocksInfo &&
-                        "text-emerald-600 dark:text-emerald-400",
-                    )}
-                  >
-                    Hitchcock&apos;s Bible Names
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-2 overflow-visible">
-                    {isHitchcocksSectionOpen ? (
-                      <>
-                    <StudySearchForm
-                      name="hitchcocks-search"
-                      placeholder="Search Hitchcock's..."
-                      ariaLabel="Search Hitchcock's Bible Names"
-                      loading={isHitchcocksLoading || isHitchcocksSearching}
-                      onSearch={applyHitchcocksSearch}
-                    />
-                    {isHitchcocksLoading || isHitchcocksSearching ? (
-                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <LoaderCircleIcon className="size-4 animate-spin" />
-                        {isHitchcocksLoading
-                          ? "Loading Hitchcock's..."
-                          : "Searching Hitchcock's..."}
-                      </p>
-                    ) : hitchcocksError ? (
-                      <p className="text-sm text-destructive">
-                        {hitchcocksError}
-                      </p>
-                    ) : hitchcocksSearchResults.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">
-                        {hitchcocksSearchTerm.trim()
-                          ? "No matching names found."
-                          : "Click a word in the text or search Hitchcock's Bible Names."}
-                      </p>
-                    ) : (
-                      <div className="space-y-2 text-sm leading-relaxed">
-                        {hitchcocksSearchResults.map(({ key, definition }) => (
-                          <p key={key}>
-                            <span className="font-semibold">{key}</span>
-                            {": "}
-                            {definition}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                      </>
-                    ) : null}
-                  </AccordionContent>
-                </AccordionItem>
+                <CrossRefsTool
+                  hasInfo={hasCrossRefsInfo}
+                  isOpen={isCrossRefsSectionOpen}
+                  isLoading={isCrossRefsLoading}
+                  error={crossRefsError}
+                  selected={selectedCrossReferences}
+                  books={books}
+                  renderPreview={referencePreviewContent}
+                  onOpenReference={openConcordanceReference}
+                  onCloseSidebar={closeRightSidebarForMobile}
+                />
+                <ConcordanceTool
+                  hasInfo={hasConcordanceInfo}
+                  isOpen={isConcordanceSectionOpen}
+                  isLoading={isConcordanceLoading}
+                  isSearching={isConcordanceSearching}
+                  error={concordanceError}
+                  searchTerm={concordanceSearchTerm}
+                  results={concordanceSearchResults}
+                  wordAccordionValue={concordanceWordAccordionValue}
+                  onWordAccordionValueChange={setConcordanceWordAccordionValue}
+                  onSearch={applyConcordanceSearch}
+                  renderPreview={referencePreviewContent}
+                  onOpenReference={openConcordanceReference}
+                  onCloseSidebar={closeRightSidebarForMobile}
+                />
+                <WebstersTool
+                  hasInfo={hasWebstersInfo}
+                  isOpen={isWebstersSectionOpen}
+                  isLoading={isWebstersLoading}
+                  isSearching={isWebstersSearching}
+                  error={webstersError}
+                  searchTerm={webstersSearchTerm}
+                  results={webstersSearchResults}
+                  wordAccordionValue={webstersWordAccordionValue}
+                  onWordAccordionValueChange={setWebstersWordAccordionValue}
+                  onSearch={applyWebstersSearch}
+                />
+                <StrongsTool
+                  hasInfo={hasStrongsInfo}
+                  isOpen={isStrongsSectionOpen}
+                  isLoading={isStrongsLoading}
+                  isSearching={isStrongsSearching}
+                  error={strongsError}
+                  searchTerm={strongsSearchTerm}
+                  results={strongsSearchResults}
+                  wordAccordionValue={strongsWordAccordionValue}
+                  onWordAccordionValueChange={setStrongsWordAccordionValue}
+                  onSearch={applyStrongsSearch}
+                  inputRef={strongsSearchInputRef}
+                  renderPreview={referencePreviewContent}
+                  onOpenReference={openConcordanceReference}
+                  onCloseSidebar={closeRightSidebarForMobile}
+                />
+                <OldEnglishTool
+                  hasInfo={hasOldEnglishInfo}
+                  isOpen={isOldEnglishSectionOpen}
+                  isLoading={isOldEnglishLoading}
+                  isSearching={isOldEnglishSearching}
+                  error={oldEnglishError}
+                  searchTerm={oldEnglishSearchTerm}
+                  results={oldEnglishSearchResults}
+                  onSearch={applyOldEnglishSearch}
+                />
+                <MapsTool
+                  hasInfo={hasMapsInfo}
+                  isOpen={isMapsSectionOpen}
+                  isLoading={isMapsLoading}
+                  isSearching={isMapsSearching}
+                  error={mapsError}
+                  searchTerm={mapsSearchTerm}
+                  resultsLength={mapsSearchResults.length}
+                  displayEntries={mapsDisplayEntries}
+                  wordAccordionValue={mapsWordAccordionValue}
+                  onWordAccordionValueChange={setMapsWordAccordionValue}
+                  onSearch={applyMapsSearch}
+                  onOpenMapDialog={openMapDialog}
+                  isMapImagesLoading={isMapImagesLoading}
+                  mapImagesError={mapImagesError}
+                  onOpenPhotoDialog={openPhotoDialog}
+                  renderPreview={referencePreviewContent}
+                  onOpenReference={openConcordanceReference}
+                  onCloseSidebar={closeRightSidebarForMobile}
+                />
+                <GenealogyTool
+                  hasInfo={hasGenealogyInfo}
+                  isOpen={isGenealogySectionOpen}
+                  isLoading={isGenealogyLoading}
+                  isSearching={isGenealogySearching}
+                  error={genealogyError}
+                  searchTerm={genealogySearchTerm}
+                  results={genealogySearchResults}
+                  onSearch={applyGenealogySearch}
+                  renderPersonDetails={renderGenealogyPersonDetails}
+                />
+                <HitchcocksTool
+                  hasInfo={hasHitchcocksInfo}
+                  isOpen={isHitchcocksSectionOpen}
+                  isLoading={isHitchcocksLoading}
+                  isSearching={isHitchcocksSearching}
+                  error={hitchcocksError}
+                  searchTerm={hitchcocksSearchTerm}
+                  results={hitchcocksSearchResults}
+                  onSearch={applyHitchcocksSearch}
+                />
               </Accordion>
             </SidebarContent>
           </Sidebar>
