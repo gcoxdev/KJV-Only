@@ -115,6 +115,39 @@ type ConcordancePayload = Record<string, string[]>;
 type CrossRefsPayload = Record<string, string[]>;
 type HitchcocksPayload = Record<string, string>;
 type OldEnglishPayload = Record<string, string[]>;
+type GenealogyVerseByName = {
+  name: string;
+  verses: string[];
+  numOccurrences?: number;
+  numVerses?: number;
+};
+type GenealogyRelation = {
+  name: string;
+  id: string;
+  verse?: string;
+};
+type GenealogyParentRef = {
+  name: string;
+  id: string;
+};
+type GenealogyPerson = {
+  id: string;
+  names: string[];
+  gender?: string;
+  notes?: string;
+  verses?: {
+    byName?: GenealogyVerseByName[];
+    totalOccurrences?: number;
+    totalVerses?: number;
+    first?: string;
+  };
+  father?: GenealogyParentRef;
+  mother?: GenealogyParentRef;
+  spouses?: GenealogyRelation[];
+  siblings?: GenealogyRelation[];
+  children?: GenealogyRelation[];
+};
+type GenealogyPayload = GenealogyPerson[];
 type WebstersEntry = {
   pronunciation?: string;
   definitions: Array<{
@@ -177,6 +210,7 @@ let concordancePromise: Promise<ConcordancePayload> | null = null;
 let crossRefsPromise: Promise<CrossRefsPayload> | null = null;
 let hitchcocksPromise: Promise<HitchcocksPayload> | null = null;
 let oldEnglishPromise: Promise<OldEnglishPayload> | null = null;
+let genealogyPromise: Promise<GenealogyPayload> | null = null;
 let webstersPromise: Promise<WebstersPayload> | null = null;
 let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
@@ -310,6 +344,27 @@ function loadOldEnglish() {
   }
 
   return oldEnglishPromise;
+}
+
+function loadGenealogy() {
+  if (!genealogyPromise) {
+    genealogyPromise = fetch("/references/genealogy.json", {
+      cache: "force-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/genealogy.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as GenealogyPayload)
+      .catch((error) => {
+        genealogyPromise = null;
+        throw error;
+      });
+  }
+
+  return genealogyPromise;
 }
 
 function loadStrongsGreek() {
@@ -1609,6 +1664,14 @@ export function KJVReader() {
     key: string;
     definitions: string[];
   } | null>(null);
+  const [genealogy, setGenealogy] = useState<GenealogyPayload | null>(null);
+  const [genealogySearchTerm, setGenealogySearchTerm] = useState("");
+  const [isGenealogySearching, setIsGenealogySearching] = useState(false);
+  const [isGenealogyLoading, setIsGenealogyLoading] = useState(false);
+  const [genealogyError, setGenealogyError] = useState<string | null>(null);
+  const [selectedGenealogyIds, setSelectedGenealogyIds] = useState<string[]>(
+    [],
+  );
   const [strongsGreek, setStrongsGreek] = useState<StrongsPayload | null>(null);
   const [strongsHebrew, setStrongsHebrew] = useState<StrongsPayload | null>(null);
   const [strongsSearchTerm, setStrongsSearchTerm] = useState("");
@@ -1679,6 +1742,10 @@ export function KJVReader() {
     setIsOldEnglishLoading(false);
     setIsOldEnglishSearching(false);
     setSelectedOldEnglishEntry(null);
+    setGenealogyError(null);
+    setIsGenealogyLoading(false);
+    setIsGenealogySearching(false);
+    setSelectedGenealogyIds([]);
     setStrongsError(null);
     setIsStrongsLoading(false);
     setIsStrongsSearching(false);
@@ -2393,6 +2460,75 @@ export function KJVReader() {
         });
     },
     [ensureOldEnglishLoaded],
+  );
+
+  const ensureGenealogyLoaded = useCallback(async () => {
+    if (genealogy) {
+      return genealogy;
+    }
+    setGenealogyError(null);
+    setIsGenealogyLoading(true);
+    try {
+      const data = await loadGenealogy();
+      setGenealogy(data);
+      return data;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to load genealogy data";
+      setGenealogyError(message);
+      throw error;
+    } finally {
+      setIsGenealogyLoading(false);
+    }
+  }, [genealogy]);
+
+  const genealogyById = useMemo(() => {
+    const map = new Map<string, GenealogyPerson>();
+    for (const person of genealogy ?? []) {
+      map.set(person.id, person);
+    }
+    return map;
+  }, [genealogy]);
+
+  const genealogySearchResults = useMemo(() => {
+    const term = genealogySearchTerm.trim().toLowerCase();
+    if (term) {
+      return (genealogy ?? [])
+        .filter((person) =>
+          person.names.some((name) => name.toLowerCase().includes(term)),
+        )
+        .sort((a, b) =>
+          (a.names[0] ?? a.id).localeCompare(b.names[0] ?? b.id),
+        );
+    }
+    if (selectedGenealogyIds.length === 0) {
+      return [] as GenealogyPerson[];
+    }
+    return selectedGenealogyIds
+      .map((id) => genealogyById.get(id))
+      .filter((person): person is GenealogyPerson => Boolean(person));
+  }, [genealogy, genealogyById, genealogySearchTerm, selectedGenealogyIds]);
+
+  const applyGenealogySearch = useCallback(
+    (rawValue?: string) => {
+      const nextTerm = (rawValue ?? "").trim();
+      setGenealogySearchTerm(nextTerm);
+      if (!nextTerm) {
+        setIsGenealogySearching(false);
+        return;
+      }
+      setIsGenealogySearching(true);
+      void ensureGenealogyLoaded()
+        .catch(() => {
+          // Error state is set by ensureGenealogyLoaded
+        })
+        .finally(() => {
+          window.requestAnimationFrame(() => {
+            setIsGenealogySearching(false);
+          });
+        });
+    },
+    [ensureGenealogyLoaded],
   );
 
   const ensureStrongsLoaded = useCallback(async () => {
@@ -3258,6 +3394,30 @@ export function KJVReader() {
         setIsOldEnglishLoading(false);
       };
 
+      const applyGenealogySelection = (data: GenealogyPayload) => {
+        const matches = data.filter((person) =>
+          person.names.some(
+            (name) =>
+              normalizeConcordanceWord(name).toLowerCase() ===
+              rawWord.toLowerCase(),
+          ),
+        );
+        const matchIds = matches.map((person) => person.id);
+        setSelectedGenealogyIds(matchIds);
+        setConcordanceAccordionValue((current) => {
+          const withoutGenealogy = current.filter(
+            (value) => value !== "genealogy",
+          );
+          if (matchIds.length === 0) {
+            return withoutGenealogy;
+          }
+          return withoutGenealogy.includes("concordance")
+            ? [...withoutGenealogy, "genealogy"]
+            : ["concordance", ...withoutGenealogy, "genealogy"];
+        });
+        setIsGenealogyLoading(false);
+      };
+
       const applyStrongsSelection = (
         greek: StrongsPayload,
         hebrew: StrongsPayload,
@@ -3392,15 +3552,36 @@ export function KJVReader() {
             setIsOldEnglishLoading(false);
           });
       }
+
+      setGenealogyError(null);
+      setIsGenealogyLoading(true);
+      if (genealogy) {
+        applyGenealogySelection(genealogy);
+      } else {
+        void ensureGenealogyLoaded()
+          .then((data) => {
+            applyGenealogySelection(data);
+          })
+          .catch((error) => {
+            const message =
+              error instanceof Error
+                ? error.message
+                : "Failed to load genealogy data";
+            setGenealogyError(message);
+            setIsGenealogyLoading(false);
+          });
+      }
     },
     [
       concordance,
       ensureConcordanceLoaded,
       ensureHitchcocksLoaded,
+      ensureGenealogyLoaded,
       ensureOldEnglishLoaded,
       openCrossReferencesForVerse,
       ensureStrongsLoaded,
       ensureWebstersLoaded,
+      genealogy,
       hitchcocks,
       oldEnglish,
       strongsGreek,
@@ -3570,6 +3751,201 @@ export function KJVReader() {
             </p>
           ))}
         </div>
+      </div>
+    );
+  }
+
+  const selectGenealogyPerson = useCallback((personId: string) => {
+    if (!personId) {
+      return;
+    }
+    setGenealogySearchTerm("");
+    setSelectedGenealogyIds([personId]);
+    setConcordanceAccordionValue((current) => {
+      const without = current.filter((value) => value !== "genealogy");
+      return without.includes("concordance")
+        ? [...without, "genealogy"]
+        : ["concordance", ...without, "genealogy"];
+    });
+  }, []);
+
+  function renderGenealogyPersonDetails(person: GenealogyPerson) {
+    const primaryName = person.names[0] ?? person.id;
+    const byName = person.verses?.byName ?? [];
+    const spouses = person.spouses ?? [];
+    const siblings = person.siblings ?? [];
+    const children = person.children ?? [];
+    const fatherName =
+      person.father?.name ||
+      (person.father?.id ? (genealogyById.get(person.father.id)?.names[0] ?? "") : "");
+    const motherName =
+      person.mother?.name ||
+      (person.mother?.id ? (genealogyById.get(person.mother.id)?.names[0] ?? "") : "");
+
+    return (
+      <div className="space-y-2 rounded-md border p-2 text-sm">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="font-semibold">{primaryName}</span>
+          {person.names.length > 1 ? (
+            <span className="text-muted-foreground">
+              ({person.names.slice(1).join(", ")})
+            </span>
+          ) : null}
+          {person.gender ? (
+            <span className="text-xs text-muted-foreground">{person.gender}</span>
+          ) : null}
+        </div>
+        {byName.length > 0 ? (
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              References
+            </p>
+            <Accordion className="w-full rounded-md border px-2" multiple>
+              {byName.map((entry) => (
+                <AccordionItem
+                  key={`${person.id}-${entry.name}`}
+                  value={`${person.id}-${entry.name}`}
+                >
+                  <AccordionTrigger>
+                    {`${entry.name} (${entry.verses.length})`}
+                  </AccordionTrigger>
+                  <AccordionContent className="leading-7">
+                    {entry.verses.map((reference, index) => (
+                      <Fragment
+                        key={`${person.id}-${entry.name}-${reference}-${index}`}
+                      >
+                        <ConcordanceReferencePopover
+                          reference={reference}
+                          highlightWord={entry.name}
+                        />
+                        {index < entry.verses.length - 1 ? ", " : null}
+                      </Fragment>
+                    ))}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        ) : null}
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Lineage
+          </p>
+          {fatherName ? (
+            <p>
+              <span className="font-semibold">Father:</span>{" "}
+              <Button
+                type="button"
+                variant="link"
+                className="h-auto px-0"
+                onClick={() => selectGenealogyPerson(person.father?.id ?? "")}
+              >
+                {fatherName}
+              </Button>
+            </p>
+          ) : null}
+          {motherName ? (
+            <p>
+              <span className="font-semibold">Mother:</span>{" "}
+              <Button
+                type="button"
+                variant="link"
+                className="h-auto px-0"
+                onClick={() => selectGenealogyPerson(person.mother?.id ?? "")}
+              >
+                {motherName}
+              </Button>
+            </p>
+          ) : null}
+          {spouses.length > 0 ? (
+            <p>
+              <span className="font-semibold">Spouses:</span>{" "}
+              {spouses.map((relation, index) => (
+                <Fragment key={`${person.id}-spouse-${relation.id}-${index}`}>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="h-auto px-0"
+                    onClick={() => selectGenealogyPerson(relation.id)}
+                  >
+                    {relation.name || relation.id}
+                  </Button>
+                  {relation.verse ? (
+                    <>
+                      {" "}
+                      (
+                      <ConcordanceReferencePopover
+                        reference={relation.verse}
+                        highlightWord={relation.name || primaryName}
+                      />
+                      )
+                    </>
+                  ) : null}
+                  {index < spouses.length - 1 ? ", " : null}
+                </Fragment>
+              ))}
+            </p>
+          ) : null}
+          {siblings.length > 0 ? (
+            <p>
+              <span className="font-semibold">Siblings:</span>{" "}
+              {siblings.map((relation, index) => (
+                <Fragment key={`${person.id}-sibling-${relation.id}-${index}`}>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="h-auto px-0"
+                    onClick={() => selectGenealogyPerson(relation.id)}
+                  >
+                    {relation.name || relation.id}
+                  </Button>
+                  {relation.verse ? (
+                    <>
+                      {" "}
+                      (
+                      <ConcordanceReferencePopover
+                        reference={relation.verse}
+                        highlightWord={relation.name || primaryName}
+                      />
+                      )
+                    </>
+                  ) : null}
+                  {index < siblings.length - 1 ? ", " : null}
+                </Fragment>
+              ))}
+            </p>
+          ) : null}
+          {children.length > 0 ? (
+            <p>
+              <span className="font-semibold">Children:</span>{" "}
+              {children.map((relation, index) => (
+                <Fragment key={`${person.id}-child-${relation.id}-${index}`}>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="h-auto px-0"
+                    onClick={() => selectGenealogyPerson(relation.id)}
+                  >
+                    {relation.name || relation.id}
+                  </Button>
+                  {relation.verse ? (
+                    <>
+                      {" "}
+                      (
+                      <ConcordanceReferencePopover
+                        reference={relation.verse}
+                        highlightWord={relation.name || primaryName}
+                      />
+                      )
+                    </>
+                  ) : null}
+                  {index < children.length - 1 ? ", " : null}
+                </Fragment>
+              ))}
+            </p>
+          ) : null}
+        </div>
+        {person.notes ? <p className="text-muted-foreground">{person.notes}</p> : null}
       </div>
     );
   }
@@ -4511,6 +4887,7 @@ export function KJVReader() {
     "strongs",
     "hitchcocks",
     "old-english",
+    "genealogy",
   ] as const;
   const allStudyAccordionsOpen = studyAccordionItems.every((item) =>
     concordanceAccordionValue.includes(item),
@@ -4523,6 +4900,7 @@ export function KJVReader() {
   const hasStrongsInfo = strongsSearchResults.length > 0;
   const hasHitchcocksInfo = hitchcocksSearchResults.length > 0;
   const hasOldEnglishInfo = oldEnglishSearchResults.length > 0;
+  const hasGenealogyInfo = genealogySearchResults.length > 0;
 
   const bookPickerDialogLeaf =
     bookPickerDialogLeafId && activeTab
@@ -5183,6 +5561,94 @@ export function KJVReader() {
                           </p>
                         ))}
                       </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="genealogy">
+                  <AccordionTrigger
+                    className={cn(
+                      hasGenealogyInfo && "text-emerald-600 dark:text-emerald-400",
+                    )}
+                  >
+                    Genealogy
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-2 overflow-visible">
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        const value = formData.get("genealogy-search");
+                        applyGenealogySearch(
+                          typeof value === "string" ? value : "",
+                        );
+                      }}
+                    >
+                      <InputGroup>
+                        <InputGroupInput
+                          name="genealogy-search"
+                          placeholder="Search genealogy..."
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupButton
+                            type="submit"
+                            size="icon-sm"
+                            variant="ghost"
+                            aria-label="Search genealogy"
+                            disabled={isGenealogyLoading || isGenealogySearching}
+                          >
+                            {isGenealogyLoading || isGenealogySearching ? (
+                              <LoaderCircleIcon className="animate-spin" />
+                            ) : (
+                              <SearchIcon />
+                            )}
+                          </InputGroupButton>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </form>
+                    {isGenealogyLoading || isGenealogySearching ? (
+                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <LoaderCircleIcon className="size-4 animate-spin" />
+                        {isGenealogyLoading
+                          ? "Loading genealogy..."
+                          : "Searching genealogy..."}
+                      </p>
+                    ) : genealogyError ? (
+                      <p className="text-sm text-destructive">
+                        {genealogyError}
+                      </p>
+                    ) : genealogySearchResults.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        {genealogySearchTerm.trim()
+                          ? "No matching people found."
+                          : "Click a name in the text or search genealogy."}
+                      </p>
+                    ) : (
+                      genealogySearchTerm.trim() &&
+                      genealogySearchResults.length > 1 ? (
+                        <Accordion className="w-full rounded-md border px-2" multiple>
+                          {genealogySearchResults.map((person) => (
+                            <AccordionItem
+                              key={person.id}
+                              value={`genealogy-${person.id}`}
+                            >
+                              <AccordionTrigger>
+                                {person.names[0] ?? person.id}
+                              </AccordionTrigger>
+                              <AccordionContent>
+                                {renderGenealogyPersonDetails(person)}
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      ) : (
+                        <div className="space-y-2">
+                          {genealogySearchResults.map((person) => (
+                            <Fragment key={person.id}>
+                              {renderGenealogyPersonDetails(person)}
+                            </Fragment>
+                          ))}
+                        </div>
+                      )
                     )}
                   </AccordionContent>
                 </AccordionItem>
