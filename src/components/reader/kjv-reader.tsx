@@ -120,6 +120,16 @@ type WebstersEntry = {
   }>;
 };
 type WebstersPayload = Record<string, WebstersEntry>;
+type StrongsEntry = {
+  kjv_def?: string;
+  strongs_def?: string;
+  lemma?: string;
+  translit?: string;
+  derivation?: string;
+  pron?: string;
+  kjv_refs?: Record<string, string[]>;
+};
+type StrongsPayload = Record<string, StrongsEntry>;
 
 type PanelDirection = "left" | "right" | "up" | "down";
 type SplitOrientation = "horizontal" | "vertical";
@@ -162,6 +172,8 @@ type TokenPopupState = {
 let kjvBooksPromise: Promise<Book[]> | null = null;
 let concordancePromise: Promise<ConcordancePayload> | null = null;
 let webstersPromise: Promise<WebstersPayload> | null = null;
+let strongsGreekPromise: Promise<StrongsPayload> | null = null;
+let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
 
 function loadKjvBooks() {
   if (!kjvBooksPromise) {
@@ -231,10 +243,44 @@ function loadWebsters() {
   return webstersPromise;
 }
 
-function hasTokenMetadata(token: VerseToken) {
-  return Boolean(
-    token.strong || token.lemma || token.morph || token.divineName,
-  );
+function loadStrongsGreek() {
+  if (!strongsGreekPromise) {
+    strongsGreekPromise = fetch("/references/strongs-greek.json", {
+      cache: "force-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/strongs-greek.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as StrongsPayload)
+      .catch((error) => {
+        strongsGreekPromise = null;
+        throw error;
+      });
+  }
+  return strongsGreekPromise;
+}
+
+function loadStrongsHebrew() {
+  if (!strongsHebrewPromise) {
+    strongsHebrewPromise = fetch("/references/strongs-hebrew.json", {
+      cache: "force-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/strongs-hebrew.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as StrongsPayload)
+      .catch((error) => {
+        strongsHebrewPromise = null;
+        throw error;
+      });
+  }
+  return strongsHebrewPromise;
 }
 
 function isPunctuationToken(tokenText: string) {
@@ -262,7 +308,6 @@ function renderToken(
 ) {
   const tokenClassName = cn(token.added && "italic");
   const displayText = formatDisplayTokenText(token);
-  const showMetadata = isStudyMode && hasTokenMetadata(token);
 
   if (!isStudyMode) {
     return <span className={tokenClassName}>{displayText}</span>;
@@ -272,10 +317,7 @@ function renderToken(
     <span
       role="button"
       tabIndex={0}
-      className={cn(
-        "cursor-pointer rounded-sm px-0.5 py-0.5 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring/60",
-        showMetadata && "underline decoration-dotted underline-offset-3",
-      )}
+      className="cursor-pointer rounded-sm px-0.5 py-0.5 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring/60"
       aria-label={`Details for ${displayText}`}
       onClick={(event) => onOpenDetails(event.currentTarget, token)}
       onKeyDown={(event) => {
@@ -603,6 +645,15 @@ function resolveWebstersKey(websters: WebstersPayload, rawWord: string) {
     (key) => key.toLowerCase() === lowered,
   );
   return fallback ?? null;
+}
+
+function normalizeStrongsCode(value: string) {
+  const match = value.toUpperCase().match(/([GH])\s*0*([0-9]{1,4})/);
+  if (!match) {
+    return null;
+  }
+  const [, prefix, numeric] = match;
+  return `${prefix}${numeric.padStart(4, "0")}`;
 }
 
 function parseConcordanceReference(reference: string) {
@@ -1328,10 +1379,25 @@ export function KJVReader() {
     key: string;
     entry: WebstersEntry;
   } | null>(null);
+  const [strongsGreek, setStrongsGreek] = useState<StrongsPayload | null>(null);
+  const [strongsHebrew, setStrongsHebrew] = useState<StrongsPayload | null>(null);
+  const [strongsSearchTerm, setStrongsSearchTerm] = useState("");
+  const [isStrongsSearching, setIsStrongsSearching] = useState(false);
+  const [isStrongsLoading, setIsStrongsLoading] = useState(false);
+  const [strongsError, setStrongsError] = useState<string | null>(null);
+  const [strongsWordAccordionValue, setStrongsWordAccordionValue] = useState<
+    string[]
+  >([]);
+  const [selectedStrongsEntry, setSelectedStrongsEntry] = useState<{
+    code: string;
+    testament: "greek" | "hebrew";
+    entry: StrongsEntry;
+  } | null>(null);
   const [pendingVerseHighlights, setPendingVerseHighlights] = useState<
     Record<string, number>
   >({});
   const tabEndRef = useRef<HTMLDivElement>(null);
+  const strongsSearchInputRef = useRef<HTMLInputElement | null>(null);
   const panelElementRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const previewLeafIdRef = useRef<string | null>(null);
   const addPreviewLeafIdsRef = useRef<string[]>([]);
@@ -1372,6 +1438,11 @@ export function KJVReader() {
     setIsWebstersSearching(false);
     setWebstersWordAccordionValue([]);
     setSelectedWebstersEntry(null);
+    setStrongsError(null);
+    setIsStrongsLoading(false);
+    setIsStrongsSearching(false);
+    setStrongsWordAccordionValue([]);
+    setSelectedStrongsEntry(null);
   }, [isStudyMode]);
 
   useEffect(() => {
@@ -1914,6 +1985,90 @@ export function KJVReader() {
         });
     },
     [ensureWebstersLoaded],
+  );
+
+  const ensureStrongsLoaded = useCallback(async () => {
+    if (strongsGreek && strongsHebrew) {
+      return { greek: strongsGreek, hebrew: strongsHebrew };
+    }
+    setStrongsError(null);
+    setIsStrongsLoading(true);
+    try {
+      const [greek, hebrew] = await Promise.all([
+        strongsGreek ? Promise.resolve(strongsGreek) : loadStrongsGreek(),
+        strongsHebrew ? Promise.resolve(strongsHebrew) : loadStrongsHebrew(),
+      ]);
+      setStrongsGreek(greek);
+      setStrongsHebrew(hebrew);
+      return { greek, hebrew };
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to load Strong's data";
+      setStrongsError(message);
+      throw error;
+    } finally {
+      setIsStrongsLoading(false);
+    }
+  }, [strongsGreek, strongsHebrew]);
+
+  const strongsSearchResults = useMemo(() => {
+    const term = strongsSearchTerm.trim().toLowerCase();
+    if (!term) {
+      return selectedStrongsEntry ? [selectedStrongsEntry] : [];
+    }
+    const results: Array<{
+      code: string;
+      testament: "greek" | "hebrew";
+      entry: StrongsEntry;
+    }> = [];
+    const pushMatches = (
+      payload: StrongsPayload | null,
+      testament: "greek" | "hebrew",
+    ) => {
+      if (!payload) {
+        return;
+      }
+      for (const [code, entry] of Object.entries(payload)) {
+        const haystack = [
+          code,
+          entry.lemma ?? "",
+          entry.translit ?? "",
+          entry.kjv_def ?? "",
+          entry.strongs_def ?? "",
+        ]
+          .join(" ")
+          .toLowerCase();
+        if (haystack.includes(term)) {
+          results.push({ code, testament, entry });
+        }
+      }
+    };
+    pushMatches(strongsGreek, "greek");
+    pushMatches(strongsHebrew, "hebrew");
+    return results.sort((a, b) => a.code.localeCompare(b.code));
+  }, [selectedStrongsEntry, strongsGreek, strongsHebrew, strongsSearchTerm]);
+
+  const applyStrongsSearch = useCallback(
+    (rawValue?: string) => {
+      const nextTerm = (rawValue ?? "").trim();
+      setStrongsSearchTerm(nextTerm);
+      setStrongsWordAccordionValue([]);
+      if (!nextTerm) {
+        setIsStrongsSearching(false);
+        return;
+      }
+      setIsStrongsSearching(true);
+      void ensureStrongsLoaded()
+        .catch(() => {
+          // Error state is set by ensureStrongsLoaded
+        })
+        .finally(() => {
+          window.requestAnimationFrame(() => {
+            setIsStrongsSearching(false);
+          });
+        });
+    },
+    [ensureStrongsLoaded],
   );
 
   function chapterFromLeaf(leaf: LeafNode): Chapter | null {
@@ -2519,18 +2674,22 @@ export function KJVReader() {
 
   const openTokenDetailsFromElement = useCallback(
     (element: HTMLElement, token: VerseToken) => {
-      const rect = element.getBoundingClientRect();
-      const popupWidth = 280;
-      const safeX = Math.max(
-        8,
-        Math.min(window.innerWidth - popupWidth - 8, rect.left),
-      );
-      const safeY = Math.min(window.innerHeight - 180, rect.bottom + 8);
-      setTokenPopup({
-        token,
-        x: safeX,
-        y: safeY,
-      });
+      if (!token.strong) {
+        const rect = element.getBoundingClientRect();
+        const popupWidth = 280;
+        const safeX = Math.max(
+          8,
+          Math.min(window.innerWidth - popupWidth - 8, rect.left),
+        );
+        const safeY = Math.min(window.innerHeight - 180, rect.bottom + 8);
+        setTokenPopup({
+          token,
+          x: safeX,
+          y: safeY,
+        });
+      } else {
+        setTokenPopup(null);
+      }
 
       const rawWord = normalizeConcordanceWord(token.text);
       if (!rawWord) {
@@ -2542,6 +2701,13 @@ export function KJVReader() {
       setConcordanceAccordionValue(["concordance"]);
       setConcordanceError(null);
       setIsConcordanceLoading(true);
+      if (token.strong) {
+        setStrongsSearchTerm("");
+        setIsStrongsSearching(false);
+        if (strongsSearchInputRef.current) {
+          strongsSearchInputRef.current.value = "";
+        }
+      }
 
       const applyConcordanceSelection = (data: ConcordancePayload) => {
         const matchedKey = resolveConcordanceKey(data, rawWord) ?? rawWord;
@@ -2572,6 +2738,48 @@ export function KJVReader() {
             : ["concordance", ...withoutWebsters, "websters"];
         });
         setIsWebstersLoading(false);
+      };
+
+      const applyStrongsSelection = (
+        greek: StrongsPayload,
+        hebrew: StrongsPayload,
+      ) => {
+        const normalizedCode = token.strong
+          ? normalizeStrongsCode(token.strong)
+          : null;
+        setStrongsWordAccordionValue([]);
+        if (!normalizedCode) {
+          setSelectedStrongsEntry(null);
+          setConcordanceAccordionValue((current) =>
+            current.filter((value) => value !== "strongs"),
+          );
+          setIsStrongsLoading(false);
+          return;
+        }
+
+        const source = normalizedCode.startsWith("G") ? greek : hebrew;
+        const entry = source[normalizedCode];
+        if (!entry) {
+          setSelectedStrongsEntry(null);
+          setConcordanceAccordionValue((current) =>
+            current.filter((value) => value !== "strongs"),
+          );
+          setIsStrongsLoading(false);
+          return;
+        }
+
+        setSelectedStrongsEntry({
+          code: normalizedCode,
+          testament: normalizedCode.startsWith("G") ? "greek" : "hebrew",
+          entry,
+        });
+        setConcordanceAccordionValue((current) => {
+          const without = current.filter((value) => value !== "strongs");
+          return without.includes("concordance")
+            ? [...without, "strongs"]
+            : ["concordance", ...without, "strongs"];
+        });
+        setIsStrongsLoading(false);
       };
 
       if (concordance) {
@@ -2609,8 +2817,35 @@ export function KJVReader() {
             setIsWebstersLoading(false);
           });
       }
+
+      setStrongsError(null);
+      setIsStrongsLoading(true);
+      if (strongsGreek && strongsHebrew) {
+        applyStrongsSelection(strongsGreek, strongsHebrew);
+      } else {
+        void ensureStrongsLoaded()
+          .then(({ greek, hebrew }) => {
+            applyStrongsSelection(greek, hebrew);
+          })
+          .catch((error) => {
+            const message =
+              error instanceof Error
+                ? error.message
+                : "Failed to load Strong's data";
+            setStrongsError(message);
+            setIsStrongsLoading(false);
+          });
+      }
     },
-    [concordance, ensureConcordanceLoaded, ensureWebstersLoaded, websters],
+    [
+      concordance,
+      ensureConcordanceLoaded,
+      ensureStrongsLoaded,
+      ensureWebstersLoaded,
+      strongsGreek,
+      strongsHebrew,
+      websters,
+    ],
   );
 
   function openConcordanceReference(reference: string) {
@@ -3954,6 +4189,144 @@ export function KJVReader() {
                                   No definitions found.
                                 </p>
                               )}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="strongs">
+                  <AccordionTrigger>Strong&apos;s Dictionary</AccordionTrigger>
+                  <AccordionContent className="space-y-2 overflow-visible">
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        const value = formData.get("strongs-search");
+                        applyStrongsSearch(typeof value === "string" ? value : "");
+                      }}
+                    >
+                      <InputGroup>
+                        <InputGroupInput
+                          ref={strongsSearchInputRef}
+                          name="strongs-search"
+                          placeholder="Search Strong's..."
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupButton
+                            type="submit"
+                            size="icon-sm"
+                            variant="ghost"
+                            aria-label="Search Strong's dictionary"
+                            disabled={isStrongsLoading || isStrongsSearching}
+                          >
+                            {isStrongsLoading || isStrongsSearching ? (
+                              <LoaderCircleIcon className="animate-spin" />
+                            ) : (
+                              <SearchIcon />
+                            )}
+                          </InputGroupButton>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </form>
+                    {isStrongsLoading || isStrongsSearching ? (
+                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <LoaderCircleIcon className="size-4 animate-spin" />
+                        {isStrongsLoading
+                          ? "Loading Strong's..."
+                          : "Searching Strong's..."}
+                      </p>
+                    ) : strongsError ? (
+                      <p className="text-sm text-destructive">{strongsError}</p>
+                    ) : strongsSearchResults.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        {strongsSearchTerm.trim()
+                          ? "No matching entries found."
+                          : "Click a Strong's-tagged word or search Strong's dictionary."}
+                      </p>
+                    ) : (
+                      <Accordion
+                        className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+                        multiple
+                        value={strongsWordAccordionValue}
+                        onValueChange={(value) =>
+                          setStrongsWordAccordionValue(
+                            value.filter(Boolean) as string[],
+                          )
+                        }
+                      >
+                        {strongsSearchResults.map(({ code, testament, entry }) => (
+                          <AccordionItem key={code} value={code}>
+                            <AccordionTrigger>{`${code} (${testament})`}</AccordionTrigger>
+                            <AccordionContent className="space-y-2 text-sm">
+                              {entry.kjv_def ? (
+                                <p>
+                                  <span className="text-muted-foreground">
+                                    KJV Definition:
+                                  </span>{" "}
+                                  {entry.kjv_def}
+                                </p>
+                              ) : null}
+                              {entry.kjv_refs && Object.keys(entry.kjv_refs).length > 0 ? (
+                                <div className="space-y-1">
+                                  <p className="text-muted-foreground">KJV References</p>
+                                  <Accordion className="w-full rounded-md border px-2" multiple>
+                                    {Object.entries(entry.kjv_refs).map(([word, references]) => (
+                                      <AccordionItem key={`${code}-${word}`} value={`${code}-${word}`}>
+                                        <AccordionTrigger>{`${word} (${references.length})`}</AccordionTrigger>
+                                        <AccordionContent>
+                                          <p className="leading-7">
+                                            {references.map((reference, index) => (
+                                              <Fragment key={`${code}-${word}-${reference}-${index}`}>
+                                                <ConcordanceReferencePopover
+                                                  reference={reference}
+                                                  highlightWord={word}
+                                                />
+                                                {index < references.length - 1 ? ", " : null}
+                                              </Fragment>
+                                            ))}
+                                          </p>
+                                        </AccordionContent>
+                                      </AccordionItem>
+                                    ))}
+                                  </Accordion>
+                                </div>
+                              ) : null}
+                              {entry.strongs_def ? (
+                                <p>
+                                  <span className="text-muted-foreground">
+                                    Strong&apos;s Definition:
+                                  </span>{" "}
+                                  {entry.strongs_def}
+                                </p>
+                              ) : null}
+                              {entry.lemma ? (
+                                <p>
+                                  <span className="text-muted-foreground">Lemma:</span>{" "}
+                                  <span className="font-mono">{entry.lemma}</span>
+                                </p>
+                              ) : null}
+                              {entry.translit ? (
+                                <p>
+                                  <span className="text-muted-foreground">
+                                    Transliteration:
+                                  </span>{" "}
+                                  <span className="font-mono">{entry.translit}</span>
+                                </p>
+                              ) : null}
+                              {entry.pron ? (
+                                <p>
+                                  <span className="text-muted-foreground">Pronunciation:</span>{" "}
+                                  {entry.pron}
+                                </p>
+                              ) : null}
+                              {entry.derivation ? (
+                                <p>
+                                  <span className="text-muted-foreground">Derivation:</span>{" "}
+                                  {entry.derivation}
+                                </p>
+                              ) : null}
                             </AccordionContent>
                           </AccordionItem>
                         ))}
