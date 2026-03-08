@@ -1824,7 +1824,7 @@ export function KJVReader() {
     });
   }
 
-  function markAllChaptersComplete(bookIndex: number) {
+  function setAllBookChaptersRead(bookIndex: number, isRead: boolean) {
     const book = books[bookIndex];
     if (!book) {
       return;
@@ -1832,7 +1832,12 @@ export function KJVReader() {
     setReadChapters((current) => {
       const next = new Set(current);
       for (let chapterIndex = 0; chapterIndex < book.chapters.length; chapterIndex += 1) {
-        next.add(chapterProgressKey(bookIndex, chapterIndex));
+        const key = chapterProgressKey(bookIndex, chapterIndex);
+        if (isRead) {
+          next.add(key);
+        } else {
+          next.delete(key);
+        }
       }
       return next;
     });
@@ -3177,11 +3182,15 @@ export function KJVReader() {
                                       variant="outline"
                                       size="sm"
                                       onClick={() =>
-                                        markAllChaptersComplete(book.bookIndex)
+                                        setAllBookChaptersRead(
+                                          book.bookIndex,
+                                          book.read !== book.total,
+                                        )
                                       }
-                                      disabled={bookPercent === 100}
                                     >
-                                      Mark all complete
+                                      {book.read === book.total
+                                        ? "Mark all incomplete"
+                                        : "Mark all complete"}
                                     </Button>
                                   </div>
                                   <div className="space-y-1">
