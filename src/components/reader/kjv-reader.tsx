@@ -93,6 +93,12 @@ import {
   ProgressLabel,
   ProgressValue,
 } from "@/components/ui/progress";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 type ReaderPayload = {
   books?: Book[];
@@ -101,6 +107,7 @@ type ReaderPayload = {
 type PanelDirection = "left" | "right" | "up" | "down";
 type SplitOrientation = "horizontal" | "vertical";
 type TabsOrientation = "horizontal" | "vertical";
+type IconVariant = "bw" | "color";
 
 type LeafNode = {
   id: string;
@@ -384,6 +391,24 @@ function createId() {
 
 function chapterProgressKey(bookIndex: number, chapterIndex: number) {
   return `${bookIndex}:${chapterIndex}`;
+}
+
+const BOOK_ICON_CODES = [
+  "GEN", "EXO", "LEV", "NUM", "DEU", "JOS", "JDG", "RUT", "1SA", "2SA",
+  "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST", "JOB", "PSA", "PRO",
+  "ECC", "SNG", "ISA", "JER", "LAM", "EZK", "DAN", "HOS", "JOL", "AMO",
+  "OBA", "JON", "MIC", "NAM", "HAB", "ZEP", "HAG", "ZEC", "MAL", "MAT",
+  "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP",
+  "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE",
+  "2PE", "1JN", "2JN", "3JN", "JUD", "REV",
+] as const;
+
+function bookCodeForIndex(bookIndex: number) {
+  return BOOK_ICON_CODES[bookIndex] ?? "GEN";
+}
+
+function iconPath(variant: IconVariant, code: string) {
+  return `/icons/${variant}/${code}.png`;
 }
 
 function panelViewportElement(panelElement: HTMLDivElement | null | undefined) {
@@ -1217,13 +1242,16 @@ export function KJVReader() {
 
     const makeBookProgress = (book: Book, bookIndex: number) => {
       const total = book.chapters.length;
-      let read = 0;
-      for (let chapterIndex = 0; chapterIndex < total; chapterIndex += 1) {
-        if (readChapters.has(chapterProgressKey(bookIndex, chapterIndex))) {
-          read += 1;
-        }
-      }
-      return { name: book.name, read, total };
+      const chapters = book.chapters.map((chapter, chapterIndex) => {
+        const read = readChapters.has(chapterProgressKey(bookIndex, chapterIndex));
+        return {
+          chapterIndex,
+          chapterNumber: chapter.chapter,
+          read,
+        };
+      });
+      const read = chapters.reduce((count, chapter) => count + (chapter.read ? 1 : 0), 0);
+      return { name: book.name, bookIndex, read, total, chapters };
     };
 
     const oldBookProgress = oldBooks.map((book, index) =>
@@ -1771,6 +1799,45 @@ export function KJVReader() {
     });
   }
 
+  function openChapterInNewTab(bookIndex: number, chapterIndex: number) {
+    const nextTabId = createId();
+    setTabs((currentTabs) => [
+      ...currentTabs,
+      {
+        id: nextTabId,
+        title: `Tab ${currentTabs.length + 1}`,
+        root: {
+          ...createLeaf(bookIndex, chapterIndex, "reader"),
+          pickerTestament: null,
+          pickerBookIndex: null,
+        },
+      },
+    ]);
+    setActiveTabId(nextTabId);
+    setIsProgressOpen(false);
+    requestAnimationFrame(() => {
+      tabEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: tabsOrientation === "vertical" ? "end" : "nearest",
+        inline: tabsOrientation === "vertical" ? "nearest" : "end",
+      });
+    });
+  }
+
+  function markAllChaptersComplete(bookIndex: number) {
+    const book = books[bookIndex];
+    if (!book) {
+      return;
+    }
+    setReadChapters((current) => {
+      const next = new Set(current);
+      for (let chapterIndex = 0; chapterIndex < book.chapters.length; chapterIndex += 1) {
+        next.add(chapterProgressKey(bookIndex, chapterIndex));
+      }
+      return next;
+    });
+  }
+
   function updateSplitSize(splitId: string, ratio: number) {
     updateActiveTab((tab) => ({
       ...tab,
@@ -2064,6 +2131,14 @@ export function KJVReader() {
       leaf.chapterIndex,
     );
     const isChapterRead = readChapters.has(chapterReadKey);
+    const readChapterCount = book.chapters.reduce(
+      (count, _chapter, chapterIndex) =>
+        count + (readChapters.has(chapterProgressKey(leaf.bookIndex, chapterIndex)) ? 1 : 0),
+      0,
+    );
+    const isBookComplete = readChapterCount === book.chapters.length;
+    const currentBookIconCode = bookCodeForIndex(leaf.bookIndex);
+    const currentBookIconSrc = iconPath(isBookComplete ? "color" : "bw", currentBookIconCode);
     const readingProgress = leafScrollProgress[leaf.id] ?? 0;
     const showVerseNumbers = !hideReadModeVerseNumbers;
     const neighbors =
@@ -2125,6 +2200,11 @@ export function KJVReader() {
             <div className="flex flex-wrap items-center gap-2">
               {leaf.view === "reader" && chapter ? (
                 <>
+                  <img
+                    src={currentBookIconSrc}
+                    alt={`${book.name} icon`}
+                    className="size-6 shrink-0"
+                  />
                   <Select
                     items={books.map((bookItem) => ({
                       label: bookItem.name,
@@ -2914,81 +2994,86 @@ export function KJVReader() {
       </AlertDialog>
 
       <AlertDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <AlertDialogContent size="sm">
+        <AlertDialogContent
+          size="sm"
+          className="flex max-h-[calc(100vh-1.5rem)] flex-col gap-2 overflow-hidden"
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Settings</AlertDialogTitle>
             <AlertDialogDescription>
               Reader preferences for this device.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="flex items-center justify-between gap-3">
-            <Label htmlFor="theme-mode">Dark Mode</Label>
-            <Switch
-              id="theme-mode"
-              checked={theme === "dark"}
-              onCheckedChange={(checked) =>
-                setTheme(checked ? "dark" : "light")
-              }
-            />
-          </div>
-          <div className="space-y-2 border-t pt-3">
-            <div className="flex items-center justify-between gap-3">
-              <Label htmlFor="verse-spacing">Verse Spacing</Label>
-              <span className="text-xs text-muted-foreground">
-                {verseSpacing}px
-              </span>
+          <div className="min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto px-2 py-2">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <Label htmlFor="theme-mode">Dark Mode</Label>
+              <Switch
+                id="theme-mode"
+                checked={theme === "dark"}
+                onCheckedChange={(checked) =>
+                  setTheme(checked ? "dark" : "light")
+                }
+              />
             </div>
-            <Slider
-              id="verse-spacing"
-              min={0}
-              max={24}
-              step={1}
-              value={[verseSpacing]}
-              onValueChange={(value) => {
-                const nextValue = Array.isArray(value) ? value[0] : value;
-                setVerseSpacing(
-                  Math.max(0, Math.min(24, Math.round(nextValue ?? 0))),
-                );
-              }}
-            />
-          </div>
-          <div className="flex items-center justify-between gap-3 border-t pt-3">
-            <Label htmlFor="hide-read-mode-verse-numbers">
-              Hide Verse Numbers
-            </Label>
-            <Switch
-              id="hide-read-mode-verse-numbers"
-              checked={hideReadModeVerseNumbers}
-              onCheckedChange={(checked) =>
-                setHideReadModeVerseNumbers(checked)
-              }
-            />
-          </div>
-          <div className="flex items-center justify-between gap-3 border-t pt-3">
-            <Label htmlFor="read-mode-indents">Paragraph Indents</Label>
-            <Switch
-              id="read-mode-indents"
-              checked={readModeParagraphIndent}
-              onCheckedChange={(checked) => setReadModeParagraphIndent(checked)}
-            />
-          </div>
-          <div className="flex items-center justify-between gap-3 border-t pt-3">
-            <Label htmlFor="flow-verses">Flow Verses by Paragraph</Label>
-            <Switch
-              id="flow-verses"
-              checked={flowVersesByParagraph}
-              onCheckedChange={(checked) => setFlowVersesByParagraph(checked)}
-            />
-          </div>
-          <div className="flex items-center justify-between gap-3 border-t pt-3">
-            <Label htmlFor="vertical-tabs">Vertical Tabs</Label>
-            <Switch
-              id="vertical-tabs"
-              checked={tabsOrientation === "vertical"}
-              onCheckedChange={(checked) =>
-                setTabsOrientation(checked ? "vertical" : "horizontal")
-              }
-            />
+            <div className="space-y-2 border-t pt-3">
+              <div className="flex min-w-0 items-center justify-between gap-3">
+                <Label htmlFor="verse-spacing">Verse Spacing</Label>
+                <span className="text-xs text-muted-foreground">
+                  {verseSpacing}px
+                </span>
+              </div>
+              <Slider
+                id="verse-spacing"
+                min={0}
+                max={24}
+                step={1}
+                value={[verseSpacing]}
+                onValueChange={(value) => {
+                  const nextValue = Array.isArray(value) ? value[0] : value;
+                  setVerseSpacing(
+                    Math.max(0, Math.min(24, Math.round(nextValue ?? 0))),
+                  );
+                }}
+              />
+            </div>
+            <div className="flex min-w-0 items-center justify-between gap-3 border-t pt-3">
+              <Label htmlFor="hide-read-mode-verse-numbers">
+                Hide Verse Numbers
+              </Label>
+              <Switch
+                id="hide-read-mode-verse-numbers"
+                checked={hideReadModeVerseNumbers}
+                onCheckedChange={(checked) =>
+                  setHideReadModeVerseNumbers(checked)
+                }
+              />
+            </div>
+            <div className="flex min-w-0 items-center justify-between gap-3 border-t pt-3">
+              <Label htmlFor="read-mode-indents">Paragraph Indents</Label>
+              <Switch
+                id="read-mode-indents"
+                checked={readModeParagraphIndent}
+                onCheckedChange={(checked) => setReadModeParagraphIndent(checked)}
+              />
+            </div>
+            <div className="flex min-w-0 items-center justify-between gap-3 border-t pt-3">
+              <Label htmlFor="flow-verses">Flow Verses by Paragraph</Label>
+              <Switch
+                id="flow-verses"
+                checked={flowVersesByParagraph}
+                onCheckedChange={(checked) => setFlowVersesByParagraph(checked)}
+              />
+            </div>
+            <div className="flex min-w-0 items-center justify-between gap-3 border-t pt-3">
+              <Label htmlFor="vertical-tabs">Vertical Tabs</Label>
+              <Switch
+                id="vertical-tabs"
+                checked={tabsOrientation === "vertical"}
+                onCheckedChange={(checked) =>
+                  setTabsOrientation(checked ? "vertical" : "horizontal")
+                }
+              />
+            </div>
           </div>
           <div className="flex justify-end">
             <Button variant="outline" onClick={() => setIsSettingsOpen(false)}>
@@ -3007,7 +3092,7 @@ export function KJVReader() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="max-h-[65vh] space-y-3 overflow-auto pr-1 text-sm">
-            <Progress value={totalProgressPercent}>
+            <Progress value={totalProgressPercent} className="w-full">
               <ProgressLabel className="font-semibold">
                 Whole Bible
               </ProgressLabel>
@@ -3018,52 +3103,132 @@ export function KJVReader() {
               </ProgressValue>
             </Progress>
 
-            {[progressByTestament.old, progressByTestament.new].map(
-              (testament) => {
-                const testamentPercent =
-                  testament.total > 0
-                    ? Math.round((testament.read / testament.total) * 100)
-                    : 0;
+            <Accordion className="w-full rounded-md border px-3" multiple defaultValue={[]}>
+              {[progressByTestament.old, progressByTestament.new].map(
+                (testament) => {
+                  const testamentPercent =
+                    testament.total > 0
+                      ? Math.round((testament.read / testament.total) * 100)
+                      : 0;
+                  const testamentCode = testament.label.startsWith("Old") ? "OT" : "NT";
+                  const testamentIconSrc = iconPath(
+                    testamentPercent === 100 ? "color" : "bw",
+                    testamentCode,
+                  );
 
-                return (
-                  <details
-                    key={testament.label}
-                    className="rounded-md border p-3"
-                  >
-                    <summary className="cursor-pointer">
-                      <Progress value={testamentPercent}>
-                        <ProgressLabel>{testament.label}</ProgressLabel>
-                        <ProgressValue>
-                          {() =>
-                            `${testament.read}/${testament.total} (${testamentPercent}%)`
-                          }
-                        </ProgressValue>
-                      </Progress>
-                    </summary>
-                    <div className="mt-3 space-y-2">
-                      {testament.books.map((book) => {
-                        const bookPercent =
-                          book.total > 0
-                            ? Math.round((book.read / book.total) * 100)
-                            : 0;
-                        return (
-                          <Progress key={book.name} value={bookPercent}>
-                            <ProgressLabel className="text-xs">
-                              {book.name}
-                            </ProgressLabel>
-                            <ProgressValue className="text-xs">
+                  return (
+                    <AccordionItem key={testament.label} value={testament.label} className="w-full">
+                      <AccordionTrigger className="w-full">
+                        <div className="flex w-full items-center gap-3">
+                          <img
+                            src={testamentIconSrc}
+                            alt={`${testament.label} icon`}
+                            className="size-10 shrink-0"
+                          />
+                          <Progress value={testamentPercent} className="w-full">
+                            <ProgressLabel>{testament.label}</ProgressLabel>
+                            <ProgressValue>
                               {() =>
-                                `${book.read}/${book.total} (${bookPercent}%)`
+                                `${testament.read}/${testament.total} (${testamentPercent}%)`
                               }
                             </ProgressValue>
                           </Progress>
-                        );
-                      })}
-                    </div>
-                  </details>
-                );
-              },
-            )}
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="space-y-3">
+                        <Accordion className="w-full rounded-md border px-2" multiple defaultValue={[]}>
+                          {testament.books.map((book) => {
+                            const bookPercent =
+                              book.total > 0
+                                ? Math.round((book.read / book.total) * 100)
+                                : 0;
+                            const bookIconSrc = iconPath(
+                              bookPercent === 100 ? "color" : "bw",
+                              bookCodeForIndex(book.bookIndex),
+                            );
+                            return (
+                              <AccordionItem
+                                key={book.name}
+                                value={`${testament.label}-${book.name}`}
+                                className="w-full"
+                              >
+                                <AccordionTrigger className="w-full px-1">
+                                  <div className="flex w-full items-center gap-3">
+                                    <img
+                                      src={bookIconSrc}
+                                      alt={`${book.name} icon`}
+                                      className="size-10 shrink-0"
+                                    />
+                                    <Progress value={bookPercent} className="w-full">
+                                      <ProgressLabel className="text-xs">
+                                        {book.name}
+                                      </ProgressLabel>
+                                      <ProgressValue className="text-xs">
+                                        {() =>
+                                          `${book.read}/${book.total} (${bookPercent}%)`
+                                        }
+                                      </ProgressValue>
+                                    </Progress>
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="space-y-2 px-1">
+                                  <div className="flex justify-end">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        markAllChaptersComplete(book.bookIndex)
+                                      }
+                                      disabled={bookPercent === 100}
+                                    >
+                                      Mark all complete
+                                    </Button>
+                                  </div>
+                                  <div className="space-y-1">
+                                    {book.chapters.map((chapter) => (
+                                      <div
+                                        key={`${book.name}-${chapter.chapterNumber}`}
+                                        className="flex items-center gap-2"
+                                      >
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="flex-1 justify-start"
+                                          onClick={() =>
+                                            openChapterInNewTab(
+                                              book.bookIndex,
+                                              chapter.chapterIndex,
+                                            )
+                                          }
+                                        >
+                                          {`Chapter ${chapter.chapterNumber}`}
+                                        </Button>
+                                        <Button
+                                          variant={chapter.read ? "secondary" : "outline"}
+                                          size="sm"
+                                          onClick={() =>
+                                            toggleChapterRead(
+                                              book.bookIndex,
+                                              chapter.chapterIndex,
+                                            )
+                                          }
+                                        >
+                                          {chapter.read ? "Read" : "Mark Read"}
+                                        </Button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </AccordionContent>
+                              </AccordionItem>
+                            );
+                          })}
+                        </Accordion>
+                      </AccordionContent>
+                    </AccordionItem>
+                  );
+                },
+              )}
+            </Accordion>
           </div>
           <AlertDialogFooter>
             <Button
