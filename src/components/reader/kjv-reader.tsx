@@ -114,6 +114,7 @@ type ReaderPayload = {
 type ConcordancePayload = Record<string, string[]>;
 type CrossRefsPayload = Record<string, string[]>;
 type HitchcocksPayload = Record<string, string>;
+type OldEnglishPayload = Record<string, string[]>;
 type WebstersEntry = {
   pronunciation?: string;
   definitions: Array<{
@@ -175,6 +176,7 @@ let kjvBooksPromise: Promise<Book[]> | null = null;
 let concordancePromise: Promise<ConcordancePayload> | null = null;
 let crossRefsPromise: Promise<CrossRefsPayload> | null = null;
 let hitchcocksPromise: Promise<HitchcocksPayload> | null = null;
+let oldEnglishPromise: Promise<OldEnglishPayload> | null = null;
 let webstersPromise: Promise<WebstersPayload> | null = null;
 let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
@@ -287,6 +289,27 @@ function loadHitchcocks() {
   }
 
   return hitchcocksPromise;
+}
+
+function loadOldEnglish() {
+  if (!oldEnglishPromise) {
+    oldEnglishPromise = fetch("/references/old-english.json", {
+      cache: "force-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/old-english.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as OldEnglishPayload)
+      .catch((error) => {
+        oldEnglishPromise = null;
+        throw error;
+      });
+  }
+
+  return oldEnglishPromise;
 }
 
 function loadStrongsGreek() {
@@ -729,6 +752,32 @@ function resolveHitchcocksKey(hitchcocks: HitchcocksPayload, rawWord: string) {
 
   const lowered = cleaned.toLowerCase();
   const fallback = Object.keys(hitchcocks).find(
+    (key) => key.toLowerCase() === lowered,
+  );
+  return fallback ?? null;
+}
+
+function resolveOldEnglishKey(oldEnglish: OldEnglishPayload, rawWord: string) {
+  const cleaned = normalizeConcordanceWord(rawWord);
+  if (!cleaned) {
+    return null;
+  }
+
+  const candidates = [
+    cleaned,
+    cleaned.toLowerCase(),
+    cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase(),
+    cleaned.toUpperCase(),
+  ];
+
+  for (const candidate of candidates) {
+    if (oldEnglish[candidate]) {
+      return candidate;
+    }
+  }
+
+  const lowered = cleaned.toLowerCase();
+  const fallback = Object.keys(oldEnglish).find(
     (key) => key.toLowerCase() === lowered,
   );
   return fallback ?? null;
@@ -1551,6 +1600,15 @@ export function KJVReader() {
     key: string;
     definition: string;
   } | null>(null);
+  const [oldEnglish, setOldEnglish] = useState<OldEnglishPayload | null>(null);
+  const [oldEnglishSearchTerm, setOldEnglishSearchTerm] = useState("");
+  const [isOldEnglishSearching, setIsOldEnglishSearching] = useState(false);
+  const [isOldEnglishLoading, setIsOldEnglishLoading] = useState(false);
+  const [oldEnglishError, setOldEnglishError] = useState<string | null>(null);
+  const [selectedOldEnglishEntry, setSelectedOldEnglishEntry] = useState<{
+    key: string;
+    definitions: string[];
+  } | null>(null);
   const [strongsGreek, setStrongsGreek] = useState<StrongsPayload | null>(null);
   const [strongsHebrew, setStrongsHebrew] = useState<StrongsPayload | null>(null);
   const [strongsSearchTerm, setStrongsSearchTerm] = useState("");
@@ -1617,6 +1675,10 @@ export function KJVReader() {
     setIsHitchcocksLoading(false);
     setIsHitchcocksSearching(false);
     setSelectedHitchcocksEntry(null);
+    setOldEnglishError(null);
+    setIsOldEnglishLoading(false);
+    setIsOldEnglishSearching(false);
+    setSelectedOldEnglishEntry(null);
     setStrongsError(null);
     setIsStrongsLoading(false);
     setIsStrongsSearching(false);
@@ -2273,6 +2335,64 @@ export function KJVReader() {
         });
     },
     [ensureHitchcocksLoaded],
+  );
+
+  const ensureOldEnglishLoaded = useCallback(async () => {
+    if (oldEnglish) {
+      return oldEnglish;
+    }
+    setOldEnglishError(null);
+    setIsOldEnglishLoading(true);
+    try {
+      const data = await loadOldEnglish();
+      setOldEnglish(data);
+      return data;
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to load Old English data";
+      setOldEnglishError(message);
+      throw error;
+    } finally {
+      setIsOldEnglishLoading(false);
+    }
+  }, [oldEnglish]);
+
+  const oldEnglishSearchResults = useMemo(() => {
+    const term = oldEnglishSearchTerm.trim().toLowerCase();
+    if (!term) {
+      return selectedOldEnglishEntry ? [selectedOldEnglishEntry] : [];
+    }
+    if (!oldEnglish) {
+      return [];
+    }
+    return Object.keys(oldEnglish)
+      .filter((word) => word.toLowerCase().includes(term))
+      .sort((a, b) => a.localeCompare(b))
+      .map((word) => ({ key: word, definitions: oldEnglish[word] }));
+  }, [oldEnglish, oldEnglishSearchTerm, selectedOldEnglishEntry]);
+
+  const applyOldEnglishSearch = useCallback(
+    (rawValue?: string) => {
+      const nextTerm = (rawValue ?? "").trim();
+      setOldEnglishSearchTerm(nextTerm);
+      if (!nextTerm) {
+        setIsOldEnglishSearching(false);
+        return;
+      }
+      setIsOldEnglishSearching(true);
+      void ensureOldEnglishLoaded()
+        .catch(() => {
+          // Error state is set by ensureOldEnglishLoaded
+        })
+        .finally(() => {
+          window.requestAnimationFrame(() => {
+            setIsOldEnglishSearching(false);
+          });
+        });
+    },
+    [ensureOldEnglishLoaded],
   );
 
   const ensureStrongsLoaded = useCallback(async () => {
@@ -3117,6 +3237,27 @@ export function KJVReader() {
         setIsHitchcocksLoading(false);
       };
 
+      const applyOldEnglishSelection = (data: OldEnglishPayload) => {
+        const matchedKey = resolveOldEnglishKey(data, rawWord);
+        setSelectedOldEnglishEntry(
+          matchedKey
+            ? { key: matchedKey, definitions: data[matchedKey] ?? [] }
+            : null,
+        );
+        setConcordanceAccordionValue((current) => {
+          const withoutOldEnglish = current.filter(
+            (value) => value !== "old-english",
+          );
+          if (!matchedKey) {
+            return withoutOldEnglish;
+          }
+          return withoutOldEnglish.includes("concordance")
+            ? [...withoutOldEnglish, "old-english"]
+            : ["concordance", ...withoutOldEnglish, "old-english"];
+        });
+        setIsOldEnglishLoading(false);
+      };
+
       const applyStrongsSelection = (
         greek: StrongsPayload,
         hebrew: StrongsPayload,
@@ -3232,15 +3373,36 @@ export function KJVReader() {
             setIsHitchcocksLoading(false);
           });
       }
+
+      setOldEnglishError(null);
+      setIsOldEnglishLoading(true);
+      if (oldEnglish) {
+        applyOldEnglishSelection(oldEnglish);
+      } else {
+        void ensureOldEnglishLoaded()
+          .then((data) => {
+            applyOldEnglishSelection(data);
+          })
+          .catch((error) => {
+            const message =
+              error instanceof Error
+                ? error.message
+                : "Failed to load Old English data";
+            setOldEnglishError(message);
+            setIsOldEnglishLoading(false);
+          });
+      }
     },
     [
       concordance,
       ensureConcordanceLoaded,
       ensureHitchcocksLoaded,
+      ensureOldEnglishLoaded,
       openCrossReferencesForVerse,
       ensureStrongsLoaded,
       ensureWebstersLoaded,
       hitchcocks,
+      oldEnglish,
       strongsGreek,
       strongsHebrew,
       websters,
@@ -4348,6 +4510,7 @@ export function KJVReader() {
     "websters",
     "strongs",
     "hitchcocks",
+    "old-english",
   ] as const;
   const allStudyAccordionsOpen = studyAccordionItems.every((item) =>
     concordanceAccordionValue.includes(item),
@@ -4359,6 +4522,7 @@ export function KJVReader() {
   const hasWebstersInfo = webstersSearchResults.length > 0;
   const hasStrongsInfo = strongsSearchResults.length > 0;
   const hasHitchcocksInfo = hitchcocksSearchResults.length > 0;
+  const hasOldEnglishInfo = oldEnglishSearchResults.length > 0;
 
   const bookPickerDialogLeaf =
     bookPickerDialogLeafId && activeTab
@@ -5017,6 +5181,79 @@ export function KJVReader() {
                             <span className="font-semibold">{key}</span>
                             {": "}
                             {definition}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="old-english">
+                  <AccordionTrigger
+                    className={cn(
+                      hasOldEnglishInfo && "text-emerald-600 dark:text-emerald-400",
+                    )}
+                  >
+                    Old English Dictionary
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-2 overflow-visible">
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        const value = formData.get("old-english-search");
+                        applyOldEnglishSearch(
+                          typeof value === "string" ? value : "",
+                        );
+                      }}
+                    >
+                      <InputGroup>
+                        <InputGroupInput
+                          name="old-english-search"
+                          placeholder="Search Old English..."
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupButton
+                            type="submit"
+                            size="icon-sm"
+                            variant="ghost"
+                            aria-label="Search Old English dictionary"
+                            disabled={
+                              isOldEnglishLoading || isOldEnglishSearching
+                            }
+                          >
+                            {isOldEnglishLoading || isOldEnglishSearching ? (
+                              <LoaderCircleIcon className="animate-spin" />
+                            ) : (
+                              <SearchIcon />
+                            )}
+                          </InputGroupButton>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </form>
+                    {isOldEnglishLoading || isOldEnglishSearching ? (
+                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <LoaderCircleIcon className="size-4 animate-spin" />
+                        {isOldEnglishLoading
+                          ? "Loading Old English..."
+                          : "Searching Old English..."}
+                      </p>
+                    ) : oldEnglishError ? (
+                      <p className="text-sm text-destructive">
+                        {oldEnglishError}
+                      </p>
+                    ) : oldEnglishSearchResults.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        {oldEnglishSearchTerm.trim()
+                          ? "No matching words found."
+                          : "Click a word in the text or search Old English dictionary."}
+                      </p>
+                    ) : (
+                      <div className="space-y-2 text-sm leading-relaxed">
+                        {oldEnglishSearchResults.map(({ key, definitions }) => (
+                          <p key={key}>
+                            <span className="font-semibold">{key}</span>
+                            {": "}
+                            {definitions.join("; ")}
                           </p>
                         ))}
                       </div>
