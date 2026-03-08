@@ -2659,7 +2659,8 @@ export function KJVReader() {
                 onClick={() => setActiveTabId(tab.id)}
                 className={cn(
                   "min-w-24 justify-start",
-                  tabsOrientation === "vertical" && "w-full min-w-0 flex-1",
+                  tabsOrientation === "vertical" &&
+                    "h-auto w-full min-w-0 flex-1 whitespace-normal break-words py-1.5 text-left leading-tight",
                   active &&
                     "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background!",
                 )}
@@ -2674,6 +2675,7 @@ export function KJVReader() {
                       size="icon-sm"
                       className={cn(
                         "relative",
+                        tabsOrientation === "vertical" && "h-auto self-stretch",
                         active &&
                           "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background! before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-background/45 before:content-['']",
                       )}
