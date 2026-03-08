@@ -5,33 +5,11 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  ArrowDownIcon,
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  ArrowUpIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  EllipsisVerticalIcon,
-  ExternalLinkIcon,
-  ExpandIcon,
-  MinimizeIcon,
-  RotateCwIcon,
-  SquareChevronDownIcon,
-  SquareChevronLeftIcon,
-  SquareChevronRightIcon,
-  SquareChevronUpIcon,
-  SplitSquareHorizontalIcon,
-  SplitSquareVerticalIcon,
-  XIcon,
-} from "lucide-react";
 
 import {
   type Book,
-  type Chapter,
   type VerseToken,
 } from "@/types/bible";
-import { cn } from "@/lib/utils";
 import {
   type AncientMapEntry,
   type AncientMapPayload,
@@ -68,9 +46,7 @@ import {
   resolveWebstersKey,
 } from "@/lib/references";
 import {
-  bookCodeForIndex,
   chapterProgressKey,
-  iconPath,
   panelViewportElement,
 } from "@/lib/reader-view";
 import {
@@ -115,27 +91,10 @@ import type {
   WebstersEntry,
   WebstersPayload,
 } from "@/types/reader";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 import { SidebarOpenRequestSync } from "@/components/reader/sidebar-open-request-sync";
 import { MapAndPhotoDialogs } from "@/components/reader/map-and-photo-dialogs";
 import { BookPickerDialog } from "@/components/reader/book-picker-dialog";
@@ -155,10 +114,7 @@ import { ReaderTopBar } from "@/components/reader/reader-top-bar";
 import { TabsWorkspace } from "@/components/reader/tabs-workspace";
 import { ReaderStatusScreen } from "@/components/reader/reader-status-screen";
 import { ReaderStudySidebar } from "@/components/reader/reader-study-sidebar";
-import {
-  ChapterTextContent,
-} from "@/components/reader/chapter-text-content";
-import { Progress } from "@/components/ui/progress";
+import { ReaderPanelTree } from "@/components/reader/reader-panel-tree";
 
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -1474,15 +1430,6 @@ export function KJVReader() {
     };
   }, [activeMapDialogEntry, isMapDialogOpen]);
 
-  function chapterFromLeaf(leaf: LeafNode): Chapter | null {
-    const book = books[leaf.bookIndex];
-    if (!book) {
-      return null;
-    }
-
-    return book.chapters[leaf.chapterIndex] ?? null;
-  }
-
   function updateActiveTab(updater: (tab: ReaderTab) => ReaderTab) {
     if (!activeTabId) {
       return;
@@ -2490,504 +2437,6 @@ export function KJVReader() {
     }
   }
 
-  function renderLeaf(leaf: LeafNode) {
-    const book = books[leaf.bookIndex];
-    if (!book) {
-      return null;
-    }
-
-    const chapter = chapterFromLeaf(leaf);
-
-    const key = `${leaf.bookIndex}-${leaf.chapterIndex}`;
-    const chapterReadKey = chapterProgressKey(
-      leaf.bookIndex,
-      leaf.chapterIndex,
-    );
-    const isChapterRead = readChapters.has(chapterReadKey);
-    const readChapterCount = readChapterCountByBook.get(leaf.bookIndex) ?? 0;
-    const isBookComplete = readChapterCount === book.chapters.length;
-    const currentBookIconCode = bookCodeForIndex(leaf.bookIndex);
-    const currentBookIconSrc = iconPath(
-      isBookComplete ? "color" : "bw",
-      currentBookIconCode,
-    );
-    const readingProgress = leafScrollProgress[leaf.id] ?? 0;
-    const showVerseNumbers = !hideReadModeVerseNumbers;
-    const isPanelMenuOpen = panelMenuOpenLeafId === leaf.id;
-    const neighbors = isPanelMenuOpen
-      ? (modelLeafNeighbors.get(leaf.id) ?? neighborsForLeaf(leaf.id))
-      : {};
-    const moveDirections = isPanelMenuOpen
-      ? (["left", "right", "up", "down"] as PanelDirection[]).filter((direction) =>
-          Boolean(neighbors[direction]),
-        )
-      : [];
-    const groupTargets =
-      isPanelMenuOpen && activeTab
-        ? {
-            left: findGroupTargetNodeId(activeTab.root, leaf.id, "left"),
-            right: findGroupTargetNodeId(activeTab.root, leaf.id, "right"),
-            up: findGroupTargetNodeId(activeTab.root, leaf.id, "up"),
-            down: findGroupTargetNodeId(activeTab.root, leaf.id, "down"),
-          }
-        : { left: null, right: null, up: null, down: null };
-    const parentSplit =
-      isPanelMenuOpen && activeTab
-        ? findParentSplitForLeaf(activeTab.root, leaf.id)
-        : null;
-    const nextOrientationLabel = parentSplit
-      ? parentSplit.orientation === "horizontal"
-        ? "Make Group Vertical"
-        : "Make Group Horizontal"
-      : null;
-    const hasGroupAddOptions = Boolean(
-      groupTargets.left ||
-      groupTargets.right ||
-      groupTargets.up ||
-      groupTargets.down,
-    );
-    const refIndex = chapterRefIndex.get(key) ?? -1;
-    const hasPrev = refIndex > 0;
-    const hasNext = refIndex >= 0 && refIndex < chapterRefs.length - 1;
-    const isFullscreenLeaf = fullscreenLeafId === leaf.id;
-    const closePanelMenu = () => {
-      setPanelMenuOpenLeafId(null);
-      clearAllPanelPreviews();
-    };
-
-    const openBookPickerDialog = () => {
-      const isOldTestament = leaf.bookIndex < 39;
-      updateLeafLocation(leaf.id, {
-        pickerTestament: isOldTestament ? "old" : "new",
-        pickerBookIndex: leaf.bookIndex,
-      });
-      setBookPickerDialogLeafId(leaf.id);
-    };
-
-    return (
-      <div
-        data-panel-leaf-id={leaf.id}
-        ref={(element) => {
-          panelElementRefs.current[leaf.id] = element;
-        }}
-        className={cn(
-          "h-full w-full min-w-0 bg-background",
-          isFullscreenLeaf && "fixed inset-0 z-40 h-screen w-screen",
-        )}
-      >
-        <Card className="flex h-full min-h-0 w-full min-w-0 flex-col rounded-none py-0">
-          <CardHeader className="border-b p-2!">
-            <div className="flex flex-wrap items-center gap-2">
-              {leaf.view === "reader" && chapter ? (
-                <>
-                  <img
-                    src={currentBookIconSrc}
-                    alt={`${book.name} icon`}
-                    className="size-6 shrink-0"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="w-auto max-w-full justify-start px-2"
-                    onClick={openBookPickerDialog}
-                  >
-                    {`${book.name} ${chapter.chapter}`}
-                  </Button>
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  Choose a book and chapter
-                </p>
-              )}
-
-              <DropdownMenu
-                open={isPanelMenuOpen}
-                onOpenChange={(open) => {
-                  if (open) {
-                    setPanelMenuOpenLeafId(leaf.id);
-                    return;
-                  }
-                  if (panelMenuOpenLeafId === leaf.id) {
-                    setPanelMenuOpenLeafId(null);
-                  }
-                  clearAllPanelPreviews();
-                }}
-              >
-                <DropdownMenuTrigger
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon-sm"
-                      className="ml-auto"
-                    />
-                  }
-                >
-                  <EllipsisVerticalIcon />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      closePanelMenu();
-                      void toggleFullscreenLeaf(leaf.id);
-                    }}
-                  >
-                    {isFullscreenLeaf ? <MinimizeIcon /> : <ExpandIcon />}
-                    {isFullscreenLeaf ? "Exit Full Screen" : "Full Screen"}
-                  </DropdownMenuItem>
-                  {!isFullscreenLeaf ? (
-                    <>
-                      {parentSplit ? (
-                        <DropdownMenuItem
-                          onClick={() => toggleParentGroupOrientation(leaf.id)}
-                          onPointerEnter={() =>
-                            setOrientationPreviewTarget(leaf.id)
-                          }
-                          onPointerLeave={() => clearOrientationPreview()}
-                        >
-                          <RotateCwIcon />
-                          {nextOrientationLabel}
-                        </DropdownMenuItem>
-                      ) : null}
-                      <DropdownMenuSeparator />
-                      {moveDirections.length > 0 ? (
-                        <>
-                          <DropdownMenuGroup>
-                            {moveDirections.includes("left") ? (
-                              <DropdownMenuItem
-                                onClick={() => moveLeaf(leaf.id, "left")}
-                                onPointerEnter={() =>
-                                  setMovePreviewTarget(leaf.id, "left")
-                                }
-                                onPointerLeave={() => clearMovePreview()}
-                              >
-                                <ArrowLeftIcon />
-                                Move Left
-                              </DropdownMenuItem>
-                            ) : null}
-                            {moveDirections.includes("right") ? (
-                              <DropdownMenuItem
-                                onClick={() => moveLeaf(leaf.id, "right")}
-                                onPointerEnter={() =>
-                                  setMovePreviewTarget(leaf.id, "right")
-                                }
-                                onPointerLeave={() => clearMovePreview()}
-                              >
-                                <ArrowRightIcon />
-                                Move Right
-                              </DropdownMenuItem>
-                            ) : null}
-                            {moveDirections.includes("up") ? (
-                              <DropdownMenuItem
-                                onClick={() => moveLeaf(leaf.id, "up")}
-                                onPointerEnter={() =>
-                                  setMovePreviewTarget(leaf.id, "up")
-                                }
-                                onPointerLeave={() => clearMovePreview()}
-                              >
-                                <ArrowUpIcon />
-                                Move Up
-                              </DropdownMenuItem>
-                            ) : null}
-                            {moveDirections.includes("down") ? (
-                              <DropdownMenuItem
-                                onClick={() => moveLeaf(leaf.id, "down")}
-                                onPointerEnter={() =>
-                                  setMovePreviewTarget(leaf.id, "down")
-                                }
-                                onPointerLeave={() => clearMovePreview()}
-                              >
-                                <ArrowDownIcon />
-                                Move Down
-                              </DropdownMenuItem>
-                            ) : null}
-                          </DropdownMenuGroup>
-                          <DropdownMenuSeparator />
-                        </>
-                      ) : null}
-                      <DropdownMenuItem
-                        onClick={() => splitLeaf(leaf.id, "left")}
-                        onPointerEnter={() =>
-                          setAddPreviewTarget(leaf.id, "left")
-                        }
-                        onPointerLeave={() => clearAddPreview()}
-                      >
-                        <SplitSquareHorizontalIcon />
-                        Add Panel Left
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => splitLeaf(leaf.id, "right")}
-                        onPointerEnter={() =>
-                          setAddPreviewTarget(leaf.id, "right")
-                        }
-                        onPointerLeave={() => clearAddPreview()}
-                      >
-                        <SplitSquareHorizontalIcon className="rotate-180" />
-                        Add Panel Right
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => splitLeaf(leaf.id, "up")}
-                        onPointerEnter={() =>
-                          setAddPreviewTarget(leaf.id, "up")
-                        }
-                        onPointerLeave={() => clearAddPreview()}
-                      >
-                        <SplitSquareVerticalIcon />
-                        Add Panel Above
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => splitLeaf(leaf.id, "down")}
-                        onPointerEnter={() =>
-                          setAddPreviewTarget(leaf.id, "down")
-                        }
-                        onPointerLeave={() => clearAddPreview()}
-                      >
-                        <SplitSquareVerticalIcon className="rotate-180" />
-                        Add Panel Below
-                      </DropdownMenuItem>
-                      {hasGroupAddOptions ? (
-                        <>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuGroup>
-                            {groupTargets.left ? (
-                              <DropdownMenuItem
-                                onClick={() => splitPanelGroup(leaf.id, "left")}
-                                onPointerEnter={() =>
-                                  setGroupAddPreviewTarget(leaf.id, "left")
-                                }
-                                onPointerLeave={() => clearAddPreview()}
-                              >
-                                <SquareChevronLeftIcon />
-                                Add Panel Left (Group)
-                              </DropdownMenuItem>
-                            ) : null}
-                            {groupTargets.right ? (
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  splitPanelGroup(leaf.id, "right")
-                                }
-                                onPointerEnter={() =>
-                                  setGroupAddPreviewTarget(leaf.id, "right")
-                                }
-                                onPointerLeave={() => clearAddPreview()}
-                              >
-                                <SquareChevronRightIcon />
-                                Add Panel Right (Group)
-                              </DropdownMenuItem>
-                            ) : null}
-                            {groupTargets.up ? (
-                              <DropdownMenuItem
-                                onClick={() => splitPanelGroup(leaf.id, "up")}
-                                onPointerEnter={() =>
-                                  setGroupAddPreviewTarget(leaf.id, "up")
-                                }
-                                onPointerLeave={() => clearAddPreview()}
-                              >
-                                <SquareChevronUpIcon />
-                                Add Panel Above (Group)
-                              </DropdownMenuItem>
-                            ) : null}
-                            {groupTargets.down ? (
-                              <DropdownMenuItem
-                                onClick={() => splitPanelGroup(leaf.id, "down")}
-                                onPointerEnter={() =>
-                                  setGroupAddPreviewTarget(leaf.id, "down")
-                                }
-                                onPointerLeave={() => clearAddPreview()}
-                              >
-                                <SquareChevronDownIcon />
-                                Add Panel Below (Group)
-                              </DropdownMenuItem>
-                            ) : null}
-                          </DropdownMenuGroup>
-                        </>
-                      ) : null}
-                      <DropdownMenuSeparator />
-                      {existingTabTargets.length > 0 ? (
-                        <>
-                          <DropdownMenuGroup>
-                            {existingTabTargets.map((targetTab) => (
-                              <DropdownMenuItem
-                                key={`move-panel-${leaf.id}-${targetTab.id}`}
-                                onClick={() =>
-                                  moveLeafToExistingTab(leaf.id, targetTab.id)
-                                }
-                              >
-                                <ExternalLinkIcon />
-                                {`Move to Tab ${targetTab.index + 1}) ${targetTab.title}`}
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuGroup>
-                          <DropdownMenuSeparator />
-                        </>
-                      ) : null}
-                      <DropdownMenuItem
-                        onClick={() => moveLeafToNewTab(leaf.id)}
-                      >
-                        <ExternalLinkIcon />
-                        Move to New Tab
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => closeLeaf(leaf.id)}>
-                        <XIcon />
-                        Close Panel
-                      </DropdownMenuItem>
-                    </>
-                  ) : null}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </CardHeader>
-
-          {leaf.view === "reader" && chapter ? (
-            <>
-              <CardContent className="min-h-0 flex-1 p-0">
-                <ScrollArea className="h-full w-full" data-panel-content-scroll>
-                  <ChapterTextContent
-                    bookName={book.name}
-                    chapterNumber={chapter.chapter}
-                    verses={chapter.verses}
-                    flowVersesByParagraph={flowVersesByParagraph}
-                    readModeParagraphIndent={readModeParagraphIndent}
-                    showVerseNumbers={showVerseNumbers}
-                    isStudyMode={isStudyMode}
-                    verseSpacing={verseSpacing}
-                    onOpenTokenDetails={(element, token) =>
-                      openTokenDetailsFromElement(
-                        element,
-                        token,
-                        leaf.bookIndex,
-                        leaf.chapterIndex,
-                      )
-                    }
-                    onSelectVerse={(verseNumber) =>
-                      openCrossReferencesForVerse(
-                        leaf.bookIndex,
-                        leaf.chapterIndex,
-                        verseNumber,
-                      )
-                    }
-                  />
-                </ScrollArea>
-              </CardContent>
-
-              <div className="border-t">
-                <Progress
-                  value={readingProgress}
-                  className="w-full"
-                  aria-label={`Reading progress for ${book.name} ${chapter.chapter}`}
-                />
-                <div className="flex items-center justify-between p-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => moveLeafChapter(leaf.id, -1)}
-                    disabled={!hasPrev}
-                  >
-                    <ChevronLeftIcon />
-                    Prev
-                  </Button>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant={isChapterRead ? "default" : "outline"}
-                      size="sm"
-                      onClick={() =>
-                        toggleChapterRead(leaf.bookIndex, leaf.chapterIndex)
-                      }
-                    >
-                      {isChapterRead ? "Read" : "Mark Read"}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => moveLeafChapter(leaf.id, 1)}
-                      disabled={!hasNext}
-                    >
-                      Next
-                      <ChevronRightIcon />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : (
-            <CardContent className="min-h-0 flex-1 overflow-auto p-2">
-              <BookChapterPicker
-                books={books}
-                selectedTestament={leaf.pickerTestament}
-                selectedBookIndex={leaf.pickerBookIndex}
-                onSelectTestament={(testament) =>
-                  updateLeafLocation(leaf.id, {
-                    pickerTestament: testament,
-                    pickerBookIndex: null,
-                  })
-                }
-                onBackToTestaments={() =>
-                  updateLeafLocation(leaf.id, {
-                    pickerTestament: null,
-                    pickerBookIndex: null,
-                  })
-                }
-                onSelectBook={(bookIndex) =>
-                  updateLeafLocation(leaf.id, {
-                    pickerBookIndex: bookIndex,
-                  })
-                }
-                onBackToBooks={() =>
-                  updateLeafLocation(leaf.id, { pickerBookIndex: null })
-                }
-                onSelectChapter={(bookIndex, chapterIndex) =>
-                  updateLeafLocation(leaf.id, {
-                    bookIndex,
-                    chapterIndex,
-                    view: "reader",
-                    pickerTestament: null,
-                    pickerBookIndex: null,
-                  })
-                }
-              />
-            </CardContent>
-          )}
-        </Card>
-      </div>
-    );
-  }
-
-  function renderNode(node: PanelNode) {
-    if (node.type === "leaf") {
-      return renderLeaf(node);
-    }
-
-    return (
-      <ResizablePanelGroup
-        orientation={node.orientation}
-        onLayoutChanged={(layout) => {
-          const nextSize = layout[`${node.id}-first`];
-          if (typeof nextSize === "number") {
-            updateSplitSize(node.id, nextSize);
-          }
-        }}
-        className="min-h-0 min-w-0 flex-1"
-      >
-        <ResizablePanel
-          id={`${node.id}-first`}
-          defaultSize={node.ratio}
-          minSize={15}
-        >
-          {renderNode(node.first)}
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel
-          id={`${node.id}-second`}
-          defaultSize={100 - node.ratio}
-          minSize={15}
-        >
-          {renderNode(node.second)}
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    );
-  }
-
   if (!isLoaded) {
     return <ReaderStatusScreen message="Loading Bible data..." />;
   }
@@ -3085,7 +2534,53 @@ export function KJVReader() {
           <TabsWorkspace
             tabsOrientation={tabsOrientation}
             tabsStrip={tabsStrip}
-            readerContent={renderNode(activeTab.root)}
+            readerContent={
+              <ReaderPanelTree
+                root={activeTab.root}
+                books={books}
+                activeRoot={activeTab.root}
+                chapterRefIndex={chapterRefIndex}
+                chapterRefCount={chapterRefs.length}
+                readChapters={readChapters}
+                readChapterCountByBook={readChapterCountByBook}
+                leafScrollProgress={leafScrollProgress}
+                hideReadModeVerseNumbers={hideReadModeVerseNumbers}
+                panelMenuOpenLeafId={panelMenuOpenLeafId}
+                setPanelMenuOpenLeafId={setPanelMenuOpenLeafId}
+                modelLeafNeighbors={modelLeafNeighbors}
+                neighborsForLeaf={neighborsForLeaf}
+                fullscreenLeafId={fullscreenLeafId}
+                panelElementRefs={panelElementRefs}
+                clearAllPanelPreviews={clearAllPanelPreviews}
+                updateLeafLocation={updateLeafLocation}
+                setBookPickerDialogLeafId={setBookPickerDialogLeafId}
+                toggleFullscreenLeaf={toggleFullscreenLeaf}
+                toggleParentGroupOrientation={toggleParentGroupOrientation}
+                setOrientationPreviewTarget={setOrientationPreviewTarget}
+                clearOrientationPreview={clearOrientationPreview}
+                moveLeaf={moveLeaf}
+                setMovePreviewTarget={setMovePreviewTarget}
+                clearMovePreview={clearMovePreview}
+                splitLeaf={splitLeaf}
+                setAddPreviewTarget={setAddPreviewTarget}
+                clearAddPreview={clearAddPreview}
+                splitPanelGroup={splitPanelGroup}
+                setGroupAddPreviewTarget={setGroupAddPreviewTarget}
+                existingTabTargets={existingTabTargets}
+                moveLeafToExistingTab={moveLeafToExistingTab}
+                moveLeafToNewTab={moveLeafToNewTab}
+                closeLeaf={closeLeaf}
+                flowVersesByParagraph={flowVersesByParagraph}
+                readModeParagraphIndent={readModeParagraphIndent}
+                isStudyMode={isStudyMode}
+                verseSpacing={verseSpacing}
+                onOpenTokenDetails={openTokenDetailsFromElement}
+                onSelectVerse={openCrossReferencesForVerse}
+                moveLeafChapter={moveLeafChapter}
+                toggleChapterRead={toggleChapterRead}
+                updateSplitSize={updateSplitSize}
+              />
+            }
           />
         </SidebarInset>
 
