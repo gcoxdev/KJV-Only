@@ -49,6 +49,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -2758,7 +2759,7 @@ export function KJVReader() {
                 >
                   <MenuIcon />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuContent align="start" className="w-56">
                   <DropdownMenuItem onClick={() => setIsProgressOpen(true)}>
                     <ChartBarIcon />
                     Reading Progress
@@ -2768,6 +2769,21 @@ export function KJVReader() {
                     <SettingsIcon />
                     Settings
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>Pages</DropdownMenuLabel>
+                    <DropdownMenuItem>How to Get Saved</DropdownMenuItem>
+                    <DropdownMenuItem>Why KJV Only?</DropdownMenuItem>
+                    <DropdownMenuItem>Resources</DropdownMenuItem>
+                    <DropdownMenuItem>Local Churches</DropdownMenuItem>
+                    <DropdownMenuItem>Download</DropdownMenuItem>
+                    <DropdownMenuItem>Donate</DropdownMenuItem>
+                    <DropdownMenuItem>Credits</DropdownMenuItem>
+                    <DropdownMenuItem>What&apos;s New</DropdownMenuItem>
+                    <DropdownMenuItem>About</DropdownMenuItem>
+                    <DropdownMenuItem>Contact</DropdownMenuItem>
+                    <DropdownMenuItem>Help</DropdownMenuItem>
+                  </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
               <div className="flex items-center gap-2">
