@@ -12,7 +12,6 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpIcon,
-  BookOpenIcon,
   ChartBarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -2787,7 +2786,11 @@ export function KJVReader() {
                 </DropdownMenuContent>
               </DropdownMenu>
               <div className="flex items-center gap-2">
-                <BookOpenIcon className="text-primary" />
+                <img
+                  src="/icons/app-icon.png"
+                  alt="KJV Only icon"
+                  className="size-5 rounded-sm"
+                />
                 <p className="font-semibold">KJV Only</p>
               </div>
             </div>
