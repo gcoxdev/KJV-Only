@@ -1,6 +1,4 @@
 import {
-  Fragment,
-  type ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -12,18 +10,13 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpIcon,
-  ChartBarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  EllipsisIcon,
   EllipsisVerticalIcon,
   ExternalLinkIcon,
   ExpandIcon,
   MinimizeIcon,
-  MenuIcon,
-  PlusIcon,
   RotateCwIcon,
-  SettingsIcon,
   SquareChevronDownIcon,
   SquareChevronLeftIcon,
   SquareChevronRightIcon,
@@ -69,7 +62,6 @@ import {
   chapterVerseKey,
   normalizeConcordanceWord,
   normalizeStrongsCode,
-  parseBibleReference,
   resolveConcordanceKey,
   resolveHitchcocksKey,
   resolveOldEnglishKey,
@@ -80,7 +72,6 @@ import {
   chapterProgressKey,
   iconPath,
   panelViewportElement,
-  renderHighlightedText,
 } from "@/lib/reader-view";
 import {
   collectLeafIds,
@@ -88,7 +79,6 @@ import {
   createId,
   createInitialTab,
   createLeaf,
-  extractLeafNode,
   findGroupTargetNodeId,
   findLeafNode,
   findNodeById,
@@ -126,30 +116,25 @@ import type {
   WebstersPayload,
 } from "@/types/reader";
 import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Switch } from "@/components/ui/switch";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 import { SidebarOpenRequestSync } from "@/components/reader/sidebar-open-request-sync";
 import { MapAndPhotoDialogs } from "@/components/reader/map-and-photo-dialogs";
@@ -157,30 +142,23 @@ import { BookPickerDialog } from "@/components/reader/book-picker-dialog";
 import { RenameTabDialog } from "@/components/reader/rename-tab-dialog";
 import { SettingsDialog } from "@/components/reader/settings-dialog";
 import { ProgressDialog } from "@/components/reader/progress-dialog";
-import { CrossRefsTool } from "@/components/reader/study-tools/cross-refs-tool";
-import { ConcordanceTool } from "@/components/reader/study-tools/concordance-tool";
-import { WebstersTool } from "@/components/reader/study-tools/websters-tool";
-import { StrongsTool } from "@/components/reader/study-tools/strongs-tool";
-import { OldEnglishTool } from "@/components/reader/study-tools/old-english-tool";
-import { MapsTool } from "@/components/reader/study-tools/maps-tool";
-import { GenealogyTool } from "@/components/reader/study-tools/genealogy-tool";
-import { HitchcocksTool } from "@/components/reader/study-tools/hitchcocks-tool";
-import { StudyToolsSidebar } from "@/components/reader/study-tools-sidebar";
+import { GenealogyPersonDetails } from "@/components/reader/genealogy-person-details";
+import { useReferencePreview } from "@/hooks/use-reference-preview";
+import { useTabActions } from "@/hooks/use-tab-actions";
+import {
+  STUDY_ACCORDION_ITEMS,
+  useStudySidebarState,
+} from "@/hooks/use-study-sidebar-state";
+import { TabsStrip } from "@/components/reader/tabs-strip";
+import { TokenPopupCard } from "@/components/reader/token-popup-card";
+import { ReaderTopBar } from "@/components/reader/reader-top-bar";
+import { TabsWorkspace } from "@/components/reader/tabs-workspace";
+import { ReaderStatusScreen } from "@/components/reader/reader-status-screen";
+import { ReaderStudySidebar } from "@/components/reader/reader-study-sidebar";
 import {
   ChapterTextContent,
-  formatDisplayTokenText,
-  isPunctuationToken,
 } from "@/components/reader/chapter-text-content";
-import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
-import {
-  Progress,
-} from "@/components/ui/progress";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Progress } from "@/components/ui/progress";
 
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -202,10 +180,6 @@ export function KJVReader() {
   const [tabs, setTabs] = useState<ReaderTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [tokenPopup, setTokenPopup] = useState<TokenPopupState | null>(null);
-  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
-  const [renameTabId, setRenameTabId] = useState<string | null>(null);
-  const [renameValue, setRenameValue] = useState("");
-  const [renameError, setRenameError] = useState<string | null>(null);
   const [fullscreenLeafId, setFullscreenLeafId] = useState<string | null>(null);
   const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(
     null,
@@ -338,9 +312,6 @@ export function KJVReader() {
     root: null,
     neighbors: new Map(),
   });
-  const referencePreviewCacheRef = useRef<
-    Map<string, { citation: string; verseLines: Array<{ label: string; text: string }> }>
-  >(new Map());
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -358,10 +329,6 @@ export function KJVReader() {
     document.documentElement.classList.toggle("dark", theme === "dark");
     window.localStorage.setItem("theme", theme);
   }, [theme]);
-
-  useEffect(() => {
-    referencePreviewCacheRef.current.clear();
-  }, [books]);
 
   useEffect(() => {
     if (isStudyMode) {
@@ -2001,115 +1968,29 @@ export function KJVReader() {
     setReadChapters(new Set());
   }
 
-  function moveLeafToNewTab(leafId: string) {
-    if (!activeTabId) {
-      return;
-    }
-
-    const nextTabId = createId();
-    let shouldActivate = false;
-
-    setTabs((currentTabs) => {
-      const activeIndex = currentTabs.findIndex(
-        (tab) => tab.id === activeTabId,
-      );
-      if (activeIndex < 0) {
-        return currentTabs;
-      }
-
-      const active = currentTabs[activeIndex];
-      const result = extractLeafNode(active.root, leafId);
-      if (!result.extracted) {
-        return currentTabs;
-      }
-
-      const sourceRoot = result.next ?? createLeaf();
-      const newTab: ReaderTab = {
-        id: nextTabId,
-        title: `Tab ${currentTabs.length + 1}`,
-        root: result.extracted,
-      };
-
-      const nextTabs = [...currentTabs];
-      nextTabs[activeIndex] = { ...active, root: sourceRoot };
-      nextTabs.push(newTab);
-      shouldActivate = true;
-      return nextTabs;
-    });
-
-    if (shouldActivate) {
-      setActiveTabId(nextTabId);
-      clearAllPanelPreviews();
-      requestAnimationFrame(() => {
-        tabEndRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: tabsOrientation === "vertical" ? "end" : "nearest",
-          inline: tabsOrientation === "vertical" ? "nearest" : "end",
-        });
-      });
-    }
-  }
-
-  function addTab() {
-    const nextTab = createInitialTab(tabs.length + 1, "picker");
-    setTabs((currentTabs) => [...currentTabs, nextTab]);
-    setActiveTabId(nextTab.id);
-    requestAnimationFrame(() => {
-      tabEndRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: tabsOrientation === "vertical" ? "end" : "nearest",
-        inline: tabsOrientation === "vertical" ? "nearest" : "end",
-      });
-    });
-  }
-
-  function closeTab(tabId: string) {
-    let nextActiveTabId: string | null | undefined;
-    setTabs((currentTabs) => {
-      if (currentTabs.length <= 1) {
-        return currentTabs;
-      }
-
-      const closingIndex = currentTabs.findIndex((tab) => tab.id === tabId);
-      if (closingIndex < 0) {
-        return currentTabs;
-      }
-
-      const nextTabs = currentTabs.filter((tab) => tab.id !== tabId);
-      if (tabId === activeTabId) {
-        const fallbackTab =
-          nextTabs[Math.max(0, closingIndex - 1)] ?? nextTabs[0] ?? null;
-        nextActiveTabId = fallbackTab?.id ?? null;
-      }
-      return nextTabs;
-    });
-    if (nextActiveTabId !== undefined) {
-      setActiveTabId(nextActiveTabId);
-    }
-  }
-
-  function moveTab(tabId: string, direction: -1 | 1) {
-    if (!tabId) {
-      return;
-    }
-
-    setTabs((currentTabs) => {
-      const index = currentTabs.findIndex((tab) => tab.id === tabId);
-      if (index < 0) {
-        return currentTabs;
-      }
-
-      const nextIndex = index + direction;
-      if (nextIndex < 0 || nextIndex >= currentTabs.length) {
-        return currentTabs;
-      }
-
-      const nextTabs = [...currentTabs];
-      const [tab] = nextTabs.splice(index, 1);
-      nextTabs.splice(nextIndex, 0, tab);
-      return nextTabs;
-    });
-  }
+  const {
+    isRenameDialogOpen,
+    renameValue,
+    renameError,
+    setIsRenameDialogOpen,
+    moveLeafToNewTab,
+    addTab,
+    closeTab,
+    moveTab,
+    openRenameDialog,
+    confirmRenameTab,
+    moveLeafToExistingTab,
+    onRenameValueChange,
+    onRenameCancel,
+  } = useTabActions({
+    tabs,
+    setTabs,
+    activeTabId,
+    setActiveTabId,
+    tabsOrientation,
+    tabEndRef,
+    clearAllPanelPreviews,
+  });
 
   const openCrossReferencesForVerse = useCallback(
     (bookIndex: number, chapterIndex: number, verseNumber: number) => {
@@ -2530,152 +2411,11 @@ export function KJVReader() {
     ],
   );
 
-  const openConcordanceReference = useCallback((reference: string) => {
-    const parsed = parseBibleReference(reference);
-    if (!parsed) {
-      return;
-    }
-    const startChapter =
-      books[parsed.bookIndex]?.chapters[parsed.startChapterIndex] ?? null;
-    const highlightEnd =
-      parsed.startChapterIndex === parsed.endChapterIndex
-        ? parsed.endVerse
-        : (startChapter?.verses[startChapter.verses.length - 1]?.verse ??
-          parsed.startVerse);
-    openChapterReferenceInNewTab(
-      parsed.bookIndex,
-      parsed.startChapterIndex,
-      parsed.startVerse,
-      highlightEnd,
-    );
-  }, [books, openChapterReferenceInNewTab]);
-
-  const referencePreviewData = useCallback((reference: string) => {
-    const cached = referencePreviewCacheRef.current.get(reference);
-    if (cached) {
-      return cached;
-    }
-
-    const parsed = parseBibleReference(reference);
-    if (!parsed) {
-      const fallback = {
-        citation: reference,
-        verseLines: [] as Array<{ label: string; text: string }>,
-      };
-      referencePreviewCacheRef.current.set(reference, fallback);
-      return fallback;
-    }
-
-    const book = books[parsed.bookIndex];
-    const chapters = book?.chapters ?? [];
-    if (
-      !book ||
-      !chapters[parsed.startChapterIndex] ||
-      !chapters[parsed.endChapterIndex]
-    ) {
-      const fallback = {
-        citation: reference,
-        verseLines: [] as Array<{ label: string; text: string }>,
-      };
-      referencePreviewCacheRef.current.set(reference, fallback);
-      return fallback;
-    }
-
-    const MAX_PREVIEW_VERSES = 24;
-    const verseLines: Array<{ label: string; text: string }> = [];
-    for (
-      let chapterIndex = parsed.startChapterIndex;
-      chapterIndex <= parsed.endChapterIndex;
-      chapterIndex += 1
-    ) {
-      const chapter = chapters[chapterIndex];
-      if (!chapter) {
-        continue;
-      }
-
-      const start =
-        chapterIndex === parsed.startChapterIndex ? parsed.startVerse : 1;
-      const end =
-        chapterIndex === parsed.endChapterIndex
-          ? parsed.endVerse
-          : (chapter.verses[chapter.verses.length - 1]?.verse ?? 0);
-      const verses = chapter.verses.filter(
-        (candidate) => candidate.verse >= start && candidate.verse <= end,
-      );
-
-      for (const verse of verses) {
-        verseLines.push({
-          label: `${chapter.chapter}:${verse.verse}`,
-          text: verse.tokens
-            .map((token, index) => {
-              const leadingSpace = index > 0 && !isPunctuationToken(token.text);
-              return `${leadingSpace ? " " : ""}${formatDisplayTokenText(token)}`;
-            })
-            .join(""),
-        });
-        if (verseLines.length >= MAX_PREVIEW_VERSES) {
-          break;
-        }
-      }
-
-      if (verseLines.length >= MAX_PREVIEW_VERSES) {
-        break;
-      }
-    }
-
-    const citationVerse =
-      parsed.startChapterIndex === parsed.endChapterIndex
-        ? parsed.startVerse === parsed.endVerse
-          ? `${parsed.startVerse}`
-          : `${parsed.startVerse}-${parsed.endVerse}`
-        : `${parsed.startChapterIndex + 1}:${parsed.startVerse}-${parsed.endChapterIndex + 1}:${parsed.endVerse}`;
-
-    const computed = {
-      citation: `${book.name} ${citationVerse}`,
-      verseLines,
-    };
-    referencePreviewCacheRef.current.set(reference, computed);
-    return computed;
-  }, [books]);
-
-  const referencePreviewContent = useCallback((
-    reference: string,
-    highlightWord: string,
-  ): ReactNode => {
-    const { citation, verseLines } = referencePreviewData(reference);
-    const needle = normalizeConcordanceWord(highlightWord);
-
-    if (verseLines.length === 0) {
-      return (
-        <div className="space-y-1">
-          <p className="font-semibold">{citation}</p>
-          <p>{reference}</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-1">
-        <p className="font-semibold">{citation}</p>
-        <div className="space-y-1">
-          {verseLines.map((line) => (
-            <p key={`${reference}-line-${line.label}`}>
-              <span className="mr-1 text-xs font-semibold text-muted-foreground">
-                {line.label}
-              </span>
-              <span>
-                {renderHighlightedText(
-                  line.text,
-                  needle,
-                  `${reference}-${line.label}`,
-                )}
-              </span>
-            </p>
-          ))}
-        </div>
-      </div>
-    );
-  }, [referencePreviewData]);
+  const { openReference: openConcordanceReference, renderPreview: referencePreviewContent } =
+    useReferencePreview({
+      books,
+      openChapterReferenceInNewTab,
+    });
 
   const selectGenealogyPerson = useCallback((personId: string) => {
     if (!personId) {
@@ -2691,286 +2431,25 @@ export function KJVReader() {
     });
   }, []);
 
-  function renderGenealogyPersonDetails(person: GenealogyPerson) {
-    const primaryName = person.names[0] ?? person.id;
-    const byName = person.verses?.byName ?? [];
-    const spouses = person.spouses ?? [];
-    const siblings = person.siblings ?? [];
-    const children = person.children ?? [];
-    const fatherName =
-      person.father?.name ||
-      (person.father?.id ? (genealogyById.get(person.father.id)?.names[0] ?? "") : "");
-    const motherName =
-      person.mother?.name ||
-      (person.mother?.id ? (genealogyById.get(person.mother.id)?.names[0] ?? "") : "");
-
-    return (
-      <div className="space-y-2 rounded-md border p-2 text-sm">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="font-semibold">{primaryName}</span>
-          {person.names.length > 1 ? (
-            <span className="text-muted-foreground">
-              ({person.names.slice(1).join(", ")})
-            </span>
-          ) : null}
-          {person.gender ? (
-            <span className="text-xs text-muted-foreground">{person.gender}</span>
-          ) : null}
-        </div>
-        {byName.length > 0 ? (
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              References
-            </p>
-            <Accordion className="w-full rounded-md border px-2" multiple>
-              {byName.map((entry) => (
-                <AccordionItem
-                  key={`${person.id}-${entry.name}`}
-                  value={`${person.id}-${entry.name}`}
-                >
-                  <AccordionTrigger>
-                    {`${entry.name} (${entry.verses.length})`}
-                  </AccordionTrigger>
-                  <AccordionContent className="leading-7">
-                    {entry.verses.map((reference, index) => (
-                      <Fragment
-                        key={`${person.id}-${entry.name}-${reference}-${index}`}
-                      >
-                        <ConcordanceReferencePopover
-                          reference={reference}
-                          highlightWord={entry.name}
-                          renderPreview={referencePreviewContent}
-                          onOpenReference={openConcordanceReference}
-                          onCloseSidebar={closeRightSidebarForMobile}
-                        />
-                        {index < entry.verses.length - 1 ? ", " : null}
-                      </Fragment>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-        ) : null}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Lineage
-          </p>
-          {fatherName ? (
-            <p>
-              <span className="font-semibold">Father:</span>{" "}
-              <Button
-                type="button"
-                variant="link"
-                className="h-auto px-0"
-                onClick={() => selectGenealogyPerson(person.father?.id ?? "")}
-              >
-                {fatherName}
-              </Button>
-            </p>
-          ) : null}
-          {motherName ? (
-            <p>
-              <span className="font-semibold">Mother:</span>{" "}
-              <Button
-                type="button"
-                variant="link"
-                className="h-auto px-0"
-                onClick={() => selectGenealogyPerson(person.mother?.id ?? "")}
-              >
-                {motherName}
-              </Button>
-            </p>
-          ) : null}
-          {spouses.length > 0 ? (
-            <p>
-              <span className="font-semibold">Spouses:</span>{" "}
-              {spouses.map((relation, index) => (
-                <Fragment key={`${person.id}-spouse-${relation.id}-${index}`}>
-                  <Button
-                    type="button"
-                    variant="link"
-                    className="h-auto px-0"
-                    onClick={() => selectGenealogyPerson(relation.id)}
-                  >
-                    {relation.name || relation.id}
-                  </Button>
-                  {relation.verse ? (
-                    <>
-                      {" "}
-                      (
-                      <ConcordanceReferencePopover
-                        reference={relation.verse}
-                        highlightWord={relation.name || primaryName}
-                        renderPreview={referencePreviewContent}
-                        onOpenReference={openConcordanceReference}
-                        onCloseSidebar={closeRightSidebarForMobile}
-                      />
-                      )
-                    </>
-                  ) : null}
-                  {index < spouses.length - 1 ? ", " : null}
-                </Fragment>
-              ))}
-            </p>
-          ) : null}
-          {siblings.length > 0 ? (
-            <p>
-              <span className="font-semibold">Siblings:</span>{" "}
-              {siblings.map((relation, index) => (
-                <Fragment key={`${person.id}-sibling-${relation.id}-${index}`}>
-                  <Button
-                    type="button"
-                    variant="link"
-                    className="h-auto px-0"
-                    onClick={() => selectGenealogyPerson(relation.id)}
-                  >
-                    {relation.name || relation.id}
-                  </Button>
-                  {relation.verse ? (
-                    <>
-                      {" "}
-                      (
-                      <ConcordanceReferencePopover
-                        reference={relation.verse}
-                        highlightWord={relation.name || primaryName}
-                        renderPreview={referencePreviewContent}
-                        onOpenReference={openConcordanceReference}
-                        onCloseSidebar={closeRightSidebarForMobile}
-                      />
-                      )
-                    </>
-                  ) : null}
-                  {index < siblings.length - 1 ? ", " : null}
-                </Fragment>
-              ))}
-            </p>
-          ) : null}
-          {children.length > 0 ? (
-            <p>
-              <span className="font-semibold">Children:</span>{" "}
-              {children.map((relation, index) => (
-                <Fragment key={`${person.id}-child-${relation.id}-${index}`}>
-                  <Button
-                    type="button"
-                    variant="link"
-                    className="h-auto px-0"
-                    onClick={() => selectGenealogyPerson(relation.id)}
-                  >
-                    {relation.name || relation.id}
-                  </Button>
-                  {relation.verse ? (
-                    <>
-                      {" "}
-                      (
-                      <ConcordanceReferencePopover
-                        reference={relation.verse}
-                        highlightWord={relation.name || primaryName}
-                        renderPreview={referencePreviewContent}
-                        onOpenReference={openConcordanceReference}
-                        onCloseSidebar={closeRightSidebarForMobile}
-                      />
-                      )
-                    </>
-                  ) : null}
-                  {index < children.length - 1 ? ", " : null}
-                </Fragment>
-              ))}
-            </p>
-          ) : null}
-        </div>
-        {person.notes ? <p className="text-muted-foreground">{person.notes}</p> : null}
-      </div>
-    );
-  }
-
-  function openRenameDialog(tabId: string) {
-    const tab = tabs.find((item) => item.id === tabId);
-    if (!tab) {
-      return;
-    }
-
-    setRenameTabId(tabId);
-    setRenameValue(tab.title);
-    setRenameError(null);
-    setIsRenameDialogOpen(true);
-  }
-
-  function confirmRenameTab() {
-    if (!renameTabId) {
-      return;
-    }
-
-    const nextTitle = renameValue.trim();
-    if (!nextTitle) {
-      setRenameError("Tab label must be at least 1 character.");
-      return;
-    }
-
-    setTabs((currentTabs) =>
-      currentTabs.map((tab) =>
-        tab.id === renameTabId ? { ...tab, title: nextTitle } : tab,
-      ),
-    );
-    setIsRenameDialogOpen(false);
-    setRenameTabId(null);
-    setRenameError(null);
-  }
-
-  function moveLeafToExistingTab(leafId: string, targetTabId: string) {
-    if (!activeTabId || targetTabId === activeTabId) {
-      return;
-    }
-
-    setTabs((currentTabs) => {
-      const sourceIndex = currentTabs.findIndex(
-        (tab) => tab.id === activeTabId,
-      );
-      const targetIndex = currentTabs.findIndex(
-        (tab) => tab.id === targetTabId,
-      );
-      if (sourceIndex < 0 || targetIndex < 0) {
-        return currentTabs;
-      }
-
-      const sourceTab = currentTabs[sourceIndex];
-      const extraction = extractLeafNode(sourceTab.root, leafId);
-      if (!extraction.extracted) {
-        return currentTabs;
-      }
-
-      const nextTabs = [...currentTabs];
-      nextTabs[sourceIndex] = {
-        ...sourceTab,
-        root: extraction.next ?? createLeaf(),
-      };
-
-      const nextTargetIndex = nextTabs.findIndex(
-        (tab) => tab.id === targetTabId,
-      );
-      if (nextTargetIndex < 0) {
-        return currentTabs;
-      }
-
-      const targetTab = nextTabs[nextTargetIndex];
-      nextTabs[nextTargetIndex] = {
-        ...targetTab,
-        root: {
-          id: createId(),
-          type: "split",
-          orientation: "horizontal",
-          ratio: 50,
-          first: targetTab.root,
-          second: extraction.extracted,
-        },
-      };
-
-      return nextTabs;
-    });
-
-    setActiveTabId(targetTabId);
-    clearAllPanelPreviews();
-  }
+  const renderGenealogyPersonDetails = useCallback(
+    (person: GenealogyPerson) => (
+      <GenealogyPersonDetails
+        person={person}
+        genealogyById={genealogyById}
+        onSelectPerson={selectGenealogyPerson}
+        renderReferencePreview={referencePreviewContent}
+        onOpenReference={openConcordanceReference}
+        onCloseSidebar={closeRightSidebarForMobile}
+      />
+    ),
+    [
+      closeRightSidebarForMobile,
+      genealogyById,
+      openConcordanceReference,
+      referencePreviewContent,
+      selectGenealogyPerson,
+    ],
+  );
 
   async function toggleFullscreenLeaf(leafId: string) {
     try {
@@ -3510,207 +2989,64 @@ export function KJVReader() {
   }
 
   if (!isLoaded) {
-    return (
-      <main className="flex min-h-screen w-full items-center justify-center p-4">
-        <Card className="w-full max-w-xl">
-          <CardHeader>
-            <CardTitle className="text-xl">KJV Only</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Loading Bible data...
-            </p>
-          </CardHeader>
-        </Card>
-      </main>
-    );
+    return <ReaderStatusScreen message="Loading Bible data..." />;
   }
 
   if (loadError || !activeTab) {
     return (
-      <main className="flex min-h-screen w-full items-center justify-center p-4">
-        <Card className="w-full max-w-xl">
-          <CardHeader>
-            <CardTitle className="text-xl">KJV Only</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {loadError ?? "No Bible data available. Run npm run build:data."}
-            </p>
-          </CardHeader>
-        </Card>
-      </main>
+      <ReaderStatusScreen
+        message={loadError ?? "No Bible data available. Run npm run build:data."}
+      />
     );
   }
 
   const tokenPopupCard = tokenPopup ? (
-    <Card
-      data-token-popup
-      className="fixed z-50 w-[280px] shadow-lg"
-      style={{ left: tokenPopup.x, top: tokenPopup.y }}
-    >
-      <CardContent className="space-y-2 p-3 text-sm">
-        <p className="font-medium">
-          {formatDisplayTokenText(tokenPopup.token)}
-        </p>
-        {tokenPopup.token.added ? (
-          <p className="text-xs text-muted-foreground">
-            Added word (italic in KJV typography)
-          </p>
-        ) : null}
-        {tokenPopup.token.strong ? (
-          <p>
-            <span className="text-muted-foreground">Strong&apos;s:</span>{" "}
-            <span className="font-mono">{tokenPopup.token.strong}</span>
-          </p>
-        ) : null}
-        {tokenPopup.token.lemma ? (
-          <p>
-            <span className="text-muted-foreground">Lemma:</span>{" "}
-            <span className="font-mono">{tokenPopup.token.lemma}</span>
-          </p>
-        ) : null}
-        {tokenPopup.token.morph ? (
-          <p>
-            <span className="text-muted-foreground">Morph:</span>{" "}
-            <span className="font-mono">{tokenPopup.token.morph}</span>
-          </p>
-        ) : null}
-      </CardContent>
-    </Card>
+    <TokenPopupCard token={tokenPopup.token} x={tokenPopup.x} y={tokenPopup.y} />
   ) : null;
 
   const tabsStrip = (
-    <ScrollArea className="h-full w-full">
-      <div
-        className={cn(
-          "p-1",
-          tabsOrientation === "vertical"
-            ? "flex flex-col items-stretch gap-2"
-            : "flex w-max items-center gap-2",
-        )}
-      >
-        {tabs.map((tab, index) => {
-          const active = tab.id === activeTabId;
-          const canMoveLeft = tabs.length > 1 && index > 0;
-          const canMoveRight = tabs.length > 1 && index < tabs.length - 1;
-          return (
-            <ButtonGroup
-              key={tab.id}
-              className={cn(tabsOrientation === "vertical" && "w-full")}
-            >
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setActiveTabId(tab.id)}
-                className={cn(
-                  "min-w-24 justify-start",
-                  tabsOrientation === "vertical" &&
-                    "h-auto w-full min-w-0 flex-1 whitespace-normal wrap-break-word py-1.5 text-left leading-tight",
-                  active &&
-                    "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background!",
-                )}
-              >
-                {tab.title}
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon-sm"
-                      className={cn(
-                        "relative",
-                        tabsOrientation === "vertical" && "h-auto self-stretch",
-                        active &&
-                          "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background! before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-background/45 before:content-['']",
-                      )}
-                      aria-label={`Tab options for ${tab.title}`}
-                    >
-                      <EllipsisIcon />
-                    </Button>
-                  }
-                />
-                <DropdownMenuContent align="start" className="w-40">
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={() => openRenameDialog(tab.id)}>
-                      Relabel Tab
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  {tabs.length > 1 ? (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        {canMoveLeft ? (
-                          <DropdownMenuItem onClick={() => moveTab(tab.id, -1)}>
-                            Move Left
-                          </DropdownMenuItem>
-                        ) : null}
-                        {canMoveRight ? (
-                          <DropdownMenuItem onClick={() => moveTab(tab.id, 1)}>
-                            Move Right
-                          </DropdownMenuItem>
-                        ) : null}
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem onClick={() => closeTab(tab.id)}>
-                          Close Tab
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </>
-                  ) : null}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </ButtonGroup>
-          );
-        })}
-
-        <Button
-          variant="outline"
-          size="icon-sm"
-          onClick={addTab}
-          aria-label="New Tab"
-          className={cn(tabsOrientation === "vertical" && "w-full")}
-        >
-          <PlusIcon />
-        </Button>
-        <div ref={tabEndRef} />
-      </div>
-      <ScrollBar
-        orientation={tabsOrientation === "vertical" ? "vertical" : "horizontal"}
-      />
-    </ScrollArea>
+    <TabsStrip
+      tabs={tabs}
+      activeTabId={activeTabId}
+      tabsOrientation={tabsOrientation}
+      tabEndRef={tabEndRef}
+      onActivateTab={setActiveTabId}
+      onOpenRenameDialog={openRenameDialog}
+      onMoveTab={moveTab}
+      onCloseTab={closeTab}
+      onAddTab={addTab}
+    />
   );
 
-  const studyAccordionItems = [
-    "cross-refs",
-    "concordance",
-    "websters",
-    "strongs",
-    "maps",
-    "hitchcocks",
-    "old-english",
-    "genealogy",
-  ] as const;
-  const allStudyAccordionsOpen = studyAccordionItems.every((item) =>
-    concordanceAccordionValue.includes(item),
-  );
-  const openStudySections = new Set(concordanceAccordionValue);
-  const isCrossRefsSectionOpen = openStudySections.has("cross-refs");
-  const isConcordanceSectionOpen = openStudySections.has("concordance");
-  const isWebstersSectionOpen = openStudySections.has("websters");
-  const isStrongsSectionOpen = openStudySections.has("strongs");
-  const isMapsSectionOpen = openStudySections.has("maps");
-  const isGenealogySectionOpen = openStudySections.has("genealogy");
-  const isHitchcocksSectionOpen = openStudySections.has("hitchcocks");
-  const isOldEnglishSectionOpen = openStudySections.has("old-english");
-  const hasCrossRefsInfo = Boolean(
-    selectedCrossReferences && selectedCrossReferences.references.length > 0,
-  );
-  const hasConcordanceInfo = concordanceSearchResults.length > 0;
-  const hasWebstersInfo = webstersSearchResults.length > 0;
-  const hasStrongsInfo = strongsSearchResults.length > 0;
-  const hasMapsInfo = mapsSearchResults.length > 0;
-  const hasHitchcocksInfo = hitchcocksSearchResults.length > 0;
-  const hasOldEnglishInfo = oldEnglishSearchResults.length > 0;
-  const hasGenealogyInfo = genealogySearchResults.length > 0;
+  const {
+    allStudyAccordionsOpen,
+    isCrossRefsSectionOpen,
+    isConcordanceSectionOpen,
+    isWebstersSectionOpen,
+    isStrongsSectionOpen,
+    isMapsSectionOpen,
+    isGenealogySectionOpen,
+    isHitchcocksSectionOpen,
+    isOldEnglishSectionOpen,
+    hasCrossRefsInfo,
+    hasConcordanceInfo,
+    hasWebstersInfo,
+    hasStrongsInfo,
+    hasMapsInfo,
+    hasHitchcocksInfo,
+    hasOldEnglishInfo,
+    hasGenealogyInfo,
+  } = useStudySidebarState({
+    accordionValue: concordanceAccordionValue,
+    crossRefsCount: selectedCrossReferences?.references.length ?? 0,
+    concordanceCount: concordanceSearchResults.length,
+    webstersCount: webstersSearchResults.length,
+    strongsCount: strongsSearchResults.length,
+    mapsCount: mapsSearchResults.length,
+    hitchcocksCount: hitchcocksSearchResults.length,
+    oldEnglishCount: oldEnglishSearchResults.length,
+    genealogyCount: genealogySearchResults.length,
+  });
 
   const bookPickerDialogLeaf =
     bookPickerDialogLeafId && activeTab
@@ -3739,220 +3075,136 @@ export function KJVReader() {
           enabled={isStudyMode}
         />
         <SidebarInset className="flex h-screen min-h-0 flex-col overflow-hidden">
-          <header className="z-20 flex h-14 shrink-0 items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-6">
-            <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Open menu"
-                    />
-                  }
-                >
-                  <MenuIcon />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  <DropdownMenuItem onClick={() => setIsProgressOpen(true)}>
-                    <ChartBarIcon />
-                    Reading Progress
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setIsSettingsOpen(true)}>
-                    <SettingsIcon />
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuLabel>Pages</DropdownMenuLabel>
-                    <DropdownMenuItem>How to Get Saved</DropdownMenuItem>
-                    <DropdownMenuItem>Why KJV Only?</DropdownMenuItem>
-                    <DropdownMenuItem>Resources</DropdownMenuItem>
-                    <DropdownMenuItem>Local Churches</DropdownMenuItem>
-                    <DropdownMenuItem>Download</DropdownMenuItem>
-                    <DropdownMenuItem>Donate</DropdownMenuItem>
-                    <DropdownMenuItem>Credits</DropdownMenuItem>
-                    <DropdownMenuItem>What&apos;s New</DropdownMenuItem>
-                    <DropdownMenuItem>About</DropdownMenuItem>
-                    <DropdownMenuItem>Contact</DropdownMenuItem>
-                    <DropdownMenuItem>Help</DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <div className="flex items-center gap-2">
-                <img
-                  src="/icons/app-icon.png"
-                  alt="KJV Only icon"
-                  className="size-5 rounded-sm"
-                />
-                <p className="font-semibold">KJV Only</p>
-              </div>
-            </div>
+          <ReaderTopBar
+            isStudyMode={isStudyMode}
+            onStudyModeChange={setIsStudyMode}
+            onOpenProgress={() => setIsProgressOpen(true)}
+            onOpenSettings={() => setIsSettingsOpen(true)}
+          />
 
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="study-mode" className="text-sm">
-                  Study
-                </Label>
-                <Switch
-                  id="study-mode"
-                  checked={isStudyMode}
-                  onCheckedChange={(checked) => setIsStudyMode(checked)}
-                />
-              </div>
-              {isStudyMode ? <SidebarTrigger /> : null}
-            </div>
-          </header>
-
-          {tabsOrientation === "horizontal" ? (
-            <>
-              <div className="shrink-0 border-b px-4 py-2 sm:px-6">
-                {tabsStrip}
-              </div>
-              <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
-                {renderNode(activeTab.root)}
-              </div>
-            </>
-          ) : (
-            <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
-              <ResizablePanelGroup orientation="horizontal">
-                <ResizablePanel
-                  id="tabs-sidebar"
-                  defaultSize={150}
-                  minSize={150}
-                  maxSize={300}
-                  collapsible
-                  className="min-h-0 min-w-0 border-r"
-                >
-                  <div className="h-full w-full px-2 py-2">{tabsStrip}</div>
-                </ResizablePanel>
-                <ResizableHandle withHandle />
-                <ResizablePanel id="reader-content" minSize={15}>
-                  <div className="flex h-full min-h-0 min-w-0 overflow-hidden">
-                    {renderNode(activeTab.root)}
-                  </div>
-                </ResizablePanel>
-              </ResizablePanelGroup>
-            </div>
-          )}
+          <TabsWorkspace
+            tabsOrientation={tabsOrientation}
+            tabsStrip={tabsStrip}
+            readerContent={renderNode(activeTab.root)}
+          />
         </SidebarInset>
 
-        <StudyToolsSidebar
+        <ReaderStudySidebar
           visible={isStudyMode}
           accordionValue={concordanceAccordionValue}
           onAccordionValueChange={setConcordanceAccordionValue}
-          onExpandAll={() => setConcordanceAccordionValue([...studyAccordionItems])}
+          onExpandAll={() =>
+            setConcordanceAccordionValue([...STUDY_ACCORDION_ITEMS])
+          }
           onCollapseAll={() => setConcordanceAccordionValue([])}
           canExpand={!allStudyAccordionsOpen}
           canCollapse={concordanceAccordionValue.length > 0}
-        >
-          <CrossRefsTool
-            hasInfo={hasCrossRefsInfo}
-            isOpen={isCrossRefsSectionOpen}
-            isLoading={isCrossRefsLoading}
-            error={crossRefsError}
-            selected={selectedCrossReferences}
-            books={books}
-            renderPreview={referencePreviewContent}
-            onOpenReference={openConcordanceReference}
-            onCloseSidebar={closeRightSidebarForMobile}
-          />
-          <ConcordanceTool
-            hasInfo={hasConcordanceInfo}
-            isOpen={isConcordanceSectionOpen}
-            isLoading={isConcordanceLoading}
-            isSearching={isConcordanceSearching}
-            error={concordanceError}
-            searchTerm={concordanceSearchTerm}
-            results={concordanceSearchResults}
-            wordAccordionValue={concordanceWordAccordionValue}
-            onWordAccordionValueChange={setConcordanceWordAccordionValue}
-            onSearch={applyConcordanceSearch}
-            renderPreview={referencePreviewContent}
-            onOpenReference={openConcordanceReference}
-            onCloseSidebar={closeRightSidebarForMobile}
-          />
-          <WebstersTool
-            hasInfo={hasWebstersInfo}
-            isOpen={isWebstersSectionOpen}
-            isLoading={isWebstersLoading}
-            isSearching={isWebstersSearching}
-            error={webstersError}
-            searchTerm={webstersSearchTerm}
-            results={webstersSearchResults}
-            wordAccordionValue={webstersWordAccordionValue}
-            onWordAccordionValueChange={setWebstersWordAccordionValue}
-            onSearch={applyWebstersSearch}
-          />
-          <StrongsTool
-            hasInfo={hasStrongsInfo}
-            isOpen={isStrongsSectionOpen}
-            isLoading={isStrongsLoading}
-            isSearching={isStrongsSearching}
-            error={strongsError}
-            searchTerm={strongsSearchTerm}
-            results={strongsSearchResults}
-            wordAccordionValue={strongsWordAccordionValue}
-            onWordAccordionValueChange={setStrongsWordAccordionValue}
-            onSearch={applyStrongsSearch}
-            inputRef={strongsSearchInputRef}
-            renderPreview={referencePreviewContent}
-            onOpenReference={openConcordanceReference}
-            onCloseSidebar={closeRightSidebarForMobile}
-          />
-          <OldEnglishTool
-            hasInfo={hasOldEnglishInfo}
-            isOpen={isOldEnglishSectionOpen}
-            isLoading={isOldEnglishLoading}
-            isSearching={isOldEnglishSearching}
-            error={oldEnglishError}
-            searchTerm={oldEnglishSearchTerm}
-            results={oldEnglishSearchResults}
-            onSearch={applyOldEnglishSearch}
-          />
-          <MapsTool
-            hasInfo={hasMapsInfo}
-            isOpen={isMapsSectionOpen}
-            isLoading={isMapsLoading}
-            isSearching={isMapsSearching}
-            error={mapsError}
-            searchTerm={mapsSearchTerm}
-            resultsLength={mapsSearchResults.length}
-            displayEntries={mapsDisplayEntries}
-            wordAccordionValue={mapsWordAccordionValue}
-            onWordAccordionValueChange={setMapsWordAccordionValue}
-            onSearch={applyMapsSearch}
-            onOpenMapDialog={openMapDialog}
-            isMapImagesLoading={isMapImagesLoading}
-            mapImagesError={mapImagesError}
-            onOpenPhotoDialog={openPhotoDialog}
-            renderPreview={referencePreviewContent}
-            onOpenReference={openConcordanceReference}
-            onCloseSidebar={closeRightSidebarForMobile}
-          />
-          <GenealogyTool
-            hasInfo={hasGenealogyInfo}
-            isOpen={isGenealogySectionOpen}
-            isLoading={isGenealogyLoading}
-            isSearching={isGenealogySearching}
-            error={genealogyError}
-            searchTerm={genealogySearchTerm}
-            results={genealogySearchResults}
-            onSearch={applyGenealogySearch}
-            renderPersonDetails={renderGenealogyPersonDetails}
-          />
-          <HitchcocksTool
-            hasInfo={hasHitchcocksInfo}
-            isOpen={isHitchcocksSectionOpen}
-            isLoading={isHitchcocksLoading}
-            isSearching={isHitchcocksSearching}
-            error={hitchcocksError}
-            searchTerm={hitchcocksSearchTerm}
-            results={hitchcocksSearchResults}
-            onSearch={applyHitchcocksSearch}
-          />
-        </StudyToolsSidebar>
+          crossRefsProps={{
+            hasInfo: hasCrossRefsInfo,
+            isOpen: isCrossRefsSectionOpen,
+            isLoading: isCrossRefsLoading,
+            error: crossRefsError,
+            selected: selectedCrossReferences,
+            books,
+            renderPreview: referencePreviewContent,
+            onOpenReference: openConcordanceReference,
+            onCloseSidebar: closeRightSidebarForMobile,
+          }}
+          concordanceProps={{
+            hasInfo: hasConcordanceInfo,
+            isOpen: isConcordanceSectionOpen,
+            isLoading: isConcordanceLoading,
+            isSearching: isConcordanceSearching,
+            error: concordanceError,
+            searchTerm: concordanceSearchTerm,
+            results: concordanceSearchResults,
+            wordAccordionValue: concordanceWordAccordionValue,
+            onWordAccordionValueChange: setConcordanceWordAccordionValue,
+            onSearch: applyConcordanceSearch,
+            renderPreview: referencePreviewContent,
+            onOpenReference: openConcordanceReference,
+            onCloseSidebar: closeRightSidebarForMobile,
+          }}
+          webstersProps={{
+            hasInfo: hasWebstersInfo,
+            isOpen: isWebstersSectionOpen,
+            isLoading: isWebstersLoading,
+            isSearching: isWebstersSearching,
+            error: webstersError,
+            searchTerm: webstersSearchTerm,
+            results: webstersSearchResults,
+            wordAccordionValue: webstersWordAccordionValue,
+            onWordAccordionValueChange: setWebstersWordAccordionValue,
+            onSearch: applyWebstersSearch,
+          }}
+          strongsProps={{
+            hasInfo: hasStrongsInfo,
+            isOpen: isStrongsSectionOpen,
+            isLoading: isStrongsLoading,
+            isSearching: isStrongsSearching,
+            error: strongsError,
+            searchTerm: strongsSearchTerm,
+            results: strongsSearchResults,
+            wordAccordionValue: strongsWordAccordionValue,
+            onWordAccordionValueChange: setStrongsWordAccordionValue,
+            onSearch: applyStrongsSearch,
+            inputRef: strongsSearchInputRef,
+            renderPreview: referencePreviewContent,
+            onOpenReference: openConcordanceReference,
+            onCloseSidebar: closeRightSidebarForMobile,
+          }}
+          oldEnglishProps={{
+            hasInfo: hasOldEnglishInfo,
+            isOpen: isOldEnglishSectionOpen,
+            isLoading: isOldEnglishLoading,
+            isSearching: isOldEnglishSearching,
+            error: oldEnglishError,
+            searchTerm: oldEnglishSearchTerm,
+            results: oldEnglishSearchResults,
+            onSearch: applyOldEnglishSearch,
+          }}
+          mapsProps={{
+            hasInfo: hasMapsInfo,
+            isOpen: isMapsSectionOpen,
+            isLoading: isMapsLoading,
+            isSearching: isMapsSearching,
+            error: mapsError,
+            searchTerm: mapsSearchTerm,
+            resultsLength: mapsSearchResults.length,
+            displayEntries: mapsDisplayEntries,
+            wordAccordionValue: mapsWordAccordionValue,
+            onWordAccordionValueChange: setMapsWordAccordionValue,
+            onSearch: applyMapsSearch,
+            onOpenMapDialog: openMapDialog,
+            isMapImagesLoading: isMapImagesLoading,
+            mapImagesError: mapImagesError,
+            onOpenPhotoDialog: openPhotoDialog,
+            renderPreview: referencePreviewContent,
+            onOpenReference: openConcordanceReference,
+            onCloseSidebar: closeRightSidebarForMobile,
+          }}
+          genealogyProps={{
+            hasInfo: hasGenealogyInfo,
+            isOpen: isGenealogySectionOpen,
+            isLoading: isGenealogyLoading,
+            isSearching: isGenealogySearching,
+            error: genealogyError,
+            searchTerm: genealogySearchTerm,
+            results: genealogySearchResults,
+            onSearch: applyGenealogySearch,
+            renderPersonDetails: renderGenealogyPersonDetails,
+          }}
+          hitchcocksProps={{
+            hasInfo: hasHitchcocksInfo,
+            isOpen: isHitchcocksSectionOpen,
+            isLoading: isHitchcocksLoading,
+            isSearching: isHitchcocksSearching,
+            error: hitchcocksError,
+            searchTerm: hitchcocksSearchTerm,
+            results: hitchcocksSearchResults,
+            onSearch: applyHitchcocksSearch,
+          }}
+        />
       </SidebarProvider>
 
       {tokenPopupCard}
@@ -4056,19 +3308,8 @@ export function KJVReader() {
         value={renameValue}
         error={renameError}
         onOpenChange={setIsRenameDialogOpen}
-        onValueChange={(value) => {
-          setRenameValue(value);
-          setRenameError(
-            value.trim().length > 0
-              ? null
-              : "Tab label must be at least 1 character.",
-          );
-        }}
-        onCancel={() => {
-          setIsRenameDialogOpen(false);
-          setRenameTabId(null);
-          setRenameError(null);
-        }}
+        onValueChange={onRenameValueChange}
+        onCancel={onRenameCancel}
         onConfirm={confirmRenameTab}
       />
 
