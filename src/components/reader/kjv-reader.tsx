@@ -56,14 +56,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -119,6 +111,14 @@ type ReaderPayload = {
   books?: Book[];
 };
 type ConcordancePayload = Record<string, string[]>;
+type WebstersEntry = {
+  pronunciation?: string;
+  definitions: Array<{
+    type: string;
+    text: string;
+  }>;
+};
+type WebstersPayload = Record<string, WebstersEntry>;
 
 type PanelDirection = "left" | "right" | "up" | "down";
 type SplitOrientation = "horizontal" | "vertical";
@@ -160,6 +160,7 @@ type TokenPopupState = {
 
 let kjvBooksPromise: Promise<Book[]> | null = null;
 let concordancePromise: Promise<ConcordancePayload> | null = null;
+let webstersPromise: Promise<WebstersPayload> | null = null;
 
 function loadKjvBooks() {
   if (!kjvBooksPromise) {
@@ -206,6 +207,27 @@ function loadConcordance() {
   }
 
   return concordancePromise;
+}
+
+function loadWebsters() {
+  if (!webstersPromise) {
+    webstersPromise = fetch("/references/websters.json", {
+      cache: "force-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/websters.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as WebstersPayload)
+      .catch((error) => {
+        webstersPromise = null;
+        throw error;
+      });
+  }
+
+  return webstersPromise;
 }
 
 function hasTokenMetadata(token: VerseToken) {
@@ -495,6 +517,32 @@ function resolveConcordanceKey(
   }
 
   return null;
+}
+
+function resolveWebstersKey(websters: WebstersPayload, rawWord: string) {
+  const cleaned = normalizeConcordanceWord(rawWord);
+  if (!cleaned) {
+    return null;
+  }
+
+  const candidates = [
+    cleaned,
+    cleaned.toLowerCase(),
+    cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase(),
+    cleaned.toUpperCase(),
+  ];
+
+  for (const candidate of candidates) {
+    if (websters[candidate]) {
+      return candidate;
+    }
+  }
+
+  const lowered = cleaned.toLowerCase();
+  const fallback = Object.keys(websters).find(
+    (key) => key.toLowerCase() === lowered,
+  );
+  return fallback ?? null;
 }
 
 function parseConcordanceReference(reference: string) {
@@ -1185,6 +1233,9 @@ export function KJVReader() {
   const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(
     null,
   );
+  const [bookPickerDialogLeafId, setBookPickerDialogLeafId] = useState<string | null>(
+    null,
+  );
   const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
   const [leafScrollProgress, setLeafScrollProgress] = useState<
     Record<string, number>
@@ -1202,6 +1253,18 @@ export function KJVReader() {
   >([]);
   const [isConcordanceLoading, setIsConcordanceLoading] = useState(false);
   const [concordanceError, setConcordanceError] = useState<string | null>(null);
+  const [websters, setWebsters] = useState<WebstersPayload | null>(null);
+  const [webstersSearchTerm, setWebstersSearchTerm] = useState("");
+  const [isWebstersSearching, setIsWebstersSearching] = useState(false);
+  const [isWebstersLoading, setIsWebstersLoading] = useState(false);
+  const [webstersError, setWebstersError] = useState<string | null>(null);
+  const [webstersWordAccordionValue, setWebstersWordAccordionValue] = useState<
+    string[]
+  >([]);
+  const [selectedWebstersEntry, setSelectedWebstersEntry] = useState<{
+    key: string;
+    entry: WebstersEntry;
+  } | null>(null);
   const [pendingVerseHighlights, setPendingVerseHighlights] = useState<
     Record<string, number>
   >({});
@@ -1241,6 +1304,11 @@ export function KJVReader() {
     setSelectedConcordanceWord(null);
     setConcordanceError(null);
     setIsConcordanceLoading(false);
+    setWebstersError(null);
+    setIsWebstersLoading(false);
+    setIsWebstersSearching(false);
+    setWebstersWordAccordionValue([]);
+    setSelectedWebstersEntry(null);
   }, [isStudyMode]);
 
   useEffect(() => {
@@ -1717,6 +1785,63 @@ export function KJVReader() {
         });
       });
   }, [ensureConcordanceLoaded]);
+
+  const ensureWebstersLoaded = useCallback(async () => {
+    if (websters) {
+      return websters;
+    }
+    setWebstersError(null);
+    setIsWebstersLoading(true);
+    try {
+      const data = await loadWebsters();
+      setWebsters(data);
+      return data;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to load Webster's data";
+      setWebstersError(message);
+      throw error;
+    } finally {
+      setIsWebstersLoading(false);
+    }
+  }, [websters]);
+
+  const webstersSearchResults = useMemo(() => {
+    const term = webstersSearchTerm.trim().toLowerCase();
+    if (!term) {
+      return selectedWebstersEntry ? [selectedWebstersEntry] : [];
+    }
+    if (!websters) {
+      return [];
+    }
+    return Object.keys(websters)
+      .filter((word) => word.toLowerCase().includes(term))
+      .sort((a, b) => a.localeCompare(b))
+      .map((word) => ({ key: word, entry: websters[word] }));
+  }, [selectedWebstersEntry, websters, webstersSearchTerm]);
+
+  const applyWebstersSearch = useCallback(
+    (rawValue?: string) => {
+      const nextTerm = (rawValue ?? "").trim();
+      setWebstersSearchTerm(nextTerm);
+      setWebstersWordAccordionValue([]);
+      if (!nextTerm) {
+        setIsWebstersSearching(false);
+        return;
+      }
+      setIsWebstersSearching(true);
+      void ensureWebstersLoaded()
+        .catch(() => {
+          // Error state is set by ensureWebstersLoaded
+        })
+        .finally(() => {
+          window.requestAnimationFrame(() => {
+            setIsWebstersSearching(false);
+          });
+        });
+    },
+    [ensureWebstersLoaded],
+  );
 
   function chapterFromLeaf(leaf: LeafNode): Chapter | null {
     const book = books[leaf.bookIndex];
@@ -2352,25 +2477,61 @@ export function KJVReader() {
         setIsConcordanceLoading(false);
       };
 
+      const applyWebstersSelection = (data: WebstersPayload) => {
+        const matchedKey = resolveWebstersKey(data, rawWord);
+        setWebstersWordAccordionValue([]);
+        setSelectedWebstersEntry(
+          matchedKey ? { key: matchedKey, entry: data[matchedKey] } : null,
+        );
+        setConcordanceAccordionValue((current) => {
+          const withoutWebsters = current.filter((value) => value !== "websters");
+          if (!matchedKey) {
+            return withoutWebsters;
+          }
+          return withoutWebsters.includes("concordance")
+            ? [...withoutWebsters, "websters"]
+            : ["concordance", ...withoutWebsters, "websters"];
+        });
+        setIsWebstersLoading(false);
+      };
+
       if (concordance) {
         applyConcordanceSelection(concordance);
-        return;
+      } else {
+        void ensureConcordanceLoaded()
+          .then((data) => {
+            applyConcordanceSelection(data);
+          })
+          .catch((error) => {
+            const message =
+              error instanceof Error
+                ? error.message
+                : "Failed to load concordance data";
+            setConcordanceError(message);
+            setIsConcordanceLoading(false);
+          });
       }
 
-      void ensureConcordanceLoaded()
-        .then((data) => {
-          applyConcordanceSelection(data);
-        })
-        .catch((error) => {
-          const message =
-            error instanceof Error
-              ? error.message
-              : "Failed to load concordance data";
-          setConcordanceError(message);
-          setIsConcordanceLoading(false);
-        });
+      setWebstersError(null);
+      setIsWebstersLoading(true);
+      if (websters) {
+        applyWebstersSelection(websters);
+      } else {
+        void ensureWebstersLoaded()
+          .then((data) => {
+            applyWebstersSelection(data);
+          })
+          .catch((error) => {
+            const message =
+              error instanceof Error
+                ? error.message
+                : "Failed to load Webster's data";
+            setWebstersError(message);
+            setIsWebstersLoading(false);
+          });
+      }
     },
-    [concordance, ensureConcordanceLoaded],
+    [concordance, ensureConcordanceLoaded, ensureWebstersLoaded, websters],
   );
 
   function openConcordanceReference(reference: string) {
@@ -2655,6 +2816,15 @@ function referencePreviewContent(
       clearAllPanelPreviews();
     };
 
+    const openBookPickerDialog = () => {
+      const isOldTestament = leaf.bookIndex < 39;
+      updateLeafLocation(leaf.id, {
+        pickerTestament: isOldTestament ? "old" : "new",
+        pickerBookIndex: leaf.bookIndex,
+      });
+      setBookPickerDialogLeafId(leaf.id);
+    };
+
     return (
       <div
         data-panel-leaf-id={leaf.id}
@@ -2676,71 +2846,15 @@ function referencePreviewContent(
                     alt={`${book.name} icon`}
                     className="size-6 shrink-0"
                   />
-                  <Select
-                    items={books.map((bookItem) => ({
-                      label: bookItem.name,
-                      value: bookItem.name,
-                    }))}
-                    value={book.name}
-                    onValueChange={(value) => {
-                      const nextBookIndex = books.findIndex(
-                        (bookItem) => bookItem.name === value,
-                      );
-                      if (nextBookIndex >= 0) {
-                        updateLeafLocation(leaf.id, {
-                          bookIndex: nextBookIndex,
-                          chapterIndex: 0,
-                        });
-                      }
-                    }}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="min-w-36 justify-start sm:min-w-52"
+                    onClick={openBookPickerDialog}
                   >
-                    <SelectTrigger className="min-w-36 sm:min-w-44">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {books.map((bookItem) => (
-                          <SelectItem key={bookItem.name} value={bookItem.name}>
-                            {bookItem.name}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-
-                  <Select
-                    items={book.chapters.map((chapterItem) => ({
-                      label: `Chapter ${chapterItem.chapter}`,
-                      value: String(chapterItem.chapter),
-                    }))}
-                    value={String(chapter.chapter)}
-                    onValueChange={(value) => {
-                      const nextChapterIndex = book.chapters.findIndex(
-                        (chapterItem) => String(chapterItem.chapter) === value,
-                      );
-                      if (nextChapterIndex >= 0) {
-                        updateLeafLocation(leaf.id, {
-                          chapterIndex: nextChapterIndex,
-                        });
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {book.chapters.map((chapterItem) => (
-                          <SelectItem
-                            key={`${book.name}-${chapterItem.chapter}`}
-                            value={String(chapterItem.chapter)}
-                          >
-                            Chapter {chapterItem.chapter}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                    {`${book.name} ${chapter.chapter}`}
+                  </Button>
                 </>
               ) : (
                 <p className="text-sm text-muted-foreground">
@@ -3413,6 +3527,14 @@ function referencePreviewContent(
     </ScrollArea>
   );
 
+  const bookPickerDialogLeaf =
+    bookPickerDialogLeafId && activeTab
+      ? findLeafNode(activeTab.root, bookPickerDialogLeafId)
+      : null;
+  const isBookPickerDialogOpen = Boolean(
+    bookPickerDialogLeafId && bookPickerDialogLeaf,
+  );
+
   return (
     <main className="h-screen w-full overflow-hidden bg-background">
       <SidebarProvider
@@ -3533,13 +3655,10 @@ function referencePreviewContent(
           <Sidebar side="right" className="h-screen">
             <SidebarHeader>
               <h2 className="text-base font-semibold">Study Tools</h2>
-              <p className="text-sm text-muted-foreground">
-                Concordance cross-references for selected words.
-              </p>
             </SidebarHeader>
             <SidebarContent className="px-2 pb-3">
               <Accordion
-                className="w-full rounded-md border px-2"
+                className="w-full rounded-md border px-2 [&_[data-slot=accordion-trigger]]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
                 multiple
                 value={concordanceAccordionValue}
                 onValueChange={(value) =>
@@ -3598,7 +3717,7 @@ function referencePreviewContent(
                       </p>
                     ) : (
                       <Accordion
-                        className="w-full rounded-md border px-2"
+                        className="w-full rounded-md border px-2 [&_[data-slot=accordion-trigger]]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
                         multiple
                         value={concordanceWordAccordionValue}
                         onValueChange={(value) =>
@@ -3639,6 +3758,100 @@ function referencePreviewContent(
                     )}
                   </AccordionContent>
                 </AccordionItem>
+                <AccordionItem value="websters">
+                  <AccordionTrigger>Webster&apos;s 1828</AccordionTrigger>
+                  <AccordionContent className="space-y-2 overflow-visible">
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        const value = formData.get("websters-search");
+                        applyWebstersSearch(typeof value === "string" ? value : "");
+                      }}
+                    >
+                      <InputGroup>
+                        <InputGroupInput
+                          name="websters-search"
+                          placeholder="Search Webster's..."
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupButton
+                            type="submit"
+                            size="icon-sm"
+                            variant="ghost"
+                            aria-label="Search Webster's dictionary"
+                            disabled={isWebstersLoading || isWebstersSearching}
+                          >
+                            {isWebstersLoading || isWebstersSearching ? (
+                              <LoaderCircleIcon className="animate-spin" />
+                            ) : (
+                              <SearchIcon />
+                            )}
+                          </InputGroupButton>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </form>
+                    {isWebstersLoading || isWebstersSearching ? (
+                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <LoaderCircleIcon className="size-4 animate-spin" />
+                        {isWebstersLoading
+                          ? "Loading Webster's..."
+                          : "Searching Webster's..."}
+                      </p>
+                    ) : webstersError ? (
+                      <p className="text-sm text-destructive">{webstersError}</p>
+                    ) : webstersSearchResults.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        {webstersSearchTerm.trim()
+                          ? "No matching words found."
+                          : "Search Webster's 1828 dictionary."}
+                      </p>
+                    ) : (
+                      <Accordion
+                        className="w-full rounded-md border px-2 [&_[data-slot=accordion-trigger]]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+                        multiple
+                        value={webstersWordAccordionValue}
+                        onValueChange={(value) =>
+                          setWebstersWordAccordionValue(value.filter(Boolean) as string[])
+                        }
+                      >
+                        {webstersSearchResults.map(({ key, entry }) => (
+                          <AccordionItem key={key} value={key}>
+                            <AccordionTrigger>{key}</AccordionTrigger>
+                            <AccordionContent className="space-y-2">
+                              {entry.pronunciation ? (
+                                <p className="text-sm text-muted-foreground">
+                                  {entry.pronunciation}
+                                </p>
+                              ) : null}
+                              {entry.definitions.length > 0 ? (
+                                <div className="space-y-2 text-sm">
+                                  {entry.definitions.map((definition, index) => (
+                                    <div key={`${key}-definition-${index}`} className="space-y-1">
+                                      <p className="font-medium capitalize">
+                                        {definition.type}
+                                      </p>
+                                      <p
+                                        className="leading-relaxed"
+                                        dangerouslySetInnerHTML={{
+                                          __html: definition.text,
+                                        }}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-sm text-muted-foreground">
+                                  No definitions found.
+                                </p>
+                              )}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
               </Accordion>
             </SidebarContent>
           </Sidebar>
@@ -3646,6 +3859,69 @@ function referencePreviewContent(
       </SidebarProvider>
 
       {tokenPopupCard}
+
+      <AlertDialog
+        open={isBookPickerDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setBookPickerDialogLeafId(null);
+          }
+        }}
+      >
+        <AlertDialogContent className="sm:max-w-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Choose Book and Chapter</AlertDialogTitle>
+          </AlertDialogHeader>
+          {bookPickerDialogLeaf ? (
+            <div className="max-h-[70vh] overflow-y-auto pr-1">
+              <BookChapterPicker
+                books={books}
+                selectedTestament={bookPickerDialogLeaf.pickerTestament}
+                selectedBookIndex={bookPickerDialogLeaf.pickerBookIndex}
+                onSelectTestament={(testament) =>
+                  updateLeafLocation(bookPickerDialogLeaf.id, {
+                    pickerTestament: testament,
+                    pickerBookIndex: null,
+                  })
+                }
+                onBackToTestaments={() =>
+                  updateLeafLocation(bookPickerDialogLeaf.id, {
+                    pickerTestament: null,
+                    pickerBookIndex: null,
+                  })
+                }
+                onSelectBook={(bookIndex) =>
+                  updateLeafLocation(bookPickerDialogLeaf.id, {
+                    pickerBookIndex: bookIndex,
+                  })
+                }
+                onBackToBooks={() =>
+                  updateLeafLocation(bookPickerDialogLeaf.id, {
+                    pickerBookIndex: null,
+                  })
+                }
+                onSelectChapter={(bookIndex, chapterIndex) => {
+                  updateLeafLocation(bookPickerDialogLeaf.id, {
+                    bookIndex,
+                    chapterIndex,
+                    view: "reader",
+                  });
+                  setBookPickerDialogLeafId(null);
+                }}
+              />
+            </div>
+          ) : null}
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setBookPickerDialogLeafId(null);
+              }}
+            >
+              Close
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog
         open={isRenameDialogOpen}
