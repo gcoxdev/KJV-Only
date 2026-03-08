@@ -4342,6 +4342,24 @@ export function KJVReader() {
     </ScrollArea>
   );
 
+  const studyAccordionItems = [
+    "cross-refs",
+    "concordance",
+    "websters",
+    "strongs",
+    "hitchcocks",
+  ] as const;
+  const allStudyAccordionsOpen = studyAccordionItems.every((item) =>
+    concordanceAccordionValue.includes(item),
+  );
+  const hasCrossRefsInfo = Boolean(
+    selectedCrossReferences && selectedCrossReferences.references.length > 0,
+  );
+  const hasConcordanceInfo = concordanceSearchResults.length > 0;
+  const hasWebstersInfo = webstersSearchResults.length > 0;
+  const hasStrongsInfo = strongsSearchResults.length > 0;
+  const hasHitchcocksInfo = hitchcocksSearchResults.length > 0;
+
   const bookPickerDialogLeaf =
     bookPickerDialogLeafId && activeTab
       ? findLeafNode(activeTab.root, bookPickerDialogLeafId)
@@ -4468,8 +4486,20 @@ export function KJVReader() {
 
         {isStudyMode ? (
           <Sidebar side="right" className="h-screen">
-            <SidebarHeader>
+            <SidebarHeader className="gap-2">
               <h2 className="text-base font-semibold">Study Tools</h2>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setConcordanceAccordionValue(
+                    allStudyAccordionsOpen ? [] : [...studyAccordionItems],
+                  );
+                }}
+              >
+                {allStudyAccordionsOpen ? "Collapse All" : "Expand All"}
+              </Button>
             </SidebarHeader>
             <SidebarContent className="px-2 pb-3">
               <Accordion
@@ -4483,7 +4513,13 @@ export function KJVReader() {
                 }
               >
                 <AccordionItem value="cross-refs">
-                  <AccordionTrigger>Cross References</AccordionTrigger>
+                  <AccordionTrigger
+                    className={cn(
+                      hasCrossRefsInfo && "text-emerald-600 dark:text-emerald-400",
+                    )}
+                  >
+                    Cross References
+                  </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
                     {isCrossRefsLoading ? (
                       <p className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -4553,7 +4589,14 @@ export function KJVReader() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="concordance">
-                  <AccordionTrigger>Concordance</AccordionTrigger>
+                  <AccordionTrigger
+                    className={cn(
+                      hasConcordanceInfo &&
+                        "text-emerald-600 dark:text-emerald-400",
+                    )}
+                  >
+                    Concordance
+                  </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
                     <form
                       onSubmit={(event) => {
@@ -4652,7 +4695,13 @@ export function KJVReader() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="websters">
-                  <AccordionTrigger>Webster&apos;s 1828</AccordionTrigger>
+                  <AccordionTrigger
+                    className={cn(
+                      hasWebstersInfo && "text-emerald-600 dark:text-emerald-400",
+                    )}
+                  >
+                    Webster&apos;s 1828
+                  </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
                     <form
                       onSubmit={(event) => {
@@ -4757,7 +4806,13 @@ export function KJVReader() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="strongs">
-                  <AccordionTrigger>Strong&apos;s Dictionary</AccordionTrigger>
+                  <AccordionTrigger
+                    className={cn(
+                      hasStrongsInfo && "text-emerald-600 dark:text-emerald-400",
+                    )}
+                  >
+                    Strong&apos;s Dictionary
+                  </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
                     <form
                       onSubmit={(event) => {
@@ -4895,7 +4950,14 @@ export function KJVReader() {
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="hitchcocks">
-                  <AccordionTrigger>Hitchcock&apos;s Bible Names</AccordionTrigger>
+                  <AccordionTrigger
+                    className={cn(
+                      hasHitchcocksInfo &&
+                        "text-emerald-600 dark:text-emerald-400",
+                    )}
+                  >
+                    Hitchcock&apos;s Bible Names
+                  </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
                     <form
                       onSubmit={(event) => {
