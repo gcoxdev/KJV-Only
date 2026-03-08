@@ -23,6 +23,8 @@ import {
   MenuIcon,
   PlusIcon,
   RotateCwIcon,
+  LoaderCircleIcon,
+  SearchIcon,
   SettingsIcon,
   SquareChevronDownIcon,
   SquareChevronLeftIcon,
@@ -82,6 +84,12 @@ import {
 } from "@/components/ui/sidebar";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Slider } from "@/components/ui/slider";
 import {
   ResizableHandle,
@@ -1186,6 +1194,8 @@ export function KJVReader() {
     key: string;
     references: string[];
   } | null>(null);
+  const [concordanceSearchTerm, setConcordanceSearchTerm] = useState("");
+  const [isConcordanceSearching, setIsConcordanceSearching] = useState(false);
   const [concordanceAccordionValue, setConcordanceAccordionValue] = useState<string[]>([]);
   const [concordanceWordAccordionValue, setConcordanceWordAccordionValue] = useState<
     string[]
@@ -1648,6 +1658,65 @@ export function KJVReader() {
       window.cancelAnimationFrame(rafId);
     };
   }, [pendingVerseHighlights, activeTabId, tabs]);
+
+  const ensureConcordanceLoaded = useCallback(async () => {
+    if (concordance) {
+      return concordance;
+    }
+    setConcordanceError(null);
+    setIsConcordanceLoading(true);
+    try {
+      const data = await loadConcordance();
+      setConcordance(data);
+      return data;
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to load concordance data";
+      setConcordanceError(message);
+      throw error;
+    } finally {
+      setIsConcordanceLoading(false);
+    }
+  }, [concordance]);
+
+  const concordanceSearchResults = useMemo(() => {
+    const term = concordanceSearchTerm.trim().toLowerCase();
+    if (!term) {
+      return selectedConcordanceWord ? [selectedConcordanceWord] : [];
+    }
+    if (!concordance) {
+      return [];
+    }
+    return Object.keys(concordance)
+      .filter((word) => word.toLowerCase().includes(term))
+      .sort((a, b) => a.localeCompare(b))
+      .map((word) => ({
+        key: word,
+        references: concordance[word] ?? [],
+      }));
+  }, [concordance, concordanceSearchTerm, selectedConcordanceWord]);
+
+  const applyConcordanceSearch = useCallback((rawValue?: string) => {
+    const nextTerm = (rawValue ?? "").trim();
+    setConcordanceSearchTerm(nextTerm);
+    setConcordanceWordAccordionValue([]);
+    if (!nextTerm) {
+      setIsConcordanceSearching(false);
+      return;
+    }
+    setIsConcordanceSearching(true);
+    void ensureConcordanceLoaded()
+      .catch(() => {
+        // Error state is set by ensureConcordanceLoaded
+      })
+      .finally(() => {
+        window.requestAnimationFrame(() => {
+          setIsConcordanceSearching(false);
+        });
+      });
+  }, [ensureConcordanceLoaded]);
 
   function chapterFromLeaf(leaf: LeafNode): Chapter | null {
     const book = books[leaf.bookIndex];
@@ -2288,9 +2357,8 @@ export function KJVReader() {
         return;
       }
 
-      void loadConcordance()
+      void ensureConcordanceLoaded()
         .then((data) => {
-          setConcordance(data);
           applyConcordanceSelection(data);
         })
         .catch((error) => {
@@ -2302,7 +2370,7 @@ export function KJVReader() {
           setIsConcordanceLoading(false);
         });
     },
-    [concordance],
+    [concordance, ensureConcordanceLoaded],
   );
 
   function openConcordanceReference(reference: string) {
@@ -3355,6 +3423,7 @@ function referencePreviewContent(
           }
           setIsRightSidebarOpen(open);
         }}
+        style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
       >
         <SidebarOpenRequestSync
           requestKey={sidebarOpenRequestKey}
@@ -3479,16 +3548,53 @@ function referencePreviewContent(
               >
                 <AccordionItem value="concordance">
                   <AccordionTrigger>Concordance</AccordionTrigger>
-                  <AccordionContent className="space-y-2">
-                    {isConcordanceLoading ? (
-                      <p className="text-sm text-muted-foreground">
-                        Loading concordance...
+                  <AccordionContent className="space-y-2 overflow-visible">
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        const value = formData.get("concordance-search");
+                        applyConcordanceSearch(
+                          typeof value === "string" ? value : "",
+                        );
+                      }}
+                    >
+                      <InputGroup>
+                        <InputGroupInput
+                          name="concordance-search"
+                          placeholder="Search concordance..."
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupButton
+                            type="submit"
+                            size="icon-sm"
+                            variant="ghost"
+                            aria-label="Search concordance"
+                            disabled={isConcordanceLoading || isConcordanceSearching}
+                          >
+                            {isConcordanceLoading || isConcordanceSearching ? (
+                              <LoaderCircleIcon className="animate-spin" />
+                            ) : (
+                              <SearchIcon />
+                            )}
+                          </InputGroupButton>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </form>
+                    {isConcordanceLoading || isConcordanceSearching ? (
+                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <LoaderCircleIcon className="size-4 animate-spin" />
+                        {isConcordanceLoading
+                          ? "Loading concordance..."
+                          : "Searching concordance..."}
                       </p>
                     ) : concordanceError ? (
                       <p className="text-sm text-destructive">{concordanceError}</p>
-                    ) : !selectedConcordanceWord ? (
+                    ) : concordanceSearchResults.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
-                        Click a word in the text to view references.
+                        {concordanceSearchTerm.trim()
+                          ? "No matching words found."
+                          : "Click a word in the text or search concordance."}
                       </p>
                     ) : (
                       <Accordion
@@ -3499,34 +3605,36 @@ function referencePreviewContent(
                           setConcordanceWordAccordionValue(value.filter(Boolean) as string[])
                         }
                       >
-                        <AccordionItem value={selectedConcordanceWord.key}>
-                          <AccordionTrigger>
-                            {`${selectedConcordanceWord.key} (${selectedConcordanceWord.references.length})`}
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            {selectedConcordanceWord.references.length === 0 ? (
-                              <p className="text-sm text-muted-foreground">
-                                No references found.
-                              </p>
-                            ) : (
-                              <p className="text-sm leading-7">
-                                {selectedConcordanceWord.references.map((reference, index) => (
-                                  <Fragment
-                                    key={`${selectedConcordanceWord.key}-${reference}-${index}`}
-                                  >
-                                    <ConcordanceReferencePopover
-                                      reference={reference}
-                                      highlightWord={selectedConcordanceWord.key}
-                                    />
-                                    {index < selectedConcordanceWord.references.length - 1
-                                      ? ", "
-                                      : null}
-                                  </Fragment>
-                                ))}
-                              </p>
-                            )}
-                          </AccordionContent>
-                        </AccordionItem>
+                        {concordanceSearchResults.map((entry) => (
+                          <AccordionItem key={entry.key} value={entry.key}>
+                            <AccordionTrigger>
+                              {`${entry.key} (${entry.references.length})`}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {entry.references.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">
+                                  No references found.
+                                </p>
+                              ) : (
+                                <p className="text-sm leading-7">
+                                  {entry.references.map((reference, index) => (
+                                    <Fragment
+                                      key={`${entry.key}-${reference}-${index}`}
+                                    >
+                                      <ConcordanceReferencePopover
+                                        reference={reference}
+                                        highlightWord={entry.key}
+                                      />
+                                      {index < entry.references.length - 1
+                                        ? ", "
+                                        : null}
+                                    </Fragment>
+                                  ))}
+                                </p>
+                              )}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
                       </Accordion>
                     )}
                   </AccordionContent>
