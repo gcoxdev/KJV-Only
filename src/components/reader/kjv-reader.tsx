@@ -17,6 +17,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   EllipsisIcon,
+  EllipsisVerticalIcon,
   ExternalLinkIcon,
   ExpandIcon,
   MinimizeIcon,
@@ -347,7 +348,7 @@ const ChapterTextContent = memo(function ChapterTextContent({
 
   return (
     <div
-      className="flex w-full flex-col p-3 sm:p-4"
+      className="flex w-full flex-col p-2"
       style={{ rowGap: `${verseSpacing}px` }}
     >
       {flowVersesByParagraph
@@ -462,13 +463,72 @@ function chapterProgressKey(bookIndex: number, chapterIndex: number) {
 }
 
 const BOOK_ICON_CODES = [
-  "GEN", "EXO", "LEV", "NUM", "DEU", "JOS", "JDG", "RUT", "1SA", "2SA",
-  "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST", "JOB", "PSA", "PRO",
-  "ECC", "SNG", "ISA", "JER", "LAM", "EZK", "DAN", "HOS", "JOL", "AMO",
-  "OBA", "JON", "MIC", "NAM", "HAB", "ZEP", "HAG", "ZEC", "MAL", "MAT",
-  "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP",
-  "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE",
-  "2PE", "1JN", "2JN", "3JN", "JUD", "REV",
+  "GEN",
+  "EXO",
+  "LEV",
+  "NUM",
+  "DEU",
+  "JOS",
+  "JDG",
+  "RUT",
+  "1SA",
+  "2SA",
+  "1KI",
+  "2KI",
+  "1CH",
+  "2CH",
+  "EZR",
+  "NEH",
+  "EST",
+  "JOB",
+  "PSA",
+  "PRO",
+  "ECC",
+  "SNG",
+  "ISA",
+  "JER",
+  "LAM",
+  "EZK",
+  "DAN",
+  "HOS",
+  "JOL",
+  "AMO",
+  "OBA",
+  "JON",
+  "MIC",
+  "NAM",
+  "HAB",
+  "ZEP",
+  "HAG",
+  "ZEC",
+  "MAL",
+  "MAT",
+  "MRK",
+  "LUK",
+  "JHN",
+  "ACT",
+  "ROM",
+  "1CO",
+  "2CO",
+  "GAL",
+  "EPH",
+  "PHP",
+  "COL",
+  "1TH",
+  "2TH",
+  "1TI",
+  "2TI",
+  "TIT",
+  "PHM",
+  "HEB",
+  "JAS",
+  "1PE",
+  "2PE",
+  "1JN",
+  "2JN",
+  "3JN",
+  "JUD",
+  "REV",
 ] as const;
 
 function bookCodeForIndex(bookIndex: number) {
@@ -1233,24 +1293,27 @@ export function KJVReader() {
   const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(
     null,
   );
-  const [bookPickerDialogLeafId, setBookPickerDialogLeafId] = useState<string | null>(
-    null,
-  );
+  const [bookPickerDialogLeafId, setBookPickerDialogLeafId] = useState<
+    string | null
+  >(null);
   const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
   const [leafScrollProgress, setLeafScrollProgress] = useState<
     Record<string, number>
   >({});
-  const [concordance, setConcordance] = useState<ConcordancePayload | null>(null);
+  const [concordance, setConcordance] = useState<ConcordancePayload | null>(
+    null,
+  );
   const [selectedConcordanceWord, setSelectedConcordanceWord] = useState<{
     key: string;
     references: string[];
   } | null>(null);
   const [concordanceSearchTerm, setConcordanceSearchTerm] = useState("");
   const [isConcordanceSearching, setIsConcordanceSearching] = useState(false);
-  const [concordanceAccordionValue, setConcordanceAccordionValue] = useState<string[]>([]);
-  const [concordanceWordAccordionValue, setConcordanceWordAccordionValue] = useState<
+  const [concordanceAccordionValue, setConcordanceAccordionValue] = useState<
     string[]
   >([]);
+  const [concordanceWordAccordionValue, setConcordanceWordAccordionValue] =
+    useState<string[]>([]);
   const [isConcordanceLoading, setIsConcordanceLoading] = useState(false);
   const [concordanceError, setConcordanceError] = useState<string | null>(null);
   const [websters, setWebsters] = useState<WebstersPayload | null>(null);
@@ -1488,14 +1551,19 @@ export function KJVReader() {
     const makeBookProgress = (book: Book, bookIndex: number) => {
       const total = book.chapters.length;
       const chapters = book.chapters.map((chapter, chapterIndex) => {
-        const read = readChapters.has(chapterProgressKey(bookIndex, chapterIndex));
+        const read = readChapters.has(
+          chapterProgressKey(bookIndex, chapterIndex),
+        );
         return {
           chapterIndex,
           chapterNumber: chapter.chapter,
           read,
         };
       });
-      const read = chapters.reduce((count, chapter) => count + (chapter.read ? 1 : 0), 0);
+      const read = chapters.reduce(
+        (count, chapter) => count + (chapter.read ? 1 : 0),
+        0,
+      );
       return { name: book.name, bookIndex, read, total, chapters };
     };
 
@@ -1692,8 +1760,8 @@ export function KJVReader() {
         const highlightElement =
           verseElement.tagName === "ARTICLE"
             ? verseElement
-            : (verseElement.closest("article") as HTMLElement | null) ??
-              verseElement;
+            : ((verseElement.closest("article") as HTMLElement | null) ??
+              verseElement);
 
         viewport.scrollTo({
           top: clampedCenteredScrollTop(viewport, highlightElement),
@@ -1766,25 +1834,28 @@ export function KJVReader() {
       }));
   }, [concordance, concordanceSearchTerm, selectedConcordanceWord]);
 
-  const applyConcordanceSearch = useCallback((rawValue?: string) => {
-    const nextTerm = (rawValue ?? "").trim();
-    setConcordanceSearchTerm(nextTerm);
-    setConcordanceWordAccordionValue([]);
-    if (!nextTerm) {
-      setIsConcordanceSearching(false);
-      return;
-    }
-    setIsConcordanceSearching(true);
-    void ensureConcordanceLoaded()
-      .catch(() => {
-        // Error state is set by ensureConcordanceLoaded
-      })
-      .finally(() => {
-        window.requestAnimationFrame(() => {
-          setIsConcordanceSearching(false);
+  const applyConcordanceSearch = useCallback(
+    (rawValue?: string) => {
+      const nextTerm = (rawValue ?? "").trim();
+      setConcordanceSearchTerm(nextTerm);
+      setConcordanceWordAccordionValue([]);
+      if (!nextTerm) {
+        setIsConcordanceSearching(false);
+        return;
+      }
+      setIsConcordanceSearching(true);
+      void ensureConcordanceLoaded()
+        .catch(() => {
+          // Error state is set by ensureConcordanceLoaded
+        })
+        .finally(() => {
+          window.requestAnimationFrame(() => {
+            setIsConcordanceSearching(false);
+          });
         });
-      });
-  }, [ensureConcordanceLoaded]);
+    },
+    [ensureConcordanceLoaded],
+  );
 
   const ensureWebstersLoaded = useCallback(async () => {
     if (websters) {
@@ -1798,7 +1869,9 @@ export function KJVReader() {
       return data;
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Failed to load Webster's data";
+        error instanceof Error
+          ? error.message
+          : "Failed to load Webster's data";
       setWebstersError(message);
       throw error;
     } finally {
@@ -2252,7 +2325,7 @@ export function KJVReader() {
       });
     });
   }
-  
+
   function openChapterReferenceInNewTab(
     bookIndex: number,
     chapterIndex: number,
@@ -2294,7 +2367,11 @@ export function KJVReader() {
     }
     setReadChapters((current) => {
       const next = new Set(current);
-      for (let chapterIndex = 0; chapterIndex < book.chapters.length; chapterIndex += 1) {
+      for (
+        let chapterIndex = 0;
+        chapterIndex < book.chapters.length;
+        chapterIndex += 1
+      ) {
         const key = chapterProgressKey(bookIndex, chapterIndex);
         if (isRead) {
           next.add(key);
@@ -2484,7 +2561,9 @@ export function KJVReader() {
           matchedKey ? { key: matchedKey, entry: data[matchedKey] } : null,
         );
         setConcordanceAccordionValue((current) => {
-          const withoutWebsters = current.filter((value) => value !== "websters");
+          const withoutWebsters = current.filter(
+            (value) => value !== "websters",
+          );
           if (!matchedKey) {
             return withoutWebsters;
           }
@@ -2546,20 +2625,20 @@ export function KJVReader() {
     );
   }
 
-function referencePreviewData(reference: string) {
-  const parsed = parseConcordanceReference(reference);
-  if (!parsed) {
-    return { citation: reference, verseText: "" };
-  }
+  function referencePreviewData(reference: string) {
+    const parsed = parseConcordanceReference(reference);
+    if (!parsed) {
+      return { citation: reference, verseText: "" };
+    }
 
     const book = books[parsed.bookIndex];
-  const chapter = book?.chapters[parsed.chapterIndex];
-  const verse = chapter?.verses.find(
-    (candidate) => candidate.verse === parsed.verseNumber,
-  );
-  if (!book || !chapter || !verse) {
-    return { citation: reference, verseText: "" };
-  }
+    const chapter = book?.chapters[parsed.chapterIndex];
+    const verse = chapter?.verses.find(
+      (candidate) => candidate.verse === parsed.verseNumber,
+    );
+    if (!book || !chapter || !verse) {
+      return { citation: reference, verseText: "" };
+    }
 
     const verseText = verse.tokens
       .map((token, index) => {
@@ -2568,59 +2647,59 @@ function referencePreviewData(reference: string) {
       })
       .join("");
 
-  return {
-    citation: `${book.name} ${chapter.chapter}:${verse.verse}`,
-    verseText,
-  };
-}
-
-function referencePreviewContent(
-  reference: string,
-  highlightWord: string,
-): ReactNode {
-  const { citation, verseText } = referencePreviewData(reference);
-  const text = verseText || reference;
-  const needle = normalizeConcordanceWord(highlightWord);
-  if (!needle) {
-    return (
-      <div className="space-y-1">
-        <p className="font-semibold">{citation}</p>
-        <p>{text}</p>
-      </div>
-    );
+    return {
+      citation: `${book.name} ${chapter.chapter}:${verse.verse}`,
+      verseText,
+    };
   }
+
+  function referencePreviewContent(
+    reference: string,
+    highlightWord: string,
+  ): ReactNode {
+    const { citation, verseText } = referencePreviewData(reference);
+    const text = verseText || reference;
+    const needle = normalizeConcordanceWord(highlightWord);
+    if (!needle) {
+      return (
+        <div className="space-y-1">
+          <p className="font-semibold">{citation}</p>
+          <p>{text}</p>
+        </div>
+      );
+    }
 
     const matcher = new RegExp(`(${escapeRegExp(needle)})`, "ig");
     const parts = text.split(matcher);
-  if (parts.length <= 1) {
+    if (parts.length <= 1) {
+      return (
+        <div className="space-y-1">
+          <p className="font-semibold">{citation}</p>
+          <p>{text}</p>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-1">
         <p className="font-semibold">{citation}</p>
-        <p>{text}</p>
+        <p>
+          {parts.map((part, index) =>
+            part.toLowerCase() === needle.toLowerCase() ? (
+              <span
+                key={`${reference}-highlight-${index}`}
+                className="bg-[#fafac5] text-black"
+              >
+                {part}
+              </span>
+            ) : (
+              <span key={`${reference}-text-${index}`}>{part}</span>
+            ),
+          )}
+        </p>
       </div>
     );
   }
-
-  return (
-    <div className="space-y-1">
-      <p className="font-semibold">{citation}</p>
-      <p>
-        {parts.map((part, index) =>
-          part.toLowerCase() === needle.toLowerCase() ? (
-            <span
-              key={`${reference}-highlight-${index}`}
-              className="bg-[#fafac5] text-black"
-            >
-              {part}
-            </span>
-          ) : (
-            <span key={`${reference}-text-${index}`}>{part}</span>
-          ),
-        )}
-      </p>
-    </div>
-  );
-}
 
   function openRenameDialog(tabId: string) {
     const tab = tabs.find((item) => item.id === tabId);
@@ -2765,12 +2844,18 @@ function referencePreviewContent(
     const isChapterRead = readChapters.has(chapterReadKey);
     const readChapterCount = book.chapters.reduce(
       (count, _chapter, chapterIndex) =>
-        count + (readChapters.has(chapterProgressKey(leaf.bookIndex, chapterIndex)) ? 1 : 0),
+        count +
+        (readChapters.has(chapterProgressKey(leaf.bookIndex, chapterIndex))
+          ? 1
+          : 0),
       0,
     );
     const isBookComplete = readChapterCount === book.chapters.length;
     const currentBookIconCode = bookCodeForIndex(leaf.bookIndex);
-    const currentBookIconSrc = iconPath(isBookComplete ? "color" : "bw", currentBookIconCode);
+    const currentBookIconSrc = iconPath(
+      isBookComplete ? "color" : "bw",
+      currentBookIconCode,
+    );
     const readingProgress = leafScrollProgress[leaf.id] ?? 0;
     const showVerseNumbers = !hideReadModeVerseNumbers;
     const neighbors =
@@ -2836,8 +2921,8 @@ function referencePreviewContent(
           isFullscreenLeaf && "fixed inset-0 z-40 h-screen w-screen",
         )}
       >
-        <Card className="flex h-full min-h-0 w-full min-w-0 flex-col rounded-none">
-          <CardHeader className="border-b p-2 sm:p-3">
+        <Card className="flex h-full min-h-0 w-full min-w-0 flex-col rounded-none py-0">
+          <CardHeader className="border-b p-2!">
             <div className="flex flex-wrap items-center gap-2">
               {leaf.view === "reader" && chapter ? (
                 <>
@@ -2850,7 +2935,7 @@ function referencePreviewContent(
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="min-w-36 justify-start sm:min-w-52"
+                    className="w-auto max-w-full justify-start px-2"
                     onClick={openBookPickerDialog}
                   >
                     {`${book.name} ${chapter.chapter}`}
@@ -2877,11 +2962,14 @@ function referencePreviewContent(
               >
                 <DropdownMenuTrigger
                   render={
-                    <Button variant="outline" size="sm" className="ml-auto" />
+                    <Button
+                      variant="outline"
+                      size="icon-sm"
+                      className="ml-auto"
+                    />
                   }
                 >
-                  <PlusIcon />
-                  Panel
+                  <EllipsisVerticalIcon />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuItem
@@ -3155,7 +3243,7 @@ function referencePreviewContent(
               </div>
             </>
           ) : (
-            <CardContent className="min-h-0 flex-1 overflow-auto p-3 sm:p-4">
+            <CardContent className="min-h-0 flex-1 overflow-auto p-2">
               <BookChapterPicker
                 books={books}
                 selectedTestament={leaf.pickerTestament}
@@ -3320,7 +3408,9 @@ function referencePreviewContent(
       if (typeof window === "undefined" || !window.matchMedia) {
         return;
       }
-      const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+      const mediaQuery = window.matchMedia(
+        "(hover: hover) and (pointer: fine)",
+      );
       const update = () => setSupportsHover(mediaQuery.matches);
       update();
       mediaQuery.addEventListener("change", update);
@@ -3658,11 +3748,13 @@ function referencePreviewContent(
             </SidebarHeader>
             <SidebarContent className="px-2 pb-3">
               <Accordion
-                className="w-full rounded-md border px-2 [&_[data-slot=accordion-trigger]]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+                className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
                 multiple
                 value={concordanceAccordionValue}
                 onValueChange={(value) =>
-                  setConcordanceAccordionValue(value.filter(Boolean) as string[])
+                  setConcordanceAccordionValue(
+                    value.filter(Boolean) as string[],
+                  )
                 }
               >
                 <AccordionItem value="concordance">
@@ -3689,7 +3781,9 @@ function referencePreviewContent(
                             size="icon-sm"
                             variant="ghost"
                             aria-label="Search concordance"
-                            disabled={isConcordanceLoading || isConcordanceSearching}
+                            disabled={
+                              isConcordanceLoading || isConcordanceSearching
+                            }
                           >
                             {isConcordanceLoading || isConcordanceSearching ? (
                               <LoaderCircleIcon className="animate-spin" />
@@ -3708,7 +3802,9 @@ function referencePreviewContent(
                           : "Searching concordance..."}
                       </p>
                     ) : concordanceError ? (
-                      <p className="text-sm text-destructive">{concordanceError}</p>
+                      <p className="text-sm text-destructive">
+                        {concordanceError}
+                      </p>
                     ) : concordanceSearchResults.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
                         {concordanceSearchTerm.trim()
@@ -3717,11 +3813,13 @@ function referencePreviewContent(
                       </p>
                     ) : (
                       <Accordion
-                        className="w-full rounded-md border px-2 [&_[data-slot=accordion-trigger]]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+                        className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
                         multiple
                         value={concordanceWordAccordionValue}
                         onValueChange={(value) =>
-                          setConcordanceWordAccordionValue(value.filter(Boolean) as string[])
+                          setConcordanceWordAccordionValue(
+                            value.filter(Boolean) as string[],
+                          )
                         }
                       >
                         {concordanceSearchResults.map((entry) => (
@@ -3766,7 +3864,9 @@ function referencePreviewContent(
                         event.preventDefault();
                         const formData = new FormData(event.currentTarget);
                         const value = formData.get("websters-search");
-                        applyWebstersSearch(typeof value === "string" ? value : "");
+                        applyWebstersSearch(
+                          typeof value === "string" ? value : "",
+                        );
                       }}
                     >
                       <InputGroup>
@@ -3799,7 +3899,9 @@ function referencePreviewContent(
                           : "Searching Webster's..."}
                       </p>
                     ) : webstersError ? (
-                      <p className="text-sm text-destructive">{webstersError}</p>
+                      <p className="text-sm text-destructive">
+                        {webstersError}
+                      </p>
                     ) : webstersSearchResults.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
                         {webstersSearchTerm.trim()
@@ -3808,11 +3910,13 @@ function referencePreviewContent(
                       </p>
                     ) : (
                       <Accordion
-                        className="w-full rounded-md border px-2 [&_[data-slot=accordion-trigger]]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+                        className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
                         multiple
                         value={webstersWordAccordionValue}
                         onValueChange={(value) =>
-                          setWebstersWordAccordionValue(value.filter(Boolean) as string[])
+                          setWebstersWordAccordionValue(
+                            value.filter(Boolean) as string[],
+                          )
                         }
                       >
                         {webstersSearchResults.map(({ key, entry }) => (
@@ -3826,19 +3930,24 @@ function referencePreviewContent(
                               ) : null}
                               {entry.definitions.length > 0 ? (
                                 <div className="space-y-2 text-sm">
-                                  {entry.definitions.map((definition, index) => (
-                                    <div key={`${key}-definition-${index}`} className="space-y-1">
-                                      <p className="font-medium capitalize">
-                                        {definition.type}
-                                      </p>
-                                      <p
-                                        className="leading-relaxed"
-                                        dangerouslySetInnerHTML={{
-                                          __html: definition.text,
-                                        }}
-                                      />
-                                    </div>
-                                  ))}
+                                  {entry.definitions.map(
+                                    (definition, index) => (
+                                      <div
+                                        key={`${key}-definition-${index}`}
+                                        className="space-y-1"
+                                      >
+                                        <p className="font-medium capitalize">
+                                          {definition.type}
+                                        </p>
+                                        <p
+                                          className="leading-relaxed"
+                                          dangerouslySetInnerHTML={{
+                                            __html: definition.text,
+                                          }}
+                                        />
+                                      </div>
+                                    ),
+                                  )}
                                 </div>
                               ) : (
                                 <p className="text-sm text-muted-foreground">
@@ -4037,7 +4146,9 @@ function referencePreviewContent(
               <Switch
                 id="read-mode-indents"
                 checked={readModeParagraphIndent}
-                onCheckedChange={(checked) => setReadModeParagraphIndent(checked)}
+                onCheckedChange={(checked) =>
+                  setReadModeParagraphIndent(checked)
+                }
               />
             </div>
             <div className="flex min-w-0 items-center justify-between gap-3 border-t pt-3">
@@ -4087,21 +4198,31 @@ function referencePreviewContent(
               </ProgressValue>
             </Progress>
 
-            <Accordion className="w-full rounded-md border px-3" multiple defaultValue={[]}>
+            <Accordion
+              className="w-full rounded-md border px-3"
+              multiple
+              defaultValue={[]}
+            >
               {[progressByTestament.old, progressByTestament.new].map(
                 (testament) => {
                   const testamentPercent =
                     testament.total > 0
                       ? Math.round((testament.read / testament.total) * 100)
                       : 0;
-                  const testamentCode = testament.label.startsWith("Old") ? "OT" : "NT";
+                  const testamentCode = testament.label.startsWith("Old")
+                    ? "OT"
+                    : "NT";
                   const testamentIconSrc = iconPath(
                     testamentPercent === 100 ? "color" : "bw",
                     testamentCode,
                   );
 
                   return (
-                    <AccordionItem key={testament.label} value={testament.label} className="w-full">
+                    <AccordionItem
+                      key={testament.label}
+                      value={testament.label}
+                      className="w-full"
+                    >
                       <AccordionTrigger className="w-full">
                         <div className="flex w-full items-center gap-3">
                           <img
@@ -4120,7 +4241,11 @@ function referencePreviewContent(
                         </div>
                       </AccordionTrigger>
                       <AccordionContent className="space-y-3">
-                        <Accordion className="w-full rounded-md border px-2" multiple defaultValue={[]}>
+                        <Accordion
+                          className="w-full rounded-md border px-2"
+                          multiple
+                          defaultValue={[]}
+                        >
                           {testament.books.map((book) => {
                             const bookPercent =
                               book.total > 0
@@ -4143,7 +4268,10 @@ function referencePreviewContent(
                                       alt={`${book.name} icon`}
                                       className="size-10 shrink-0"
                                     />
-                                    <Progress value={bookPercent} className="w-full">
+                                    <Progress
+                                      value={bookPercent}
+                                      className="w-full"
+                                    >
                                       <ProgressLabel className="text-xs">
                                         {book.name}
                                       </ProgressLabel>
@@ -4192,7 +4320,11 @@ function referencePreviewContent(
                                           {`Chapter ${chapter.chapterNumber}`}
                                         </Button>
                                         <Button
-                                          variant={chapter.read ? "secondary" : "outline"}
+                                          variant={
+                                            chapter.read
+                                              ? "secondary"
+                                              : "outline"
+                                          }
                                           size="sm"
                                           onClick={() =>
                                             toggleChapterRead(
