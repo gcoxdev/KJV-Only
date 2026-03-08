@@ -4864,7 +4864,7 @@ export function KJVReader() {
                       hasWebstersInfo && "text-emerald-600 dark:text-emerald-400",
                     )}
                   >
-                    Webster&apos;s 1828
+                    Webster&apos;s 1828 Dictionary
                   </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
                     <form
@@ -5113,6 +5113,79 @@ export function KJVReader() {
                     )}
                   </AccordionContent>
                 </AccordionItem>
+                <AccordionItem value="old-english">
+                  <AccordionTrigger
+                    className={cn(
+                      hasOldEnglishInfo && "text-emerald-600 dark:text-emerald-400",
+                    )}
+                  >
+                    Old English Dictionary
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-2 overflow-visible">
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        const value = formData.get("old-english-search");
+                        applyOldEnglishSearch(
+                          typeof value === "string" ? value : "",
+                        );
+                      }}
+                    >
+                      <InputGroup>
+                        <InputGroupInput
+                          name="old-english-search"
+                          placeholder="Search Old English..."
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupButton
+                            type="submit"
+                            size="icon-sm"
+                            variant="ghost"
+                            aria-label="Search Old English dictionary"
+                            disabled={
+                              isOldEnglishLoading || isOldEnglishSearching
+                            }
+                          >
+                            {isOldEnglishLoading || isOldEnglishSearching ? (
+                              <LoaderCircleIcon className="animate-spin" />
+                            ) : (
+                              <SearchIcon />
+                            )}
+                          </InputGroupButton>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </form>
+                    {isOldEnglishLoading || isOldEnglishSearching ? (
+                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <LoaderCircleIcon className="size-4 animate-spin" />
+                        {isOldEnglishLoading
+                          ? "Loading Old English..."
+                          : "Searching Old English..."}
+                      </p>
+                    ) : oldEnglishError ? (
+                      <p className="text-sm text-destructive">
+                        {oldEnglishError}
+                      </p>
+                    ) : oldEnglishSearchResults.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        {oldEnglishSearchTerm.trim()
+                          ? "No matching words found."
+                          : "Click a word in the text or search Old English dictionary."}
+                      </p>
+                    ) : (
+                      <div className="space-y-2 text-sm leading-relaxed">
+                        {oldEnglishSearchResults.map(({ key, definitions }) => (
+                          <p key={key}>
+                            <span className="font-semibold">{key}</span>
+                            {": "}
+                            {definitions.join("; ")}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
                 <AccordionItem value="hitchcocks">
                   <AccordionTrigger
                     className={cn(
@@ -5181,79 +5254,6 @@ export function KJVReader() {
                             <span className="font-semibold">{key}</span>
                             {": "}
                             {definition}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="old-english">
-                  <AccordionTrigger
-                    className={cn(
-                      hasOldEnglishInfo && "text-emerald-600 dark:text-emerald-400",
-                    )}
-                  >
-                    Old English Dictionary
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-2 overflow-visible">
-                    <form
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const value = formData.get("old-english-search");
-                        applyOldEnglishSearch(
-                          typeof value === "string" ? value : "",
-                        );
-                      }}
-                    >
-                      <InputGroup>
-                        <InputGroupInput
-                          name="old-english-search"
-                          placeholder="Search Old English..."
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            type="submit"
-                            size="icon-sm"
-                            variant="ghost"
-                            aria-label="Search Old English dictionary"
-                            disabled={
-                              isOldEnglishLoading || isOldEnglishSearching
-                            }
-                          >
-                            {isOldEnglishLoading || isOldEnglishSearching ? (
-                              <LoaderCircleIcon className="animate-spin" />
-                            ) : (
-                              <SearchIcon />
-                            )}
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </form>
-                    {isOldEnglishLoading || isOldEnglishSearching ? (
-                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <LoaderCircleIcon className="size-4 animate-spin" />
-                        {isOldEnglishLoading
-                          ? "Loading Old English..."
-                          : "Searching Old English..."}
-                      </p>
-                    ) : oldEnglishError ? (
-                      <p className="text-sm text-destructive">
-                        {oldEnglishError}
-                      </p>
-                    ) : oldEnglishSearchResults.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">
-                        {oldEnglishSearchTerm.trim()
-                          ? "No matching words found."
-                          : "Click a word in the text or search Old English dictionary."}
-                      </p>
-                    ) : (
-                      <div className="space-y-2 text-sm leading-relaxed">
-                        {oldEnglishSearchResults.map(({ key, definitions }) => (
-                          <p key={key}>
-                            <span className="font-semibold">{key}</span>
-                            {": "}
-                            {definitions.join("; ")}
                           </p>
                         ))}
                       </div>
