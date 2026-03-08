@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -451,6 +452,11 @@ export function KJVReader() {
       applyConcordanceSearchRaw(rawValue);
     },
     [applyConcordanceSearchRaw],
+  );
+
+  const concordanceWords = useMemo(
+    () => (concordance ? Object.keys(concordance).sort((a, b) => a.localeCompare(b)) : []),
+    [concordance],
   );
 
   const {
@@ -1132,6 +1138,31 @@ export function KJVReader() {
       });
     });
   }
+
+  const openSearchTab = useCallback(() => {
+    const nextTabId = createId();
+    const nextLeaf = createLeaf(0, 0, "search");
+    const nextSearchNumber = tabs.filter((tab) =>
+      tab.title.toLowerCase().startsWith("search"),
+    ).length + 1;
+    const nextSearchTitle = nextSearchNumber === 1 ? "Search" : `Search ${nextSearchNumber}`;
+    setTabs((currentTabs) => [
+      ...currentTabs,
+      {
+        id: nextTabId,
+        title: nextSearchTitle,
+        root: nextLeaf,
+      },
+    ]);
+    setActiveTabId(nextTabId);
+    requestAnimationFrame(() => {
+      tabEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: tabsOrientation === "vertical" ? "end" : "nearest",
+        inline: tabsOrientation === "vertical" ? "nearest" : "end",
+      });
+    });
+  }, [tabs, tabsOrientation]);
 
   const openChapterReferenceInNewTab = useCallback((
     bookIndex: number,
@@ -1824,6 +1855,7 @@ export function KJVReader() {
           <ReaderTopBar
             isStudyMode={isStudyMode}
             onStudyModeChange={setIsStudyMode}
+            onOpenSearch={openSearchTab}
             onOpenProgress={() => setIsProgressOpen(true)}
             onOpenSettings={() => setIsSettingsOpen(true)}
           />
@@ -1872,6 +1904,9 @@ export function KJVReader() {
                 verseSpacing={verseSpacing}
                 onOpenTokenDetails={openTokenDetailsFromElement}
                 onSelectVerse={openCrossReferencesForVerse}
+                concordanceWords={concordanceWords}
+                ensureConcordanceWordsLoaded={ensureConcordanceLoaded}
+                onOpenSearchResult={openChapterReferenceInNewTab}
                 moveLeafChapter={moveLeafChapter}
                 toggleChapterRead={toggleChapterRead}
                 updateSplitSize={updateSplitSize}

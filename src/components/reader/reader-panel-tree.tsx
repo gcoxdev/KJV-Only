@@ -49,6 +49,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ChapterTextContent } from "@/components/reader/chapter-text-content";
+import { SearchPage } from "@/components/reader/search-page";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import type { LeafNeighbors } from "@/lib/reader-neighbors";
@@ -118,6 +119,14 @@ type ReaderPanelTreeProps = {
     chapterIndex: number,
     verseNumber: number,
   ) => void;
+  concordanceWords: string[];
+  ensureConcordanceWordsLoaded: () => Promise<unknown>;
+  onOpenSearchResult: (
+    bookIndex: number,
+    chapterIndex: number,
+    verseStart: number,
+    verseEnd?: number,
+  ) => void;
   moveLeafChapter: (leafId: string, step: -1 | 1) => void;
   toggleChapterRead: (bookIndex: number, chapterIndex: number) => void;
   updateSplitSize: (splitId: string, ratio: number) => void;
@@ -163,6 +172,9 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   verseSpacing,
   onOpenTokenDetails,
   onSelectVerse,
+  concordanceWords,
+  ensureConcordanceWordsLoaded,
+  onOpenSearchResult,
   moveLeafChapter,
   toggleChapterRead,
   updateSplitSize,
@@ -270,17 +282,13 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   }, [panelElementRefs, root]);
 
   const renderLeaf = (leaf: LeafNode) => {
-    const book = books[leaf.bookIndex];
-    if (!book) {
-      return null;
-    }
-
-    const chapter: Chapter | null = book.chapters[leaf.chapterIndex] ?? null;
+    const book = books[leaf.bookIndex] ?? null;
+    const chapter: Chapter | null = book?.chapters[leaf.chapterIndex] ?? null;
     const key = `${leaf.bookIndex}-${leaf.chapterIndex}`;
     const chapterReadKey = chapterProgressKey(leaf.bookIndex, leaf.chapterIndex);
     const isChapterRead = readChapters.has(chapterReadKey);
     const readChapterCount = readChapterCountByBook.get(leaf.bookIndex) ?? 0;
-    const isBookComplete = readChapterCount === book.chapters.length;
+    const isBookComplete = book ? readChapterCount === book.chapters.length : false;
     const currentBookIconCode = bookCodeForIndex(leaf.bookIndex);
     const currentBookIconSrc = iconPath(
       isBookComplete ? "color" : "bw",
@@ -357,7 +365,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
                 <>
                   <img
                     src={currentBookIconSrc}
-                    alt={`${book.name} icon`}
+                    alt={`${book?.name ?? "Book"} icon`}
                     className="size-6 shrink-0"
                   />
                   <Button
@@ -367,9 +375,11 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
                     className="w-auto max-w-full justify-start px-2"
                     onClick={openBookPickerDialog}
                   >
-                    {`${book.name} ${chapter.chapter}`}
+                    {`${book?.name ?? "Book"} ${chapter.chapter}`}
                   </Button>
                 </>
+              ) : leaf.view === "search" ? (
+                <p className="text-sm text-muted-foreground">Search</p>
               ) : (
                 <p className="text-sm text-muted-foreground">
                   Choose a book and chapter
@@ -628,7 +638,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
                 <Progress
                   value={readingProgress}
                   className="w-full"
-                  aria-label={`Reading progress for ${book.name} ${chapter.chapter}`}
+                  aria-label={`Reading progress for ${book?.name ?? "Book"} ${chapter.chapter}`}
                 />
                 <div className="flex items-center justify-between p-2">
                   <Button
@@ -663,6 +673,15 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
                 </div>
               </div>
             </>
+          ) : leaf.view === "search" ? (
+            <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
+              <SearchPage
+                books={books}
+                concordanceWords={concordanceWords}
+                ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
+                onOpenResult={onOpenSearchResult}
+              />
+            </CardContent>
           ) : (
             <CardContent className="min-h-0 flex-1 overflow-auto p-2">
               <BookChapterPicker

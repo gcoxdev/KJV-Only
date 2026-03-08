@@ -65,7 +65,7 @@ export function MapAndPhotoDialogs({
   return (
     <>
       <AlertDialog open={isMapDialogOpen} onOpenChange={onMapDialogOpenChange}>
-        <AlertDialogContent className="h-[min(86vh,900px)] w-[min(98vw,1700px)] max-w-none">
+        <AlertDialogContent className="h-[min(86vh,900px)] w-[min(98vw,1700px)]! max-w-none!">
           <AlertDialogHeader>
             <AlertDialogTitle>
               {activeMapDialogEntry
@@ -111,7 +111,7 @@ export function MapAndPhotoDialogs({
       </AlertDialog>
 
       <AlertDialog open={isPhotoDialogOpen} onOpenChange={onPhotoDialogOpenChange}>
-        <AlertDialogContent className="w-[min(98vw,1600px)] max-w-none">
+        <AlertDialogContent className="w-[min(98vw,1600px)]! max-w-none!">
           <AlertDialogHeader>
             <AlertDialogTitle>Photo</AlertDialogTitle>
             <AlertDialogDescription>

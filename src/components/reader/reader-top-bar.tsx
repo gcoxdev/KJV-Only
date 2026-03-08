@@ -1,4 +1,4 @@
-import { ChartBarIcon, MenuIcon, SettingsIcon } from "lucide-react";
+import { ChartBarIcon, MenuIcon, SearchIcon, SettingsIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,7 @@ import { Switch } from "@/components/ui/switch";
 type ReaderTopBarProps = {
   isStudyMode: boolean;
   onStudyModeChange: (checked: boolean) => void;
+  onOpenSearch: () => void;
   onOpenProgress: () => void;
   onOpenSettings: () => void;
 };
@@ -24,6 +25,7 @@ type ReaderTopBarProps = {
 export function ReaderTopBar({
   isStudyMode,
   onStudyModeChange,
+  onOpenSearch,
   onOpenProgress,
   onOpenSettings,
 }: ReaderTopBarProps) {
@@ -74,6 +76,15 @@ export function ReaderTopBar({
       </div>
 
       <div className="flex items-center gap-3">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label="Open search"
+          onClick={onOpenSearch}
+        >
+          <SearchIcon />
+        </Button>
         <div className="flex items-center gap-2">
           <Label htmlFor="study-mode" className="text-sm">
             Study
