@@ -2661,7 +2661,7 @@ export function KJVReader() {
                 className={cn(
                   "min-w-24 justify-start",
                   tabsOrientation === "vertical" &&
-                    "h-auto w-full min-w-0 flex-1 whitespace-normal break-words py-1.5 text-left leading-tight",
+                    "h-auto w-full min-w-0 flex-1 whitespace-normal wrap-break-word py-1.5 text-left leading-tight",
                   active &&
                     "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background!",
                 )}
