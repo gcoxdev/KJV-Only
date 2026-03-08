@@ -1,6 +1,8 @@
 import {
   Fragment,
+  lazy,
   memo,
+  Suspense,
   type ReactNode,
   useCallback,
   useEffect,
@@ -8,7 +10,6 @@ import {
   useRef,
   useState,
 } from "react";
-import L from "leaflet";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
@@ -44,6 +45,20 @@ import {
   type VerseToken,
 } from "@/types/bible";
 import { cn } from "@/lib/utils";
+import {
+  type AncientMapEntry,
+  type AncientMapPayload,
+  cleanMapMarkup,
+  deriveMapPhotoDialogItems,
+  mapEntryLabel,
+  mapEntrySearchableText,
+  matchesMapWord,
+  modernIdsForMapEntry,
+  parseJsonl,
+  type MapGeoJsonPayload,
+  type MapImageEntry,
+  type MapPhotoDialogItem,
+} from "@/lib/maps";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -108,12 +123,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  GeoJSON as LeafletGeoJSON,
-  MapContainer,
-  TileLayer,
-  useMap,
-} from "react-leaflet";
 
 type ReaderPayload = {
   books?: Book[];
@@ -173,54 +182,16 @@ type StrongsEntry = {
   kjv_refs?: Record<string, string[]>;
 };
 type StrongsPayload = Record<string, StrongsEntry>;
-type AncientMapRole = {
-  description?: string;
-  score?: number;
-};
-type AncientMapEntry = {
-  verses: string[];
-  translations: string[];
-  types: string[];
-  geojson_file: string;
-  geojson_roles?: Record<string, AncientMapRole>;
-};
-type AncientMapPayload = AncientMapEntry[];
-type MapGeoJsonPayload = {
-  type?: string;
-  bbox?: number[];
-  features?: Array<{
-    type?: string;
-    geometry?: {
-      type?: string;
-      coordinates?: unknown;
-    };
-  }>;
-};
-type MapImageThumbnail = {
-  file?: string;
-  description?: string;
-};
-type MapImageEntry = {
-  id: string;
-  credit?: string;
-  credit_url?: string;
-  url?: string;
-  file_url?: string;
-  license?: string;
-  descriptions?: Record<string, string>;
-  thumbnails?: Record<string, MapImageThumbnail>;
-};
-type MapPhotoDialogItem = {
-  id: string;
-  src: string;
-  alt: string;
-  caption: string;
-};
 
 type PanelDirection = "left" | "right" | "up" | "down";
 type SplitOrientation = "horizontal" | "vertical";
 type TabsOrientation = "horizontal" | "vertical";
 type IconVariant = "bw" | "color";
+
+const LazyMapGeoJsonView = lazy(async () => {
+  const module = await import("@/components/reader/map-geojson-view");
+  return { default: module.MapGeoJsonView };
+});
 
 type LeafNode = {
   id: string;
@@ -501,14 +472,6 @@ function loadMapGeoJson(geojsonFile: string) {
   return promise;
 }
 
-function parseJsonl<T>(text: string) {
-  return text
-    .split(/\r?\n/g)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => JSON.parse(line) as T);
-}
-
 function loadMapImages() {
   if (!mapImagesPromise) {
     mapImagesPromise = fetch("/maps/data/image.jsonl", { cache: "force-cache" })
@@ -622,21 +585,24 @@ const ChapterTextContent = memo(function ChapterTextContent({
   onOpenTokenDetails,
   onSelectVerse,
 }: ChapterTextContentProps) {
-  const paragraphGroups: Verse[][] = [];
-  let currentGroup: Verse[] = [];
-  for (const verse of verses) {
-    if (currentGroup.length === 0 || verse.paragraphStart) {
-      if (currentGroup.length > 0) {
-        paragraphGroups.push(currentGroup);
+  const paragraphGroups = useMemo(() => {
+    const grouped: Verse[][] = [];
+    let currentGroup: Verse[] = [];
+    for (const verse of verses) {
+      if (currentGroup.length === 0 || verse.paragraphStart) {
+        if (currentGroup.length > 0) {
+          grouped.push(currentGroup);
+        }
+        currentGroup = [verse];
+      } else {
+        currentGroup.push(verse);
       }
-      currentGroup = [verse];
-    } else {
-      currentGroup.push(verse);
     }
-  }
-  if (currentGroup.length > 0) {
-    paragraphGroups.push(currentGroup);
-  }
+    if (currentGroup.length > 0) {
+      grouped.push(currentGroup);
+    }
+    return grouped;
+  }, [verses]);
 
   return (
     <div
@@ -742,6 +708,149 @@ const ChapterTextContent = memo(function ChapterTextContent({
             </article>
           ))}
     </div>
+  );
+},
+(prev, next) =>
+  prev.bookName === next.bookName &&
+  prev.chapterNumber === next.chapterNumber &&
+  prev.verses === next.verses &&
+  prev.flowVersesByParagraph === next.flowVersesByParagraph &&
+  prev.readModeParagraphIndent === next.readModeParagraphIndent &&
+  prev.showVerseNumbers === next.showVerseNumbers &&
+  prev.isStudyMode === next.isStudyMode &&
+  prev.verseSpacing === next.verseSpacing,
+);
+
+type ConcordanceReferencePopoverProps = {
+  reference: string;
+  highlightWord: string;
+  renderPreview: (reference: string, highlightWord: string) => ReactNode;
+  onOpenReference: (reference: string) => void;
+  onCloseSidebar: () => void;
+};
+
+const ConcordanceReferencePopover = memo(function ConcordanceReferencePopover({
+  reference,
+  highlightWord,
+  renderPreview,
+  onOpenReference,
+  onCloseSidebar,
+}: ConcordanceReferencePopoverProps) {
+  const { setOpenMobile } = useSidebar();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [supportsHover, setSupportsHover] = useState(() => {
+    if (typeof window === "undefined" || !window.matchMedia) {
+      return false;
+    }
+    return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  });
+  const closeTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) {
+      return;
+    }
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const update = () => setSupportsHover(mediaQuery.matches);
+    update();
+    mediaQuery.addEventListener("change", update);
+    return () => {
+      mediaQuery.removeEventListener("change", update);
+      if (closeTimerRef.current !== null) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  const scheduleClose = () => {
+    if (!supportsHover) {
+      return;
+    }
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+    }
+    closeTimerRef.current = window.setTimeout(() => {
+      setIsPopoverOpen(false);
+      closeTimerRef.current = null;
+    }, 150);
+  };
+
+  const cancelScheduledClose = () => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  return (
+    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+      <PopoverTrigger
+        render={
+          <button
+            type="button"
+            className="text-primary underline underline-offset-4 hover:text-primary/80"
+            onMouseEnter={() => {
+              if (supportsHover) {
+                cancelScheduledClose();
+                setIsPopoverOpen(true);
+              }
+            }}
+            onMouseLeave={() => {
+              if (supportsHover && isPopoverOpen) {
+                scheduleClose();
+              }
+            }}
+            onClick={() => {
+              if (supportsHover) {
+                onOpenReference(reference);
+              }
+            }}
+          />
+        }
+      >
+        {reference}
+      </PopoverTrigger>
+      <PopoverContent
+        side="top"
+        align="start"
+        className="w-80 max-w-[calc(100vw-2rem)] space-y-2"
+        onMouseEnter={() => {
+          if (supportsHover) {
+            cancelScheduledClose();
+            setIsPopoverOpen(true);
+          }
+        }}
+        onMouseLeave={() => {
+          if (supportsHover && isPopoverOpen) {
+            scheduleClose();
+          }
+        }}
+      >
+        <div className="max-h-[min(24rem,60vh)] overflow-y-auto pr-1 text-xs leading-relaxed">
+          {renderPreview(reference, highlightWord)}
+        </div>
+        {!supportsHover ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-xs"
+              onClick={() => {
+                onOpenReference(reference);
+                setOpenMobile(false);
+                onCloseSidebar();
+                setIsPopoverOpen(false);
+              }}
+            >
+              <ExternalLinkIcon className="size-3.5" />
+              Open
+            </Button>
+          </div>
+        ) : null}
+      </PopoverContent>
+    </Popover>
   );
 });
 
@@ -956,111 +1065,6 @@ function resolveOldEnglishKey(oldEnglish: OldEnglishPayload, rawWord: string) {
     (key) => key.toLowerCase() === lowered,
   );
   return fallback ?? null;
-}
-
-function mapEntryLabel(entry: AncientMapEntry) {
-  return entry.translations[0] ?? entry.geojson_file.replace(".geojson", "");
-}
-
-function matchesMapWord(entry: AncientMapEntry, rawWord: string) {
-  const cleaned = normalizeConcordanceWord(rawWord).toLowerCase();
-  if (!cleaned) {
-    return false;
-  }
-
-  return entry.translations.some(
-    (name) => normalizeConcordanceWord(name).toLowerCase() === cleaned,
-  );
-}
-
-function mapEntrySearchableText(entry: AncientMapEntry) {
-  return [
-    ...entry.translations,
-    ...entry.types,
-    ...entry.verses,
-    entry.geojson_file,
-  ]
-    .join(" ")
-    .toLowerCase();
-}
-
-function cleanMapMarkup(input: string) {
-  return input
-    .replace(/<[^>]+>/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function modernIdsForMapEntry(entry: AncientMapEntry) {
-  const ids = new Set<string>();
-  for (const roleKey of Object.keys(entry.geojson_roles ?? {})) {
-    const [root] = roleKey.split(".");
-    if (/^m[0-9a-f]{6}$/i.test(root)) {
-      ids.add(root);
-    }
-  }
-  return [...ids];
-}
-
-function extractCoordinateBounds(
-  coordinates: unknown,
-  accumulator: { minLat: number; maxLat: number; minLng: number; maxLng: number },
-) {
-  if (!Array.isArray(coordinates)) {
-    return;
-  }
-
-  if (
-    coordinates.length >= 2 &&
-    typeof coordinates[0] === "number" &&
-    typeof coordinates[1] === "number"
-  ) {
-    const lng = coordinates[0];
-    const lat = coordinates[1];
-    accumulator.minLat = Math.min(accumulator.minLat, lat);
-    accumulator.maxLat = Math.max(accumulator.maxLat, lat);
-    accumulator.minLng = Math.min(accumulator.minLng, lng);
-    accumulator.maxLng = Math.max(accumulator.maxLng, lng);
-    return;
-  }
-
-  for (const item of coordinates) {
-    extractCoordinateBounds(item, accumulator);
-  }
-}
-
-function boundsForGeoJson(payload: MapGeoJsonPayload) {
-  if (Array.isArray(payload.bbox) && payload.bbox.length >= 4) {
-    return [
-      [payload.bbox[1], payload.bbox[0]],
-      [payload.bbox[3], payload.bbox[2]],
-    ] as [[number, number], [number, number]];
-  }
-
-  const bounds = {
-    minLat: Number.POSITIVE_INFINITY,
-    maxLat: Number.NEGATIVE_INFINITY,
-    minLng: Number.POSITIVE_INFINITY,
-    maxLng: Number.NEGATIVE_INFINITY,
-  };
-
-  for (const feature of payload.features ?? []) {
-    extractCoordinateBounds(feature.geometry?.coordinates, bounds);
-  }
-
-  if (
-    !Number.isFinite(bounds.minLat) ||
-    !Number.isFinite(bounds.maxLat) ||
-    !Number.isFinite(bounds.minLng) ||
-    !Number.isFinite(bounds.maxLng)
-  ) {
-    return null;
-  }
-
-  return [
-    [bounds.minLat, bounds.minLng],
-    [bounds.maxLat, bounds.maxLng],
-  ] as [[number, number], [number, number]];
 }
 
 function normalizeStrongsCode(value: string) {
@@ -1800,24 +1804,6 @@ function findParentSplitForLeaf(
   const parent = path[path.length - 2];
   return parent.type === "split" ? parent : null;
 }
-
-const MapBoundsSync = memo(function MapBoundsSync({
-  geojson,
-}: {
-  geojson: MapGeoJsonPayload;
-}) {
-  const map = useMap();
-
-  useEffect(() => {
-    const bounds = boundsForGeoJson(geojson);
-    if (!bounds) {
-      return;
-    }
-    map.fitBounds(bounds, { padding: [24, 24], maxZoom: 12 });
-  }, [geojson, map]);
-
-  return null;
-});
 
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -3709,6 +3695,9 @@ export function KJVReader() {
     },
     [crossRefs, ensureCrossRefsLoaded],
   );
+  const closeRightSidebarForMobile = useCallback(() => {
+    setIsRightSidebarOpen(false);
+  }, []);
 
   const openTokenDetailsFromElement = useCallback(
     (
@@ -3870,7 +3859,9 @@ export function KJVReader() {
       };
 
       const applyMapsSelection = (data: AncientMapPayload) => {
-        const matches = data.filter((entry) => matchesMapWord(entry, rawWord));
+        const matches = data.filter((entry) =>
+          matchesMapWord(entry, rawWord, normalizeConcordanceWord),
+        );
         setMapsWordAccordionValue([]);
         setSelectedMapsEntries(matches);
         setConcordanceAccordionValue((current) => {
@@ -4309,6 +4300,9 @@ export function KJVReader() {
                         <ConcordanceReferencePopover
                           reference={reference}
                           highlightWord={entry.name}
+                          renderPreview={referencePreviewContent}
+                          onOpenReference={openConcordanceReference}
+                          onCloseSidebar={closeRightSidebarForMobile}
                         />
                         {index < entry.verses.length - 1 ? ", " : null}
                       </Fragment>
@@ -4369,6 +4363,9 @@ export function KJVReader() {
                       <ConcordanceReferencePopover
                         reference={relation.verse}
                         highlightWord={relation.name || primaryName}
+                        renderPreview={referencePreviewContent}
+                        onOpenReference={openConcordanceReference}
+                        onCloseSidebar={closeRightSidebarForMobile}
                       />
                       )
                     </>
@@ -4398,6 +4395,9 @@ export function KJVReader() {
                       <ConcordanceReferencePopover
                         reference={relation.verse}
                         highlightWord={relation.name || primaryName}
+                        renderPreview={referencePreviewContent}
+                        onOpenReference={openConcordanceReference}
+                        onCloseSidebar={closeRightSidebarForMobile}
                       />
                       )
                     </>
@@ -4427,6 +4427,9 @@ export function KJVReader() {
                       <ConcordanceReferencePopover
                         reference={relation.verse}
                         highlightWord={relation.name || primaryName}
+                        renderPreview={referencePreviewContent}
+                        onOpenReference={openConcordanceReference}
+                        onCloseSidebar={closeRightSidebarForMobile}
                       />
                       )
                     </>
@@ -5142,133 +5145,6 @@ export function KJVReader() {
     </Card>
   ) : null;
 
-  function ConcordanceReferencePopover({
-    reference,
-    highlightWord,
-  }: {
-    reference: string;
-    highlightWord: string;
-  }) {
-    const { setOpenMobile } = useSidebar();
-    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-    const [supportsHover, setSupportsHover] = useState(() => {
-      if (typeof window === "undefined" || !window.matchMedia) {
-        return false;
-      }
-      return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    });
-    const closeTimerRef = useRef<number | null>(null);
-
-    useEffect(() => {
-      if (typeof window === "undefined" || !window.matchMedia) {
-        return;
-      }
-      const mediaQuery = window.matchMedia(
-        "(hover: hover) and (pointer: fine)",
-      );
-      const update = () => setSupportsHover(mediaQuery.matches);
-      update();
-      mediaQuery.addEventListener("change", update);
-      return () => {
-        mediaQuery.removeEventListener("change", update);
-        if (closeTimerRef.current !== null) {
-          window.clearTimeout(closeTimerRef.current);
-          closeTimerRef.current = null;
-        }
-      };
-    }, []);
-
-    const scheduleClose = () => {
-      if (!supportsHover) {
-        return;
-      }
-      if (closeTimerRef.current !== null) {
-        window.clearTimeout(closeTimerRef.current);
-      }
-      closeTimerRef.current = window.setTimeout(() => {
-        setIsPopoverOpen(false);
-        closeTimerRef.current = null;
-      }, 150);
-    };
-
-    const cancelScheduledClose = () => {
-      if (closeTimerRef.current !== null) {
-        window.clearTimeout(closeTimerRef.current);
-        closeTimerRef.current = null;
-      }
-    };
-
-    return (
-      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-        <PopoverTrigger
-          render={
-            <button
-              type="button"
-              className="text-primary underline underline-offset-4 hover:text-primary/80"
-              onMouseEnter={() => {
-                if (supportsHover) {
-                  cancelScheduledClose();
-                  setIsPopoverOpen(true);
-                }
-              }}
-              onMouseLeave={() => {
-                if (supportsHover && isPopoverOpen) {
-                  scheduleClose();
-                }
-              }}
-              onClick={() => {
-                if (supportsHover) {
-                  openConcordanceReference(reference);
-                }
-              }}
-            />
-          }
-        >
-          {reference}
-        </PopoverTrigger>
-        <PopoverContent
-          side="top"
-          align="start"
-          className="w-80 max-w-[calc(100vw-2rem)] space-y-2"
-          onMouseEnter={() => {
-            if (supportsHover) {
-              cancelScheduledClose();
-              setIsPopoverOpen(true);
-            }
-          }}
-          onMouseLeave={() => {
-            if (supportsHover && isPopoverOpen) {
-              scheduleClose();
-            }
-          }}
-        >
-          <div className="max-h-[min(24rem,60vh)] overflow-y-auto pr-1 text-xs leading-relaxed">
-            {referencePreviewContent(reference, highlightWord)}
-          </div>
-          {!supportsHover ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="h-7 px-2 text-xs"
-                onClick={() => {
-                  openConcordanceReference(reference);
-                  setOpenMobile(false);
-                  setIsRightSidebarOpen(false);
-                  setIsPopoverOpen(false);
-                }}
-              >
-                <ExternalLinkIcon className="size-3.5" />
-                Open
-              </Button>
-            </div>
-          ) : null}
-        </PopoverContent>
-      </Popover>
-    );
-  }
-
   const tabsStrip = (
     <ScrollArea className="h-full w-full">
       <div
@@ -5385,6 +5261,15 @@ export function KJVReader() {
   const allStudyAccordionsOpen = studyAccordionItems.every((item) =>
     concordanceAccordionValue.includes(item),
   );
+  const openStudySections = new Set(concordanceAccordionValue);
+  const isCrossRefsSectionOpen = openStudySections.has("cross-refs");
+  const isConcordanceSectionOpen = openStudySections.has("concordance");
+  const isWebstersSectionOpen = openStudySections.has("websters");
+  const isStrongsSectionOpen = openStudySections.has("strongs");
+  const isMapsSectionOpen = openStudySections.has("maps");
+  const isGenealogySectionOpen = openStudySections.has("genealogy");
+  const isHitchcocksSectionOpen = openStudySections.has("hitchcocks");
+  const isOldEnglishSectionOpen = openStudySections.has("old-english");
   const hasCrossRefsInfo = Boolean(
     selectedCrossReferences && selectedCrossReferences.references.length > 0,
   );
@@ -5559,71 +5444,78 @@ export function KJVReader() {
                     Cross References
                   </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
-                    {isCrossRefsLoading ? (
-                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <LoaderCircleIcon className="size-4 animate-spin" />
-                        Loading cross references...
-                      </p>
-                    ) : crossRefsError ? (
-                      <p className="text-sm text-destructive">
-                        {crossRefsError}
-                      </p>
-                    ) : !selectedCrossReferences ? (
-                      <p className="text-sm text-muted-foreground">
-                        Click a word or verse to load cross references.
-                      </p>
-                    ) : selectedCrossReferences.references.length === 0 ? (
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">
-                          {(() => {
-                            const parsed = parseBibleReference(
-                              selectedCrossReferences.key,
-                            );
-                            if (!parsed) {
-                              return selectedCrossReferences.key;
-                            }
-                            const book = books[parsed.bookIndex];
-                            return `${book?.name ?? parsed.bookCode} ${parsed.startChapterIndex + 1}:${parsed.startVerse}`;
-                          })()}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          No cross references found.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium">
-                          {(() => {
-                            const parsed = parseBibleReference(
-                              selectedCrossReferences.key,
-                            );
-                            if (!parsed) {
-                              return selectedCrossReferences.key;
-                            }
-                            const book = books[parsed.bookIndex];
-                            return `${book?.name ?? parsed.bookCode} ${parsed.startChapterIndex + 1}:${parsed.startVerse}`;
-                          })()}
-                        </p>
-                        <p className="text-sm leading-7">
-                          {selectedCrossReferences.references.map(
-                            (reference, index) => (
-                              <Fragment
-                                key={`${selectedCrossReferences.key}-${reference}-${index}`}
-                              >
-                                <ConcordanceReferencePopover
-                                  reference={reference}
-                                  highlightWord=""
-                                />
-                                {index <
-                                selectedCrossReferences.references.length - 1
-                                  ? ", "
-                                  : null}
-                              </Fragment>
-                            ),
-                          )}
-                        </p>
-                      </div>
-                    )}
+                    {isCrossRefsSectionOpen ? (
+                      <>
+                        {isCrossRefsLoading ? (
+                          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <LoaderCircleIcon className="size-4 animate-spin" />
+                            Loading cross references...
+                          </p>
+                        ) : crossRefsError ? (
+                          <p className="text-sm text-destructive">
+                            {crossRefsError}
+                          </p>
+                        ) : !selectedCrossReferences ? (
+                          <p className="text-sm text-muted-foreground">
+                            Click a word or verse to load cross references.
+                          </p>
+                        ) : selectedCrossReferences.references.length === 0 ? (
+                          <div className="space-y-1">
+                            <p className="text-sm font-medium">
+                              {(() => {
+                                const parsed = parseBibleReference(
+                                  selectedCrossReferences.key,
+                                );
+                                if (!parsed) {
+                                  return selectedCrossReferences.key;
+                                }
+                                const book = books[parsed.bookIndex];
+                                return `${book?.name ?? parsed.bookCode} ${parsed.startChapterIndex + 1}:${parsed.startVerse}`;
+                              })()}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              No cross references found.
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <p className="text-sm font-medium">
+                              {(() => {
+                                const parsed = parseBibleReference(
+                                  selectedCrossReferences.key,
+                                );
+                                if (!parsed) {
+                                  return selectedCrossReferences.key;
+                                }
+                                const book = books[parsed.bookIndex];
+                                return `${book?.name ?? parsed.bookCode} ${parsed.startChapterIndex + 1}:${parsed.startVerse}`;
+                              })()}
+                            </p>
+                            <p className="text-sm leading-7">
+                              {selectedCrossReferences.references.map(
+                                (reference, index) => (
+                                  <Fragment
+                                    key={`${selectedCrossReferences.key}-${reference}-${index}`}
+                                  >
+                                    <ConcordanceReferencePopover
+                                      reference={reference}
+                                      highlightWord=""
+                                      renderPreview={referencePreviewContent}
+                                      onOpenReference={openConcordanceReference}
+                                      onCloseSidebar={closeRightSidebarForMobile}
+                                    />
+                                    {index <
+                                    selectedCrossReferences.references.length - 1
+                                      ? ", "
+                                      : null}
+                                  </Fragment>
+                                ),
+                              )}
+                            </p>
+                          </div>
+                        )}
+                      </>
+                    ) : null}
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="concordance">
@@ -5636,100 +5528,107 @@ export function KJVReader() {
                     Concordance
                   </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
-                    <form
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const value = formData.get("concordance-search");
-                        applyConcordanceSearch(
-                          typeof value === "string" ? value : "",
-                        );
-                      }}
-                    >
-                      <InputGroup>
-                        <InputGroupInput
-                          name="concordance-search"
-                          placeholder="Search concordance..."
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            type="submit"
-                            size="icon-sm"
-                            variant="ghost"
-                            aria-label="Search concordance"
-                            disabled={
-                              isConcordanceLoading || isConcordanceSearching
+                    {isConcordanceSectionOpen ? (
+                      <>
+                        <form
+                          onSubmit={(event) => {
+                            event.preventDefault();
+                            const formData = new FormData(event.currentTarget);
+                            const value = formData.get("concordance-search");
+                            applyConcordanceSearch(
+                              typeof value === "string" ? value : "",
+                            );
+                          }}
+                        >
+                          <InputGroup>
+                            <InputGroupInput
+                              name="concordance-search"
+                              placeholder="Search concordance..."
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                type="submit"
+                                size="icon-sm"
+                                variant="ghost"
+                                aria-label="Search concordance"
+                                disabled={
+                                  isConcordanceLoading || isConcordanceSearching
+                                }
+                              >
+                                {isConcordanceLoading || isConcordanceSearching ? (
+                                  <LoaderCircleIcon className="animate-spin" />
+                                ) : (
+                                  <SearchIcon />
+                                )}
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </form>
+                        {isConcordanceLoading || isConcordanceSearching ? (
+                          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <LoaderCircleIcon className="size-4 animate-spin" />
+                            {isConcordanceLoading
+                              ? "Loading concordance..."
+                              : "Searching concordance..."}
+                          </p>
+                        ) : concordanceError ? (
+                          <p className="text-sm text-destructive">
+                            {concordanceError}
+                          </p>
+                        ) : concordanceSearchResults.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">
+                            {concordanceSearchTerm.trim()
+                              ? "No matching words found."
+                              : "Click a word in the text or search concordance."}
+                          </p>
+                        ) : (
+                          <Accordion
+                            className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+                            multiple
+                            value={concordanceWordAccordionValue}
+                            onValueChange={(value) =>
+                              setConcordanceWordAccordionValue(
+                                value.filter(Boolean) as string[],
+                              )
                             }
                           >
-                            {isConcordanceLoading || isConcordanceSearching ? (
-                              <LoaderCircleIcon className="animate-spin" />
-                            ) : (
-                              <SearchIcon />
-                            )}
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </form>
-                    {isConcordanceLoading || isConcordanceSearching ? (
-                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <LoaderCircleIcon className="size-4 animate-spin" />
-                        {isConcordanceLoading
-                          ? "Loading concordance..."
-                          : "Searching concordance..."}
-                      </p>
-                    ) : concordanceError ? (
-                      <p className="text-sm text-destructive">
-                        {concordanceError}
-                      </p>
-                    ) : concordanceSearchResults.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">
-                        {concordanceSearchTerm.trim()
-                          ? "No matching words found."
-                          : "Click a word in the text or search concordance."}
-                      </p>
-                    ) : (
-                      <Accordion
-                        className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
-                        multiple
-                        value={concordanceWordAccordionValue}
-                        onValueChange={(value) =>
-                          setConcordanceWordAccordionValue(
-                            value.filter(Boolean) as string[],
-                          )
-                        }
-                      >
-                        {concordanceSearchResults.map((entry) => (
-                          <AccordionItem key={entry.key} value={entry.key}>
-                            <AccordionTrigger>
-                              {`${entry.key} (${entry.references.length})`}
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              {entry.references.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">
-                                  No references found.
-                                </p>
-                              ) : (
-                                <p className="text-sm leading-7">
-                                  {entry.references.map((reference, index) => (
-                                    <Fragment
-                                      key={`${entry.key}-${reference}-${index}`}
-                                    >
-                                      <ConcordanceReferencePopover
-                                        reference={reference}
-                                        highlightWord={entry.key}
-                                      />
-                                      {index < entry.references.length - 1
-                                        ? ", "
-                                        : null}
-                                    </Fragment>
-                                  ))}
-                                </p>
-                              )}
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    )}
+                            {concordanceSearchResults.map((entry) => (
+                              <AccordionItem key={entry.key} value={entry.key}>
+                                <AccordionTrigger>
+                                  {`${entry.key} (${entry.references.length})`}
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                  {entry.references.length === 0 ? (
+                                    <p className="text-sm text-muted-foreground">
+                                      No references found.
+                                    </p>
+                                  ) : (
+                                    <p className="text-sm leading-7">
+                                      {entry.references.map((reference, index) => (
+                                        <Fragment
+                                          key={`${entry.key}-${reference}-${index}`}
+                                        >
+                                          <ConcordanceReferencePopover
+                                            reference={reference}
+                                            highlightWord={entry.key}
+                                            renderPreview={referencePreviewContent}
+                                            onOpenReference={openConcordanceReference}
+                                            onCloseSidebar={closeRightSidebarForMobile}
+                                          />
+                                          {index < entry.references.length - 1
+                                            ? ", "
+                                            : null}
+                                        </Fragment>
+                                      ))}
+                                    </p>
+                                  )}
+                                </AccordionContent>
+                              </AccordionItem>
+                            ))}
+                          </Accordion>
+                        )}
+                      </>
+                    ) : null}
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="websters">
@@ -5741,106 +5640,110 @@ export function KJVReader() {
                     Webster&apos;s 1828 Dictionary
                   </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
-                    <form
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const value = formData.get("websters-search");
-                        applyWebstersSearch(
-                          typeof value === "string" ? value : "",
-                        );
-                      }}
-                    >
-                      <InputGroup>
-                        <InputGroupInput
-                          name="websters-search"
-                          placeholder="Search Webster's..."
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            type="submit"
-                            size="icon-sm"
-                            variant="ghost"
-                            aria-label="Search Webster's dictionary"
-                            disabled={isWebstersLoading || isWebstersSearching}
+                    {isWebstersSectionOpen ? (
+                      <>
+                        <form
+                          onSubmit={(event) => {
+                            event.preventDefault();
+                            const formData = new FormData(event.currentTarget);
+                            const value = formData.get("websters-search");
+                            applyWebstersSearch(
+                              typeof value === "string" ? value : "",
+                            );
+                          }}
+                        >
+                          <InputGroup>
+                            <InputGroupInput
+                              name="websters-search"
+                              placeholder="Search Webster's..."
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                type="submit"
+                                size="icon-sm"
+                                variant="ghost"
+                                aria-label="Search Webster's dictionary"
+                                disabled={isWebstersLoading || isWebstersSearching}
+                              >
+                                {isWebstersLoading || isWebstersSearching ? (
+                                  <LoaderCircleIcon className="animate-spin" />
+                                ) : (
+                                  <SearchIcon />
+                                )}
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </form>
+                        {isWebstersLoading || isWebstersSearching ? (
+                          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <LoaderCircleIcon className="size-4 animate-spin" />
+                            {isWebstersLoading
+                              ? "Loading Webster's..."
+                              : "Searching Webster's..."}
+                          </p>
+                        ) : webstersError ? (
+                          <p className="text-sm text-destructive">
+                            {webstersError}
+                          </p>
+                        ) : webstersSearchResults.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">
+                            {webstersSearchTerm.trim()
+                              ? "No matching words found."
+                              : "Search Webster's 1828 dictionary."}
+                          </p>
+                        ) : (
+                          <Accordion
+                            className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+                            multiple
+                            value={webstersWordAccordionValue}
+                            onValueChange={(value) =>
+                              setWebstersWordAccordionValue(
+                                value.filter(Boolean) as string[],
+                              )
+                            }
                           >
-                            {isWebstersLoading || isWebstersSearching ? (
-                              <LoaderCircleIcon className="animate-spin" />
-                            ) : (
-                              <SearchIcon />
-                            )}
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </form>
-                    {isWebstersLoading || isWebstersSearching ? (
-                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <LoaderCircleIcon className="size-4 animate-spin" />
-                        {isWebstersLoading
-                          ? "Loading Webster's..."
-                          : "Searching Webster's..."}
-                      </p>
-                    ) : webstersError ? (
-                      <p className="text-sm text-destructive">
-                        {webstersError}
-                      </p>
-                    ) : webstersSearchResults.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">
-                        {webstersSearchTerm.trim()
-                          ? "No matching words found."
-                          : "Search Webster's 1828 dictionary."}
-                      </p>
-                    ) : (
-                      <Accordion
-                        className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
-                        multiple
-                        value={webstersWordAccordionValue}
-                        onValueChange={(value) =>
-                          setWebstersWordAccordionValue(
-                            value.filter(Boolean) as string[],
-                          )
-                        }
-                      >
-                        {webstersSearchResults.map(({ key, entry }) => (
-                          <AccordionItem key={key} value={key}>
-                            <AccordionTrigger>{key}</AccordionTrigger>
-                            <AccordionContent className="space-y-2">
-                              {entry.pronunciation ? (
-                                <p className="text-sm text-muted-foreground">
-                                  {entry.pronunciation}
-                                </p>
-                              ) : null}
-                              {entry.definitions.length > 0 ? (
-                                <div className="space-y-2 text-sm">
-                                  {entry.definitions.map(
-                                    (definition, index) => (
-                                      <div
-                                        key={`${key}-definition-${index}`}
-                                        className="space-y-1"
-                                      >
-                                        <p className="font-medium capitalize">
-                                          {definition.type}
-                                        </p>
-                                        <p
-                                          className="leading-relaxed"
-                                          dangerouslySetInnerHTML={{
-                                            __html: definition.text,
-                                          }}
-                                        />
-                                      </div>
-                                    ),
+                            {webstersSearchResults.map(({ key, entry }) => (
+                              <AccordionItem key={key} value={key}>
+                                <AccordionTrigger>{key}</AccordionTrigger>
+                                <AccordionContent className="space-y-2">
+                                  {entry.pronunciation ? (
+                                    <p className="text-sm text-muted-foreground">
+                                      {entry.pronunciation}
+                                    </p>
+                                  ) : null}
+                                  {entry.definitions.length > 0 ? (
+                                    <div className="space-y-2 text-sm">
+                                      {entry.definitions.map(
+                                        (definition, index) => (
+                                          <div
+                                            key={`${key}-definition-${index}`}
+                                            className="space-y-1"
+                                          >
+                                            <p className="font-medium capitalize">
+                                              {definition.type}
+                                            </p>
+                                            <p
+                                              className="leading-relaxed"
+                                              dangerouslySetInnerHTML={{
+                                                __html: definition.text,
+                                              }}
+                                            />
+                                          </div>
+                                        ),
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <p className="text-sm text-muted-foreground">
+                                      No definitions found.
+                                    </p>
                                   )}
-                                </div>
-                              ) : (
-                                <p className="text-sm text-muted-foreground">
-                                  No definitions found.
-                                </p>
-                              )}
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    )}
+                                </AccordionContent>
+                              </AccordionItem>
+                            ))}
+                          </Accordion>
+                        )}
+                      </>
+                    ) : null}
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="strongs">
@@ -5852,139 +5755,153 @@ export function KJVReader() {
                     Strong&apos;s Dictionary
                   </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
-                    <form
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const value = formData.get("strongs-search");
-                        applyStrongsSearch(typeof value === "string" ? value : "");
-                      }}
-                    >
-                      <InputGroup>
-                        <InputGroupInput
-                          ref={strongsSearchInputRef}
-                          name="strongs-search"
-                          placeholder="Search Strong's..."
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            type="submit"
-                            size="icon-sm"
-                            variant="ghost"
-                            aria-label="Search Strong's dictionary"
-                            disabled={isStrongsLoading || isStrongsSearching}
+                    {isStrongsSectionOpen ? (
+                      <>
+                        <form
+                          onSubmit={(event) => {
+                            event.preventDefault();
+                            const formData = new FormData(event.currentTarget);
+                            const value = formData.get("strongs-search");
+                            applyStrongsSearch(typeof value === "string" ? value : "");
+                          }}
+                        >
+                          <InputGroup>
+                            <InputGroupInput
+                              ref={strongsSearchInputRef}
+                              name="strongs-search"
+                              placeholder="Search Strong's..."
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                type="submit"
+                                size="icon-sm"
+                                variant="ghost"
+                                aria-label="Search Strong's dictionary"
+                                disabled={isStrongsLoading || isStrongsSearching}
+                              >
+                                {isStrongsLoading || isStrongsSearching ? (
+                                  <LoaderCircleIcon className="animate-spin" />
+                                ) : (
+                                  <SearchIcon />
+                                )}
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </form>
+                        {isStrongsLoading || isStrongsSearching ? (
+                          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <LoaderCircleIcon className="size-4 animate-spin" />
+                            {isStrongsLoading
+                              ? "Loading Strong's..."
+                              : "Searching Strong's..."}
+                          </p>
+                        ) : strongsError ? (
+                          <p className="text-sm text-destructive">{strongsError}</p>
+                        ) : strongsSearchResults.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">
+                            {strongsSearchTerm.trim()
+                              ? "No matching entries found."
+                              : "Click a Strong's-tagged word or search Strong's dictionary."}
+                          </p>
+                        ) : (
+                          <Accordion
+                            className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+                            multiple
+                            value={strongsWordAccordionValue}
+                            onValueChange={(value) =>
+                              setStrongsWordAccordionValue(
+                                value.filter(Boolean) as string[],
+                              )
+                            }
                           >
-                            {isStrongsLoading || isStrongsSearching ? (
-                              <LoaderCircleIcon className="animate-spin" />
-                            ) : (
-                              <SearchIcon />
-                            )}
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </form>
-                    {isStrongsLoading || isStrongsSearching ? (
-                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <LoaderCircleIcon className="size-4 animate-spin" />
-                        {isStrongsLoading
-                          ? "Loading Strong's..."
-                          : "Searching Strong's..."}
-                      </p>
-                    ) : strongsError ? (
-                      <p className="text-sm text-destructive">{strongsError}</p>
-                    ) : strongsSearchResults.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">
-                        {strongsSearchTerm.trim()
-                          ? "No matching entries found."
-                          : "Click a Strong's-tagged word or search Strong's dictionary."}
-                      </p>
-                    ) : (
-                      <Accordion
-                        className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
-                        multiple
-                        value={strongsWordAccordionValue}
-                        onValueChange={(value) =>
-                          setStrongsWordAccordionValue(
-                            value.filter(Boolean) as string[],
-                          )
-                        }
-                      >
-                        {strongsSearchResults.map(({ code, testament, entry }) => (
-                          <AccordionItem key={code} value={code}>
-                            <AccordionTrigger>{`${code} (${testament})`}</AccordionTrigger>
-                            <AccordionContent className="space-y-2 text-sm">
-                              {entry.kjv_def ? (
-                                <p>
-                                  <span className="text-muted-foreground">
-                                    KJV Definition:
-                                  </span>{" "}
-                                  {entry.kjv_def}
-                                </p>
-                              ) : null}
-                              {entry.kjv_refs && Object.keys(entry.kjv_refs).length > 0 ? (
-                                <div className="space-y-1">
-                                  <p className="text-muted-foreground">KJV References</p>
-                                  <Accordion className="w-full rounded-md border px-2" multiple>
-                                    {Object.entries(entry.kjv_refs).map(([word, references]) => (
-                                      <AccordionItem key={`${code}-${word}`} value={`${code}-${word}`}>
-                                        <AccordionTrigger>{`${word} (${references.length})`}</AccordionTrigger>
-                                        <AccordionContent>
-                                          <p className="leading-7">
-                                            {references.map((reference, index) => (
-                                              <Fragment key={`${code}-${word}-${reference}-${index}`}>
-                                                <ConcordanceReferencePopover
-                                                  reference={reference}
-                                                  highlightWord={word}
-                                                />
-                                                {index < references.length - 1 ? ", " : null}
-                                              </Fragment>
-                                            ))}
-                                          </p>
-                                        </AccordionContent>
-                                      </AccordionItem>
-                                    ))}
-                                  </Accordion>
-                                </div>
-                              ) : null}
-                              {entry.strongs_def ? (
-                                <p>
-                                  <span className="text-muted-foreground">
-                                    Strong&apos;s Definition:
-                                  </span>{" "}
-                                  {entry.strongs_def}
-                                </p>
-                              ) : null}
-                              {entry.lemma ? (
-                                <p>
-                                  <span className="text-muted-foreground">Lemma:</span>{" "}
-                                  <span className="font-mono">{entry.lemma}</span>
-                                </p>
-                              ) : null}
-                              {entry.translit ? (
-                                <p>
-                                  <span className="text-muted-foreground">
-                                    Transliteration:
-                                  </span>{" "}
-                                  <span className="font-mono">{entry.translit}</span>
-                                </p>
-                              ) : null}
-                              {entry.pron ? (
-                                <p>
-                                  <span className="text-muted-foreground">Pronunciation:</span>{" "}
-                                  {entry.pron}
-                                </p>
-                              ) : null}
-                              {entry.derivation ? (
-                                <p>
-                                  <span className="text-muted-foreground">Derivation:</span>{" "}
-                                  {entry.derivation}
-                                </p>
-                              ) : null}
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    )}
+                            {strongsSearchResults.map(({ code, testament, entry }) => (
+                              <AccordionItem key={code} value={code}>
+                                <AccordionTrigger>{`${code} (${testament})`}</AccordionTrigger>
+                                <AccordionContent className="space-y-2 text-sm">
+                                  {entry.kjv_def ? (
+                                    <p>
+                                      <span className="text-muted-foreground">
+                                        KJV Definition:
+                                      </span>{" "}
+                                      {entry.kjv_def}
+                                    </p>
+                                  ) : null}
+                                  {entry.kjv_refs && Object.keys(entry.kjv_refs).length > 0 ? (
+                                    <div className="space-y-1">
+                                      <p className="text-muted-foreground">KJV References</p>
+                                      <Accordion className="w-full rounded-md border px-2" multiple>
+                                        {Object.entries(entry.kjv_refs).map(
+                                          ([word, references]) => (
+                                            <AccordionItem
+                                              key={`${code}-${word}`}
+                                              value={`${code}-${word}`}
+                                            >
+                                              <AccordionTrigger>{`${word} (${references.length})`}</AccordionTrigger>
+                                              <AccordionContent>
+                                                <p className="leading-7">
+                                                  {references.map((reference, index) => (
+                                                    <Fragment key={`${code}-${word}-${reference}-${index}`}>
+                                                      <ConcordanceReferencePopover
+                                                        reference={reference}
+                                                        highlightWord={word}
+                                                        renderPreview={referencePreviewContent}
+                                                        onOpenReference={openConcordanceReference}
+                                                        onCloseSidebar={closeRightSidebarForMobile}
+                                                      />
+                                                      {index < references.length - 1
+                                                        ? ", "
+                                                        : null}
+                                                    </Fragment>
+                                                  ))}
+                                                </p>
+                                              </AccordionContent>
+                                            </AccordionItem>
+                                          ),
+                                        )}
+                                      </Accordion>
+                                    </div>
+                                  ) : null}
+                                  {entry.strongs_def ? (
+                                    <p>
+                                      <span className="text-muted-foreground">
+                                        Strong&apos;s Definition:
+                                      </span>{" "}
+                                      {entry.strongs_def}
+                                    </p>
+                                  ) : null}
+                                  {entry.lemma ? (
+                                    <p>
+                                      <span className="text-muted-foreground">Lemma:</span>{" "}
+                                      <span className="font-mono">{entry.lemma}</span>
+                                    </p>
+                                  ) : null}
+                                  {entry.translit ? (
+                                    <p>
+                                      <span className="text-muted-foreground">
+                                        Transliteration:
+                                      </span>{" "}
+                                      <span className="font-mono">{entry.translit}</span>
+                                    </p>
+                                  ) : null}
+                                  {entry.pron ? (
+                                    <p>
+                                      <span className="text-muted-foreground">Pronunciation:</span>{" "}
+                                      {entry.pron}
+                                    </p>
+                                  ) : null}
+                                  {entry.derivation ? (
+                                    <p>
+                                      <span className="text-muted-foreground">Derivation:</span>{" "}
+                                      {entry.derivation}
+                                    </p>
+                                  ) : null}
+                                </AccordionContent>
+                              </AccordionItem>
+                            ))}
+                          </Accordion>
+                        )}
+                      </>
+                    ) : null}
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="old-english">
@@ -5996,68 +5913,72 @@ export function KJVReader() {
                     Old English Dictionary
                   </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
-                    <form
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const value = formData.get("old-english-search");
-                        applyOldEnglishSearch(
-                          typeof value === "string" ? value : "",
-                        );
-                      }}
-                    >
-                      <InputGroup>
-                        <InputGroupInput
-                          name="old-english-search"
-                          placeholder="Search Old English..."
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            type="submit"
-                            size="icon-sm"
-                            variant="ghost"
-                            aria-label="Search Old English dictionary"
-                            disabled={
-                              isOldEnglishLoading || isOldEnglishSearching
-                            }
-                          >
-                            {isOldEnglishLoading || isOldEnglishSearching ? (
-                              <LoaderCircleIcon className="animate-spin" />
-                            ) : (
-                              <SearchIcon />
-                            )}
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </form>
-                    {isOldEnglishLoading || isOldEnglishSearching ? (
-                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <LoaderCircleIcon className="size-4 animate-spin" />
-                        {isOldEnglishLoading
-                          ? "Loading Old English..."
-                          : "Searching Old English..."}
-                      </p>
-                    ) : oldEnglishError ? (
-                      <p className="text-sm text-destructive">
-                        {oldEnglishError}
-                      </p>
-                    ) : oldEnglishSearchResults.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">
-                        {oldEnglishSearchTerm.trim()
-                          ? "No matching words found."
-                          : "Click a word in the text or search Old English dictionary."}
-                      </p>
-                    ) : (
-                      <div className="space-y-2 text-sm leading-relaxed">
-                        {oldEnglishSearchResults.map(({ key, definitions }) => (
-                          <p key={key}>
-                            <span className="font-semibold">{key}</span>
-                            {": "}
-                            {definitions.join("; ")}
+                    {isOldEnglishSectionOpen ? (
+                      <>
+                        <form
+                          onSubmit={(event) => {
+                            event.preventDefault();
+                            const formData = new FormData(event.currentTarget);
+                            const value = formData.get("old-english-search");
+                            applyOldEnglishSearch(
+                              typeof value === "string" ? value : "",
+                            );
+                          }}
+                        >
+                          <InputGroup>
+                            <InputGroupInput
+                              name="old-english-search"
+                              placeholder="Search Old English..."
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                type="submit"
+                                size="icon-sm"
+                                variant="ghost"
+                                aria-label="Search Old English dictionary"
+                                disabled={
+                                  isOldEnglishLoading || isOldEnglishSearching
+                                }
+                              >
+                                {isOldEnglishLoading || isOldEnglishSearching ? (
+                                  <LoaderCircleIcon className="animate-spin" />
+                                ) : (
+                                  <SearchIcon />
+                                )}
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </form>
+                        {isOldEnglishLoading || isOldEnglishSearching ? (
+                          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <LoaderCircleIcon className="size-4 animate-spin" />
+                            {isOldEnglishLoading
+                              ? "Loading Old English..."
+                              : "Searching Old English..."}
                           </p>
-                        ))}
-                      </div>
-                    )}
+                        ) : oldEnglishError ? (
+                          <p className="text-sm text-destructive">
+                            {oldEnglishError}
+                          </p>
+                        ) : oldEnglishSearchResults.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">
+                            {oldEnglishSearchTerm.trim()
+                              ? "No matching words found."
+                              : "Click a word in the text or search Old English dictionary."}
+                          </p>
+                        ) : (
+                          <div className="space-y-2 text-sm leading-relaxed">
+                            {oldEnglishSearchResults.map(({ key, definitions }) => (
+                              <p key={key}>
+                                <span className="font-semibold">{key}</span>
+                                {": "}
+                                {definitions.join("; ")}
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : null}
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="maps">
@@ -6069,6 +5990,8 @@ export function KJVReader() {
                     Maps &amp; Photos
                   </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
+                    {isMapsSectionOpen ? (
+                      <>
                     <form
                       onSubmit={(event) => {
                         event.preventDefault();
@@ -6199,6 +6122,9 @@ export function KJVReader() {
                                             <ConcordanceReferencePopover
                                               reference={reference}
                                               highlightWord={title}
+                                              renderPreview={referencePreviewContent}
+                                              onOpenReference={openConcordanceReference}
+                                              onCloseSidebar={closeRightSidebarForMobile}
                                             />
                                             {verseIndex < entry.verses.length - 1
                                               ? ", "
@@ -6223,6 +6149,14 @@ export function KJVReader() {
                                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                                       Photos ({photoEntries.length})
                                     </p>
+                                    {(() => {
+                                      const dialogPhotos = deriveMapPhotoDialogItems(
+                                        photoEntries.slice(0, 9),
+                                        modernIds,
+                                        title,
+                                      );
+
+                                      return (
                                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                                       {photoEntries.slice(0, 9).map((image) => {
                                         const imageLocationKey = modernIds.find((id) =>
@@ -6239,41 +6173,6 @@ export function KJVReader() {
                                               ?.description ??
                                             image.descriptions?.[imageLocationKey])
                                           : undefined;
-                                        const dialogPhotos = photoEntries
-                                          .slice(0, 9)
-                                          .map((item) => {
-                                            const locationId = modernIds.find((id) =>
-                                              Boolean(
-                                                item.thumbnails?.[id]?.file ??
-                                                  item.descriptions?.[id],
-                                              ),
-                                            );
-                                            const file = locationId
-                                              ? item.thumbnails?.[locationId]?.file
-                                              : undefined;
-                                            if (!file) {
-                                              return null;
-                                            }
-                                            const description = cleanMapMarkup(
-                                              (locationId
-                                                ? (item.thumbnails?.[locationId]
-                                                    ?.description ??
-                                                  item.descriptions?.[locationId])
-                                                : undefined) ??
-                                                item.credit ??
-                                                title,
-                                            );
-                                            return {
-                                              id: item.id,
-                                              src: `/maps/thumbnails/${file}`,
-                                              alt: description,
-                                              caption: description,
-                                            } satisfies MapPhotoDialogItem;
-                                          })
-                                          .filter(
-                                            (item): item is MapPhotoDialogItem =>
-                                              Boolean(item),
-                                          );
 
                                         const clickedIndex = dialogPhotos.findIndex(
                                           (item) => item.id === image.id,
@@ -6317,6 +6216,8 @@ export function KJVReader() {
                                         );
                                       })}
                                     </div>
+                                      );
+                                    })()}
                                   </div>
                                 ) : null}
                               </AccordionContent>
@@ -6325,6 +6226,8 @@ export function KJVReader() {
                         })}
                       </Accordion>
                     )}
+                      </>
+                    ) : null}
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="genealogy">
@@ -6336,6 +6239,8 @@ export function KJVReader() {
                     Genealogy
                   </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
+                    {isGenealogySectionOpen ? (
+                      <>
                     <form
                       onSubmit={(event) => {
                         event.preventDefault();
@@ -6413,6 +6318,8 @@ export function KJVReader() {
                         </div>
                       )
                     )}
+                      </>
+                    ) : null}
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="hitchcocks">
@@ -6425,6 +6332,8 @@ export function KJVReader() {
                     Hitchcock&apos;s Bible Names
                   </AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
+                    {isHitchcocksSectionOpen ? (
+                      <>
                     <form
                       onSubmit={(event) => {
                         event.preventDefault();
@@ -6487,6 +6396,8 @@ export function KJVReader() {
                         ))}
                       </div>
                     )}
+                      </>
+                    ) : null}
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -6528,40 +6439,19 @@ export function KJVReader() {
             ) : mapDialogError ? (
               <p className="text-sm text-destructive">{mapDialogError}</p>
             ) : mapDialogGeoJson ? (
-              <MapContainer
-                center={[31.5, 35]}
-                zoom={6}
-                className="h-[calc(min(86vh,900px)-12rem)] min-h-96 w-full rounded-md border"
-                scrollWheelZoom
+              <Suspense
+                fallback={
+                  <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <LoaderCircleIcon className="size-4 animate-spin" />
+                    Loading map renderer...
+                  </p>
+                }
               >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                <LazyMapGeoJsonView
+                  geojson={mapDialogGeoJson}
+                  className="h-[calc(min(86vh,900px)-12rem)] min-h-96 w-full rounded-md border"
                 />
-                <LeafletGeoJSON
-                  data={mapDialogGeoJson as never}
-                  style={() => ({
-                    color: "#2563eb",
-                    weight: 2,
-                    opacity: 0.9,
-                    fillColor: "#60a5fa",
-                    fillOpacity: 0.25,
-                  })}
-                  pointToLayer={(
-                    _feature: unknown,
-                    latlng: { lat: number; lng: number },
-                  ) =>
-                    L.circleMarker([latlng.lat, latlng.lng], {
-                      radius: 5,
-                      color: "#1d4ed8",
-                      weight: 2,
-                      fillColor: "#60a5fa",
-                      fillOpacity: 0.8,
-                    })
-                  }
-                />
-                <MapBoundsSync geojson={mapDialogGeoJson} />
-              </MapContainer>
+              </Suspense>
             ) : (
               <p className="text-sm text-muted-foreground">No map data found.</p>
             )}
