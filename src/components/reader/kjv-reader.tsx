@@ -1,6 +1,7 @@
 import {
   Fragment,
   memo,
+  type ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -77,6 +78,7 @@ import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
@@ -94,6 +96,11 @@ import {
   ProgressValue,
 } from "@/components/ui/progress";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -103,6 +110,7 @@ import {
 type ReaderPayload = {
   books?: Book[];
 };
+type ConcordancePayload = Record<string, string[]>;
 
 type PanelDirection = "left" | "right" | "up" | "down";
 type SplitOrientation = "horizontal" | "vertical";
@@ -143,6 +151,7 @@ type TokenPopupState = {
 };
 
 let kjvBooksPromise: Promise<Book[]> | null = null;
+let concordancePromise: Promise<ConcordancePayload> | null = null;
 
 function loadKjvBooks() {
   if (!kjvBooksPromise) {
@@ -168,6 +177,27 @@ function loadKjvBooks() {
   }
 
   return kjvBooksPromise;
+}
+
+function loadConcordance() {
+  if (!concordancePromise) {
+    concordancePromise = fetch("/references/concordance.json", {
+      cache: "force-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/concordance.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as ConcordancePayload)
+      .catch((error) => {
+        concordancePromise = null;
+        throw error;
+      });
+  }
+
+  return concordancePromise;
 }
 
 function hasTokenMetadata(token: VerseToken) {
@@ -203,7 +233,7 @@ function renderToken(
   const displayText = formatDisplayTokenText(token);
   const showMetadata = isStudyMode && hasTokenMetadata(token);
 
-  if (!showMetadata) {
+  if (!isStudyMode) {
     return <span className={tokenClassName}>{displayText}</span>;
   }
 
@@ -211,7 +241,10 @@ function renderToken(
     <span
       role="button"
       tabIndex={0}
-      className="cursor-pointer rounded-sm px-0.5 py-0.5 underline decoration-dotted underline-offset-3 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring/60"
+      className={cn(
+        "cursor-pointer rounded-sm px-0.5 py-0.5 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring/60",
+        showMetadata && "underline decoration-dotted underline-offset-3",
+      )}
       aria-label={`Details for ${displayText}`}
       onClick={(event) => onOpenDetails(event.currentTarget, token)}
       onKeyDown={(event) => {
@@ -291,6 +324,7 @@ const ChapterTextContent = memo(function ChapterTextContent({
         ? paragraphGroups.map((group, groupIndex) => (
             <article
               key={`${bookName}-${chapterNumber}-paragraph-${groupIndex}`}
+              data-verse-number={group[0]?.verse ?? 1}
               className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
             >
               <p
@@ -305,7 +339,10 @@ const ChapterTextContent = memo(function ChapterTextContent({
                 {group.map((verse, verseIndex) => (
                   <Fragment key={`${bookName}-${chapterNumber}-${verse.verse}`}>
                     {verseIndex > 0 ? " " : null}
-                    <span className={cn(verse.redLetter && "text-red-700")}>
+                    <span
+                      data-verse-number={verse.verse}
+                      className={cn(verse.redLetter && "text-red-700")}
+                    >
                       {showVerseNumbers ? (
                         <span className="mr-2 inline-flex w-7 shrink-0 justify-end align-top text-xs font-semibold tabular-nums text-muted-foreground">
                           {verse.verse}
@@ -325,6 +362,7 @@ const ChapterTextContent = memo(function ChapterTextContent({
         : verses.map((verse) => (
             <article
               key={`${bookName}-${chapterNumber}-${verse.verse}`}
+              data-verse-number={verse.verse}
               className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
             >
               <p
@@ -411,12 +449,114 @@ function iconPath(variant: IconVariant, code: string) {
   return `/icons/${variant}/${code}.png`;
 }
 
+function normalizeConcordanceWord(input: string) {
+  return input.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, "");
+}
+
+function clampedCenteredScrollTop(viewport: HTMLElement, element: HTMLElement) {
+  const viewportRect = viewport.getBoundingClientRect();
+  const elementRect = element.getBoundingClientRect();
+  const offsetWithinViewport =
+    elementRect.top - viewportRect.top + viewport.scrollTop;
+  const centeredTop =
+    offsetWithinViewport - viewport.clientHeight / 2 + elementRect.height / 2;
+  const maxTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight);
+  return Math.max(0, Math.min(maxTop, centeredTop));
+}
+
+function resolveConcordanceKey(
+  concordance: ConcordancePayload,
+  rawWord: string,
+) {
+  const cleaned = normalizeConcordanceWord(rawWord);
+  if (!cleaned) {
+    return null;
+  }
+
+  const candidates = [
+    cleaned,
+    cleaned.toLowerCase(),
+    cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase(),
+    cleaned.toUpperCase(),
+  ];
+
+  for (const candidate of candidates) {
+    if (concordance[candidate]) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
+function parseConcordanceReference(reference: string) {
+  const match = reference.match(/^([1-3]?[A-Z]{2,3})\.(\d+)\.(\d+)$/);
+  if (!match) {
+    return null;
+  }
+
+  const [, bookCode, chapterString, verseString] = match;
+  const bookIndex = BOOK_ICON_CODES.findIndex((code) => code === bookCode);
+  if (bookIndex < 0) {
+    return null;
+  }
+
+  const chapterNumber = Number.parseInt(chapterString, 10);
+  const verseNumber = Number.parseInt(verseString, 10);
+  if (!Number.isFinite(chapterNumber) || chapterNumber < 1) {
+    return null;
+  }
+  if (!Number.isFinite(verseNumber) || verseNumber < 1) {
+    return null;
+  }
+
+  return {
+    bookIndex,
+    chapterIndex: chapterNumber - 1,
+    verseNumber,
+    bookCode,
+  };
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function panelViewportElement(panelElement: HTMLDivElement | null | undefined) {
   return (
     panelElement?.querySelector<HTMLElement>(
       '[data-panel-content-scroll] [data-slot="scroll-area-viewport"]',
     ) ?? null
   );
+}
+
+function SidebarOpenRequestSync({
+  requestKey,
+  enabled,
+}: {
+  requestKey: number;
+  enabled: boolean;
+}) {
+  const { isMobile, setOpen, setOpenMobile } = useSidebar();
+  const previousRequestKeyRef = useRef(requestKey);
+
+  useEffect(() => {
+    if (!enabled) {
+      previousRequestKeyRef.current = requestKey;
+      return;
+    }
+    if (previousRequestKeyRef.current === requestKey) {
+      return;
+    }
+    previousRequestKeyRef.current = requestKey;
+    if (isMobile) {
+      setOpenMobile(true);
+    } else {
+      setOpen(true);
+    }
+  }, [enabled, isMobile, requestKey, setOpen, setOpenMobile]);
+
+  return null;
 }
 
 function createLeaf(
@@ -1025,6 +1165,7 @@ export function KJVReader() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isProgressOpen, setIsProgressOpen] = useState(false);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
+  const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [tabs, setTabs] = useState<ReaderTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [tokenPopup, setTokenPopup] = useState<TokenPopupState | null>(null);
@@ -1040,6 +1181,20 @@ export function KJVReader() {
   const [leafScrollProgress, setLeafScrollProgress] = useState<
     Record<string, number>
   >({});
+  const [concordance, setConcordance] = useState<ConcordancePayload | null>(null);
+  const [selectedConcordanceWord, setSelectedConcordanceWord] = useState<{
+    key: string;
+    references: string[];
+  } | null>(null);
+  const [concordanceAccordionValue, setConcordanceAccordionValue] = useState<string[]>([]);
+  const [concordanceWordAccordionValue, setConcordanceWordAccordionValue] = useState<
+    string[]
+  >([]);
+  const [isConcordanceLoading, setIsConcordanceLoading] = useState(false);
+  const [concordanceError, setConcordanceError] = useState<string | null>(null);
+  const [pendingVerseHighlights, setPendingVerseHighlights] = useState<
+    Record<string, number>
+  >({});
   const tabEndRef = useRef<HTMLDivElement>(null);
   const panelElementRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const previewLeafIdRef = useRef<string | null>(null);
@@ -1048,6 +1203,7 @@ export function KJVReader() {
   const addPreviewIsGroupRef = useRef(false);
   const orientationPreviewLeafIdsRef = useRef<string[]>([]);
   const fullscreenRequestedLeafIdRef = useRef<string | null>(null);
+  const highlightedVerseElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -1065,6 +1221,17 @@ export function KJVReader() {
     document.documentElement.classList.toggle("dark", theme === "dark");
     window.localStorage.setItem("theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    if (isStudyMode) {
+      return;
+    }
+    setIsRightSidebarOpen(false);
+    setConcordanceAccordionValue([]);
+    setSelectedConcordanceWord(null);
+    setConcordanceError(null);
+    setIsConcordanceLoading(false);
+  }, [isStudyMode]);
 
   useEffect(() => {
     try {
@@ -1414,6 +1581,73 @@ export function KJVReader() {
       cleanups.forEach((cleanup) => cleanup());
     };
   }, [activeTab]);
+
+  useEffect(() => {
+    const entries = Object.entries(pendingVerseHighlights);
+    if (entries.length === 0) {
+      return;
+    }
+
+    const rafId = window.requestAnimationFrame(() => {
+      const appliedLeafIds: string[] = [];
+      if (highlightedVerseElementRef.current) {
+        highlightedVerseElementRef.current.classList.remove(
+          "verse-reference-highlight",
+        );
+        highlightedVerseElementRef.current = null;
+      }
+
+      for (const [leafId, verseNumber] of entries) {
+        const panelElement = panelElementRefs.current[leafId];
+        const viewport = panelViewportElement(panelElement);
+        const verseElement =
+          panelElement?.querySelector<HTMLElement>(
+            `article[data-verse-number="${verseNumber}"]`,
+          ) ??
+          panelElement?.querySelector<HTMLElement>(
+            `[data-verse-number="${verseNumber}"]`,
+          );
+        if (!viewport || !verseElement) {
+          continue;
+        }
+
+        const highlightElement =
+          verseElement.tagName === "ARTICLE"
+            ? verseElement
+            : (verseElement.closest("article") as HTMLElement | null) ??
+              verseElement;
+
+        viewport.scrollTo({
+          top: clampedCenteredScrollTop(viewport, highlightElement),
+          behavior: "auto",
+        });
+        window.requestAnimationFrame(() => {
+          viewport.scrollTo({
+            top: clampedCenteredScrollTop(viewport, highlightElement),
+            behavior: "auto",
+          });
+        });
+        highlightElement.classList.add("verse-reference-highlight");
+        highlightedVerseElementRef.current = highlightElement;
+
+        appliedLeafIds.push(leafId);
+      }
+
+      if (appliedLeafIds.length > 0) {
+        setPendingVerseHighlights((current) => {
+          const next = { ...current };
+          for (const leafId of appliedLeafIds) {
+            delete next[leafId];
+          }
+          return next;
+        });
+      }
+    });
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+    };
+  }, [pendingVerseHighlights, activeTabId, tabs]);
 
   function chapterFromLeaf(leaf: LeafNode): Chapter | null {
     const book = books[leaf.bookIndex];
@@ -1801,18 +2035,53 @@ export function KJVReader() {
 
   function openChapterInNewTab(bookIndex: number, chapterIndex: number) {
     const nextTabId = createId();
+    const nextLeaf = createLeaf(bookIndex, chapterIndex, "reader");
     setTabs((currentTabs) => [
       ...currentTabs,
       {
         id: nextTabId,
         title: `Tab ${currentTabs.length + 1}`,
         root: {
-          ...createLeaf(bookIndex, chapterIndex, "reader"),
+          ...nextLeaf,
           pickerTestament: null,
           pickerBookIndex: null,
         },
       },
     ]);
+    setActiveTabId(nextTabId);
+    setIsProgressOpen(false);
+    requestAnimationFrame(() => {
+      tabEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: tabsOrientation === "vertical" ? "end" : "nearest",
+        inline: tabsOrientation === "vertical" ? "nearest" : "end",
+      });
+    });
+  }
+  
+  function openChapterReferenceInNewTab(
+    bookIndex: number,
+    chapterIndex: number,
+    verseNumber: number,
+  ) {
+    const nextTabId = createId();
+    const nextLeaf = createLeaf(bookIndex, chapterIndex, "reader");
+    setTabs((currentTabs) => [
+      ...currentTabs,
+      {
+        id: nextTabId,
+        title: `Tab ${currentTabs.length + 1}`,
+        root: {
+          ...nextLeaf,
+          pickerTestament: null,
+          pickerBookIndex: null,
+        },
+      },
+    ]);
+    setPendingVerseHighlights((current) => ({
+      ...current,
+      [nextLeaf.id]: verseNumber,
+    }));
     setActiveTabId(nextTabId);
     setIsProgressOpen(false);
     requestAnimationFrame(() => {
@@ -1991,9 +2260,138 @@ export function KJVReader() {
         x: safeX,
         y: safeY,
       });
+
+      const rawWord = normalizeConcordanceWord(token.text);
+      if (!rawWord) {
+        return;
+      }
+
+      setIsRightSidebarOpen(true);
+      setSidebarOpenRequestKey((current) => current + 1);
+      setConcordanceAccordionValue(["concordance"]);
+      setConcordanceError(null);
+      setIsConcordanceLoading(true);
+
+      const applyConcordanceSelection = (data: ConcordancePayload) => {
+        const matchedKey = resolveConcordanceKey(data, rawWord) ?? rawWord;
+        const references = data[matchedKey] ?? [];
+        setConcordanceWordAccordionValue([]);
+        setSelectedConcordanceWord({
+          key: matchedKey,
+          references,
+        });
+        setIsConcordanceLoading(false);
+      };
+
+      if (concordance) {
+        applyConcordanceSelection(concordance);
+        return;
+      }
+
+      void loadConcordance()
+        .then((data) => {
+          setConcordance(data);
+          applyConcordanceSelection(data);
+        })
+        .catch((error) => {
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Failed to load concordance data";
+          setConcordanceError(message);
+          setIsConcordanceLoading(false);
+        });
     },
-    [],
+    [concordance],
   );
+
+  function openConcordanceReference(reference: string) {
+    const parsed = parseConcordanceReference(reference);
+    if (!parsed) {
+      return;
+    }
+    openChapterReferenceInNewTab(
+      parsed.bookIndex,
+      parsed.chapterIndex,
+      parsed.verseNumber,
+    );
+  }
+
+function referencePreviewData(reference: string) {
+  const parsed = parseConcordanceReference(reference);
+  if (!parsed) {
+    return { citation: reference, verseText: "" };
+  }
+
+    const book = books[parsed.bookIndex];
+  const chapter = book?.chapters[parsed.chapterIndex];
+  const verse = chapter?.verses.find(
+    (candidate) => candidate.verse === parsed.verseNumber,
+  );
+  if (!book || !chapter || !verse) {
+    return { citation: reference, verseText: "" };
+  }
+
+    const verseText = verse.tokens
+      .map((token, index) => {
+        const leadingSpace = index > 0 && !isPunctuationToken(token.text);
+        return `${leadingSpace ? " " : ""}${formatDisplayTokenText(token)}`;
+      })
+      .join("");
+
+  return {
+    citation: `${book.name} ${chapter.chapter}:${verse.verse}`,
+    verseText,
+  };
+}
+
+function referencePreviewContent(
+  reference: string,
+  highlightWord: string,
+): ReactNode {
+  const { citation, verseText } = referencePreviewData(reference);
+  const text = verseText || reference;
+  const needle = normalizeConcordanceWord(highlightWord);
+  if (!needle) {
+    return (
+      <div className="space-y-1">
+        <p className="font-semibold">{citation}</p>
+        <p>{text}</p>
+      </div>
+    );
+  }
+
+    const matcher = new RegExp(`(${escapeRegExp(needle)})`, "ig");
+    const parts = text.split(matcher);
+  if (parts.length <= 1) {
+    return (
+      <div className="space-y-1">
+        <p className="font-semibold">{citation}</p>
+        <p>{text}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      <p className="font-semibold">{citation}</p>
+      <p>
+        {parts.map((part, index) =>
+          part.toLowerCase() === needle.toLowerCase() ? (
+            <span
+              key={`${reference}-highlight-${index}`}
+              className="bg-[#fafac5] text-black"
+            >
+              {part}
+            </span>
+          ) : (
+            <span key={`${reference}-text-${index}`}>{part}</span>
+          ),
+        )}
+      </p>
+    </div>
+  );
+}
 
   function openRenameDialog(tabId: string) {
     const tab = tabs.find((item) => item.id === tabId);
@@ -2719,6 +3117,131 @@ export function KJVReader() {
     </Card>
   ) : null;
 
+  function ConcordanceReferencePopover({
+    reference,
+    highlightWord,
+  }: {
+    reference: string;
+    highlightWord: string;
+  }) {
+    const { setOpenMobile } = useSidebar();
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+    const [supportsHover, setSupportsHover] = useState(() => {
+      if (typeof window === "undefined" || !window.matchMedia) {
+        return false;
+      }
+      return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    });
+    const closeTimerRef = useRef<number | null>(null);
+
+    useEffect(() => {
+      if (typeof window === "undefined" || !window.matchMedia) {
+        return;
+      }
+      const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+      const update = () => setSupportsHover(mediaQuery.matches);
+      update();
+      mediaQuery.addEventListener("change", update);
+      return () => {
+        mediaQuery.removeEventListener("change", update);
+        if (closeTimerRef.current !== null) {
+          window.clearTimeout(closeTimerRef.current);
+          closeTimerRef.current = null;
+        }
+      };
+    }, []);
+
+    const scheduleClose = () => {
+      if (!supportsHover) {
+        return;
+      }
+      if (closeTimerRef.current !== null) {
+        window.clearTimeout(closeTimerRef.current);
+      }
+      closeTimerRef.current = window.setTimeout(() => {
+        setIsPopoverOpen(false);
+        closeTimerRef.current = null;
+      }, 150);
+    };
+
+    const cancelScheduledClose = () => {
+      if (closeTimerRef.current !== null) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    };
+
+    return (
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <PopoverTrigger
+          render={
+            <button
+              type="button"
+              className="text-primary underline underline-offset-4 hover:text-primary/80"
+              onMouseEnter={() => {
+                if (supportsHover) {
+                  cancelScheduledClose();
+                  setIsPopoverOpen(true);
+                }
+              }}
+              onMouseLeave={() => {
+                if (supportsHover && isPopoverOpen) {
+                  scheduleClose();
+                }
+              }}
+              onClick={() => {
+                if (supportsHover) {
+                  openConcordanceReference(reference);
+                }
+              }}
+            />
+          }
+        >
+          {reference}
+        </PopoverTrigger>
+        <PopoverContent
+          side="top"
+          align="start"
+          className="w-80 max-w-[calc(100vw-2rem)] space-y-2"
+          onMouseEnter={() => {
+            if (supportsHover) {
+              cancelScheduledClose();
+              setIsPopoverOpen(true);
+            }
+          }}
+          onMouseLeave={() => {
+            if (supportsHover && isPopoverOpen) {
+              scheduleClose();
+            }
+          }}
+        >
+          <div className="text-xs leading-relaxed">
+            {referencePreviewContent(reference, highlightWord)}
+          </div>
+          {!supportsHover ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-7 px-2 text-xs"
+                onClick={() => {
+                  openConcordanceReference(reference);
+                  setOpenMobile(false);
+                  setIsRightSidebarOpen(false);
+                  setIsPopoverOpen(false);
+                }}
+              >
+                <ExternalLinkIcon className="size-3.5" />
+                Open
+              </Button>
+            </div>
+          ) : null}
+        </PopoverContent>
+      </Popover>
+    );
+  }
+
   const tabsStrip = (
     <ScrollArea className="h-full w-full">
       <div
@@ -2825,9 +3348,18 @@ export function KJVReader() {
   return (
     <main className="h-screen w-full overflow-hidden bg-background">
       <SidebarProvider
-        open={isRightSidebarOpen}
-        onOpenChange={setIsRightSidebarOpen}
+        open={isStudyMode ? isRightSidebarOpen : false}
+        onOpenChange={(open) => {
+          if (!isStudyMode) {
+            return;
+          }
+          setIsRightSidebarOpen(open);
+        }}
       >
+        <SidebarOpenRequestSync
+          requestKey={sidebarOpenRequestKey}
+          enabled={isStudyMode}
+        />
         <SidebarInset className="flex h-screen min-h-0 flex-col overflow-hidden">
           <header className="z-20 flex h-14 shrink-0 items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-6">
             <div className="flex items-center gap-2">
@@ -2891,7 +3423,7 @@ export function KJVReader() {
                   onCheckedChange={(checked) => setIsStudyMode(checked)}
                 />
               </div>
-              <SidebarTrigger />
+              {isStudyMode ? <SidebarTrigger /> : null}
             </div>
           </header>
 
@@ -2928,18 +3460,81 @@ export function KJVReader() {
           )}
         </SidebarInset>
 
-        <Sidebar side="right" className="h-screen">
-          <SidebarHeader>
-            <h2 className="text-base font-semibold">Sidebar</h2>
-            <p className="text-sm text-muted-foreground">
-              Placeholder for future tools.
-            </p>
-          </SidebarHeader>
-          <SidebarContent className="text-muted-foreground">
-            This right sidebar is ready for study tools, notes, references, or
-            tab presets.
-          </SidebarContent>
-        </Sidebar>
+        {isStudyMode ? (
+          <Sidebar side="right" className="h-screen">
+            <SidebarHeader>
+              <h2 className="text-base font-semibold">Study Tools</h2>
+              <p className="text-sm text-muted-foreground">
+                Concordance cross-references for selected words.
+              </p>
+            </SidebarHeader>
+            <SidebarContent className="px-2 pb-3">
+              <Accordion
+                className="w-full rounded-md border px-2"
+                multiple
+                value={concordanceAccordionValue}
+                onValueChange={(value) =>
+                  setConcordanceAccordionValue(value.filter(Boolean) as string[])
+                }
+              >
+                <AccordionItem value="concordance">
+                  <AccordionTrigger>Concordance</AccordionTrigger>
+                  <AccordionContent className="space-y-2">
+                    {isConcordanceLoading ? (
+                      <p className="text-sm text-muted-foreground">
+                        Loading concordance...
+                      </p>
+                    ) : concordanceError ? (
+                      <p className="text-sm text-destructive">{concordanceError}</p>
+                    ) : !selectedConcordanceWord ? (
+                      <p className="text-sm text-muted-foreground">
+                        Click a word in the text to view references.
+                      </p>
+                    ) : (
+                      <Accordion
+                        className="w-full rounded-md border px-2"
+                        multiple
+                        value={concordanceWordAccordionValue}
+                        onValueChange={(value) =>
+                          setConcordanceWordAccordionValue(value.filter(Boolean) as string[])
+                        }
+                      >
+                        <AccordionItem value={selectedConcordanceWord.key}>
+                          <AccordionTrigger>
+                            {`${selectedConcordanceWord.key} (${selectedConcordanceWord.references.length})`}
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            {selectedConcordanceWord.references.length === 0 ? (
+                              <p className="text-sm text-muted-foreground">
+                                No references found.
+                              </p>
+                            ) : (
+                              <p className="text-sm leading-7">
+                                {selectedConcordanceWord.references.map((reference, index) => (
+                                  <Fragment
+                                    key={`${selectedConcordanceWord.key}-${reference}-${index}`}
+                                  >
+                                    <ConcordanceReferencePopover
+                                      reference={reference}
+                                      highlightWord={selectedConcordanceWord.key}
+                                    />
+                                    {index < selectedConcordanceWord.references.length - 1
+                                      ? ", "
+                                      : null}
+                                  </Fragment>
+                                ))}
+                              </p>
+                            )}
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </SidebarContent>
+          </Sidebar>
+        ) : null}
       </SidebarProvider>
 
       {tokenPopupCard}
