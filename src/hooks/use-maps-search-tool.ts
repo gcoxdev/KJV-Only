@@ -83,18 +83,31 @@ export function useMapsSearchTool() {
     return index;
   }, [mapImages]);
 
+  const indexedAncientMaps = useMemo(() => {
+    if (!ancientMaps) {
+      return [];
+    }
+    return ancientMaps
+      .map((entry) => ({
+        entry,
+        label: mapEntryLabel(entry),
+        searchable: mapEntrySearchableText(entry),
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [ancientMaps]);
+
   const mapsSearchResults = useMemo(() => {
     const term = mapsSearchTerm.trim().toLowerCase();
     if (!term) {
       return selectedMapsEntries;
     }
-    if (!ancientMaps) {
+    if (indexedAncientMaps.length === 0) {
       return [] as AncientMapEntry[];
     }
-    return ancientMaps
-      .filter((entry) => mapEntrySearchableText(entry).includes(term))
-      .sort((a, b) => mapEntryLabel(a).localeCompare(mapEntryLabel(b)));
-  }, [ancientMaps, mapsSearchTerm, selectedMapsEntries]);
+    return indexedAncientMaps
+      .filter((item) => item.searchable.includes(term))
+      .map((item) => item.entry);
+  }, [indexedAncientMaps, mapsSearchTerm, selectedMapsEntries]);
 
   const mapsDisplayEntries = useMemo(
     () =>

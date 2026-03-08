@@ -39,14 +39,22 @@ export function useGenealogySearchTool() {
     return map;
   }, [genealogy]);
 
+  const indexedGenealogy = useMemo(() => {
+    return (genealogy ?? [])
+      .map((person) => ({
+        person,
+        firstName: person.names[0] ?? person.id,
+        namesLower: person.names.map((name) => name.toLowerCase()),
+      }))
+      .sort((a, b) => a.firstName.localeCompare(b.firstName));
+  }, [genealogy]);
+
   const genealogySearchResults = useMemo(() => {
     const term = genealogySearchTerm.trim().toLowerCase();
     if (term) {
-      return (genealogy ?? [])
-        .filter((person) =>
-          person.names.some((name) => name.toLowerCase().includes(term)),
-        )
-        .sort((a, b) => (a.names[0] ?? a.id).localeCompare(b.names[0] ?? b.id));
+      return indexedGenealogy
+        .filter((item) => item.namesLower.some((name) => name.includes(term)))
+        .map((item) => item.person);
     }
     if (selectedGenealogyIds.length === 0) {
       return [] as GenealogyPerson[];
@@ -54,7 +62,7 @@ export function useGenealogySearchTool() {
     return selectedGenealogyIds
       .map((id) => genealogyById.get(id))
       .filter((person): person is GenealogyPerson => Boolean(person));
-  }, [genealogy, genealogyById, genealogySearchTerm, selectedGenealogyIds]);
+  }, [genealogyById, genealogySearchTerm, indexedGenealogy, selectedGenealogyIds]);
 
   const applyGenealogySearch = useCallback(
     (rawValue?: string) => {

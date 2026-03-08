@@ -21,6 +21,20 @@ export function useConcordanceCrossRefsTool() {
   const [isConcordanceLoading, setIsConcordanceLoading] = useState(false);
   const [concordanceError, setConcordanceError] = useState<string | null>(null);
 
+  const indexedConcordance = useMemo(
+    () =>
+      concordance
+        ? Object.keys(concordance)
+            .sort((a, b) => a.localeCompare(b))
+            .map((key) => ({
+              key,
+              keyLower: key.toLowerCase(),
+              references: concordance[key] ?? [],
+            }))
+        : [],
+    [concordance],
+  );
+
   const ensureConcordanceLoaded = useCallback(async () => {
     if (concordance) {
       return concordance;
@@ -68,17 +82,13 @@ export function useConcordanceCrossRefsTool() {
     if (!term) {
       return selectedConcordanceWord ? [selectedConcordanceWord] : [];
     }
-    if (!concordance) {
+    if (indexedConcordance.length === 0) {
       return [];
     }
-    return Object.keys(concordance)
-      .filter((word) => word.toLowerCase().includes(term))
-      .sort((a, b) => a.localeCompare(b))
-      .map((word) => ({
-        key: word,
-        references: concordance[word] ?? [],
-      }));
-  }, [concordance, concordanceSearchTerm, selectedConcordanceWord]);
+    return indexedConcordance
+      .filter((item) => item.keyLower.includes(term))
+      .map((item) => ({ key: item.key, references: item.references }));
+  }, [indexedConcordance, concordanceSearchTerm, selectedConcordanceWord]);
 
   const applyConcordanceSearch = useCallback(
     (rawValue?: string) => {

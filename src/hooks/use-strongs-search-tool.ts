@@ -43,13 +43,15 @@ export function useStrongsSearchTool() {
     }
   }, [strongsGreek, strongsHebrew]);
 
-  const strongsSearchResults = useMemo(() => {
-    const term = strongsSearchTerm.trim().toLowerCase();
-    if (!term) {
-      return selectedStrongsEntry ? [selectedStrongsEntry] : [];
-    }
-    const results: StrongsSearchResult[] = [];
-    const pushMatches = (
+  const indexedStrongsEntries = useMemo(() => {
+    const index: Array<{
+      code: string;
+      testament: "greek" | "hebrew";
+      entry: StrongsEntry;
+      haystackLower: string;
+    }> = [];
+
+    const pushEntries = (
       payload: StrongsPayload | null,
       testament: "greek" | "hebrew",
     ) => {
@@ -57,7 +59,7 @@ export function useStrongsSearchTool() {
         return;
       }
       for (const [code, entry] of Object.entries(payload)) {
-        const haystack = [
+        const haystackLower = [
           code,
           entry.lemma ?? "",
           entry.translit ?? "",
@@ -66,15 +68,24 @@ export function useStrongsSearchTool() {
         ]
           .join(" ")
           .toLowerCase();
-        if (haystack.includes(term)) {
-          results.push({ code, testament, entry });
-        }
+        index.push({ code, testament, entry, haystackLower });
       }
     };
-    pushMatches(strongsGreek, "greek");
-    pushMatches(strongsHebrew, "hebrew");
-    return results.sort((a, b) => a.code.localeCompare(b.code));
-  }, [selectedStrongsEntry, strongsGreek, strongsHebrew, strongsSearchTerm]);
+
+    pushEntries(strongsGreek, "greek");
+    pushEntries(strongsHebrew, "hebrew");
+    return index.sort((a, b) => a.code.localeCompare(b.code));
+  }, [strongsGreek, strongsHebrew]);
+
+  const strongsSearchResults = useMemo(() => {
+    const term = strongsSearchTerm.trim().toLowerCase();
+    if (!term) {
+      return selectedStrongsEntry ? [selectedStrongsEntry] : [];
+    }
+    return indexedStrongsEntries
+      .filter((item) => item.haystackLower.includes(term))
+      .map(({ code, testament, entry }) => ({ code, testament, entry }));
+  }, [indexedStrongsEntries, selectedStrongsEntry, strongsSearchTerm]);
 
   const applyStrongsSearch = useCallback(
     (rawValue?: string) => {

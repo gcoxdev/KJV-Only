@@ -134,9 +134,6 @@ export function KJVReader() {
     string | null
   >(null);
   const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
-  const [leafScrollProgress, setLeafScrollProgress] = useState<
-    Record<string, number>
-  >({});
   const [concordanceAccordionValue, setConcordanceAccordionValue] = useState<
     string[]
   >([]);
@@ -635,100 +632,6 @@ export function KJVReader() {
   }, [activeTab, panelMenuOpenLeafId]);
 
   useEffect(() => {
-    if (!activeTab) {
-      return;
-    }
-
-    const leafIds: string[] = [];
-    const collectLeafIds = (node: PanelNode) => {
-      if (node.type === "leaf") {
-        leafIds.push(node.id);
-        return;
-      }
-      collectLeafIds(node.first);
-      collectLeafIds(node.second);
-    };
-    collectLeafIds(activeTab.root);
-
-    const cleanups: Array<() => void> = [];
-    const viewports = new Map<string, HTMLElement>();
-    const pendingProgress: Record<string, number> = {};
-    let rafId: number | null = null;
-
-    const flushPendingProgress = () => {
-      rafId = null;
-      setLeafScrollProgress((current) => {
-        let changed = false;
-        const next = { ...current };
-        for (const [leafId, value] of Object.entries(pendingProgress)) {
-          if (next[leafId] !== value) {
-            next[leafId] = value;
-            changed = true;
-          }
-          delete pendingProgress[leafId];
-        }
-        return changed ? next : current;
-      });
-    };
-
-    const queueProgressForLeaf = (leafId: string, value: number) => {
-      pendingProgress[leafId] = value;
-      if (rafId === null) {
-        rafId = window.requestAnimationFrame(flushPendingProgress);
-      }
-    };
-
-    const calculateProgress = (viewport: HTMLElement) => {
-      const maxScroll = viewport.scrollHeight - viewport.clientHeight;
-      return maxScroll <= 0
-        ? 0
-        : Math.round((viewport.scrollTop / maxScroll) * 100);
-    };
-
-    for (const leafId of leafIds) {
-      const panelElement = panelElementRefs.current[leafId];
-      const viewport = panelElement?.querySelector<HTMLElement>(
-        '[data-panel-content-scroll] [data-slot="scroll-area-viewport"]',
-      );
-
-      if (!viewport) {
-        continue;
-      }
-
-      viewports.set(leafId, viewport);
-
-      const update = () => {
-        const next = calculateProgress(viewport);
-        queueProgressForLeaf(leafId, next);
-      };
-
-      update();
-      viewport.addEventListener("scroll", update, { passive: true });
-      cleanups.push(() => {
-        viewport.removeEventListener("scroll", update);
-      });
-    }
-
-    const onResize = () => {
-      for (const [leafId, viewport] of viewports.entries()) {
-        queueProgressForLeaf(leafId, calculateProgress(viewport));
-      }
-    };
-    window.addEventListener("resize", onResize);
-    cleanups.push(() => {
-      window.removeEventListener("resize", onResize);
-      if (rafId !== null) {
-        window.cancelAnimationFrame(rafId);
-        rafId = null;
-      }
-    });
-
-    return () => {
-      cleanups.forEach((cleanup) => cleanup());
-    };
-  }, [activeTab]);
-
-  useEffect(() => {
     const entries = Object.entries(pendingVerseHighlights);
     if (entries.length === 0) {
       return;
@@ -1165,13 +1068,6 @@ export function KJVReader() {
     if (!shouldResetScroll) {
       return;
     }
-
-    setLeafScrollProgress((current) => {
-      if (current[leafId] === 0) {
-        return current;
-      }
-      return { ...current, [leafId]: 0 };
-    });
 
     // Wait for React to commit the chapter/book change before forcing scroll top.
     requestAnimationFrame(() => {
@@ -1944,7 +1840,6 @@ export function KJVReader() {
                 chapterRefCount={chapterRefs.length}
                 readChapters={readChapters}
                 readChapterCountByBook={readChapterCountByBook}
-                leafScrollProgress={leafScrollProgress}
                 hideReadModeVerseNumbers={hideReadModeVerseNumbers}
                 panelMenuOpenLeafId={panelMenuOpenLeafId}
                 setPanelMenuOpenLeafId={setPanelMenuOpenLeafId}
@@ -1985,122 +1880,124 @@ export function KJVReader() {
           />
         </SidebarInset>
 
-        <ReaderStudySidebar
-          visible={isStudyMode}
-          accordionValue={concordanceAccordionValue}
-          onAccordionValueChange={setConcordanceAccordionValue}
-          onExpandAll={() =>
-            setConcordanceAccordionValue([...STUDY_ACCORDION_ITEMS])
-          }
-          onCollapseAll={() => setConcordanceAccordionValue([])}
-          canExpand={!allStudyAccordionsOpen}
-          canCollapse={concordanceAccordionValue.length > 0}
-          crossRefsProps={{
-            hasInfo: hasCrossRefsInfo,
-            isOpen: isCrossRefsSectionOpen,
-            isLoading: isCrossRefsLoading,
-            error: crossRefsError,
-            selected: selectedCrossReferences,
-            books,
-            renderPreview: referencePreviewContent,
-            onOpenReference: openConcordanceReference,
-            onCloseSidebar: closeRightSidebarForMobile,
-          }}
-          concordanceProps={{
-            hasInfo: hasConcordanceInfo,
-            isOpen: isConcordanceSectionOpen,
-            isLoading: isConcordanceLoading,
-            isSearching: isConcordanceSearching,
-            error: concordanceError,
-            searchTerm: concordanceSearchTerm,
-            results: concordanceSearchResults,
-            wordAccordionValue: concordanceWordAccordionValue,
-            onWordAccordionValueChange: setConcordanceWordAccordionValue,
-            onSearch: applyConcordanceSearch,
-            renderPreview: referencePreviewContent,
-            onOpenReference: openConcordanceReference,
-            onCloseSidebar: closeRightSidebarForMobile,
-          }}
-          webstersProps={{
-            hasInfo: hasWebstersInfo,
-            isOpen: isWebstersSectionOpen,
-            isLoading: isWebstersLoading,
-            isSearching: isWebstersSearching,
-            error: webstersError,
-            searchTerm: webstersSearchTerm,
-            results: webstersSearchResults,
-            wordAccordionValue: webstersWordAccordionValue,
-            onWordAccordionValueChange: setWebstersWordAccordionValue,
-            onSearch: applyWebstersSearch,
-          }}
-          strongsProps={{
-            hasInfo: hasStrongsInfo,
-            isOpen: isStrongsSectionOpen,
-            isLoading: isStrongsLoading,
-            isSearching: isStrongsSearching,
-            error: strongsError,
-            searchTerm: strongsSearchTerm,
-            results: strongsSearchResults,
-            wordAccordionValue: strongsWordAccordionValue,
-            onWordAccordionValueChange: setStrongsWordAccordionValue,
-            onSearch: applyStrongsSearch,
-            inputRef: strongsSearchInputRef,
-            renderPreview: referencePreviewContent,
-            onOpenReference: openConcordanceReference,
-            onCloseSidebar: closeRightSidebarForMobile,
-          }}
-          oldEnglishProps={{
-            hasInfo: hasOldEnglishInfo,
-            isOpen: isOldEnglishSectionOpen,
-            isLoading: isOldEnglishLoading,
-            isSearching: isOldEnglishSearching,
-            error: oldEnglishError,
-            searchTerm: oldEnglishSearchTerm,
-            results: oldEnglishSearchResults,
-            onSearch: applyOldEnglishSearch,
-          }}
-          mapsProps={{
-            hasInfo: hasMapsInfo,
-            isOpen: isMapsSectionOpen,
-            isLoading: isMapsLoading,
-            isSearching: isMapsSearching,
-            error: mapsError,
-            searchTerm: mapsSearchTerm,
-            resultsLength: mapsSearchResults.length,
-            displayEntries: mapsDisplayEntries,
-            wordAccordionValue: mapsWordAccordionValue,
-            onWordAccordionValueChange: setMapsWordAccordionValue,
-            onSearch: applyMapsSearch,
-            onOpenMapDialog: openMapDialogWithImages,
-            isMapImagesLoading: isMapImagesLoading,
-            mapImagesError: mapImagesError,
-            onOpenPhotoDialog: openPhotoDialog,
-            renderPreview: referencePreviewContent,
-            onOpenReference: openConcordanceReference,
-            onCloseSidebar: closeRightSidebarForMobile,
-          }}
-          genealogyProps={{
-            hasInfo: hasGenealogyInfo,
-            isOpen: isGenealogySectionOpen,
-            isLoading: isGenealogyLoading,
-            isSearching: isGenealogySearching,
-            error: genealogyError,
-            searchTerm: genealogySearchTerm,
-            results: genealogySearchResults,
-            onSearch: applyGenealogySearch,
-            renderPersonDetails: renderGenealogyPersonDetails,
-          }}
-          hitchcocksProps={{
-            hasInfo: hasHitchcocksInfo,
-            isOpen: isHitchcocksSectionOpen,
-            isLoading: isHitchcocksLoading,
-            isSearching: isHitchcocksSearching,
-            error: hitchcocksError,
-            searchTerm: hitchcocksSearchTerm,
-            results: hitchcocksSearchResults,
-            onSearch: applyHitchcocksSearch,
-          }}
-        />
+        {isStudyMode ? (
+          <ReaderStudySidebar
+            visible={isStudyMode}
+            accordionValue={concordanceAccordionValue}
+            onAccordionValueChange={setConcordanceAccordionValue}
+            onExpandAll={() =>
+              setConcordanceAccordionValue([...STUDY_ACCORDION_ITEMS])
+            }
+            onCollapseAll={() => setConcordanceAccordionValue([])}
+            canExpand={!allStudyAccordionsOpen}
+            canCollapse={concordanceAccordionValue.length > 0}
+            crossRefsProps={{
+              hasInfo: hasCrossRefsInfo,
+              isOpen: isCrossRefsSectionOpen,
+              isLoading: isCrossRefsLoading,
+              error: crossRefsError,
+              selected: selectedCrossReferences,
+              books,
+              renderPreview: referencePreviewContent,
+              onOpenReference: openConcordanceReference,
+              onCloseSidebar: closeRightSidebarForMobile,
+            }}
+            concordanceProps={{
+              hasInfo: hasConcordanceInfo,
+              isOpen: isConcordanceSectionOpen,
+              isLoading: isConcordanceLoading,
+              isSearching: isConcordanceSearching,
+              error: concordanceError,
+              searchTerm: concordanceSearchTerm,
+              results: concordanceSearchResults,
+              wordAccordionValue: concordanceWordAccordionValue,
+              onWordAccordionValueChange: setConcordanceWordAccordionValue,
+              onSearch: applyConcordanceSearch,
+              renderPreview: referencePreviewContent,
+              onOpenReference: openConcordanceReference,
+              onCloseSidebar: closeRightSidebarForMobile,
+            }}
+            webstersProps={{
+              hasInfo: hasWebstersInfo,
+              isOpen: isWebstersSectionOpen,
+              isLoading: isWebstersLoading,
+              isSearching: isWebstersSearching,
+              error: webstersError,
+              searchTerm: webstersSearchTerm,
+              results: webstersSearchResults,
+              wordAccordionValue: webstersWordAccordionValue,
+              onWordAccordionValueChange: setWebstersWordAccordionValue,
+              onSearch: applyWebstersSearch,
+            }}
+            strongsProps={{
+              hasInfo: hasStrongsInfo,
+              isOpen: isStrongsSectionOpen,
+              isLoading: isStrongsLoading,
+              isSearching: isStrongsSearching,
+              error: strongsError,
+              searchTerm: strongsSearchTerm,
+              results: strongsSearchResults,
+              wordAccordionValue: strongsWordAccordionValue,
+              onWordAccordionValueChange: setStrongsWordAccordionValue,
+              onSearch: applyStrongsSearch,
+              inputRef: strongsSearchInputRef,
+              renderPreview: referencePreviewContent,
+              onOpenReference: openConcordanceReference,
+              onCloseSidebar: closeRightSidebarForMobile,
+            }}
+            oldEnglishProps={{
+              hasInfo: hasOldEnglishInfo,
+              isOpen: isOldEnglishSectionOpen,
+              isLoading: isOldEnglishLoading,
+              isSearching: isOldEnglishSearching,
+              error: oldEnglishError,
+              searchTerm: oldEnglishSearchTerm,
+              results: oldEnglishSearchResults,
+              onSearch: applyOldEnglishSearch,
+            }}
+            mapsProps={{
+              hasInfo: hasMapsInfo,
+              isOpen: isMapsSectionOpen,
+              isLoading: isMapsLoading,
+              isSearching: isMapsSearching,
+              error: mapsError,
+              searchTerm: mapsSearchTerm,
+              resultsLength: mapsSearchResults.length,
+              displayEntries: mapsDisplayEntries,
+              wordAccordionValue: mapsWordAccordionValue,
+              onWordAccordionValueChange: setMapsWordAccordionValue,
+              onSearch: applyMapsSearch,
+              onOpenMapDialog: openMapDialogWithImages,
+              isMapImagesLoading: isMapImagesLoading,
+              mapImagesError: mapImagesError,
+              onOpenPhotoDialog: openPhotoDialog,
+              renderPreview: referencePreviewContent,
+              onOpenReference: openConcordanceReference,
+              onCloseSidebar: closeRightSidebarForMobile,
+            }}
+            genealogyProps={{
+              hasInfo: hasGenealogyInfo,
+              isOpen: isGenealogySectionOpen,
+              isLoading: isGenealogyLoading,
+              isSearching: isGenealogySearching,
+              error: genealogyError,
+              searchTerm: genealogySearchTerm,
+              results: genealogySearchResults,
+              onSearch: applyGenealogySearch,
+              renderPersonDetails: renderGenealogyPersonDetails,
+            }}
+            hitchcocksProps={{
+              hasInfo: hasHitchcocksInfo,
+              isOpen: isHitchcocksSectionOpen,
+              isLoading: isHitchcocksLoading,
+              isSearching: isHitchcocksSearching,
+              error: hitchcocksError,
+              searchTerm: hitchcocksSearchTerm,
+              results: hitchcocksSearchResults,
+              onSearch: applyHitchcocksSearch,
+            }}
+          />
+        ) : null}
       </SidebarProvider>
 
       {tokenPopupCard}

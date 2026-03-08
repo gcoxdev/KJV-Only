@@ -18,6 +18,20 @@ export function useDictionarySearchTool<
   const [error, setError] = useState<string | null>(null);
   const [selectedResult, setSelectedResult] = useState<TResult | null>(null);
 
+  const indexedEntries = useMemo(
+    () =>
+      payload
+        ? Object.keys(payload)
+            .sort((a, b) => a.localeCompare(b))
+            .map((key) => ({
+              key,
+              keyLower: key.toLowerCase(),
+              value: payload[key] as TValue,
+            }))
+        : [],
+    [payload],
+  );
+
   const ensureLoaded = useCallback(async () => {
     if (payload) {
       return payload;
@@ -42,14 +56,13 @@ export function useDictionarySearchTool<
     if (!term) {
       return selectedResult ? [selectedResult] : [];
     }
-    if (!payload) {
+    if (indexedEntries.length === 0) {
       return [] as TResult[];
     }
-    return Object.keys(payload)
-      .filter((word) => word.toLowerCase().includes(term))
-      .sort((a, b) => a.localeCompare(b))
-      .map((word) => mapResult(word, payload[word] as TValue));
-  }, [mapResult, payload, searchTerm, selectedResult]);
+    return indexedEntries
+      .filter((item) => item.keyLower.includes(term))
+      .map((item) => mapResult(item.key, item.value));
+  }, [indexedEntries, mapResult, searchTerm, selectedResult]);
 
   const applySearch = useCallback(
     (rawValue?: string) => {

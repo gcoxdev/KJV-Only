@@ -1,4 +1,4 @@
-import { type ReactNode, type RefObject } from "react";
+import { memo, type ReactNode, type RefObject, useEffect, useState } from "react";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
@@ -74,7 +74,6 @@ type ReaderPanelTreeProps = {
   chapterRefCount: number;
   readChapters: Set<string>;
   readChapterCountByBook: Map<number, number>;
-  leafScrollProgress: Record<string, number>;
   hideReadModeVerseNumbers: boolean;
   panelMenuOpenLeafId: string | null;
   setPanelMenuOpenLeafId: (leafId: string | null) => void;
@@ -124,7 +123,7 @@ type ReaderPanelTreeProps = {
   updateSplitSize: (splitId: string, ratio: number) => void;
 };
 
-export function ReaderPanelTree({
+export const ReaderPanelTree = memo(function ReaderPanelTree({
   root,
   books,
   activeRoot,
@@ -132,7 +131,6 @@ export function ReaderPanelTree({
   chapterRefCount,
   readChapters,
   readChapterCountByBook,
-  leafScrollProgress,
   hideReadModeVerseNumbers,
   panelMenuOpenLeafId,
   setPanelMenuOpenLeafId,
@@ -169,6 +167,108 @@ export function ReaderPanelTree({
   toggleChapterRead,
   updateSplitSize,
 }: ReaderPanelTreeProps) {
+  const [leafScrollProgress, setLeafScrollProgress] = useState<
+    Record<string, number>
+  >({});
+
+  useEffect(() => {
+    const leafIds: string[] = [];
+    const collectLeafIds = (node: PanelNode) => {
+      if (node.type === "leaf") {
+        leafIds.push(node.id);
+        return;
+      }
+      collectLeafIds(node.first);
+      collectLeafIds(node.second);
+    };
+    collectLeafIds(root);
+
+    setLeafScrollProgress((current) => {
+      const next: Record<string, number> = {};
+      for (const leafId of leafIds) {
+        next[leafId] = current[leafId] ?? 0;
+      }
+      return next;
+    });
+
+    const cleanups: Array<() => void> = [];
+    const viewports = new Map<string, HTMLElement>();
+    const pendingProgress: Record<string, number> = {};
+    let rafId: number | null = null;
+
+    const flushPendingProgress = () => {
+      rafId = null;
+      setLeafScrollProgress((current) => {
+        let changed = false;
+        const next = { ...current };
+        for (const [leafId, value] of Object.entries(pendingProgress)) {
+          if (next[leafId] !== value) {
+            next[leafId] = value;
+            changed = true;
+          }
+          delete pendingProgress[leafId];
+        }
+        return changed ? next : current;
+      });
+    };
+
+    const queueProgressForLeaf = (leafId: string, value: number) => {
+      pendingProgress[leafId] = value;
+      if (rafId === null) {
+        rafId = window.requestAnimationFrame(flushPendingProgress);
+      }
+    };
+
+    const calculateProgress = (viewport: HTMLElement) => {
+      const maxScroll = viewport.scrollHeight - viewport.clientHeight;
+      return maxScroll <= 0
+        ? 0
+        : Math.round((viewport.scrollTop / maxScroll) * 100);
+    };
+
+    for (const leafId of leafIds) {
+      const panelElement = panelElementRefs.current[leafId];
+      const viewport = panelElement?.querySelector<HTMLElement>(
+        '[data-panel-content-scroll] [data-slot="scroll-area-viewport"]',
+      );
+
+      if (!viewport) {
+        continue;
+      }
+
+      viewports.set(leafId, viewport);
+
+      const update = () => {
+        const next = calculateProgress(viewport);
+        queueProgressForLeaf(leafId, next);
+      };
+
+      update();
+      viewport.addEventListener("scroll", update, { passive: true });
+      cleanups.push(() => {
+        viewport.removeEventListener("scroll", update);
+      });
+    }
+
+    const onResize = () => {
+      for (const [leafId, viewport] of viewports.entries()) {
+        queueProgressForLeaf(leafId, calculateProgress(viewport));
+      }
+    };
+    window.addEventListener("resize", onResize);
+    cleanups.push(() => {
+      window.removeEventListener("resize", onResize);
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    });
+
+    return () => {
+      cleanups.forEach((cleanup) => cleanup());
+    };
+  }, [panelElementRefs, root]);
+
   const renderLeaf = (leaf: LeafNode) => {
     const book = books[leaf.bookIndex];
     if (!book) {
@@ -638,4 +738,4 @@ export function ReaderPanelTree({
   };
 
   return <>{renderNode(root)}</>;
-}
+});
