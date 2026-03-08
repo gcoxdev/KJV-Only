@@ -230,5 +230,4 @@
 
 .verse-reference-highlight {
     background-color: #fafac5;
-    border-radius: calc(var(--radius) - 2px);
 }

@@ -112,6 +112,7 @@ type ReaderPayload = {
   books?: Book[];
 };
 type ConcordancePayload = Record<string, string[]>;
+type CrossRefsPayload = Record<string, string[]>;
 type WebstersEntry = {
   pronunciation?: string;
   definitions: Array<{
@@ -171,6 +172,7 @@ type TokenPopupState = {
 
 let kjvBooksPromise: Promise<Book[]> | null = null;
 let concordancePromise: Promise<ConcordancePayload> | null = null;
+let crossRefsPromise: Promise<CrossRefsPayload> | null = null;
 let webstersPromise: Promise<WebstersPayload> | null = null;
 let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
@@ -220,6 +222,27 @@ function loadConcordance() {
   }
 
   return concordancePromise;
+}
+
+function loadCrossRefs() {
+  if (!crossRefsPromise) {
+    crossRefsPromise = fetch("/references/cross-refs.json", {
+      cache: "force-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/cross-refs.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as CrossRefsPayload)
+      .catch((error) => {
+        crossRefsPromise = null;
+        throw error;
+      });
+  }
+
+  return crossRefsPromise;
 }
 
 function loadWebsters() {
@@ -319,10 +342,14 @@ function renderToken(
       tabIndex={0}
       className="cursor-pointer rounded-sm px-0.5 py-0.5 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring/60"
       aria-label={`Details for ${displayText}`}
-      onClick={(event) => onOpenDetails(event.currentTarget, token)}
+      onClick={(event) => {
+        event.stopPropagation();
+        onOpenDetails(event.currentTarget, token);
+      }}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
+          event.stopPropagation();
           onOpenDetails(event.currentTarget, token);
         }
       }}
@@ -359,6 +386,7 @@ type ChapterTextContentProps = {
   isStudyMode: boolean;
   verseSpacing: number;
   onOpenTokenDetails: (element: HTMLElement, token: VerseToken) => void;
+  onSelectVerse: (verseNumber: number) => void;
 };
 
 const ChapterTextContent = memo(function ChapterTextContent({
@@ -371,6 +399,7 @@ const ChapterTextContent = memo(function ChapterTextContent({
   isStudyMode,
   verseSpacing,
   onOpenTokenDetails,
+  onSelectVerse,
 }: ChapterTextContentProps) {
   const paragraphGroups: Verse[][] = [];
   let currentGroup: Verse[] = [];
@@ -399,6 +428,21 @@ const ChapterTextContent = memo(function ChapterTextContent({
               key={`${bookName}-${chapterNumber}-paragraph-${groupIndex}`}
               data-verse-number={group[0]?.verse ?? 1}
               className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
+              onClick={(event) => {
+                if (!isStudyMode) {
+                  return;
+                }
+                const target = event.target as HTMLElement;
+                const withVerse = target.closest<HTMLElement>(
+                  "[data-verse-number]",
+                );
+                const fallbackVerse = group[0]?.verse ?? 1;
+                const raw = withVerse?.dataset.verseNumber ?? `${fallbackVerse}`;
+                const verseNumber = Number.parseInt(raw, 10);
+                if (Number.isFinite(verseNumber) && verseNumber > 0) {
+                  onSelectVerse(verseNumber);
+                }
+              }}
             >
               <p
                 className="text-pretty leading-7"
@@ -437,6 +481,11 @@ const ChapterTextContent = memo(function ChapterTextContent({
               key={`${bookName}-${chapterNumber}-${verse.verse}`}
               data-verse-number={verse.verse}
               className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
+              onClick={() => {
+                if (isStudyMode) {
+                  onSelectVerse(verse.verse);
+                }
+              }}
             >
               <p
                 className={cn(
@@ -585,17 +634,6 @@ function normalizeConcordanceWord(input: string) {
   return input.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, "");
 }
 
-function clampedCenteredScrollTop(viewport: HTMLElement, element: HTMLElement) {
-  const viewportRect = viewport.getBoundingClientRect();
-  const elementRect = element.getBoundingClientRect();
-  const offsetWithinViewport =
-    elementRect.top - viewportRect.top + viewport.scrollTop;
-  const centeredTop =
-    offsetWithinViewport - viewport.clientHeight / 2 + elementRect.height / 2;
-  const maxTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight);
-  return Math.max(0, Math.min(maxTop, centeredTop));
-}
-
 function resolveConcordanceKey(
   concordance: ConcordancePayload,
   rawWord: string,
@@ -656,33 +694,102 @@ function normalizeStrongsCode(value: string) {
   return `${prefix}${numeric.padStart(4, "0")}`;
 }
 
-function parseConcordanceReference(reference: string) {
-  const match = reference.match(/^([1-3]?[A-Z]{2,3})\.(\d+)\.(\d+)$/);
+function parseBibleReference(reference: string) {
+  const chapterSpanMatch = reference.match(
+    /^([1-3]?[A-Z]{2,3})\.(\d+)\.(\d+):(\d+)\.(\d+)$/,
+  );
+  if (chapterSpanMatch) {
+    const [
+      ,
+      bookCode,
+      startChapterString,
+      startVerseString,
+      endChapterString,
+      endVerseString,
+    ] = chapterSpanMatch;
+    const bookIndex = BOOK_ICON_CODES.findIndex((code) => code === bookCode);
+    if (bookIndex < 0) {
+      return null;
+    }
+
+    const startChapterNumber = Number.parseInt(startChapterString, 10);
+    const endChapterNumber = Number.parseInt(endChapterString, 10);
+    const startVerse = Number.parseInt(startVerseString, 10);
+    const endVerse = Number.parseInt(endVerseString, 10);
+    if (!Number.isFinite(startChapterNumber) || startChapterNumber < 1) {
+      return null;
+    }
+    if (!Number.isFinite(endChapterNumber) || endChapterNumber < 1) {
+      return null;
+    }
+    if (!Number.isFinite(startVerse) || startVerse < 1) {
+      return null;
+    }
+    if (!Number.isFinite(endVerse) || endVerse < 1) {
+      return null;
+    }
+
+    const startChapterIndex = startChapterNumber - 1;
+    const endChapterIndex = endChapterNumber - 1;
+    if (startChapterIndex > endChapterIndex) {
+      return null;
+    }
+
+    return {
+      bookIndex,
+      startChapterIndex,
+      endChapterIndex,
+      startVerse,
+      endVerse,
+      bookCode,
+    };
+  }
+
+  const match = reference.match(/^([1-3]?[A-Z]{2,3})\.(\d+)\.(\d+)(?:-(\d+))?$/);
   if (!match) {
     return null;
   }
 
-  const [, bookCode, chapterString, verseString] = match;
+  const [, bookCode, chapterString, verseStartString, verseEndString] = match;
   const bookIndex = BOOK_ICON_CODES.findIndex((code) => code === bookCode);
   if (bookIndex < 0) {
     return null;
   }
 
   const chapterNumber = Number.parseInt(chapterString, 10);
-  const verseNumber = Number.parseInt(verseString, 10);
+  const startVerseNumber = Number.parseInt(verseStartString, 10);
+  const endVerseNumber = Number.parseInt(
+    verseEndString ?? verseStartString,
+    10,
+  );
   if (!Number.isFinite(chapterNumber) || chapterNumber < 1) {
     return null;
   }
-  if (!Number.isFinite(verseNumber) || verseNumber < 1) {
+  if (!Number.isFinite(startVerseNumber) || startVerseNumber < 1) {
     return null;
   }
+  if (!Number.isFinite(endVerseNumber) || endVerseNumber < 1) {
+    return null;
+  }
+  const verseStart = Math.min(startVerseNumber, endVerseNumber);
+  const verseEnd = Math.max(startVerseNumber, endVerseNumber);
 
   return {
     bookIndex,
-    chapterIndex: chapterNumber - 1,
-    verseNumber,
+    startChapterIndex: chapterNumber - 1,
+    endChapterIndex: chapterNumber - 1,
+    startVerse: verseStart,
+    endVerse: verseEnd,
     bookCode,
   };
+}
+
+function chapterVerseKey(
+  bookIndex: number,
+  chapterIndex: number,
+  verseNumber: number,
+) {
+  return `${bookCodeForIndex(bookIndex)}.${chapterIndex + 1}.${verseNumber}`;
 }
 
 function escapeRegExp(value: string) {
@@ -1354,6 +1461,13 @@ export function KJVReader() {
   const [concordance, setConcordance] = useState<ConcordancePayload | null>(
     null,
   );
+  const [crossRefs, setCrossRefs] = useState<CrossRefsPayload | null>(null);
+  const [selectedCrossReferences, setSelectedCrossReferences] = useState<{
+    key: string;
+    references: string[];
+  } | null>(null);
+  const [isCrossRefsLoading, setIsCrossRefsLoading] = useState(false);
+  const [crossRefsError, setCrossRefsError] = useState<string | null>(null);
   const [selectedConcordanceWord, setSelectedConcordanceWord] = useState<{
     key: string;
     references: string[];
@@ -1394,7 +1508,7 @@ export function KJVReader() {
     entry: StrongsEntry;
   } | null>(null);
   const [pendingVerseHighlights, setPendingVerseHighlights] = useState<
-    Record<string, number>
+    Record<string, { start: number; end: number }>
   >({});
   const tabEndRef = useRef<HTMLDivElement>(null);
   const strongsSearchInputRef = useRef<HTMLInputElement | null>(null);
@@ -1405,7 +1519,7 @@ export function KJVReader() {
   const addPreviewIsGroupRef = useRef(false);
   const orientationPreviewLeafIdsRef = useRef<string[]>([]);
   const fullscreenRequestedLeafIdRef = useRef<string | null>(null);
-  const highlightedVerseElementRef = useRef<HTMLElement | null>(null);
+  const highlightedVerseElementsRef = useRef<HTMLElement[]>([]);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -1430,6 +1544,9 @@ export function KJVReader() {
     }
     setIsRightSidebarOpen(false);
     setConcordanceAccordionValue([]);
+    setSelectedCrossReferences(null);
+    setCrossRefsError(null);
+    setIsCrossRefsLoading(false);
     setSelectedConcordanceWord(null);
     setConcordanceError(null);
     setIsConcordanceLoading(false);
@@ -1807,45 +1924,74 @@ export function KJVReader() {
 
     const rafId = window.requestAnimationFrame(() => {
       const appliedLeafIds: string[] = [];
-      if (highlightedVerseElementRef.current) {
-        highlightedVerseElementRef.current.classList.remove(
-          "verse-reference-highlight",
-        );
-        highlightedVerseElementRef.current = null;
+      for (const highlightedElement of highlightedVerseElementsRef.current) {
+        highlightedElement.classList.remove("verse-reference-highlight");
       }
+      highlightedVerseElementsRef.current = [];
 
-      for (const [leafId, verseNumber] of entries) {
+      for (const [leafId, verseRange] of entries) {
         const panelElement = panelElementRefs.current[leafId];
         const viewport = panelViewportElement(panelElement);
-        const verseElement =
-          panelElement?.querySelector<HTMLElement>(
-            `article[data-verse-number="${verseNumber}"]`,
-          ) ??
-          panelElement?.querySelector<HTMLElement>(
-            `[data-verse-number="${verseNumber}"]`,
-          );
-        if (!viewport || !verseElement) {
+        if (!viewport || !panelElement) {
           continue;
         }
 
-        const highlightElement =
-          verseElement.tagName === "ARTICLE"
-            ? verseElement
-            : ((verseElement.closest("article") as HTMLElement | null) ??
-              verseElement);
+        const verseElements: HTMLElement[] = [];
+        const seen = new Set<HTMLElement>();
+        for (
+          let verseNumber = verseRange.start;
+          verseNumber <= verseRange.end;
+          verseNumber += 1
+        ) {
+          const match =
+            panelElement.querySelector<HTMLElement>(
+              `article[data-verse-number="${verseNumber}"]`,
+            ) ??
+            panelElement.querySelector<HTMLElement>(
+              `[data-verse-number="${verseNumber}"]`,
+            );
+          if (!match || seen.has(match)) {
+            continue;
+          }
+          seen.add(match);
+          verseElements.push(match);
+        }
+        if (verseElements.length === 0) {
+          continue;
+        }
+
+        const viewportRect = viewport.getBoundingClientRect();
+        let blockTop = Number.POSITIVE_INFINITY;
+        let blockBottom = Number.NEGATIVE_INFINITY;
+        for (const verseElement of verseElements) {
+          const rect = verseElement.getBoundingClientRect();
+          const top = rect.top - viewportRect.top + viewport.scrollTop;
+          const bottom = rect.bottom - viewportRect.top + viewport.scrollTop;
+          blockTop = Math.min(blockTop, top);
+          blockBottom = Math.max(blockBottom, bottom);
+          verseElement.classList.add("verse-reference-highlight");
+        }
+        highlightedVerseElementsRef.current = [
+          ...highlightedVerseElementsRef.current,
+          ...verseElements,
+        ];
+
+        const blockHeight = Math.max(1, blockBottom - blockTop);
+        const centeredTop =
+          blockTop - viewport.clientHeight / 2 + blockHeight / 2;
+        const maxTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight);
+        const clampedTop = Math.max(0, Math.min(maxTop, centeredTop));
 
         viewport.scrollTo({
-          top: clampedCenteredScrollTop(viewport, highlightElement),
+          top: clampedTop,
           behavior: "auto",
         });
         window.requestAnimationFrame(() => {
           viewport.scrollTo({
-            top: clampedCenteredScrollTop(viewport, highlightElement),
+            top: clampedTop,
             behavior: "auto",
           });
         });
-        highlightElement.classList.add("verse-reference-highlight");
-        highlightedVerseElementRef.current = highlightElement;
 
         appliedLeafIds.push(leafId);
       }
@@ -1887,6 +2033,28 @@ export function KJVReader() {
       setIsConcordanceLoading(false);
     }
   }, [concordance]);
+
+  const ensureCrossRefsLoaded = useCallback(async () => {
+    if (crossRefs) {
+      return crossRefs;
+    }
+    setCrossRefsError(null);
+    setIsCrossRefsLoading(true);
+    try {
+      const data = await loadCrossRefs();
+      setCrossRefs(data);
+      return data;
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to load cross-reference data";
+      setCrossRefsError(message);
+      throw error;
+    } finally {
+      setIsCrossRefsLoading(false);
+    }
+  }, [crossRefs]);
 
   const concordanceSearchResults = useMemo(() => {
     const term = concordanceSearchTerm.trim().toLowerCase();
@@ -2484,7 +2652,8 @@ export function KJVReader() {
   function openChapterReferenceInNewTab(
     bookIndex: number,
     chapterIndex: number,
-    verseNumber: number,
+    verseStart: number,
+    verseEnd = verseStart,
   ) {
     const nextTabId = createId();
     const nextLeaf = createLeaf(bookIndex, chapterIndex, "reader");
@@ -2502,7 +2671,7 @@ export function KJVReader() {
     ]);
     setPendingVerseHighlights((current) => ({
       ...current,
-      [nextLeaf.id]: verseNumber,
+      [nextLeaf.id]: { start: verseStart, end: verseEnd },
     }));
     setActiveTabId(nextTabId);
     setIsProgressOpen(false);
@@ -2672,8 +2841,55 @@ export function KJVReader() {
     });
   }
 
+  const openCrossReferencesForVerse = useCallback(
+    (bookIndex: number, chapterIndex: number, verseNumber: number) => {
+      const key = chapterVerseKey(bookIndex, chapterIndex, verseNumber);
+
+      setIsRightSidebarOpen(true);
+      setSidebarOpenRequestKey((current) => current + 1);
+      setCrossRefsError(null);
+      setIsCrossRefsLoading(true);
+      setConcordanceAccordionValue((current) => {
+        const without = current.filter((value) => value !== "cross-refs");
+        return ["cross-refs", ...without];
+      });
+
+      const applyCrossRefsSelection = (data: CrossRefsPayload) => {
+        setSelectedCrossReferences({
+          key,
+          references: data[key] ?? [],
+        });
+        setIsCrossRefsLoading(false);
+      };
+
+      if (crossRefs) {
+        applyCrossRefsSelection(crossRefs);
+        return;
+      }
+
+      void ensureCrossRefsLoaded()
+        .then((data) => {
+          applyCrossRefsSelection(data);
+        })
+        .catch((error) => {
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Failed to load cross-reference data";
+          setCrossRefsError(message);
+          setIsCrossRefsLoading(false);
+        });
+    },
+    [crossRefs, ensureCrossRefsLoaded],
+  );
+
   const openTokenDetailsFromElement = useCallback(
-    (element: HTMLElement, token: VerseToken) => {
+    (
+      element: HTMLElement,
+      token: VerseToken,
+      bookIndex: number,
+      chapterIndex: number,
+    ) => {
       if (!token.strong) {
         const rect = element.getBoundingClientRect();
         const popupWidth = 280;
@@ -2692,13 +2908,35 @@ export function KJVReader() {
       }
 
       const rawWord = normalizeConcordanceWord(token.text);
+      const verseContainer = element.closest<HTMLElement>("[data-verse-number]");
+      const rawVerseNumber = verseContainer?.dataset.verseNumber;
+      const verseNumber =
+        rawVerseNumber === undefined
+          ? Number.NaN
+          : Number.parseInt(rawVerseNumber, 10);
+      if (Number.isFinite(verseNumber) && verseNumber > 0) {
+        openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
+      }
+
       if (!rawWord) {
         return;
       }
 
       setIsRightSidebarOpen(true);
       setSidebarOpenRequestKey((current) => current + 1);
-      setConcordanceAccordionValue(["concordance"]);
+      setConcordanceAccordionValue((current) => {
+        const withoutConcordance = current.filter(
+          (value) => value !== "concordance",
+        );
+        if (!withoutConcordance.includes("cross-refs")) {
+          return ["concordance", ...withoutConcordance];
+        }
+        return [
+          "cross-refs",
+          "concordance",
+          ...withoutConcordance.filter((value) => value !== "cross-refs"),
+        ];
+      });
       setConcordanceError(null);
       setIsConcordanceLoading(true);
       if (token.strong) {
@@ -2840,6 +3078,7 @@ export function KJVReader() {
     [
       concordance,
       ensureConcordanceLoaded,
+      openCrossReferencesForVerse,
       ensureStrongsLoaded,
       ensureWebstersLoaded,
       strongsGreek,
@@ -2849,68 +3088,143 @@ export function KJVReader() {
   );
 
   function openConcordanceReference(reference: string) {
-    const parsed = parseConcordanceReference(reference);
+    const parsed = parseBibleReference(reference);
     if (!parsed) {
       return;
     }
+    const startChapter =
+      books[parsed.bookIndex]?.chapters[parsed.startChapterIndex] ?? null;
+    const highlightEnd =
+      parsed.startChapterIndex === parsed.endChapterIndex
+        ? parsed.endVerse
+        : (startChapter?.verses[startChapter.verses.length - 1]?.verse ??
+          parsed.startVerse);
     openChapterReferenceInNewTab(
       parsed.bookIndex,
-      parsed.chapterIndex,
-      parsed.verseNumber,
+      parsed.startChapterIndex,
+      parsed.startVerse,
+      highlightEnd,
     );
   }
 
   function referencePreviewData(reference: string) {
-    const parsed = parseConcordanceReference(reference);
+    const parsed = parseBibleReference(reference);
     if (!parsed) {
-      return { citation: reference, verseText: "" };
+      return {
+        citation: reference,
+        verseLines: [] as Array<{ label: string; text: string }>,
+      };
     }
 
     const book = books[parsed.bookIndex];
-    const chapter = book?.chapters[parsed.chapterIndex];
-    const verse = chapter?.verses.find(
-      (candidate) => candidate.verse === parsed.verseNumber,
-    );
-    if (!book || !chapter || !verse) {
-      return { citation: reference, verseText: "" };
+    const chapters = book?.chapters ?? [];
+    if (
+      !book ||
+      !chapters[parsed.startChapterIndex] ||
+      !chapters[parsed.endChapterIndex]
+    ) {
+      return {
+        citation: reference,
+        verseLines: [] as Array<{ label: string; text: string }>,
+      };
     }
 
-    const verseText = verse.tokens
-      .map((token, index) => {
-        const leadingSpace = index > 0 && !isPunctuationToken(token.text);
-        return `${leadingSpace ? " " : ""}${formatDisplayTokenText(token)}`;
-      })
-      .join("");
+    const MAX_PREVIEW_VERSES = 24;
+    const verseLines: Array<{ label: string; text: string }> = [];
+    for (
+      let chapterIndex = parsed.startChapterIndex;
+      chapterIndex <= parsed.endChapterIndex;
+      chapterIndex += 1
+    ) {
+      const chapter = chapters[chapterIndex];
+      if (!chapter) {
+        continue;
+      }
+
+      const start =
+        chapterIndex === parsed.startChapterIndex ? parsed.startVerse : 1;
+      const end =
+        chapterIndex === parsed.endChapterIndex
+          ? parsed.endVerse
+          : (chapter.verses[chapter.verses.length - 1]?.verse ?? 0);
+      const verses = chapter.verses.filter(
+        (candidate) => candidate.verse >= start && candidate.verse <= end,
+      );
+
+      for (const verse of verses) {
+        verseLines.push({
+          label: `${chapter.chapter}:${verse.verse}`,
+          text: verse.tokens
+            .map((token, index) => {
+              const leadingSpace = index > 0 && !isPunctuationToken(token.text);
+              return `${leadingSpace ? " " : ""}${formatDisplayTokenText(token)}`;
+            })
+            .join(""),
+        });
+        if (verseLines.length >= MAX_PREVIEW_VERSES) {
+          break;
+        }
+      }
+
+      if (verseLines.length >= MAX_PREVIEW_VERSES) {
+        break;
+      }
+    }
+
+    const citationVerse =
+      parsed.startChapterIndex === parsed.endChapterIndex
+        ? parsed.startVerse === parsed.endVerse
+          ? `${parsed.startVerse}`
+          : `${parsed.startVerse}-${parsed.endVerse}`
+        : `${parsed.startChapterIndex + 1}:${parsed.startVerse}-${parsed.endChapterIndex + 1}:${parsed.endVerse}`;
 
     return {
-      citation: `${book.name} ${chapter.chapter}:${verse.verse}`,
-      verseText,
+      citation: `${book.name} ${citationVerse}`,
+      verseLines,
     };
+  }
+
+  function renderHighlightedText(
+    text: string,
+    needle: string,
+    keyPrefix: string,
+  ): ReactNode {
+    if (!needle) {
+      return text;
+    }
+
+    const matcher = new RegExp(`(${escapeRegExp(needle)})`, "ig");
+    const parts = text.split(matcher);
+    if (parts.length <= 1) {
+      return text;
+    }
+
+    return parts.map((part, index) =>
+      part.toLowerCase() === needle.toLowerCase() ? (
+        <span
+          key={`${keyPrefix}-highlight-${index}`}
+          className="bg-[#fafac5] text-black"
+        >
+          {part}
+        </span>
+      ) : (
+        <span key={`${keyPrefix}-text-${index}`}>{part}</span>
+      ),
+    );
   }
 
   function referencePreviewContent(
     reference: string,
     highlightWord: string,
   ): ReactNode {
-    const { citation, verseText } = referencePreviewData(reference);
-    const text = verseText || reference;
+    const { citation, verseLines } = referencePreviewData(reference);
     const needle = normalizeConcordanceWord(highlightWord);
-    if (!needle) {
-      return (
-        <div className="space-y-1">
-          <p className="font-semibold">{citation}</p>
-          <p>{text}</p>
-        </div>
-      );
-    }
 
-    const matcher = new RegExp(`(${escapeRegExp(needle)})`, "ig");
-    const parts = text.split(matcher);
-    if (parts.length <= 1) {
+    if (verseLines.length === 0) {
       return (
         <div className="space-y-1">
           <p className="font-semibold">{citation}</p>
-          <p>{text}</p>
+          <p>{reference}</p>
         </div>
       );
     }
@@ -2918,20 +3232,22 @@ export function KJVReader() {
     return (
       <div className="space-y-1">
         <p className="font-semibold">{citation}</p>
-        <p>
-          {parts.map((part, index) =>
-            part.toLowerCase() === needle.toLowerCase() ? (
-              <span
-                key={`${reference}-highlight-${index}`}
-                className="bg-[#fafac5] text-black"
-              >
-                {part}
+        <div className="space-y-1">
+          {verseLines.map((line) => (
+            <p key={`${reference}-line-${line.label}`}>
+              <span className="mr-1 text-xs font-semibold text-muted-foreground">
+                {line.label}
               </span>
-            ) : (
-              <span key={`${reference}-text-${index}`}>{part}</span>
-            ),
-          )}
-        </p>
+              <span>
+                {renderHighlightedText(
+                  line.text,
+                  needle,
+                  `${reference}-${line.label}`,
+                )}
+              </span>
+            </p>
+          ))}
+        </div>
       </div>
     );
   }
@@ -3433,7 +3749,21 @@ export function KJVReader() {
                     showVerseNumbers={showVerseNumbers}
                     isStudyMode={isStudyMode}
                     verseSpacing={verseSpacing}
-                    onOpenTokenDetails={openTokenDetailsFromElement}
+                    onOpenTokenDetails={(element, token) =>
+                      openTokenDetailsFromElement(
+                        element,
+                        token,
+                        leaf.bookIndex,
+                        leaf.chapterIndex,
+                      )
+                    }
+                    onSelectVerse={(verseNumber) =>
+                      openCrossReferencesForVerse(
+                        leaf.bookIndex,
+                        leaf.chapterIndex,
+                        verseNumber,
+                      )
+                    }
                   />
                 </ScrollArea>
               </CardContent>
@@ -3722,7 +4052,7 @@ export function KJVReader() {
             }
           }}
         >
-          <div className="text-xs leading-relaxed">
+          <div className="max-h-[min(24rem,60vh)] overflow-y-auto pr-1 text-xs leading-relaxed">
             {referencePreviewContent(reference, highlightWord)}
           </div>
           {!supportsHover ? (
@@ -3992,6 +4322,76 @@ export function KJVReader() {
                   )
                 }
               >
+                <AccordionItem value="cross-refs">
+                  <AccordionTrigger>Cross References</AccordionTrigger>
+                  <AccordionContent className="space-y-2 overflow-visible">
+                    {isCrossRefsLoading ? (
+                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <LoaderCircleIcon className="size-4 animate-spin" />
+                        Loading cross references...
+                      </p>
+                    ) : crossRefsError ? (
+                      <p className="text-sm text-destructive">
+                        {crossRefsError}
+                      </p>
+                    ) : !selectedCrossReferences ? (
+                      <p className="text-sm text-muted-foreground">
+                        Click a word or verse to load cross references.
+                      </p>
+                    ) : selectedCrossReferences.references.length === 0 ? (
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium">
+                          {(() => {
+                            const parsed = parseBibleReference(
+                              selectedCrossReferences.key,
+                            );
+                            if (!parsed) {
+                              return selectedCrossReferences.key;
+                            }
+                            const book = books[parsed.bookIndex];
+                            return `${book?.name ?? parsed.bookCode} ${parsed.startChapterIndex + 1}:${parsed.startVerse}`;
+                          })()}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          No cross references found.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">
+                          {(() => {
+                            const parsed = parseBibleReference(
+                              selectedCrossReferences.key,
+                            );
+                            if (!parsed) {
+                              return selectedCrossReferences.key;
+                            }
+                            const book = books[parsed.bookIndex];
+                            return `${book?.name ?? parsed.bookCode} ${parsed.startChapterIndex + 1}:${parsed.startVerse}`;
+                          })()}
+                        </p>
+                        <p className="text-sm leading-7">
+                          {selectedCrossReferences.references.map(
+                            (reference, index) => (
+                              <Fragment
+                                key={`${selectedCrossReferences.key}-${reference}-${index}`}
+                              >
+                                <ConcordanceReferencePopover
+                                  reference={reference}
+                                  highlightWord=""
+                                />
+                                {index <
+                                selectedCrossReferences.references.length - 1
+                                  ? ", "
+                                  : null}
+                              </Fragment>
+                            ),
+                          )}
+                        </p>
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
                 <AccordionItem value="concordance">
                   <AccordionTrigger>Concordance</AccordionTrigger>
                   <AccordionContent className="space-y-2 overflow-visible">
