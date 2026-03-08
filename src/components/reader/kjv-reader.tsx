@@ -1,7 +1,6 @@
 import {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -13,27 +12,13 @@ import {
 import {
   type AncientMapEntry,
   type AncientMapPayload,
-  cleanMapMarkup,
-  mapEntryLabel,
-  mapEntrySearchableText,
   matchesMapWord,
-  modernIdsForMapEntry,
-  type MapGeoJsonPayload,
-  type MapImageEntry,
-  type MapPhotoDialogItem,
 } from "@/lib/maps";
 import {
-  loadAncientMap,
-  loadConcordance,
-  loadCrossRefs,
-  loadGenealogy,
   loadHitchcocks,
   loadKjvBooks,
   loadMapGeoJson,
-  loadMapImages,
   loadOldEnglish,
-  loadStrongsGreek,
-  loadStrongsHebrew,
   loadWebsters,
 } from "@/lib/reader-data";
 import {
@@ -68,7 +53,6 @@ import {
   updateSplitRatio,
 } from "@/lib/reader-layout";
 import {
-  buildLeafNeighborMap,
   buildLeafNeighborMapFromDom,
   type LeafNeighbors,
 } from "@/lib/reader-neighbors";
@@ -84,7 +68,6 @@ import type {
   PanelNode,
   ReaderTab,
   SplitOrientation,
-  StrongsEntry,
   StrongsPayload,
   TabsOrientation,
   TokenPopupState,
@@ -104,9 +87,16 @@ import { ProgressDialog } from "@/components/reader/progress-dialog";
 import { GenealogyPersonDetails } from "@/components/reader/genealogy-person-details";
 import { useReferencePreview } from "@/hooks/use-reference-preview";
 import { useTabActions } from "@/hooks/use-tab-actions";
+import { useMapDialogState } from "@/hooks/use-map-dialog-state";
+import { useReaderDerivedState } from "@/hooks/use-reader-derived-state";
+import { useDictionarySearchTool } from "@/hooks/use-dictionary-search-tool";
+import { useStrongsSearchTool } from "@/hooks/use-strongs-search-tool";
+import { useGenealogySearchTool } from "@/hooks/use-genealogy-search-tool";
+import { useMapsSearchTool } from "@/hooks/use-maps-search-tool";
+import { useConcordanceCrossRefsTool } from "@/hooks/use-concordance-crossrefs-tool";
 import {
   STUDY_ACCORDION_ITEMS,
-  useStudySidebarState,
+  deriveStudySidebarState,
 } from "@/hooks/use-study-sidebar-state";
 import { TabsStrip } from "@/components/reader/tabs-strip";
 import { TokenPopupCard } from "@/components/reader/token-popup-card";
@@ -147,107 +137,41 @@ export function KJVReader() {
   const [leafScrollProgress, setLeafScrollProgress] = useState<
     Record<string, number>
   >({});
-  const [concordance, setConcordance] = useState<ConcordancePayload | null>(
-    null,
-  );
-  const [crossRefs, setCrossRefs] = useState<CrossRefsPayload | null>(null);
-  const [selectedCrossReferences, setSelectedCrossReferences] = useState<{
-    key: string;
-    references: string[];
-  } | null>(null);
-  const [isCrossRefsLoading, setIsCrossRefsLoading] = useState(false);
-  const [crossRefsError, setCrossRefsError] = useState<string | null>(null);
-  const [selectedConcordanceWord, setSelectedConcordanceWord] = useState<{
-    key: string;
-    references: string[];
-  } | null>(null);
-  const [concordanceSearchTerm, setConcordanceSearchTerm] = useState("");
-  const [isConcordanceSearching, setIsConcordanceSearching] = useState(false);
   const [concordanceAccordionValue, setConcordanceAccordionValue] = useState<
     string[]
   >([]);
   const [concordanceWordAccordionValue, setConcordanceWordAccordionValue] =
     useState<string[]>([]);
-  const [isConcordanceLoading, setIsConcordanceLoading] = useState(false);
-  const [concordanceError, setConcordanceError] = useState<string | null>(null);
-  const [websters, setWebsters] = useState<WebstersPayload | null>(null);
-  const [webstersSearchTerm, setWebstersSearchTerm] = useState("");
-  const [isWebstersSearching, setIsWebstersSearching] = useState(false);
-  const [isWebstersLoading, setIsWebstersLoading] = useState(false);
-  const [webstersError, setWebstersError] = useState<string | null>(null);
   const [webstersWordAccordionValue, setWebstersWordAccordionValue] = useState<
     string[]
   >([]);
-  const [selectedWebstersEntry, setSelectedWebstersEntry] = useState<{
-    key: string;
-    entry: WebstersEntry;
-  } | null>(null);
-  const [hitchcocks, setHitchcocks] = useState<HitchcocksPayload | null>(null);
-  const [hitchcocksSearchTerm, setHitchcocksSearchTerm] = useState("");
-  const [isHitchcocksSearching, setIsHitchcocksSearching] = useState(false);
-  const [isHitchcocksLoading, setIsHitchcocksLoading] = useState(false);
-  const [hitchcocksError, setHitchcocksError] = useState<string | null>(null);
-  const [selectedHitchcocksEntry, setSelectedHitchcocksEntry] = useState<{
-    key: string;
-    definition: string;
-  } | null>(null);
-  const [oldEnglish, setOldEnglish] = useState<OldEnglishPayload | null>(null);
-  const [oldEnglishSearchTerm, setOldEnglishSearchTerm] = useState("");
-  const [isOldEnglishSearching, setIsOldEnglishSearching] = useState(false);
-  const [isOldEnglishLoading, setIsOldEnglishLoading] = useState(false);
-  const [oldEnglishError, setOldEnglishError] = useState<string | null>(null);
-  const [selectedOldEnglishEntry, setSelectedOldEnglishEntry] = useState<{
-    key: string;
-    definitions: string[];
-  } | null>(null);
-  const [genealogy, setGenealogy] = useState<GenealogyPayload | null>(null);
-  const [genealogySearchTerm, setGenealogySearchTerm] = useState("");
-  const [isGenealogySearching, setIsGenealogySearching] = useState(false);
-  const [isGenealogyLoading, setIsGenealogyLoading] = useState(false);
-  const [genealogyError, setGenealogyError] = useState<string | null>(null);
-  const [selectedGenealogyIds, setSelectedGenealogyIds] = useState<string[]>(
-    [],
-  );
-  const [strongsGreek, setStrongsGreek] = useState<StrongsPayload | null>(null);
-  const [strongsHebrew, setStrongsHebrew] = useState<StrongsPayload | null>(null);
-  const [strongsSearchTerm, setStrongsSearchTerm] = useState("");
-  const [isStrongsSearching, setIsStrongsSearching] = useState(false);
-  const [isStrongsLoading, setIsStrongsLoading] = useState(false);
-  const [strongsError, setStrongsError] = useState<string | null>(null);
   const [strongsWordAccordionValue, setStrongsWordAccordionValue] = useState<
     string[]
-  >([]);
-  const [selectedStrongsEntry, setSelectedStrongsEntry] = useState<{
-    code: string;
-    testament: "greek" | "hebrew";
-    entry: StrongsEntry;
-  } | null>(null);
-  const [ancientMaps, setAncientMaps] = useState<AncientMapPayload | null>(null);
-  const [mapsSearchTerm, setMapsSearchTerm] = useState("");
-  const [isMapsSearching, setIsMapsSearching] = useState(false);
-  const [isMapsLoading, setIsMapsLoading] = useState(false);
-  const [mapsError, setMapsError] = useState<string | null>(null);
-  const [selectedMapsEntries, setSelectedMapsEntries] = useState<
-    AncientMapEntry[]
   >([]);
   const [mapsWordAccordionValue, setMapsWordAccordionValue] = useState<
     string[]
   >([]);
-  const [isMapDialogOpen, setIsMapDialogOpen] = useState(false);
-  const [activeMapDialogEntry, setActiveMapDialogEntry] =
-    useState<AncientMapEntry | null>(null);
-  const [mapDialogGeoJson, setMapDialogGeoJson] =
-    useState<MapGeoJsonPayload | null>(null);
-  const [isMapDialogLoading, setIsMapDialogLoading] = useState(false);
-  const [mapDialogError, setMapDialogError] = useState<string | null>(null);
-  const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
-  const [photoDialogItems, setPhotoDialogItems] = useState<MapPhotoDialogItem[]>(
-    [],
-  );
-  const [photoDialogIndex, setPhotoDialogIndex] = useState(0);
-  const [mapImages, setMapImages] = useState<MapImageEntry[] | null>(null);
-  const [isMapImagesLoading, setIsMapImagesLoading] = useState(false);
-  const [mapImagesError, setMapImagesError] = useState<string | null>(null);
+  const {
+    isMapDialogOpen,
+    activeMapDialogEntry,
+    isMapDialogLoading,
+    mapDialogError,
+    mapDialogGeoJson,
+    onMapDialogOpenChange,
+    onCloseMapDialog,
+    openMapDialog,
+    isPhotoDialogOpen,
+    currentPhotoDialogItem,
+    photoDialogIndex,
+    photoDialogItemsLength,
+    onPhotoDialogOpenChange,
+    onClosePhotoDialog,
+    openPhotoDialog,
+    movePhotoDialog,
+    resetMapDialogState,
+  } = useMapDialogState({
+    loadMapGeoJsonByFile: loadMapGeoJson,
+  });
   const [pendingVerseHighlights, setPendingVerseHighlights] = useState<
     Record<string, { start: number; end: number }>
   >({});
@@ -325,16 +249,10 @@ export function KJVReader() {
     setIsMapsSearching(false);
     setMapsWordAccordionValue([]);
     setSelectedMapsEntries([]);
-    setIsMapDialogOpen(false);
-    setIsPhotoDialogOpen(false);
-    setPhotoDialogItems([]);
-    setPhotoDialogIndex(0);
-    setActiveMapDialogEntry(null);
-    setMapDialogGeoJson(null);
-    setMapDialogError(null);
+    resetMapDialogState();
     setIsMapImagesLoading(false);
     setMapImagesError(null);
-  }, [isStudyMode]);
+  }, [isStudyMode, resetMapDialogState]);
 
   useEffect(() => {
     try {
@@ -479,121 +397,212 @@ export function KJVReader() {
     };
   }, []);
 
-  const chapterRefs = useMemo(
-    () =>
-      books.flatMap((book, bIndex) =>
-        book.chapters.map((_, cIndex) => ({
-          bookIndex: bIndex,
-          chapterIndex: cIndex,
-        })),
-      ),
-    [books],
+  const {
+    chapterRefs,
+    chapterRefIndex,
+    activeTab,
+    modelLeafNeighbors,
+    existingTabTargets,
+    progressByTestament,
+    readChapterCountByBook,
+    totalProgressPercent,
+  } = useReaderDerivedState({
+    books,
+    tabs,
+    activeTabId,
+    readChapters,
+  });
+
+  const mapWebstersResult = useCallback(
+    (key: string, entry: WebstersEntry) => ({ key, entry }),
+    [],
+  );
+  const mapHitchcocksResult = useCallback(
+    (key: string, definition: string) => ({ key, definition }),
+    [],
+  );
+  const mapOldEnglishResult = useCallback(
+    (key: string, definitions: string[]) => ({ key, definitions }),
+    [],
   );
 
-  const chapterRefIndex = useMemo(() => {
-    const map = new Map<string, number>();
-    chapterRefs.forEach((ref, index) => {
-      map.set(`${ref.bookIndex}-${ref.chapterIndex}`, index);
-    });
-    return map;
-  }, [chapterRefs]);
+  const {
+    concordance,
+    crossRefs,
+    selectedCrossReferences,
+    isCrossRefsLoading,
+    crossRefsError,
+    concordanceSearchTerm,
+    isConcordanceSearching,
+    isConcordanceLoading,
+    concordanceError,
+    concordanceSearchResults,
+    setSelectedCrossReferences,
+    setIsCrossRefsLoading,
+    setCrossRefsError,
+    setSelectedConcordanceWord,
+    setIsConcordanceLoading,
+    setConcordanceError,
+    ensureConcordanceLoaded,
+    ensureCrossRefsLoaded,
+    applyConcordanceSearch: applyConcordanceSearchRaw,
+  } = useConcordanceCrossRefsTool();
 
-  const activeTab = useMemo(
-    () => tabs.find((tab) => tab.id === activeTabId) ?? null,
-    [activeTabId, tabs],
+  const applyConcordanceSearch = useCallback(
+    (rawValue?: string) => {
+      setConcordanceWordAccordionValue([]);
+      applyConcordanceSearchRaw(rawValue);
+    },
+    [applyConcordanceSearchRaw],
   );
-  const modelLeafNeighbors = useMemo(
-    () => (activeTab ? buildLeafNeighborMap(activeTab.root) : new Map()),
-    [activeTab],
+
+  const {
+    payload: websters,
+    searchTerm: webstersSearchTerm,
+    isSearching: isWebstersSearching,
+    isLoading: isWebstersLoading,
+    error: webstersError,
+    results: webstersSearchResults,
+    setIsSearching: setIsWebstersSearching,
+    setIsLoading: setIsWebstersLoading,
+    setError: setWebstersError,
+    setSelectedResult: setSelectedWebstersEntry,
+    ensureLoaded: ensureWebstersLoaded,
+    applySearch: applyWebstersSearchRaw,
+  } = useDictionarySearchTool<WebstersPayload, WebstersEntry, { key: string; entry: WebstersEntry }>({
+    load: loadWebsters,
+    errorMessage: "Failed to load Webster's data",
+    mapResult: mapWebstersResult,
+  });
+
+  const applyWebstersSearch = useCallback(
+    (rawValue?: string) => {
+      setWebstersWordAccordionValue([]);
+      applyWebstersSearchRaw(rawValue);
+    },
+    [applyWebstersSearchRaw],
   );
-  const existingTabTargets = useMemo(
-    () =>
-      tabs
-        .map((tab, index) => ({
-          id: tab.id,
-          index,
-          title: tab.title,
-        }))
-        .filter((tab) => tab.id !== activeTabId),
-    [tabs, activeTabId],
+
+  const {
+    payload: hitchcocks,
+    searchTerm: hitchcocksSearchTerm,
+    isSearching: isHitchcocksSearching,
+    isLoading: isHitchcocksLoading,
+    error: hitchcocksError,
+    results: hitchcocksSearchResults,
+    setIsSearching: setIsHitchcocksSearching,
+    setIsLoading: setIsHitchcocksLoading,
+    setError: setHitchcocksError,
+    setSelectedResult: setSelectedHitchcocksEntry,
+    ensureLoaded: ensureHitchcocksLoaded,
+    applySearch: applyHitchcocksSearch,
+  } = useDictionarySearchTool<
+    HitchcocksPayload,
+    string,
+    { key: string; definition: string }
+  >({
+    load: loadHitchcocks,
+    errorMessage: "Failed to load Hitchcock's data",
+    mapResult: mapHitchcocksResult,
+  });
+
+  const {
+    payload: oldEnglish,
+    searchTerm: oldEnglishSearchTerm,
+    isSearching: isOldEnglishSearching,
+    isLoading: isOldEnglishLoading,
+    error: oldEnglishError,
+    results: oldEnglishSearchResults,
+    setIsSearching: setIsOldEnglishSearching,
+    setIsLoading: setIsOldEnglishLoading,
+    setError: setOldEnglishError,
+    setSelectedResult: setSelectedOldEnglishEntry,
+    ensureLoaded: ensureOldEnglishLoaded,
+    applySearch: applyOldEnglishSearch,
+  } = useDictionarySearchTool<
+    OldEnglishPayload,
+    string[],
+    { key: string; definitions: string[] }
+  >({
+    load: loadOldEnglish,
+    errorMessage: "Failed to load Old English data",
+    mapResult: mapOldEnglishResult,
+  });
+
+  const {
+    strongsGreek,
+    strongsHebrew,
+    strongsSearchTerm,
+    isStrongsSearching,
+    isStrongsLoading,
+    strongsError,
+    strongsSearchResults,
+    setStrongsSearchTerm,
+    setIsStrongsSearching,
+    setIsStrongsLoading,
+    setStrongsError,
+    setSelectedStrongsEntry,
+    ensureStrongsLoaded,
+    applyStrongsSearch: applyStrongsSearchRaw,
+  } = useStrongsSearchTool();
+
+  const applyStrongsSearch = useCallback(
+    (rawValue?: string) => {
+      setStrongsWordAccordionValue([]);
+      applyStrongsSearchRaw(rawValue);
+    },
+    [applyStrongsSearchRaw],
+  );
+
+  const {
+    genealogy,
+    genealogySearchTerm,
+    isGenealogySearching,
+    isGenealogyLoading,
+    genealogyError,
+    genealogyById,
+    genealogySearchResults,
+    setGenealogySearchTerm,
+    setIsGenealogySearching,
+    setIsGenealogyLoading,
+    setGenealogyError,
+    setSelectedGenealogyIds,
+    ensureGenealogyLoaded,
+    applyGenealogySearch,
+  } = useGenealogySearchTool();
+
+  const {
+    ancientMaps,
+    mapsSearchTerm,
+    isMapsSearching,
+    isMapsLoading,
+    mapsError,
+    isMapImagesLoading,
+    mapImagesError,
+    mapsSearchResults,
+    mapsDisplayEntries,
+    setIsMapsSearching,
+    setIsMapsLoading,
+    setMapsError,
+    setSelectedMapsEntries,
+    setIsMapImagesLoading,
+    setMapImagesError,
+    ensureAncientMapsLoaded,
+    ensureMapImagesLoaded,
+    applyMapsSearch: applyMapsSearchRaw,
+  } = useMapsSearchTool();
+
+  const applyMapsSearch = useCallback(
+    (rawValue?: string) => {
+      setMapsWordAccordionValue([]);
+      applyMapsSearchRaw(rawValue);
+    },
+    [applyMapsSearchRaw],
   );
 
   useEffect(() => {
     domNeighborCacheRef.current = { root: null, neighbors: new Map() };
   }, [activeTab]);
-  const progressByTestament = useMemo(() => {
-    const oldBooks = books.slice(0, 39);
-    const newBooks = books.slice(39);
-
-    const makeBookProgress = (book: Book, bookIndex: number) => {
-      const total = book.chapters.length;
-      const chapters = book.chapters.map((chapter, chapterIndex) => {
-        const read = readChapters.has(
-          chapterProgressKey(bookIndex, chapterIndex),
-        );
-        return {
-          chapterIndex,
-          chapterNumber: chapter.chapter,
-          read,
-        };
-      });
-      const read = chapters.reduce(
-        (count, chapter) => count + (chapter.read ? 1 : 0),
-        0,
-      );
-      return { name: book.name, bookIndex, read, total, chapters };
-    };
-
-    const oldBookProgress = oldBooks.map((book, index) =>
-      makeBookProgress(book, index),
-    );
-    const newBookProgress = newBooks.map((book, index) =>
-      makeBookProgress(book, index + 39),
-    );
-
-    const summarize = (items: { read: number; total: number }[]) =>
-      items.reduce(
-        (acc, item) => ({
-          read: acc.read + item.read,
-          total: acc.total + item.total,
-        }),
-        { read: 0, total: 0 },
-      );
-
-    const oldSummary = summarize(oldBookProgress);
-    const newSummary = summarize(newBookProgress);
-    const totalSummary = {
-      read: oldSummary.read + newSummary.read,
-      total: oldSummary.total + newSummary.total,
-    };
-
-    return {
-      old: { label: "Old Testament", ...oldSummary, books: oldBookProgress },
-      new: { label: "New Testament", ...newSummary, books: newBookProgress },
-      total: totalSummary,
-    };
-  }, [books, readChapters]);
-  const readChapterCountByBook = useMemo(() => {
-    const counts = new Map<number, number>();
-    for (let bookIndex = 0; bookIndex < books.length; bookIndex += 1) {
-      const book = books[bookIndex];
-      let count = 0;
-      for (let chapterIndex = 0; chapterIndex < book.chapters.length; chapterIndex += 1) {
-        if (readChapters.has(chapterProgressKey(bookIndex, chapterIndex))) {
-          count += 1;
-        }
-      }
-      counts.set(bookIndex, count);
-    }
-    return counts;
-  }, [books, readChapters]);
-  const totalProgressPercent =
-    progressByTestament.total.total > 0
-      ? Math.round(
-          (progressByTestament.total.read / progressByTestament.total.total) *
-            100,
-        )
-      : 0;
   useEffect(() => {
     function onFullscreenChange() {
       const element = document.fullscreenElement as HTMLElement | null;
@@ -815,620 +824,15 @@ export function KJVReader() {
     };
   }, [pendingVerseHighlights, activeTabId, tabs]);
 
-  const ensureConcordanceLoaded = useCallback(async () => {
-    if (concordance) {
-      return concordance;
-    }
-    setConcordanceError(null);
-    setIsConcordanceLoading(true);
-    try {
-      const data = await loadConcordance();
-      setConcordance(data);
-      return data;
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to load concordance data";
-      setConcordanceError(message);
-      throw error;
-    } finally {
-      setIsConcordanceLoading(false);
-    }
-  }, [concordance]);
-
-  const ensureCrossRefsLoaded = useCallback(async () => {
-    if (crossRefs) {
-      return crossRefs;
-    }
-    setCrossRefsError(null);
-    setIsCrossRefsLoading(true);
-    try {
-      const data = await loadCrossRefs();
-      setCrossRefs(data);
-      return data;
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to load cross-reference data";
-      setCrossRefsError(message);
-      throw error;
-    } finally {
-      setIsCrossRefsLoading(false);
-    }
-  }, [crossRefs]);
-
-  const concordanceSearchResults = useMemo(() => {
-    const term = concordanceSearchTerm.trim().toLowerCase();
-    if (!term) {
-      return selectedConcordanceWord ? [selectedConcordanceWord] : [];
-    }
-    if (!concordance) {
-      return [];
-    }
-    return Object.keys(concordance)
-      .filter((word) => word.toLowerCase().includes(term))
-      .sort((a, b) => a.localeCompare(b))
-      .map((word) => ({
-        key: word,
-        references: concordance[word] ?? [],
-      }));
-  }, [concordance, concordanceSearchTerm, selectedConcordanceWord]);
-
-  const applyConcordanceSearch = useCallback(
-    (rawValue?: string) => {
-      const nextTerm = (rawValue ?? "").trim();
-      setConcordanceSearchTerm(nextTerm);
-      setConcordanceWordAccordionValue([]);
-      if (!nextTerm) {
-        setIsConcordanceSearching(false);
-        return;
-      }
-      setIsConcordanceSearching(true);
-      void ensureConcordanceLoaded()
-        .catch(() => {
-          // Error state is set by ensureConcordanceLoaded
-        })
-        .finally(() => {
-          window.requestAnimationFrame(() => {
-            setIsConcordanceSearching(false);
-          });
-        });
-    },
-    [ensureConcordanceLoaded],
-  );
-
-  const ensureWebstersLoaded = useCallback(async () => {
-    if (websters) {
-      return websters;
-    }
-    setWebstersError(null);
-    setIsWebstersLoading(true);
-    try {
-      const data = await loadWebsters();
-      setWebsters(data);
-      return data;
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to load Webster's data";
-      setWebstersError(message);
-      throw error;
-    } finally {
-      setIsWebstersLoading(false);
-    }
-  }, [websters]);
-
-  const webstersSearchResults = useMemo(() => {
-    const term = webstersSearchTerm.trim().toLowerCase();
-    if (!term) {
-      return selectedWebstersEntry ? [selectedWebstersEntry] : [];
-    }
-    if (!websters) {
-      return [];
-    }
-    return Object.keys(websters)
-      .filter((word) => word.toLowerCase().includes(term))
-      .sort((a, b) => a.localeCompare(b))
-      .map((word) => ({ key: word, entry: websters[word] }));
-  }, [selectedWebstersEntry, websters, webstersSearchTerm]);
-
-  const applyWebstersSearch = useCallback(
-    (rawValue?: string) => {
-      const nextTerm = (rawValue ?? "").trim();
-      setWebstersSearchTerm(nextTerm);
-      setWebstersWordAccordionValue([]);
-      if (!nextTerm) {
-        setIsWebstersSearching(false);
-        return;
-      }
-      setIsWebstersSearching(true);
-      void ensureWebstersLoaded()
-        .catch(() => {
-          // Error state is set by ensureWebstersLoaded
-        })
-        .finally(() => {
-          window.requestAnimationFrame(() => {
-            setIsWebstersSearching(false);
-          });
-        });
-    },
-    [ensureWebstersLoaded],
-  );
-
-  const ensureHitchcocksLoaded = useCallback(async () => {
-    if (hitchcocks) {
-      return hitchcocks;
-    }
-    setHitchcocksError(null);
-    setIsHitchcocksLoading(true);
-    try {
-      const data = await loadHitchcocks();
-      setHitchcocks(data);
-      return data;
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to load Hitchcock's data";
-      setHitchcocksError(message);
-      throw error;
-    } finally {
-      setIsHitchcocksLoading(false);
-    }
-  }, [hitchcocks]);
-
-  const hitchcocksSearchResults = useMemo(() => {
-    const term = hitchcocksSearchTerm.trim().toLowerCase();
-    if (!term) {
-      return selectedHitchcocksEntry ? [selectedHitchcocksEntry] : [];
-    }
-    if (!hitchcocks) {
-      return [];
-    }
-    return Object.keys(hitchcocks)
-      .filter((word) => word.toLowerCase().includes(term))
-      .sort((a, b) => a.localeCompare(b))
-      .map((word) => ({ key: word, definition: hitchcocks[word] }));
-  }, [hitchcocks, hitchcocksSearchTerm, selectedHitchcocksEntry]);
-
-  const applyHitchcocksSearch = useCallback(
-    (rawValue?: string) => {
-      const nextTerm = (rawValue ?? "").trim();
-      setHitchcocksSearchTerm(nextTerm);
-      if (!nextTerm) {
-        setIsHitchcocksSearching(false);
-        return;
-      }
-      setIsHitchcocksSearching(true);
-      void ensureHitchcocksLoaded()
-        .catch(() => {
-          // Error state is set by ensureHitchcocksLoaded
-        })
-        .finally(() => {
-          window.requestAnimationFrame(() => {
-            setIsHitchcocksSearching(false);
-          });
-        });
-    },
-    [ensureHitchcocksLoaded],
-  );
-
-  const ensureOldEnglishLoaded = useCallback(async () => {
-    if (oldEnglish) {
-      return oldEnglish;
-    }
-    setOldEnglishError(null);
-    setIsOldEnglishLoading(true);
-    try {
-      const data = await loadOldEnglish();
-      setOldEnglish(data);
-      return data;
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to load Old English data";
-      setOldEnglishError(message);
-      throw error;
-    } finally {
-      setIsOldEnglishLoading(false);
-    }
-  }, [oldEnglish]);
-
-  const oldEnglishSearchResults = useMemo(() => {
-    const term = oldEnglishSearchTerm.trim().toLowerCase();
-    if (!term) {
-      return selectedOldEnglishEntry ? [selectedOldEnglishEntry] : [];
-    }
-    if (!oldEnglish) {
-      return [];
-    }
-    return Object.keys(oldEnglish)
-      .filter((word) => word.toLowerCase().includes(term))
-      .sort((a, b) => a.localeCompare(b))
-      .map((word) => ({ key: word, definitions: oldEnglish[word] }));
-  }, [oldEnglish, oldEnglishSearchTerm, selectedOldEnglishEntry]);
-
-  const applyOldEnglishSearch = useCallback(
-    (rawValue?: string) => {
-      const nextTerm = (rawValue ?? "").trim();
-      setOldEnglishSearchTerm(nextTerm);
-      if (!nextTerm) {
-        setIsOldEnglishSearching(false);
-        return;
-      }
-      setIsOldEnglishSearching(true);
-      void ensureOldEnglishLoaded()
-        .catch(() => {
-          // Error state is set by ensureOldEnglishLoaded
-        })
-        .finally(() => {
-          window.requestAnimationFrame(() => {
-            setIsOldEnglishSearching(false);
-          });
-        });
-    },
-    [ensureOldEnglishLoaded],
-  );
-
-  const ensureGenealogyLoaded = useCallback(async () => {
-    if (genealogy) {
-      return genealogy;
-    }
-    setGenealogyError(null);
-    setIsGenealogyLoading(true);
-    try {
-      const data = await loadGenealogy();
-      setGenealogy(data);
-      return data;
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to load genealogy data";
-      setGenealogyError(message);
-      throw error;
-    } finally {
-      setIsGenealogyLoading(false);
-    }
-  }, [genealogy]);
-
-  const genealogyById = useMemo(() => {
-    const map = new Map<string, GenealogyPerson>();
-    for (const person of genealogy ?? []) {
-      map.set(person.id, person);
-    }
-    return map;
-  }, [genealogy]);
-
-  const genealogySearchResults = useMemo(() => {
-    const term = genealogySearchTerm.trim().toLowerCase();
-    if (term) {
-      return (genealogy ?? [])
-        .filter((person) =>
-          person.names.some((name) => name.toLowerCase().includes(term)),
-        )
-        .sort((a, b) =>
-          (a.names[0] ?? a.id).localeCompare(b.names[0] ?? b.id),
-        );
-    }
-    if (selectedGenealogyIds.length === 0) {
-      return [] as GenealogyPerson[];
-    }
-    return selectedGenealogyIds
-      .map((id) => genealogyById.get(id))
-      .filter((person): person is GenealogyPerson => Boolean(person));
-  }, [genealogy, genealogyById, genealogySearchTerm, selectedGenealogyIds]);
-
-  const applyGenealogySearch = useCallback(
-    (rawValue?: string) => {
-      const nextTerm = (rawValue ?? "").trim();
-      setGenealogySearchTerm(nextTerm);
-      if (!nextTerm) {
-        setIsGenealogySearching(false);
-        return;
-      }
-      setIsGenealogySearching(true);
-      void ensureGenealogyLoaded()
-        .catch(() => {
-          // Error state is set by ensureGenealogyLoaded
-        })
-        .finally(() => {
-          window.requestAnimationFrame(() => {
-            setIsGenealogySearching(false);
-          });
-        });
-    },
-    [ensureGenealogyLoaded],
-  );
-
-  const ensureStrongsLoaded = useCallback(async () => {
-    if (strongsGreek && strongsHebrew) {
-      return { greek: strongsGreek, hebrew: strongsHebrew };
-    }
-    setStrongsError(null);
-    setIsStrongsLoading(true);
-    try {
-      const [greek, hebrew] = await Promise.all([
-        strongsGreek ? Promise.resolve(strongsGreek) : loadStrongsGreek(),
-        strongsHebrew ? Promise.resolve(strongsHebrew) : loadStrongsHebrew(),
-      ]);
-      setStrongsGreek(greek);
-      setStrongsHebrew(hebrew);
-      return { greek, hebrew };
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to load Strong's data";
-      setStrongsError(message);
-      throw error;
-    } finally {
-      setIsStrongsLoading(false);
-    }
-  }, [strongsGreek, strongsHebrew]);
-
-  const strongsSearchResults = useMemo(() => {
-    const term = strongsSearchTerm.trim().toLowerCase();
-    if (!term) {
-      return selectedStrongsEntry ? [selectedStrongsEntry] : [];
-    }
-    const results: Array<{
-      code: string;
-      testament: "greek" | "hebrew";
-      entry: StrongsEntry;
-    }> = [];
-    const pushMatches = (
-      payload: StrongsPayload | null,
-      testament: "greek" | "hebrew",
-    ) => {
-      if (!payload) {
-        return;
-      }
-      for (const [code, entry] of Object.entries(payload)) {
-        const haystack = [
-          code,
-          entry.lemma ?? "",
-          entry.translit ?? "",
-          entry.kjv_def ?? "",
-          entry.strongs_def ?? "",
-        ]
-          .join(" ")
-          .toLowerCase();
-        if (haystack.includes(term)) {
-          results.push({ code, testament, entry });
-        }
-      }
-    };
-    pushMatches(strongsGreek, "greek");
-    pushMatches(strongsHebrew, "hebrew");
-    return results.sort((a, b) => a.code.localeCompare(b.code));
-  }, [selectedStrongsEntry, strongsGreek, strongsHebrew, strongsSearchTerm]);
-
-  const applyStrongsSearch = useCallback(
-    (rawValue?: string) => {
-      const nextTerm = (rawValue ?? "").trim();
-      setStrongsSearchTerm(nextTerm);
-      setStrongsWordAccordionValue([]);
-      if (!nextTerm) {
-        setIsStrongsSearching(false);
-        return;
-      }
-      setIsStrongsSearching(true);
-      void ensureStrongsLoaded()
-        .catch(() => {
-          // Error state is set by ensureStrongsLoaded
-        })
-        .finally(() => {
-          window.requestAnimationFrame(() => {
-            setIsStrongsSearching(false);
-          });
-        });
-    },
-    [ensureStrongsLoaded],
-  );
-
-  const ensureAncientMapsLoaded = useCallback(async () => {
-    if (ancientMaps) {
-      return ancientMaps;
-    }
-    setMapsError(null);
-    setIsMapsLoading(true);
-    try {
-      const data = await loadAncientMap();
-      setAncientMaps(data);
-      return data;
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to load ancient map data";
-      setMapsError(message);
-      throw error;
-    } finally {
-      setIsMapsLoading(false);
-    }
-  }, [ancientMaps]);
-
-  const ensureMapImagesLoaded = useCallback(async () => {
-    if (mapImages) {
-      return mapImages;
-    }
-    setMapImagesError(null);
-    setIsMapImagesLoading(true);
-    try {
-      const data = await loadMapImages();
-      setMapImages(data);
-      return data;
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to load map images";
-      setMapImagesError(message);
-      throw error;
-    } finally {
-      setIsMapImagesLoading(false);
-    }
-  }, [mapImages]);
-
-  const mapImagesByLocationId = useMemo(() => {
-    const index = new Map<string, MapImageEntry[]>();
-    for (const image of mapImages ?? []) {
-      const ids = new Set<string>([
-        ...Object.keys(image.thumbnails ?? {}),
-        ...Object.keys(image.descriptions ?? {}),
-      ]);
-      for (const id of ids) {
-        const existing = index.get(id);
-        if (existing) {
-          existing.push(image);
-        } else {
-          index.set(id, [image]);
-        }
-      }
-    }
-    return index;
-  }, [mapImages]);
-
-  const mapsSearchResults = useMemo(() => {
-    const term = mapsSearchTerm.trim().toLowerCase();
-    if (!term) {
-      return selectedMapsEntries;
-    }
-    if (!ancientMaps) {
-      return [] as AncientMapEntry[];
-    }
-    return ancientMaps
-      .filter((entry) => mapEntrySearchableText(entry).includes(term))
-      .sort((a, b) => mapEntryLabel(a).localeCompare(mapEntryLabel(b)));
-  }, [ancientMaps, mapsSearchTerm, selectedMapsEntries]);
-  const mapsDisplayEntries = useMemo(
-    () =>
-      mapsSearchResults.map((entry, index) => {
-        const itemKey = `${entry.geojson_file}-${index}`;
-        const title = mapEntryLabel(entry);
-        const modernIds = modernIdsForMapEntry(entry);
-        const imageCandidates = modernIds.flatMap(
-          (id) => mapImagesByLocationId.get(id) ?? [],
-        );
-        const seenImageIds = new Set<string>();
-        const photoEntries = imageCandidates.filter((image) => {
-          if (seenImageIds.has(image.id)) {
-            return false;
-          }
-          seenImageIds.add(image.id);
-          return true;
-        });
-        const linkedPlaces = Object.entries(entry.geojson_roles ?? {}).map(
-          ([roleKey, role]) => ({
-            roleKey,
-            text: cleanMapMarkup(role.description ?? roleKey),
-          }),
-        );
-
-        return {
-          entry,
-          itemKey,
-          title,
-          modernIds,
-          photoEntries,
-          linkedPlaces,
-        };
-      }),
-    [mapsSearchResults, mapImagesByLocationId],
-  );
-
-  const applyMapsSearch = useCallback(
-    (rawValue?: string) => {
-      const nextTerm = (rawValue ?? "").trim();
-      setMapsSearchTerm(nextTerm);
-      setMapsWordAccordionValue([]);
-      if (!nextTerm) {
-        setIsMapsSearching(false);
-        return;
-      }
-      setIsMapsSearching(true);
-      void Promise.all([ensureAncientMapsLoaded(), ensureMapImagesLoaded()])
-        .catch(() => {
-          // Error state is set by ensure loaders.
-        })
-        .finally(() => {
-          window.requestAnimationFrame(() => {
-            setIsMapsSearching(false);
-          });
-        });
-    },
-    [ensureAncientMapsLoaded, ensureMapImagesLoaded],
-  );
-
-  const openMapDialog = useCallback(
+  const openMapDialogWithImages = useCallback(
     (entry: AncientMapEntry) => {
-      setActiveMapDialogEntry(entry);
-      setIsMapDialogOpen(true);
+      openMapDialog(entry);
       void ensureMapImagesLoaded().catch(() => {
         // Error state is set by ensureMapImagesLoaded.
       });
     },
-    [ensureMapImagesLoaded],
+    [ensureMapImagesLoaded, openMapDialog],
   );
-
-  const openPhotoDialog = useCallback(
-    (items: MapPhotoDialogItem[], startIndex: number) => {
-      if (items.length === 0) {
-        return;
-      }
-      const clampedIndex = Math.max(0, Math.min(items.length - 1, startIndex));
-      setPhotoDialogItems(items);
-      setPhotoDialogIndex(clampedIndex);
-      setIsPhotoDialogOpen(true);
-    },
-    [],
-  );
-
-  const movePhotoDialog = useCallback((direction: -1 | 1) => {
-    setPhotoDialogIndex((current) => {
-      if (photoDialogItems.length === 0) {
-        return 0;
-      }
-      return (current + direction + photoDialogItems.length) % photoDialogItems.length;
-    });
-  }, [photoDialogItems.length]);
-
-  useEffect(() => {
-    if (!isMapDialogOpen || !activeMapDialogEntry) {
-      setMapDialogGeoJson(null);
-      setMapDialogError(null);
-      setIsMapDialogLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-    setMapDialogError(null);
-    setIsMapDialogLoading(true);
-    void loadMapGeoJson(activeMapDialogEntry.geojson_file)
-      .then((payload) => {
-        if (cancelled) {
-          return;
-        }
-        setMapDialogGeoJson(payload);
-      })
-      .catch((error) => {
-        if (cancelled) {
-          return;
-        }
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Failed to load map geometry data";
-        setMapDialogError(message);
-        setMapDialogGeoJson(null);
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsMapDialogLoading(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [activeMapDialogEntry, isMapDialogOpen]);
 
   function updateActiveTab(updater: (tab: ReaderTab) => ReaderTab) {
     if (!activeTabId) {
@@ -2485,7 +1889,7 @@ export function KJVReader() {
     hasHitchcocksInfo,
     hasOldEnglishInfo,
     hasGenealogyInfo,
-  } = useStudySidebarState({
+  } = deriveStudySidebarState({
     accordionValue: concordanceAccordionValue,
     crossRefsCount: selectedCrossReferences?.references.length ?? 0,
     concordanceCount: concordanceSearchResults.length,
@@ -2504,9 +1908,6 @@ export function KJVReader() {
   const isBookPickerDialogOpen = Boolean(
     bookPickerDialogLeafId && bookPickerDialogLeaf,
   );
-  const currentPhotoDialogItem =
-    photoDialogItems.length > 0 ? photoDialogItems[photoDialogIndex] : null;
-
   return (
     <main className="h-screen w-full overflow-hidden bg-background">
       <SidebarProvider
@@ -2670,7 +2071,7 @@ export function KJVReader() {
             wordAccordionValue: mapsWordAccordionValue,
             onWordAccordionValueChange: setMapsWordAccordionValue,
             onSearch: applyMapsSearch,
-            onOpenMapDialog: openMapDialog,
+            onOpenMapDialog: openMapDialogWithImages,
             isMapImagesLoading: isMapImagesLoading,
             mapImagesError: mapImagesError,
             onOpenPhotoDialog: openPhotoDialog,
@@ -2710,36 +2111,14 @@ export function KJVReader() {
         isMapDialogLoading={isMapDialogLoading}
         mapDialogError={mapDialogError}
         mapDialogGeoJson={mapDialogGeoJson}
-        onMapDialogOpenChange={(open) => {
-          setIsMapDialogOpen(open);
-          if (!open) {
-            setActiveMapDialogEntry(null);
-            setMapDialogGeoJson(null);
-            setMapDialogError(null);
-          }
-        }}
-        onCloseMapDialog={() => {
-          setIsMapDialogOpen(false);
-          setActiveMapDialogEntry(null);
-          setMapDialogGeoJson(null);
-          setMapDialogError(null);
-        }}
+        onMapDialogOpenChange={onMapDialogOpenChange}
+        onCloseMapDialog={onCloseMapDialog}
         isPhotoDialogOpen={isPhotoDialogOpen}
         currentPhotoDialogItem={currentPhotoDialogItem}
         photoDialogIndex={photoDialogIndex}
-        photoDialogItemsLength={photoDialogItems.length}
-        onPhotoDialogOpenChange={(open) => {
-          setIsPhotoDialogOpen(open);
-          if (!open) {
-            setPhotoDialogItems([]);
-            setPhotoDialogIndex(0);
-          }
-        }}
-        onClosePhotoDialog={() => {
-          setIsPhotoDialogOpen(false);
-          setPhotoDialogItems([]);
-          setPhotoDialogIndex(0);
-        }}
+        photoDialogItemsLength={photoDialogItemsLength}
+        onPhotoDialogOpenChange={onPhotoDialogOpenChange}
+        onClosePhotoDialog={onClosePhotoDialog}
         onPreviousPhoto={() => movePhotoDialog(-1)}
         onNextPhoto={() => movePhotoDialog(1)}
       />

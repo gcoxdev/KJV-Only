@@ -57,3 +57,5 @@ export function useStudySidebarState({
     hasGenealogyInfo: genealogyCount > 0,
   };
 }
+
+export const deriveStudySidebarState = useStudySidebarState;
