@@ -139,9 +139,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
@@ -168,6 +165,7 @@ import { OldEnglishTool } from "@/components/reader/study-tools/old-english-tool
 import { MapsTool } from "@/components/reader/study-tools/maps-tool";
 import { GenealogyTool } from "@/components/reader/study-tools/genealogy-tool";
 import { HitchcocksTool } from "@/components/reader/study-tools/hitchcocks-tool";
+import { StudyToolsSidebar } from "@/components/reader/study-tools-sidebar";
 import {
   ChapterTextContent,
   formatDisplayTokenText,
@@ -3840,143 +3838,121 @@ export function KJVReader() {
           )}
         </SidebarInset>
 
-        {isStudyMode ? (
-          <Sidebar side="right" className="h-screen">
-            <SidebarHeader className="gap-2">
-              <h2 className="text-base font-semibold">Study Tools</h2>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setConcordanceAccordionValue(
-                    allStudyAccordionsOpen ? [] : [...studyAccordionItems],
-                  );
-                }}
-              >
-                {allStudyAccordionsOpen ? "Collapse All" : "Expand All"}
-              </Button>
-            </SidebarHeader>
-            <SidebarContent className="px-2 pb-3">
-              <Accordion
-                className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
-                multiple
-                value={concordanceAccordionValue}
-                onValueChange={(value) =>
-                  setConcordanceAccordionValue(
-                    value.filter(Boolean) as string[],
-                  )
-                }
-              >
-                <CrossRefsTool
-                  hasInfo={hasCrossRefsInfo}
-                  isOpen={isCrossRefsSectionOpen}
-                  isLoading={isCrossRefsLoading}
-                  error={crossRefsError}
-                  selected={selectedCrossReferences}
-                  books={books}
-                  renderPreview={referencePreviewContent}
-                  onOpenReference={openConcordanceReference}
-                  onCloseSidebar={closeRightSidebarForMobile}
-                />
-                <ConcordanceTool
-                  hasInfo={hasConcordanceInfo}
-                  isOpen={isConcordanceSectionOpen}
-                  isLoading={isConcordanceLoading}
-                  isSearching={isConcordanceSearching}
-                  error={concordanceError}
-                  searchTerm={concordanceSearchTerm}
-                  results={concordanceSearchResults}
-                  wordAccordionValue={concordanceWordAccordionValue}
-                  onWordAccordionValueChange={setConcordanceWordAccordionValue}
-                  onSearch={applyConcordanceSearch}
-                  renderPreview={referencePreviewContent}
-                  onOpenReference={openConcordanceReference}
-                  onCloseSidebar={closeRightSidebarForMobile}
-                />
-                <WebstersTool
-                  hasInfo={hasWebstersInfo}
-                  isOpen={isWebstersSectionOpen}
-                  isLoading={isWebstersLoading}
-                  isSearching={isWebstersSearching}
-                  error={webstersError}
-                  searchTerm={webstersSearchTerm}
-                  results={webstersSearchResults}
-                  wordAccordionValue={webstersWordAccordionValue}
-                  onWordAccordionValueChange={setWebstersWordAccordionValue}
-                  onSearch={applyWebstersSearch}
-                />
-                <StrongsTool
-                  hasInfo={hasStrongsInfo}
-                  isOpen={isStrongsSectionOpen}
-                  isLoading={isStrongsLoading}
-                  isSearching={isStrongsSearching}
-                  error={strongsError}
-                  searchTerm={strongsSearchTerm}
-                  results={strongsSearchResults}
-                  wordAccordionValue={strongsWordAccordionValue}
-                  onWordAccordionValueChange={setStrongsWordAccordionValue}
-                  onSearch={applyStrongsSearch}
-                  inputRef={strongsSearchInputRef}
-                  renderPreview={referencePreviewContent}
-                  onOpenReference={openConcordanceReference}
-                  onCloseSidebar={closeRightSidebarForMobile}
-                />
-                <OldEnglishTool
-                  hasInfo={hasOldEnglishInfo}
-                  isOpen={isOldEnglishSectionOpen}
-                  isLoading={isOldEnglishLoading}
-                  isSearching={isOldEnglishSearching}
-                  error={oldEnglishError}
-                  searchTerm={oldEnglishSearchTerm}
-                  results={oldEnglishSearchResults}
-                  onSearch={applyOldEnglishSearch}
-                />
-                <MapsTool
-                  hasInfo={hasMapsInfo}
-                  isOpen={isMapsSectionOpen}
-                  isLoading={isMapsLoading}
-                  isSearching={isMapsSearching}
-                  error={mapsError}
-                  searchTerm={mapsSearchTerm}
-                  resultsLength={mapsSearchResults.length}
-                  displayEntries={mapsDisplayEntries}
-                  wordAccordionValue={mapsWordAccordionValue}
-                  onWordAccordionValueChange={setMapsWordAccordionValue}
-                  onSearch={applyMapsSearch}
-                  onOpenMapDialog={openMapDialog}
-                  isMapImagesLoading={isMapImagesLoading}
-                  mapImagesError={mapImagesError}
-                  onOpenPhotoDialog={openPhotoDialog}
-                  renderPreview={referencePreviewContent}
-                  onOpenReference={openConcordanceReference}
-                  onCloseSidebar={closeRightSidebarForMobile}
-                />
-                <GenealogyTool
-                  hasInfo={hasGenealogyInfo}
-                  isOpen={isGenealogySectionOpen}
-                  isLoading={isGenealogyLoading}
-                  isSearching={isGenealogySearching}
-                  error={genealogyError}
-                  searchTerm={genealogySearchTerm}
-                  results={genealogySearchResults}
-                  onSearch={applyGenealogySearch}
-                  renderPersonDetails={renderGenealogyPersonDetails}
-                />
-                <HitchcocksTool
-                  hasInfo={hasHitchcocksInfo}
-                  isOpen={isHitchcocksSectionOpen}
-                  isLoading={isHitchcocksLoading}
-                  isSearching={isHitchcocksSearching}
-                  error={hitchcocksError}
-                  searchTerm={hitchcocksSearchTerm}
-                  results={hitchcocksSearchResults}
-                  onSearch={applyHitchcocksSearch}
-                />
-              </Accordion>
-            </SidebarContent>
-          </Sidebar>
-        ) : null}
+        <StudyToolsSidebar
+          visible={isStudyMode}
+          accordionValue={concordanceAccordionValue}
+          onAccordionValueChange={setConcordanceAccordionValue}
+          onExpandAll={() => setConcordanceAccordionValue([...studyAccordionItems])}
+          onCollapseAll={() => setConcordanceAccordionValue([])}
+          canExpand={!allStudyAccordionsOpen}
+          canCollapse={concordanceAccordionValue.length > 0}
+        >
+          <CrossRefsTool
+            hasInfo={hasCrossRefsInfo}
+            isOpen={isCrossRefsSectionOpen}
+            isLoading={isCrossRefsLoading}
+            error={crossRefsError}
+            selected={selectedCrossReferences}
+            books={books}
+            renderPreview={referencePreviewContent}
+            onOpenReference={openConcordanceReference}
+            onCloseSidebar={closeRightSidebarForMobile}
+          />
+          <ConcordanceTool
+            hasInfo={hasConcordanceInfo}
+            isOpen={isConcordanceSectionOpen}
+            isLoading={isConcordanceLoading}
+            isSearching={isConcordanceSearching}
+            error={concordanceError}
+            searchTerm={concordanceSearchTerm}
+            results={concordanceSearchResults}
+            wordAccordionValue={concordanceWordAccordionValue}
+            onWordAccordionValueChange={setConcordanceWordAccordionValue}
+            onSearch={applyConcordanceSearch}
+            renderPreview={referencePreviewContent}
+            onOpenReference={openConcordanceReference}
+            onCloseSidebar={closeRightSidebarForMobile}
+          />
+          <WebstersTool
+            hasInfo={hasWebstersInfo}
+            isOpen={isWebstersSectionOpen}
+            isLoading={isWebstersLoading}
+            isSearching={isWebstersSearching}
+            error={webstersError}
+            searchTerm={webstersSearchTerm}
+            results={webstersSearchResults}
+            wordAccordionValue={webstersWordAccordionValue}
+            onWordAccordionValueChange={setWebstersWordAccordionValue}
+            onSearch={applyWebstersSearch}
+          />
+          <StrongsTool
+            hasInfo={hasStrongsInfo}
+            isOpen={isStrongsSectionOpen}
+            isLoading={isStrongsLoading}
+            isSearching={isStrongsSearching}
+            error={strongsError}
+            searchTerm={strongsSearchTerm}
+            results={strongsSearchResults}
+            wordAccordionValue={strongsWordAccordionValue}
+            onWordAccordionValueChange={setStrongsWordAccordionValue}
+            onSearch={applyStrongsSearch}
+            inputRef={strongsSearchInputRef}
+            renderPreview={referencePreviewContent}
+            onOpenReference={openConcordanceReference}
+            onCloseSidebar={closeRightSidebarForMobile}
+          />
+          <OldEnglishTool
+            hasInfo={hasOldEnglishInfo}
+            isOpen={isOldEnglishSectionOpen}
+            isLoading={isOldEnglishLoading}
+            isSearching={isOldEnglishSearching}
+            error={oldEnglishError}
+            searchTerm={oldEnglishSearchTerm}
+            results={oldEnglishSearchResults}
+            onSearch={applyOldEnglishSearch}
+          />
+          <MapsTool
+            hasInfo={hasMapsInfo}
+            isOpen={isMapsSectionOpen}
+            isLoading={isMapsLoading}
+            isSearching={isMapsSearching}
+            error={mapsError}
+            searchTerm={mapsSearchTerm}
+            resultsLength={mapsSearchResults.length}
+            displayEntries={mapsDisplayEntries}
+            wordAccordionValue={mapsWordAccordionValue}
+            onWordAccordionValueChange={setMapsWordAccordionValue}
+            onSearch={applyMapsSearch}
+            onOpenMapDialog={openMapDialog}
+            isMapImagesLoading={isMapImagesLoading}
+            mapImagesError={mapImagesError}
+            onOpenPhotoDialog={openPhotoDialog}
+            renderPreview={referencePreviewContent}
+            onOpenReference={openConcordanceReference}
+            onCloseSidebar={closeRightSidebarForMobile}
+          />
+          <GenealogyTool
+            hasInfo={hasGenealogyInfo}
+            isOpen={isGenealogySectionOpen}
+            isLoading={isGenealogyLoading}
+            isSearching={isGenealogySearching}
+            error={genealogyError}
+            searchTerm={genealogySearchTerm}
+            results={genealogySearchResults}
+            onSearch={applyGenealogySearch}
+            renderPersonDetails={renderGenealogyPersonDetails}
+          />
+          <HitchcocksTool
+            hasInfo={hasHitchcocksInfo}
+            isOpen={isHitchcocksSectionOpen}
+            isLoading={isHitchcocksLoading}
+            isSearching={isHitchcocksSearching}
+            error={hitchcocksError}
+            searchTerm={hitchcocksSearchTerm}
+            results={hitchcocksSearchResults}
+            onSearch={applyHitchcocksSearch}
+          />
+        </StudyToolsSidebar>
       </SidebarProvider>
 
       {tokenPopupCard}
