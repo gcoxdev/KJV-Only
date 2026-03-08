@@ -113,6 +113,7 @@ type ReaderPayload = {
 };
 type ConcordancePayload = Record<string, string[]>;
 type CrossRefsPayload = Record<string, string[]>;
+type HitchcocksPayload = Record<string, string>;
 type WebstersEntry = {
   pronunciation?: string;
   definitions: Array<{
@@ -173,6 +174,7 @@ type TokenPopupState = {
 let kjvBooksPromise: Promise<Book[]> | null = null;
 let concordancePromise: Promise<ConcordancePayload> | null = null;
 let crossRefsPromise: Promise<CrossRefsPayload> | null = null;
+let hitchcocksPromise: Promise<HitchcocksPayload> | null = null;
 let webstersPromise: Promise<WebstersPayload> | null = null;
 let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
@@ -264,6 +266,27 @@ function loadWebsters() {
   }
 
   return webstersPromise;
+}
+
+function loadHitchcocks() {
+  if (!hitchcocksPromise) {
+    hitchcocksPromise = fetch("/references/hitchcocks.json", {
+      cache: "force-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/hitchcocks.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as HitchcocksPayload)
+      .catch((error) => {
+        hitchcocksPromise = null;
+        throw error;
+      });
+  }
+
+  return hitchcocksPromise;
 }
 
 function loadStrongsGreek() {
@@ -680,6 +703,32 @@ function resolveWebstersKey(websters: WebstersPayload, rawWord: string) {
 
   const lowered = cleaned.toLowerCase();
   const fallback = Object.keys(websters).find(
+    (key) => key.toLowerCase() === lowered,
+  );
+  return fallback ?? null;
+}
+
+function resolveHitchcocksKey(hitchcocks: HitchcocksPayload, rawWord: string) {
+  const cleaned = normalizeConcordanceWord(rawWord);
+  if (!cleaned) {
+    return null;
+  }
+
+  const candidates = [
+    cleaned,
+    cleaned.toLowerCase(),
+    cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase(),
+    cleaned.toUpperCase(),
+  ];
+
+  for (const candidate of candidates) {
+    if (hitchcocks[candidate]) {
+      return candidate;
+    }
+  }
+
+  const lowered = cleaned.toLowerCase();
+  const fallback = Object.keys(hitchcocks).find(
     (key) => key.toLowerCase() === lowered,
   );
   return fallback ?? null;
@@ -1493,6 +1542,15 @@ export function KJVReader() {
     key: string;
     entry: WebstersEntry;
   } | null>(null);
+  const [hitchcocks, setHitchcocks] = useState<HitchcocksPayload | null>(null);
+  const [hitchcocksSearchTerm, setHitchcocksSearchTerm] = useState("");
+  const [isHitchcocksSearching, setIsHitchcocksSearching] = useState(false);
+  const [isHitchcocksLoading, setIsHitchcocksLoading] = useState(false);
+  const [hitchcocksError, setHitchcocksError] = useState<string | null>(null);
+  const [selectedHitchcocksEntry, setSelectedHitchcocksEntry] = useState<{
+    key: string;
+    definition: string;
+  } | null>(null);
   const [strongsGreek, setStrongsGreek] = useState<StrongsPayload | null>(null);
   const [strongsHebrew, setStrongsHebrew] = useState<StrongsPayload | null>(null);
   const [strongsSearchTerm, setStrongsSearchTerm] = useState("");
@@ -1555,6 +1613,10 @@ export function KJVReader() {
     setIsWebstersSearching(false);
     setWebstersWordAccordionValue([]);
     setSelectedWebstersEntry(null);
+    setHitchcocksError(null);
+    setIsHitchcocksLoading(false);
+    setIsHitchcocksSearching(false);
+    setSelectedHitchcocksEntry(null);
     setStrongsError(null);
     setIsStrongsLoading(false);
     setIsStrongsSearching(false);
@@ -2153,6 +2215,64 @@ export function KJVReader() {
         });
     },
     [ensureWebstersLoaded],
+  );
+
+  const ensureHitchcocksLoaded = useCallback(async () => {
+    if (hitchcocks) {
+      return hitchcocks;
+    }
+    setHitchcocksError(null);
+    setIsHitchcocksLoading(true);
+    try {
+      const data = await loadHitchcocks();
+      setHitchcocks(data);
+      return data;
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to load Hitchcock's data";
+      setHitchcocksError(message);
+      throw error;
+    } finally {
+      setIsHitchcocksLoading(false);
+    }
+  }, [hitchcocks]);
+
+  const hitchcocksSearchResults = useMemo(() => {
+    const term = hitchcocksSearchTerm.trim().toLowerCase();
+    if (!term) {
+      return selectedHitchcocksEntry ? [selectedHitchcocksEntry] : [];
+    }
+    if (!hitchcocks) {
+      return [];
+    }
+    return Object.keys(hitchcocks)
+      .filter((word) => word.toLowerCase().includes(term))
+      .sort((a, b) => a.localeCompare(b))
+      .map((word) => ({ key: word, definition: hitchcocks[word] }));
+  }, [hitchcocks, hitchcocksSearchTerm, selectedHitchcocksEntry]);
+
+  const applyHitchcocksSearch = useCallback(
+    (rawValue?: string) => {
+      const nextTerm = (rawValue ?? "").trim();
+      setHitchcocksSearchTerm(nextTerm);
+      if (!nextTerm) {
+        setIsHitchcocksSearching(false);
+        return;
+      }
+      setIsHitchcocksSearching(true);
+      void ensureHitchcocksLoaded()
+        .catch(() => {
+          // Error state is set by ensureHitchcocksLoaded
+        })
+        .finally(() => {
+          window.requestAnimationFrame(() => {
+            setIsHitchcocksSearching(false);
+          });
+        });
+    },
+    [ensureHitchcocksLoaded],
   );
 
   const ensureStrongsLoaded = useCallback(async () => {
@@ -2978,6 +3098,25 @@ export function KJVReader() {
         setIsWebstersLoading(false);
       };
 
+      const applyHitchcocksSelection = (data: HitchcocksPayload) => {
+        const matchedKey = resolveHitchcocksKey(data, rawWord);
+        setSelectedHitchcocksEntry(
+          matchedKey ? { key: matchedKey, definition: data[matchedKey] } : null,
+        );
+        setConcordanceAccordionValue((current) => {
+          const withoutHitchcocks = current.filter(
+            (value) => value !== "hitchcocks",
+          );
+          if (!matchedKey) {
+            return withoutHitchcocks;
+          }
+          return withoutHitchcocks.includes("concordance")
+            ? [...withoutHitchcocks, "hitchcocks"]
+            : ["concordance", ...withoutHitchcocks, "hitchcocks"];
+        });
+        setIsHitchcocksLoading(false);
+      };
+
       const applyStrongsSelection = (
         greek: StrongsPayload,
         hebrew: StrongsPayload,
@@ -3074,13 +3213,34 @@ export function KJVReader() {
             setIsStrongsLoading(false);
           });
       }
+
+      setHitchcocksError(null);
+      setIsHitchcocksLoading(true);
+      if (hitchcocks) {
+        applyHitchcocksSelection(hitchcocks);
+      } else {
+        void ensureHitchcocksLoaded()
+          .then((data) => {
+            applyHitchcocksSelection(data);
+          })
+          .catch((error) => {
+            const message =
+              error instanceof Error
+                ? error.message
+                : "Failed to load Hitchcock's data";
+            setHitchcocksError(message);
+            setIsHitchcocksLoading(false);
+          });
+      }
     },
     [
       concordance,
       ensureConcordanceLoaded,
+      ensureHitchcocksLoaded,
       openCrossReferencesForVerse,
       ensureStrongsLoaded,
       ensureWebstersLoaded,
+      hitchcocks,
       strongsGreek,
       strongsHebrew,
       websters,
@@ -4731,6 +4891,73 @@ export function KJVReader() {
                           </AccordionItem>
                         ))}
                       </Accordion>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="hitchcocks">
+                  <AccordionTrigger>Hitchcock&apos;s Bible Names</AccordionTrigger>
+                  <AccordionContent className="space-y-2 overflow-visible">
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const formData = new FormData(event.currentTarget);
+                        const value = formData.get("hitchcocks-search");
+                        applyHitchcocksSearch(
+                          typeof value === "string" ? value : "",
+                        );
+                      }}
+                    >
+                      <InputGroup>
+                        <InputGroupInput
+                          name="hitchcocks-search"
+                          placeholder="Search Hitchcock's..."
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupButton
+                            type="submit"
+                            size="icon-sm"
+                            variant="ghost"
+                            aria-label="Search Hitchcock's Bible Names"
+                            disabled={
+                              isHitchcocksLoading || isHitchcocksSearching
+                            }
+                          >
+                            {isHitchcocksLoading || isHitchcocksSearching ? (
+                              <LoaderCircleIcon className="animate-spin" />
+                            ) : (
+                              <SearchIcon />
+                            )}
+                          </InputGroupButton>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </form>
+                    {isHitchcocksLoading || isHitchcocksSearching ? (
+                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <LoaderCircleIcon className="size-4 animate-spin" />
+                        {isHitchcocksLoading
+                          ? "Loading Hitchcock's..."
+                          : "Searching Hitchcock's..."}
+                      </p>
+                    ) : hitchcocksError ? (
+                      <p className="text-sm text-destructive">
+                        {hitchcocksError}
+                      </p>
+                    ) : hitchcocksSearchResults.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        {hitchcocksSearchTerm.trim()
+                          ? "No matching names found."
+                          : "Click a word in the text or search Hitchcock's Bible Names."}
+                      </p>
+                    ) : (
+                      <div className="space-y-2 text-sm leading-relaxed">
+                        {hitchcocksSearchResults.map(({ key, definition }) => (
+                          <p key={key}>
+                            <span className="font-semibold">{key}</span>
+                            {": "}
+                            {definition}
+                          </p>
+                        ))}
+                      </div>
                     )}
                   </AccordionContent>
                 </AccordionItem>
