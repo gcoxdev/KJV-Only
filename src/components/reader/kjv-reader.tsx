@@ -854,6 +854,35 @@ const ConcordanceReferencePopover = memo(function ConcordanceReferencePopover({
   );
 });
 
+function renderHighlightedText(
+  text: string,
+  needle: string,
+  keyPrefix: string,
+): ReactNode {
+  if (!needle) {
+    return text;
+  }
+
+  const matcher = new RegExp(`(${escapeRegExp(needle)})`, "ig");
+  const parts = text.split(matcher);
+  if (parts.length <= 1) {
+    return text;
+  }
+
+  return parts.map((part, index) =>
+    part.toLowerCase() === needle.toLowerCase() ? (
+      <span
+        key={`${keyPrefix}-highlight-${index}`}
+        className="bg-[#fafac5] text-black"
+      >
+        {part}
+      </span>
+    ) : (
+      <span key={`${keyPrefix}-text-${index}`}>{part}</span>
+    ),
+  );
+}
+
 function parseBooks(input: unknown): Book[] | null {
   if (Array.isArray(input)) {
     return input as Book[];
@@ -1954,6 +1983,16 @@ export function KJVReader() {
   const orientationPreviewLeafIdsRef = useRef<string[]>([]);
   const fullscreenRequestedLeafIdRef = useRef<string | null>(null);
   const highlightedVerseElementsRef = useRef<HTMLElement[]>([]);
+  const domNeighborCacheRef = useRef<{
+    root: PanelNode | null;
+    neighbors: Map<string, LeafNeighbors>;
+  }>({
+    root: null,
+    neighbors: new Map(),
+  });
+  const referencePreviewCacheRef = useRef<
+    Map<string, { citation: string; verseLines: Array<{ label: string; text: string }> }>
+  >(new Map());
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -1971,6 +2010,10 @@ export function KJVReader() {
     document.documentElement.classList.toggle("dark", theme === "dark");
     window.localStorage.setItem("theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    referencePreviewCacheRef.current.clear();
+  }, [books]);
 
   useEffect(() => {
     if (isStudyMode) {
@@ -2192,6 +2235,21 @@ export function KJVReader() {
     () => (activeTab ? buildLeafNeighborMap(activeTab.root) : new Map()),
     [activeTab],
   );
+  const existingTabTargets = useMemo(
+    () =>
+      tabs
+        .map((tab, index) => ({
+          id: tab.id,
+          index,
+          title: tab.title,
+        }))
+        .filter((tab) => tab.id !== activeTabId),
+    [tabs, activeTabId],
+  );
+
+  useEffect(() => {
+    domNeighborCacheRef.current = { root: null, neighbors: new Map() };
+  }, [activeTab]);
   const progressByTestament = useMemo(() => {
     const oldBooks = books.slice(0, 39);
     const newBooks = books.slice(39);
@@ -2243,6 +2301,20 @@ export function KJVReader() {
       new: { label: "New Testament", ...newSummary, books: newBookProgress },
       total: totalSummary,
     };
+  }, [books, readChapters]);
+  const readChapterCountByBook = useMemo(() => {
+    const counts = new Map<number, number>();
+    for (let bookIndex = 0; bookIndex < books.length; bookIndex += 1) {
+      const book = books[bookIndex];
+      let count = 0;
+      for (let chapterIndex = 0; chapterIndex < book.chapters.length; chapterIndex += 1) {
+        if (readChapters.has(chapterProgressKey(bookIndex, chapterIndex))) {
+          count += 1;
+        }
+      }
+      counts.set(bookIndex, count);
+    }
+    return counts;
   }, [books, readChapters]);
   const totalProgressPercent =
     progressByTestament.total.total > 0
@@ -2955,6 +3027,41 @@ export function KJVReader() {
       .filter((entry) => mapEntrySearchableText(entry).includes(term))
       .sort((a, b) => mapEntryLabel(a).localeCompare(mapEntryLabel(b)));
   }, [ancientMaps, mapsSearchTerm, selectedMapsEntries]);
+  const mapsDisplayEntries = useMemo(
+    () =>
+      mapsSearchResults.map((entry, index) => {
+        const itemKey = `${entry.geojson_file}-${index}`;
+        const title = mapEntryLabel(entry);
+        const modernIds = modernIdsForMapEntry(entry);
+        const imageCandidates = modernIds.flatMap(
+          (id) => mapImagesByLocationId.get(id) ?? [],
+        );
+        const seenImageIds = new Set<string>();
+        const photoEntries = imageCandidates.filter((image) => {
+          if (seenImageIds.has(image.id)) {
+            return false;
+          }
+          seenImageIds.add(image.id);
+          return true;
+        });
+        const linkedPlaces = Object.entries(entry.geojson_roles ?? {}).map(
+          ([roleKey, role]) => ({
+            roleKey,
+            text: cleanMapMarkup(role.description ?? roleKey),
+          }),
+        );
+
+        return {
+          entry,
+          itemKey,
+          title,
+          modernIds,
+          photoEntries,
+          linkedPlaces,
+        };
+      }),
+    [mapsSearchResults, mapImagesByLocationId],
+  );
 
   const applyMapsSearch = useCallback(
     (rawValue?: string) => {
@@ -3092,11 +3199,13 @@ export function KJVReader() {
       return null;
     }
 
-    const freshDomNeighbors = buildLeafNeighborMapFromDom(
-      activeTab.root,
-      panelElementRefs.current,
-    );
-    return freshDomNeighbors.get(leafId)?.[direction] ?? null;
+    if (domNeighborCacheRef.current.root !== activeTab.root) {
+      domNeighborCacheRef.current = {
+        root: activeTab.root,
+        neighbors: buildLeafNeighborMapFromDom(activeTab.root, panelElementRefs.current),
+      };
+    }
+    return domNeighborCacheRef.current.neighbors.get(leafId)?.[direction] ?? null;
   }
 
   function panelCardElement(leafId: string) {
@@ -3243,34 +3352,34 @@ export function KJVReader() {
     }
 
     const targetLeafIds = collectLeafIds(targetNode);
+    const allRects = targetLeafIds
+      .map((id) => panelElementRefs.current[id]?.getBoundingClientRect())
+      .filter((item): item is DOMRect => Boolean(item));
+    if (allRects.length === 0) {
+      return;
+    }
+
+    const epsilon = 0.5;
+    const minLeft = Math.min(...allRects.map((item) => item.left));
+    const maxRight = Math.max(...allRects.map((item) => item.right));
+    const minTop = Math.min(...allRects.map((item) => item.top));
+    const maxBottom = Math.max(...allRects.map((item) => item.bottom));
+
     const edgeLeafIds = targetLeafIds.filter((targetLeafId) => {
       const panelElement = panelElementRefs.current[targetLeafId];
       const rect = panelElement?.getBoundingClientRect();
       if (!rect) {
         return false;
       }
-
-      const allRects = targetLeafIds
-        .map((id) => panelElementRefs.current[id]?.getBoundingClientRect())
-        .filter((item): item is DOMRect => Boolean(item));
-      if (allRects.length === 0) {
-        return false;
-      }
-
-      const epsilon = 0.5;
       if (direction === "left") {
-        const minLeft = Math.min(...allRects.map((item) => item.left));
         return Math.abs(rect.left - minLeft) <= epsilon;
       }
       if (direction === "right") {
-        const maxRight = Math.max(...allRects.map((item) => item.right));
         return Math.abs(rect.right - maxRight) <= epsilon;
       }
       if (direction === "up") {
-        const minTop = Math.min(...allRects.map((item) => item.top));
         return Math.abs(rect.top - minTop) <= epsilon;
       }
-      const maxBottom = Math.max(...allRects.map((item) => item.bottom));
       return Math.abs(rect.bottom - maxBottom) <= epsilon;
     });
 
@@ -3462,12 +3571,12 @@ export function KJVReader() {
     });
   }
 
-  function openChapterReferenceInNewTab(
+  const openChapterReferenceInNewTab = useCallback((
     bookIndex: number,
     chapterIndex: number,
     verseStart: number,
     verseEnd = verseStart,
-  ) {
+  ) => {
     const nextTabId = createId();
     const nextLeaf = createLeaf(bookIndex, chapterIndex, "reader");
     setTabs((currentTabs) => [
@@ -3495,7 +3604,7 @@ export function KJVReader() {
         inline: tabsOrientation === "vertical" ? "nearest" : "end",
       });
     });
-  }
+  }, [tabsOrientation]);
 
   function setAllBookChaptersRead(bookIndex: number, isRead: boolean) {
     const book = books[bookIndex];
@@ -4073,7 +4182,7 @@ export function KJVReader() {
     ],
   );
 
-  function openConcordanceReference(reference: string) {
+  const openConcordanceReference = useCallback((reference: string) => {
     const parsed = parseBibleReference(reference);
     if (!parsed) {
       return;
@@ -4091,15 +4200,22 @@ export function KJVReader() {
       parsed.startVerse,
       highlightEnd,
     );
-  }
+  }, [books, openChapterReferenceInNewTab]);
 
-  function referencePreviewData(reference: string) {
+  const referencePreviewData = useCallback((reference: string) => {
+    const cached = referencePreviewCacheRef.current.get(reference);
+    if (cached) {
+      return cached;
+    }
+
     const parsed = parseBibleReference(reference);
     if (!parsed) {
-      return {
+      const fallback = {
         citation: reference,
         verseLines: [] as Array<{ label: string; text: string }>,
       };
+      referencePreviewCacheRef.current.set(reference, fallback);
+      return fallback;
     }
 
     const book = books[parsed.bookIndex];
@@ -4109,10 +4225,12 @@ export function KJVReader() {
       !chapters[parsed.startChapterIndex] ||
       !chapters[parsed.endChapterIndex]
     ) {
-      return {
+      const fallback = {
         citation: reference,
         verseLines: [] as Array<{ label: string; text: string }>,
       };
+      referencePreviewCacheRef.current.set(reference, fallback);
+      return fallback;
     }
 
     const MAX_PREVIEW_VERSES = 24;
@@ -4164,45 +4282,18 @@ export function KJVReader() {
           : `${parsed.startVerse}-${parsed.endVerse}`
         : `${parsed.startChapterIndex + 1}:${parsed.startVerse}-${parsed.endChapterIndex + 1}:${parsed.endVerse}`;
 
-    return {
+    const computed = {
       citation: `${book.name} ${citationVerse}`,
       verseLines,
     };
-  }
+    referencePreviewCacheRef.current.set(reference, computed);
+    return computed;
+  }, [books]);
 
-  function renderHighlightedText(
-    text: string,
-    needle: string,
-    keyPrefix: string,
-  ): ReactNode {
-    if (!needle) {
-      return text;
-    }
-
-    const matcher = new RegExp(`(${escapeRegExp(needle)})`, "ig");
-    const parts = text.split(matcher);
-    if (parts.length <= 1) {
-      return text;
-    }
-
-    return parts.map((part, index) =>
-      part.toLowerCase() === needle.toLowerCase() ? (
-        <span
-          key={`${keyPrefix}-highlight-${index}`}
-          className="bg-[#fafac5] text-black"
-        >
-          {part}
-        </span>
-      ) : (
-        <span key={`${keyPrefix}-text-${index}`}>{part}</span>
-      ),
-    );
-  }
-
-  function referencePreviewContent(
+  const referencePreviewContent = useCallback((
     reference: string,
     highlightWord: string,
-  ): ReactNode {
+  ): ReactNode => {
     const { citation, verseLines } = referencePreviewData(reference);
     const needle = normalizeConcordanceWord(highlightWord);
 
@@ -4236,7 +4327,7 @@ export function KJVReader() {
         </div>
       </div>
     );
-  }
+  }, [referencePreviewData]);
 
   const selectGenealogyPerson = useCallback((personId: string) => {
     if (!personId) {
@@ -4586,14 +4677,7 @@ export function KJVReader() {
       leaf.chapterIndex,
     );
     const isChapterRead = readChapters.has(chapterReadKey);
-    const readChapterCount = book.chapters.reduce(
-      (count, _chapter, chapterIndex) =>
-        count +
-        (readChapters.has(chapterProgressKey(leaf.bookIndex, chapterIndex))
-          ? 1
-          : 0),
-      0,
-    );
+    const readChapterCount = readChapterCountByBook.get(leaf.bookIndex) ?? 0;
     const isBookComplete = readChapterCount === book.chapters.length;
     const currentBookIconCode = bookCodeForIndex(leaf.bookIndex);
     const currentBookIconSrc = iconPath(
@@ -4602,22 +4686,28 @@ export function KJVReader() {
     );
     const readingProgress = leafScrollProgress[leaf.id] ?? 0;
     const showVerseNumbers = !hideReadModeVerseNumbers;
-    const neighbors =
-      modelLeafNeighbors.get(leaf.id) ?? neighborsForLeaf(leaf.id);
-    const moveDirections = (
-      ["left", "right", "up", "down"] as PanelDirection[]
-    ).filter((direction) => Boolean(neighbors[direction]));
-    const groupTargets = activeTab
-      ? {
-          left: findGroupTargetNodeId(activeTab.root, leaf.id, "left"),
-          right: findGroupTargetNodeId(activeTab.root, leaf.id, "right"),
-          up: findGroupTargetNodeId(activeTab.root, leaf.id, "up"),
-          down: findGroupTargetNodeId(activeTab.root, leaf.id, "down"),
-        }
-      : { left: null, right: null, up: null, down: null };
-    const parentSplit = activeTab
-      ? findParentSplitForLeaf(activeTab.root, leaf.id)
-      : null;
+    const isPanelMenuOpen = panelMenuOpenLeafId === leaf.id;
+    const neighbors = isPanelMenuOpen
+      ? (modelLeafNeighbors.get(leaf.id) ?? neighborsForLeaf(leaf.id))
+      : {};
+    const moveDirections = isPanelMenuOpen
+      ? (["left", "right", "up", "down"] as PanelDirection[]).filter((direction) =>
+          Boolean(neighbors[direction]),
+        )
+      : [];
+    const groupTargets =
+      isPanelMenuOpen && activeTab
+        ? {
+            left: findGroupTargetNodeId(activeTab.root, leaf.id, "left"),
+            right: findGroupTargetNodeId(activeTab.root, leaf.id, "right"),
+            up: findGroupTargetNodeId(activeTab.root, leaf.id, "up"),
+            down: findGroupTargetNodeId(activeTab.root, leaf.id, "down"),
+          }
+        : { left: null, right: null, up: null, down: null };
+    const parentSplit =
+      isPanelMenuOpen && activeTab
+        ? findParentSplitForLeaf(activeTab.root, leaf.id)
+        : null;
     const nextOrientationLabel = parentSplit
       ? parentSplit.orientation === "horizontal"
         ? "Make Group Vertical"
@@ -4629,13 +4719,6 @@ export function KJVReader() {
       groupTargets.up ||
       groupTargets.down,
     );
-    const existingTabTargets = tabs
-      .map((tab, index) => ({
-        id: tab.id,
-        index,
-        title: tab.title,
-      }))
-      .filter((tab) => tab.id !== activeTabId);
     const refIndex = chapterRefIndex.get(key) ?? -1;
     const hasPrev = refIndex > 0;
     const hasNext = refIndex >= 0 && refIndex < chapterRefs.length - 1;
@@ -4692,7 +4775,7 @@ export function KJVReader() {
               )}
 
               <DropdownMenu
-                open={panelMenuOpenLeafId === leaf.id}
+                open={isPanelMenuOpen}
                 onOpenChange={(open) => {
                   if (open) {
                     setPanelMenuOpenLeafId(leaf.id);
@@ -6046,28 +6129,15 @@ export function KJVReader() {
                           )
                         }
                       >
-                        {mapsSearchResults.map((entry, index) => {
-                          const itemKey = `${entry.geojson_file}-${index}`;
-                          const title = mapEntryLabel(entry);
-                          const modernIds = modernIdsForMapEntry(entry);
-                          const imageCandidates = modernIds.flatMap(
-                            (id) => mapImagesByLocationId.get(id) ?? [],
-                          );
-                          const seenImageIds = new Set<string>();
-                          const photoEntries = imageCandidates.filter((image) => {
-                            if (seenImageIds.has(image.id)) {
-                              return false;
-                            }
-                            seenImageIds.add(image.id);
-                            return true;
-                          });
-                          const linkedPlaces = Object.entries(
-                            entry.geojson_roles ?? {},
-                          ).map(([roleKey, role]) => ({
-                            roleKey,
-                            text: cleanMapMarkup(role.description ?? roleKey),
-                          }));
-                          return (
+                        {mapsDisplayEntries.map(
+                          ({
+                            entry,
+                            itemKey,
+                            title,
+                            modernIds,
+                            photoEntries,
+                            linkedPlaces,
+                          }) => (
                             <AccordionItem key={itemKey} value={itemKey}>
                               <AccordionTrigger>
                                 {title}
@@ -6222,8 +6292,8 @@ export function KJVReader() {
                                 ) : null}
                               </AccordionContent>
                             </AccordionItem>
-                          );
-                        })}
+                          ),
+                        )}
                       </Accordion>
                     )}
                       </>
