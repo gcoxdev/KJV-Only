@@ -1,0 +1,62 @@
+import { useState } from "react"
+import { $isTableSelection } from "@lexical/table"
+import { $isRangeSelection, FORMAT_TEXT_COMMAND } from "lexical"
+import type { BaseSelection } from "lexical"
+import { SubscriptIcon, SuperscriptIcon } from "lucide-react"
+
+import { useToolbarContext } from "@/components/editor/context/toolbar-context"
+import { useUpdateToolbarHandler } from "@/components/editor/editor-hooks/use-update-toolbar"
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@/components/ui/toggle-group"
+
+export function SubSuperToolbarPlugin() {
+  const { activeEditor } = useToolbarContext()
+  const [isSubscript, setIsSubscript] = useState(false)
+  const [isSuperscript, setIsSuperscript] = useState(false)
+
+  const $updateToolbar = (selection: BaseSelection) => {
+    if ($isRangeSelection(selection) || $isTableSelection(selection)) {
+      // @ts-ignore
+      setIsSubscript(selection.hasFormat("subscript"))
+      // @ts-ignore
+      setIsSuperscript(selection.hasFormat("superscript"))
+    }
+  }
+
+  useUpdateToolbarHandler($updateToolbar)
+
+  const selected = isSubscript
+    ? ["subscript"]
+    : isSuperscript
+      ? ["superscript"]
+      : []
+
+  return (
+    <ToggleGroup value={selected}>
+      <ToggleGroupItem
+        value="subscript"
+        size="sm"
+        aria-label="Toggle subscript"
+        onClick={() => {
+          activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript")
+        }}
+        variant={"outline"}
+      >
+        <SubscriptIcon className="size-4" />
+      </ToggleGroupItem>
+      <ToggleGroupItem
+        value="superscript"
+        size="sm"
+        aria-label="Toggle superscript"
+        onClick={() => {
+          activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript")
+        }}
+        variant={"outline"}
+      >
+        <SuperscriptIcon className="size-4" />
+      </ToggleGroupItem>
+    </ToggleGroup>
+  )
+}

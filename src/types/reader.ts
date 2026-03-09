@@ -77,7 +77,7 @@ export type IconVariant = "bw" | "color";
 export type LeafNode = {
   id: string;
   type: "leaf";
-  view: "reader" | "picker" | "search";
+  view: "reader" | "picker" | "search" | "notes";
   bookIndex: number;
   chapterIndex: number;
   pickerTestament: "old" | "new" | null;

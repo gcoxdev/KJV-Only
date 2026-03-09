@@ -31,6 +31,7 @@ import {
   resolveOldEnglishKey,
   resolveWebstersKey,
 } from "@/lib/references";
+import { noteMatchesContext } from "@/lib/notes";
 import {
   chapterProgressKey,
   panelViewportElement,
@@ -75,6 +76,11 @@ import type {
   WebstersEntry,
   WebstersPayload,
 } from "@/types/reader";
+import type {
+  NotesContext,
+  NotesTabState,
+  ReaderNote,
+} from "@/types/notes";
 import {
   SidebarInset,
   SidebarProvider,
@@ -135,6 +141,11 @@ export function KJVReader() {
     string | null
   >(null);
   const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
+  const [readerNotes, setReaderNotes] = useState<ReaderNote[]>([]);
+  const [notesContext, setNotesContext] = useState<NotesContext | null>(null);
+  const [notesTabStateByLeafId, setNotesTabStateByLeafId] = useState<
+    Record<string, NotesTabState>
+  >({});
   const [concordanceAccordionValue, setConcordanceAccordionValue] = useState<
     string[]
   >([]);
@@ -207,6 +218,30 @@ export function KJVReader() {
     document.documentElement.classList.toggle("dark", theme === "dark");
     window.localStorage.setItem("theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem("kjv-reader-notes-v1");
+      if (!stored) {
+        return;
+      }
+      const parsed = JSON.parse(stored) as ReaderNote[];
+      if (!Array.isArray(parsed)) {
+        return;
+      }
+      setReaderNotes(parsed);
+    } catch {
+      // Ignore invalid stored notes payloads.
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("kjv-reader-notes-v1", JSON.stringify(readerNotes));
+    } catch {
+      // Ignore persistence errors (quota/private mode edge cases).
+    }
+  }, [readerNotes]);
 
   useEffect(() => {
     if (isStudyMode) {
@@ -410,6 +445,37 @@ export function KJVReader() {
     activeTabId,
     readChapters,
   });
+
+  useEffect(() => {
+    if (!activeTab) {
+      return;
+    }
+    const readerLeafId = collectLeafIds(activeTab.root).find((leafId) => {
+      const leaf = findLeafNode(activeTab.root, leafId);
+      return leaf?.view === "reader";
+    });
+    if (!readerLeafId) {
+      return;
+    }
+    const leaf = findLeafNode(activeTab.root, readerLeafId);
+    if (!leaf) {
+      return;
+    }
+    setNotesContext((current) => {
+      if (
+        current?.bookIndex === leaf.bookIndex &&
+        current?.chapterIndex === leaf.chapterIndex &&
+        current?.verseNumber === undefined &&
+        current?.word === undefined
+      ) {
+        return current;
+      }
+      return {
+        bookIndex: leaf.bookIndex,
+        chapterIndex: leaf.chapterIndex,
+      };
+    });
+  }, [activeTab]);
 
   const mapWebstersResult = useCallback(
     (key: string, entry: WebstersEntry) => ({ key, entry }),
@@ -1164,6 +1230,126 @@ export function KJVReader() {
     });
   }, [tabs, tabsOrientation]);
 
+  const openNotesTab = useCallback(
+    (selectedNoteId?: string | null) => {
+      const nextTabId = createId();
+      const nextLeaf = createLeaf(0, 0, "notes");
+      setTabs((currentTabs) => [
+        ...currentTabs,
+        {
+          id: nextTabId,
+          title: "Notes",
+          root: nextLeaf,
+        },
+      ]);
+      setNotesTabStateByLeafId((current) => ({
+        ...current,
+        [nextLeaf.id]: {
+          selectedNoteId: selectedNoteId ?? null,
+          filter: selectedNoteId ? "all" : "context",
+          context: notesContext,
+        },
+      }));
+      setActiveTabId(nextTabId);
+      requestAnimationFrame(() => {
+        tabEndRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: tabsOrientation === "vertical" ? "end" : "nearest",
+          inline: tabsOrientation === "vertical" ? "nearest" : "end",
+        });
+      });
+    },
+    [notesContext, tabsOrientation],
+  );
+
+  const createGeneralNote = useCallback(() => {
+    const noteId = createId();
+    const now = Date.now();
+    setReaderNotes((current) => [
+      {
+        id: noteId,
+        title: "General note",
+        body: "",
+        scope: { type: "general" },
+        createdAt: now,
+        updatedAt: now,
+      },
+      ...current,
+    ]);
+    return noteId;
+  }, []);
+
+  const createContextNote = useCallback((context: NotesContext | null) => {
+    if (!context) {
+      return null;
+    }
+    const noteId = createId();
+    const now = Date.now();
+    const scope = context.word
+      ? {
+          type: "word" as const,
+          bookIndex: context.bookIndex,
+          chapterIndex: context.chapterIndex,
+          verseNumber: context.verseNumber,
+          word: context.word,
+        }
+      : context.verseNumber
+        ? {
+            type: "verse" as const,
+            bookIndex: context.bookIndex,
+            chapterIndex: context.chapterIndex,
+            verseNumber: context.verseNumber,
+          }
+        : {
+            type: "chapter" as const,
+            bookIndex: context.bookIndex,
+            chapterIndex: context.chapterIndex,
+          };
+    setReaderNotes((current) => [
+      {
+        id: noteId,
+        title: "Context note",
+        body: "",
+        scope,
+        createdAt: now,
+        updatedAt: now,
+      },
+      ...current,
+    ]);
+    return noteId;
+  }, []);
+
+  const updateNote = useCallback(
+    (noteId: string, patch: Partial<Pick<ReaderNote, "title" | "body" | "scope">>) => {
+      const now = Date.now();
+      setReaderNotes((current) =>
+        current.map((note) =>
+          note.id === noteId ? { ...note, ...patch, updatedAt: now } : note,
+        ),
+      );
+    },
+    [],
+  );
+
+  const deleteNote = useCallback((noteId: string) => {
+    setReaderNotes((current) => current.filter((note) => note.id !== noteId));
+  }, []);
+
+  const changeNotesTabState = useCallback(
+    (leafId: string, patch: Partial<NotesTabState>) => {
+      setNotesTabStateByLeafId((current) => ({
+        ...current,
+        [leafId]: {
+          selectedNoteId: current[leafId]?.selectedNoteId ?? null,
+          filter: current[leafId]?.filter ?? "all",
+          context: current[leafId]?.context ?? notesContext,
+          ...patch,
+        },
+      }));
+    },
+    [notesContext],
+  );
+
   const openChapterReferenceInNewTab = useCallback((
     bookIndex: number,
     chapterIndex: number,
@@ -1272,6 +1458,11 @@ export function KJVReader() {
 
   const openCrossReferencesForVerse = useCallback(
     (bookIndex: number, chapterIndex: number, verseNumber: number) => {
+      setNotesContext({
+        bookIndex,
+        chapterIndex,
+        verseNumber,
+      });
       const key = chapterVerseKey(bookIndex, chapterIndex, verseNumber);
 
       setIsRightSidebarOpen(true);
@@ -1348,6 +1539,20 @@ export function KJVReader() {
           : Number.parseInt(rawVerseNumber, 10);
       if (Number.isFinite(verseNumber) && verseNumber > 0) {
         openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
+        if (rawWord) {
+          setNotesContext({
+            bookIndex,
+            chapterIndex,
+            verseNumber,
+            word: rawWord,
+          });
+        }
+      } else if (rawWord) {
+        setNotesContext({
+          bookIndex,
+          chapterIndex,
+          word: rawWord,
+        });
       }
 
       if (!rawWord) {
@@ -1768,6 +1973,23 @@ export function KJVReader() {
     }
   }
 
+  const generalNotes = useMemo(
+    () =>
+      readerNotes
+        .filter((note) => note.scope.type === "general")
+        .sort((a, b) => b.updatedAt - a.updatedAt),
+    [readerNotes],
+  );
+  const contextNotes = useMemo(
+    () =>
+      readerNotes
+        .filter(
+          (note) => note.scope.type !== "general" && noteMatchesContext(note, notesContext),
+        )
+        .sort((a, b) => b.updatedAt - a.updatedAt),
+    [notesContext, readerNotes],
+  );
+
   if (!isLoaded) {
     return <ReaderStatusScreen message="Loading Bible data..." />;
   }
@@ -1907,6 +2129,14 @@ export function KJVReader() {
                 concordanceWords={concordanceWords}
                 ensureConcordanceWordsLoaded={ensureConcordanceLoaded}
                 onOpenSearchResult={openChapterReferenceInNewTab}
+                notes={readerNotes}
+                notesContext={notesContext}
+                notesTabStateByLeafId={notesTabStateByLeafId}
+                onChangeNotesTabState={changeNotesTabState}
+                onCreateGeneralNote={createGeneralNote}
+                onCreateContextNote={createContextNote}
+                onUpdateNote={updateNote}
+                onDeleteNote={deleteNote}
                 moveLeafChapter={moveLeafChapter}
                 toggleChapterRead={toggleChapterRead}
                 updateSplitSize={updateSplitSize}
@@ -2009,6 +2239,32 @@ export function KJVReader() {
               renderPreview: referencePreviewContent,
               onOpenReference: openConcordanceReference,
               onCloseSidebar: closeRightSidebarForMobile,
+            }}
+            notesProps={{
+              books,
+              generalNotes,
+              contextNotes,
+              context: notesContext,
+              onOpenNotesTab: (noteId) => openNotesTab(noteId),
+              onCreateGeneralNote: () => {
+                const noteId = createGeneralNote();
+                openNotesTab(noteId);
+              },
+              onCreateContextNote: () => {
+                const noteId = createContextNote(notesContext);
+                if (noteId) {
+                  openNotesTab(noteId);
+                }
+              },
+              onSetChapterContext: () => {
+                setNotesContext((current) => {
+                  if (!current) return current;
+                  return {
+                    bookIndex: current.bookIndex,
+                    chapterIndex: current.chapterIndex,
+                  };
+                });
+              },
             }}
             genealogyProps={{
               hasInfo: hasGenealogyInfo,
