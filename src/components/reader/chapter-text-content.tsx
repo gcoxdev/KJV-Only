@@ -85,6 +85,7 @@ type ChapterTextContentProps = {
   enableVerseSelection: boolean;
   bookmarkModeEnabled: boolean;
   pendingRangeStartVerseNumber: number | null;
+  highlightedVerseRange?: { start: number; end: number } | null;
   verseSpacing: number;
   onOpenTokenDetails: (element: HTMLElement, token: VerseToken) => void;
   onSelectVerse: (verseNumber: number) => void;
@@ -102,6 +103,7 @@ export const ChapterTextContent = memo(
     enableVerseSelection,
     bookmarkModeEnabled,
     pendingRangeStartVerseNumber,
+    highlightedVerseRange,
     verseSpacing,
     onOpenTokenDetails,
     onSelectVerse,
@@ -124,6 +126,16 @@ export const ChapterTextContent = memo(
       }
       return grouped;
     }, [verses]);
+
+    const isVerseHighlighted = useMemo(
+      () =>
+        highlightedVerseRange
+          ? (verseNumber: number) =>
+              verseNumber >= highlightedVerseRange.start &&
+              verseNumber <= highlightedVerseRange.end
+          : () => false,
+      [highlightedVerseRange],
+    );
 
     return (
       <div
@@ -169,7 +181,11 @@ export const ChapterTextContent = memo(
                       {verseIndex > 0 ? " " : null}
                       <span
                         data-verse-number={verse.verse}
-                        className={cn(verse.redLetter && "text-red-700")}
+                        className={cn(
+                          verse.redLetter && "text-red-700",
+                          isVerseHighlighted(verse.verse) &&
+                            "verse-reference-highlight",
+                        )}
                       >
                         {bookmarkModeEnabled ? (
                           <span
@@ -209,7 +225,10 @@ export const ChapterTextContent = memo(
               <article
                 key={`${bookName}-${chapterNumber}-${verse.verse}`}
                 data-verse-number={verse.verse}
-                className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
+                className={cn(
+                  "[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]",
+                  isVerseHighlighted(verse.verse) && "verse-reference-highlight",
+                )}
                 onClick={() => {
                   if (enableVerseSelection) {
                     onSelectVerse(verse.verse);
@@ -281,5 +300,7 @@ export const ChapterTextContent = memo(
     prev.enableVerseSelection === next.enableVerseSelection &&
     prev.bookmarkModeEnabled === next.bookmarkModeEnabled &&
     prev.pendingRangeStartVerseNumber === next.pendingRangeStartVerseNumber &&
+    prev.highlightedVerseRange?.start === next.highlightedVerseRange?.start &&
+    prev.highlightedVerseRange?.end === next.highlightedVerseRange?.end &&
     prev.verseSpacing === next.verseSpacing,
 );

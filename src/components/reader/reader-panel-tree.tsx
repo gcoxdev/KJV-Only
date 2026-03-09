@@ -680,6 +680,9 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   enableVerseSelection={isStudyMode || bookmarkModeEnabled}
                   bookmarkModeEnabled={bookmarkModeEnabled}
                   pendingRangeStartVerseNumber={pendingRangeStartVerseNumber}
+                  highlightedVerseRange={
+                    highlightedVerseRangesByLeafId[leaf.id] ?? null
+                  }
                   verseSpacing={verseSpacing}
                   onOpenTokenDetails={(element, token) =>
                     onOpenTokenDetails(
