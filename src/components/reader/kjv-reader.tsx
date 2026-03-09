@@ -33,6 +33,11 @@ import {
 } from "@/lib/references";
 import { noteMatchesContext } from "@/lib/notes";
 import {
+  bookmarkCanonicalKey,
+  bookmarkScopeLabel,
+  normalizeRangePoints,
+} from "@/lib/bookmarks";
+import {
   chapterProgressKey,
   panelViewportElement,
 } from "@/lib/reader-view";
@@ -81,6 +86,11 @@ import type {
   NotesTabState,
   ReaderNote,
 } from "@/types/notes";
+import type {
+  BookmarkPoint,
+  BookmarkScope,
+  ReaderBookmark,
+} from "@/types/bookmarks";
 import {
   SidebarInset,
   SidebarProvider,
@@ -146,6 +156,9 @@ export function KJVReader() {
   const [notesTabStateByLeafId, setNotesTabStateByLeafId] = useState<
     Record<string, NotesTabState>
   >({});
+  const [readerBookmarks, setReaderBookmarks] = useState<ReaderBookmark[]>([]);
+  const [bookmarkModeEnabled, setBookmarkModeEnabled] = useState(false);
+  const [pendingBookmarkRangeStart, setPendingBookmarkRangeStart] = useState<BookmarkPoint | null>(null);
   const [concordanceAccordionValue, setConcordanceAccordionValue] = useState<
     string[]
   >([]);
@@ -184,6 +197,9 @@ export function KJVReader() {
   const [pendingVerseHighlights, setPendingVerseHighlights] = useState<
     Record<string, { start: number; end: number }>
   >({});
+  const [highlightedVerseRangesByLeafId, setHighlightedVerseRangesByLeafId] = useState<
+    Record<string, { start: number; end: number }>
+  >({});
   const tabEndRef = useRef<HTMLDivElement>(null);
   const strongsSearchInputRef = useRef<HTMLInputElement | null>(null);
   const panelElementRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -201,6 +217,36 @@ export function KJVReader() {
     root: null,
     neighbors: new Map(),
   });
+
+  const clearAllVerseHighlights = useCallback(() => {
+    for (const highlightedElement of highlightedVerseElementsRef.current) {
+      highlightedElement.classList.remove("verse-reference-highlight");
+    }
+    highlightedVerseElementsRef.current = [];
+    setHighlightedVerseRangesByLeafId({});
+  }, []);
+
+  const clearLeafHighlights = useCallback((leafId: string) => {
+    const panelElement = panelElementRefs.current[leafId];
+    if (panelElement) {
+      panelElement
+        .querySelectorAll<HTMLElement>(".verse-reference-highlight")
+        .forEach((element) => {
+          element.classList.remove("verse-reference-highlight");
+        });
+      highlightedVerseElementsRef.current = highlightedVerseElementsRef.current.filter(
+        (element) => !panelElement.contains(element),
+      );
+    }
+    setHighlightedVerseRangesByLeafId((current) => {
+      if (!current[leafId]) {
+        return current;
+      }
+      const next = { ...current };
+      delete next[leafId];
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -242,6 +288,33 @@ export function KJVReader() {
       // Ignore persistence errors (quota/private mode edge cases).
     }
   }, [readerNotes]);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem("kjv-reader-bookmarks-v1");
+      if (!stored) {
+        return;
+      }
+      const parsed = JSON.parse(stored) as ReaderBookmark[];
+      if (!Array.isArray(parsed)) {
+        return;
+      }
+      setReaderBookmarks(parsed);
+    } catch {
+      // Ignore invalid stored bookmarks payloads.
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        "kjv-reader-bookmarks-v1",
+        JSON.stringify(readerBookmarks),
+      );
+    } catch {
+      // Ignore persistence errors (quota/private mode edge cases).
+    }
+  }, [readerBookmarks]);
 
   useEffect(() => {
     if (isStudyMode) {
@@ -711,6 +784,7 @@ export function KJVReader() {
 
     const rafId = window.requestAnimationFrame(() => {
       const appliedLeafIds: string[] = [];
+      const appliedLeafRanges: Record<string, { start: number; end: number }> = {};
       for (const highlightedElement of highlightedVerseElementsRef.current) {
         highlightedElement.classList.remove("verse-reference-highlight");
       }
@@ -781,7 +855,9 @@ export function KJVReader() {
         });
 
         appliedLeafIds.push(leafId);
+        appliedLeafRanges[leafId] = { ...verseRange };
       }
+      setHighlightedVerseRangesByLeafId(appliedLeafRanges);
 
       if (appliedLeafIds.length > 0) {
         setPendingVerseHighlights((current) => {
@@ -808,6 +884,38 @@ export function KJVReader() {
     },
     [ensureMapImagesLoaded, openMapDialog],
   );
+
+  useEffect(() => {
+    for (const highlightedElement of highlightedVerseElementsRef.current) {
+      highlightedElement.classList.remove("verse-reference-highlight");
+    }
+    highlightedVerseElementsRef.current = [];
+
+    if (!activeTab || Object.keys(highlightedVerseRangesByLeafId).length === 0) {
+      return;
+    }
+
+    for (const [leafId, range] of Object.entries(highlightedVerseRangesByLeafId)) {
+      const panelElement = panelElementRefs.current[leafId];
+      if (!panelElement) {
+        continue;
+      }
+      for (let verseNumber = range.start; verseNumber <= range.end; verseNumber += 1) {
+        const verseElement =
+          panelElement.querySelector<HTMLElement>(
+            `article[data-verse-number="${verseNumber}"]`,
+          ) ??
+          panelElement.querySelector<HTMLElement>(
+            `[data-verse-number="${verseNumber}"]`,
+          );
+        if (!verseElement) {
+          continue;
+        }
+        verseElement.classList.add("verse-reference-highlight");
+        highlightedVerseElementsRef.current.push(verseElement);
+      }
+    }
+  }, [activeTab, activeTabId, highlightedVerseRangesByLeafId]);
 
   function updateActiveTab(updater: (tab: ReaderTab) => ReaderTab) {
     if (!activeTabId) {
@@ -1350,12 +1458,155 @@ export function KJVReader() {
     [notesContext],
   );
 
+  const upsertBookmark = useCallback(
+    (
+      scope: BookmarkScope,
+      patch?: Partial<Pick<ReaderBookmark, "label" | "note">>,
+    ) => {
+      const normalizedScope =
+        scope.type === "range"
+          ? {
+              ...scope,
+              ...normalizeRangePoints(scope.start, scope.end),
+            }
+          : scope;
+      const scopeKey = bookmarkCanonicalKey(normalizedScope);
+      const now = Date.now();
+      const defaultLabel = bookmarkScopeLabel(normalizedScope, books);
+      const nextLabel = patch?.label?.trim() || defaultLabel;
+      const nextNote = patch?.note?.trim() ?? "";
+      let nextBookmarkId = createId();
+
+      setReaderBookmarks((current) => {
+        const existingIndex = current.findIndex(
+          (bookmark) => bookmarkCanonicalKey(bookmark.scope) === scopeKey,
+        );
+
+        if (existingIndex < 0) {
+          return [
+            {
+              id: nextBookmarkId,
+              type: normalizedScope.type,
+              scope: normalizedScope,
+              label: nextLabel,
+              note: nextNote,
+              createdAt: now,
+              updatedAt: now,
+            },
+            ...current,
+          ];
+        }
+
+        const existing = current[existingIndex];
+        nextBookmarkId = existing.id;
+        const updated: ReaderBookmark = {
+          ...existing,
+          type: normalizedScope.type,
+          scope: normalizedScope,
+          label:
+            patch?.label !== undefined
+              ? nextLabel
+              : existing.label || defaultLabel,
+          note: patch?.note !== undefined ? nextNote : existing.note,
+          updatedAt: now,
+        };
+
+        const next = [...current];
+        next.splice(existingIndex, 1);
+        return [updated, ...next];
+      });
+
+      return nextBookmarkId;
+    },
+    [books],
+  );
+
+  const updateBookmark = useCallback(
+    (
+      bookmarkId: string,
+      patch: Partial<Pick<ReaderBookmark, "label" | "note">>,
+    ) => {
+      const now = Date.now();
+      setReaderBookmarks((current) =>
+        current.map((bookmark) =>
+          bookmark.id === bookmarkId
+            ? {
+                ...bookmark,
+                ...(patch.label !== undefined
+                  ? { label: patch.label.trim() }
+                  : null),
+                ...(patch.note !== undefined ? { note: patch.note.trim() } : null),
+                updatedAt: now,
+              }
+            : bookmark,
+        ),
+      );
+    },
+    [],
+  );
+
+  const deleteBookmark = useCallback((bookmarkId: string) => {
+    setReaderBookmarks((current) =>
+      current.filter((bookmark) => bookmark.id !== bookmarkId),
+    );
+  }, []);
+
+  const toggleBookmarkMode = useCallback(() => {
+    setBookmarkModeEnabled((current) => {
+      const next = !current;
+      if (!next) {
+        setPendingBookmarkRangeStart(null);
+      }
+      return next;
+    });
+  }, []);
+
+  const createChapterBookmark = useCallback(
+    (bookIndex: number, chapterIndex: number) => {
+      upsertBookmark({
+        type: "chapter",
+        bookIndex,
+        chapterIndex,
+      });
+    },
+    [upsertBookmark],
+  );
+
+  function openBookmarkInNewTab(bookmark: ReaderBookmark) {
+    if (bookmark.scope.type === "chapter") {
+      openChapterInNewTab(bookmark.scope.bookIndex, bookmark.scope.chapterIndex);
+      return;
+    }
+
+    if (bookmark.scope.type === "verse") {
+      openChapterReferenceInNewTab(
+        bookmark.scope.bookIndex,
+        bookmark.scope.chapterIndex,
+        bookmark.scope.verseNumber,
+        bookmark.scope.verseNumber,
+      );
+      return;
+    }
+
+    const normalized = normalizeRangePoints(bookmark.scope.start, bookmark.scope.end);
+    const isSameChapter =
+      normalized.start.bookIndex === normalized.end.bookIndex &&
+      normalized.start.chapterIndex === normalized.end.chapterIndex;
+    openChapterReferenceInNewTab(
+      normalized.start.bookIndex,
+      normalized.start.chapterIndex,
+      normalized.start.verseNumber,
+      isSameChapter ? normalized.end.verseNumber : normalized.start.verseNumber,
+    );
+  }
+
   const openChapterReferenceInNewTab = useCallback((
     bookIndex: number,
     chapterIndex: number,
     verseStart: number,
     verseEnd = verseStart,
   ) => {
+    clearAllVerseHighlights();
     const nextTabId = createId();
     const nextLeaf = createLeaf(bookIndex, chapterIndex, "reader");
     setTabs((currentTabs) => [
@@ -1383,7 +1634,7 @@ export function KJVReader() {
         inline: tabsOrientation === "vertical" ? "nearest" : "end",
       });
     });
-  }, [tabsOrientation]);
+  }, [clearAllVerseHighlights, tabsOrientation]);
 
   function setAllBookChaptersRead(bookIndex: number, isRead: boolean) {
     const book = books[bookIndex];
@@ -1502,6 +1753,57 @@ export function KJVReader() {
     },
     [crossRefs, ensureCrossRefsLoaded],
   );
+
+  const handleVerseSelection = useCallback(
+    (bookIndex: number, chapterIndex: number, verseNumber: number) => {
+      if (!bookmarkModeEnabled) {
+        openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
+        return;
+      }
+
+      const point: BookmarkPoint = { bookIndex, chapterIndex, verseNumber };
+      setNotesContext(point);
+
+      if (!pendingBookmarkRangeStart) {
+        setPendingBookmarkRangeStart(point);
+        setIsRightSidebarOpen(true);
+        setSidebarOpenRequestKey((current) => current + 1);
+        return;
+      }
+
+      const normalized = normalizeRangePoints(pendingBookmarkRangeStart, point);
+      const isSingleVerse =
+        normalized.start.bookIndex === normalized.end.bookIndex &&
+        normalized.start.chapterIndex === normalized.end.chapterIndex &&
+        normalized.start.verseNumber === normalized.end.verseNumber;
+
+      if (isSingleVerse) {
+        upsertBookmark({
+          type: "verse",
+          bookIndex: normalized.start.bookIndex,
+          chapterIndex: normalized.start.chapterIndex,
+          verseNumber: normalized.start.verseNumber,
+        });
+      } else {
+        upsertBookmark({
+          type: "range",
+          start: normalized.start,
+          end: normalized.end,
+        });
+      }
+
+      setPendingBookmarkRangeStart(null);
+      setIsRightSidebarOpen(true);
+      setSidebarOpenRequestKey((current) => current + 1);
+    },
+    [
+      bookmarkModeEnabled,
+      openCrossReferencesForVerse,
+      pendingBookmarkRangeStart,
+      upsertBookmark,
+    ],
+  );
+
   const closeRightSidebarForMobile = useCallback(() => {
     setIsRightSidebarOpen(false);
   }, []);
@@ -1989,6 +2291,26 @@ export function KJVReader() {
         .sort((a, b) => b.updatedAt - a.updatedAt),
     [notesContext, readerNotes],
   );
+  const currentReaderChapterForBookmarks = useMemo(() => {
+    if (!activeTab) {
+      return null;
+    }
+    const readerLeafId = collectLeafIds(activeTab.root).find((leafId) => {
+      const leaf = findLeafNode(activeTab.root, leafId);
+      return leaf?.view === "reader";
+    });
+    if (!readerLeafId) {
+      return null;
+    }
+    const leaf = findLeafNode(activeTab.root, readerLeafId);
+    if (!leaf) {
+      return null;
+    }
+    return {
+      bookIndex: leaf.bookIndex,
+      chapterIndex: leaf.chapterIndex,
+    };
+  }, [activeTab]);
 
   if (!isLoaded) {
     return <ReaderStatusScreen message="Loading Bible data..." />;
@@ -2125,7 +2447,7 @@ export function KJVReader() {
                 isStudyMode={isStudyMode}
                 verseSpacing={verseSpacing}
                 onOpenTokenDetails={openTokenDetailsFromElement}
-                onSelectVerse={openCrossReferencesForVerse}
+                onSelectVerse={handleVerseSelection}
                 concordanceWords={concordanceWords}
                 ensureConcordanceWordsLoaded={ensureConcordanceLoaded}
                 onOpenSearchResult={openChapterReferenceInNewTab}
@@ -2140,6 +2462,10 @@ export function KJVReader() {
                 moveLeafChapter={moveLeafChapter}
                 toggleChapterRead={toggleChapterRead}
                 updateSplitSize={updateSplitSize}
+                bookmarkModeEnabled={bookmarkModeEnabled}
+                pendingBookmarkRangeStart={pendingBookmarkRangeStart}
+                highlightedVerseRangesByLeafId={highlightedVerseRangesByLeafId}
+                onClearLeafHighlights={clearLeafHighlights}
               />
             }
           />
@@ -2265,6 +2591,18 @@ export function KJVReader() {
                   };
                 });
               },
+            }}
+            bookmarksProps={{
+              books,
+              bookmarks: readerBookmarks,
+              bookmarkModeEnabled,
+              pendingRangeStart: pendingBookmarkRangeStart,
+              currentChapter: currentReaderChapterForBookmarks,
+              onToggleBookmarkMode: toggleBookmarkMode,
+              onCreateChapterBookmark: createChapterBookmark,
+              onOpenBookmark: openBookmarkInNewTab,
+              onUpdateBookmark: updateBookmark,
+              onDeleteBookmark: deleteBookmark,
             }}
             genealogyProps={{
               hasInfo: hasGenealogyInfo,
