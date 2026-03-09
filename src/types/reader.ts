@@ -69,6 +69,32 @@ export type StrongsEntry = {
 
 export type StrongsPayload = Record<string, StrongsEntry>;
 
+export type SearchMode =
+  | "contains-any"
+  | "contains-all"
+  | "contains-phrase"
+  | "regex";
+
+export type SearchMatch = {
+  bookIndex: number;
+  chapterIndex: number;
+  verseNumber: number;
+  bookName: string;
+  text: string;
+};
+
+export type SearchPageState = {
+  searchMode: SearchMode;
+  caseSensitive: boolean;
+  chipInput: string;
+  phraseInput: string;
+  selectedWords: string[];
+  expandedBookTree: string[];
+  selectedBookIndexes: number[];
+  results: SearchMatch[];
+  error: string | null;
+};
+
 export type PanelDirection = "left" | "right" | "up" | "down";
 export type SplitOrientation = "horizontal" | "vertical";
 export type TabsOrientation = "horizontal" | "vertical";

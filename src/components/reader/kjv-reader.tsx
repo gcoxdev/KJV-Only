@@ -71,6 +71,7 @@ import type {
   PanelDirection,
   PanelNode,
   ReaderTab,
+  SearchPageState,
   SplitOrientation,
   StrongsPayload,
   TabsOrientation,
@@ -479,6 +480,37 @@ export function KJVReader() {
   } = useReaderBookmarks({
     books,
   });
+  const [searchPageStateByLeafId, setSearchPageStateByLeafId] = useState<
+    Record<string, SearchPageState>
+  >({});
+
+  const createDefaultSearchPageState = useCallback(
+    (): SearchPageState => ({
+      searchMode: "contains-any",
+      caseSensitive: false,
+      chipInput: "",
+      phraseInput: "",
+      selectedWords: [],
+      expandedBookTree: ["entire", "old", "new"],
+      selectedBookIndexes: books.map((_, index) => index),
+      results: [],
+      error: null,
+    }),
+    [books],
+  );
+
+  const changeSearchPageState = useCallback(
+    (leafId: string, patch: Partial<SearchPageState>) => {
+      setSearchPageStateByLeafId((current) => ({
+        ...current,
+        [leafId]: {
+          ...(current[leafId] ?? createDefaultSearchPageState()),
+          ...patch,
+        },
+      }));
+    },
+    [createDefaultSearchPageState],
+  );
 
   const mapWebstersResult = useCallback(
     (key: string, entry: WebstersEntry) => ({ key, entry }),
@@ -488,6 +520,21 @@ export function KJVReader() {
     (key: string, definition: string) => ({ key, definition }),
     [],
   );
+
+  useEffect(() => {
+    const activeLeafIds = new Set(
+      tabs.flatMap((tab) => collectLeafIds(tab.root)),
+    );
+    setSearchPageStateByLeafId((current) => {
+      const nextEntries = Object.entries(current).filter(([leafId]) =>
+        activeLeafIds.has(leafId),
+      );
+      if (nextEntries.length === Object.keys(current).length) {
+        return current;
+      }
+      return Object.fromEntries(nextEntries);
+    });
+  }, [tabs]);
   const mapOldEnglishResult = useCallback(
     (key: string, definitions: string[]) => ({ key, definitions }),
     [],
@@ -1127,6 +1174,10 @@ export function KJVReader() {
         root: nextLeaf,
       },
     ]);
+    setSearchPageStateByLeafId((current) => ({
+      ...current,
+      [nextLeaf.id]: createDefaultSearchPageState(),
+    }));
     setActiveTabId(nextTabId);
     requestAnimationFrame(() => {
       tabEndRef.current?.scrollIntoView({
@@ -1135,7 +1186,7 @@ export function KJVReader() {
         inline: tabsOrientation === "vertical" ? "nearest" : "end",
       });
     });
-  }, [tabs, tabsOrientation]);
+  }, [createDefaultSearchPageState, tabs, tabsOrientation]);
 
   const openNotesTab = useCallback(
     (selectedNoteId?: string | null) => {
@@ -2030,6 +2081,8 @@ export function KJVReader() {
                 notesContext={notesContext}
                 notesTabStateByLeafId={notesTabStateByLeafId}
                 onChangeNotesTabState={changeNotesTabState}
+                searchPageStateByLeafId={searchPageStateByLeafId}
+                onChangeSearchPageState={changeSearchPageState}
                 onCreateGeneralNote={createGeneralNote}
                 onCreateContextNote={createContextNote}
                 onUpdateNote={updateNote}
