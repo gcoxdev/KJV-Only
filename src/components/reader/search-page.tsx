@@ -459,7 +459,7 @@ export function SearchPage({
                       <button
                         key={word}
                         type="button"
-                        className="block w-full rounded px-2 py-1 text-left text-sm hover:bg-accent"
+                        className="block w-full rounded px-2 py-1 text-left text-sm text-foreground hover:bg-muted/50 hover:text-foreground"
                         onClick={() => addWordChip(word)}
                       >
                         {word}

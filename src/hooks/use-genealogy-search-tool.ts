@@ -49,20 +49,41 @@ export function useGenealogySearchTool() {
       .sort((a, b) => a.firstName.localeCompare(b.firstName));
   }, [genealogy]);
 
+  const dedupePeopleById = useCallback((people: GenealogyPerson[]) => {
+    const seen = new Set<string>();
+    return people.filter((person) => {
+      if (seen.has(person.id)) {
+        return false;
+      }
+      seen.add(person.id);
+      return true;
+    });
+  }, []);
+
   const genealogySearchResults = useMemo(() => {
     const term = genealogySearchTerm.trim().toLowerCase();
     if (term) {
-      return indexedGenealogy
-        .filter((item) => item.namesLower.some((name) => name.includes(term)))
-        .map((item) => item.person);
+      return dedupePeopleById(
+        indexedGenealogy
+          .filter((item) => item.namesLower.some((name) => name.includes(term)))
+          .map((item) => item.person),
+      );
     }
     if (selectedGenealogyIds.length === 0) {
       return [] as GenealogyPerson[];
     }
-    return selectedGenealogyIds
-      .map((id) => genealogyById.get(id))
-      .filter((person): person is GenealogyPerson => Boolean(person));
-  }, [genealogyById, genealogySearchTerm, indexedGenealogy, selectedGenealogyIds]);
+    return dedupePeopleById(
+      selectedGenealogyIds
+        .map((id) => genealogyById.get(id))
+        .filter((person): person is GenealogyPerson => Boolean(person)),
+    );
+  }, [
+    dedupePeopleById,
+    genealogyById,
+    genealogySearchTerm,
+    indexedGenealogy,
+    selectedGenealogyIds,
+  ]);
 
   const applyGenealogySearch = useCallback(
     (rawValue?: string) => {
