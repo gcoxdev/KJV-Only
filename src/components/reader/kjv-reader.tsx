@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -96,11 +98,6 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar";
 import { SidebarOpenRequestSync } from "@/components/reader/sidebar-open-request-sync";
-import { MapAndPhotoDialogs } from "@/components/reader/map-and-photo-dialogs";
-import { BookPickerDialog } from "@/components/reader/book-picker-dialog";
-import { RenameTabDialog } from "@/components/reader/rename-tab-dialog";
-import { SettingsDialog } from "@/components/reader/settings-dialog";
-import { ProgressDialog } from "@/components/reader/progress-dialog";
 import { GenealogyPersonDetails } from "@/components/reader/genealogy-person-details";
 import { useReferencePreview } from "@/hooks/use-reference-preview";
 import { useTabActions } from "@/hooks/use-tab-actions";
@@ -120,8 +117,37 @@ import { TokenPopupCard } from "@/components/reader/token-popup-card";
 import { ReaderTopBar } from "@/components/reader/reader-top-bar";
 import { TabsWorkspace } from "@/components/reader/tabs-workspace";
 import { ReaderStatusScreen } from "@/components/reader/reader-status-screen";
-import { ReaderStudySidebar } from "@/components/reader/reader-study-sidebar";
 import { ReaderPanelTree } from "@/components/reader/reader-panel-tree";
+
+const LazyReaderStudySidebar = lazy(async () => {
+  const module = await import("@/components/reader/reader-study-sidebar");
+  return { default: module.ReaderStudySidebar };
+});
+
+const LazyMapAndPhotoDialogs = lazy(async () => {
+  const module = await import("@/components/reader/map-and-photo-dialogs");
+  return { default: module.MapAndPhotoDialogs };
+});
+
+const LazyBookPickerDialog = lazy(async () => {
+  const module = await import("@/components/reader/book-picker-dialog");
+  return { default: module.BookPickerDialog };
+});
+
+const LazyRenameTabDialog = lazy(async () => {
+  const module = await import("@/components/reader/rename-tab-dialog");
+  return { default: module.RenameTabDialog };
+});
+
+const LazySettingsDialog = lazy(async () => {
+  const module = await import("@/components/reader/settings-dialog");
+  return { default: module.SettingsDialog };
+});
+
+const LazyProgressDialog = lazy(async () => {
+  const module = await import("@/components/reader/progress-dialog");
+  return { default: module.ProgressDialog };
+});
 
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -2472,7 +2498,8 @@ export function KJVReader() {
         </SidebarInset>
 
         {isStudyMode ? (
-          <ReaderStudySidebar
+          <Suspense fallback={null}>
+            <LazyReaderStudySidebar
             visible={isStudyMode}
             accordionValue={concordanceAccordionValue}
             onAccordionValueChange={setConcordanceAccordionValue}
@@ -2625,121 +2652,142 @@ export function KJVReader() {
               results: hitchcocksSearchResults,
               onSearch: applyHitchcocksSearch,
             }}
-          />
+            />
+          </Suspense>
         ) : null}
       </SidebarProvider>
 
       {tokenPopupCard}
 
-      <MapAndPhotoDialogs
-        isMapDialogOpen={isMapDialogOpen}
-        activeMapDialogEntry={activeMapDialogEntry}
-        isMapDialogLoading={isMapDialogLoading}
-        mapDialogError={mapDialogError}
-        mapDialogGeoJson={mapDialogGeoJson}
-        onMapDialogOpenChange={onMapDialogOpenChange}
-        onCloseMapDialog={onCloseMapDialog}
-        isPhotoDialogOpen={isPhotoDialogOpen}
-        currentPhotoDialogItem={currentPhotoDialogItem}
-        photoDialogIndex={photoDialogIndex}
-        photoDialogItemsLength={photoDialogItemsLength}
-        onPhotoDialogOpenChange={onPhotoDialogOpenChange}
-        onClosePhotoDialog={onClosePhotoDialog}
-        onPreviousPhoto={() => movePhotoDialog(-1)}
-        onNextPhoto={() => movePhotoDialog(1)}
-      />
+      {isMapDialogOpen || isPhotoDialogOpen ? (
+        <Suspense fallback={null}>
+          <LazyMapAndPhotoDialogs
+            isMapDialogOpen={isMapDialogOpen}
+            activeMapDialogEntry={activeMapDialogEntry}
+            isMapDialogLoading={isMapDialogLoading}
+            mapDialogError={mapDialogError}
+            mapDialogGeoJson={mapDialogGeoJson}
+            onMapDialogOpenChange={onMapDialogOpenChange}
+            onCloseMapDialog={onCloseMapDialog}
+            isPhotoDialogOpen={isPhotoDialogOpen}
+            currentPhotoDialogItem={currentPhotoDialogItem}
+            photoDialogIndex={photoDialogIndex}
+            photoDialogItemsLength={photoDialogItemsLength}
+            onPhotoDialogOpenChange={onPhotoDialogOpenChange}
+            onClosePhotoDialog={onClosePhotoDialog}
+            onPreviousPhoto={() => movePhotoDialog(-1)}
+            onNextPhoto={() => movePhotoDialog(1)}
+          />
+        </Suspense>
+      ) : null}
 
-      <BookPickerDialog
-        open={isBookPickerDialogOpen}
-        books={books}
-        leaf={bookPickerDialogLeaf}
-        onClose={() => {
-          setBookPickerDialogLeafId(null);
-        }}
-        onSelectTestament={(testament) => {
-          if (!bookPickerDialogLeaf) {
-            return;
-          }
-          updateLeafLocation(bookPickerDialogLeaf.id, {
-            pickerTestament: testament,
-            pickerBookIndex: null,
-          });
-        }}
-        onBackToTestaments={() => {
-          if (!bookPickerDialogLeaf) {
-            return;
-          }
-          updateLeafLocation(bookPickerDialogLeaf.id, {
-            pickerTestament: null,
-            pickerBookIndex: null,
-          });
-        }}
-        onSelectBook={(bookIndex) => {
-          if (!bookPickerDialogLeaf) {
-            return;
-          }
-          updateLeafLocation(bookPickerDialogLeaf.id, {
-            pickerBookIndex: bookIndex,
-          });
-        }}
-        onBackToBooks={() => {
-          if (!bookPickerDialogLeaf) {
-            return;
-          }
-          updateLeafLocation(bookPickerDialogLeaf.id, {
-            pickerBookIndex: null,
-          });
-        }}
-        onSelectChapter={(bookIndex, chapterIndex) => {
-          if (!bookPickerDialogLeaf) {
-            return;
-          }
-          updateLeafLocation(bookPickerDialogLeaf.id, {
-            bookIndex,
-            chapterIndex,
-            view: "reader",
-          });
-          setBookPickerDialogLeafId(null);
-        }}
-      />
+      {isBookPickerDialogOpen ? (
+        <Suspense fallback={null}>
+          <LazyBookPickerDialog
+            open={isBookPickerDialogOpen}
+            books={books}
+            leaf={bookPickerDialogLeaf}
+            onClose={() => {
+              setBookPickerDialogLeafId(null);
+            }}
+            onSelectTestament={(testament) => {
+              if (!bookPickerDialogLeaf) {
+                return;
+              }
+              updateLeafLocation(bookPickerDialogLeaf.id, {
+                pickerTestament: testament,
+                pickerBookIndex: null,
+              });
+            }}
+            onBackToTestaments={() => {
+              if (!bookPickerDialogLeaf) {
+                return;
+              }
+              updateLeafLocation(bookPickerDialogLeaf.id, {
+                pickerTestament: null,
+                pickerBookIndex: null,
+              });
+            }}
+            onSelectBook={(bookIndex) => {
+              if (!bookPickerDialogLeaf) {
+                return;
+              }
+              updateLeafLocation(bookPickerDialogLeaf.id, {
+                pickerBookIndex: bookIndex,
+              });
+            }}
+            onBackToBooks={() => {
+              if (!bookPickerDialogLeaf) {
+                return;
+              }
+              updateLeafLocation(bookPickerDialogLeaf.id, {
+                pickerBookIndex: null,
+              });
+            }}
+            onSelectChapter={(bookIndex, chapterIndex) => {
+              if (!bookPickerDialogLeaf) {
+                return;
+              }
+              updateLeafLocation(bookPickerDialogLeaf.id, {
+                bookIndex,
+                chapterIndex,
+                view: "reader",
+              });
+              setBookPickerDialogLeafId(null);
+            }}
+          />
+        </Suspense>
+      ) : null}
 
-      <RenameTabDialog
-        open={isRenameDialogOpen}
-        value={renameValue}
-        error={renameError}
-        onOpenChange={setIsRenameDialogOpen}
-        onValueChange={onRenameValueChange}
-        onCancel={onRenameCancel}
-        onConfirm={confirmRenameTab}
-      />
+      {isRenameDialogOpen ? (
+        <Suspense fallback={null}>
+          <LazyRenameTabDialog
+            open={isRenameDialogOpen}
+            value={renameValue}
+            error={renameError}
+            onOpenChange={setIsRenameDialogOpen}
+            onValueChange={onRenameValueChange}
+            onCancel={onRenameCancel}
+            onConfirm={confirmRenameTab}
+          />
+        </Suspense>
+      ) : null}
 
-      <SettingsDialog
-        open={isSettingsOpen}
-        onOpenChange={setIsSettingsOpen}
-        theme={theme}
-        onThemeChange={setTheme}
-        verseSpacing={verseSpacing}
-        onVerseSpacingChange={setVerseSpacing}
-        hideReadModeVerseNumbers={hideReadModeVerseNumbers}
-        onHideReadModeVerseNumbersChange={setHideReadModeVerseNumbers}
-        readModeParagraphIndent={readModeParagraphIndent}
-        onReadModeParagraphIndentChange={setReadModeParagraphIndent}
-        flowVersesByParagraph={flowVersesByParagraph}
-        onFlowVersesByParagraphChange={setFlowVersesByParagraph}
-        tabsOrientation={tabsOrientation}
-        onTabsOrientationChange={setTabsOrientation}
-      />
+      {isSettingsOpen ? (
+        <Suspense fallback={null}>
+          <LazySettingsDialog
+            open={isSettingsOpen}
+            onOpenChange={setIsSettingsOpen}
+            theme={theme}
+            onThemeChange={setTheme}
+            verseSpacing={verseSpacing}
+            onVerseSpacingChange={setVerseSpacing}
+            hideReadModeVerseNumbers={hideReadModeVerseNumbers}
+            onHideReadModeVerseNumbersChange={setHideReadModeVerseNumbers}
+            readModeParagraphIndent={readModeParagraphIndent}
+            onReadModeParagraphIndentChange={setReadModeParagraphIndent}
+            flowVersesByParagraph={flowVersesByParagraph}
+            onFlowVersesByParagraphChange={setFlowVersesByParagraph}
+            tabsOrientation={tabsOrientation}
+            onTabsOrientationChange={setTabsOrientation}
+          />
+        </Suspense>
+      ) : null}
 
-      <ProgressDialog
-        open={isProgressOpen}
-        onOpenChange={setIsProgressOpen}
-        totalProgressPercent={totalProgressPercent}
-        progressByTestament={progressByTestament}
-        onSetAllBookChaptersRead={setAllBookChaptersRead}
-        onOpenChapterInNewTab={openChapterInNewTab}
-        onToggleChapterRead={toggleChapterRead}
-        onResetAllProgress={resetAllProgress}
-      />
+      {isProgressOpen ? (
+        <Suspense fallback={null}>
+          <LazyProgressDialog
+            open={isProgressOpen}
+            onOpenChange={setIsProgressOpen}
+            totalProgressPercent={totalProgressPercent}
+            progressByTestament={progressByTestament}
+            onSetAllBookChaptersRead={setAllBookChaptersRead}
+            onOpenChapterInNewTab={openChapterInNewTab}
+            onToggleChapterRead={toggleChapterRead}
+            onResetAllProgress={resetAllProgress}
+          />
+        </Suspense>
+      ) : null}
     </main>
   );
 }
