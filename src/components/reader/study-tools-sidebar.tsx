@@ -20,6 +20,7 @@ type StudyToolsSidebarProps = {
   canCollapse: boolean;
   toolsContent: ReactNode;
   notesContent: ReactNode;
+  bookmarksContent: ReactNode;
 };
 
 export function StudyToolsSidebar({
@@ -32,8 +33,9 @@ export function StudyToolsSidebar({
   canCollapse,
   toolsContent,
   notesContent,
+  bookmarksContent,
 }: StudyToolsSidebarProps) {
-  const [activeTab, setActiveTab] = useState<"tools" | "notes">("tools");
+  const [activeTab, setActiveTab] = useState<"tools" | "notes" | "bookmarks">("tools");
 
   if (!visible) {
     return null;
@@ -59,6 +61,14 @@ export function StudyToolsSidebar({
             onClick={() => setActiveTab("notes")}
           >
             Notes
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={activeTab === "bookmarks" ? "default" : "outline"}
+            onClick={() => setActiveTab("bookmarks")}
+          >
+            Bookmarks
           </Button>
         </div>
       </SidebarHeader>
@@ -96,8 +106,10 @@ export function StudyToolsSidebar({
               {toolsContent}
             </Accordion>
           </div>
-        ) : (
+        ) : activeTab === "notes" ? (
           <div className="w-full rounded-md border p-2">{notesContent}</div>
+        ) : (
+          <div className="w-full rounded-md border p-2">{bookmarksContent}</div>
         )}
       </SidebarContent>
     </Sidebar>

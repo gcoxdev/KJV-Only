@@ -2,6 +2,7 @@ import { Fragment, memo, useMemo } from "react";
 
 import type { Verse, VerseToken } from "@/types/bible";
 import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export function isPunctuationToken(tokenText: string) {
   return /^[,.;:!?)]/.test(tokenText);
@@ -81,6 +82,9 @@ type ChapterTextContentProps = {
   readModeParagraphIndent: boolean;
   showVerseNumbers: boolean;
   isStudyMode: boolean;
+  enableVerseSelection: boolean;
+  bookmarkModeEnabled: boolean;
+  pendingRangeStartVerseNumber: number | null;
   verseSpacing: number;
   onOpenTokenDetails: (element: HTMLElement, token: VerseToken) => void;
   onSelectVerse: (verseNumber: number) => void;
@@ -95,6 +99,9 @@ export const ChapterTextContent = memo(
     readModeParagraphIndent,
     showVerseNumbers,
     isStudyMode,
+    enableVerseSelection,
+    bookmarkModeEnabled,
+    pendingRangeStartVerseNumber,
     verseSpacing,
     onOpenTokenDetails,
     onSelectVerse,
@@ -119,7 +126,10 @@ export const ChapterTextContent = memo(
     }, [verses]);
 
     return (
-      <div className="flex w-full flex-col p-2" style={{ rowGap: `${verseSpacing}px` }}>
+      <div
+        className="flex w-full flex-col p-2"
+        style={{ rowGap: `${verseSpacing}px` }}
+      >
         {flowVersesByParagraph
           ? paragraphGroups.map((group, groupIndex) => (
               <article
@@ -127,13 +137,16 @@ export const ChapterTextContent = memo(
                 data-verse-number={group[0]?.verse ?? 1}
                 className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
                 onClick={(event) => {
-                  if (!isStudyMode) {
+                  if (!enableVerseSelection) {
                     return;
                   }
                   const target = event.target as HTMLElement;
-                  const withVerse = target.closest<HTMLElement>("[data-verse-number]");
+                  const withVerse = target.closest<HTMLElement>(
+                    "[data-verse-number]",
+                  );
                   const fallbackVerse = group[0]?.verse ?? 1;
-                  const raw = withVerse?.dataset.verseNumber ?? `${fallbackVerse}`;
+                  const raw =
+                    withVerse?.dataset.verseNumber ?? `${fallbackVerse}`;
                   const verseNumber = Number.parseInt(raw, 10);
                   if (Number.isFinite(verseNumber) && verseNumber > 0) {
                     onSelectVerse(verseNumber);
@@ -143,24 +156,49 @@ export const ChapterTextContent = memo(
                 <p
                   className="text-pretty leading-7"
                   style={
-                    readModeParagraphIndent && (groupIndex === 0 || group[0]?.paragraphStart)
+                    readModeParagraphIndent &&
+                    (groupIndex === 0 || group[0]?.paragraphStart)
                       ? { textIndent: "1.5rem" }
                       : undefined
                   }
                 >
                   {group.map((verse, verseIndex) => (
-                    <Fragment key={`${bookName}-${chapterNumber}-${verse.verse}`}>
+                    <Fragment
+                      key={`${bookName}-${chapterNumber}-${verse.verse}`}
+                    >
                       {verseIndex > 0 ? " " : null}
                       <span
                         data-verse-number={verse.verse}
                         className={cn(verse.redLetter && "text-red-700")}
                       >
+                        {bookmarkModeEnabled ? (
+                          <span
+                            className="mr-1 inline-flex h-7 items-center align-top"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                            }}
+                          >
+                            <Checkbox
+                              checked={
+                                pendingRangeStartVerseNumber === verse.verse
+                              }
+                              aria-label={`Select verse ${verse.verse} for bookmark`}
+                              onCheckedChange={() => {
+                                onSelectVerse(verse.verse);
+                              }}
+                            />
+                          </span>
+                        ) : null}
                         {showVerseNumbers ? (
-                          <span className="mr-2 inline-flex w-7 shrink-0 justify-end align-top text-xs font-semibold tabular-nums text-muted-foreground">
+                          <span className="mr-2 inline-flex w-7 shrink-0 justify-end text-xs leading-7 font-semibold tabular-nums text-muted-foreground">
                             {verse.verse}
                           </span>
                         ) : null}
-                        {renderVerseTokens(verse.tokens, isStudyMode, onOpenTokenDetails)}
+                        {renderVerseTokens(
+                          verse.tokens,
+                          isStudyMode,
+                          onOpenTokenDetails,
+                        )}
                       </span>
                     </Fragment>
                   ))}
@@ -173,7 +211,7 @@ export const ChapterTextContent = memo(
                 data-verse-number={verse.verse}
                 className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
                 onClick={() => {
-                  if (isStudyMode) {
+                  if (enableVerseSelection) {
                     onSelectVerse(verse.verse);
                   }
                 }}
@@ -181,24 +219,50 @@ export const ChapterTextContent = memo(
                 <p
                   className={cn(
                     "leading-7",
-                    showVerseNumbers &&
-                      "grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-x-2",
+                    (showVerseNumbers || bookmarkModeEnabled) &&
+                      "grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2",
                   )}
                 >
-                  {showVerseNumbers ? (
-                    <span className="inline-flex w-7 shrink-0 justify-start align-top text-xs font-semibold tabular-nums text-muted-foreground">
-                      {verse.verse}
-                    </span>
-                  ) : null}
+                  <span className="inline-flex items-center gap-1">
+                    {bookmarkModeEnabled ? (
+                      <span
+                        className="inline-flex h-7 items-center align-top"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                        }}
+                      >
+                        <Checkbox
+                          checked={pendingRangeStartVerseNumber === verse.verse}
+                          aria-label={`Select verse ${verse.verse} for bookmark`}
+                          onCheckedChange={() => {
+                            onSelectVerse(verse.verse);
+                          }}
+                        />
+                      </span>
+                    ) : null}
+                    {showVerseNumbers ? (
+                      <span className="inline-flex w-7 shrink-0 justify-start text-xs leading-7 font-semibold tabular-nums text-muted-foreground">
+                        {verse.verse}
+                      </span>
+                    ) : null}
+                  </span>
                   <span
-                    className={cn("text-pretty", verse.redLetter && "text-red-700")}
+                    className={cn(
+                      "text-pretty",
+                      verse.redLetter && "text-red-700",
+                    )}
                     style={
-                      readModeParagraphIndent && (verse.verse === 1 || verse.paragraphStart)
+                      readModeParagraphIndent &&
+                      (verse.verse === 1 || verse.paragraphStart)
                         ? { textIndent: "1.5rem" }
                         : undefined
                     }
                   >
-                    {renderVerseTokens(verse.tokens, isStudyMode, onOpenTokenDetails)}
+                    {renderVerseTokens(
+                      verse.tokens,
+                      isStudyMode,
+                      onOpenTokenDetails,
+                    )}
                   </span>
                 </p>
               </article>
@@ -214,5 +278,8 @@ export const ChapterTextContent = memo(
     prev.readModeParagraphIndent === next.readModeParagraphIndent &&
     prev.showVerseNumbers === next.showVerseNumbers &&
     prev.isStudyMode === next.isStudyMode &&
+    prev.enableVerseSelection === next.enableVerseSelection &&
+    prev.bookmarkModeEnabled === next.bookmarkModeEnabled &&
+    prev.pendingRangeStartVerseNumber === next.pendingRangeStartVerseNumber &&
     prev.verseSpacing === next.verseSpacing,
 );

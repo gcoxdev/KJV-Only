@@ -9,6 +9,7 @@ import { MapsTool } from "@/components/reader/study-tools/maps-tool";
 import { GenealogyTool } from "@/components/reader/study-tools/genealogy-tool";
 import { HitchcocksTool } from "@/components/reader/study-tools/hitchcocks-tool";
 import { NotesTool } from "@/components/reader/study-tools/notes-tool";
+import { BookmarksTool } from "@/components/reader/study-tools/bookmarks-tool";
 import { StudyToolsSidebar } from "@/components/reader/study-tools-sidebar";
 
 type ReaderStudySidebarProps = {
@@ -28,6 +29,7 @@ type ReaderStudySidebarProps = {
   genealogyProps: ComponentProps<typeof GenealogyTool>;
   hitchcocksProps: ComponentProps<typeof HitchcocksTool>;
   notesProps: ComponentProps<typeof NotesTool>;
+  bookmarksProps: ComponentProps<typeof BookmarksTool>;
 };
 
 export function ReaderStudySidebar({
@@ -47,6 +49,7 @@ export function ReaderStudySidebar({
   genealogyProps,
   hitchcocksProps,
   notesProps,
+  bookmarksProps,
 }: ReaderStudySidebarProps) {
   return (
     <StudyToolsSidebar
@@ -58,6 +61,7 @@ export function ReaderStudySidebar({
       canExpand={canExpand}
       canCollapse={canCollapse}
       notesContent={<NotesTool {...notesProps} />}
+      bookmarksContent={<BookmarksTool {...bookmarksProps} />}
       toolsContent={
         <>
           <CrossRefsTool {...crossRefsProps} />

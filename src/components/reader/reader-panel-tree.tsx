@@ -70,6 +70,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import type { LeafNeighbors } from "@/lib/reader-neighbors";
 import type { NotesContext, NotesTabState, ReaderNote } from "@/types/notes";
+import type { BookmarkPoint } from "@/types/bookmarks";
 
 type ExistingTabTarget = {
   id: string;
@@ -169,6 +170,10 @@ type ReaderPanelTreeProps = {
   moveLeafChapter: (leafId: string, step: -1 | 1) => void;
   toggleChapterRead: (bookIndex: number, chapterIndex: number) => void;
   updateSplitSize: (splitId: string, ratio: number) => void;
+  bookmarkModeEnabled: boolean;
+  pendingBookmarkRangeStart: BookmarkPoint | null;
+  highlightedVerseRangesByLeafId: Record<string, { start: number; end: number }>;
+  onClearLeafHighlights: (leafId: string) => void;
 };
 
 export const ReaderPanelTree = memo(function ReaderPanelTree({
@@ -225,6 +230,10 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   moveLeafChapter,
   toggleChapterRead,
   updateSplitSize,
+  bookmarkModeEnabled,
+  pendingBookmarkRangeStart,
+  highlightedVerseRangesByLeafId,
+  onClearLeafHighlights,
 }: ReaderPanelTreeProps) {
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
   const pendingAutoPlayLeafIdsRef = useRef<Set<string>>(new Set());
@@ -494,7 +503,14 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
     const audioPlaying = audioPlayingByLeafId[leaf.id] ?? false;
     const audioErrored = audioErroredByLeafId[leaf.id] ?? false;
     const effectiveVolume = audioMuted ? 0 : audioVolume;
+    const pendingRangeStartVerseNumber =
+      pendingBookmarkRangeStart &&
+      pendingBookmarkRangeStart.bookIndex === leaf.bookIndex &&
+      pendingBookmarkRangeStart.chapterIndex === leaf.chapterIndex
+        ? pendingBookmarkRangeStart.verseNumber
+        : null;
     const isFullscreenLeaf = fullscreenLeafId === leaf.id;
+    const hasHighlightInLeaf = Boolean(highlightedVerseRangesByLeafId[leaf.id]);
     const closePanelMenu = () => {
       setPanelMenuOpenLeafId(null);
       clearAllPanelPreviews();
@@ -580,6 +596,17 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
                     {isFullscreenLeaf ? <MinimizeIcon /> : <ExpandIcon />}
                     {isFullscreenLeaf ? "Exit Full Screen" : "Full Screen"}
                   </DropdownMenuItem>
+                  {hasHighlightInLeaf ? (
+                    <DropdownMenuItem
+                      onClick={() => {
+                        onClearLeafHighlights(leaf.id);
+                        closePanelMenu();
+                      }}
+                    >
+                      <XIcon />
+                      Clear Highlights
+                    </DropdownMenuItem>
+                  ) : null}
                   {!isFullscreenLeaf ? (
                     <>
                       {parentSplit ? (
@@ -782,6 +809,9 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
                     readModeParagraphIndent={readModeParagraphIndent}
                     showVerseNumbers={showVerseNumbers}
                     isStudyMode={isStudyMode}
+                    enableVerseSelection={isStudyMode || bookmarkModeEnabled}
+                    bookmarkModeEnabled={bookmarkModeEnabled}
+                    pendingRangeStartVerseNumber={pendingRangeStartVerseNumber}
                     verseSpacing={verseSpacing}
                     onOpenTokenDetails={(element, token) =>
                       onOpenTokenDetails(
