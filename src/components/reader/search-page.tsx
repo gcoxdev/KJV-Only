@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import type { Book, Verse } from "@/types/bible";
+import type { SearchMatch, SearchMode, SearchPageState } from "@/types/reader";
 import { formatDisplayTokenText, isPunctuationToken } from "@/components/reader/chapter-text-content";
 import { bookCodeForIndex, iconPath } from "@/lib/reader-view";
 import { Button } from "@/components/ui/button";
@@ -32,26 +33,18 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
-type SearchMode = "contains-any" | "contains-all" | "contains-phrase" | "regex";
-
 type SearchPageProps = {
   books: Book[];
   concordanceWords: string[];
   ensureConcordanceWordsLoaded: () => Promise<unknown>;
+  state: SearchPageState;
+  onStateChange: (patch: Partial<SearchPageState>) => void;
   onOpenResult: (
     bookIndex: number,
     chapterIndex: number,
     verseStart: number,
     verseEnd?: number,
   ) => void;
-};
-
-type SearchMatch = {
-  bookIndex: number;
-  chapterIndex: number;
-  verseNumber: number;
-  bookName: string;
-  text: string;
 };
 
 type VerseIndexEntry = SearchMatch & {
@@ -107,23 +100,31 @@ export function SearchPage({
   books,
   concordanceWords,
   ensureConcordanceWordsLoaded,
+  state,
+  onStateChange,
   onOpenResult,
 }: SearchPageProps) {
-  const [searchMode, setSearchMode] = useState<SearchMode>("contains-any");
-  const [caseSensitive, setCaseSensitive] = useState(false);
-  const [chipInput, setChipInput] = useState("");
-  const [phraseInput, setPhraseInput] = useState("");
-  const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [isBookFilterOpen, setIsBookFilterOpen] = useState(false);
-  const [expandedBookTree, setExpandedBookTree] = useState<Set<string>>(
-    () => new Set(["entire", "old", "new"]),
-  );
-  const [selectedBookIndexes, setSelectedBookIndexes] = useState<Set<number>>(
-    () => new Set(books.map((_, index) => index)),
-  );
-  const [results, setResults] = useState<SearchMatch[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+
+  const {
+    searchMode,
+    caseSensitive,
+    chipInput,
+    phraseInput,
+    selectedWords,
+    results,
+    error,
+  } = state;
+
+  const expandedBookTree = useMemo(
+    () => new Set(state.expandedBookTree),
+    [state.expandedBookTree],
+  );
+  const selectedBookIndexes = useMemo(
+    () => new Set(state.selectedBookIndexes),
+    [state.selectedBookIndexes],
+  );
 
   const openBookFilterDialog = () => {
     const activeElement = document.activeElement;
@@ -137,17 +138,21 @@ export function SearchPage({
 
   useEffect(() => {
     const nextAll = new Set(books.map((_, index) => index));
-    if (selectedBookIndexes.size === 0 || selectedBookIndexes.size > books.length) {
-      setSelectedBookIndexes(nextAll);
+    if (
+      state.selectedBookIndexes.length === 0 ||
+      selectedBookIndexes.size === 0 ||
+      selectedBookIndexes.size > books.length
+    ) {
+      onStateChange({ selectedBookIndexes: Array.from(nextAll) });
       return;
     }
     for (const selected of selectedBookIndexes) {
       if (selected >= books.length) {
-        setSelectedBookIndexes(nextAll);
+        onStateChange({ selectedBookIndexes: Array.from(nextAll) });
         return;
       }
     }
-  }, [books, selectedBookIndexes]);
+  }, [books, onStateChange, selectedBookIndexes, state.selectedBookIndexes.length]);
 
   useEffect(() => {
     if (searchMode === "contains-any" || searchMode === "contains-all") {
@@ -183,8 +188,7 @@ export function SearchPage({
     const selected = new Set(selectedWords.map((word) => word.toLowerCase()));
     return concordanceWords
       .filter((word) => word.toLowerCase().includes(query))
-      .filter((word) => !selected.has(word.toLowerCase()))
-      .slice(0, 50);
+      .filter((word) => !selected.has(word.toLowerCase()));
   }, [chipInput, concordanceWords, selectedWords]);
 
   const allBookIndexes = useMemo(
@@ -226,7 +230,8 @@ export function SearchPage({
   const selectedBookCount = selectedBookIndexes.size;
 
   const toggleTreeNode = (nodeId: string) => {
-    setExpandedBookTree((current) => {
+    const next = (() => {
+      const current = new Set(state.expandedBookTree);
       const next = new Set(current);
       if (next.has(nodeId)) {
         next.delete(nodeId);
@@ -234,7 +239,8 @@ export function SearchPage({
         next.add(nodeId);
       }
       return next;
-    });
+    })();
+    onStateChange({ expandedBookTree: Array.from(next) });
   };
 
   const addWordChip = (word: string) => {
@@ -243,24 +249,28 @@ export function SearchPage({
       return;
     }
     const lowerClean = clean.toLowerCase();
-    setSelectedWords((current) => {
+    const next = (() => {
+      const current = state.selectedWords;
       if (current.some((item) => item.toLowerCase() === lowerClean)) {
         return current;
       }
       return [...current, clean];
-    });
-    setChipInput("");
+    })();
+    onStateChange({ selectedWords: next, chipInput: "" });
   };
 
   const removeWordChip = (word: string) => {
     const lowerWord = word.toLowerCase();
-    setSelectedWords((current) =>
-      current.filter((item) => item.toLowerCase() !== lowerWord),
-    );
+    onStateChange({
+      selectedWords: state.selectedWords.filter(
+        (item) => item.toLowerCase() !== lowerWord,
+      ),
+    });
   };
 
   const toggleBookSelection = (bookIndex: number, nextChecked: boolean) => {
-    setSelectedBookIndexes((current) => {
+    const next = (() => {
+      const current = new Set(state.selectedBookIndexes);
       const next = new Set(current);
       if (nextChecked) {
         next.add(bookIndex);
@@ -268,11 +278,13 @@ export function SearchPage({
         next.delete(bookIndex);
       }
       return next;
-    });
+    })();
+    onStateChange({ selectedBookIndexes: Array.from(next) });
   };
 
   const setIndicesSelection = (indices: number[], nextChecked: boolean) => {
-    setSelectedBookIndexes((current) => {
+    const next = (() => {
+      const current = new Set(state.selectedBookIndexes);
       const next = new Set(current);
       indices.forEach((index) => {
         if (nextChecked) {
@@ -282,25 +294,30 @@ export function SearchPage({
         }
       });
       return next;
-    });
+    })();
+    onStateChange({ selectedBookIndexes: Array.from(next) });
   };
 
   const search = () => {
-    setError(null);
+    onStateChange({ error: null });
     let matcher: ((entry: VerseIndexEntry) => boolean) | null = null;
 
     if (searchMode === "contains-any" || searchMode === "contains-all") {
       if (selectedWords.length === 0) {
-        setError("Select at least one word for this search mode.");
-        setResults([]);
+        onStateChange({
+          error: "Select at least one word for this search mode.",
+          results: [],
+        });
         return;
       }
       const needles = caseSensitive
         ? selectedWords.map((word) => word.trim()).filter(Boolean)
         : selectedWords.map((word) => word.trim().toLowerCase()).filter(Boolean);
       if (needles.length === 0) {
-        setError("Select at least one word for this search mode.");
-        setResults([]);
+        onStateChange({
+          error: "Select at least one word for this search mode.",
+          results: [],
+        });
         return;
       }
       matcher =
@@ -318,8 +335,7 @@ export function SearchPage({
     if (searchMode === "contains-phrase") {
       const phrase = phraseInput.trim();
       if (!phrase) {
-        setError("Enter a phrase to search.");
-        setResults([]);
+        onStateChange({ error: "Enter a phrase to search.", results: [] });
         return;
       }
       const needle = caseSensitive ? phrase : phrase.toLowerCase();
@@ -330,8 +346,7 @@ export function SearchPage({
     if (searchMode === "regex") {
       const pattern = phraseInput.trim();
       if (!pattern) {
-        setError("Enter a regular expression.");
-        setResults([]);
+        onStateChange({ error: "Enter a regular expression.", results: [] });
         return;
       }
       try {
@@ -340,14 +355,13 @@ export function SearchPage({
       } catch (regexError) {
         const message =
           regexError instanceof Error ? regexError.message : "Invalid regular expression.";
-        setError(message);
-        setResults([]);
+        onStateChange({ error: message, results: [] });
         return;
       }
     }
 
     if (!matcher) {
-      setResults([]);
+      onStateChange({ results: [] });
       return;
     }
 
@@ -365,7 +379,7 @@ export function SearchPage({
           bookName,
           text,
         }));
-      setResults(matches);
+      onStateChange({ results: matches });
       setIsSearching(false);
     });
   };
@@ -377,7 +391,7 @@ export function SearchPage({
       <div className="flex flex-wrap items-center gap-2">
         <Select
           value={searchMode}
-          onValueChange={(value) => setSearchMode(value as SearchMode)}
+          onValueChange={(value) => onStateChange({ searchMode: value as SearchMode })}
         >
           <SelectTrigger className="w-[13rem]">
             <SelectValue>{SEARCH_MODE_LABELS[searchMode]}</SelectValue>
@@ -399,7 +413,9 @@ export function SearchPage({
         <label className="inline-flex items-center gap-2 text-sm">
           <Checkbox
             checked={caseSensitive}
-            onCheckedChange={(value) => setCaseSensitive(isChecked(value))}
+            onCheckedChange={(value) =>
+              onStateChange({ caseSensitive: isChecked(value) })
+            }
           />
           Case-sensitive
         </label>
@@ -438,7 +454,9 @@ export function SearchPage({
             <Input
               id="search-chip-input"
               value={chipInput}
-              onChange={(event) => setChipInput(event.currentTarget.value)}
+              onChange={(event) =>
+                onStateChange({ chipInput: event.currentTarget.value })
+              }
               onKeyDown={(event) => {
                 if (event.key !== "Enter") {
                   return;
@@ -452,7 +470,7 @@ export function SearchPage({
               placeholder="Type to find concordance words..."
             />
             {chipInput.trim() ? (
-              <ScrollArea className="mt-2 h-40 rounded border">
+              <div className="mt-2 max-h-40 overflow-y-auto rounded border">
                 <div className="p-1">
                   {concordanceSuggestions.length > 0 ? (
                     concordanceSuggestions.map((word) => (
@@ -471,7 +489,7 @@ export function SearchPage({
                     </p>
                   )}
                 </div>
-              </ScrollArea>
+              </div>
             ) : null}
           </div>
         </div>
@@ -483,7 +501,9 @@ export function SearchPage({
           <Input
             id="search-phrase-input"
             value={phraseInput}
-            onChange={(event) => setPhraseInput(event.currentTarget.value)}
+            onChange={(event) =>
+              onStateChange({ phraseInput: event.currentTarget.value })
+            }
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();
@@ -509,12 +529,12 @@ export function SearchPage({
 
       <Separator />
 
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <p className="mb-2 px-1 text-sm font-medium text-muted-foreground">
           {`Results - ${results.length} matches found`}
         </p>
-        <ScrollArea className="h-full rounded border">
-          <div className="divide-y">
+        <ScrollArea className="min-h-0 flex-1 rounded border">
+          <div className="divide-y pb-2">
             {results.length === 0 ? (
               <p className="p-3 text-sm text-muted-foreground">
                 Run a search to see matching verses.

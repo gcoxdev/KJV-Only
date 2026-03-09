@@ -40,6 +40,7 @@ import type {
   LeafNode,
   PanelDirection,
   PanelNode,
+  SearchPageState,
 } from "@/types/reader";
 import { cn } from "@/lib/utils";
 import {
@@ -195,6 +196,11 @@ type ReaderPanelTreeProps = {
   bookmarkModeEnabled: boolean;
   pendingBookmarkRangeStart: BookmarkPoint | null;
   highlightedVerseRangesByLeafId: Record<string, { start: number; end: number }>;
+  searchPageStateByLeafId: Record<string, SearchPageState>;
+  onChangeSearchPageState: (
+    leafId: string,
+    patch: Partial<SearchPageState>,
+  ) => void;
   onClearLeafHighlights: (leafId: string) => void;
 };
 
@@ -258,6 +264,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   notesContext,
   notesTabStateByLeafId,
   onChangeNotesTabState,
+  searchPageStateByLeafId,
+  onChangeSearchPageState,
   onCreateGeneralNote,
   onCreateContextNote,
   onUpdateNote,
@@ -970,6 +978,20 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 books={books}
                 concordanceWords={concordanceWords}
                 ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
+                state={
+                  searchPageStateByLeafId[leaf.id] ?? {
+                    searchMode: "contains-any",
+                    caseSensitive: false,
+                    chipInput: "",
+                    phraseInput: "",
+                    selectedWords: [],
+                    expandedBookTree: ["entire", "old", "new"],
+                    selectedBookIndexes: [],
+                    results: [],
+                    error: null,
+                  }
+                }
+                onStateChange={(patch) => onChangeSearchPageState(leaf.id, patch)}
                 onOpenResult={onOpenSearchResult}
               />
             </Suspense>
@@ -1086,6 +1108,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   notesContext,
   notesTabStateByLeafId,
   onChangeNotesTabState,
+  searchPageStateByLeafId,
+  onChangeSearchPageState,
   onCreateGeneralNote,
   onCreateContextNote,
   onUpdateNote,
@@ -1147,6 +1171,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       notesContext={notesContext}
       notesTabStateByLeafId={notesTabStateByLeafId}
       onChangeNotesTabState={onChangeNotesTabState}
+      searchPageStateByLeafId={searchPageStateByLeafId}
+      onChangeSearchPageState={onChangeSearchPageState}
       onCreateGeneralNote={onCreateGeneralNote}
       onCreateContextNote={onCreateContextNote}
       onUpdateNote={onUpdateNote}
