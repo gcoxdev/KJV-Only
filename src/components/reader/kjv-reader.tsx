@@ -33,12 +33,7 @@ import {
   resolveOldEnglishKey,
   resolveWebstersKey,
 } from "@/lib/references";
-import { noteMatchesContext } from "@/lib/notes";
-import {
-  bookmarkCanonicalKey,
-  bookmarkScopeLabel,
-  normalizeRangePoints,
-} from "@/lib/bookmarks";
+import { normalizeRangePoints } from "@/lib/bookmarks";
 import {
   chapterProgressKey,
   panelViewportElement,
@@ -83,16 +78,7 @@ import type {
   WebstersEntry,
   WebstersPayload,
 } from "@/types/reader";
-import type {
-  NotesContext,
-  NotesTabState,
-  ReaderNote,
-} from "@/types/notes";
-import type {
-  BookmarkPoint,
-  BookmarkScope,
-  ReaderBookmark,
-} from "@/types/bookmarks";
+import type { BookmarkPoint, ReaderBookmark } from "@/types/bookmarks";
 import {
   SidebarInset,
   SidebarProvider,
@@ -108,6 +94,9 @@ import { useStrongsSearchTool } from "@/hooks/use-strongs-search-tool";
 import { useGenealogySearchTool } from "@/hooks/use-genealogy-search-tool";
 import { useMapsSearchTool } from "@/hooks/use-maps-search-tool";
 import { useConcordanceCrossRefsTool } from "@/hooks/use-concordance-crossrefs-tool";
+import { useReaderBookmarks } from "@/hooks/use-reader-bookmarks";
+import { useReaderNotes } from "@/hooks/use-reader-notes";
+import { useVerseHighlights } from "@/hooks/use-verse-highlights";
 import {
   STUDY_ACCORDION_ITEMS,
   deriveStudySidebarState,
@@ -177,14 +166,6 @@ export function KJVReader() {
     string | null
   >(null);
   const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
-  const [readerNotes, setReaderNotes] = useState<ReaderNote[]>([]);
-  const [notesContext, setNotesContext] = useState<NotesContext | null>(null);
-  const [notesTabStateByLeafId, setNotesTabStateByLeafId] = useState<
-    Record<string, NotesTabState>
-  >({});
-  const [readerBookmarks, setReaderBookmarks] = useState<ReaderBookmark[]>([]);
-  const [bookmarkModeEnabled, setBookmarkModeEnabled] = useState(false);
-  const [pendingBookmarkRangeStart, setPendingBookmarkRangeStart] = useState<BookmarkPoint | null>(null);
   const [concordanceAccordionValue, setConcordanceAccordionValue] = useState<
     string[]
   >([]);
@@ -220,12 +201,6 @@ export function KJVReader() {
   } = useMapDialogState({
     loadMapGeoJsonByFile: loadMapGeoJson,
   });
-  const [pendingVerseHighlights, setPendingVerseHighlights] = useState<
-    Record<string, { start: number; end: number }>
-  >({});
-  const [highlightedVerseRangesByLeafId, setHighlightedVerseRangesByLeafId] = useState<
-    Record<string, { start: number; end: number }>
-  >({});
   const tabEndRef = useRef<HTMLDivElement>(null);
   const strongsSearchInputRef = useRef<HTMLInputElement | null>(null);
   const panelElementRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -235,7 +210,6 @@ export function KJVReader() {
   const addPreviewIsGroupRef = useRef(false);
   const orientationPreviewLeafIdsRef = useRef<string[]>([]);
   const fullscreenRequestedLeafIdRef = useRef<string | null>(null);
-  const highlightedVerseElementsRef = useRef<HTMLElement[]>([]);
   const domNeighborCacheRef = useRef<{
     root: PanelNode | null;
     neighbors: Map<string, LeafNeighbors>;
@@ -244,35 +218,16 @@ export function KJVReader() {
     neighbors: new Map(),
   });
 
-  const clearAllVerseHighlights = useCallback(() => {
-    for (const highlightedElement of highlightedVerseElementsRef.current) {
-      highlightedElement.classList.remove("verse-reference-highlight");
-    }
-    highlightedVerseElementsRef.current = [];
-    setHighlightedVerseRangesByLeafId({});
-  }, []);
-
-  const clearLeafHighlights = useCallback((leafId: string) => {
-    const panelElement = panelElementRefs.current[leafId];
-    if (panelElement) {
-      panelElement
-        .querySelectorAll<HTMLElement>(".verse-reference-highlight")
-        .forEach((element) => {
-          element.classList.remove("verse-reference-highlight");
-        });
-      highlightedVerseElementsRef.current = highlightedVerseElementsRef.current.filter(
-        (element) => !panelElement.contains(element),
-      );
-    }
-    setHighlightedVerseRangesByLeafId((current) => {
-      if (!current[leafId]) {
-        return current;
-      }
-      const next = { ...current };
-      delete next[leafId];
-      return next;
-    });
-  }, []);
+  const {
+    highlightedVerseRangesByLeafId,
+    clearAllVerseHighlights,
+    clearLeafHighlights,
+    queueVerseHighlight,
+  } = useVerseHighlights({
+    panelElementRefs,
+    activeTabId,
+    tabsVersion: tabs,
+  });
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme");
@@ -290,57 +245,6 @@ export function KJVReader() {
     document.documentElement.classList.toggle("dark", theme === "dark");
     window.localStorage.setItem("theme", theme);
   }, [theme]);
-
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem("kjv-reader-notes-v1");
-      if (!stored) {
-        return;
-      }
-      const parsed = JSON.parse(stored) as ReaderNote[];
-      if (!Array.isArray(parsed)) {
-        return;
-      }
-      setReaderNotes(parsed);
-    } catch {
-      // Ignore invalid stored notes payloads.
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem("kjv-reader-notes-v1", JSON.stringify(readerNotes));
-    } catch {
-      // Ignore persistence errors (quota/private mode edge cases).
-    }
-  }, [readerNotes]);
-
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem("kjv-reader-bookmarks-v1");
-      if (!stored) {
-        return;
-      }
-      const parsed = JSON.parse(stored) as ReaderBookmark[];
-      if (!Array.isArray(parsed)) {
-        return;
-      }
-      setReaderBookmarks(parsed);
-    } catch {
-      // Ignore invalid stored bookmarks payloads.
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(
-        "kjv-reader-bookmarks-v1",
-        JSON.stringify(readerBookmarks),
-      );
-    } catch {
-      // Ignore persistence errors (quota/private mode edge cases).
-    }
-  }, [readerBookmarks]);
 
   useEffect(() => {
     if (isStudyMode) {
@@ -545,36 +449,36 @@ export function KJVReader() {
     readChapters,
   });
 
-  useEffect(() => {
-    if (!activeTab) {
-      return;
-    }
-    const readerLeafId = collectLeafIds(activeTab.root).find((leafId) => {
-      const leaf = findLeafNode(activeTab.root, leafId);
-      return leaf?.view === "reader";
-    });
-    if (!readerLeafId) {
-      return;
-    }
-    const leaf = findLeafNode(activeTab.root, readerLeafId);
-    if (!leaf) {
-      return;
-    }
-    setNotesContext((current) => {
-      if (
-        current?.bookIndex === leaf.bookIndex &&
-        current?.chapterIndex === leaf.chapterIndex &&
-        current?.verseNumber === undefined &&
-        current?.word === undefined
-      ) {
-        return current;
-      }
-      return {
-        bookIndex: leaf.bookIndex,
-        chapterIndex: leaf.chapterIndex,
-      };
-    });
-  }, [activeTab]);
+  const {
+    readerNotes,
+    notesContext,
+    setNotesContext,
+    notesTabStateByLeafId,
+    createGeneralNote,
+    createContextNote,
+    updateNote,
+    deleteNote,
+    changeNotesTabState,
+    initializeNotesTabState,
+    generalNotes,
+    contextNotes,
+  } = useReaderNotes({
+    activeTab,
+  });
+
+  const {
+    readerBookmarks,
+    bookmarkModeEnabled,
+    pendingBookmarkRangeStart,
+    setPendingBookmarkRangeStart,
+    upsertBookmark,
+    updateBookmark,
+    deleteBookmark,
+    toggleBookmarkMode,
+    createChapterBookmark,
+  } = useReaderBookmarks({
+    books,
+  });
 
   const mapWebstersResult = useCallback(
     (key: string, entry: WebstersEntry) => ({ key, entry }),
@@ -802,105 +706,6 @@ export function KJVReader() {
     }
   }, [activeTab, panelMenuOpenLeafId]);
 
-  useEffect(() => {
-    const entries = Object.entries(pendingVerseHighlights);
-    if (entries.length === 0) {
-      return;
-    }
-
-    const rafId = window.requestAnimationFrame(() => {
-      const appliedLeafIds: string[] = [];
-      const appliedLeafRanges: Record<string, { start: number; end: number }> = {};
-      for (const highlightedElement of highlightedVerseElementsRef.current) {
-        highlightedElement.classList.remove("verse-reference-highlight");
-      }
-      highlightedVerseElementsRef.current = [];
-
-      for (const [leafId, verseRange] of entries) {
-        const panelElement = panelElementRefs.current[leafId];
-        const viewport = panelViewportElement(panelElement);
-        if (!viewport || !panelElement) {
-          continue;
-        }
-
-        const verseElements: HTMLElement[] = [];
-        const seen = new Set<HTMLElement>();
-        for (
-          let verseNumber = verseRange.start;
-          verseNumber <= verseRange.end;
-          verseNumber += 1
-        ) {
-          const match =
-            panelElement.querySelector<HTMLElement>(
-              `article[data-verse-number="${verseNumber}"]`,
-            ) ??
-            panelElement.querySelector<HTMLElement>(
-              `[data-verse-number="${verseNumber}"]`,
-            );
-          if (!match || seen.has(match)) {
-            continue;
-          }
-          seen.add(match);
-          verseElements.push(match);
-        }
-        if (verseElements.length === 0) {
-          continue;
-        }
-
-        const viewportRect = viewport.getBoundingClientRect();
-        let blockTop = Number.POSITIVE_INFINITY;
-        let blockBottom = Number.NEGATIVE_INFINITY;
-        for (const verseElement of verseElements) {
-          const rect = verseElement.getBoundingClientRect();
-          const top = rect.top - viewportRect.top + viewport.scrollTop;
-          const bottom = rect.bottom - viewportRect.top + viewport.scrollTop;
-          blockTop = Math.min(blockTop, top);
-          blockBottom = Math.max(blockBottom, bottom);
-          verseElement.classList.add("verse-reference-highlight");
-        }
-        highlightedVerseElementsRef.current = [
-          ...highlightedVerseElementsRef.current,
-          ...verseElements,
-        ];
-
-        const blockHeight = Math.max(1, blockBottom - blockTop);
-        const centeredTop =
-          blockTop - viewport.clientHeight / 2 + blockHeight / 2;
-        const maxTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight);
-        const clampedTop = Math.max(0, Math.min(maxTop, centeredTop));
-
-        viewport.scrollTo({
-          top: clampedTop,
-          behavior: "auto",
-        });
-        window.requestAnimationFrame(() => {
-          viewport.scrollTo({
-            top: clampedTop,
-            behavior: "auto",
-          });
-        });
-
-        appliedLeafIds.push(leafId);
-        appliedLeafRanges[leafId] = { ...verseRange };
-      }
-      setHighlightedVerseRangesByLeafId(appliedLeafRanges);
-
-      if (appliedLeafIds.length > 0) {
-        setPendingVerseHighlights((current) => {
-          const next = { ...current };
-          for (const leafId of appliedLeafIds) {
-            delete next[leafId];
-          }
-          return next;
-        });
-      }
-    });
-
-    return () => {
-      window.cancelAnimationFrame(rafId);
-    };
-  }, [pendingVerseHighlights, activeTabId, tabs]);
-
   const openMapDialogWithImages = useCallback(
     (entry: AncientMapEntry) => {
       openMapDialog(entry);
@@ -910,38 +715,6 @@ export function KJVReader() {
     },
     [ensureMapImagesLoaded, openMapDialog],
   );
-
-  useEffect(() => {
-    for (const highlightedElement of highlightedVerseElementsRef.current) {
-      highlightedElement.classList.remove("verse-reference-highlight");
-    }
-    highlightedVerseElementsRef.current = [];
-
-    if (!activeTab || Object.keys(highlightedVerseRangesByLeafId).length === 0) {
-      return;
-    }
-
-    for (const [leafId, range] of Object.entries(highlightedVerseRangesByLeafId)) {
-      const panelElement = panelElementRefs.current[leafId];
-      if (!panelElement) {
-        continue;
-      }
-      for (let verseNumber = range.start; verseNumber <= range.end; verseNumber += 1) {
-        const verseElement =
-          panelElement.querySelector<HTMLElement>(
-            `article[data-verse-number="${verseNumber}"]`,
-          ) ??
-          panelElement.querySelector<HTMLElement>(
-            `[data-verse-number="${verseNumber}"]`,
-          );
-        if (!verseElement) {
-          continue;
-        }
-        verseElement.classList.add("verse-reference-highlight");
-        highlightedVerseElementsRef.current.push(verseElement);
-      }
-    }
-  }, [activeTab, activeTabId, highlightedVerseRangesByLeafId]);
 
   function updateActiveTab(updater: (tab: ReaderTab) => ReaderTab) {
     if (!activeTabId) {
@@ -1376,14 +1149,11 @@ export function KJVReader() {
           root: nextLeaf,
         },
       ]);
-      setNotesTabStateByLeafId((current) => ({
-        ...current,
-        [nextLeaf.id]: {
-          selectedNoteId: selectedNoteId ?? null,
-          filter: selectedNoteId ? "all" : "context",
-          context: notesContext,
-        },
-      }));
+      initializeNotesTabState(nextLeaf.id, {
+        selectedNoteId: selectedNoteId ?? null,
+        filter: selectedNoteId ? "all" : "context",
+        context: notesContext,
+      });
       setActiveTabId(nextTabId);
       requestAnimationFrame(() => {
         tabEndRef.current?.scrollIntoView({
@@ -1393,209 +1163,7 @@ export function KJVReader() {
         });
       });
     },
-    [notesContext, tabsOrientation],
-  );
-
-  const createGeneralNote = useCallback(() => {
-    const noteId = createId();
-    const now = Date.now();
-    setReaderNotes((current) => [
-      {
-        id: noteId,
-        title: "General note",
-        body: "",
-        scope: { type: "general" },
-        createdAt: now,
-        updatedAt: now,
-      },
-      ...current,
-    ]);
-    return noteId;
-  }, []);
-
-  const createContextNote = useCallback((context: NotesContext | null) => {
-    if (!context) {
-      return null;
-    }
-    const noteId = createId();
-    const now = Date.now();
-    const scope = context.word
-      ? {
-          type: "word" as const,
-          bookIndex: context.bookIndex,
-          chapterIndex: context.chapterIndex,
-          verseNumber: context.verseNumber,
-          word: context.word,
-        }
-      : context.verseNumber
-        ? {
-            type: "verse" as const,
-            bookIndex: context.bookIndex,
-            chapterIndex: context.chapterIndex,
-            verseNumber: context.verseNumber,
-          }
-        : {
-            type: "chapter" as const,
-            bookIndex: context.bookIndex,
-            chapterIndex: context.chapterIndex,
-          };
-    setReaderNotes((current) => [
-      {
-        id: noteId,
-        title: "Context note",
-        body: "",
-        scope,
-        createdAt: now,
-        updatedAt: now,
-      },
-      ...current,
-    ]);
-    return noteId;
-  }, []);
-
-  const updateNote = useCallback(
-    (noteId: string, patch: Partial<Pick<ReaderNote, "title" | "body" | "scope">>) => {
-      const now = Date.now();
-      setReaderNotes((current) =>
-        current.map((note) =>
-          note.id === noteId ? { ...note, ...patch, updatedAt: now } : note,
-        ),
-      );
-    },
-    [],
-  );
-
-  const deleteNote = useCallback((noteId: string) => {
-    setReaderNotes((current) => current.filter((note) => note.id !== noteId));
-  }, []);
-
-  const changeNotesTabState = useCallback(
-    (leafId: string, patch: Partial<NotesTabState>) => {
-      setNotesTabStateByLeafId((current) => ({
-        ...current,
-        [leafId]: {
-          selectedNoteId: current[leafId]?.selectedNoteId ?? null,
-          filter: current[leafId]?.filter ?? "all",
-          context: current[leafId]?.context ?? notesContext,
-          ...patch,
-        },
-      }));
-    },
-    [notesContext],
-  );
-
-  const upsertBookmark = useCallback(
-    (
-      scope: BookmarkScope,
-      patch?: Partial<Pick<ReaderBookmark, "label" | "note">>,
-    ) => {
-      const normalizedScope =
-        scope.type === "range"
-          ? {
-              ...scope,
-              ...normalizeRangePoints(scope.start, scope.end),
-            }
-          : scope;
-      const scopeKey = bookmarkCanonicalKey(normalizedScope);
-      const now = Date.now();
-      const defaultLabel = bookmarkScopeLabel(normalizedScope, books);
-      const nextLabel = patch?.label?.trim() || defaultLabel;
-      const nextNote = patch?.note?.trim() ?? "";
-      let nextBookmarkId = createId();
-
-      setReaderBookmarks((current) => {
-        const existingIndex = current.findIndex(
-          (bookmark) => bookmarkCanonicalKey(bookmark.scope) === scopeKey,
-        );
-
-        if (existingIndex < 0) {
-          return [
-            {
-              id: nextBookmarkId,
-              type: normalizedScope.type,
-              scope: normalizedScope,
-              label: nextLabel,
-              note: nextNote,
-              createdAt: now,
-              updatedAt: now,
-            },
-            ...current,
-          ];
-        }
-
-        const existing = current[existingIndex];
-        nextBookmarkId = existing.id;
-        const updated: ReaderBookmark = {
-          ...existing,
-          type: normalizedScope.type,
-          scope: normalizedScope,
-          label:
-            patch?.label !== undefined
-              ? nextLabel
-              : existing.label || defaultLabel,
-          note: patch?.note !== undefined ? nextNote : existing.note,
-          updatedAt: now,
-        };
-
-        const next = [...current];
-        next.splice(existingIndex, 1);
-        return [updated, ...next];
-      });
-
-      return nextBookmarkId;
-    },
-    [books],
-  );
-
-  const updateBookmark = useCallback(
-    (
-      bookmarkId: string,
-      patch: Partial<Pick<ReaderBookmark, "label" | "note">>,
-    ) => {
-      const now = Date.now();
-      setReaderBookmarks((current) =>
-        current.map((bookmark) =>
-          bookmark.id === bookmarkId
-            ? {
-                ...bookmark,
-                ...(patch.label !== undefined
-                  ? { label: patch.label.trim() }
-                  : null),
-                ...(patch.note !== undefined ? { note: patch.note.trim() } : null),
-                updatedAt: now,
-              }
-            : bookmark,
-        ),
-      );
-    },
-    [],
-  );
-
-  const deleteBookmark = useCallback((bookmarkId: string) => {
-    setReaderBookmarks((current) =>
-      current.filter((bookmark) => bookmark.id !== bookmarkId),
-    );
-  }, []);
-
-  const toggleBookmarkMode = useCallback(() => {
-    setBookmarkModeEnabled((current) => {
-      const next = !current;
-      if (!next) {
-        setPendingBookmarkRangeStart(null);
-      }
-      return next;
-    });
-  }, []);
-
-  const createChapterBookmark = useCallback(
-    (bookIndex: number, chapterIndex: number) => {
-      upsertBookmark({
-        type: "chapter",
-        bookIndex,
-        chapterIndex,
-      });
-    },
-    [upsertBookmark],
+    [initializeNotesTabState, notesContext, tabsOrientation],
   );
 
   function openBookmarkInNewTab(bookmark: ReaderBookmark) {
@@ -1647,10 +1215,7 @@ export function KJVReader() {
         },
       },
     ]);
-    setPendingVerseHighlights((current) => ({
-      ...current,
-      [nextLeaf.id]: { start: verseStart, end: verseEnd },
-    }));
+    queueVerseHighlight(nextLeaf.id, { start: verseStart, end: verseEnd });
     setActiveTabId(nextTabId);
     setIsProgressOpen(false);
     requestAnimationFrame(() => {
@@ -1660,7 +1225,7 @@ export function KJVReader() {
         inline: tabsOrientation === "vertical" ? "nearest" : "end",
       });
     });
-  }, [clearAllVerseHighlights, tabsOrientation]);
+  }, [clearAllVerseHighlights, queueVerseHighlight, tabsOrientation]);
 
   function setAllBookChaptersRead(bookIndex: number, isRead: boolean) {
     const book = books[bookIndex];
@@ -2301,22 +1866,6 @@ export function KJVReader() {
     }
   }
 
-  const generalNotes = useMemo(
-    () =>
-      readerNotes
-        .filter((note) => note.scope.type === "general")
-        .sort((a, b) => b.updatedAt - a.updatedAt),
-    [readerNotes],
-  );
-  const contextNotes = useMemo(
-    () =>
-      readerNotes
-        .filter(
-          (note) => note.scope.type !== "general" && noteMatchesContext(note, notesContext),
-        )
-        .sort((a, b) => b.updatedAt - a.updatedAt),
-    [notesContext, readerNotes],
-  );
   const currentReaderChapterForBookmarks = useMemo(() => {
     if (!activeTab) {
       return null;
