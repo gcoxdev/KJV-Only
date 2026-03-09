@@ -1556,7 +1556,7 @@ export function KJVReader() {
               rawWord.toLowerCase(),
           ),
         );
-        const matchIds = matches.map((person) => person.id);
+        const matchIds = [...new Set(matches.map((person) => person.id))];
         setSelectedGenealogyIds(matchIds);
         setConcordanceAccordionValue((current) => {
           const withoutGenealogy = current.filter(

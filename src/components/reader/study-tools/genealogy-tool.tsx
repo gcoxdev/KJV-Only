@@ -67,7 +67,10 @@ export function GenealogyTool({
             ) : searchTerm.trim() && results.length > 1 ? (
               <Accordion className="w-full rounded-md border px-2" multiple>
                 {results.map((person) => (
-                  <AccordionItem key={person.id} value={`genealogy-${person.id}`}>
+                  <AccordionItem
+                    key={`${person.id}-${person.names[0] ?? "person"}`}
+                    value={`genealogy-${person.id}`}
+                  >
                     <AccordionTrigger>{person.names[0] ?? person.id}</AccordionTrigger>
                     <AccordionContent>{renderPersonDetails(person)}</AccordionContent>
                   </AccordionItem>
