@@ -1,4 +1,13 @@
-import { memo, type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
+import {
+  lazy,
+  memo,
+  Suspense,
+  type ReactNode,
+  type RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   AudioLinesIcon,
   ArrowDownIcon,
@@ -60,8 +69,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ChapterTextContent } from "@/components/reader/chapter-text-content";
-import { SearchPage } from "@/components/reader/search-page";
-import { NotesPage } from "@/components/reader/notes-page";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -82,6 +89,16 @@ type ExistingTabTarget = {
   index: number;
   title: string;
 };
+
+const LazySearchPage = lazy(async () => {
+  const module = await import("@/components/reader/search-page");
+  return { default: module.SearchPage };
+});
+
+const LazyNotesPage = lazy(async () => {
+  const module = await import("@/components/reader/notes-page");
+  return { default: module.NotesPage };
+});
 
 const AUDIO_PLAYBACK_RATE_OPTIONS = Array.from({ length: 10 }, (_, index) => {
   const value = (index + 1) * 0.25;
@@ -939,26 +956,42 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
           </>
         ) : leaf.view === "search" ? (
           <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
-            <SearchPage
-              books={books}
-              concordanceWords={concordanceWords}
-              ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
-              onOpenResult={onOpenSearchResult}
-            />
+            <Suspense
+              fallback={
+                <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                  Loading search...
+                </div>
+              }
+            >
+              <LazySearchPage
+                books={books}
+                concordanceWords={concordanceWords}
+                ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
+                onOpenResult={onOpenSearchResult}
+              />
+            </Suspense>
           </CardContent>
         ) : leaf.view === "notes" ? (
           <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
-            <NotesPage
-              books={books}
-              notes={notes}
-              context={notesContext}
-              tabState={notesTabStateByLeafId[leaf.id] ?? null}
-              onTabStateChange={(patch) => onChangeNotesTabState(leaf.id, patch)}
-              onCreateGeneralNote={onCreateGeneralNote}
-              onCreateContextNote={onCreateContextNote}
-              onUpdateNote={onUpdateNote}
-              onDeleteNote={onDeleteNote}
-            />
+            <Suspense
+              fallback={
+                <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                  Loading notes...
+                </div>
+              }
+            >
+              <LazyNotesPage
+                books={books}
+                notes={notes}
+                context={notesContext}
+                tabState={notesTabStateByLeafId[leaf.id] ?? null}
+                onTabStateChange={(patch) => onChangeNotesTabState(leaf.id, patch)}
+                onCreateGeneralNote={onCreateGeneralNote}
+                onCreateContextNote={onCreateContextNote}
+                onUpdateNote={onUpdateNote}
+                onDeleteNote={onDeleteNote}
+              />
+            </Suspense>
           </CardContent>
         ) : (
           <CardContent className="min-h-0 flex-1 overflow-auto p-2">
