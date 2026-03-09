@@ -1,5 +1,6 @@
-import { memo, type ReactNode, type RefObject, useEffect, useState } from "react";
+import { memo, type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
 import {
+  AudioLinesIcon,
   ArrowDownIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -10,6 +11,8 @@ import {
   ExpandIcon,
   ExternalLinkIcon,
   MinimizeIcon,
+  PauseIcon,
+  PlayIcon,
   RotateCwIcon,
   SplitSquareHorizontalIcon,
   SplitSquareVerticalIcon,
@@ -17,6 +20,9 @@ import {
   SquareChevronLeftIcon,
   SquareChevronRightIcon,
   SquareChevronUpIcon,
+  Volume1Icon,
+  Volume2Icon,
+  VolumeXIcon,
   XIcon,
 } from "lucide-react";
 
@@ -53,6 +59,15 @@ import { SearchPage } from "@/components/reader/search-page";
 import { NotesPage } from "@/components/reader/notes-page";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import type { LeafNeighbors } from "@/lib/reader-neighbors";
 import type { NotesContext, NotesTabState, ReaderNote } from "@/types/notes";
 
@@ -61,6 +76,14 @@ type ExistingTabTarget = {
   index: number;
   title: string;
 };
+
+const AUDIO_PLAYBACK_RATE_OPTIONS = Array.from({ length: 10 }, (_, index) => {
+  const value = (index + 1) * 0.25;
+  return {
+    value,
+    label: `${value.toFixed(2)}x`,
+  };
+});
 
 type LeafLocationPatch = Partial<
   Pick<
@@ -203,8 +226,38 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   toggleChapterRead,
   updateSplitSize,
 }: ReaderPanelTreeProps) {
+  const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
+  const pendingAutoPlayLeafIdsRef = useRef<Set<string>>(new Set());
+  const lastAudioSrcByLeafIdRef = useRef<Record<string, string>>({});
   const [leafScrollProgress, setLeafScrollProgress] = useState<
     Record<string, number>
+  >({});
+  const [audioPlayerVisibleByLeafId, setAudioPlayerVisibleByLeafId] = useState<
+    Record<string, boolean>
+  >({});
+  const [audioAutoPlayByLeafId, setAudioAutoPlayByLeafId] = useState<
+    Record<string, boolean>
+  >({});
+  const [audioMutedByLeafId, setAudioMutedByLeafId] = useState<
+    Record<string, boolean>
+  >({});
+  const [audioVolumeByLeafId, setAudioVolumeByLeafId] = useState<
+    Record<string, number>
+  >({});
+  const [audioPlaybackRateByLeafId, setAudioPlaybackRateByLeafId] = useState<
+    Record<string, number>
+  >({});
+  const [audioCurrentTimeByLeafId, setAudioCurrentTimeByLeafId] = useState<
+    Record<string, number>
+  >({});
+  const [audioDurationByLeafId, setAudioDurationByLeafId] = useState<
+    Record<string, number>
+  >({});
+  const [audioPlayingByLeafId, setAudioPlayingByLeafId] = useState<
+    Record<string, boolean>
+  >({});
+  const [audioErroredByLeafId, setAudioErroredByLeafId] = useState<
+    Record<string, boolean>
   >({});
 
   useEffect(() => {
@@ -223,6 +276,69 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       const next: Record<string, number> = {};
       for (const leafId of leafIds) {
         next[leafId] = current[leafId] ?? 0;
+      }
+      return next;
+    });
+    setAudioPlayerVisibleByLeafId((current) => {
+      const next: Record<string, boolean> = {};
+      for (const leafId of leafIds) {
+        next[leafId] = current[leafId] ?? false;
+      }
+      return next;
+    });
+    setAudioAutoPlayByLeafId((current) => {
+      const next: Record<string, boolean> = {};
+      for (const leafId of leafIds) {
+        next[leafId] = current[leafId] ?? false;
+      }
+      return next;
+    });
+    setAudioMutedByLeafId((current) => {
+      const next: Record<string, boolean> = {};
+      for (const leafId of leafIds) {
+        next[leafId] = current[leafId] ?? false;
+      }
+      return next;
+    });
+    setAudioVolumeByLeafId((current) => {
+      const next: Record<string, number> = {};
+      for (const leafId of leafIds) {
+        next[leafId] = current[leafId] ?? 1;
+      }
+      return next;
+    });
+    setAudioPlaybackRateByLeafId((current) => {
+      const next: Record<string, number> = {};
+      for (const leafId of leafIds) {
+        next[leafId] = current[leafId] ?? 1;
+      }
+      return next;
+    });
+    setAudioCurrentTimeByLeafId((current) => {
+      const next: Record<string, number> = {};
+      for (const leafId of leafIds) {
+        next[leafId] = current[leafId] ?? 0;
+      }
+      return next;
+    });
+    setAudioDurationByLeafId((current) => {
+      const next: Record<string, number> = {};
+      for (const leafId of leafIds) {
+        next[leafId] = current[leafId] ?? 0;
+      }
+      return next;
+    });
+    setAudioPlayingByLeafId((current) => {
+      const next: Record<string, boolean> = {};
+      for (const leafId of leafIds) {
+        next[leafId] = current[leafId] ?? false;
+      }
+      return next;
+    });
+    setAudioErroredByLeafId((current) => {
+      const next: Record<string, boolean> = {};
+      for (const leafId of leafIds) {
+        next[leafId] = current[leafId] ?? false;
       }
       return next;
     });
@@ -305,6 +421,15 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
     };
   }, [panelElementRefs, root]);
 
+  const formatAudioTime = (totalSeconds: number) => {
+    if (!Number.isFinite(totalSeconds) || totalSeconds < 0) {
+      return "0:00";
+    }
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
   const renderLeaf = (leaf: LeafNode) => {
     const book = books[leaf.bookIndex] ?? null;
     const chapter: Chapter | null = book?.chapters[leaf.chapterIndex] ?? null;
@@ -356,6 +481,19 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
     const refIndex = chapterRefIndex.get(key) ?? -1;
     const hasPrev = refIndex > 0;
     const hasNext = refIndex >= 0 && refIndex < chapterRefCount - 1;
+    const audioSrc = chapter
+      ? `/audio/${bookCodeForIndex(leaf.bookIndex)}.${chapter.chapter}.mp3`
+      : null;
+    const audioVisible = audioPlayerVisibleByLeafId[leaf.id] ?? false;
+    const audioAutoPlay = audioAutoPlayByLeafId[leaf.id] ?? false;
+    const audioMuted = audioMutedByLeafId[leaf.id] ?? false;
+    const audioVolume = audioVolumeByLeafId[leaf.id] ?? 1;
+    const audioPlaybackRate = audioPlaybackRateByLeafId[leaf.id] ?? 1;
+    const audioCurrentTime = audioCurrentTimeByLeafId[leaf.id] ?? 0;
+    const audioDuration = audioDurationByLeafId[leaf.id] ?? 0;
+    const audioPlaying = audioPlayingByLeafId[leaf.id] ?? false;
+    const audioErrored = audioErroredByLeafId[leaf.id] ?? false;
+    const effectiveVolume = audioMuted ? 0 : audioVolume;
     const isFullscreenLeaf = fullscreenLeafId === leaf.id;
     const closePanelMenu = () => {
       setPanelMenuOpenLeafId(null);
@@ -666,15 +804,282 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
                   className="w-full"
                   aria-label={`Reading progress for ${book?.name ?? "Book"} ${chapter.chapter}`}
                 />
+                {audioVisible ? (
+                  <div className="space-y-2 border-b p-2">
+                    {audioSrc ? (
+                      <>
+                        <audio
+                          ref={(element) => {
+                            audioRefs.current[leaf.id] = element;
+                          }}
+                          src={audioSrc}
+                          preload="metadata"
+                          muted={audioMuted}
+                          onPlay={() => {
+                            setAudioPlayingByLeafId((current) => ({
+                              ...current,
+                              [leaf.id]: true,
+                            }));
+                          }}
+                          onPause={() => {
+                            setAudioPlayingByLeafId((current) => ({
+                              ...current,
+                              [leaf.id]: false,
+                            }));
+                          }}
+                          onTimeUpdate={(event) => {
+                            const currentTime = event.currentTarget.currentTime;
+                            setAudioCurrentTimeByLeafId((current) => ({
+                              ...current,
+                              [leaf.id]: currentTime,
+                            }));
+                          }}
+                          onLoadedMetadata={(event) => {
+                            const element = event.currentTarget;
+                            const previousSrc = lastAudioSrcByLeafIdRef.current[leaf.id];
+                            const isSameTrack = previousSrc === audioSrc;
+                            lastAudioSrcByLeafIdRef.current[leaf.id] = audioSrc ?? "";
+                            element.playbackRate = audioPlaybackRate;
+                            element.volume = audioVolume;
+                            if (isSameTrack) {
+                              const resumeAt = audioCurrentTimeByLeafId[leaf.id] ?? 0;
+                              if (resumeAt > 0) {
+                                element.currentTime = resumeAt;
+                              }
+                            } else {
+                              element.currentTime = 0;
+                              setAudioCurrentTimeByLeafId((current) => ({
+                                ...current,
+                                [leaf.id]: 0,
+                              }));
+                              setAudioPlayingByLeafId((current) => ({
+                                ...current,
+                                [leaf.id]: false,
+                              }));
+                            }
+                            setAudioDurationByLeafId((current) => ({
+                              ...current,
+                              [leaf.id]: Number.isFinite(element.duration)
+                                ? element.duration
+                                : 0,
+                            }));
+                            setAudioErroredByLeafId((current) => ({
+                              ...current,
+                              [leaf.id]: false,
+                            }));
+                            if (pendingAutoPlayLeafIdsRef.current.has(leaf.id)) {
+                              pendingAutoPlayLeafIdsRef.current.delete(leaf.id);
+                              void element.play().catch(() => {});
+                            }
+                          }}
+                          onEnded={() => {
+                            setAudioPlayingByLeafId((current) => ({
+                              ...current,
+                              [leaf.id]: false,
+                            }));
+                            if (audioAutoPlay && hasNext) {
+                              pendingAutoPlayLeafIdsRef.current.add(leaf.id);
+                              moveLeafChapter(leaf.id, 1);
+                            }
+                          }}
+                          onError={() => {
+                            setAudioErroredByLeafId((current) => ({
+                              ...current,
+                              [leaf.id]: true,
+                            }));
+                          }}
+                          className="hidden"
+                        />
+                        <div className="@container/audio">
+                          <div className="flex flex-col gap-2 @md/audio:flex-row @md/audio:items-center">
+                          <div className="flex w-full min-w-0 items-center gap-2 @md/audio:w-1/2 @lg/audio:w-7/12">
+                            <Button
+                              variant="outline"
+                              size="icon-sm"
+                              onClick={() => {
+                                const audio = audioRefs.current[leaf.id];
+                                if (!audio) {
+                                  return;
+                                }
+                                if (audio.paused) {
+                                  void audio.play().catch(() => {});
+                                } else {
+                                  audio.pause();
+                                }
+                            }}
+                            aria-label={audioPlaying ? "Pause audio" : "Play audio"}
+                          >
+                            {audioPlaying ? <PauseIcon /> : <PlayIcon />}
+                          </Button>
+                            <div className="flex min-w-0 flex-1 items-center gap-2">
+                              <span className="w-16 shrink-0 text-[10px] text-muted-foreground tabular-nums">
+                                {formatAudioTime(audioCurrentTime)}/{formatAudioTime(audioDuration)}
+                              </span>
+                              <Slider
+                                className="flex-1"
+                                min={0}
+                                max={audioDuration || 1}
+                                value={[Math.min(audioCurrentTime, audioDuration || 0)]}
+                                onValueChange={(value) => {
+                                  const nextTime = Array.isArray(value) ? (value[0] ?? 0) : value;
+                                  const audio = audioRefs.current[leaf.id];
+                                  if (!audio) {
+                                    return;
+                                  }
+                                  audio.currentTime = nextTime;
+                                  setAudioCurrentTimeByLeafId((current) => ({
+                                    ...current,
+                                    [leaf.id]: nextTime,
+                                  }));
+                                }}
+                                aria-label="Seek chapter audio"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex w-full min-w-0 items-center gap-1.5 @md/audio:w-1/2 @md/audio:justify-start @lg/audio:w-5/12 @lg/audio:justify-end">
+                            <Select
+                              value={`${audioPlaybackRate.toFixed(2)}x`}
+                              onValueChange={(value) => {
+                                if (!value) {
+                                  return;
+                                }
+                                const nextRate = Number.parseFloat(value);
+                                if (!Number.isFinite(nextRate)) {
+                                  return;
+                                }
+                                setAudioPlaybackRateByLeafId((current) => ({
+                                  ...current,
+                                  [leaf.id]: nextRate,
+                                }));
+                                const audio = audioRefs.current[leaf.id];
+                                if (audio) {
+                                  audio.playbackRate = nextRate;
+                                }
+                              }}
+                            >
+                              <SelectTrigger size="sm" className="h-7 w-20 shrink-0 px-2 text-xs tabular-nums">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="w-20 min-w-0">
+                                {AUDIO_PLAYBACK_RATE_OPTIONS.map((option) => (
+                                  <SelectItem
+                                    key={option.value}
+                                    value={option.label}
+                                    className="pr-8"
+                                  >
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <div className="flex min-w-0 flex-1 items-center gap-1.5">
+                            <Button
+                              variant="outline"
+                              size="icon-sm"
+                              onClick={() => {
+                                const nextMuted = !audioMuted;
+                                setAudioMutedByLeafId((current) => ({
+                                  ...current,
+                                  [leaf.id]: nextMuted,
+                                }));
+                                const audio = audioRefs.current[leaf.id];
+                                if (audio) {
+                                  audio.muted = nextMuted;
+                                }
+                              }}
+                              aria-label={audioMuted ? "Unmute audio" : "Mute audio"}
+                              >
+                                {effectiveVolume <= 0 ? (
+                                  <VolumeXIcon />
+                              ) : effectiveVolume < 0.5 ? (
+                                <Volume1Icon />
+                              ) : (
+                                <Volume2Icon />
+                                )}
+                              </Button>
+                              <div className="min-w-14 flex-1">
+                              <Slider
+                                className="w-full"
+                                min={0}
+                                max={1}
+                                step={0.05}
+                                value={[audioVolume]}
+                                onValueChange={(value) => {
+                                  const nextVolume = Array.isArray(value) ? (value[0] ?? 0) : value;
+                                  setAudioVolumeByLeafId((current) => ({
+                                    ...current,
+                                    [leaf.id]: nextVolume,
+                                  }));
+                                  const audio = audioRefs.current[leaf.id];
+                                  if (audio) {
+                                    audio.volume = nextVolume;
+                                  }
+                                }}
+                                aria-label="Audio volume"
+                              />
+                            </div>
+                            </div>
+                            <div className="flex shrink-0 items-center gap-1.5">
+                              <span className="text-[11px] whitespace-nowrap text-muted-foreground">Auto</span>
+                              <Switch
+                                checked={audioAutoPlay}
+                                onCheckedChange={(checked) => {
+                                  setAudioAutoPlayByLeafId((current) => ({
+                                    ...current,
+                                    [leaf.id]: checked === true,
+                                  }));
+                                }}
+                                size="sm"
+                                aria-label="Toggle auto-play next chapter"
+                              />
+                            </div>
+                          </div>
+                          </div>
+                        </div>
+                        {audioErrored ? (
+                          <p className="text-xs text-muted-foreground">
+                            Audio unavailable for this chapter.
+                          </p>
+                        ) : null}
+                      </>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        Audio unavailable for this chapter.
+                      </p>
+                    )}
+                  </div>
+                ) : null}
                 <div className="flex items-center justify-between p-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => moveLeafChapter(leaf.id, -1)}
-                    disabled={!hasPrev}
+                    onClick={() =>
+                      setAudioPlayerVisibleByLeafId((current) => {
+                        const nextVisible = !(current[leaf.id] ?? false);
+                        if (!nextVisible) {
+                          const audio = audioRefs.current[leaf.id];
+                          if (audio) {
+                            audio.pause();
+                            setAudioCurrentTimeByLeafId((times) => ({
+                              ...times,
+                              [leaf.id]: audio.currentTime,
+                            }));
+                          }
+                          setAudioPlayingByLeafId((playing) => ({
+                            ...playing,
+                            [leaf.id]: false,
+                          }));
+                        }
+                        return {
+                          ...current,
+                          [leaf.id]: nextVisible,
+                        };
+                      })
+                    }
                   >
-                    <ChevronLeftIcon />
-                    Prev
+                    <AudioLinesIcon />
+                    {audioVisible ? "Hide Audio" : "Show Audio"}
                   </Button>
                   <div className="flex items-center gap-2">
                     <Button
@@ -685,6 +1090,15 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
                       }
                     >
                       {isChapterRead ? "Read" : "Mark Read"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => moveLeafChapter(leaf.id, -1)}
+                      disabled={!hasPrev}
+                    >
+                      <ChevronLeftIcon />
+                      Prev
                     </Button>
                     <Button
                       variant="outline"
