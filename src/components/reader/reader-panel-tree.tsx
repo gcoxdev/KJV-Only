@@ -50,9 +50,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ChapterTextContent } from "@/components/reader/chapter-text-content";
 import { SearchPage } from "@/components/reader/search-page";
+import { NotesPage } from "@/components/reader/notes-page";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import type { LeafNeighbors } from "@/lib/reader-neighbors";
+import type { NotesContext, NotesTabState, ReaderNote } from "@/types/notes";
 
 type ExistingTabTarget = {
   id: string;
@@ -127,6 +129,20 @@ type ReaderPanelTreeProps = {
     verseStart: number,
     verseEnd?: number,
   ) => void;
+  notes: ReaderNote[];
+  notesContext: NotesContext | null;
+  notesTabStateByLeafId: Record<string, NotesTabState>;
+  onChangeNotesTabState: (
+    leafId: string,
+    patch: Partial<NotesTabState>,
+  ) => void;
+  onCreateGeneralNote: () => string;
+  onCreateContextNote: (context: NotesContext | null) => string | null;
+  onUpdateNote: (
+    noteId: string,
+    patch: Partial<Pick<ReaderNote, "title" | "body" | "scope">>,
+  ) => void;
+  onDeleteNote: (noteId: string) => void;
   moveLeafChapter: (leafId: string, step: -1 | 1) => void;
   toggleChapterRead: (bookIndex: number, chapterIndex: number) => void;
   updateSplitSize: (splitId: string, ratio: number) => void;
@@ -175,6 +191,14 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   concordanceWords,
   ensureConcordanceWordsLoaded,
   onOpenSearchResult,
+  notes,
+  notesContext,
+  notesTabStateByLeafId,
+  onChangeNotesTabState,
+  onCreateGeneralNote,
+  onCreateContextNote,
+  onUpdateNote,
+  onDeleteNote,
   moveLeafChapter,
   toggleChapterRead,
   updateSplitSize,
@@ -380,6 +404,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
                 </>
               ) : leaf.view === "search" ? (
                 <p className="text-sm text-muted-foreground">Search</p>
+              ) : leaf.view === "notes" ? (
+                <p className="text-sm text-muted-foreground">Notes</p>
               ) : (
                 <p className="text-sm text-muted-foreground">
                   Choose a book and chapter
@@ -680,6 +706,20 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
                 concordanceWords={concordanceWords}
                 ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
                 onOpenResult={onOpenSearchResult}
+              />
+            </CardContent>
+          ) : leaf.view === "notes" ? (
+            <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
+              <NotesPage
+                books={books}
+                notes={notes}
+                context={notesContext}
+                tabState={notesTabStateByLeafId[leaf.id] ?? null}
+                onTabStateChange={(patch) => onChangeNotesTabState(leaf.id, patch)}
+                onCreateGeneralNote={onCreateGeneralNote}
+                onCreateContextNote={onCreateContextNote}
+                onUpdateNote={onUpdateNote}
+                onDeleteNote={onDeleteNote}
               />
             </CardContent>
           ) : (

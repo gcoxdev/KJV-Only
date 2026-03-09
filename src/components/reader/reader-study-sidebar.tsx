@@ -8,6 +8,7 @@ import { OldEnglishTool } from "@/components/reader/study-tools/old-english-tool
 import { MapsTool } from "@/components/reader/study-tools/maps-tool";
 import { GenealogyTool } from "@/components/reader/study-tools/genealogy-tool";
 import { HitchcocksTool } from "@/components/reader/study-tools/hitchcocks-tool";
+import { NotesTool } from "@/components/reader/study-tools/notes-tool";
 import { StudyToolsSidebar } from "@/components/reader/study-tools-sidebar";
 
 type ReaderStudySidebarProps = {
@@ -26,6 +27,7 @@ type ReaderStudySidebarProps = {
   mapsProps: ComponentProps<typeof MapsTool>;
   genealogyProps: ComponentProps<typeof GenealogyTool>;
   hitchcocksProps: ComponentProps<typeof HitchcocksTool>;
+  notesProps: ComponentProps<typeof NotesTool>;
 };
 
 export function ReaderStudySidebar({
@@ -44,6 +46,7 @@ export function ReaderStudySidebar({
   mapsProps,
   genealogyProps,
   hitchcocksProps,
+  notesProps,
 }: ReaderStudySidebarProps) {
   return (
     <StudyToolsSidebar
@@ -54,15 +57,19 @@ export function ReaderStudySidebar({
       onCollapseAll={onCollapseAll}
       canExpand={canExpand}
       canCollapse={canCollapse}
-    >
-      <CrossRefsTool {...crossRefsProps} />
-      <ConcordanceTool {...concordanceProps} />
-      <WebstersTool {...webstersProps} />
-      <StrongsTool {...strongsProps} />
-      <OldEnglishTool {...oldEnglishProps} />
-      <MapsTool {...mapsProps} />
-      <GenealogyTool {...genealogyProps} />
-      <HitchcocksTool {...hitchcocksProps} />
-    </StudyToolsSidebar>
+      notesContent={<NotesTool {...notesProps} />}
+      toolsContent={
+        <>
+          <CrossRefsTool {...crossRefsProps} />
+          <ConcordanceTool {...concordanceProps} />
+          <WebstersTool {...webstersProps} />
+          <StrongsTool {...strongsProps} />
+          <OldEnglishTool {...oldEnglishProps} />
+          <MapsTool {...mapsProps} />
+          <GenealogyTool {...genealogyProps} />
+          <HitchcocksTool {...hitchcocksProps} />
+        </>
+      }
+    />
   );
 }
