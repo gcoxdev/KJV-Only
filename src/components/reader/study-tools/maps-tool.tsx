@@ -192,7 +192,7 @@ export function MapsTool({
                         {`References (${references.length})`}
                       </AccordionTrigger>
                       <AccordionContent>
-                        <p className="leading-7">
+                        <p className="text-sm leading-7">
                           {references.map((reference, verseIndex) => (
                             <Fragment key={reference}>
                               <ConcordanceReferencePopover

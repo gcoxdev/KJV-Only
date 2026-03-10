@@ -1,9 +1,7 @@
 import type { Book } from "@/types/bible";
 import {
-  parseJsonl,
   type AncientMapPayload,
   type MapGeoJsonPayload,
-  type MapImageEntry,
 } from "@/lib/maps";
 import type {
   ConcordancePayload,
@@ -27,7 +25,6 @@ let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
 let ancientMapPromise: Promise<AncientMapPayload> | null = null;
 const mapGeoJsonPromiseCache = new Map<string, Promise<MapGeoJsonPayload>>();
-let mapImagesPromise: Promise<MapImageEntry[]> | null = null;
 
 function parseBooks(input: unknown): Book[] | null {
   if (Array.isArray(input)) {
@@ -237,12 +234,12 @@ export function loadStrongsHebrew() {
 
 export function loadAncientMap() {
   if (!ancientMapPromise) {
-    ancientMapPromise = fetch("/references/ancient_map.json", {
+    ancientMapPromise = fetch("/maps/data/map.json", {
       cache: "force-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
-          throw new Error("Could not load /references/ancient_map.json");
+          throw new Error("Could not load /maps/data/map.json");
         }
         return response.json() as Promise<unknown>;
       })
@@ -278,22 +275,4 @@ export function loadMapGeoJson(geojsonFile: string) {
     });
   mapGeoJsonPromiseCache.set(geojsonFile, promise);
   return promise;
-}
-
-export function loadMapImages() {
-  if (!mapImagesPromise) {
-    mapImagesPromise = fetch("/maps/data/image.jsonl", { cache: "force-cache" })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /maps/data/image.jsonl");
-        }
-        return response.text();
-      })
-      .then((text) => parseJsonl<MapImageEntry>(text))
-      .catch((error) => {
-        mapImagesPromise = null;
-        throw error;
-      });
-  }
-  return mapImagesPromise;
 }
