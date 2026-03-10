@@ -1,10 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import type {
-  AncientMapEntry,
-  MapGeoJsonPayload,
-  MapPhotoDialogItem,
-} from "@/lib/maps";
+import type { AncientMapEntry, MapGeoJsonPayload } from "@/lib/maps";
 
 type UseMapDialogStateArgs = {
   loadMapGeoJsonByFile: (geoJsonFile: string) => Promise<MapGeoJsonPayload>;
@@ -20,49 +16,14 @@ export function useMapDialogState({
     useState<MapGeoJsonPayload | null>(null);
   const [isMapDialogLoading, setIsMapDialogLoading] = useState(false);
   const [mapDialogError, setMapDialogError] = useState<string | null>(null);
-  const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
-  const [photoDialogItems, setPhotoDialogItems] = useState<MapPhotoDialogItem[]>(
-    [],
-  );
-  const [photoDialogIndex, setPhotoDialogIndex] = useState(0);
 
   const openMapDialog = useCallback((entry: AncientMapEntry) => {
     setActiveMapDialogEntry(entry);
     setIsMapDialogOpen(true);
   }, []);
 
-  const openPhotoDialog = useCallback(
-    (items: MapPhotoDialogItem[], startIndex: number) => {
-      if (items.length === 0) {
-        return;
-      }
-      const clampedIndex = Math.max(0, Math.min(items.length - 1, startIndex));
-      setPhotoDialogItems(items);
-      setPhotoDialogIndex(clampedIndex);
-      setIsPhotoDialogOpen(true);
-    },
-    [],
-  );
-
-  const movePhotoDialog = useCallback(
-    (direction: -1 | 1) => {
-      setPhotoDialogIndex((current) => {
-        if (photoDialogItems.length === 0) {
-          return 0;
-        }
-        return (
-          (current + direction + photoDialogItems.length) % photoDialogItems.length
-        );
-      });
-    },
-    [photoDialogItems.length],
-  );
-
   const resetMapDialogState = useCallback(() => {
     setIsMapDialogOpen(false);
-    setIsPhotoDialogOpen(false);
-    setPhotoDialogItems([]);
-    setPhotoDialogIndex(0);
     setActiveMapDialogEntry(null);
     setMapDialogGeoJson(null);
     setMapDialogError(null);
@@ -83,20 +44,6 @@ export function useMapDialogState({
     setActiveMapDialogEntry(null);
     setMapDialogGeoJson(null);
     setMapDialogError(null);
-  }, []);
-
-  const onPhotoDialogOpenChange = useCallback((open: boolean) => {
-    setIsPhotoDialogOpen(open);
-    if (!open) {
-      setPhotoDialogItems([]);
-      setPhotoDialogIndex(0);
-    }
-  }, []);
-
-  const onClosePhotoDialog = useCallback(() => {
-    setIsPhotoDialogOpen(false);
-    setPhotoDialogItems([]);
-    setPhotoDialogIndex(0);
   }, []);
 
   useEffect(() => {
@@ -139,11 +86,6 @@ export function useMapDialogState({
     };
   }, [activeMapDialogEntry, isMapDialogOpen, loadMapGeoJsonByFile]);
 
-  const currentPhotoDialogItem = useMemo(
-    () => (photoDialogItems.length > 0 ? photoDialogItems[photoDialogIndex] : null),
-    [photoDialogIndex, photoDialogItems],
-  );
-
   return {
     isMapDialogOpen,
     activeMapDialogEntry,
@@ -153,14 +95,6 @@ export function useMapDialogState({
     onMapDialogOpenChange,
     onCloseMapDialog,
     openMapDialog,
-    isPhotoDialogOpen,
-    currentPhotoDialogItem,
-    photoDialogIndex,
-    photoDialogItemsLength: photoDialogItems.length,
-    onPhotoDialogOpenChange,
-    onClosePhotoDialog,
-    openPhotoDialog,
-    movePhotoDialog,
     resetMapDialogState,
   };
 }

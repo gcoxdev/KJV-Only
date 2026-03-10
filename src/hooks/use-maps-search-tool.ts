@@ -1,14 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { loadAncientMap, loadMapImages } from "@/lib/reader-data";
+import { loadAncientMap } from "@/lib/reader-data";
 import {
   cleanMapMarkup,
   mapEntryLabel,
   mapEntrySearchableText,
-  modernIdsForMapEntry,
   type AncientMapEntry,
   type AncientMapPayload,
-  type MapImageEntry,
 } from "@/lib/maps";
 
 export function useMapsSearchTool() {
@@ -20,9 +18,6 @@ export function useMapsSearchTool() {
   const [selectedMapsEntries, setSelectedMapsEntries] = useState<AncientMapEntry[]>(
     [],
   );
-  const [mapImages, setMapImages] = useState<MapImageEntry[] | null>(null);
-  const [isMapImagesLoading, setIsMapImagesLoading] = useState(false);
-  const [mapImagesError, setMapImagesError] = useState<string | null>(null);
 
   const ensureAncientMapsLoaded = useCallback(async () => {
     if (ancientMaps) {
@@ -43,45 +38,6 @@ export function useMapsSearchTool() {
       setIsMapsLoading(false);
     }
   }, [ancientMaps]);
-
-  const ensureMapImagesLoaded = useCallback(async () => {
-    if (mapImages) {
-      return mapImages;
-    }
-    setMapImagesError(null);
-    setIsMapImagesLoading(true);
-    try {
-      const data = await loadMapImages();
-      setMapImages(data);
-      return data;
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to load map images";
-      setMapImagesError(message);
-      throw error;
-    } finally {
-      setIsMapImagesLoading(false);
-    }
-  }, [mapImages]);
-
-  const mapImagesByLocationId = useMemo(() => {
-    const index = new Map<string, MapImageEntry[]>();
-    for (const image of mapImages ?? []) {
-      const ids = new Set<string>([
-        ...Object.keys(image.thumbnails ?? {}),
-        ...Object.keys(image.descriptions ?? {}),
-      ]);
-      for (const id of ids) {
-        const existing = index.get(id);
-        if (existing) {
-          existing.push(image);
-        } else {
-          index.set(id, [image]);
-        }
-      }
-    }
-    return index;
-  }, [mapImages]);
 
   const indexedAncientMaps = useMemo(() => {
     if (!ancientMaps) {
@@ -114,18 +70,6 @@ export function useMapsSearchTool() {
       mapsSearchResults.map((entry, index) => {
         const itemKey = `${entry.geojson_file}-${index}`;
         const title = mapEntryLabel(entry);
-        const modernIds = modernIdsForMapEntry(entry);
-        const imageCandidates = modernIds.flatMap(
-          (id) => mapImagesByLocationId.get(id) ?? [],
-        );
-        const seenImageIds = new Set<string>();
-        const photoEntries = imageCandidates.filter((image) => {
-          if (seenImageIds.has(image.id)) {
-            return false;
-          }
-          seenImageIds.add(image.id);
-          return true;
-        });
         const linkedPlaces = Object.entries(entry.geojson_roles ?? {}).map(
           ([roleKey, role]) => ({
             roleKey,
@@ -137,12 +81,10 @@ export function useMapsSearchTool() {
           entry,
           itemKey,
           title,
-          modernIds,
-          photoEntries,
           linkedPlaces,
         };
       }),
-    [mapsSearchResults, mapImagesByLocationId],
+    [mapsSearchResults],
   );
 
   const applyMapsSearch = useCallback(
@@ -154,9 +96,9 @@ export function useMapsSearchTool() {
         return;
       }
       setIsMapsSearching(true);
-      void Promise.all([ensureAncientMapsLoaded(), ensureMapImagesLoaded()])
+      void ensureAncientMapsLoaded()
         .catch(() => {
-          // Error state is set by ensure loaders.
+          // Error state is set by ensureAncientMapsLoaded.
         })
         .finally(() => {
           window.requestAnimationFrame(() => {
@@ -164,7 +106,7 @@ export function useMapsSearchTool() {
           });
         });
     },
-    [ensureAncientMapsLoaded, ensureMapImagesLoaded],
+    [ensureAncientMapsLoaded],
   );
 
   return {
@@ -174,9 +116,6 @@ export function useMapsSearchTool() {
     isMapsLoading,
     mapsError,
     selectedMapsEntries,
-    mapImages,
-    isMapImagesLoading,
-    mapImagesError,
     mapsSearchResults,
     mapsDisplayEntries,
     setMapsSearchTerm,
@@ -184,10 +123,7 @@ export function useMapsSearchTool() {
     setIsMapsLoading,
     setMapsError,
     setSelectedMapsEntries,
-    setIsMapImagesLoading,
-    setMapImagesError,
     ensureAncientMapsLoaded,
-    ensureMapImagesLoaded,
     applyMapsSearch,
   };
 }
