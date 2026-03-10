@@ -1,0 +1,194 @@
+import type { LucideIcon } from "lucide-react";
+import {
+  BadgeHelpIcon,
+  ChurchIcon,
+  CoinsIcon,
+  ContactRoundIcon,
+  DownloadIcon,
+  FileTextIcon,
+  HeartHandshakeIcon,
+  InfoIcon,
+  LandmarkIcon,
+  LibraryBigIcon,
+  ScrollTextIcon,
+  SparklesIcon,
+} from "lucide-react";
+
+import type { StaticPageId } from "@/types/reader";
+
+export type StaticPageDefinition = {
+  id: StaticPageId;
+  title: string;
+  menuLabel: string;
+  icon: LucideIcon;
+  content: {
+    eyebrow: string;
+    heading: string;
+    paragraphs: string[];
+  };
+};
+
+export const STATIC_PAGES: StaticPageDefinition[] = [
+  {
+    id: "saved",
+    title: "How to Get Saved",
+    menuLabel: "How to Get Saved",
+    icon: HeartHandshakeIcon,
+    content: {
+      eyebrow: "Gospel",
+      heading: "How to Get Saved",
+      paragraphs: [
+        "This page is reserved for a clear presentation of the gospel, salvation by grace through faith, and supporting Scripture references.",
+        "It should eventually include a concise explanation, a longer study path, and direct links into relevant passages for follow-up reading.",
+      ],
+    },
+  },
+  {
+    id: "kjv-only",
+    title: "Why KJV Only?",
+    menuLabel: "Why KJV Only?",
+    icon: ScrollTextIcon,
+    content: {
+      eyebrow: "Doctrine",
+      heading: "Why KJV Only?",
+      paragraphs: [
+        "This page is intended for the doctrinal and historical case for the King James Bible, including manuscript issues, translation philosophy, and common objections.",
+        "It should eventually organize source material into a readable structure with citations, comparisons, and study references.",
+      ],
+    },
+  },
+  {
+    id: "resources",
+    title: "Resources",
+    menuLabel: "Resources",
+    icon: LibraryBigIcon,
+    content: {
+      eyebrow: "Library",
+      heading: "Resources",
+      paragraphs: [
+        "This page will gather supporting study tools, downloadable materials, trusted external references, and recommended reading.",
+        "It can later be broken into categories such as Bible study, doctrine, ministry helps, and evangelism.",
+      ],
+    },
+  },
+  {
+    id: "churches",
+    title: "Local Churches",
+    menuLabel: "Local Churches",
+    icon: ChurchIcon,
+    content: {
+      eyebrow: "Fellowship",
+      heading: "Local Churches",
+      paragraphs: [
+        "This page is reserved for helping users find local churches, likely with filtering by location, doctrine, and contact information.",
+        "It should eventually support directory browsing and submission or verification workflows.",
+      ],
+    },
+  },
+  {
+    id: "download",
+    title: "Download",
+    menuLabel: "Download",
+    icon: DownloadIcon,
+    content: {
+      eyebrow: "Offline Access",
+      heading: "Download",
+      paragraphs: [
+        "This page will centralize downloadable app packages, data bundles, audio sets, and supporting study materials.",
+        "It should later distinguish by platform and provide versioned release notes or checksums.",
+      ],
+    },
+  },
+  {
+    id: "donate",
+    title: "Donate",
+    menuLabel: "Donate",
+    icon: CoinsIcon,
+    content: {
+      eyebrow: "Support",
+      heading: "Donate",
+      paragraphs: [
+        "This page is reserved for donation information, financial transparency, and the practical needs the project is supporting.",
+        "It should later include clear methods, accountability notes, and any legal or tax information that applies.",
+      ],
+    },
+  },
+  {
+    id: "credits",
+    title: "Credits",
+    menuLabel: "Credits",
+    icon: SparklesIcon,
+    content: {
+      eyebrow: "Acknowledgements",
+      heading: "Credits",
+      paragraphs: [
+        "This page will acknowledge the data sources, tools, libraries, maintainers, and contributors that make the project possible.",
+        "It should later include source attribution, licenses, and links where appropriate.",
+      ],
+    },
+  },
+  {
+    id: "whats-new",
+    title: "What's New",
+    menuLabel: "What's New",
+    icon: FileTextIcon,
+    content: {
+      eyebrow: "Release Notes",
+      heading: "What's New",
+      paragraphs: [
+        "This page is intended for release notes, recent feature additions, bug fixes, and data updates.",
+        "It should later present updates chronologically and make it easy to see what changed between versions.",
+      ],
+    },
+  },
+  {
+    id: "about",
+    title: "About",
+    menuLabel: "About",
+    icon: InfoIcon,
+    content: {
+      eyebrow: "Project",
+      heading: "About",
+      paragraphs: [
+        "This page is reserved for the purpose of the application, its goals, and the principles guiding its development.",
+        "It should later explain the mission, scope, and intended audience of the project.",
+      ],
+    },
+  },
+  {
+    id: "contact",
+    title: "Contact",
+    menuLabel: "Contact",
+    icon: ContactRoundIcon,
+    content: {
+      eyebrow: "Communication",
+      heading: "Contact",
+      paragraphs: [
+        "This page is intended for contact methods, feedback channels, and support requests.",
+        "It should later include structured ways to report issues, ask questions, or make ministry-related inquiries.",
+      ],
+    },
+  },
+  {
+    id: "help",
+    title: "Help",
+    menuLabel: "Help",
+    icon: BadgeHelpIcon,
+    content: {
+      eyebrow: "Guide",
+      heading: "Help",
+      paragraphs: [
+        "This page is reserved for usage guidance, explanations of study tools, panel behavior, search syntax, and common workflows.",
+        "It should later serve as the main reference for using the application efficiently.",
+      ],
+    },
+  },
+];
+
+export const STATIC_PAGE_MAP = new Map(
+  STATIC_PAGES.map((page) => [page.id, page]),
+);
+
+export function getStaticPage(pageId: StaticPageId | null | undefined) {
+  return pageId ? STATIC_PAGE_MAP.get(pageId) ?? null : null;
+}

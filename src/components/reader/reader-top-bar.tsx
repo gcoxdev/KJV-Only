@@ -1,4 +1,6 @@
 import { ChartBarIcon, MenuIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import { STATIC_PAGES } from "@/lib/static-pages";
+import type { StaticPageId } from "@/types/reader";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +22,7 @@ type ReaderTopBarProps = {
   onOpenSearch: () => void;
   onOpenProgress: () => void;
   onOpenSettings: () => void;
+  onOpenPage: (pageId: StaticPageId) => void;
 };
 
 export function ReaderTopBar({
@@ -28,9 +31,10 @@ export function ReaderTopBar({
   onOpenSearch,
   onOpenProgress,
   onOpenSettings,
+  onOpenPage,
 }: ReaderTopBarProps) {
   return (
-    <header className="z-20 flex h-14 shrink-0 items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-6">
+    <header className="z-20 flex h-10 shrink-0 items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-6">
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -51,17 +55,15 @@ export function ReaderTopBar({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuLabel>Pages</DropdownMenuLabel>
-              <DropdownMenuItem>How to Get Saved</DropdownMenuItem>
-              <DropdownMenuItem>Why KJV Only?</DropdownMenuItem>
-              <DropdownMenuItem>Resources</DropdownMenuItem>
-              <DropdownMenuItem>Local Churches</DropdownMenuItem>
-              <DropdownMenuItem>Download</DropdownMenuItem>
-              <DropdownMenuItem>Donate</DropdownMenuItem>
-              <DropdownMenuItem>Credits</DropdownMenuItem>
-              <DropdownMenuItem>What&apos;s New</DropdownMenuItem>
-              <DropdownMenuItem>About</DropdownMenuItem>
-              <DropdownMenuItem>Contact</DropdownMenuItem>
-              <DropdownMenuItem>Help</DropdownMenuItem>
+              {STATIC_PAGES.map((page) => (
+                <DropdownMenuItem
+                  key={page.id}
+                  onClick={() => onOpenPage(page.id)}
+                >
+                  <page.icon />
+                  {page.menuLabel}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>

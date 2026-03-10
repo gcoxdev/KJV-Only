@@ -56,6 +56,8 @@ import {
   panelViewportElement,
 } from "@/lib/reader-view";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
+import { StaticPage } from "@/components/reader/static-page";
+import { getStaticPage } from "@/lib/static-pages";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -441,6 +443,10 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
               <p className="text-sm text-muted-foreground">Search</p>
             ) : leaf.view === "notes" ? (
               <p className="text-sm text-muted-foreground">Notes</p>
+            ) : leaf.view === "page" ? (
+              <p className="text-sm text-muted-foreground">
+                {getStaticPage(leaf.pageId)?.title ?? "Page"}
+              </p>
             ) : (
               <p className="text-sm text-muted-foreground">
                 Choose a book and chapter
@@ -1029,6 +1035,10 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 onDeleteNote={onDeleteNote}
               />
             </Suspense>
+          </CardContent>
+        ) : leaf.view === "page" ? (
+          <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
+            <StaticPage pageId={leaf.pageId} />
           </CardContent>
         ) : (
           <CardContent className="min-h-0 flex-1 overflow-auto p-2">

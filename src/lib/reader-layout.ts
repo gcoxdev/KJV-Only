@@ -27,6 +27,7 @@ export function createLeaf(
     chapterIndex,
     pickerTestament: null,
     pickerBookIndex: null,
+    pageId: null,
   };
 }
 
@@ -162,6 +163,7 @@ export function updateLeafNode(
       | "view"
       | "pickerTestament"
       | "pickerBookIndex"
+      | "pageId"
     >
   >,
 ): PanelNode {

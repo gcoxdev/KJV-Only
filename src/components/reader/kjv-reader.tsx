@@ -113,6 +113,8 @@ import { ReaderTopBar } from "@/components/reader/reader-top-bar";
 import { TabsWorkspace } from "@/components/reader/tabs-workspace";
 import { ReaderStatusScreen } from "@/components/reader/reader-status-screen";
 import { ReaderPanelTree } from "@/components/reader/reader-panel-tree";
+import { getStaticPage } from "@/lib/static-pages";
+import type { StaticPageId } from "@/types/reader";
 
 const LazyReaderStudySidebar = lazy(async () => {
   const module = await import("@/components/reader/reader-study-sidebar");
@@ -1209,6 +1211,39 @@ export function KJVReader() {
     });
   }, [createDefaultSearchPageState, tabs, tabsOrientation]);
 
+  const openStaticPageTab = useCallback(
+    (pageId: StaticPageId) => {
+      const page = getStaticPage(pageId);
+      if (!page) {
+        return;
+      }
+
+      const nextTabId = createId();
+      const nextLeaf = {
+        ...createLeaf(0, 0, "page"),
+        pageId,
+      };
+
+      setTabs((currentTabs) => [
+        ...currentTabs,
+        {
+          id: nextTabId,
+          title: page.title,
+          root: nextLeaf,
+        },
+      ]);
+      setActiveTabId(nextTabId);
+      requestAnimationFrame(() => {
+        tabEndRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: tabsOrientation === "vertical" ? "end" : "nearest",
+          inline: tabsOrientation === "vertical" ? "nearest" : "end",
+        });
+      });
+    },
+    [tabsOrientation],
+  );
+
   const openNotesTab = useCallback(
     (selectedNoteId?: string | null) => {
       const nextTabId = createId();
@@ -2116,6 +2151,7 @@ export function KJVReader() {
             onOpenSearch={openSearchTab}
             onOpenProgress={() => setIsProgressOpen(true)}
             onOpenSettings={() => setIsSettingsOpen(true)}
+            onOpenPage={openStaticPageTab}
           />
 
           <TabsWorkspace
