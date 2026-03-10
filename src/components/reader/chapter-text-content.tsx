@@ -86,6 +86,7 @@ type ChapterTextContentProps = {
   bookmarkModeEnabled: boolean;
   pendingRangeStartVerseNumber: number | null;
   highlightedVerseRange?: { start: number; end: number } | null;
+  fontSize: number;
   verseSpacing: number;
   onOpenTokenDetails: (element: HTMLElement, token: VerseToken) => void;
   onSelectVerse: (verseNumber: number) => void;
@@ -104,10 +105,14 @@ export const ChapterTextContent = memo(
     bookmarkModeEnabled,
     pendingRangeStartVerseNumber,
     highlightedVerseRange,
+    fontSize,
     verseSpacing,
     onOpenTokenDetails,
     onSelectVerse,
   }: ChapterTextContentProps) {
+    const lineHeight = Math.max(24, Math.round(fontSize * 1.75));
+    const verseNumberSize = Math.max(11, Math.round(fontSize * 0.75));
+
     const paragraphGroups = useMemo(() => {
       const grouped: Verse[][] = [];
       let currentGroup: Verse[] = [];
@@ -140,7 +145,11 @@ export const ChapterTextContent = memo(
     return (
       <div
         className="flex w-full flex-col p-2"
-        style={{ rowGap: `${verseSpacing}px` }}
+        style={{
+          rowGap: `${verseSpacing}px`,
+          fontSize: `${fontSize}px`,
+          lineHeight: `${lineHeight}px`,
+        }}
       >
         {flowVersesByParagraph
           ? paragraphGroups.map((group, groupIndex) => (
@@ -166,12 +175,15 @@ export const ChapterTextContent = memo(
                 }}
               >
                 <p
-                  className="text-pretty leading-7"
+                  className="text-pretty"
                   style={
                     readModeParagraphIndent &&
                     (groupIndex === 0 || group[0]?.paragraphStart)
-                      ? { textIndent: "1.5rem" }
-                      : undefined
+                      ? {
+                          textIndent: "1.5rem",
+                          lineHeight: `${lineHeight}px`,
+                        }
+                      : { lineHeight: `${lineHeight}px` }
                   }
                 >
                   {group.map((verse, verseIndex) => (
@@ -189,7 +201,8 @@ export const ChapterTextContent = memo(
                       >
                         {bookmarkModeEnabled ? (
                           <span
-                            className="mr-1 inline-flex h-7 items-center align-top"
+                            className="mr-1 inline-flex items-center align-top"
+                            style={{ height: `${lineHeight}px` }}
                             onClick={(event) => {
                               event.stopPropagation();
                             }}
@@ -206,7 +219,13 @@ export const ChapterTextContent = memo(
                           </span>
                         ) : null}
                         {showVerseNumbers ? (
-                          <span className="mr-2 inline-flex w-7 shrink-0 justify-end text-xs leading-7 font-semibold tabular-nums text-muted-foreground">
+                          <span
+                            className="mr-2 inline-flex w-7 shrink-0 justify-end font-semibold tabular-nums text-muted-foreground"
+                            style={{
+                              fontSize: `${verseNumberSize}px`,
+                              lineHeight: `${lineHeight}px`,
+                            }}
+                          >
                             {verse.verse}
                           </span>
                         ) : null}
@@ -237,15 +256,16 @@ export const ChapterTextContent = memo(
               >
                 <p
                   className={cn(
-                    "leading-7",
                     (showVerseNumbers || bookmarkModeEnabled) &&
                       "grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2",
                   )}
+                  style={{ lineHeight: `${lineHeight}px` }}
                 >
                   <span className="inline-flex items-center gap-1">
                     {bookmarkModeEnabled ? (
                       <span
-                        className="inline-flex h-7 items-center align-top"
+                        className="inline-flex items-center align-top"
+                        style={{ height: `${lineHeight}px` }}
                         onClick={(event) => {
                           event.stopPropagation();
                         }}
@@ -260,7 +280,13 @@ export const ChapterTextContent = memo(
                       </span>
                     ) : null}
                     {showVerseNumbers ? (
-                      <span className="inline-flex w-7 shrink-0 justify-start text-xs leading-7 font-semibold tabular-nums text-muted-foreground">
+                      <span
+                        className="inline-flex w-7 shrink-0 justify-start font-semibold tabular-nums text-muted-foreground"
+                        style={{
+                          fontSize: `${verseNumberSize}px`,
+                          lineHeight: `${lineHeight}px`,
+                        }}
+                      >
                         {verse.verse}
                       </span>
                     ) : null}
@@ -302,5 +328,6 @@ export const ChapterTextContent = memo(
     prev.pendingRangeStartVerseNumber === next.pendingRangeStartVerseNumber &&
     prev.highlightedVerseRange?.start === next.highlightedVerseRange?.start &&
     prev.highlightedVerseRange?.end === next.highlightedVerseRange?.end &&
+    prev.fontSize === next.fontSize &&
     prev.verseSpacing === next.verseSpacing,
 );
