@@ -1,7 +1,9 @@
 import { type RefObject } from "react";
 import {
+  ArrowDownIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
+  ArrowUpIcon,
   EllipsisIcon,
   PencilLineIcon,
   PlusIcon,
@@ -49,7 +51,7 @@ export function TabsStrip({
     <ScrollArea className="h-full w-full">
       <div
         className={cn(
-          "p-1",
+          "p-2",
           tabsOrientation === "vertical"
             ? "flex flex-col items-stretch gap-2"
             : "flex w-max items-center gap-2",
@@ -59,6 +61,14 @@ export function TabsStrip({
           const active = tab.id === activeTabId;
           const canMoveLeft = tabs.length > 1 && index > 0;
           const canMoveRight = tabs.length > 1 && index < tabs.length - 1;
+          const moveBackwardLabel =
+            tabsOrientation === "vertical" ? "Move Up" : "Move Left";
+          const moveForwardLabel =
+            tabsOrientation === "vertical" ? "Move Down" : "Move Right";
+          const MoveBackwardIcon =
+            tabsOrientation === "vertical" ? ArrowUpIcon : ArrowLeftIcon;
+          const MoveForwardIcon =
+            tabsOrientation === "vertical" ? ArrowDownIcon : ArrowRightIcon;
           return (
             <ButtonGroup
               key={tab.id}
@@ -109,14 +119,14 @@ export function TabsStrip({
                       <DropdownMenuGroup>
                         {canMoveLeft ? (
                           <DropdownMenuItem onClick={() => onMoveTab(tab.id, -1)}>
-                            <ArrowLeftIcon />
-                            Move Left
+                            <MoveBackwardIcon />
+                            {moveBackwardLabel}
                           </DropdownMenuItem>
                         ) : null}
                         {canMoveRight ? (
                           <DropdownMenuItem onClick={() => onMoveTab(tab.id, 1)}>
-                            <ArrowRightIcon />
-                            Move Right
+                            <MoveForwardIcon />
+                            {moveForwardLabel}
                           </DropdownMenuItem>
                         ) : null}
                       </DropdownMenuGroup>

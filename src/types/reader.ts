@@ -95,6 +95,19 @@ export type SearchPageState = {
   error: string | null;
 };
 
+export type StaticPageId =
+  | "saved"
+  | "kjv-only"
+  | "resources"
+  | "churches"
+  | "download"
+  | "donate"
+  | "credits"
+  | "whats-new"
+  | "about"
+  | "contact"
+  | "help";
+
 export type PanelDirection = "left" | "right" | "up" | "down";
 export type SplitOrientation = "horizontal" | "vertical";
 export type TabsOrientation = "horizontal" | "vertical";
@@ -103,11 +116,12 @@ export type IconVariant = "bw" | "color";
 export type LeafNode = {
   id: string;
   type: "leaf";
-  view: "reader" | "picker" | "search" | "notes";
+  view: "reader" | "picker" | "search" | "notes" | "page";
   bookIndex: number;
   chapterIndex: number;
   pickerTestament: "old" | "new" | null;
   pickerBookIndex: number | null;
+  pageId: StaticPageId | null;
 };
 
 export type SplitNode = {
