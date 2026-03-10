@@ -6,6 +6,7 @@ import {
 import type {
   ConcordancePayload,
   CrossRefsPayload,
+  GenealogyCompactPayload,
   GenealogyPayload,
   HitchcocksPayload,
   OldEnglishPayload,
@@ -13,6 +14,7 @@ import type {
   StrongsPayload,
   WebstersPayload,
 } from "@/types/reader";
+import { decodeGenealogyPayload } from "@/lib/genealogy";
 
 let kjvBooksPromise: Promise<Book[]> | null = null;
 let concordancePromise: Promise<ConcordancePayload> | null = null;
@@ -173,16 +175,16 @@ export function loadOldEnglish() {
 
 export function loadGenealogy() {
   if (!genealogyPromise) {
-    genealogyPromise = fetch("/references/genealogy.json", {
+    genealogyPromise = fetch("/references/genealogy.compact.min.json", {
       cache: "force-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
-          throw new Error("Could not load /references/genealogy.json");
+          throw new Error("Could not load /references/genealogy.compact.min.json");
         }
         return response.json() as Promise<unknown>;
       })
-      .then((payload) => payload as GenealogyPayload)
+      .then((payload) => decodeGenealogyPayload(payload as GenealogyCompactPayload))
       .catch((error) => {
         genealogyPromise = null;
         throw error;
