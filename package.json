@@ -11,6 +11,7 @@
     "build:genealogy": "node scripts/build-genealogy-compact.mjs",
     "build:map-photos": "node scripts/fetch-map-photos.mjs",
     "build:maps": "node scripts/build-map-json.mjs",
+    "build:strongs": "node scripts/build-strongs-compact.mjs",
     "build:all": "npm run build:data && npm run build",
     "lint": "eslint .",
     "preview": "vite preview"

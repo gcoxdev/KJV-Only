@@ -96,6 +96,16 @@ export type StrongsEntry = {
 
 export type StrongsPayload = Record<string, StrongsEntry>;
 
+export type StrongsCompactPayload = {
+  v: string[];
+  w: string[];
+  s: string[];
+  e: Record<
+    string,
+    [number?, number?, number?, number?, number?, number?, Array<[number, number[]]>?]
+  >;
+};
+
 export type SearchMode =
   | "contains-any"
   | "contains-all"
