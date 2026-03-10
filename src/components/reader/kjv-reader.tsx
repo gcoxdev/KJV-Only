@@ -35,6 +35,11 @@ import {
 } from "@/lib/references";
 import { normalizeRangePoints } from "@/lib/bookmarks";
 import {
+  defaultHighlightColor,
+  normalizeHighlightColor,
+  readableHighlightTextColor,
+} from "@/lib/highlight-color";
+import {
   chapterProgressKey,
   panelViewportElement,
 } from "@/lib/reader-view";
@@ -146,6 +151,7 @@ export function KJVReader() {
   const [isStudyMode, setIsStudyMode] = useState(true);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [fontSize, setFontSize] = useState(16);
+  const [highlightColor, setHighlightColor] = useState(defaultHighlightColor);
   const [verseSpacing, setVerseSpacing] = useState(0);
   const [hideReadModeVerseNumbers, setHideReadModeVerseNumbers] =
     useState(false);
@@ -300,6 +306,7 @@ export function KJVReader() {
       }
       const parsed = JSON.parse(stored) as {
         fontSize?: number;
+        highlightColor?: string;
         verseSpacing?: number;
         hideReadModeVerseNumbers?: boolean;
         readModeParagraphIndent?: boolean;
@@ -308,6 +315,9 @@ export function KJVReader() {
       };
       if (typeof parsed.fontSize === "number") {
         setFontSize(Math.max(8, Math.round(parsed.fontSize)));
+      }
+      if (typeof parsed.highlightColor === "string") {
+        setHighlightColor(normalizeHighlightColor(parsed.highlightColor));
       }
       if (typeof parsed.verseSpacing === "number") {
         setVerseSpacing(
@@ -339,6 +349,7 @@ export function KJVReader() {
       "kjv-display-settings-v1",
         JSON.stringify({
         fontSize,
+        highlightColor,
         verseSpacing,
         hideReadModeVerseNumbers,
         readModeParagraphIndent,
@@ -348,6 +359,7 @@ export function KJVReader() {
     );
   }, [
     fontSize,
+    highlightColor,
     verseSpacing,
     hideReadModeVerseNumbers,
     readModeParagraphIndent,
@@ -478,7 +490,9 @@ export function KJVReader() {
     readerBookmarks,
     bookmarkModeEnabled,
     pendingBookmarkRangeStart,
+    pendingBookmarkRangeStartLeafId,
     setPendingBookmarkRangeStart,
+    setPendingBookmarkRangeStartLeafId,
     upsertBookmark,
     updateBookmark,
     deleteBookmark,
@@ -1404,7 +1418,12 @@ export function KJVReader() {
   );
 
   const handleVerseSelection = useCallback(
-    (bookIndex: number, chapterIndex: number, verseNumber: number) => {
+    (
+      leafId: string,
+      bookIndex: number,
+      chapterIndex: number,
+      verseNumber: number,
+    ) => {
       if (!bookmarkModeEnabled) {
         openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
         return;
@@ -1414,13 +1433,57 @@ export function KJVReader() {
       setNotesContext(point);
 
       if (!pendingBookmarkRangeStart) {
+        clearAllVerseHighlights();
+        queueVerseHighlight(leafId, { start: verseNumber, end: verseNumber });
         setPendingBookmarkRangeStart(point);
+        setPendingBookmarkRangeStartLeafId(leafId);
         setIsRightSidebarOpen(true);
         setSidebarOpenRequestKey((current) => current + 1);
         return;
       }
 
       const normalized = normalizeRangePoints(pendingBookmarkRangeStart, point);
+      clearAllVerseHighlights();
+
+      if (
+        normalized.start.bookIndex === normalized.end.bookIndex &&
+        normalized.start.chapterIndex === normalized.end.chapterIndex
+      ) {
+        queueVerseHighlight(leafId, {
+          start: normalized.start.verseNumber,
+          end: normalized.end.verseNumber,
+        });
+      } else {
+        if (
+          pendingBookmarkRangeStartLeafId &&
+          normalized.start.bookIndex === pendingBookmarkRangeStart.bookIndex &&
+          normalized.start.chapterIndex === pendingBookmarkRangeStart.chapterIndex
+        ) {
+          const startChapterVerseCount =
+            books[normalized.start.bookIndex]?.chapters[
+              normalized.start.chapterIndex
+            ]?.verses.length ?? normalized.start.verseNumber;
+          queueVerseHighlight(pendingBookmarkRangeStartLeafId, {
+            start: normalized.start.verseNumber,
+            end: startChapterVerseCount,
+          });
+        }
+
+        if (
+          normalized.end.bookIndex === bookIndex &&
+          normalized.end.chapterIndex === chapterIndex
+        ) {
+          queueVerseHighlight(leafId, {
+            start:
+              normalized.start.bookIndex === bookIndex &&
+              normalized.start.chapterIndex === chapterIndex
+                ? normalized.start.verseNumber
+                : 1,
+            end: normalized.end.verseNumber,
+          });
+        }
+      }
+
       const isSingleVerse =
         normalized.start.bookIndex === normalized.end.bookIndex &&
         normalized.start.chapterIndex === normalized.end.chapterIndex &&
@@ -1442,13 +1505,19 @@ export function KJVReader() {
       }
 
       setPendingBookmarkRangeStart(null);
+      setPendingBookmarkRangeStartLeafId(null);
       setIsRightSidebarOpen(true);
       setSidebarOpenRequestKey((current) => current + 1);
     },
     [
       bookmarkModeEnabled,
+      books,
+      clearAllVerseHighlights,
       openCrossReferencesForVerse,
       pendingBookmarkRangeStart,
+      pendingBookmarkRangeStartLeafId,
+      queueVerseHighlight,
+      setPendingBookmarkRangeStartLeafId,
       upsertBookmark,
     ],
   );
@@ -1944,6 +2013,10 @@ export function KJVReader() {
       chapterIndex: leaf.chapterIndex,
     };
   }, [activeTab]);
+  const highlightTextColor = useMemo(
+    () => readableHighlightTextColor(highlightColor),
+    [highlightColor],
+  );
 
   if (!isLoaded) {
     return <ReaderStatusScreen message="Loading Bible data..." />;
@@ -2013,7 +2086,15 @@ export function KJVReader() {
     bookPickerDialogLeafId && bookPickerDialogLeaf,
   );
   return (
-    <main className="h-screen w-full overflow-hidden bg-background">
+    <main
+      className="h-screen w-full overflow-hidden bg-background"
+      style={
+        {
+          "--verse-highlight-bg": highlightColor,
+          "--verse-highlight-fg": highlightTextColor,
+        } as React.CSSProperties
+      }
+    >
       <SidebarProvider
         open={isStudyMode ? isRightSidebarOpen : false}
         onOpenChange={(open) => {
@@ -2378,6 +2459,13 @@ export function KJVReader() {
               setFontSize((current) => Math.max(8, current - 4))
             }
             onResetFontSize={() => setFontSize(16)}
+            highlightColor={highlightColor}
+            onHighlightColorChange={(value) =>
+              setHighlightColor(normalizeHighlightColor(value))
+            }
+            onResetHighlightColor={() =>
+              setHighlightColor(defaultHighlightColor())
+            }
             verseSpacing={verseSpacing}
             onVerseSpacingChange={setVerseSpacing}
             hideReadModeVerseNumbers={hideReadModeVerseNumbers}

@@ -141,6 +141,7 @@ export const ChapterTextContent = memo(
           : () => false,
       [highlightedVerseRange],
     );
+    const hasAnyHighlightedVerse = Boolean(highlightedVerseRange);
 
     return (
       <div
@@ -187,31 +188,117 @@ export const ChapterTextContent = memo(
                   }
                 >
                   {group.map((verse, verseIndex) => (
-                    <Fragment
-                      key={`${bookName}-${chapterNumber}-${verse.verse}`}
+                    (() => {
+                      const highlighted = isVerseHighlighted(verse.verse);
+
+                      return (
+                        <Fragment
+                          key={`${bookName}-${chapterNumber}-${verse.verse}`}
+                        >
+                          {verseIndex > 0 ? " " : null}
+                          <span
+                            data-verse-number={verse.verse}
+                            className={cn(
+                              hasAnyHighlightedVerse &&
+                                !bookmarkModeEnabled &&
+                                "pl-1",
+                              verse.redLetter && "text-red-700",
+                              highlighted && "verse-reference-highlight",
+                            )}
+                          >
+                            {bookmarkModeEnabled ? (
+                              <span
+                                className="mr-1 inline-flex items-center pl-1 align-top"
+                                style={{ height: `${lineHeight}px` }}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                }}
+                              >
+                                <Checkbox
+                                  checked={
+                                    pendingRangeStartVerseNumber === verse.verse
+                                  }
+                                  aria-label={`Select verse ${verse.verse} for bookmark`}
+                                  className={cn(
+                                    highlighted &&
+                                      "border-[var(--verse-highlight-fg)] text-[var(--verse-highlight-fg)] data-checked:border-[var(--verse-highlight-fg)] data-checked:bg-[var(--verse-highlight-fg)] data-checked:text-[var(--verse-highlight-bg)]",
+                                  )}
+                                  onCheckedChange={() => {
+                                    onSelectVerse(verse.verse);
+                                  }}
+                                />
+                              </span>
+                            ) : null}
+                            {showVerseNumbers ? (
+                              <span
+                                className={cn(
+                                  "mr-2 inline-flex w-7 shrink-0 justify-end font-semibold tabular-nums text-muted-foreground",
+                                  highlighted &&
+                                    "text-[var(--verse-highlight-fg)]",
+                                )}
+                                style={{
+                                  fontSize: `${verseNumberSize}px`,
+                                  lineHeight: `${lineHeight}px`,
+                                }}
+                              >
+                                {verse.verse}
+                              </span>
+                            ) : null}
+                            {renderVerseTokens(
+                              verse.tokens,
+                              isStudyMode,
+                              onOpenTokenDetails,
+                            )}
+                          </span>
+                        </Fragment>
+                      );
+                    })()
+                  ))}
+                </p>
+              </article>
+            ))
+          : verses.map((verse) => (
+              (() => {
+                const highlighted = isVerseHighlighted(verse.verse);
+
+                return (
+                  <article
+                    key={`${bookName}-${chapterNumber}-${verse.verse}`}
+                    data-verse-number={verse.verse}
+                    className={cn(
+                      "[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]",
+                      hasAnyHighlightedVerse && !bookmarkModeEnabled && "pl-1",
+                      highlighted && "verse-reference-highlight",
+                    )}
+                    onClick={() => {
+                      if (enableVerseSelection) {
+                        onSelectVerse(verse.verse);
+                      }
+                    }}
+                  >
+                    <p
+                      className={cn(
+                        (showVerseNumbers || bookmarkModeEnabled) &&
+                          "grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2",
+                      )}
+                      style={{ lineHeight: `${lineHeight}px` }}
                     >
-                      {verseIndex > 0 ? " " : null}
-                      <span
-                        data-verse-number={verse.verse}
-                        className={cn(
-                          verse.redLetter && "text-red-700",
-                          isVerseHighlighted(verse.verse) &&
-                            "verse-reference-highlight",
-                        )}
-                      >
+                      <span className="inline-flex items-center gap-1">
                         {bookmarkModeEnabled ? (
                           <span
-                            className="mr-1 inline-flex items-center align-top"
+                            className="inline-flex items-center pl-1 align-top"
                             style={{ height: `${lineHeight}px` }}
                             onClick={(event) => {
                               event.stopPropagation();
                             }}
                           >
                             <Checkbox
-                              checked={
-                                pendingRangeStartVerseNumber === verse.verse
-                              }
+                              checked={pendingRangeStartVerseNumber === verse.verse}
                               aria-label={`Select verse ${verse.verse} for bookmark`}
+                              className={cn(
+                                highlighted &&
+                                  "border-[var(--verse-highlight-fg)] text-[var(--verse-highlight-fg)] data-checked:border-[var(--verse-highlight-fg)] data-checked:bg-[var(--verse-highlight-fg)] data-checked:text-[var(--verse-highlight-bg)]",
+                              )}
                               onCheckedChange={() => {
                                 onSelectVerse(verse.verse);
                               }}
@@ -220,7 +307,10 @@ export const ChapterTextContent = memo(
                         ) : null}
                         {showVerseNumbers ? (
                           <span
-                            className="mr-2 inline-flex w-7 shrink-0 justify-end font-semibold tabular-nums text-muted-foreground"
+                            className={cn(
+                              "inline-flex w-7 shrink-0 justify-start font-semibold tabular-nums text-muted-foreground",
+                              highlighted && "text-[var(--verse-highlight-fg)]",
+                            )}
                             style={{
                               fontSize: `${verseNumberSize}px`,
                               lineHeight: `${lineHeight}px`,
@@ -229,88 +319,29 @@ export const ChapterTextContent = memo(
                             {verse.verse}
                           </span>
                         ) : null}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-pretty",
+                          verse.redLetter && "text-red-700",
+                        )}
+                        style={
+                          readModeParagraphIndent &&
+                          (verse.verse === 1 || verse.paragraphStart)
+                            ? { textIndent: "1.5rem" }
+                            : undefined
+                        }
+                      >
                         {renderVerseTokens(
                           verse.tokens,
                           isStudyMode,
                           onOpenTokenDetails,
                         )}
                       </span>
-                    </Fragment>
-                  ))}
-                </p>
-              </article>
-            ))
-          : verses.map((verse) => (
-              <article
-                key={`${bookName}-${chapterNumber}-${verse.verse}`}
-                data-verse-number={verse.verse}
-                className={cn(
-                  "[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]",
-                  isVerseHighlighted(verse.verse) && "verse-reference-highlight",
-                )}
-                onClick={() => {
-                  if (enableVerseSelection) {
-                    onSelectVerse(verse.verse);
-                  }
-                }}
-              >
-                <p
-                  className={cn(
-                    (showVerseNumbers || bookmarkModeEnabled) &&
-                      "grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2",
-                  )}
-                  style={{ lineHeight: `${lineHeight}px` }}
-                >
-                  <span className="inline-flex items-center gap-1">
-                    {bookmarkModeEnabled ? (
-                      <span
-                        className="inline-flex items-center align-top"
-                        style={{ height: `${lineHeight}px` }}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                        }}
-                      >
-                        <Checkbox
-                          checked={pendingRangeStartVerseNumber === verse.verse}
-                          aria-label={`Select verse ${verse.verse} for bookmark`}
-                          onCheckedChange={() => {
-                            onSelectVerse(verse.verse);
-                          }}
-                        />
-                      </span>
-                    ) : null}
-                    {showVerseNumbers ? (
-                      <span
-                        className="inline-flex w-7 shrink-0 justify-start font-semibold tabular-nums text-muted-foreground"
-                        style={{
-                          fontSize: `${verseNumberSize}px`,
-                          lineHeight: `${lineHeight}px`,
-                        }}
-                      >
-                        {verse.verse}
-                      </span>
-                    ) : null}
-                  </span>
-                  <span
-                    className={cn(
-                      "text-pretty",
-                      verse.redLetter && "text-red-700",
-                    )}
-                    style={
-                      readModeParagraphIndent &&
-                      (verse.verse === 1 || verse.paragraphStart)
-                        ? { textIndent: "1.5rem" }
-                        : undefined
-                    }
-                  >
-                    {renderVerseTokens(
-                      verse.tokens,
-                      isStudyMode,
-                      onOpenTokenDetails,
-                    )}
-                  </span>
-                </p>
-              </article>
+                    </p>
+                  </article>
+                );
+              })()
             ))}
       </div>
     );
