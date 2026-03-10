@@ -87,7 +87,7 @@ export function ReaderTopBar({
         </Button>
         <div className="flex items-center gap-2">
           <Label htmlFor="study-mode" className="text-sm">
-            Study
+            {isStudyMode ? "Study" : "Read"}
           </Label>
           <Switch
             id="study-mode"

@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from "react";
-import { LoaderCircleIcon } from "lucide-react";
+import { LoaderCircleIcon, UserSearchIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { GenealogyPerson } from "@/types/reader";
@@ -39,6 +39,7 @@ export function GenealogyTool({
       <AccordionTrigger
         className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
       >
+        <UserSearchIcon />
         Genealogy
       </AccordionTrigger>
       <AccordionContent className="space-y-2 overflow-visible">

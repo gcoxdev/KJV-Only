@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from "react";
-import { LoaderCircleIcon } from "lucide-react";
+import { EarthIcon, LoaderCircleIcon } from "lucide-react";
 
 import { type AncientMapEntry, cleanMapMarkup, deriveMapPhotoDialogItems } from "@/lib/maps";
 import { cn } from "@/lib/utils";
@@ -75,6 +75,7 @@ export function MapsTool({
       <AccordionTrigger
         className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
       >
+        <EarthIcon />
         Maps &amp; Photos
       </AccordionTrigger>
       <AccordionContent className="space-y-2 overflow-visible">

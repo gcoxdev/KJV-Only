@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from "react";
-import { LoaderCircleIcon } from "lucide-react";
+import { BookSearchIcon, LoaderCircleIcon } from "lucide-react";
 
 import type { Book } from "@/types/bible";
 import { cn } from "@/lib/utils";
@@ -48,6 +48,7 @@ export function CrossRefsTool({
       <AccordionTrigger
         className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
       >
+        <BookSearchIcon />
         Cross References
       </AccordionTrigger>
       <AccordionContent className="space-y-2 overflow-visible">

@@ -10,6 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { BookOpenCheckIcon, BookOpenIcon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -198,6 +199,7 @@ export function ProgressDialog({
                                         )
                                       }
                                     >
+                                      {chapter.read ? <BookOpenIcon /> : <BookOpenCheckIcon />}
                                       {chapter.read ? "Read" : "Mark Read"}
                                     </Button>
                                   </div>

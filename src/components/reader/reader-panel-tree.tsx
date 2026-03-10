@@ -14,6 +14,8 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpIcon,
+  BookOpenCheckIcon,
+  BookOpenIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   EllipsisVerticalIcon,
@@ -944,6 +946,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                       toggleChapterRead(leaf.bookIndex, leaf.chapterIndex)
                     }
                   >
+                    {isChapterRead ? <BookOpenIcon /> : <BookOpenCheckIcon />}
                     {isChapterRead ? "Read" : "Mark Read"}
                   </Button>
                   <Button

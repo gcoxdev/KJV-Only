@@ -1,4 +1,11 @@
 import { useState, type ReactNode } from "react";
+import {
+  BookMarkedIcon,
+  CopyMinusIcon,
+  CopyPlusIcon,
+  NotebookPenIcon,
+  ToolboxIcon,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -52,6 +59,7 @@ export function StudyToolsSidebar({
             variant={activeTab === "tools" ? "default" : "outline"}
             onClick={() => setActiveTab("tools")}
           >
+            <ToolboxIcon />
             Tools
           </Button>
           <Button
@@ -60,6 +68,7 @@ export function StudyToolsSidebar({
             variant={activeTab === "notes" ? "default" : "outline"}
             onClick={() => setActiveTab("notes")}
           >
+            <NotebookPenIcon />
             Notes
           </Button>
           <Button
@@ -68,6 +77,7 @@ export function StudyToolsSidebar({
             variant={activeTab === "bookmarks" ? "default" : "outline"}
             onClick={() => setActiveTab("bookmarks")}
           >
+            <BookMarkedIcon />
             Bookmarks
           </Button>
         </div>
@@ -83,6 +93,7 @@ export function StudyToolsSidebar({
                 onClick={onExpandAll}
                 disabled={!canExpand}
               >
+                <CopyPlusIcon />
                 Expand All
               </Button>
               <Button
@@ -92,6 +103,7 @@ export function StudyToolsSidebar({
                 onClick={onCollapseAll}
                 disabled={!canCollapse}
               >
+                <CopyMinusIcon />
                 Collapse All
               </Button>
             </div>
