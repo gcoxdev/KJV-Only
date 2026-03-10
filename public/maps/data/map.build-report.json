@@ -1,0 +1,28 @@
+{
+  "counts": {
+    "ancientEntries": 1342,
+    "modernEntries": 1596,
+    "compactEntries": 1285
+  },
+  "size": {
+    "outputBytes": 744245,
+    "legacyBytes": 1163993,
+    "bytesSaved": 419748
+  },
+  "sample": {
+    "geojson_file": "aea17b7.geojson",
+    "translations": [
+      "Abana",
+      "Abanah"
+    ],
+    "types": [
+      "river"
+    ],
+    "verses": [
+      "2KI.5.12"
+    ],
+    "modern_names": [
+      "Barada River"
+    ]
+  }
+}

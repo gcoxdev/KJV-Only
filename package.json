@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "build:data": "python3 scripts/import_osis_to_sqlite.py --input data-source/kjv.osis.xml --db public/data/kjv.sqlite --json public/data/kjv.json",
     "build:map-photos": "node scripts/fetch-map-photos.mjs",
+    "build:maps": "node scripts/build-map-json.mjs",
     "build:all": "npm run build:data && npm run build",
     "lint": "eslint .",
     "preview": "vite preview"
