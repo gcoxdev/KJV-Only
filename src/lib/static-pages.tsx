@@ -8,7 +8,6 @@ import {
   FileTextIcon,
   HeartHandshakeIcon,
   InfoIcon,
-  LandmarkIcon,
   LibraryBigIcon,
   ScrollTextIcon,
   SparklesIcon,

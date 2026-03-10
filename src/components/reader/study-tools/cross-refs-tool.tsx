@@ -5,6 +5,7 @@ import type { Book } from "@/types/bible";
 import { cn } from "@/lib/utils";
 import { parseBibleReference } from "@/lib/references";
 import {
+  Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
@@ -73,20 +74,29 @@ export function CrossRefsTool({
             ) : (
               <div className="space-y-2">
                 <p className="text-sm font-medium">{selectedLabel(selected.key, books)}</p>
-                <p className="text-sm leading-7">
-                  {selected.references.map((reference, index) => (
-                    <Fragment key={`${selected.key}-${reference}-${index}`}>
-                      <ConcordanceReferencePopover
-                        reference={reference}
-                        highlightWord=""
-                        renderPreview={renderPreview}
-                        onOpenReference={onOpenReference}
-                        onCloseSidebar={onCloseSidebar}
-                      />
-                      {index < selected.references.length - 1 ? ", " : null}
-                    </Fragment>
-                  ))}
-                </p>
+                <Accordion className="w-full rounded-md border px-2" multiple>
+                  <AccordionItem value="cross-refs-references">
+                    <AccordionTrigger>
+                      {`References (${selected.references.length})`}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="text-sm leading-7">
+                        {selected.references.map((reference, index) => (
+                          <Fragment key={`${selected.key}-${reference}-${index}`}>
+                            <ConcordanceReferencePopover
+                              reference={reference}
+                              highlightWord=""
+                              renderPreview={renderPreview}
+                              onOpenReference={onOpenReference}
+                              onCloseSidebar={onCloseSidebar}
+                            />
+                            {index < selected.references.length - 1 ? ", " : null}
+                          </Fragment>
+                        ))}
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
             )}
           </>
