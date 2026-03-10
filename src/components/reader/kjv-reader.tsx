@@ -13,7 +13,6 @@ import {
   type VerseToken,
 } from "@/types/bible";
 import {
-  type AncientMapEntry,
   type AncientMapPayload,
   matchesMapWord,
 } from "@/lib/maps";
@@ -187,9 +186,6 @@ export function KJVReader() {
   const [strongsWordAccordionValue, setStrongsWordAccordionValue] = useState<
     string[]
   >([]);
-  const [mapsWordAccordionValue, setMapsWordAccordionValue] = useState<
-    string[]
-  >([]);
   const {
     isMapDialogOpen,
     activeMapDialogEntry,
@@ -199,14 +195,6 @@ export function KJVReader() {
     onMapDialogOpenChange,
     onCloseMapDialog,
     openMapDialog,
-    isPhotoDialogOpen,
-    currentPhotoDialogItem,
-    photoDialogIndex,
-    photoDialogItemsLength,
-    onPhotoDialogOpenChange,
-    onClosePhotoDialog,
-    openPhotoDialog,
-    movePhotoDialog,
     resetMapDialogState,
   } = useMapDialogState({
     loadMapGeoJsonByFile: loadMapGeoJson,
@@ -293,11 +281,8 @@ export function KJVReader() {
     setMapsError(null);
     setIsMapsLoading(false);
     setIsMapsSearching(false);
-    setMapsWordAccordionValue([]);
     setSelectedMapsEntries([]);
     resetMapDialogState();
-    setIsMapImagesLoading(false);
-    setMapImagesError(null);
   }, [isStudyMode, resetMapDialogState]);
 
   useEffect(() => {
@@ -719,24 +704,18 @@ export function KJVReader() {
     isMapsSearching,
     isMapsLoading,
     mapsError,
-    isMapImagesLoading,
-    mapImagesError,
     mapsSearchResults,
     mapsDisplayEntries,
     setIsMapsSearching,
     setIsMapsLoading,
     setMapsError,
     setSelectedMapsEntries,
-    setIsMapImagesLoading,
-    setMapImagesError,
     ensureAncientMapsLoaded,
-    ensureMapImagesLoaded,
     applyMapsSearch: applyMapsSearchRaw,
   } = useMapsSearchTool();
 
   const applyMapsSearch = useCallback(
     (rawValue?: string) => {
-      setMapsWordAccordionValue([]);
       applyMapsSearchRaw(rawValue);
     },
     [applyMapsSearchRaw],
@@ -775,16 +754,6 @@ export function KJVReader() {
       clearAllPanelPreviews();
     }
   }, [activeTab, panelMenuOpenLeafId]);
-
-  const openMapDialogWithImages = useCallback(
-    (entry: AncientMapEntry) => {
-      openMapDialog(entry);
-      void ensureMapImagesLoaded().catch(() => {
-        // Error state is set by ensureMapImagesLoaded.
-      });
-    },
-    [ensureMapImagesLoaded, openMapDialog],
-  );
 
   function updateActiveTab(updater: (tab: ReaderTab) => ReaderTab) {
     if (!activeTabId) {
@@ -1738,7 +1707,6 @@ export function KJVReader() {
         const matches = data.filter((entry) =>
           matchesMapWord(entry, rawWord, normalizeConcordanceWord),
         );
-        setMapsWordAccordionValue([]);
         setSelectedMapsEntries(matches);
         setConcordanceAccordionValue((current) => {
           const withoutMaps = current.filter((value) => value !== "maps");
@@ -1908,9 +1876,6 @@ export function KJVReader() {
 
       setMapsError(null);
       setIsMapsLoading(true);
-      void ensureMapImagesLoaded().catch(() => {
-        // Error state is set by ensureMapImagesLoaded.
-      });
       if (ancientMaps) {
         applyMapsSelection(ancientMaps);
       } else {
@@ -1933,7 +1898,6 @@ export function KJVReader() {
       concordance,
       ensureConcordanceLoaded,
       ensureAncientMapsLoaded,
-      ensureMapImagesLoaded,
       ensureHitchcocksLoaded,
       ensureGenealogyLoaded,
       ensureOldEnglishLoaded,
@@ -2309,13 +2273,8 @@ export function KJVReader() {
               searchTerm: mapsSearchTerm,
               resultsLength: mapsSearchResults.length,
               displayEntries: mapsDisplayEntries,
-              wordAccordionValue: mapsWordAccordionValue,
-              onWordAccordionValueChange: setMapsWordAccordionValue,
               onSearch: applyMapsSearch,
-              onOpenMapDialog: openMapDialogWithImages,
-              isMapImagesLoading: isMapImagesLoading,
-              mapImagesError: mapImagesError,
-              onOpenPhotoDialog: openPhotoDialog,
+              onOpenMapDialog: openMapDialog,
               renderPreview: referencePreviewContent,
               onOpenReference: openConcordanceReference,
               onCloseSidebar: closeRightSidebarForMobile,
@@ -2386,7 +2345,7 @@ export function KJVReader() {
 
       {tokenPopupCard}
 
-      {isMapDialogOpen || isPhotoDialogOpen ? (
+      {isMapDialogOpen ? (
         <Suspense fallback={null}>
           <LazyMapAndPhotoDialogs
             isMapDialogOpen={isMapDialogOpen}
@@ -2396,14 +2355,6 @@ export function KJVReader() {
             mapDialogGeoJson={mapDialogGeoJson}
             onMapDialogOpenChange={onMapDialogOpenChange}
             onCloseMapDialog={onCloseMapDialog}
-            isPhotoDialogOpen={isPhotoDialogOpen}
-            currentPhotoDialogItem={currentPhotoDialogItem}
-            photoDialogIndex={photoDialogIndex}
-            photoDialogItemsLength={photoDialogItemsLength}
-            onPhotoDialogOpenChange={onPhotoDialogOpenChange}
-            onClosePhotoDialog={onClosePhotoDialog}
-            onPreviousPhoto={() => movePhotoDialog(-1)}
-            onNextPhoto={() => movePhotoDialog(1)}
           />
         </Suspense>
       ) : null}

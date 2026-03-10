@@ -1,0 +1,4836 @@
+{
+  "summary": {
+    "candidateCount": 481,
+    "byLicense": {
+      "CC-BY-2.5": 20,
+      "CC-BY-SA-3.0": 117,
+      "CC-BY-3.0": 47,
+      "PD": 80,
+      "GFDL": 38,
+      "CC-Zero": 10,
+      "CC-BY-SA-4.0": 113,
+      "CC-BY-4.0": 8,
+      "attribution": 15,
+      "CC-BY-SA-2.0": 11,
+      "CC-BY-2.0": 14,
+      "FAL": 2,
+      "CC-PD-Mark": 1,
+      "CC-BY-SA-2.5": 5
+    }
+  },
+  "candidates": [
+    {
+      "id": "i0061bb",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "MathKnight",
+      "url": "https://commons.wikimedia.org/wiki/File:Marvad-kalaniyot02.jpg",
+      "descriptions": {
+        "m902faf": "field near <modern id=\"m902faf\">Horbat Gluma</modern>"
+      }
+    },
+    {
+      "id": "i007bc0",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Lior Golgher • ליאור גולגר",
+      "url": "https://commons.wikimedia.org/wiki/File:Northern_slope_of_Mount_Meron.jpg",
+      "descriptions": {
+        "m75b528": "panorama of <modern id=\"m75b528\">Mount Meron</modern>"
+      }
+    },
+    {
+      "id": "i00b05d",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Ajloon_-_panoramio_(2).jpg",
+      "descriptions": {
+        "m765dcc": "cityscape near <modern id=\"m765dcc\">Khirbet Hamid</modern>"
+      }
+    },
+    {
+      "id": "i00b49c",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Jorre",
+      "url": "https://commons.wikimedia.org/wiki/File:Tulul_adh-Dhahab_morning_view_on_excavation_2008_I.JPG",
+      "descriptions": {
+        "m222ca7": "panorama of <modern id=\"m222ca7\">Tell edh Dhahab esh Sherqiyeh</modern> in the background"
+      }
+    },
+    {
+      "id": "i01083c",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Abuaviv68",
+      "url": "https://commons.wikimedia.org/wiki/File:Bldg-haluza.jpg",
+      "descriptions": {
+        "mea9d16": "ruins of building at <modern id=\"mea9d16\">Haluza</modern>"
+      }
+    },
+    {
+      "id": "i0121bd",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:West_Bank_by_Mujaddara_-_panoramio_(1355).jpg",
+      "descriptions": {
+        "mf2c1fd": "panorama looking east near <modern id=\"mf2c1fd\">Khirbet Ibziq</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "i0147e4",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Vikiçizer",
+      "url": "https://commons.wikimedia.org/wiki/File:Halepvikicizer.JPG",
+      "descriptions": {
+        "m4badb5": "cityscape of <modern id=\"m4badb5\">Aleppo</modern>"
+      }
+    },
+    {
+      "id": "i01d981",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Berthold Werner",
+      "url": "https://commons.wikimedia.org/wiki/File:Moses_spring_BW_1.jpg",
+      "descriptions": {
+        "mfcf75f": "trees at <modern id=\"mfcf75f\">Uyun Musa</modern>"
+      }
+    },
+    {
+      "id": "i0219b3",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Deror avi",
+      "url": "https://commons.wikimedia.org/wiki/File:Afek_IMG_8276.JPG",
+      "descriptions": {
+        "m97d53f": "building at <modern id=\"m97d53f\">Tell Ras el Ain</modern>"
+      }
+    },
+    {
+      "id": "i031c83",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "שלומי שטרית",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_7908_Hirbat_Beit_Loya.jpg",
+      "descriptions": {
+        "ma1b417": "mosaic at <modern id=\"ma1b417\">Khirbet Beit Lei</modern>"
+      }
+    },
+    {
+      "id": "i0353fd",
+      "license": "CC-Zero",
+      "source": "wikimedia",
+      "credit": "Yotam Nachum",
+      "url": "https://commons.wikimedia.org/wiki/File:The_Divider_4.jpg",
+      "descriptions": {
+        "m71c96a": "stream near <modern id=\"m71c96a\">Khirbet Dufnah</modern>"
+      }
+    },
+    {
+      "id": "i044638",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "zstadler",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%A7%D7%A0%D7%99%D7%95%D7%9F_%D7%94%D7%9C%D7%A1.jpeg",
+      "descriptions": {
+        "m64de18": "aerial panorama near <modern id=\"m64de18\">Jebel el Biri</modern>"
+      }
+    },
+    {
+      "id": "i044fd3",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "This image was taken by the NASA Expedition 20 crew.",
+      "url": "https://commons.wikimedia.org/wiki/File:Lake_Tiberias_(Sea_of_Galilee),_Northern_Israel.jpg",
+      "descriptions": {
+        "m0438ff": "satellite view of the <modern id=\"m0438ff\">Sea of Galilee</modern>"
+      }
+    },
+    {
+      "id": "i04885d",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Ramez Habboub",
+      "url": "https://commons.wikimedia.org/wiki/File:Omari_Mosque_in_Gaza_City.jpg",
+      "descriptions": {
+        "mb5cfe4": "building near <modern id=\"mb5cfe4\">Tell Harube</modern>"
+      }
+    },
+    {
+      "id": "i053fbc",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Mboesch",
+      "url": "https://commons.wikimedia.org/wiki/File:Nahal-besor-tel-sharuen-b.jpg",
+      "descriptions": {
+        "me0e0b1": "ruins at <modern id=\"me0e0b1\">Tel Sharuhen</modern>"
+      }
+    },
+    {
+      "id": "i054144",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Quairah_District,_Jordan_-_panoramio_(1).jpg",
+      "descriptions": {
+        "mf3eae1": "panorama of mountains near <modern id=\"mf3eae1\">Jebel el Musraq</modern>"
+      }
+    },
+    {
+      "id": "i056a9a",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Wladyslaw Sojka",
+      "url": "https://commons.wikimedia.org/wiki/File:Modell_Pergamonmuseum.jpg",
+      "descriptions": {
+        "m16099a": "model of <modern id=\"m16099a\">Pergamon</modern>"
+      }
+    },
+    {
+      "id": "i063f2b",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Advah Ben Shachar",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%91%D7%99%D7%AA_%D7%94%D7%91%D7%A7_-_%D7%A2%D7%A5.png",
+      "descriptions": {
+        "m00b3ac": "building at <modern id=\"m00b3ac\">Al Araj</modern>"
+      }
+    },
+    {
+      "id": "i06446b",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Harel M",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%A8%D7%9E%D7%99_%D7%91%D7%A0%D7%A6%D7%91%D7%99.jpeg",
+      "descriptions": {
+        "m8b46cd": "panorama looking north near <modern id=\"m8b46cd\">Tel Salwim</modern>, which is just off-camera to the right"
+      }
+    },
+    {
+      "id": "i0803ab",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "GPO Israel photographer",
+      "url": "https://commons.wikimedia.org/wiki/File:Aqir_1949.jpg",
+      "descriptions": {
+        "m6efad3": "building at <modern id=\"m6efad3\">Aqir</modern>"
+      }
+    },
+    {
+      "id": "i085c14",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Ashkelon-9114.jpg",
+      "descriptions": {
+        "m0a9529": "ruins at <modern id=\"m0a9529\">Tel Ashkelon</modern>"
+      }
+    },
+    {
+      "id": "i08a3ff",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "josefstuefer",
+      "url": "https://commons.wikimedia.org/wiki/File:The_Negev_Rocks_-_panoramio.jpg",
+      "descriptions": {
+        "me74322": "closeup of rocks near <modern id=\"me74322\">El Alem</modern>"
+      }
+    },
+    {
+      "id": "i08e99e",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "محمد وائل بالي",
+      "url": "https://commons.wikimedia.org/wiki/File:Sunrise%D9%A1.jpg",
+      "descriptions": {
+        "m9a6508": "buildings near <modern id=\"m9a6508\">Ain Sarah</modern>"
+      }
+    },
+    {
+      "id": "i0a9897",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "נח שלמה",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_15200_Moshav_Hamra_bridge.jpg",
+      "descriptions": {
+        "m5c5bc6": "bridge across <modern id=\"m5c5bc6\">Wadi al Fara</modern>"
+      }
+    },
+    {
+      "id": "i0aeccc",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Noa",
+      "url": "https://commons.wikimedia.org/wiki/File:Ezuz.JPG",
+      "descriptions": {
+        "m4ee7bd": "sign at <modern id=\"m4ee7bd\">Birein</modern>"
+      }
+    },
+    {
+      "id": "i0af19c",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Davidbena",
+      "url": "https://commons.wikimedia.org/wiki/File:Lower_site_of_the_Adullam_ruin.jpg",
+      "descriptions": {
+        "m28e80a": "panorama of <modern id=\"m28e80a\">Khirbet Id el Minya</modern>"
+      }
+    },
+    {
+      "id": "i0afbe6",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:Harei_Yehuda,_Israel_-_panoramio_(4).jpg",
+      "descriptions": {
+        "ma365e4": "panorama looking northeast near <modern id=\"ma365e4\">Khirbet el Ghashina</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "i0b3dea",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Jotpe",
+      "url": "https://commons.wikimedia.org/wiki/File:Kiryat_Shmona_northern_view.JPG",
+      "descriptions": {
+        "mb066ed": "panorama looking north near <modern id=\"mb066ed\">Givat ha Shoqet</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "i0c41d2",
+      "license": "CC-BY-4.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Karnei-Hitin-MT-554.jpg",
+      "descriptions": {
+        "m7470bc": "ruins at <modern id=\"m7470bc\">Khirbet Madin</modern>"
+      }
+    },
+    {
+      "id": "i0d20bd",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Pacman",
+      "url": "https://commons.wikimedia.org/wiki/File:Amud_stream.JPG",
+      "descriptions": {
+        "mcfd44e": "closeup of <modern id=\"mcfd44e\">Nahal Amud</modern>"
+      }
+    },
+    {
+      "id": "i0d4a7b",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Avi1111",
+      "url": "https://commons.wikimedia.org/wiki/File:Al-Khayriyya_(3).JPG",
+      "descriptions": {
+        "me36d66": "building at <modern id=\"me36d66\">Al Khayriyya</modern>"
+      }
+    },
+    {
+      "id": "i0d5a90",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "valleyofdawn",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%9E%D7%A4%D7%9C_%D7%98%D7%A8%D7%A3.jpeg",
+      "descriptions": {
+        "m6af844": "cliff near <modern id=\"m6af844\">En Orahot</modern>"
+      }
+    },
+    {
+      "id": "i0e126e",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel-Gamma-16.jpg",
+      "descriptions": {
+        "m3f6c55": "panorama of <modern id=\"m3f6c55\">Tell Jemmeh</modern>"
+      }
+    },
+    {
+      "id": "i0ed441",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Yuber",
+      "url": "https://commons.wikimedia.org/wiki/File:Karkar.jpg",
+      "descriptions": {
+        "mfa2f6d": "artifact describing a battle at <modern id=\"mfa2f6d\">Qarqar</modern>"
+      }
+    },
+    {
+      "id": "i0ee634",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Eithan Ya’aran",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%93%D7%A8%D7%95%D7%9D_%D7%94%D7%A8_%D7%97%D7%91%D7%A8%D7%95%D7%9F_014.JPG",
+      "descriptions": {
+        "mee9587": "panorama looking south near <modern id=\"mee9587\">Khirbet Umm er Rammamin</modern>, which is just off-camera to the right in the midground"
+      }
+    },
+    {
+      "id": "i0f4627",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Oren Rozen",
+      "url": "https://commons.wikimedia.org/wiki/File:BeitShean_Scythopolis_110513_04.jpg",
+      "descriptions": {
+        "m2af7af": "panorama of ruins at <modern id=\"m2af7af\">Tel Bet Shean</modern>"
+      }
+    },
+    {
+      "id": "i0f9054",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Davidbena",
+      "url": "https://commons.wikimedia.org/wiki/File:View_of_Elah_Valley_from_atop_Aderet,_March_2015.jpg",
+      "descriptions": {
+        "m354756": "panorama near <modern id=\"m354756\">Khirbet Beit Fasal</modern>, which is below the crest of the hill in the foreground"
+      }
+    },
+    {
+      "id": "i0fbbf3",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Chai",
+      "url": "https://commons.wikimedia.org/wiki/File:Beit_Guvrin_4.JPG",
+      "descriptions": {
+        "m7bf4f1": "oil press at <modern id=\"m7bf4f1\">Tel Maresha</modern>"
+      }
+    },
+    {
+      "id": "i100f89",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Drahnier",
+      "url": "https://commons.wikimedia.org/wiki/File:Hazor_israelitischer_Verteidigungsturm.jpg",
+      "descriptions": {
+        "m6429cf": "ruins at <modern id=\"m6429cf\">Tel Hazor</modern>"
+      }
+    },
+    {
+      "id": "i106b40",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Nehme1499",
+      "url": "https://commons.wikimedia.org/wiki/File:Mahrouna,_2015.jpg",
+      "descriptions": {
+        "m8d5a65": "panorama looking northwest from Mahrouna near <modern id=\"m8d5a65\">Majadel</modern>, which is off-camera to the right"
+      }
+    },
+    {
+      "id": "i1118c0",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Berthold Werner",
+      "url": "https://commons.wikimedia.org/wiki/File:Mount_Nebo_BW_6.JPG",
+      "descriptions": {
+        "m07d05e": "panorama of <modern id=\"m07d05e\">Rujm Siyaghah</modern>"
+      }
+    },
+    {
+      "id": "i11ffee",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Saudi Arabia Heritage Commission",
+      "url": "https://commons.wikimedia.org/wiki/File:%D8%B3%D8%AF_%D9%85%D8%B9%D8%A7%D9%88%D9%8A%D8%A9_%D8%A8%D9%88%D8%A7%D8%AF%D9%8A_%D8%A7%D9%84%D8%AE%D9%86%D8%AF%D9%82.jpg",
+      "descriptions": {
+        "mc750ee": "panorama near <modern id=\"mc750ee\">Azalla</modern>"
+      }
+    },
+    {
+      "id": "i136743",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "Tal Oz טל עוז",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_14301_Gilboa_Mountain.JPG",
+      "descriptions": {
+        "m2b7883": "panorama of the <modern id=\"m2b7883\">Jezreel Valley</modern>"
+      }
+    },
+    {
+      "id": "i147d9d",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Roni Abiri",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%9E%D7%A6%D7%A4%D7%94_%D7%9C%D7%95%D7%99_%D7%90%D7%A9%D7%9B%D7%95%D7%9C.jpeg",
+      "descriptions": {
+        "m63c688": "panorama near <modern id=\"m63c688\">Khirbet Anim</modern>, which is just off-camera at the bottom left"
+      }
+    },
+    {
+      "id": "i159034",
+      "license": "CC-BY-4.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel-Maamer-54.jpg",
+      "descriptions": {
+        "m7ff2c3": "closeup of <modern id=\"m7ff2c3\">Tell Amr</modern>"
+      }
+    },
+    {
+      "id": "i179789",
+      "license": "CC-BY-SA-2.0",
+      "source": "wikimedia",
+      "credit": "ninara",
+      "url": "https://commons.wikimedia.org/wiki/File:Shushtar_bridge.jpg",
+      "descriptions": {
+        "md8bbce": "bridge near the <modern id=\"md8bbce\">Ulai canal</modern>"
+      }
+    },
+    {
+      "id": "i17af29",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "NASA",
+      "url": "https://commons.wikimedia.org/wiki/File:Sinai_Peninsula_from_Southeastern_Mediterranean_panorama_STS040-152-180.jpg",
+      "descriptions": {
+        "ma80c62": "satellite view of the <modern id=\"ma80c62\">Gulf of Aqaba</modern>",
+        "mec75f5": "satellite view of the <modern id=\"mec75f5\">Gulf of Suez</modern>"
+      }
+    },
+    {
+      "id": "i186ca3",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "zeevveez",
+      "url": "https://commons.wikimedia.org/wiki/File:Winding_Road_(11580990234).jpg",
+      "descriptions": {
+        "ma2bc43": "road near <modern id=\"ma2bc43\">Ez Zuhur</modern>"
+      }
+    },
+    {
+      "id": "i18d6cc",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "David Roberts",
+      "url": "https://commons.wikimedia.org/wiki/File:מעיין_הגיחון_רוברטס.jpg",
+      "descriptions": {
+        "m92dbfa": "painting of the <modern id=\"m92dbfa\">Gihon Spring</modern>"
+      }
+    },
+    {
+      "id": "i1931de",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "יוסי אושר",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%A0%D7%92%D7%95%D7%94%D7%95%D7%AA_%D7%9B%D7%A4%D7%99_%D7%A9%D7%A0%D7%A8%D7%90%D7%99%D7%AA_%D7%9E%D7%A9%D7%9E%D7%95%D7%A8%D7%AA_%D7%94%D7%90%D7%9C%D7%95%D7%A0%D7%99%D7%9D_%D7%94%D7%A6%D7%9E%D7%95%D7%93%D7%94_%D7%9C%D7%99%D7%99%D7%A9%D7%95%D7%91.jpg",
+      "descriptions": {
+        "me45184": "panorama of a hill looking north near <modern id=\"me45184\">Khirbet Fuqeiqis</modern>, which is behind the camera"
+      }
+    },
+    {
+      "id": "i1a4fd4",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Thafer",
+      "url": "https://commons.wikimedia.org/wiki/File:Untitled_-_panoramio_-_Thafer_(23).jpg",
+      "descriptions": {
+        "mbdd01a": "streetscape near <modern id=\"mbdd01a\">Khirbet Atara</modern>"
+      }
+    },
+    {
+      "id": "i1a8f1b",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Odilia",
+      "url": "https://commons.wikimedia.org/wiki/File:Qanawat_SYRIE_028.jpg",
+      "descriptions": {
+        "m612cff": "ruins at <modern id=\"m612cff\">Qanawat</modern>"
+      }
+    },
+    {
+      "id": "i1b2b45",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "עדירל",
+      "url": "https://commons.wikimedia.org/wiki/File:Yasuf4208_d25.JPG",
+      "descriptions": {
+        "m31fd25": "panorama of a settlement near <modern id=\"m31fd25\">Ein et Tuta</modern>, which is behind the ridge"
+      }
+    },
+    {
+      "id": "i1b5807",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Freedom’s Falcon",
+      "url": "https://commons.wikimedia.org/wiki/File:Dana_Biosphere_Reserve_1.JPG",
+      "descriptions": {
+        "m97dd72": "panorama of cliffs near <modern id=\"m97dd72\">Wadi esh Shellal</modern>"
+      }
+    },
+    {
+      "id": "i1c493f",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "sarfatty",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%93%D7%A8%D7%9A_%D7%94%D7%A8%D7%95%D7%A1%D7%94.jpeg",
+      "descriptions": {
+        "mdc7c58": "panorama looking west near <modern id=\"mdc7c58\">Tell Muhalhal</modern>, which is behind a hill to the right of the camera"
+      }
+    },
+    {
+      "id": "i1c6fab",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Danny Gershoni",
+      "url": "https://commons.wikimedia.org/wiki/File:The_Jiftlik_Police_Station_-_photo_-15.jpg",
+      "descriptions": {
+        "med2628": "ruins and police station at <modern id=\"med2628\">Tel al Mazar</modern>"
+      }
+    },
+    {
+      "id": "i1cc63e",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Liron Lev",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%A2%D7%99%D7%9F_%D7%A8%D7%9B%D7%A9.jpeg",
+      "descriptions": {
+        "m325c72": "closeup of stream near <modern id=\"m325c72\">Hadita</modern>"
+      }
+    },
+    {
+      "id": "i1dc5fa",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "דוד שי",
+      "url": "https://commons.wikimedia.org/wiki/File:Old_Jaffa_2017.jpg",
+      "descriptions": {
+        "mcb49f3": "cityscape of <modern id=\"mcb49f3\">Jaffa</modern>"
+      }
+    },
+    {
+      "id": "i1deb67",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Ljuba brank",
+      "url": "https://commons.wikimedia.org/wiki/File:083_stari_jez.jpg",
+      "descriptions": {
+        "m06de45": "panorama of hills in <modern id=\"m06de45\">Sheba</modern>"
+      }
+    },
+    {
+      "id": "i1e1f0b",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel-Tsafit-206.jpg",
+      "descriptions": {
+        "m28d167": "panorama of <modern id=\"m28d167\">Tell es Safi</modern>"
+      }
+    },
+    {
+      "id": "i1e8b60",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Danny Gershoni",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel_A-Sheria_excavation_3.jpg",
+      "descriptions": {
+        "m489f67": "ruins at <modern id=\"m489f67\">Tell esh Sharia</modern>"
+      }
+    },
+    {
+      "id": "i1ef466",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "ekeidar",
+      "url": "https://commons.wikimedia.org/wiki/File:Cave_Creek_-_panoramio.jpg",
+      "descriptions": {
+        "mf5e945": "panorama of a hill near <modern id=\"mf5e945\">Khirbet es Sira</modern>"
+      }
+    },
+    {
+      "id": "i2089d6",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mghanem91",
+      "url": "https://commons.wikimedia.org/wiki/File:Kufur_Thuluth.jpg",
+      "descriptions": {
+        "m991597": "cityscape of <modern id=\"m991597\">Kafr Thulth</modern>"
+      }
+    },
+    {
+      "id": "i214a46",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Nivzu",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%9E%D7%95%D7%A9%D7%91_%D7%91%D7%A7%D7%A2%D7%95%D7%AA.jpg",
+      "descriptions": {
+        "ma725ef": "cityscape near <modern id=\"ma725ef\">Bab en Naqb</modern>"
+      }
+    },
+    {
+      "id": "i2173cd",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "Ángel M. Felicísimo",
+      "url": "https://commons.wikimedia.org/wiki/File:Ra-Horajti_(44782346830).jpg",
+      "descriptions": {
+        "mf20d69": "artifact from <modern id=\"mf20d69\">Tell el Maskhuta</modern>"
+      }
+    },
+    {
+      "id": "i22d89f",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "TrickyH",
+      "url": "https://commons.wikimedia.org/wiki/File:Tell_Balata.jpg",
+      "descriptions": {
+        "m657590": "ruins at <modern id=\"m657590\">Tell Balatah</modern>"
+      }
+    },
+    {
+      "id": "i230461",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Maderibeyza",
+      "url": "https://commons.wikimedia.org/wiki/File:Antiocheia_in_Psidia.jpg",
+      "descriptions": {
+        "m93f901": "panorama of <modern id=\"m93f901\">Antioch in Pisidia</modern>"
+      }
+    },
+    {
+      "id": "i242230",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "עדירל",
+      "url": "https://commons.wikimedia.org/wiki/File:Al-Burj9786.JPG",
+      "descriptions": {
+        "m051570": "panorama looking east near <modern id=\"m051570\">Khirbet al Bira</modern>"
+      }
+    },
+    {
+      "id": "i242b3c",
+      "license": "CC-BY-4.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File%3AAbud-082558.jpg",
+      "descriptions": {
+        "m68e2d1": "panorama of a region near <modern id=\"m68e2d1\">Ain Seridah</modern>"
+      }
+    },
+    {
+      "id": "i24495b",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Conder and Kitchener",
+      "url": "https://commons.wikimedia.org/wiki/File:Khirbat_al-Simia.png",
+      "descriptions": {
+        "m4813c9": "plan of <modern id=\"m4813c9\">Khirbet al Simia</modern>"
+      }
+    },
+    {
+      "id": "i250246",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel-Gamma-44.jpg",
+      "descriptions": {
+        "m3f6c55": "ruins at <modern id=\"m3f6c55\">Tell Jemmeh</modern>"
+      }
+    },
+    {
+      "id": "i2671d3",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Herwig Reidlinger",
+      "url": "https://commons.wikimedia.org/wiki/File:Herods_Gate_Jerusalem.jpg",
+      "descriptions": {
+        "m749812": "closeup of a gate in the <modern id=\"m749812\">northern wall of Jerusalem</modern>"
+      }
+    },
+    {
+      "id": "i2752c7",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Didia",
+      "url": "https://commons.wikimedia.org/wiki/File:Obelisk-SesostrisI-Heliopolis.JPG",
+      "descriptions": {
+        "mb69a90": "obelisk at <modern id=\"mb69a90\">Ain Shams</modern>"
+      }
+    },
+    {
+      "id": "i27da56",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "rafed omar",
+      "url": "https://commons.wikimedia.org/wiki/File:Darbandikhan,_Iraq_-_panoramio.jpg",
+      "descriptions": {
+        "m0cf140": "panorama of a lake near <modern id=\"m0cf140\">Til Assuri</modern>"
+      }
+    },
+    {
+      "id": "i28bf97",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Walid Khalidi",
+      "url": "https://commons.wikimedia.org/wiki/File:Bait_Dajan.jpg",
+      "descriptions": {
+        "m756fb4": "historical cityscape of <modern id=\"m756fb4\">Bayt Dajan</modern>"
+      }
+    },
+    {
+      "id": "i28c5f8",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "יעקב",
+      "url": "https://commons.wikimedia.org/wiki/File:Tzalfon0503.JPG",
+      "descriptions": {
+        "m7b9c77": "panorama looking northeast near <modern id=\"m7b9c77\">Tel Zelafon</modern>, which is off-camera to the right and behind a hill"
+      }
+    },
+    {
+      "id": "i290556",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "arie tennbaum",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_43262_Geography_of_Palestine.jpg",
+      "descriptions": {
+        "mc4242d": "panorama of <modern id=\"mc4242d\">Wadi Qelt</modern>"
+      }
+    },
+    {
+      "id": "i29dad8",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "חיליק אגמון",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%97%D7%90%D7%9F_%D7%9B%D7%A4%D7%A8_%D7%90%D7%95%D7%A8%D7%99%D7%94.jpeg",
+      "descriptions": {
+        "m0d7f01": "building near <modern id=\"m0d7f01\">Ayun Qara</modern>"
+      }
+    },
+    {
+      "id": "i2a54fd",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "User DEMOSH on flickr.com",
+      "url": "https://commons.wikimedia.org/wiki/File:Sudan_Juba_bridge.jpg",
+      "descriptions": {
+        "m9c6cd5": "bridge over the <modern id=\"m9c6cd5\">White Nile</modern>"
+      }
+    },
+    {
+      "id": "i2b8b7d",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Gilabrand",
+      "url": "https://commons.wikimedia.org/wiki/File:GilostreetS.jpg",
+      "descriptions": {
+        "m1f6a45": "streetscape of <modern id=\"m1f6a45\">Gilo</modern>"
+      }
+    },
+    {
+      "id": "i2bacac",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "גיל אהרוני",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_53248_beit_arif_reiver.jpg",
+      "descriptions": {
+        "m933319": "stream near <modern id=\"m933319\">Al Haditha</modern>"
+      }
+    },
+    {
+      "id": "i2c115e",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Nteli78",
+      "url": "https://commons.wikimedia.org/wiki/File:Tall_Jawa_Amman_Jordan.jpg",
+      "descriptions": {
+        "m09cf7c": "ruins at <modern id=\"m09cf7c\">Tell Jawah</modern>"
+      }
+    },
+    {
+      "id": "i2c6da3",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Hanay",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel_Regev_(2).JPG",
+      "descriptions": {
+        "md7c132": "panorama of <modern id=\"md7c132\">Tel Regev</modern>"
+      }
+    },
+    {
+      "id": "i2c73b1",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Gustav Droysen",
+      "url": "https://commons.wikimedia.org/wiki/File:Roman_provinces_of_Illyricum,_Macedonia,_Dacia,_Moesia,_Pannonia_and_Thracia.jpg",
+      "descriptions": {
+        "me8c716": "map of <modern id=\"me8c716\">Dalmatia</modern>"
+      }
+    },
+    {
+      "id": "i2ce9af",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Revava Schatz",
+      "url": "https://commons.wikimedia.org/wiki/File:Nahal_kana_West_Bank.jpg",
+      "descriptions": {
+        "m96bbc3": "panorama of <modern id=\"m96bbc3\">Wadi Qana</modern>"
+      }
+    },
+    {
+      "id": "i2d0c87",
+      "license": "CC-BY-4.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel-Yarmuth-2-33941.jpg",
+      "descriptions": {
+        "mb00c2d": "ruins at <modern id=\"mb00c2d\">Tel Yarmuth</modern>"
+      }
+    },
+    {
+      "id": "i2e440b",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Bluemix",
+      "url": "https://commons.wikimedia.org/wiki/File:%D9%85%D8%AA%D9%86%D8%B2%D9%87_%D8%A7%D9%84%D8%A8%D9%8A%D8%B6%D9%88%D9%8A%D9%87_-_%D8%AC%D8%A8%D9%84%D9%87_--_2012.jpg",
+      "descriptions": {
+        "m0b7a33": "park near <modern id=\"m0b7a33\">Tell Ibrahim</modern>"
+      }
+    },
+    {
+      "id": "i2e6fb8",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Ramibp",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%9E%D7%91%D7%98_%D7%A2%D7%9C_%D7%9E%D7%A9%D7%9B%D7%99%D7%95%D7%AA.JPG",
+      "descriptions": {
+        "m309c4d": "panorama looking southwest near <modern id=\"m309c4d\">Tell el Hilu</modern>, which is just off-camera to the right"
+      }
+    },
+    {
+      "id": "i2e9168",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Julius Hoffmann",
+      "url": "https://commons.wikimedia.org/wiki/File:Beit_Sur1.jpg",
+      "descriptions": {
+        "m1b2999": "ruins at <modern id=\"m1b2999\">Khirbet et Tubeiqa</modern>"
+      }
+    },
+    {
+      "id": "i2f7ef0",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Kalogeropoulos",
+      "url": "https://commons.wikimedia.org/wiki/File:MadabaCallirrhoeDetail.jpg",
+      "descriptions": {
+        "me57a9a": "mosaic map of <modern id=\"me57a9a\">Callirrhoe</modern>"
+      }
+    },
+    {
+      "id": "i2feaea",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Vorash",
+      "url": "https://commons.wikimedia.org/wiki/File:Downtown_area_of_Lod,_Israel_00262.JPG",
+      "descriptions": {
+        "m2b1a3a": "buildings at <modern id=\"m2b1a3a\">Lod</modern>"
+      }
+    },
+    {
+      "id": "i3034ca",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "bentzy",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_cistern_3.jpeg",
+      "descriptions": {
+        "mb7457d": "panorama of cistern at <modern id=\"mb7457d\">Khirbet Hirsha</modern>"
+      }
+    },
+    {
+      "id": "i3083d4",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "CaptMondo",
+      "url": "https://commons.wikimedia.org/wiki/File:GraniteSlabWithNameOfKhufu-BritishMuseum-August19-08.jpg",
+      "descriptions": {
+        "m518e57": "artifact from <modern id=\"m518e57\">Tell Basteh</modern>"
+      }
+    },
+    {
+      "id": "i310216",
+      "license": "FAL",
+      "source": "wikimedia",
+      "credit": "יעקב",
+      "url": "https://commons.wikimedia.org/wiki/File:JaljuliyaSouthEntrance.JPG",
+      "descriptions": {
+        "m85c404": "streetscape of <modern id=\"m85c404\">Jiljuliyeh</modern>"
+      }
+    },
+    {
+      "id": "i322431",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Zvi Oron-Orushkes",
+      "url": "https://commons.wikimedia.org/wiki/File:Kabara_Aquaduct.jpg",
+      "descriptions": {
+        "m8bb3e9": "historical panorama of the <modern id=\"m8bb3e9\">Kebara Swamps</modern>"
+      }
+    },
+    {
+      "id": "i3265b1",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:West_Bank_by_Mujaddara_-_panoramio_(1408).jpg",
+      "descriptions": {
+        "mcb28e1": "panorama looking south near <modern id=\"mcb28e1\">Khirbet el Hara el Fawqa</modern>, which is just off-camera to the right"
+      }
+    },
+    {
+      "id": "i32eabf",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Osama Shukir Muhammed Amin FRCP(Glasg)",
+      "url": "https://commons.wikimedia.org/wiki/File:From_Mount_Nebo,_viewing_north-east_into_Uyon_Mosa_(%D8%B9%D9%8A%D9%88%D9%86_%D9%85%D9%88%D8%B3%D9%89),_Jordan.jpg",
+      "descriptions": {
+        "m6b366e": "panorama of <modern id=\"m6b366e\">Khirbet Ayun Musa</modern>"
+      }
+    },
+    {
+      "id": "i34a147",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "hikinginjordan",
+      "url": "https://commons.wikimedia.org/wiki/File:26_Wadi_Mujib_Malaqi_Trail_-_Flash_flood_at_Wadi_Mujib_-_panoramio.jpg",
+      "descriptions": {
+        "m63b310": "panorama of the <modern id=\"m63b310\">mouth of Wadi Mujib</modern>"
+      }
+    },
+    {
+      "id": "i34c1d4",
+      "license": "CC-PD-Mark",
+      "source": "wikimedia",
+      "credit": "Mallet",
+      "url": "https://commons.wikimedia.org/wiki/File:Sofala1683.jpg",
+      "descriptions": {
+        "m076642": "historical drawing of <modern id=\"m076642\">Sofala</modern>"
+      }
+    },
+    {
+      "id": "i35ad34",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "The Yorck Project",
+      "url": "https://commons.wikimedia.org/wiki/File:Arabischer_Mosaizist_um_735_001.jpg",
+      "descriptions": {
+        "ma342c0": "mosaic at <modern id=\"ma342c0\">Khirbet el Mefjir</modern>"
+      }
+    },
+    {
+      "id": "i35f21f",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Marion Golsteijn",
+      "url": "https://commons.wikimedia.org/wiki/File:Luxor_Tempel.jpg",
+      "descriptions": {
+        "mf51729": "ruins at <modern id=\"mf51729\">Thebes</modern>"
+      }
+    },
+    {
+      "id": "i3630eb",
+      "license": "CC-BY-4.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Beyt-ha-Emek-0917.jpg",
+      "descriptions": {
+        "mb63cde": "archaeological garden near <modern id=\"mb63cde\">Tel Emek</modern>"
+      }
+    },
+    {
+      "id": "i373f3c",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mervat Salman",
+      "url": "https://commons.wikimedia.org/wiki/File:Ma%27in_Hot_Springs2.JPG",
+      "descriptions": {
+        "m656d70": "waterfall along <modern id=\"m656d70\">Wadi Zerqa Main</modern>"
+      }
+    },
+    {
+      "id": "i37410b",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Palmachim-442.jpg",
+      "descriptions": {
+        "md62f3e": "ruins at <modern id=\"md62f3e\">Yavne Yam</modern>"
+      }
+    },
+    {
+      "id": "i37dde3",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "W. M. Thomson",
+      "url": "https://commons.wikimedia.org/wiki/File:Anathoth_(Anata),_p._549_in_Thomson,_1859.jpg",
+      "descriptions": {
+        "ma76eac": "historical cityscape of <modern id=\"ma76eac\">Anata</modern>"
+      }
+    },
+    {
+      "id": "i387a51",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Hanay",
+      "url": "https://commons.wikimedia.org/wiki/File:Sharona_1_(6).JPG",
+      "descriptions": {
+        "m4a7dca": "streetscape near <modern id=\"m4a7dca\">Khirbet Sarona</modern>"
+      }
+    },
+    {
+      "id": "i38d750",
+      "license": "CC-BY-SA-2.0",
+      "source": "wikimedia",
+      "credit": "Carole Raddato",
+      "url": "https://commons.wikimedia.org/wiki/File:Ancient_Theatre,_built_by_Philip_II_in_the_4th_century_BC_and_later_reconstructed_by_the_Romans,_Philippi_(7272297822).jpg",
+      "descriptions": {
+        "mec5201": "theater at <modern id=\"mec5201\">Philippi</modern>"
+      }
+    },
+    {
+      "id": "i3941c5",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:Camel_-_panoramio.jpg",
+      "descriptions": {
+        "mb1aeb3": "camels near <modern id=\"mb1aeb3\">Khirbet Abu Tabaq</modern>"
+      }
+    },
+    {
+      "id": "i397cf1",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "אסף.צ",
+      "url": "https://commons.wikimedia.org/wiki/File:Lachish.JPG",
+      "descriptions": {
+        "md32cc7": "panorama looking north near <modern id=\"md32cc7\">Khirbet ed Duweir</modern>, which is off-camera to the right"
+      }
+    },
+    {
+      "id": "i39c601",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Petra_District,_Jordan_-_panoramio_(45).jpg",
+      "descriptions": {
+        "meb4627": "cityscape looking north near <modern id=\"meb4627\">Tawilan</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "i3a4284",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "יעקב",
+      "url": "https://commons.wikimedia.org/wiki/File:Surda.png",
+      "descriptions": {
+        "mf3284e": "cityscape of <modern id=\"mf3284e\">Surdah</modern>"
+      }
+    },
+    {
+      "id": "i3b63eb",
+      "license": "CC-BY-4.0",
+      "source": "wikimedia",
+      "credit": "Zaincashu",
+      "url": "https://commons.wikimedia.org/wiki/File:مدينة_السماوة.jpg",
+      "descriptions": {
+        "m2f36e0": "park at <modern id=\"m2f36e0\">Samawah</modern>"
+      }
+    },
+    {
+      "id": "i3b7c62",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "IsraelHikingMap",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%AA%D7%9C_%D7%A9%D7%9C%D7%9D.jpeg",
+      "descriptions": {
+        "m860ae3": "panorama of <modern id=\"m860ae3\">Tel Shalem</modern>"
+      }
+    },
+    {
+      "id": "i3b811c",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Shayshal2",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%98%D7%95%D7%A8%D7%91%D7%99%D7%A0%D7%95%D7%AA_%D7%A8%D7%95%D7%97_%D7%91%D7%A8%D7%9E%D7%AA_%D7%A1%D7%99%D7%A8%D7%99%D7%9F.jpg",
+      "descriptions": {
+        "mbd0d86": "panorama looking north near <modern id=\"mbd0d86\">Khirbet Idma</modern>, which is off-camera to the right"
+      }
+    },
+    {
+      "id": "i3c0d57",
+      "license": "CC-BY-SA-2.5",
+      "source": "wikimedia",
+      "credit": "Freedom’s Falcon",
+      "url": "https://commons.wikimedia.org/wiki/File:Jerash_City.jpg",
+      "descriptions": {
+        "m23c9bd": "cityscape of <modern id=\"m23c9bd\">Jerash</modern>"
+      }
+    },
+    {
+      "id": "i3c1bea",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Moshe Hoffman",
+      "url": "https://commons.wikimedia.org/wiki/File:Eastern_Upper_Galilee,_Israel_-_panoramio.jpg",
+      "descriptions": {
+        "m3f2d3d": "panorama near <modern id=\"m3f2d3d\">Ein el Khirba</modern>, which is off-camera to the right",
+        "mf00bed": "panorama near <modern id=\"mf00bed\">Yarun</modern>"
+      }
+    },
+    {
+      "id": "i3c7b3d",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Israeli GPO photographer",
+      "url": "https://commons.wikimedia.org/wiki/File:Beit_Natif_1948.jpg",
+      "descriptions": {
+        "m23ba30": "historical cityscape of <modern id=\"m23ba30\">Bayt Nattif</modern>"
+      }
+    },
+    {
+      "id": "i3cb366",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Davidbena",
+      "url": "https://commons.wikimedia.org/wiki/File:Elah_Valley_below_Adullam.jpg",
+      "descriptions": {
+        "m6df964": "panorama near <modern id=\"m6df964\">Khirbet Alin</modern>, which is just behind the hill on the left"
+      }
+    },
+    {
+      "id": "i3d1636",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Unknown author",
+      "url": "https://commons.wikimedia.org/wiki/File:Brockhaus_and_Efron_Jewish_Encyclopedia_e14_213-0.jpg",
+      "descriptions": {
+        "m068207": "drawing of the <modern id=\"m068207\">Pool of Siloam</modern>"
+      }
+    },
+    {
+      "id": "i3dc6ff",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Davidbena",
+      "url": "https://commons.wikimedia.org/wiki/File:Khurbet_Tell_el_Beida.jpg",
+      "descriptions": {
+        "m7d8664": "panorama of <modern id=\"m7d8664\">Tel el Beida</modern>"
+      }
+    },
+    {
+      "id": "i3eba4f",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "hatul",
+      "url": "https://commons.wikimedia.org/wiki/File:West_Bank_Hiking_Map_5.jpg",
+      "descriptions": {
+        "mcbb4ce": "spring near <modern id=\"mcbb4ce\">Wadi ar Rashrash</modern>"
+      }
+    },
+    {
+      "id": "i3ef8a9",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "zstadler",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%9E%D7%A6%D7%95%D7%93%D7%AA_%D7%A0%D7%97%D7%9C_%D7%9C%D7%A2%D7%A0%D7%94_2.jpeg",
+      "descriptions": {
+        "mb5ae8b": "panorama near <modern id=\"mb5ae8b\">El Jebariyeh</modern>"
+      }
+    },
+    {
+      "id": "i3f1f88",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Beni 75",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%A2%D7%99%D7%9F_%D7%A7%D7%99%D7%A9%D7%99%D7%95%D7%9F.jpeg",
+      "descriptions": {
+        "m81b743": "pool near <modern id=\"m81b743\">Tell Qisyon</modern>"
+      }
+    },
+    {
+      "id": "i3fa913",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Nacasma",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%90%D7%A8%D7%A5_%D7%99%D7%A9%D7%A8%D7%90%D7%9C._-_panoramio_(19).jpg",
+      "descriptions": {
+        "m082a19": "cityscape near <modern id=\"m082a19\">Ain Mesherfi</modern>"
+      }
+    },
+    {
+      "id": "i4036d1",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Zereshk",
+      "url": "https://commons.wikimedia.org/wiki/File:Destruction_of_the_Elamite_city_of_Hamanu_645-635_BCE.jpg",
+      "descriptions": {
+        "m9cb1d4": "relief of battle at <modern id=\"m9cb1d4\">Shush</modern>"
+      }
+    },
+    {
+      "id": "i4045ae",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Anton Gutsunaev",
+      "url": "https://commons.wikimedia.org/wiki/File:Cambyses_II_capturing_Psamtik_III.png",
+      "descriptions": {
+        "m6da49d": "drawing of a battle at <modern id=\"m6da49d\">Tell el Farama</modern>"
+      }
+    },
+    {
+      "id": "i40c8a9",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Onzd",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%99%D7%A2%D7%A8_%D7%94%D7%9E%D7%9C%D7%90%D7%9B%D7%99%D7%9D.jpeg",
+      "descriptions": {
+        "m52bb94": "panorama near <modern id=\"m52bb94\">Iraq el Kharab</modern>"
+      }
+    },
+    {
+      "id": "i40d11b",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "ZeevDash",
+      "url": "https://commons.wikimedia.org/wiki/File:Naomi_Shemer_Tunnel_in_Jerusalem_(2018).jpg",
+      "descriptions": {
+        "m8ad95e": "tunnel near <modern id=\"m8ad95e\">Khallat el Ajuz</modern>"
+      }
+    },
+    {
+      "id": "i411101",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Elph",
+      "url": "https://commons.wikimedia.org/wiki/File:Ahvaz_White_Bridge.JPG",
+      "descriptions": {
+        "me21b7f": "panorama of a river in the <modern id=\"me21b7f\">plain between the Tigris River and Elam</modern>"
+      }
+    },
+    {
+      "id": "i418dee",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Maximus Rex",
+      "url": "https://commons.wikimedia.org/wiki/File:Aurelian.jpg",
+      "descriptions": {
+        "md1c5ba": "coin with the head of a person involved in a battle at <modern id=\"md1c5ba\">Imma</modern>"
+      }
+    },
+    {
+      "id": "i419a5f",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Imrich",
+      "url": "https://commons.wikimedia.org/wiki/File:Achituv_and_Shimshon_cement_plant1.jpg",
+      "descriptions": {
+        "me1373f": "building at <modern id=\"me1373f\">Artuf</modern>"
+      }
+    },
+    {
+      "id": "i42b91b",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Zereshk",
+      "url": "https://commons.wikimedia.org/wiki/File:Rython_boz.jpg",
+      "descriptions": {
+        "m6d408e": "artifact from <modern id=\"m6d408e\">Tell Hagmatana</modern>"
+      }
+    },
+    {
+      "id": "i4329db",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Bashar Tabbah",
+      "url": "https://commons.wikimedia.org/wiki/File:Wadi_Feynan_(1).jpg",
+      "descriptions": {
+        "mfed480": "ruins at <modern id=\"mfed480\">Khirbet Faynan</modern>"
+      }
+    },
+    {
+      "id": "i432cca",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "AtilimGunesBaydin",
+      "url": "https://commons.wikimedia.org/wiki/File:SardisGymnasium1February2003.JPG",
+      "descriptions": {
+        "mb0ee42": "ruins at <modern id=\"mb0ee42\">Sardis</modern>"
+      }
+    },
+    {
+      "id": "i436cf5",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Herwig Reidlinger",
+      "url": "https://commons.wikimedia.org/wiki/File:Jaffa_Gate_Jerusalem.jpg",
+      "descriptions": {
+        "m4c90cf": "panorama of <modern id=\"m4c90cf\">Jaffa Gate</modern>"
+      }
+    },
+    {
+      "id": "i43c910",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Christian Theological Seminary",
+      "url": "https://commons.wikimedia.org/wiki/File:CanaanMap.jpg",
+      "descriptions": {
+        "m39393a": "map of <modern id=\"m39393a\">Canaan</modern>"
+      }
+    },
+    {
+      "id": "i4457b4",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "el ui",
+      "url": "https://commons.wikimedia.org/wiki/File:Wadi_near_Karak_-_panoramio_(10).jpg",
+      "descriptions": {
+        "m54d9cf": "panorama near <modern id=\"m54d9cf\">Arair</modern>"
+      }
+    },
+    {
+      "id": "i4469fb",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:Dzjalame_077.jpg",
+      "descriptions": {
+        "m7bc13e": "building near <modern id=\"m7bc13e\">Khirbet Jelameh</modern>"
+      }
+    },
+    {
+      "id": "i451e12",
+      "license": "CC-Zero",
+      "source": "wikimedia",
+      "credit": "George E. Koronaios",
+      "url": "https://commons.wikimedia.org/wiki/File:The_tower_at_the_entrance_to_the_port_of_Ancient_Kechries_on_January_10,_2020.jpg",
+      "descriptions": {
+        "mf07963": "ruins at <modern id=\"mf07963\">Kechries</modern>"
+      }
+    },
+    {
+      "id": "i45a3c0",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Seidalex",
+      "url": "https://commons.wikimedia.org/wiki/File:Kishon.jpg",
+      "descriptions": {
+        "mbcae83": "closeup of the <modern id=\"mbcae83\">Kishon River</modern>"
+      }
+    },
+    {
+      "id": "i4660b9",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "David Stanley",
+      "url": "https://commons.wikimedia.org/wiki/File:Byzantine_Basilica_(8527948107).jpg",
+      "descriptions": {
+        "m63c98b": "ruins at <modern id=\"m63c98b\">Adulis</modern>"
+      }
+    },
+    {
+      "id": "i469208",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Avi1111",
+      "url": "https://commons.wikimedia.org/wiki/File:View_from_Yardena_on_Jorden_river_and_valley.jpg",
+      "descriptions": {
+        "mfaa53d": "panorama looking southeast near <modern id=\"mfaa53d\">Umm ed Debar</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "i46d5b6",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Yuber",
+      "url": "https://commons.wikimedia.org/wiki/File:Resafa.jpg",
+      "descriptions": {
+        "m4b3ec6": "ruins at <modern id=\"m4b3ec6\">Resafa</modern>"
+      }
+    },
+    {
+      "id": "i48730a",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "OgreBot, Quintucket, Harold Aziziye, Nedim Ardoğa",
+      "url": "https://commons.wikimedia.org/wiki/File:City_of_Konya.jpg",
+      "descriptions": {
+        "m5ff141": "collage of <modern id=\"m5ff141\">Konya</modern>"
+      }
+    },
+    {
+      "id": "i48dc58",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:Bs_stream019.jpg",
+      "descriptions": {
+        "m76d958": "bridge across <modern id=\"m76d958\">Wadi el Milh</modern>"
+      }
+    },
+    {
+      "id": "i48ed68",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Muslim7",
+      "url": "https://commons.wikimedia.org/wiki/File:Bint_jbail_general.jpg",
+      "descriptions": {
+        "mcaedc7": "cityscape of <modern id=\"mcaedc7\">Bint Jbeil</modern>"
+      }
+    },
+    {
+      "id": "i48f198",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Itai",
+      "url": "https://commons.wikimedia.org/wiki/File:Hamat_Tiberias_zodiac_mosaic.jpg",
+      "descriptions": {
+        "m5b2a6f": "mosaic at <modern id=\"m5b2a6f\">Hamat Tiberias</modern>"
+      }
+    },
+    {
+      "id": "i49766c",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "חגי שבתאי",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%92%D7%91%D7%A2%D7%AA_%D7%94%D7%A9%D7%95%D7%A2%D7%9C%D7%99%D7%9D,_%D7%AA%D7%9C_%D7%A8%D7%A2%D7%9C%D7%94_1.jpeg",
+      "descriptions": {
+        "m40fd5b": "pond near <modern id=\"m40fd5b\">Tell el Ghaltah</modern>"
+      }
+    },
+    {
+      "id": "i4a0288",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Daniel Baránek",
+      "url": "https://commons.wikimedia.org/wiki/File:Nahal_Dishon_09.jpg",
+      "descriptions": {
+        "m10a103": "panorama of <modern id=\"m10a103\">Nahal Dishon</modern>"
+      }
+    },
+    {
+      "id": "i4a7a3c",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Bashar Tabbah",
+      "url": "https://commons.wikimedia.org/wiki/File:Dhiban,_Jordan.jpg",
+      "descriptions": {
+        "m122dcf": "buildings at <modern id=\"m122dcf\">Tall Dhiban</modern>"
+      }
+    },
+    {
+      "id": "i4a9c19",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Manfred Werner",
+      "url": "https://commons.wikimedia.org/wiki/File:Partherdenkmal,_Ephesos_Museum_Wien_2.jpg",
+      "descriptions": {
+        "m84025e": "artifact from <modern id=\"m84025e\">Ephesus</modern>"
+      }
+    },
+    {
+      "id": "i4b3d63",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "Dr. Avishai Teicher",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_32275_Shaab_in_Lower_Galilee.jpg",
+      "descriptions": {
+        "m056b9b": "panorama looking southwest near <modern id=\"m056b9b\">Khirbet Yanin</modern>, which is off-camera to the right"
+      }
+    },
+    {
+      "id": "i4c7073",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Odedshilo",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%A1%D7%9C%D7%A2_%D7%9E%D7%A9%D7%94_%D7%91%D7%99%D7%9E%D7%9F.jpeg",
+      "descriptions": {
+        "m6ef353": "panorama of a landscape near <modern id=\"m6ef353\">Jilya</modern>"
+      }
+    },
+    {
+      "id": "i4e8a88",
+      "license": "CC-Zero",
+      "source": "wikimedia",
+      "credit": "O.Mustafin",
+      "url": "https://commons.wikimedia.org/wiki/File:%D0%90lasia08.jpg",
+      "descriptions": {
+        "mf59ccc": "panorama of ruins at <modern id=\"mf59ccc\">Enkomi</modern>"
+      }
+    },
+    {
+      "id": "i4ed369",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "NASA",
+      "url": "https://commons.wikimedia.org/wiki/File:Empty_quarter_Arabia.PNG",
+      "descriptions": {
+        "m9ed9ce": "labeled satellite photo of the <modern id=\"m9ed9ce\">Arabian Peninsula</modern>"
+      }
+    },
+    {
+      "id": "i4f4626",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "ekstijn",
+      "url": "https://commons.wikimedia.org/wiki/File:Ein_gesher_-_panoramio.jpg",
+      "descriptions": {
+        "m8f1639": "panorama looking north near <modern id=\"m8f1639\">El Bira</modern>, which is off-camera to the right"
+      }
+    },
+    {
+      "id": "i4f6ca4",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Pashute",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%A4%D7%A2%D7%A0%D7%95%D7%97_%D7%9B%D7%AA%D7%95%D7%91%D7%AA_%D7%94%D7%A4%D7%99%D7%98%D7%A1.jpg",
+      "descriptions": {
+        "mf81ba4": "artifact from <modern id=\"mf81ba4\">Kuntillet Ajrud</modern>"
+      }
+    },
+    {
+      "id": "i4f9e2e",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Danny Gershoni",
+      "url": "https://commons.wikimedia.org/wiki/File:TEL_EL_KHUWEILFE_-_trenches_2.jpg",
+      "descriptions": {
+        "mfa3426": "trench at <modern id=\"mfa3426\">Tel Halif</modern>"
+      }
+    },
+    {
+      "id": "i4fec65",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Matson Collection",
+      "url": "https://commons.wikimedia.org/wiki/File:Bethany1940s.jpg",
+      "descriptions": {
+        "m227592": "historical cityscape of <modern id=\"m227592\">Al Eizariya</modern>"
+      }
+    },
+    {
+      "id": "i506e92",
+      "license": "CC-BY-SA-2.0",
+      "source": "wikimedia",
+      "credit": "tobeytravels",
+      "url": "https://commons.wikimedia.org/wiki/File:White_Temple_ziggurat_in_Uruk.jpg",
+      "descriptions": {
+        "me2d27e": "ziggurat at <modern id=\"me2d27e\">Uruk</modern>"
+      }
+    },
+    {
+      "id": "i50c0a4",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "James Gordon",
+      "url": "https://commons.wikimedia.org/wiki/File:View_from_the_Byzantine_Tower_at_Meskene,_ancient_Barbalissos.jpg",
+      "descriptions": {
+        "mc2b727": "panorama of <modern id=\"mc2b727\">Tell Meskene</modern>"
+      }
+    },
+    {
+      "id": "i514a05",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "יעקב",
+      "url": "https://commons.wikimedia.org/wiki/File:MurakSumaDuma7367_l77_d87.JPG",
+      "descriptions": {
+        "m6b0e6d": "cityscape of <modern id=\"m6b0e6d\">Dura</modern>"
+      }
+    },
+    {
+      "id": "i525859",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "יעקב",
+      "url": "https://commons.wikimedia.org/wiki/File:NorthPatzail3615_d18.JPG",
+      "descriptions": {
+        "mcd525c": "cityscape of <modern id=\"mcd525c\">Khirbet Fasayil</modern>"
+      }
+    },
+    {
+      "id": "i52a039",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Berthold Werner",
+      "url": "https://commons.wikimedia.org/wiki/File:Jericho_BW_1.jpg",
+      "descriptions": {
+        "m95349d": "panorama of <modern id=\"m95349d\">Tell es Sultan</modern>"
+      }
+    },
+    {
+      "id": "i52f97f",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Gio la Gamb",
+      "url": "https://commons.wikimedia.org/wiki/File:Valle_di_Betania_-_panoramio.jpg",
+      "descriptions": {
+        "mf177df": "panorama of cliffs near <modern id=\"mf177df\">El Jai Cave</modern>"
+      }
+    },
+    {
+      "id": "i533267",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Louis Francois Cassas",
+      "url": "https://commons.wikimedia.org/wiki/File:18th_century_original_drawing_of_the_castle_of_Hims_by_Cassas.jpg",
+      "descriptions": {
+        "m3a88d4": "historical engraving of the citadel of <modern id=\"m3a88d4\">Homs</modern>"
+      }
+    },
+    {
+      "id": "i546972",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Tafiela_Qasabah_District,_Jordan_-_panoramio_(2).jpg",
+      "descriptions": {
+        "m843146": "mountain near <modern id=\"m843146\">Khanazir</modern>"
+      }
+    },
+    {
+      "id": "i55a18c",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Sea263",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_Sirin.jpeg",
+      "descriptions": {
+        "m346d1b": "panorama looking east near <modern id=\"m346d1b\">Sirin</modern>, which is off-camera to the left",
+        "m780e56": "panorama looking east near <modern id=\"m780e56\">Horvat Ukkal</modern>, which is off-camera to the right"
+      }
+    },
+    {
+      "id": "i55d097",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Wadee_Hadee_-_panoramio.jpg",
+      "descriptions": {
+        "m5b9e13": "panorama of wadi near <modern id=\"m5b9e13\">Khirbet Batneh</modern>"
+      }
+    },
+    {
+      "id": "i5782ca",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:Woood_-_panoramio.jpg",
+      "descriptions": {
+        "mfe8eb2": "hill near <modern id=\"mfe8eb2\">Khirbet Belameh</modern>"
+      }
+    },
+    {
+      "id": "i5789c8",
+      "license": "CC-Zero",
+      "source": "wikimedia",
+      "credit": "Levi Clancy",
+      "url": "https://commons.wikimedia.org/wiki/File:Views_of_the_archaeological_site_of_Nineveh_in_modern-day_Mosul,_currently_occupied_by_squatters_06.jpg",
+      "descriptions": {
+        "m52bd87": "panorama of <modern id=\"m52bd87\">Nineveh</modern>"
+      }
+    },
+    {
+      "id": "i57e79a",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "sohrab alizadeh",
+      "url": "https://commons.wikimedia.org/wiki/File:%D8%AA%D9%84%D8%A7%D9%82%D9%8A_%D8%B1%D9%88%D8%AF%D9%87%D8%A7_-_%D8%AF%D8%A7%D9%85%D9%86%D9%87_%D8%B2%D8%B1%D8%AF%D9%83%D9%88%D9%87_-_panoramio.jpg",
+      "descriptions": {
+        "mbfc6a2": "panorama of the <modern id=\"mbfc6a2\">Karun River</modern>"
+      }
+    },
+    {
+      "id": "i57f983",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Jelaad_-_panoramio.jpg",
+      "descriptions": {
+        "m8cb9fa": "panorama of a settlement near <modern id=\"m8cb9fa\">Jel‘ad</modern>"
+      }
+    },
+    {
+      "id": "i58d48f",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Bashar Tabbah",
+      "url": "https://commons.wikimedia.org/wiki/File:%E2%80%98Umayri_(3).jpg",
+      "descriptions": {
+        "m432f6a": "ruins at <modern id=\"m432f6a\">Tall al Umayri</modern>"
+      }
+    },
+    {
+      "id": "i58e45d",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "IgnisFatuus and Didier Laroche",
+      "url": "https://commons.wikimedia.org/wiki/File:Agora_of_Smyrna.jpg",
+      "descriptions": {
+        "m1876bb": "panorama of ruins at <modern id=\"m1876bb\">Izmir</modern>"
+      }
+    },
+    {
+      "id": "i595c3f",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Malkawi99",
+      "url": "https://commons.wikimedia.org/wiki/File:Malka,_Irbid,_Jordan_21.jpg",
+      "descriptions": {
+        "ma6009a": "streetscape looking west near <modern id=\"ma6009a\">Ibdar</modern>, which is off-camera to the right"
+      }
+    },
+    {
+      "id": "i59beaf",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Davidbena",
+      "url": "https://commons.wikimedia.org/wiki/File:Adullam,_the_hilltop_ruin.jpg",
+      "descriptions": {
+        "m2d769d": "ruins at <modern id=\"m2d769d\">Khirbet esh Sheikh Madhkur</modern>"
+      }
+    },
+    {
+      "id": "i5ca053",
+      "license": "CC-BY-SA-2.5",
+      "source": "wikimedia",
+      "credit": "Heretiq",
+      "url": "https://commons.wikimedia.org/wiki/File:ByblosObeliskTemple2.jpg",
+      "descriptions": {
+        "mf937a6": "ruins at <modern id=\"mf937a6\">Byblos</modern>"
+      }
+    },
+    {
+      "id": "i5cd431",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Producer",
+      "url": "https://commons.wikimedia.org/wiki/File:Tubas.jpg",
+      "descriptions": {
+        "m4ff96d": "cityscape of <modern id=\"m4ff96d\">Tubas</modern>"
+      }
+    },
+    {
+      "id": "i5d1620",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "‫יודקה yudkey‬‎",
+      "url": "https://commons.wikimedia.org/wiki/File:Nehusha,_Israel_-_panoramio_(cropped).jpg",
+      "descriptions": {
+        "m05288e": "panorama of a region near <modern id=\"m05288e\">Atar Nehusha</modern>"
+      }
+    },
+    {
+      "id": "i5d29df",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Danny Gershoni",
+      "url": "https://commons.wikimedia.org/wiki/File:The_iron_train_bridge_-_Shaked_park_4.jpg",
+      "descriptions": {
+        "m0382c1": "panorama looking north near <modern id=\"m0382c1\">Khirbet Muleh</modern>, which is off-camera far behind the bridge"
+      }
+    },
+    {
+      "id": "i5dbaec",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "American Colony of Jerusalem",
+      "url": "https://commons.wikimedia.org/wiki/File:Beit_Ur_Fawqa_Aerial,_1931_Cropped.jpg",
+      "descriptions": {
+        "mdfba66": "historical aerial cityscape of <modern id=\"mdfba66\">Beit Ur al Fauqa</modern>"
+      }
+    },
+    {
+      "id": "i5df073",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Bnei-Brak-tel-abu-zeityn-19.jpg",
+      "descriptions": {
+        "mcd7d18": "panorama of <modern id=\"mcd7d18\">Tel Zeton</modern>"
+      }
+    },
+    {
+      "id": "i5f1064",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Murat Akar",
+      "url": "https://commons.wikimedia.org/wiki/File:Tayinat_Flyover_(Photo_credit_Murat_Akar).jpg",
+      "descriptions": {
+        "m058079": "aerial panorama of <modern id=\"m058079\">Tell Tayinat</modern>"
+      }
+    },
+    {
+      "id": "i5f30f8",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "90Desertboy",
+      "url": "https://commons.wikimedia.org/wiki/File%3AFactoryinomer.jpg",
+      "descriptions": {
+        "m36efdd": "building near <modern id=\"m36efdd\">Hazar Betarim</modern>"
+      }
+    },
+    {
+      "id": "i601f68",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Onzd",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%A2%D7%95%D7%92%27%D7%94.jpeg",
+      "descriptions": {
+        "mc06f57": "water channel near <modern id=\"mc06f57\">Khirbet el Aujah el Foqa</modern>"
+      }
+    },
+    {
+      "id": "i604174",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "AVRAMGR",
+      "url": "https://commons.wikimedia.org/wiki/File:EIN_AFEQ_AERIAL_A.JPG",
+      "descriptions": {
+        "mb6076b": "aerial panorama of <modern id=\"mb6076b\">Tel Afek</modern>"
+      }
+    },
+    {
+      "id": "i6041eb",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "valleyofdawn",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_20201219_141516.jpeg",
+      "descriptions": {
+        "mabd3be": "panorama near <modern id=\"mabd3be\">Jebel el Hamrah</modern>"
+      }
+    },
+    {
+      "id": "i61aba8",
+      "license": "CC-BY-SA-2.0",
+      "source": "wikimedia",
+      "credit": "Carole Raddato",
+      "url": "https://commons.wikimedia.org/wiki/File:Abbasid_domestic_houses,_Pella,_Jordan_(33383139913).jpg",
+      "descriptions": {
+        "m59ce29": "road in Pella, a city of the <modern id=\"m59ce29\">Decapolis</modern>"
+      }
+    },
+    {
+      "id": "i620447",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Ghassan Mroue",
+      "url": "https://commons.wikimedia.org/wiki/File:Cedar_forest_,_Barouk_Jan_2010_-_panoramio.jpg",
+      "descriptions": {
+        "m846f8b": "panorama of Barouk in <modern id=\"m846f8b\">Mount Lebanon</modern>"
+      }
+    },
+    {
+      "id": "i629c10",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Saudi Arabia Heritage Commission",
+      "url": "https://commons.wikimedia.org/wiki/File:%D8%AC%D8%A7%D9%86%D8%A8_%D9%85%D9%86_%D8%B3%D9%88%D8%B1_%D8%AA%D9%8A%D9%85%D8%A7%D8%A1.jpg",
+      "descriptions": {
+        "ma06c71": "ruins at <modern id=\"ma06c71\">Tayma</modern>"
+      }
+    },
+    {
+      "id": "i62cebd",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "See each photo for its author and license.",
+      "url": "https://commons.wikimedia.org/wiki/File:Deir_ez-Zor_collection.jpg",
+      "descriptions": {
+        "mfd1385": "collage of <modern id=\"mfd1385\">Deir ez Zor</modern>"
+      }
+    },
+    {
+      "id": "i637717",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "אבישי טייכר",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_5068_view_on_shaab_from_tzorit.jpg",
+      "descriptions": {
+        "m1049fd": "cityscape looking southwest near, which is behind the hill <modern id=\"m1049fd\">Rosh Zayit</modern>"
+      }
+    },
+    {
+      "id": "i640927",
+      "license": "CC-BY-SA-2.0",
+      "source": "wikimedia",
+      "credit": "Marion Doss",
+      "url": "https://commons.wikimedia.org/wiki/File:Lazarus_Bethany.JPG",
+      "descriptions": {
+        "m227592": "tomb of Lazarus at <modern id=\"m227592\">Al Eizariya</modern>"
+      }
+    },
+    {
+      "id": "i648b61",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Deror avi",
+      "url": "https://commons.wikimedia.org/wiki/File:Goded_IMG_5604.JPG",
+      "descriptions": {
+        "m2b72a1": "panorama of <modern id=\"m2b72a1\">Tel Goded</modern>"
+      }
+    },
+    {
+      "id": "i668c6c",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:Nablus_by_Mujaddara_-_panoramio_(1257).jpg",
+      "descriptions": {
+        "m45592a": "panorama looking north near <modern id=\"m45592a\">Khirbet en Nabi</modern>, which is behind the hill"
+      }
+    },
+    {
+      "id": "i6701b8",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Itai",
+      "url": "https://commons.wikimedia.org/wiki/File:Eshtaol_Forest.jpg",
+      "descriptions": {
+        "m1dd2b9": "panorama looking west near <modern id=\"m1dd2b9\">Khirbet Deir Shubeib</modern>"
+      }
+    },
+    {
+      "id": "i67680e",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Jcwf",
+      "url": "https://commons.wikimedia.org/wiki/File:Syria_physical_location_map_Balikh.svg",
+      "descriptions": {
+        "m02640f": "map of the <modern id=\"m02640f\">Balikh River</modern>"
+      }
+    },
+    {
+      "id": "i6790b5",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Jewbask",
+      "url": "https://commons.wikimedia.org/wiki/File:Nahal_prat2.jpg",
+      "descriptions": {
+        "mc4242d": "closeup of <modern id=\"mc4242d\">Wadi Qelt</modern>"
+      }
+    },
+    {
+      "id": "i67a214",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Seth J. Frantzman",
+      "url": "https://commons.wikimedia.org/wiki/File:Khalasa.jpg",
+      "descriptions": {
+        "mea9d16": "panorama of <modern id=\"mea9d16\">Haluza</modern>"
+      }
+    },
+    {
+      "id": "i67b84c",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Bashar Tabbah",
+      "url": "https://commons.wikimedia.org/wiki/File:Lajjun_(Jordan).jpg",
+      "descriptions": {
+        "mffb2d6": "panorama near <modern id=\"mffb2d6\">Khirbet el Medeineh</modern>"
+      }
+    },
+    {
+      "id": "i67d37a",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "AVRAM GRAICER",
+      "url": "https://commons.wikimedia.org/wiki/File:תל_מגידו.JPG",
+      "descriptions": {
+        "mf52435": "aerial panorama of ruins at <modern id=\"mf52435\">Tel Megiddo</modern>"
+      }
+    },
+    {
+      "id": "i6918ef",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "self",
+      "url": "https://commons.wikimedia.org/wiki/File:Theatre@Assos(Turkey),_April_%2709.JPG",
+      "descriptions": {
+        "mce3faf": "theater at <modern id=\"mce3faf\">Assos</modern>"
+      }
+    },
+    {
+      "id": "i6957f2",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Almog",
+      "url": "https://commons.wikimedia.org/wiki/File:Ramkhal.jpg",
+      "descriptions": {
+        "mc58154": "interior at <modern id=\"mc58154\">Acre</modern>"
+      }
+    },
+    {
+      "id": "i6ac006",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Fullo88",
+      "url": "https://commons.wikimedia.org/wiki/File:Tell_es-sultan.jpg",
+      "descriptions": {
+        "m95349d": "aerial panorama of <modern id=\"m95349d\">Tell es Sultan</modern>"
+      }
+    },
+    {
+      "id": "i6b7b0e",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Almog",
+      "url": "https://commons.wikimedia.org/wiki/File:Sharrona.jpg",
+      "descriptions": {
+        "m4a7dca": "building near <modern id=\"m4a7dca\">Khirbet Sarona</modern>"
+      }
+    },
+    {
+      "id": "i6c2d1d",
+      "license": "CC-BY-SA-2.5",
+      "source": "wikimedia",
+      "credit": "Tamarah",
+      "url": "https://commons.wikimedia.org/wiki/File:Kumeran4.jpg",
+      "descriptions": {
+        "m9c3ada": "cave at <modern id=\"m9c3ada\">Qumran</modern>"
+      }
+    },
+    {
+      "id": "i6d424d",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Berthold Werner",
+      "url": "https://commons.wikimedia.org/wiki/File:Berg_Tabor_BW_2.JPG",
+      "descriptions": {
+        "mf8c29c": "building in <modern id=\"mf8c29c\">Galilee</modern>"
+      }
+    },
+    {
+      "id": "i6d53e7",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Wilson44691",
+      "url": "https://commons.wikimedia.org/wiki/File:LachishFrontGate.jpg",
+      "descriptions": {
+        "m31bdd9": "gate at <modern id=\"m31bdd9\">Tell ed Duweir</modern>"
+      }
+    },
+    {
+      "id": "i6d9f22",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Bgabel",
+      "url": "https://commons.wikimedia.org/wiki/File:IL-Kaphernaum-petrushaus.jpg",
+      "descriptions": {
+        "m66efd0": "ruins at <modern id=\"m66efd0\">Tell Hum</modern>"
+      }
+    },
+    {
+      "id": "i6e1d0e",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "NASA",
+      "url": "https://commons.wikimedia.org/wiki/File:Lake_urmia_1984.jpg",
+      "descriptions": {
+        "m63822c": "satellite view of <modern id=\"m63822c\">Lake Urmia</modern>"
+      }
+    },
+    {
+      "id": "i6e546d",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Dieban_District,_Jordan_-_panoramio.jpg",
+      "descriptions": {
+        "me622ed": "panorama near <modern id=\"me622ed\">Rujm el Meshrefeh</modern>"
+      }
+    },
+    {
+      "id": "i6ee49c",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Hanay",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel_Shimron_-_June_2017_(1).jpg",
+      "descriptions": {
+        "m15d67c": "panorama of <modern id=\"m15d67c\">Tel Shimron</modern>"
+      }
+    },
+    {
+      "id": "i6ef42c",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:West_Bank_by_Mujaddara_-_panoramio_(1322).jpg",
+      "descriptions": {
+        "m0049f9": "forest near <modern id=\"m0049f9\">Khirbet en Najjar</modern>"
+      }
+    },
+    {
+      "id": "i6effe1",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Metsad-Hatseva-261.jpg",
+      "descriptions": {
+        "m27a1e0": "ruins at <modern id=\"m27a1e0\">En Hazeva</modern>"
+      }
+    },
+    {
+      "id": "i700ef3",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "netanel_h",
+      "url": "https://commons.wikimedia.org/wiki/File:MountCarmel1.JPG",
+      "descriptions": {
+        "mf9b7d7": "panorama of part of <modern id=\"mf9b7d7\">Mount Carmel</modern>"
+      }
+    },
+    {
+      "id": "i70883d",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:TelJavne056.jpg",
+      "descriptions": {
+        "mfbdf61": "panorama of <modern id=\"mfbdf61\">Yibna</modern>"
+      }
+    },
+    {
+      "id": "i70a866",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Uksz",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%91%D7%99%D7%AA_%D7%94%D7%91%D7%98%D7%97%D7%95%D7%9F_%D7%A0%D7%91%D7%98%D7%99%D7%9D.jpg",
+      "descriptions": {
+        "mdaf25b": "building near <modern id=\"mdaf25b\">Be’er Nevatim</modern>"
+      }
+    },
+    {
+      "id": "i70e9f5",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Napoleon Vier",
+      "url": "https://commons.wikimedia.org/wiki/File:Sparta.jpg",
+      "descriptions": {
+        "me25924": "panorama of ruins at <modern id=\"me25924\">Sparta</modern>"
+      }
+    },
+    {
+      "id": "i7136d8",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "hatul",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%A2%D7%99%D7%9F_%D7%96%D7%99%D7%95_5.jpeg",
+      "descriptions": {
+        "m4f28ee": "spring near <modern id=\"m4f28ee\">Khirbet Bani Dar</modern>"
+      }
+    },
+    {
+      "id": "i7189f9",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "omar",
+      "url": "https://commons.wikimedia.org/wiki/File:Jatt.JPG",
+      "descriptions": {
+        "md11454": "cityscape of <modern id=\"md11454\">Jett</modern>"
+      }
+    },
+    {
+      "id": "i737b07",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Wikid77",
+      "url": "https://commons.wikimedia.org/wiki/File:Aegean_Sea_with_island_groups_labeled.gif",
+      "descriptions": {
+        "mea51a2": "labeled map of the <modern id=\"mea51a2\">Aegean Islands</modern>"
+      }
+    },
+    {
+      "id": "i740ff0",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Daniel Ventura",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel_Dothan_22.JPG",
+      "descriptions": {
+        "m8774a2": "panorama of <modern id=\"m8774a2\">Tel Dotan</modern>"
+      }
+    },
+    {
+      "id": "i749ef6",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "MEDIACRAT",
+      "url": "https://commons.wikimedia.org/wiki/File:Khor_Virap_Monastery4.jpg",
+      "descriptions": {
+        "m08a591": "panorama of Mount Ararat in <modern id=\"m08a591\">Urartu</modern>"
+      }
+    },
+    {
+      "id": "i75b88b",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Deror Avi",
+      "url": "https://commons.wikimedia.org/wiki/File:Ecce_IMG_1590.jpg",
+      "descriptions": {
+        "mb10309": "arch at the <modern id=\"mb10309\">Convent of the Sisters of Zion</modern>"
+      }
+    },
+    {
+      "id": "i75c384",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "arielgr",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%91%D7%A8%D7%99%D7%9B%D7%AA_%D7%94%D7%A0%D7%A7%D7%99%D7%A7.jpeg",
+      "descriptions": {
+        "m629d7c": "closeup of cliffs near <modern id=\"m629d7c\">Khirbet Ein Fara</modern>"
+      }
+    },
+    {
+      "id": "i75e511",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "RomanDeckert",
+      "url": "https://commons.wikimedia.org/wiki/File:TyreCitySiteUNESCOworldculturalheritage_RomanDeckert07082019.jpg",
+      "descriptions": {
+        "m11c602": "panorama of ruins at <modern id=\"m11c602\">Tyre</modern>"
+      }
+    },
+    {
+      "id": "i76be5f",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "NASA",
+      "url": "https://commons.wikimedia.org/wiki/File:Crete_Nasa.jpg",
+      "descriptions": {
+        "mf93341": "satellite view of <modern id=\"mf93341\">Crete</modern>"
+      }
+    },
+    {
+      "id": "i76c782",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel-Maon-183.jpg",
+      "descriptions": {
+        "m8bd1e6": "panorama of <modern id=\"m8bd1e6\">Tel Main</modern>"
+      }
+    },
+    {
+      "id": "i770b09",
+      "license": "CC-Zero",
+      "source": "wikimedia",
+      "credit": "Friends123",
+      "url": "https://commons.wikimedia.org/wiki/File:Yatta,_Hebron.1.JPG",
+      "descriptions": {
+        "m161c59": "building at <modern id=\"m161c59\">Yatta</modern>"
+      }
+    },
+    {
+      "id": "i774b7b",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "Evgeni Dinev",
+      "url": "https://commons.wikimedia.org/wiki/File:Thessaly_Plain.jpg",
+      "descriptions": {
+        "mf0e9f8": "panorama of a valley in <modern id=\"mf0e9f8\">Thessaly</modern>"
+      }
+    },
+    {
+      "id": "i776773",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "Jim Gordon",
+      "url": "https://commons.wikimedia.org/wiki/File:Barada_River,_Damascus,_Syria.jpg",
+      "descriptions": {
+        "m39ac0b": "closeup of the <modern id=\"m39ac0b\">Barada River</modern>"
+      }
+    },
+    {
+      "id": "i77b8b2",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "אריאל מנור",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_64853_tel_arad_national_park.jpg",
+      "descriptions": {
+        "mdabd6c": "ruins at <modern id=\"mdabd6c\">Tel Arad</modern>"
+      }
+    },
+    {
+      "id": "i77fca1",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "אליהו הנביא אהי",
+      "url": "https://commons.wikimedia.org/wiki/File:View_in_Shtula,_May_2018.jpg",
+      "descriptions": {
+        "mdcac4a": "panorama looking north near <modern id=\"mdcac4a\">Tell er Rahb</modern>, which is behind the camera"
+      }
+    },
+    {
+      "id": "i78bf14",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Skilla1st",
+      "url": "https://commons.wikimedia.org/wiki/File:Djibouti_City.jpg",
+      "descriptions": {
+        "mf4f903": "collage of <modern id=\"mf4f903\">Djibouti</modern>"
+      }
+    },
+    {
+      "id": "i7b2f28",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Yoavd",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel_Shamam3.jpg",
+      "descriptions": {
+        "m307896": "building near <modern id=\"m307896\">Tel Shem</modern>"
+      }
+    },
+    {
+      "id": "i7d0aba",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Avshalombz",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%97%D7%A8%D7%91%D7%AA_%D7%A9%D7%9E%D7%A2.JPG",
+      "descriptions": {
+        "m1d647a": "ruins near <modern id=\"m1d647a\">En Meron</modern>"
+      }
+    },
+    {
+      "id": "i7d3f6a",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Deror_avi",
+      "url": "https://commons.wikimedia.org/wiki/File:Givat_HaMore_IMG_1006.JPG",
+      "descriptions": {
+        "m662b52": "panorama of a forest near <modern id=\"m662b52\">Tell el Ajjul</modern>"
+      }
+    },
+    {
+      "id": "i7dc6b3",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Chaver83",
+      "url": "https://commons.wikimedia.org/wiki/File:KeremNaftali_View2HulaNationalReserve.jpg",
+      "descriptions": {
+        "m581086": "aerial panorama of <modern id=\"m581086\">Lake Huleh</modern>"
+      }
+    },
+    {
+      "id": "i7ddd64",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "RickP",
+      "url": "https://commons.wikimedia.org/wiki/File:Pardes_Hanna-Karkur_municipality_building_sept_2006.jpg",
+      "descriptions": {
+        "mb6a27e": "building at <modern id=\"mb6a27e\">Pardes Hanna Karkur</modern>"
+      }
+    },
+    {
+      "id": "i7de895",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "gloria_euyoque",
+      "url": "https://commons.wikimedia.org/wiki/File:Mount_of_Saint_Catherine.jpg",
+      "descriptions": {
+        "me89f58": "panorama of <modern id=\"me89f58\">Jebel Katherina</modern>"
+      }
+    },
+    {
+      "id": "i7df3cd",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Bashar Tabbah",
+      "url": "https://commons.wikimedia.org/wiki/File%3AUdhruh.jpg",
+      "descriptions": {
+        "md84c87": "panorama of ruins at <modern id=\"md84c87\">Udruh</modern>"
+      }
+    },
+    {
+      "id": "i7e7da7",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Bashar Tabbah",
+      "url": "https://commons.wikimedia.org/wiki/File:Udhruh_(Ottoman_Fort_Interior).jpg",
+      "descriptions": {
+        "md84c87": "ruins of a building at <modern id=\"md84c87\">Udruh</modern>"
+      }
+    },
+    {
+      "id": "i7e8d12",
+      "license": "CC-BY-4.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel-Beyt-Shemesh-9799.jpg",
+      "descriptions": {
+        "m7c5f02": "ruins at <modern id=\"m7c5f02\">Tel Bet Shemesh</modern>"
+      }
+    },
+    {
+      "id": "i7ea48e",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Eric H. Cline",
+      "url": "https://commons.wikimedia.org/wiki/File:Kabri_2013_palace_aerial.jpg",
+      "descriptions": {
+        "mc40778": "aerial panorama of ruins at <modern id=\"mc40778\">Tel Kabri</modern>"
+      }
+    },
+    {
+      "id": "i7f3e5e",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "אבישי טייכר",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_7410_kastel_memorial_site.jpg",
+      "descriptions": {
+        "m90275b": "building at <modern id=\"m90275b\">Al Qastal</modern>"
+      }
+    },
+    {
+      "id": "i7f4fe0",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "שאולי לב",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%A2%D7%99%D7%9F_%D7%9B%D7%A1%D7%9C%D7%95%D7%9F.jpeg",
+      "descriptions": {
+        "mb905e4": "pool near <modern id=\"mb905e4\">Kesla</modern>"
+      }
+    },
+    {
+      "id": "i7f892f",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "vivali",
+      "url": "https://commons.wikimedia.org/wiki/File:%D0%93%D0%B5%D1%80%D0%BC%D0%B5%D1%82%D1%80%D0%B8%D1%8F_%D1%81%D0%BA%D0%B2%D0%B5%D1%80%D0%B0_-_panoramio.jpg",
+      "descriptions": {
+        "md512fb": "park near <modern id=\"md512fb\">Ein Haud</modern>"
+      }
+    },
+    {
+      "id": "i80371c",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Marsyas",
+      "url": "https://commons.wikimedia.org/wiki/File:Samothraki_island.jpg",
+      "descriptions": {
+        "md84660": "panorama of <modern id=\"md84660\">Samothraki</modern>"
+      }
+    },
+    {
+      "id": "i803bcb",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "MatanBM",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%9E%D7%A6%D7%A4%D7%94_%D7%A2%D7%9E%D7%A8%D7%99_%D7%98%D7%9C.jpeg",
+      "descriptions": {
+        "ma3b16c": "panorama looking northwest near <modern id=\"ma3b16c\">Tell Soreg</modern>, which is just off-camera to the right"
+      }
+    },
+    {
+      "id": "i805e5c",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Amos Meron",
+      "url": "https://commons.wikimedia.org/wiki/File:Yad_Binyamin_Aerial_View.jpg",
+      "descriptions": {
+        "mcb0fbb": "aerial panorama of a settlement near <modern id=\"mcb0fbb\">Khirbet el Mukheizin</modern>"
+      }
+    },
+    {
+      "id": "i80d40e",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Alexander Berezhnoy",
+      "url": "https://commons.wikimedia.org/wiki/File:%D0%98%D0%B7%D1%80%D0%B0%D0%B8%D0%BB%D1%8C._-_panoramio_(3).jpg",
+      "descriptions": {
+        "mec0b4d": "panorama adjacent to <modern id=\"mec0b4d\">Ain Kezbeh</modern>"
+      }
+    },
+    {
+      "id": "i813aee",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Bernard Gagnon",
+      "url": "https://commons.wikimedia.org/wiki/File:Episcopal_Center_(Salona)_03.jpg",
+      "descriptions": {
+        "m232ed8": "ruins at <modern id=\"m232ed8\">Salona</modern>"
+      }
+    },
+    {
+      "id": "i8168f1",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "Leandro Neumann Ciuffo",
+      "url": "https://commons.wikimedia.org/wiki/File:The_Roman_forum.jpg",
+      "descriptions": {
+        "mdadcc0": "panorama of ruins at <modern id=\"mdadcc0\">Thessaloniki</modern>"
+      }
+    },
+    {
+      "id": "i819185",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Almog",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%AA%D7%9E%D7%95%D7%A0%D7%94_083.jpg",
+      "descriptions": {
+        "mabe7ea": "panorama of <modern id=\"mabe7ea\">Tel Hanaton</modern>"
+      }
+    },
+    {
+      "id": "i81f265",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Sergiogr",
+      "url": "https://commons.wikimedia.org/wiki/File:VeriaPanoramic.JPG",
+      "descriptions": {
+        "ma5019d": "cityscape of <modern id=\"ma5019d\">Veria</modern>"
+      }
+    },
+    {
+      "id": "i81f446",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Yehudit Garinkol",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_32661_Settlements_in_Israel.JPG",
+      "descriptions": {
+        "m2c4507": "buildings near <modern id=\"m2c4507\">Rujm el Bahr</modern>"
+      }
+    },
+    {
+      "id": "i82a9ea",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Bashar Tabbah",
+      "url": "https://commons.wikimedia.org/wiki/File:Tell_Hesban_(Arch).jpg",
+      "descriptions": {
+        "m12c75e": "arch at <modern id=\"m12c75e\">Tell Hesban</modern>"
+      }
+    },
+    {
+      "id": "i82be9f",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Daniel Ventura",
+      "url": "https://commons.wikimedia.org/wiki/File:Visit_a_Shomron_2011_131.jpg",
+      "descriptions": {
+        "mb1e1d7": "panorama looking northeast near <modern id=\"mb1e1d7\">Khirbet Tana el Fauqa</modern>, which is off-camera to the right"
+      }
+    },
+    {
+      "id": "i82bf99",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "משה ענבר",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_3628_Tel_Dors_shoreline.JPG",
+      "descriptions": {
+        "m13789b": "panorama of <modern id=\"m13789b\">Tel Dor</modern>"
+      }
+    },
+    {
+      "id": "i83137f",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Afas1407",
+      "url": "https://commons.wikimedia.org/wiki/File:Qishlah_Palace.jpg",
+      "descriptions": {
+        "md387f1": "building at <modern id=\"md387f1\">Ha’il</modern>"
+      }
+    },
+    {
+      "id": "i837ab9",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Elfifo4",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%9B%D7%A4%D7%A8_%D7%99%D7%90%D7%A1%D7%95%D7%A3.jpg",
+      "descriptions": {
+        "m94367d": "panorama looking north near <modern id=\"m94367d\">Tell Abu Zarad</modern>, which is just off-camera to the left"
+      }
+    },
+    {
+      "id": "i83a2cc",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "רוני קניגסברג",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_76173_tel_yokneam.jpg",
+      "descriptions": {
+        "m5fdc60": "ruins at <modern id=\"m5fdc60\">Tel Yokneam</modern>"
+      }
+    },
+    {
+      "id": "i851df0",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "MathKnight",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel-Zafit_(1).JPG",
+      "descriptions": {
+        "m28d167": "panorama of <modern id=\"m28d167\">Tell es Safi</modern>"
+      }
+    },
+    {
+      "id": "i852010",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Adam Zertal",
+      "url": "https://commons.wikimedia.org/wiki/File:El-Ahwat_-_Samaria_Israel_10.8.jpg",
+      "descriptions": {
+        "mab23b9": "ruins at <modern id=\"mab23b9\">Ahwat</modern>"
+      }
+    },
+    {
+      "id": "i8526b4",
+      "license": "CC-BY-SA-2.5",
+      "source": "wikimedia",
+      "credit": "احمد منذر",
+      "url": "https://commons.wikimedia.org/wiki/File:Dyala_river.JPG",
+      "descriptions": {
+        "m4f8928": "panorama of the <modern id=\"m4f8928\">Diyala River</modern>"
+      }
+    },
+    {
+      "id": "i853f75",
+      "license": "CC-BY-SA-2.0",
+      "source": "wikimedia",
+      "credit": "Ian Scott",
+      "url": "https://commons.wikimedia.org/wiki/File:Looking_East_through_the_Arbel_Pass_-_B_(5806688072).jpg",
+      "descriptions": {
+        "m9547d7": "panorama of <modern id=\"m9547d7\">Nahal Arbel</modern>"
+      }
+    },
+    {
+      "id": "i858b87",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bewinxed",
+      "url": "https://commons.wikimedia.org/wiki/File:Al_Zmeilat_-_panoramio.jpg",
+      "descriptions": {
+        "m17c007": "cityscape near <modern id=\"m17c007\">Ad Duhaybah</modern>"
+      }
+    },
+    {
+      "id": "i85fbda",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Jotpe",
+      "url": "https://commons.wikimedia.org/wiki/File:Withered_stony_slope.JPG",
+      "descriptions": {
+        "mdc8fda": "hill near <modern id=\"mdc8fda\">Har Zevi</modern>"
+      }
+    },
+    {
+      "id": "i87d70c",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "אבישי טייכר",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_5392_meggido.jpg",
+      "descriptions": {
+        "mf52435": "pillars at <modern id=\"mf52435\">Tel Megiddo</modern>"
+      }
+    },
+    {
+      "id": "i87d953",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Uri~commonswiki (Uri Juda)",
+      "url": "https://commons.wikimedia.org/wiki/File:Sela.JPG",
+      "descriptions": {
+        "m51eef7": "panorama of ruins at <modern id=\"m51eef7\">Sela</modern>"
+      }
+    },
+    {
+      "id": "i88194b",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "אתר נלך",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%A2%D7%99%D7%9F_%D7%9E%D7%91%D7%A9%D7%A8.jpeg",
+      "descriptions": {
+        "m204e7f": "pool near <modern id=\"m204e7f\">Feldstein et al Site 34</modern>"
+      }
+    },
+    {
+      "id": "i8a0e96",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "haitham alfalah",
+      "url": "https://commons.wikimedia.org/wiki/File:قلعة_مارد.jpg",
+      "descriptions": {
+        "ma4d11e": "ruins in <modern id=\"ma4d11e\">Dumat al Jandal</modern>"
+      }
+    },
+    {
+      "id": "i8a2a48",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "יעקב",
+      "url": "https://commons.wikimedia.org/wiki/File:AtsmonGilon0723.JPG",
+      "descriptions": {
+        "m9c165a": "cityscape looking north near <modern id=\"m9c165a\">Khirbet el Jemeijimeh</modern>, which is off-camera to the right"
+      }
+    },
+    {
+      "id": "i8a370e",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:RTzipori_013.jpg",
+      "descriptions": {
+        "mf10467": "panorama of <modern id=\"mf10467\">Wadi el Melek</modern>"
+      }
+    },
+    {
+      "id": "i8ae411",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "PalFest",
+      "url": "https://commons.wikimedia.org/wiki/File:PalFest_2010_Day_5_al_Khalil_Hebron.jpg",
+      "descriptions": {
+        "m61740b": "building near <modern id=\"m61740b\">Khirbet en Nasara</modern>"
+      }
+    },
+    {
+      "id": "i8b3f55",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Beivushtang",
+      "url": "https://commons.wikimedia.org/wiki/File:Azrli_29.JPG",
+      "descriptions": {
+        "m4a75c5": "aerial panorama of the <modern id=\"m4a75c5\">Ayalon River</modern>"
+      }
+    },
+    {
+      "id": "i8c207f",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Aseel zm",
+      "url": "https://commons.wikimedia.org/wiki/File:Banana_trees_in_Jericho.jpg",
+      "descriptions": {
+        "m1a53ab": "trees near <modern id=\"m1a53ab\">Ain Hajlah</modern>"
+      }
+    },
+    {
+      "id": "i8d1e37",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "Erp",
+      "url": "https://commons.wikimedia.org/wiki/File:Patara_ruins.jpg",
+      "descriptions": {
+        "mcb8622": "panorama of ruins at <modern id=\"mcb8622\">Patara</modern>"
+      }
+    },
+    {
+      "id": "i8daad6",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Matson Collection",
+      "url": "https://commons.wikimedia.org/wiki/File:Petra-Locomotive.jpg",
+      "descriptions": {
+        "m290b1e": "historical train station at <modern id=\"m290b1e\">Ma’an</modern>"
+      }
+    },
+    {
+      "id": "i8e79db",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Guy Gotlib גיא גוטליב",
+      "url": "https://commons.wikimedia.org/wiki/File:Tell_el_Hesy_-_Israel_c._2009_-1.jpg",
+      "descriptions": {
+        "mc7ecc2": "panorama of <modern id=\"mc7ecc2\">Tel Hasi</modern>"
+      }
+    },
+    {
+      "id": "i8fb0e1",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:Near_Flam_winery_-_panoramio.jpg",
+      "descriptions": {
+        "m52af08": "panorama near <modern id=\"m52af08\">Khirbet esh Sheikh Ibrahim</modern>"
+      }
+    },
+    {
+      "id": "i907132",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Cristiano64",
+      "url": "https://commons.wikimedia.org/wiki/File:Antiochia_su_Oronte.PNG",
+      "descriptions": {
+        "mbe432b": "map of <modern id=\"mbe432b\">Antioch on the Orontes</modern>"
+      }
+    },
+    {
+      "id": "i909fe9",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Davidbena",
+      "url": "https://commons.wikimedia.org/wiki/File:The_southeastern_end_of_Tel_Socho,_Feb_2015.jpg",
+      "descriptions": {
+        "md2430d": "panorama of <modern id=\"md2430d\">Tel Socho</modern>"
+      }
+    },
+    {
+      "id": "i90cecf",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Avraham Ashkenazi",
+      "url": "https://commons.wikimedia.org/wiki/File:Saris_ii.jpg",
+      "descriptions": {
+        "m2f382d": "historical cityscape of <modern id=\"m2f382d\">Saris</modern>"
+      }
+    },
+    {
+      "id": "i913d73",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "ekstijn",
+      "url": "https://commons.wikimedia.org/wiki/File:Desert_-_panoramio_(28).jpg",
+      "descriptions": {
+        "m5ed9eb": "panorama of a road near <modern id=\"m5ed9eb\">Khirbet Kuseife</modern>"
+      }
+    },
+    {
+      "id": "i917ff7",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "MattiPaavola",
+      "url": "https://commons.wikimedia.org/wiki/File:Acropolis_of_Rhodes_overview.JPG",
+      "descriptions": {
+        "mfc8ad3": "panorama of the <modern id=\"mfc8ad3\">Acropolis of Rhodes</modern>"
+      }
+    },
+    {
+      "id": "i9276a8",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "אסף.צ",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel_arad_fortress.JPG",
+      "descriptions": {
+        "mdabd6c": "aerial panorama of ruins at <modern id=\"mdabd6c\">Tel Arad</modern>"
+      }
+    },
+    {
+      "id": "i9285ed",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "el ui",
+      "url": "https://commons.wikimedia.org/wiki/File:Wadi_near_Karak_-_panoramio_(2).jpg",
+      "descriptions": {
+        "m70b396": "panorama looking west near <modern id=\"m70b396\">Khirbet Umm el Idham</modern>, which is on the hill ascending off-camera to the right"
+      }
+    },
+    {
+      "id": "i929477",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:Dayr_Samet_-_panoramio_(5).jpg",
+      "descriptions": {
+        "mf65c37": "cityscape near <modern id=\"mf65c37\">Khirbet Beit Maqdum</modern>, which is off-camera to the right"
+      }
+    },
+    {
+      "id": "i944605",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Yuvalr",
+      "url": "https://commons.wikimedia.org/wiki/File:Tavor_stream_(Nahal_Tavor),_Lower_Galilee,_Israel_(2).jpg",
+      "descriptions": {
+        "mbcb68c": "closeup of a waterfall along <modern id=\"mbcb68c\">Nahal Tabor</modern>"
+      }
+    },
+    {
+      "id": "i944e1b",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:Deutsch_0314.jpg",
+      "descriptions": {
+        "m375464": "building near <modern id=\"m375464\">Ain Qana</modern>"
+      }
+    },
+    {
+      "id": "i94602f",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Philipp Pilhofer",
+      "url": "https://commons.wikimedia.org/wiki/File:Kavala_egnatia_2.JPG",
+      "descriptions": {
+        "m156588": "Roman road at <modern id=\"m156588\">Kavala</modern>"
+      }
+    },
+    {
+      "id": "i94fb9d",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Ollios",
+      "url": "https://commons.wikimedia.org/wiki/File:Burhaniye_Tarihi.JPG",
+      "descriptions": {
+        "me0645b": "ruins at <modern id=\"me0645b\">Oren</modern>"
+      }
+    },
+    {
+      "id": "i95b517",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Mboesch",
+      "url": "https://commons.wikimedia.org/wiki/File:Nach-mar-saba-wadi-quidron-e.jpg",
+      "descriptions": {
+        "ma5f44f": "panorama of the <modern id=\"ma5f44f\">Kidron River</modern>"
+      }
+    },
+    {
+      "id": "i95c3d2",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:Exit_of_Blue_route_-_panoramio.jpg",
+      "descriptions": {
+        "m771704": "panorama looking east near <modern id=\"m771704\">Khirbet es Samrah</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "i96374c",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Ltybcc1",
+      "url": "https://commons.wikimedia.org/wiki/File:%D0%97%D0%B8%D0%BA%D0%BA%D1%83%D1%80%D0%B0%D1%82_%D0%B2_%D0%AD%D1%80%D0%B8%D0%B4%D1%83.jpg",
+      "descriptions": {
+        "m108001": "panorama of <modern id=\"m108001\">Tell Abu Shahrain</modern>"
+      }
+    },
+    {
+      "id": "i963d30",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "AAlsaiad",
+      "url": "https://commons.wikimedia.org/wiki/File:2011_%D9%86%D9%87%D8%B1_%D8%A7%D9%84%D9%84%D8%B9%D9%88%D8%AC_river_-_panoramio.jpg",
+      "descriptions": {
+        "m6dfa22": "panorama of the <modern id=\"m6dfa22\">Awaj River</modern>"
+      }
+    },
+    {
+      "id": "i966a6f",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "שמואל מגל",
+      "url": "https://commons.wikimedia.org/wiki/File:Merot_-_Aerial_photography.jpg",
+      "descriptions": {
+        "m1a9619": "aerial panorama of ruins at <modern id=\"m1a9619\">Khirbet Marus</modern>"
+      }
+    },
+    {
+      "id": "i971bd2",
+      "license": "CC-BY-SA-2.0",
+      "source": "wikimedia",
+      "credit": "Carole Raddato",
+      "url": "https://commons.wikimedia.org/wiki/File:The_Roman_theatre,_built_during_the_reign_of_Augustus_and_completed_during_the_years_of_Trajan_and_Hadrian,_it_originally_had_50_rows_of_seats_(just_18_remain)_and_held_over_15,000_spectators,_Salamis,_Northern_Cyprus_(22335101200).jpg",
+      "descriptions": {
+        "md31e56": "theater at <modern id=\"md31e56\">Salamis</modern>"
+      }
+    },
+    {
+      "id": "i9796ac",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Steven Fruitsmaak",
+      "url": "https://commons.wikimedia.org/wiki/File:Kos_seaport.jpg",
+      "descriptions": {
+        "md321d4": "port on <modern id=\"md321d4\">Kos</modern>"
+      }
+    },
+    {
+      "id": "i982155",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Ibrahim Dwaikat",
+      "url": "https://commons.wikimedia.org/wiki/File:Shechem.jpg",
+      "descriptions": {
+        "m657590": "ruins at <modern id=\"m657590\">Tell Balatah</modern>"
+      }
+    },
+    {
+      "id": "i9aad05",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "עדירל",
+      "url": "https://commons.wikimedia.org/wiki/File:Hamra1.JPG",
+      "descriptions": {
+        "m066eb7": "panorama looking northwest near <modern id=\"m066eb7\">Khirbet Marah el Inab</modern>, which is off-camera to the right"
+      }
+    },
+    {
+      "id": "i9af7b7",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Juhani Komulainen",
+      "url": "https://commons.wikimedia.org/wiki/File:Pigadia.jpg",
+      "descriptions": {
+        "mebc554": "cityscape on <modern id=\"mebc554\">Karpathos</modern>"
+      }
+    },
+    {
+      "id": "i9b027c",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Daniel Ventura",
+      "url": "https://commons.wikimedia.org/wiki/File:The_old_Synagogue_Eshtemoa.jpg",
+      "descriptions": {
+        "m322922": "ruins at <modern id=\"m322922\">As Samu</modern>"
+      }
+    },
+    {
+      "id": "i9b57fd",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "NormanEinstein",
+      "url": "https://commons.wikimedia.org/wiki/File:Civilizacion_etrusca.png",
+      "descriptions": {
+        "mda592c": "map of <modern id=\"mda592c\">Etruria</modern>"
+      }
+    },
+    {
+      "id": "i9c7973",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Areedh_Sub-District,_Jordan_-_panoramio_(2).jpg",
+      "descriptions": {
+        "mf06c0c": "cliff near <modern id=\"mf06c0c\">Ez Zarat</modern>"
+      }
+    },
+    {
+      "id": "i9c9984",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Dvirraz",
+      "url": "https://commons.wikimedia.org/wiki/File:חיזמא.JPG",
+      "descriptions": {
+        "mcc3d1b": "aerial cityscape of <modern id=\"mcc3d1b\">Hizma</modern>"
+      }
+    },
+    {
+      "id": "i9cec3e",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "איוב אבו מדיעם",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_50761_cities_in_israel.jpg",
+      "descriptions": {
+        "m53aaf8": "cityscape looking west near <modern id=\"m53aaf8\">Khirbet ar Ras</modern>, which is off-camera to the bottom right"
+      }
+    },
+    {
+      "id": "i9d4be0",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Hadi Hijjawi",
+      "url": "https://commons.wikimedia.org/wiki/File:%D8%AD%D8%AF%D9%8A%D9%82%D8%A9_%D9%85%D8%AA%D8%AD%D9%81_%D9%85%D8%AD%D9%85%D9%88%D8%AF_%D8%AF%D8%B1%D9%88%D9%8A%D8%B4_-_%D8%B1%D8%A7%D9%85_%D8%A7%D9%84%D9%84%D9%87.jpg",
+      "descriptions": {
+        "md1c4b3": "building near <modern id=\"md1c4b3\">Bir ed Deir</modern>"
+      }
+    },
+    {
+      "id": "i9dd3e4",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:Hameginim051.jpg",
+      "descriptions": {
+        "m411129": "cityscape near <modern id=\"m411129\">Deir Muheisin</modern>"
+      }
+    },
+    {
+      "id": "i9e5f7f",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:Qassila_091.jpg",
+      "descriptions": {
+        "m31f719": "ruins at <modern id=\"m31f719\">Tell Qasile</modern>"
+      }
+    },
+    {
+      "id": "i9e767c",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "יאיר דב",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%94%D7%99%D7%99%D7%A9%D7%95%D7%91_%D7%90%D7%91%D7%99%D7%AA%D7%A8.jpg",
+      "descriptions": {
+        "meb51a3": "panorama looking west near <modern id=\"meb51a3\">Khirbet Samara</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "i9e7c32",
+      "license": "CC-Zero",
+      "source": "wikimedia",
+      "credit": "Hisham.oamr",
+      "url": "https://commons.wikimedia.org/wiki/File:Amatzia3.jpg",
+      "descriptions": {
+        "m813647": "panorama looking northwest near <modern id=\"m813647\">Khirbet el Mejdeleh</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "i9e985e",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Vladimir Boskovic",
+      "url": "https://commons.wikimedia.org/wiki/File:Cave_of_the_Apocalypse.jpg",
+      "descriptions": {
+        "m5c4548": "building on <modern id=\"m5c4548\">Patmos</modern>"
+      }
+    },
+    {
+      "id": "i9f7335",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Chmee2",
+      "url": "https://commons.wikimedia.org/wiki/File:Rosh_Hanikra_in_summer_2011_(2).JPG",
+      "descriptions": {
+        "m191987": "grotto at <modern id=\"m191987\">Rosh HaNikra</modern>"
+      }
+    },
+    {
+      "id": "ia13b83",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Samuel Bradshaw",
+      "url": "https://commons.wikimedia.org/wiki/File:Mount_serbal_print.jpg",
+      "descriptions": {
+        "mb78572": "panoramic drawing of <modern id=\"mb78572\">Jebel Serbal</modern>"
+      }
+    },
+    {
+      "id": "ia14a65",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "NASA",
+      "url": "https://commons.wikimedia.org/wiki/File:Greece_23.91172E_39.08554N.jpg",
+      "descriptions": {
+        "m904265": "satellite image of the <modern id=\"m904265\">Adriatic and Ionian Seas</modern>"
+      }
+    },
+    {
+      "id": "ia1d78c",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Ariel Palmon",
+      "url": "https://commons.wikimedia.org/wiki/File:Kabul_(Israel)_4.jpg",
+      "descriptions": {
+        "m651138": "streetscape of <modern id=\"m651138\">Kabul</modern>"
+      }
+    },
+    {
+      "id": "ia2270a",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "דניאל ונטורה",
+      "url": "https://commons.wikimedia.org/wiki/File:Ktovet_recov_AA.jpg",
+      "descriptions": {
+        "m8ce13e": "panorama of <modern id=\"m8ce13e\">Tel Rehov</modern>"
+      }
+    },
+    {
+      "id": "ia2d484",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Shayshal2",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%9B%D7%91%D7%99%D7%A9_10_%D7%9E%D7%9E%D7%A6%D7%A4%D7%94_%D7%A7%D7%93%D7%A9_%D7%91%D7%A8%D7%A0%D7%A2.jpg",
+      "descriptions": {
+        "m7ee55a": "panorama looking southwest near <modern id=\"m7ee55a\">Mezudat Sheluhat Qadesh Barnea</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "ia33e5a",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "V Katson",
+      "url": "https://commons.wikimedia.org/wiki/File:Wadi_al_Joz_big.jpg",
+      "descriptions": {
+        "ma66725": "streetscape of <modern id=\"ma66725\">Wadi al Joz</modern>"
+      }
+    },
+    {
+      "id": "ia34cee",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "ansam61@hotmail.com",
+      "url": "https://commons.wikimedia.org/wiki/File:%D9%86%D8%B8%D8%B1%D8%A9_%D8%A7%D9%84%D9%89_%D8%A7%D9%84%D8%A8%D8%B9%D9%8A%D8%AF_%D8%A7%D9%84%D9%82%D8%B1%D9%8A%D8%A8_-_panoramio.jpg",
+      "descriptions": {
+        "mb68774": "panorama near <modern id=\"mb68774\">Birket Hafour el Ahmar</modern>"
+      }
+    },
+    {
+      "id": "ia3d7c4",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "sea each photo for its author and license.",
+      "url": "https://commons.wikimedia.org/wiki/File:ArRaqqah_collection.jpg",
+      "descriptions": {
+        "m58caf3": "collage of sites at <modern id=\"m58caf3\">Alamatha</modern>"
+      }
+    },
+    {
+      "id": "ia4f02b",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "bentzy",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%A6%D7%A0%D7%99%D7%A8%D7%99%D7%9D.jpeg",
+      "descriptions": {
+        "m002fb4": "cave near <modern id=\"m002fb4\">Feldstein et al Site 43</modern>"
+      }
+    },
+    {
+      "id": "ia52a7e",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Tsaklanos giannis",
+      "url": "https://commons.wikimedia.org/wiki/File:Daskaleia.jpg",
+      "descriptions": {
+        "mf98a4e": "cliff at <modern id=\"mf98a4e\">Cape Sideros</modern>"
+      }
+    },
+    {
+      "id": "ia544d6",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Hanay",
+      "url": "https://commons.wikimedia.org/wiki/File:Huqoq_a_general_view_(2).jpg",
+      "descriptions": {
+        "m3ee2bc": "panorama of <modern id=\"m3ee2bc\">Yaquq</modern>"
+      }
+    },
+    {
+      "id": "ia5de78",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Liorca",
+      "url": "https://commons.wikimedia.org/wiki/File:4.10.17-%D7%9E%D7%91%D7%A0%D7%94_%D7%91%D7%AA%D7%9C.jpg",
+      "descriptions": {
+        "mf52435": "ruins at <modern id=\"mf52435\">Tel Megiddo</modern>"
+      }
+    },
+    {
+      "id": "ia6082d",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Hanay",
+      "url": "https://commons.wikimedia.org/wiki/File:Hanut_Tgarim_(5).jpg",
+      "descriptions": {
+        "m33ae26": "ruins at <modern id=\"m33ae26\">Hanot Taggarim</modern>"
+      }
+    },
+    {
+      "id": "ia6534f",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Hanay",
+      "url": "https://commons.wikimedia.org/wiki/File:Ruins_from_excavation_in_Tel_Kison_(7).JPG",
+      "descriptions": {
+        "m46be7f": "ruins at <modern id=\"m46be7f\">Tell Keisan</modern>"
+      }
+    },
+    {
+      "id": "ia709c1",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Mohamed Khalil",
+      "url": "https://commons.wikimedia.org/wiki/File:Landscape_Fjord_Bay_Taba.jpg",
+      "descriptions": {
+        "m743a5d": "panorama of Fjord Bay at <modern id=\"m743a5d\">Taba</modern>"
+      }
+    },
+    {
+      "id": "ia8297e",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "dov.shmuely",
+      "url": "https://commons.wikimedia.org/wiki/File:Modi%27in-Maccabim-Re%27ut,_Israel_-_panoramio_(34).jpg",
+      "descriptions": {
+        "m93008b": "panorama looking south near <modern id=\"m93008b\">Tell Bezqa</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "ia83f16",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "hatul",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%97%D7%95%D7%A8%D7%91%D7%AA_%D7%98%D7%A8%D7%90%D7%9E%D7%94.jpeg",
+      "descriptions": {
+        "md6ea3b": "ruins at <modern id=\"md6ea3b\">Khirbet Tarrama</modern>"
+      }
+    },
+    {
+      "id": "ia8ae71",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Wadee_Shoayb_-_panoramio_(7).jpg",
+      "descriptions": {
+        "mefdada": "panorama of mountains near <modern id=\"mefdada\">Khirbet Jazzir</modern>"
+      }
+    },
+    {
+      "id": "ia8c338",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Hanay",
+      "url": "https://commons.wikimedia.org/wiki/File:Tell_Abu_Hawam_area_in_2011_1_(11).JPG",
+      "descriptions": {
+        "m6152fc": "panorama of <modern id=\"m6152fc\">Tell Abu Hawam</modern>"
+      }
+    },
+    {
+      "id": "ia963fc",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Osama Shukir Muhammed Amin FRCP(Glasg)",
+      "url": "https://commons.wikimedia.org/wiki/File:An_ancient_mound_at_Kish,_Babel_Governorate,_Iraq.jpg",
+      "descriptions": {
+        "m1faf41": "panorama of <modern id=\"m1faf41\">Hursagkalamma</modern>"
+      }
+    },
+    {
+      "id": "ia9bf26",
+      "license": "CC-BY-SA-2.0",
+      "source": "wikimedia",
+      "credit": "Orient",
+      "url": "https://commons.wikimedia.org/wiki/File:Bekaa_Libanon_2003.jpg",
+      "descriptions": {
+        "m43eab9": "panorama of the <modern id=\"m43eab9\">Beqaa Valley</modern>"
+      }
+    },
+    {
+      "id": "iaa57ad",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Roland Unger",
+      "url": "https://commons.wikimedia.org/wiki/File:SerabitBothChapels.jpg",
+      "descriptions": {
+        "m14916e": "ruins at <modern id=\"m14916e\">Serabit el Khadim</modern>"
+      }
+    },
+    {
+      "id": "iaa6713",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "GameOfLight",
+      "url": "https://commons.wikimedia.org/wiki/File:GOL_Nimrod_Fortress2.jpg",
+      "descriptions": {
+        "m79cc55": "ruins at <modern id=\"m79cc55\">Qalat es Subeibeh</modern>"
+      }
+    },
+    {
+      "id": "iaaeb54",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Lodo27",
+      "url": "https://commons.wikimedia.org/wiki/File:Megaliths_in_Baalbek_quarry_09096.JPG",
+      "descriptions": {
+        "m790eb4": "quarry near <modern id=\"m790eb4\">Ain Bourdai</modern>"
+      }
+    },
+    {
+      "id": "iacc455",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Daniel Kirk",
+      "url": "https://commons.wikimedia.org/wiki/File:Umm_Rasas_House_ruins.JPG",
+      "descriptions": {
+        "m7d00ce": "ruins at <modern id=\"m7d00ce\">Umm ar Rasas</modern>"
+      }
+    },
+    {
+      "id": "iaccaaf",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "Avishai Teicher",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_19284_Tel_Nagila.JPG",
+      "descriptions": {
+        "m79536a": "panorama of <modern id=\"m79536a\">Tel Nagila</modern>"
+      }
+    },
+    {
+      "id": "iaccd0c",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "fuente: COVT",
+      "url": "https://commons.wikimedia.org/wiki/File:Cadiz_aerea.jpg",
+      "descriptions": {
+        "m0c70c9": "aerial cityscape of <modern id=\"m0c70c9\">Cádiz</modern>"
+      }
+    },
+    {
+      "id": "iad3d85",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "NortyNort",
+      "url": "https://commons.wikimedia.org/wiki/File:Hit_Iraq.jpg",
+      "descriptions": {
+        "mbd8b3e": "cityscape of <modern id=\"mbd8b3e\">Hit</modern>"
+      }
+    },
+    {
+      "id": "iae2df3",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "L-BBE",
+      "url": "https://commons.wikimedia.org/wiki/File:Al-Eizariya_Jericho_Road_-_panoramio_(540).jpg",
+      "descriptions": {
+        "maffe87": "streetscape near <modern id=\"maffe87\">El Khirbeh</modern>"
+      }
+    },
+    {
+      "id": "iaef415",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "McKaby",
+      "url": "https://commons.wikimedia.org/wiki/File:Ztipori_Stream_Nov_2018.jpg",
+      "descriptions": {
+        "mf10467": "closeup of <modern id=\"mf10467\">Wadi el Melek</modern>"
+      }
+    },
+    {
+      "id": "iafaec1",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Eliran t",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%93%D7%A7%D7%9C_%D7%AA%D7%9E%D7%A8_%D7%9E%D7%A6%D7%95%D7%99_%D7%97%D7%AA%D7%9A_%D7%92%D7%96%D7%A2_%D7%93%D7%9E%D7%95%D7%99_%D7%A2%D7%A5_(2).jpg",
+      "descriptions": {
+        "m67b92b": "fallen tree near <modern id=\"m67b92b\">Ain el Ghuweir</modern>"
+      }
+    },
+    {
+      "id": "iafcdfc",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Zunkir",
+      "url": "https://commons.wikimedia.org/wiki/File:Meso2mil.JPG",
+      "descriptions": {
+        "m5bef14": "map of the region around <modern id=\"m5bef14\">Der</modern>"
+      }
+    },
+    {
+      "id": "iaff1d0",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:Fara_-_panoramio.jpg",
+      "descriptions": {
+        "ma594e8": "panorama near <modern id=\"ma594e8\">Tell el Farah</modern>"
+      }
+    },
+    {
+      "id": "ib02646",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Berthold Werner",
+      "url": "https://commons.wikimedia.org/wiki/File:Primatskapelle_BW_7.jpg",
+      "descriptions": {
+        "mbbfbf9": "church at <modern id=\"mbbfbf9\">Tabgha</modern>"
+      }
+    },
+    {
+      "id": "ib0d9c7",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "John Romano D’Orazio",
+      "url": "https://commons.wikimedia.org/wiki/File:Moses_view_of_the_Promised_Land.jpg",
+      "descriptions": {
+        "m07d05e": "panorama looking west from <modern id=\"m07d05e\">Rujm Siyaghah</modern>"
+      }
+    },
+    {
+      "id": "ib12280",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "גנה פעמון דרור",
+      "url": "https://commons.wikimedia.org/wiki/File:Shaar_HaGai_caravanserai_IMG_4065.jpg",
+      "descriptions": {
+        "mb5d722": "building near <modern id=\"mb5d722\">Khirbet Harsis</modern>"
+      }
+    },
+    {
+      "id": "ib16ca9",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "Dr. Avishai Teicher",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_28437_Euthymius_Monastery.jpg",
+      "descriptions": {
+        "mef7914": "panorama of ruins at <modern id=\"mef7914\">Khan el Ahmar</modern>"
+      }
+    },
+    {
+      "id": "ib296d6",
+      "license": "CC-Zero",
+      "source": "wikimedia",
+      "credit": "סלבדור בא לי",
+      "url": "https://commons.wikimedia.org/wiki/File:Ramot,_Beersheba_IMG_5834.jpg",
+      "descriptions": {
+        "mcfd3eb": "streetscape near <modern id=\"mcfd3eb\">Khirbet Asan</modern>"
+      }
+    },
+    {
+      "id": "ib2be95",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "The devious diesel",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%A9%D7%A8%D7%99%D7%93%D7%99_%D7%A1%D7%95%D7%9C%D7%9C%D7%AA_%D7%9E%D7%A1%D7%99%D7%9C%D7%AA_%D7%91%D7%A8%D7%96%D7%9C_%D7%A8%D7%A4%D7%99%D7%97_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2.jpg",
+      "descriptions": {
+        "mb89a0b": "panorama looking west near <modern id=\"mb89a0b\">Ein esh Shallala</modern>, which is near the camera"
+      }
+    },
+    {
+      "id": "ib2ea09",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Amirber",
+      "url": "https://commons.wikimedia.org/wiki/File:SolingRoad_225.jpg",
+      "descriptions": {
+        "m51dd81": "panorama near <modern id=\"m51dd81\">Khirbet ez Zeifeh</modern>"
+      }
+    },
+    {
+      "id": "ib37193",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Mike Peel",
+      "url": "https://commons.wikimedia.org/wiki/File:Lachish_Relief,_British_Museum.jpg",
+      "descriptions": {
+        "m31bdd9": "relief of siege at <modern id=\"m31bdd9\">Tell ed Duweir</modern>"
+      }
+    },
+    {
+      "id": "ib38050",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "halisyalcinkaya",
+      "url": "https://commons.wikimedia.org/wiki/File:Reyhanl%C4%B1_G%C3%B6l%C3%BC_-_panoramio.jpg",
+      "descriptions": {
+        "md1c5ba": "natural area near <modern id=\"md1c5ba\">Imma</modern>"
+      }
+    },
+    {
+      "id": "ib4502f",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Hans A. Rosbach",
+      "url": "https://commons.wikimedia.org/wiki/File:Puvar_20080220-1.jpg",
+      "descriptions": {
+        "m1864ac": "boat on the beach at <modern id=\"m1864ac\">Poovar</modern>"
+      }
+    },
+    {
+      "id": "ib4691d",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:TelIzrael006.jpg",
+      "descriptions": {
+        "mda3bc1": "panoram of ruins at <modern id=\"mda3bc1\">Tel Yizre’el</modern>"
+      }
+    },
+    {
+      "id": "ib53472",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Vassilis stath",
+      "url": "https://commons.wikimedia.org/wiki/File:Gavdos,_potamos_beach_from_Ambellos_path.jpg",
+      "descriptions": {
+        "m9e1f27": "beach and hills on <modern id=\"m9e1f27\">Gavdos</modern>"
+      }
+    },
+    {
+      "id": "ib58fc0",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Ar2332",
+      "url": "https://commons.wikimedia.org/wiki/File:Gibeon_well_03.jpg",
+      "descriptions": {
+        "mf55105": "well at <modern id=\"mf55105\">El Jib</modern>"
+      }
+    },
+    {
+      "id": "ib6a76d",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Jerash,_Jordan_-_panoramio.jpg",
+      "descriptions": {
+        "m315baa": "panorama of a river in the <modern id=\"m315baa\">Transjordan</modern>"
+      }
+    },
+    {
+      "id": "ib6ab9e",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:Via_Birma1.jpg",
+      "descriptions": {
+        "me79fbd": "closeup of road near <modern id=\"me79fbd\">Alein</modern>"
+      }
+    },
+    {
+      "id": "ib7beda",
+      "license": "CC-Zero",
+      "source": "wikimedia",
+      "credit": "מיכאלי",
+      "url": "https://commons.wikimedia.org/wiki/File:HPIMbeit-ur-a-tachta4505.jpg",
+      "descriptions": {
+        "m1de942": "cityscape of <modern id=\"m1de942\">Beit Ur al Tahta</modern>"
+      }
+    },
+    {
+      "id": "ib87176",
+      "license": "FAL",
+      "source": "wikimedia",
+      "credit": "A.Savin",
+      "url": "https://commons.wikimedia.org/wiki/File:Attica_06-13_Athens_50_View_from_Philopappos_-_Acropolis_Hill.jpg",
+      "descriptions": {
+        "md70ac9": "panorama of the acropolis at <modern id=\"md70ac9\">Athens</modern>"
+      }
+    },
+    {
+      "id": "ib87631",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Peejayem",
+      "url": "https://commons.wikimedia.org/wiki/File:Teatro_Romano_de_Cádiz_-_Graderío.JPG",
+      "descriptions": {
+        "m0c70c9": "building at <modern id=\"m0c70c9\">Cádiz</modern>"
+      }
+    },
+    {
+      "id": "ib8ebf6",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "Allie_Caulfield",
+      "url": "https://commons.wikimedia.org/wiki/File:Syrakus_-_Tempio_di_Apollo.jpg",
+      "descriptions": {
+        "m4f5a82": "ruins at <modern id=\"m4f5a82\">Syracuse</modern>"
+      }
+    },
+    {
+      "id": "ib902c2",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Addshore",
+      "url": "https://commons.wikimedia.org/wiki/File:Palestine_with_sheep_panorama.jpg",
+      "descriptions": {
+        "m463f45": "panorama looking west near <modern id=\"m463f45\">Khirbet Tarafayn</modern>, which is behind the camera"
+      }
+    },
+    {
+      "id": "ibb0f18",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Amos Meron",
+      "url": "https://commons.wikimedia.org/wiki/File:WikiAir_IL-12-01_353.JPG",
+      "descriptions": {
+        "m72df71": "aerial cityscape near <modern id=\"m72df71\">Khirbet Umm es Salafe</modern>, which is just off-camera to the top"
+      }
+    },
+    {
+      "id": "ibba9da",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:NIlan010.jpg",
+      "descriptions": {
+        "m8224e7": "cityscape of <modern id=\"m8224e7\">Neve Ilan</modern>"
+      }
+    },
+    {
+      "id": "ibbe220",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "hatul",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%90%D7%97%D7%95%D7%96%D7%AA_%D7%A7%D7%91%D7%A8_1.jpeg",
+      "descriptions": {
+        "m4813c9": "waterway near <modern id=\"m4813c9\">Khirbet al Simia</modern>"
+      }
+    },
+    {
+      "id": "ibd6758",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Vikiçizer",
+      "url": "https://commons.wikimedia.org/wiki/File:Gurun.jpg",
+      "descriptions": {
+        "m81af16": "building at <modern id=\"m81af16\">Gürün</modern>"
+      }
+    },
+    {
+      "id": "ibe6cfc",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Amplifysound",
+      "url": "https://commons.wikimedia.org/wiki/File:Ajrud.jpg",
+      "descriptions": {
+        "mf81ba4": "drawing of an artifact from <modern id=\"mf81ba4\">Kuntillet Ajrud</modern>"
+      }
+    },
+    {
+      "id": "ibe7beb",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Mkmillenium",
+      "url": "https://commons.wikimedia.org/wiki/File:Ps_Sudan_2007_Nile_Egypt_-01.jpg",
+      "descriptions": {
+        "m91acfa": "boat on the <modern id=\"m91acfa\">Nile River</modern>"
+      }
+    },
+    {
+      "id": "ibeebfa",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Shmurrge1",
+      "url": "https://commons.wikimedia.org/wiki/File:חורבת_לבנין_1.JPG",
+      "descriptions": {
+        "m7d8664": "ruins at <modern id=\"m7d8664\">Tel el Beida</modern>"
+      }
+    },
+    {
+      "id": "ibfe75b",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "עדירל",
+      "url": "https://commons.wikimedia.org/wiki/File:Migron5408.JPG",
+      "descriptions": {
+        "m0ef9e3": "cityscape of <modern id=\"m0ef9e3\">Makrun</modern>"
+      }
+    },
+    {
+      "id": "ibfebb8",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Вячеслав Ребров",
+      "url": "https://commons.wikimedia.org/wiki/File:%D0%92%D0%B8%D0%B4_%D0%BD%D0%B0_%D0%B3%D0%BE%D1%80%D1%83_%D0%A4%D0%B0%D0%B2%D0%BE%D1%80_-_panoramio.jpg",
+      "descriptions": {
+        "m626d73": "panorama looking in the opposite direction of <modern id=\"m626d73\">Ain el Habus</modern>"
+      }
+    },
+    {
+      "id": "ic05d66",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Jean Housen",
+      "url": "https://commons.wikimedia.org/wiki/File:20100924_st_lot02.JPG",
+      "descriptions": {
+        "mdfc4a9": "streetscape near <modern id=\"mdfc4a9\">Khirbet al Mukhayyat</modern>"
+      }
+    },
+    {
+      "id": "ic21e62",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Ofrashay",
+      "url": "https://commons.wikimedia.org/wiki/File:Yarkon_104.jpg",
+      "descriptions": {
+        "mf4bdf8": "closeup of the <modern id=\"mf4bdf8\">Yarkon River</modern>"
+      }
+    },
+    {
+      "id": "ic25957",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Maglanist",
+      "url": "https://commons.wikimedia.org/wiki/File:Shfela.jpg",
+      "descriptions": {
+        "m6cfb9a": "panorama of hills in the <modern id=\"m6cfb9a\">Shephelah</modern>"
+      }
+    },
+    {
+      "id": "ic2618a",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Qusay.khateeb",
+      "url": "https://commons.wikimedia.org/wiki/File:Askar.JPG",
+      "descriptions": {
+        "mb04b16": "panorama of a region near <modern id=\"mb04b16\">Askar</modern>"
+      }
+    },
+    {
+      "id": "ic3be41",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Areedh_Sub-District,_Jordan_-_panoramio_(12).jpg",
+      "descriptions": {
+        "m426f79": "closeup of <modern id=\"m426f79\">Wadi al Wala</modern>"
+      }
+    },
+    {
+      "id": "ic3db7d",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Сергей Иванов",
+      "url": "https://commons.wikimedia.org/wiki/File:Храм_св._Марии_Магдалины_в_Магдале.jpg",
+      "descriptions": {
+        "mbca505": "church at <modern id=\"mbca505\">Khirbet el Fuliya</modern>"
+      }
+    },
+    {
+      "id": "ic4534d",
+      "license": "CC-Zero",
+      "source": "wikimedia",
+      "credit": "Makeandtoss",
+      "url": "https://commons.wikimedia.org/wiki/File:Al-Balu%27_Moabite_Stele_on_display_at_the_Jordan_Museum.jpg",
+      "descriptions": {
+        "me990f8": "artifact from <modern id=\"me990f8\">Khirbet al Balua</modern>"
+      }
+    },
+    {
+      "id": "ic46724",
+      "license": "CC-BY-SA-2.0",
+      "source": "wikimedia",
+      "credit": "Adam Jones",
+      "url": "https://commons.wikimedia.org/wiki/File:Shoreline_of_Lake_Ourimiyeh_-_Western_Iran_-_03_(7421861536).jpg",
+      "descriptions": {
+        "m63822c": "shoreline of <modern id=\"m63822c\">Lake Urmia</modern>"
+      }
+    },
+    {
+      "id": "ic69f66",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Ashkelon-8999.jpg",
+      "descriptions": {
+        "m0a9529": "ruins at <modern id=\"m0a9529\">Tel Ashkelon</modern>"
+      }
+    },
+    {
+      "id": "ic6d2ce",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Metsad-Tamar-389.jpg",
+      "descriptions": {
+        "m886d32": "ruins at <modern id=\"m886d32\">Mezad Tamar</modern>"
+      }
+    },
+    {
+      "id": "ic7accb",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "AWI",
+      "url": "https://commons.wikimedia.org/wiki/File:Lisos.jpg",
+      "descriptions": {
+        "me81f9f": "panorama of <modern id=\"me81f9f\">Lissos</modern>"
+      }
+    },
+    {
+      "id": "ic942e9",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Gio la Gamb",
+      "url": "https://commons.wikimedia.org/wiki/File:Nella_Valle_-_panoramio_(1).jpg",
+      "descriptions": {
+        "mff65d3": "panorama of a cliff near <modern id=\"mff65d3\">Seneh</modern>"
+      }
+    },
+    {
+      "id": "ica173a",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Ghassan Mroue",
+      "url": "https://commons.wikimedia.org/wiki/File:Barouk_mount_Jan_2010_-_panoramio.jpg",
+      "descriptions": {
+        "m846f8b": "panorama of Barouk in <modern id=\"m846f8b\">Mount Lebanon</modern>"
+      }
+    },
+    {
+      "id": "ica2a1e",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "דותן דני",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%9E%D7%91%D7%A0%D7%94_%D7%91%D7%98%D7%95%D7%9F_%D7%A0%D7%98%D7%95%D7%A9.jpeg",
+      "descriptions": {
+        "m016ac4": "road near <modern id=\"m016ac4\">Khirbet Abu Mudawwar</modern>"
+      }
+    },
+    {
+      "id": "icafa0e",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Nitramserolf",
+      "url": "https://commons.wikimedia.org/wiki/File:San_Pawl_Milqi_Roman_remains.jpg",
+      "descriptions": {
+        "m2672d3": "ruins on <modern id=\"m2672d3\">Malta</modern>"
+      }
+    },
+    {
+      "id": "icb930e",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "יעקב",
+      "url": "https://commons.wikimedia.org/wiki/File:Amona7040.JPG",
+      "descriptions": {
+        "mfe4d03": "buildings near <modern id=\"mfe4d03\">Khirbet el Mazari’a</modern>"
+      }
+    },
+    {
+      "id": "iccbbaf",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Unknown author",
+      "url": "https://commons.wikimedia.org/wiki/File:Areal_View_Of_Isdud_Pre_1935.jpg",
+      "descriptions": {
+        "mf32c7d": "historical aerial panorama of <modern id=\"mf32c7d\">Tel Ashdod</modern>"
+      }
+    },
+    {
+      "id": "icd3372",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "תמר הירדני",
+      "url": "https://commons.wikimedia.org/wiki/File:Kfaryasif.jpg",
+      "descriptions": {
+        "m67fe04": "streetscape of <modern id=\"m67fe04\">Kefr Yasif</modern>"
+      }
+    },
+    {
+      "id": "icd64bf",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Ester Inbar",
+      "url": "https://commons.wikimedia.org/wiki/File:Ruins_of_a_church_in_Shivta_in_the_Negev.jpg",
+      "descriptions": {
+        "m14b384": "structure at <modern id=\"m14b384\">Shivta</modern>"
+      }
+    },
+    {
+      "id": "icddc4b",
+      "license": "CC-Zero",
+      "source": "wikimedia",
+      "credit": "Nadav Gelbard",
+      "url": "https://commons.wikimedia.org/wiki/File:Gilro_Factory.jpg",
+      "descriptions": {
+        "m7f4729": "building near <modern id=\"m7f4729\">Khirbet Kheishum</modern>"
+      }
+    },
+    {
+      "id": "ice0dce",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Avishai Teicher",
+      "url": "https://commons.wikimedia.org/wiki/File:וCrusader_Church_in_Abu_Ghosh.jpg",
+      "descriptions": {
+        "mb94c78": "wall at <modern id=\"mb94c78\">Abu Ghosh</modern>"
+      }
+    },
+    {
+      "id": "ice4576",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "E. Rehfeld",
+      "url": "https://commons.wikimedia.org/wiki/File:Tulul_adh-Dhahab_in_spring.jpg",
+      "descriptions": {
+        "m185801": "panorama of <modern id=\"m185801\">Tell edh Dhahab el Gharbi</modern>"
+      }
+    },
+    {
+      "id": "ice870c",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "RickP",
+      "url": "https://commons.wikimedia.org/wiki/File:Ara_panorama_01.jpg",
+      "descriptions": {
+        "ma5b0a8": "cityscape looking east near <modern id=\"ma5b0a8\">Khirbet ‘Ara</modern>, which is possibly just visible at the far right"
+      }
+    },
+    {
+      "id": "ice874d",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "שועל",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel_Rekhesh_-_2.jpg",
+      "descriptions": {
+        "md54909": "ruins at <modern id=\"md54909\">Tell Rekhesh</modern>"
+      }
+    },
+    {
+      "id": "iceb92b",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Biegel",
+      "url": "https://commons.wikimedia.org/wiki/File:Khirbet_Nisya_Canaanite_high-place.jpg",
+      "descriptions": {
+        "m3b3ebc": "ruins of a high place at <modern id=\"m3b3ebc\">Khirbet Nisieh</modern>"
+      }
+    },
+    {
+      "id": "icf6a9e",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Godot13",
+      "url": "https://commons.wikimedia.org/wiki/File:2013-Aerial-Mount_of_Olives.jpg",
+      "descriptions": {
+        "me461ba": "aerial panorama of the <modern id=\"me461ba\">Mount of Olives</modern>"
+      }
+    },
+    {
+      "id": "icfa0bb",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:Cafit030.jpg",
+      "descriptions": {
+        "m28d167": "ruins at <modern id=\"m28d167\">Tell es Safi</modern>"
+      }
+    },
+    {
+      "id": "icfc30d",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "René Hourdry",
+      "url": "https://commons.wikimedia.org/wiki/File:Nil_11.jpg",
+      "descriptions": {
+        "m91acfa": "closeup of the <modern id=\"m91acfa\">Nile River</modern>"
+      }
+    },
+    {
+      "id": "id0d79c",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Adeeb Atwan",
+      "url": "https://commons.wikimedia.org/wiki/File:Wadee_Seer_-_panoramio.jpg",
+      "descriptions": {
+        "m5e9487": "panorama near <modern id=\"m5e9487\">Khirbet es Sireh</modern>"
+      }
+    },
+    {
+      "id": "id152c9",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Kerstin Rehmann",
+      "url": "https://commons.wikimedia.org/wiki/File:Die_antike_Stadt_Gerasa_(Jerash).JPG",
+      "descriptions": {
+        "m18bec1": "panorama of ruins at <modern id=\"m18bec1\">Umm Qais</modern>"
+      }
+    },
+    {
+      "id": "id18b59",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "dov.shmuely",
+      "url": "https://commons.wikimedia.org/wiki/File:Lachish,_Israel_-_panoramio_(3).jpg",
+      "descriptions": {
+        "m73ed74": "panorama near <modern id=\"m73ed74\">Khirbet Makhaz</modern>"
+      }
+    },
+    {
+      "id": "id238ff",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Samir I. Sharbaty",
+      "url": "https://commons.wikimedia.org/wiki/File:Umm_Qais_26.JPG",
+      "descriptions": {
+        "m18bec1": "panorama of ruins at <modern id=\"m18bec1\">Umm Qais</modern>"
+      }
+    },
+    {
+      "id": "id45d40",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Almog",
+      "url": "https://commons.wikimedia.org/wiki/File:Maayan_harod.jpg",
+      "descriptions": {
+        "m6851a6": "swimming pool at the <modern id=\"m6851a6\">Well of Harod</modern>"
+      }
+    },
+    {
+      "id": "id47e88",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Moshe Eliyahu",
+      "url": "https://commons.wikimedia.org/wiki/File:Hiking_Map_%D7%A2%D7%99%D7%9F_%D7%97%D7%95%D7%91%D7%9C%D7%94.jpg",
+      "descriptions": {
+        "m8c5045": "structure near <modern id=\"m8c5045\">Khirbet el Hubeila</modern>"
+      }
+    },
+    {
+      "id": "id65da5",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": " ",
+      "url": "https://commons.wikimedia.org/wiki/File:Amm%C3%A1n,_parkovi%C5%A1t%C4%9B_u_autobusov%C3%A9ho_n%C3%A1dra%C5%BE%C3%AD.jpg",
+      "descriptions": {
+        "m32279c": "streetscape near <modern id=\"m32279c\">Erjan</modern>"
+      }
+    },
+    {
+      "id": "id7537c",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "hatul",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%A2%D7%99%D7%9F_%D7%90%D7%91%D7%99%D7%93%D7%9F_1.jpeg",
+      "descriptions": {
+        "m86ff07": "panorama looking east near <modern id=\"m86ff07\">Khirbet Umm el Amad</modern>, which is behind the hill in the distance"
+      }
+    },
+    {
+      "id": "id7837c",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Amit A.",
+      "url": "https://commons.wikimedia.org/wiki/File:Yafia2.JPG",
+      "descriptions": {
+        "mdfc63b": "cityscape of <modern id=\"mdfc63b\">Yafa</modern>"
+      }
+    },
+    {
+      "id": "id7ad36",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Malamndra",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%9B%D7%A8%D7%9E%D7%99%D7%AA_2012.JPG",
+      "descriptions": {
+        "m222887": "panorama near <modern id=\"m222887\">Khirbet esh Shamsaniyat</modern>"
+      }
+    },
+    {
+      "id": "id7b18b",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "IsraelHikingMap",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%94%D7%92%27%D7%95%D7%91%D7%94_%D7%94%D7%92%D7%93%D7%95%D7%9C%D7%94.JPG",
+      "descriptions": {
+        "meb16ed": "panorama of a forest near <modern id=\"meb16ed\">Za’ura</modern>"
+      }
+    },
+    {
+      "id": "id7c1df",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Ltybcc1",
+      "url": "https://commons.wikimedia.org/wiki/File:Руины_Эриду.jpg",
+      "descriptions": {
+        "m108001": "panorama of <modern id=\"m108001\">Tell Abu Shahrain</modern>"
+      }
+    },
+    {
+      "id": "id935b9",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Ori Mey Raz",
+      "url": "https://commons.wikimedia.org/wiki/File:IHM_%D7%A2%D7%95%D7%92%27%D7%94_1.jpeg",
+      "descriptions": {
+        "mb5007c": "water channel near <modern id=\"mb5007c\">Khirbet el Aujah</modern>"
+      }
+    },
+    {
+      "id": "id9d1e1",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Mimmo Zema",
+      "url": "https://commons.wikimedia.org/wiki/File:Reggio_calabria.jpg",
+      "descriptions": {
+        "m366576": "cityscape of <modern id=\"m366576\">Reggio Calabria</modern>"
+      }
+    },
+    {
+      "id": "id9edd5",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Berthold Werner",
+      "url": "https://commons.wikimedia.org/wiki/File:Nazaret_Verkuendigungsbasilika_BW_16.JPG",
+      "descriptions": {
+        "mb3f688": "church at <modern id=\"mb3f688\">Nazareth</modern>"
+      }
+    },
+    {
+      "id": "idbb5de",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Matson Collection",
+      "url": "https://commons.wikimedia.org/wiki/File:Al-Duhayriyya.jpg",
+      "descriptions": {
+        "m2f9843": "historical cityscape of <modern id=\"m2f9843\">Dahriya</modern>"
+      }
+    },
+    {
+      "id": "idc04c5",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Kaufingdude",
+      "url": "https://commons.wikimedia.org/wiki/File:Zig_front_right_side.JPG",
+      "descriptions": {
+        "m297af3": "ziggurat at <modern id=\"m297af3\">Tell el Muqayyar</modern>"
+      }
+    },
+    {
+      "id": "idc243b",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Deror avi",
+      "url": "https://commons.wikimedia.org/wiki/File:P8170051.JPG",
+      "descriptions": {
+        "m48007f": "model of the <modern id=\"m48007f\">Pool of Bethesda</modern>"
+      }
+    },
+    {
+      "id": "idc5c5c",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Hanay",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel_Esur_(6).JPG",
+      "descriptions": {
+        "m6b2add": "ruins at <modern id=\"m6b2add\">Tel Esur</modern>"
+      }
+    },
+    {
+      "id": "idd0de6",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "????30",
+      "url": "https://commons.wikimedia.org/wiki/File:Bethpage2.jpg",
+      "descriptions": {
+        "m6bd6bd": "interior of building at <modern id=\"m6bd6bd\">Et Tur</modern>"
+      }
+    },
+    {
+      "id": "ide78e0",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Ori~",
+      "url": "https://commons.wikimedia.org/wiki/File:View_of_Gedera_from_Tel_Qatra.jpg",
+      "descriptions": {
+        "m0af4d6": "panorama from <modern id=\"m0af4d6\">Qatra</modern>"
+      }
+    },
+    {
+      "id": "idfec30",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Own work",
+      "url": "https://commons.wikimedia.org/wiki/File:Auja_044a.jpg",
+      "descriptions": {
+        "m931336": "streetscape near <modern id=\"m931336\">Khirbet el Aujah et Tahta</modern>"
+      }
+    },
+    {
+      "id": "ie002a3",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "מיכאלי",
+      "url": "https://commons.wikimedia.org/wiki/File:MALUL02.jpg",
+      "descriptions": {
+        "mc76c1b": "building at <modern id=\"mc76c1b\">Ma’alul</modern>"
+      }
+    },
+    {
+      "id": "ie00b08",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Guillaume Paumier",
+      "url": "https://commons.wikimedia.org/wiki/File:Jordan_Valley,_West_Bank_145_-_Aug_2011.jpg",
+      "descriptions": {
+        "m51d3ee": "panorama looking southwest near <modern id=\"m51d3ee\">Tell Simadi</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "ie0a32f",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Amnon Shavit",
+      "url": "https://commons.wikimedia.org/wiki/File:Moran_from_above.JPG",
+      "descriptions": {
+        "m92f044": "panorama looking south near <modern id=\"m92f044\">Khirbet Zeitun er Rameh</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "ie123c1",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "dov.shmuely",
+      "url": "https://commons.wikimedia.org/wiki/File:Modi%27in-Maccabim-Re%27ut,_Israel_-_panoramio_(13).jpg",
+      "descriptions": {
+        "m1a2cc7": "field near <modern id=\"m1a2cc7\">Khirbet el Rujm</modern>"
+      }
+    },
+    {
+      "id": "ie1a319",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Mount-Dov-500.jpg",
+      "descriptions": {
+        "m8e8c01": "panorama looking toward <modern id=\"m8e8c01\">Ain Jedeideh</modern> in the distance"
+      }
+    },
+    {
+      "id": "ie26ad7",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Own work",
+      "url": "https://commons.wikimedia.org/wiki/File:Avivim_6836.jpg",
+      "descriptions": {
+        "m0b376e": "panorama in the direction of <modern id=\"m0b376e\">Aitaroun</modern>"
+      }
+    },
+    {
+      "id": "ie3c567",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Hussein shejaeya",
+      "url": "https://commons.wikimedia.org/wiki/File:%D9%88%D8%A7%D8%AF_%D8%B5%D9%88%D8%A7%D9%86%D9%8A%D8%AA.jpg",
+      "descriptions": {
+        "m0df275": "cliff near <modern id=\"m0df275\">Bozez</modern>"
+      }
+    },
+    {
+      "id": "ie466b7",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Таис Гило",
+      "url": "https://commons.wikimedia.org/wiki/File:%D0%AD%D1%80%D0%B8%D0%B4%D1%83.jpg",
+      "descriptions": {
+        "m108001": "panorama of ruins at <modern id=\"m108001\">Tell Abu Shahrain</modern>"
+      }
+    },
+    {
+      "id": "ie4b7ed",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Bashar Tabbah",
+      "url": "https://commons.wikimedia.org/wiki/File:Umm_Al_Walid_(2).jpg",
+      "descriptions": {
+        "md6873f": "panorama of ruins at <modern id=\"md6873f\">Umm el Walid</modern>"
+      }
+    },
+    {
+      "id": "ie5025e",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "vivali",
+      "url": "https://commons.wikimedia.org/wiki/File:%D0%93%D0%BE%D1%80%D0%BD%D0%B0%D1%8F_%D0%98%D0%BE%D1%80%D0%B4%D0%B0%D0%BD%D0%B8%D1%8F_-_panoramio.jpg",
+      "descriptions": {
+        "m681aef": "panorama of mountains near <modern id=\"m681aef\">Jebel esh Shera</modern>"
+      }
+    },
+    {
+      "id": "ie517c1",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Yazan Al-Hajjaj",
+      "url": "https://commons.wikimedia.org/wiki/File:%D8%AE%D8%B1%D8%A8%D8%A9_%D9%8A%D8%A7%D8%AC%D9%88%D8%B2_%D8%A7%D9%84%D8%A3%D8%AB%D8%B1%D9%8A%D8%A9_9.jpg",
+      "descriptions": {
+        "md6cdbf": "ruins at <modern id=\"md6cdbf\">Yajuz</modern>"
+      }
+    },
+    {
+      "id": "ie5a3be",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Britchi Mirela",
+      "url": "https://commons.wikimedia.org/wiki/File:ISRAEL,_Capernaum,_The_Town_of_Jesus,_(ruins);_ID_is_16-1252-103_(3).JPG",
+      "descriptions": {
+        "m66efd0": "ruins at <modern id=\"m66efd0\">Tell Hum</modern>"
+      }
+    },
+    {
+      "id": "ie68932",
+      "license": "CC-BY-4.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File%3ANachshon-134925.jpg",
+      "descriptions": {
+        "m10cac8": "ruins at <modern id=\"m10cac8\">Khirbet Jedireh</modern>"
+      }
+    },
+    {
+      "id": "ie6fa9a",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "NASA",
+      "url": "https://commons.wikimedia.org/wiki/File:Dead_sea.jpg",
+      "descriptions": {
+        "m7d469b": "satellite view of the <modern id=\"m7d469b\">Dead Sea</modern>"
+      }
+    },
+    {
+      "id": "ie7764e",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Dideedooo",
+      "url": "https://commons.wikimedia.org/wiki/File:Issawia_from_Mount_Skalpus_Botanic_Gargen_IMG_2352.jpg",
+      "descriptions": {
+        "m36b854": "panorama from <modern id=\"m36b854\">Ras Umm et Tala</modern>"
+      }
+    },
+    {
+      "id": "ie88f1a",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "AVRAM GRAICER",
+      "url": "https://commons.wikimedia.org/wiki/File:בית_הכנסת_מגדלא.JPG",
+      "descriptions": {
+        "m516e72": "aerial panorama of ruins at <modern id=\"m516e72\">Majdal</modern>"
+      }
+    },
+    {
+      "id": "iea0212",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Hanay",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel_Zayit_(2).JPG",
+      "descriptions": {
+        "m0edba0": "ruins at <modern id=\"m0edba0\">Tel Zayit</modern>"
+      }
+    },
+    {
+      "id": "ieab96d",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Dr. Meierhofer",
+      "url": "https://commons.wikimedia.org/wiki/File:Jabbok.jpg",
+      "descriptions": {
+        "m8920d8": "panorama of the <modern id=\"m8920d8\">Zarqa River</modern>"
+      }
+    },
+    {
+      "id": "ieb35ae",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Jacek555",
+      "url": "https://commons.wikimedia.org/wiki/File:Korazim.jpg",
+      "descriptions": {
+        "m4e5f05": "ruins at <modern id=\"m4e5f05\">Khirbet Karraza</modern>"
+      }
+    },
+    {
+      "id": "iecfe82",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Yuvalr",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel_Malut_(2).jpg",
+      "descriptions": {
+        "m40394a": "panorama looking south from <modern id=\"m40394a\">Tell Melat</modern>"
+      }
+    },
+    {
+      "id": "ieed9ae",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Antonino Diano",
+      "url": "https://commons.wikimedia.org/wiki/File:PIAZZA_ITALIA_Reggio_Calabria.jpg",
+      "descriptions": {
+        "m366576": "monument at <modern id=\"m366576\">Reggio Calabria</modern>"
+      }
+    },
+    {
+      "id": "ieef390",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "NASA",
+      "url": "https://commons.wikimedia.org/wiki/File:Great_Bitter_Lake_from_space_(hires).JPG",
+      "descriptions": {
+        "md254e8": "satellite view of the <modern id=\"md254e8\">Bitter Lakes</modern>"
+      }
+    },
+    {
+      "id": "ief23cc",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Mboesch",
+      "url": "https://commons.wikimedia.org/wiki/File:Roman-ascent-aqrabim-b.jpg",
+      "descriptions": {
+        "m2ce754": "ruins at <modern id=\"m2ce754\">Ma’ale Akrabbim</modern>"
+      }
+    },
+    {
+      "id": "ief84b8",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Dvirraz",
+      "url": "https://commons.wikimedia.org/wiki/File:%D7%A9%D7%A2%D7%A8%D7%99_%D7%AA%D7%A7%D7%95%D7%94_%D7%95%D7%9E%D7%92%D7%9F_%D7%93%D7%9F.JPG",
+      "descriptions": {
+        "mcde611": "panorama looking north near <modern id=\"mcde611\">Khirbet Sirisye</modern>, which is possibly just visible on the left center between the paved road and the dirt road"
+      }
+    },
+    {
+      "id": "iefb47d",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "Nati Skital",
+      "url": "https://commons.wikimedia.org/wiki/File:Israel_Hiking_Map_%D7%A2%D7%99%D7%9F_%D7%A4%D7%A8%D7%95%D7%A8_1.jpeg",
+      "descriptions": {
+        "m896c2c": "stream near <modern id=\"m896c2c\">Tel Parur</modern>"
+      }
+    },
+    {
+      "id": "if02659",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Kippi70",
+      "url": "https://commons.wikimedia.org/wiki/File:Qalunya.jpg",
+      "descriptions": {
+        "m639fec": "historical cityscape of <modern id=\"m639fec\">Qalunya</modern>"
+      }
+    },
+    {
+      "id": "if03714",
+      "license": "attribution",
+      "source": "wikimedia",
+      "credit": "Stéphanie Gromann",
+      "url": "https://commons.wikimedia.org/wiki/File:Kana068.JPG",
+      "descriptions": {
+        "ma43757": "cityscape of <modern id=\"ma43757\">Kefr Kenna</modern>"
+      }
+    },
+    {
+      "id": "if0dbf3",
+      "license": "CC-BY-SA-4.0",
+      "source": "wikimedia",
+      "credit": "יעקב",
+      "url": "https://commons.wikimedia.org/wiki/File:Qusin7818.JPG",
+      "descriptions": {
+        "m303628": "cityscape of <modern id=\"m303628\">Qusin</modern>"
+      }
+    },
+    {
+      "id": "if1c649",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "Craig Jenkins",
+      "url": "https://commons.wikimedia.org/wiki/File:Aleppo_old_city_image.jpg",
+      "descriptions": {
+        "m4badb5": "cityscape of <modern id=\"m4badb5\">Aleppo</modern>"
+      }
+    },
+    {
+      "id": "if22589",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Bukvoed",
+      "url": "https://commons.wikimedia.org/wiki/File:Tiberias-2-076.jpg",
+      "descriptions": {
+        "mc8c3f1": "ruins at <modern id=\"mc8c3f1\">Tiberias</modern>"
+      }
+    },
+    {
+      "id": "if24284",
+      "license": "CC-BY-SA-2.5",
+      "source": "wikimedia",
+      "credit": "Heretiq",
+      "url": "https://commons.wikimedia.org/wiki/File:DamascusRomanArch.jpg",
+      "descriptions": {
+        "m878978": "arch at <modern id=\"m878978\">Damascus</modern>"
+      }
+    },
+    {
+      "id": "if2a787",
+      "license": "CC-BY-SA-2.0",
+      "source": "wikimedia",
+      "credit": "hastC276",
+      "url": "https://commons.wikimedia.org/wiki/File:Har_Amasa_(21806780031)_(2).jpg",
+      "descriptions": {
+        "mf10950": "panorama near <modern id=\"mf10950\">Khirbet el Qaryatein</modern>"
+      }
+    },
+    {
+      "id": "if37147",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Mujaddara",
+      "url": "https://commons.wikimedia.org/wiki/File:Spring_valley_-_panoramio.jpg",
+      "descriptions": {
+        "m888945": "panorama of a valley near <modern id=\"m888945\">El ’Unuq</modern>"
+      }
+    },
+    {
+      "id": "if39d5d",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "אסף.צ",
+      "url": "https://commons.wikimedia.org/wiki/File:Tel_arad_all.JPG",
+      "descriptions": {
+        "mdabd6c": "aerial panorama of ruins at <modern id=\"mdabd6c\">Tel Arad</modern>"
+      }
+    },
+    {
+      "id": "if48424",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Gilabrand",
+      "url": "https://commons.wikimedia.org/wiki/File:Maaleadumim_009.jpg",
+      "descriptions": {
+        "mb37f3a": "building at <modern id=\"mb37f3a\">Ma’ale Adummim</modern>"
+      }
+    },
+    {
+      "id": "if5e70a",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Dr. Avishai Teicher",
+      "url": "https://commons.wikimedia.org/wiki/File:Chateau_Neuf_Fortress_in_Upper_Galilee,_Israel.jpg",
+      "descriptions": {
+        "m79b6a2": "building at <modern id=\"m79b6a2\">Hunin</modern>"
+      }
+    },
+    {
+      "id": "if5ed26",
+      "license": "CC-BY-2.5",
+      "source": "wikimedia",
+      "credit": "סאהר חביב אללה",
+      "url": "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_17227_Geography_of_Israel.JPG",
+      "descriptions": {
+        "m743096": "panorama near <modern id=\"m743096\">El Karm</modern>, looking away east"
+      }
+    },
+    {
+      "id": "if609b6",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Mehrdad Sarhangi",
+      "url": "https://commons.wikimedia.org/wiki/File:%D8%B2%DB%8C%D8%A8%D8%A7%DB%8C%DB%8C%D9%87%D8%A7%DB%8C_%DA%86%D9%87%D8%A7%D8%B1_%D9%85%D8%AD%D8%A7%D9%84_%D8%A8%D8%AE%D8%AA%DB%8C%D8%A7%D8%B1%DB%8C_-_panoramio.jpg",
+      "descriptions": {
+        "mbfc6a2": "closeup of the <modern id=\"mbfc6a2\">Karun River</modern>"
+      }
+    },
+    {
+      "id": "if67e33",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Haithamzoabi",
+      "url": "https://commons.wikimedia.org/wiki/File:Taibe_Village_Mosque.jpg",
+      "descriptions": {
+        "mac1117": "building at <modern id=\"mac1117\">Et Taiyibeh</modern>"
+      }
+    },
+    {
+      "id": "if707db",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "ekeidar",
+      "url": "https://commons.wikimedia.org/wiki/File:HaBsor_Valey_%D7%A0%D7%97%D7%9C_%D7%94%D7%91%D7%A9%D7%95%D7%A8_-_panoramio.jpg",
+      "descriptions": {
+        "m69a064": "panorama of <modern id=\"m69a064\">Nahal HaBesor</modern>"
+      }
+    },
+    {
+      "id": "if77cab",
+      "license": "CC-BY-3.0",
+      "source": "wikimedia",
+      "credit": "Вячеслав Ребров",
+      "url": "https://commons.wikimedia.org/wiki/File:%D0%92%D0%B8%D0%B4_%D0%BD%D0%B0_%D0%B4%D0%BE%D0%BB%D0%B8%D0%BD%D1%83_%D0%9C%D0%B5%D0%B3%D0%B8%D0%B4%D0%B4%D0%BE_%D1%81_%D1%85%D1%80%D0%B5%D0%B1%D1%82%D0%B0_%D0%93%D0%B8%D0%BB%D1%8C%D0%B1%D0%BE%D0%B0_-_panoramio.jpg",
+      "descriptions": {
+        "m136387": "panorama near <modern id=\"m136387\">Arabbuna</modern>"
+      }
+    },
+    {
+      "id": "if8fa8a",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Pe-sa",
+      "url": "https://commons.wikimedia.org/wiki/File:Samos_049_2009.JPG",
+      "descriptions": {
+        "m509072": "cityscape of the city Samos <modern id=\"m509072\">Samos</modern>"
+      }
+    },
+    {
+      "id": "if9f006",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "Kogo",
+      "url": "https://commons.wikimedia.org/wiki/File:Indus_near_Skardu.jpg",
+      "descriptions": {
+        "m144f46": "panorama of the <modern id=\"m144f46\">Indus River</modern>"
+      }
+    },
+    {
+      "id": "if9f5f1",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "TheCuriousGnome and Eliot",
+      "url": "https://commons.wikimedia.org/wiki/File:Mount_Tabor4.jpg",
+      "descriptions": {
+        "m8e169f": "panorama of <modern id=\"m8e169f\">Jebel et Tur</modern>"
+      }
+    },
+    {
+      "id": "ifacb23",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "NASA",
+      "url": "https://commons.wikimedia.org/wiki/File:Istanbul_and_Bosporus_big.jpg",
+      "descriptions": {
+        "m17c001": "satellite view of the <modern id=\"m17c001\">Bosporus</modern>"
+      }
+    },
+    {
+      "id": "ifb0689",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Matson Collection",
+      "url": "https://commons.wikimedia.org/wiki/File:Excavations_at_Tell_Beit_Mirsim_(Kirjath-Sepher)_1926._East_shrine_of_high_place_LOC_matpc.05730.jpg",
+      "descriptions": {
+        "m6cb30d": "historical panorama of ruins at <modern id=\"m6cb30d\">Tell Beit Mirsim</modern>"
+      }
+    },
+    {
+      "id": "ifd5a92",
+      "license": "CC-BY-SA-2.0",
+      "source": "wikimedia",
+      "credit": "joepyrek",
+      "url": "https://commons.wikimedia.org/wiki/File:Cyrene_(1)_(8289544346).jpg",
+      "descriptions": {
+        "me649fd": "ruins at <modern id=\"me649fd\">Cyrene</modern>"
+      }
+    },
+    {
+      "id": "ifd8f10",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Hanay",
+      "url": "https://commons.wikimedia.org/wiki/File:Hanut_Tgarim_(11).jpg",
+      "descriptions": {
+        "mfac68f": "panorama looking east near <modern id=\"mfac68f\">Khirbet Irbadeh</modern>, which is off-camera to the left"
+      }
+    },
+    {
+      "id": "ifeea62",
+      "license": "CC-BY-2.0",
+      "source": "wikimedia",
+      "credit": "Jose A.",
+      "url": "https://commons.wikimedia.org/wiki/File:Huelva_(Spain)_(41302627111)_(cropped).jpg",
+      "descriptions": {
+        "m910aae": "cityscape of <modern id=\"m910aae\">Huelva</modern>"
+      }
+    },
+    {
+      "id": "ifef43f",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "Bporter615",
+      "url": "https://commons.wikimedia.org/wiki/File:Dhiban.jpg",
+      "descriptions": {
+        "m122dcf": "panorama of <modern id=\"m122dcf\">Tall Dhiban</modern>"
+      }
+    },
+    {
+      "id": "iff17b3",
+      "license": "GFDL",
+      "source": "wikimedia",
+      "credit": "אסף.צ",
+      "url": "https://commons.wikimedia.org/wiki/File:Shoeva.JPG",
+      "descriptions": {
+        "m2f382d": "aerial cityscape near <modern id=\"m2f382d\">Saris</modern>"
+      }
+    },
+    {
+      "id": "iff6613",
+      "license": "PD",
+      "source": "wikimedia",
+      "credit": "myself, Kelvin Case",
+      "url": "https://commons.wikimedia.org/wiki/File:Nile_Delta_Surrounding.jpg",
+      "descriptions": {
+        "mf9ae18": "map of <modern id=\"mf9ae18\">Lake Timsah</modern>"
+      }
+    },
+    {
+      "id": "iffec1e",
+      "license": "CC-BY-SA-3.0",
+      "source": "wikimedia",
+      "credit": "Fr0nt",
+      "url": "https://commons.wikimedia.org/wiki/File:Mountains_-_panoramio_(4).jpg",
+      "descriptions": {
+        "m734ef6": "panorama of a region in <modern id=\"m734ef6\">Pamphylia</modern>"
+      }
+    }
+  ]
+}

@@ -36,16 +36,10 @@ export type MapImageEntry = {
   credit_url?: string;
   url?: string;
   file_url?: string;
+  thumbnail_url_pattern?: string;
   license?: string;
   descriptions?: Record<string, string>;
   thumbnails?: Record<string, MapImageThumbnail>;
-};
-
-export type MapPhotoDialogItem = {
-  id: string;
-  src: string;
-  alt: string;
-  caption: string;
 };
 
 export function mapEntryLabel(entry: AncientMapEntry) {
@@ -163,38 +157,4 @@ export function parseJsonl<T>(text: string) {
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => JSON.parse(line) as T);
-}
-
-export function deriveMapPhotoDialogItems(
-  photoEntries: MapImageEntry[],
-  modernIds: string[],
-  fallbackTitle: string,
-) {
-  return photoEntries
-    .map((item) => {
-      const locationId = modernIds.find((id) =>
-        Boolean(item.thumbnails?.[id]?.file ?? item.descriptions?.[id]),
-      );
-      const file = locationId ? item.thumbnails?.[locationId]?.file : undefined;
-      if (!file) {
-        return null;
-      }
-
-      const description = cleanMapMarkup(
-        (locationId
-          ? (item.thumbnails?.[locationId]?.description ??
-            item.descriptions?.[locationId])
-          : undefined) ??
-          item.credit ??
-          fallbackTitle,
-      );
-
-      return {
-        id: item.id,
-        src: `/maps/thumbnails/${file}`,
-        alt: description,
-        caption: description,
-      } satisfies MapPhotoDialogItem;
-    })
-    .filter((item): item is MapPhotoDialogItem => Boolean(item));
 }
