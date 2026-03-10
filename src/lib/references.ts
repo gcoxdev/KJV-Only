@@ -95,12 +95,34 @@ export function resolveConcordanceKey(
   ];
 
   for (const candidate of candidates) {
-    if (concordance[candidate]) {
+    if (concordance.words[candidate]) {
       return candidate;
     }
   }
 
   return null;
+}
+
+export function decodeConcordanceReferences(
+  concordance: ConcordancePayload,
+  key: string,
+) {
+  const encoded = concordance.words[key] ?? [];
+  const decoded: number[] = [];
+  let current = 0;
+
+  encoded.forEach((value, index) => {
+    if (index === 0) {
+      current = value;
+    } else {
+      current += value;
+    }
+    decoded.push(current);
+  });
+
+  return decoded
+    .map((index) => concordance.verses[index])
+    .filter((reference): reference is string => Boolean(reference));
 }
 
 export function resolveWebstersKey(websters: WebstersPayload, rawWord: string) {

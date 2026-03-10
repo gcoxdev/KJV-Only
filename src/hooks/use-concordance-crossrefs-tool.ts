@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { loadConcordance, loadCrossRefs } from "@/lib/reader-data";
+import { decodeConcordanceReferences } from "@/lib/references";
 import type { ConcordancePayload, CrossRefsPayload } from "@/types/reader";
 
 export function useConcordanceCrossRefsTool() {
@@ -24,12 +25,12 @@ export function useConcordanceCrossRefsTool() {
   const indexedConcordance = useMemo(
     () =>
       concordance
-        ? Object.keys(concordance)
+        ? Object.keys(concordance.words)
             .sort((a, b) => a.localeCompare(b))
             .map((key) => ({
               key,
               keyLower: key.toLowerCase(),
-              references: concordance[key] ?? [],
+              references: decodeConcordanceReferences(concordance, key),
             }))
         : [],
     [concordance],
