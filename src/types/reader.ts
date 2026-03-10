@@ -50,6 +50,30 @@ export type GenealogyPerson = {
 
 export type GenealogyPayload = GenealogyPerson[];
 
+export type GenealogyCompactPayload = {
+  v: string[];
+  w: string[];
+  p: Array<
+    [
+      string,
+      number[],
+      string?,
+      string?,
+      [
+        Array<[number, number[], number?, number?]>,
+        number?,
+        number?,
+        number?,
+      ]?,
+      string?,
+      string?,
+      Array<[string, number?]>?,
+      Array<[string, number?]>?,
+      Array<[string, number?]>?,
+    ]
+  >;
+};
+
 export type WebstersEntry = {
   pronunciation?: string;
   definitions: Array<{
