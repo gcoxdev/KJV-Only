@@ -70,12 +70,10 @@ export function useMapsSearchTool() {
       mapsSearchResults.map((entry, index) => {
         const itemKey = `${entry.geojson_file}-${index}`;
         const title = mapEntryLabel(entry);
-        const linkedPlaces = Object.entries(entry.geojson_roles ?? {}).map(
-          ([roleKey, role]) => ({
-            roleKey,
-            text: cleanMapMarkup(role.description ?? roleKey),
-          }),
-        );
+        const linkedPlaces = entry.modern_names.map((name) => ({
+          roleKey: name.toLowerCase(),
+          text: cleanMapMarkup(name),
+        }));
 
         return {
           entry,

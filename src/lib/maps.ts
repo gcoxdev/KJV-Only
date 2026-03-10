@@ -1,14 +1,9 @@
-export type AncientMapRole = {
-  description?: string;
-  score?: number;
-};
-
 export type AncientMapEntry = {
   verses: string[];
   translations: string[];
   types: string[];
   geojson_file: string;
-  geojson_roles?: Record<string, AncientMapRole>;
+  modern_names: string[];
 };
 
 export type AncientMapPayload = AncientMapEntry[];
@@ -64,6 +59,7 @@ export function matchesMapWord(
 export function mapEntrySearchableText(entry: AncientMapEntry) {
   return [
     ...entry.translations,
+    ...entry.modern_names,
     ...entry.types,
     ...entry.verses,
     entry.geojson_file,
@@ -77,17 +73,6 @@ export function cleanMapMarkup(input: string) {
     .replace(/<[^>]+>/g, "")
     .replace(/\s+/g, " ")
     .trim();
-}
-
-export function modernIdsForMapEntry(entry: AncientMapEntry) {
-  const ids = new Set<string>();
-  for (const roleKey of Object.keys(entry.geojson_roles ?? {})) {
-    const [root] = roleKey.split(".");
-    if (/^m[0-9a-f]{6}$/i.test(root)) {
-      ids.add(root);
-    }
-  }
-  return [...ids];
 }
 
 function extractCoordinateBounds(
