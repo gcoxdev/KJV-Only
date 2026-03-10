@@ -68,12 +68,14 @@ export function loadKjvBooks() {
 
 export function loadConcordance() {
   if (!concordancePromise) {
-    concordancePromise = fetch("/references/concordance.json", {
+    concordancePromise = fetch("/references/concordance.compact.delta.min.json", {
       cache: "force-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
-          throw new Error("Could not load /references/concordance.json");
+          throw new Error(
+            "Could not load /references/concordance.compact.delta.min.json",
+          );
         }
         return response.json() as Promise<unknown>;
       })

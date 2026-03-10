@@ -24,6 +24,7 @@ import {
   loadWebsters,
 } from "@/lib/reader-data";
 import {
+  decodeConcordanceReferences,
   chapterVerseKey,
   normalizeConcordanceWord,
   normalizeStrongsCode,
@@ -579,7 +580,10 @@ export function KJVReader() {
   );
 
   const concordanceWords = useMemo(
-    () => (concordance ? Object.keys(concordance).sort((a, b) => a.localeCompare(b)) : []),
+    () =>
+      concordance
+        ? Object.keys(concordance.words).sort((a, b) => a.localeCompare(b))
+        : [],
     [concordance],
   );
 
@@ -1610,7 +1614,7 @@ export function KJVReader() {
 
       const applyConcordanceSelection = (data: ConcordancePayload) => {
         const matchedKey = resolveConcordanceKey(data, rawWord) ?? rawWord;
-        const references = data[matchedKey] ?? [];
+        const references = decodeConcordanceReferences(data, matchedKey);
         setConcordanceWordAccordionValue([]);
         setSelectedConcordanceWord({
           key: matchedKey,
