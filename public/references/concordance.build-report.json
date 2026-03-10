@@ -1,0 +1,60 @@
+{
+  "input": {
+    "path": "public/references/concordance.json",
+    "bytes": 10447858,
+    "wordCount": 13787
+  },
+  "compact": {
+    "path": "public/references/concordance.compact.json",
+    "bytes": 8788502,
+    "bytesSaved": 1659356,
+    "versesCount": 31102,
+    "wordsCount": 13787,
+    "sample": {
+      "word": "Abana",
+      "value": [
+        5085
+      ]
+    }
+  },
+  "compactMin": {
+    "path": "public/references/concordance.compact.min.json",
+    "bytes": 4066993,
+    "bytesSaved": 6380865
+  },
+  "compactDeltaMin": {
+    "path": "public/references/concordance.compact.delta.min.json",
+    "bytes": 2232652,
+    "bytesSaved": 8215206,
+    "sample": {
+      "word": "Abana",
+      "value": [
+        5085
+      ]
+    }
+  },
+  "nested": {
+    "path": "public/references/concordance.nested.json",
+    "bytes": 15083129,
+    "bytesSaved": -4635271,
+    "wordsCount": 13787,
+    "bookBuckets": 83730,
+    "chapterBuckets": 271419,
+    "verseEntries": 630618,
+    "sample": {
+      "word": "Abana",
+      "value": {
+        "2KI": {
+          "5": [
+            12
+          ]
+        }
+      }
+    }
+  },
+  "nestedMin": {
+    "path": "public/references/concordance.nested.min.json",
+    "bytes": 4318741,
+    "bytesSaved": 6129117
+  }
+}

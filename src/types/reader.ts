@@ -4,7 +4,10 @@ export type ReaderPayload = {
   books?: Book[];
 };
 
-export type ConcordancePayload = Record<string, string[]>;
+export type ConcordancePayload = {
+  verses: string[];
+  words: Record<string, number[]>;
+};
 export type CrossRefsPayload = Record<string, string[]>;
 export type HitchcocksPayload = Record<string, string>;
 export type OldEnglishPayload = Record<string, string[]>;
