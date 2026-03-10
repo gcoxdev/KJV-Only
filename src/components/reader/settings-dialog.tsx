@@ -2,6 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import {
+  AArrowDownIcon,
+  AArrowUpIcon,
+  RotateCcwIcon,
+} from "lucide-react";
 import type { TabsOrientation } from "@/types/reader";
 import {
   AlertDialog,
@@ -16,6 +21,10 @@ type SettingsDialogProps = {
   onOpenChange: (open: boolean) => void;
   theme: "light" | "dark";
   onThemeChange: (theme: "light" | "dark") => void;
+  fontSize: number;
+  onIncreaseFontSize: () => void;
+  onDecreaseFontSize: () => void;
+  onResetFontSize: () => void;
   verseSpacing: number;
   onVerseSpacingChange: (value: number) => void;
   hideReadModeVerseNumbers: boolean;
@@ -33,6 +42,10 @@ export function SettingsDialog({
   onOpenChange,
   theme,
   onThemeChange,
+  fontSize,
+  onIncreaseFontSize,
+  onDecreaseFontSize,
+  onResetFontSize,
   verseSpacing,
   onVerseSpacingChange,
   hideReadModeVerseNumbers,
@@ -66,6 +79,41 @@ export function SettingsDialog({
                 onThemeChange(checked ? "dark" : "light")
               }
             />
+          </div>
+          <div className="space-y-2 border-t pt-3">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <Label>Font Size</Label>
+              <span className="text-xs text-muted-foreground">{fontSize}px</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={onDecreaseFontSize}
+              >
+                <AArrowDownIcon />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={onResetFontSize}
+              >
+                <RotateCcwIcon />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={onIncreaseFontSize}
+              >
+                <AArrowUpIcon />
+              </Button>
+            </div>
           </div>
           <div className="space-y-2 border-t pt-3">
             <div className="flex min-w-0 items-center justify-between gap-3">

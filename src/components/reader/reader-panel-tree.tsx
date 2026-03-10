@@ -156,6 +156,7 @@ type ReaderPanelTreeProps = {
   flowVersesByParagraph: boolean;
   readModeParagraphIndent: boolean;
   isStudyMode: boolean;
+  fontSize: number;
   verseSpacing: number;
   onOpenTokenDetails: (
     element: HTMLElement,
@@ -254,6 +255,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   flowVersesByParagraph,
   readModeParagraphIndent,
   isStudyMode,
+  fontSize,
   verseSpacing,
   onOpenTokenDetails,
   onSelectVerse,
@@ -691,6 +693,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   highlightedVerseRange={
                     highlightedVerseRangesByLeafId[leaf.id] ?? null
                   }
+                  fontSize={fontSize}
                   verseSpacing={verseSpacing}
                   onOpenTokenDetails={(element, token) =>
                     onOpenTokenDetails(
@@ -1098,6 +1101,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   flowVersesByParagraph,
   readModeParagraphIndent,
   isStudyMode,
+  fontSize,
   verseSpacing,
   onOpenTokenDetails,
   onSelectVerse,
@@ -1161,6 +1165,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       flowVersesByParagraph={flowVersesByParagraph}
       readModeParagraphIndent={readModeParagraphIndent}
       isStudyMode={isStudyMode}
+      fontSize={fontSize}
       verseSpacing={verseSpacing}
       onOpenTokenDetails={onOpenTokenDetails}
       onSelectVerse={onSelectVerse}

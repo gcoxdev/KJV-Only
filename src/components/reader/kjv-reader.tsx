@@ -145,6 +145,7 @@ export function KJVReader() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isStudyMode, setIsStudyMode] = useState(true);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [fontSize, setFontSize] = useState(16);
   const [verseSpacing, setVerseSpacing] = useState(0);
   const [hideReadModeVerseNumbers, setHideReadModeVerseNumbers] =
     useState(false);
@@ -298,12 +299,16 @@ export function KJVReader() {
         return;
       }
       const parsed = JSON.parse(stored) as {
+        fontSize?: number;
         verseSpacing?: number;
         hideReadModeVerseNumbers?: boolean;
         readModeParagraphIndent?: boolean;
         flowVersesByParagraph?: boolean;
         tabsOrientation?: TabsOrientation;
       };
+      if (typeof parsed.fontSize === "number") {
+        setFontSize(Math.max(8, Math.round(parsed.fontSize)));
+      }
       if (typeof parsed.verseSpacing === "number") {
         setVerseSpacing(
           Math.max(0, Math.min(24, Math.round(parsed.verseSpacing))),
@@ -332,7 +337,8 @@ export function KJVReader() {
   useEffect(() => {
     window.localStorage.setItem(
       "kjv-display-settings-v1",
-      JSON.stringify({
+        JSON.stringify({
+        fontSize,
         verseSpacing,
         hideReadModeVerseNumbers,
         readModeParagraphIndent,
@@ -341,6 +347,7 @@ export function KJVReader() {
       }),
     );
   }, [
+    fontSize,
     verseSpacing,
     hideReadModeVerseNumbers,
     readModeParagraphIndent,
@@ -2071,6 +2078,7 @@ export function KJVReader() {
                 flowVersesByParagraph={flowVersesByParagraph}
                 readModeParagraphIndent={readModeParagraphIndent}
                 isStudyMode={isStudyMode}
+                fontSize={fontSize}
                 verseSpacing={verseSpacing}
                 onOpenTokenDetails={openTokenDetailsFromElement}
                 onSelectVerse={handleVerseSelection}
@@ -2362,6 +2370,14 @@ export function KJVReader() {
             onOpenChange={setIsSettingsOpen}
             theme={theme}
             onThemeChange={setTheme}
+            fontSize={fontSize}
+            onIncreaseFontSize={() =>
+              setFontSize((current) => current + 4)
+            }
+            onDecreaseFontSize={() =>
+              setFontSize((current) => Math.max(8, current - 4))
+            }
+            onResetFontSize={() => setFontSize(16)}
             verseSpacing={verseSpacing}
             onVerseSpacingChange={setVerseSpacing}
             hideReadModeVerseNumbers={hideReadModeVerseNumbers}
