@@ -18,6 +18,8 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
   const [bookmarkModeEnabled, setBookmarkModeEnabled] = useState(false);
   const [pendingBookmarkRangeStart, setPendingBookmarkRangeStart] =
     useState<BookmarkPoint | null>(null);
+  const [pendingBookmarkRangeStartLeafId, setPendingBookmarkRangeStartLeafId] =
+    useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -144,6 +146,7 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
       const next = !current;
       if (!next) {
         setPendingBookmarkRangeStart(null);
+        setPendingBookmarkRangeStartLeafId(null);
       }
       return next;
     });
@@ -164,7 +167,9 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
     readerBookmarks,
     bookmarkModeEnabled,
     pendingBookmarkRangeStart,
+    pendingBookmarkRangeStartLeafId,
     setPendingBookmarkRangeStart,
+    setPendingBookmarkRangeStartLeafId,
     upsertBookmark,
     updateBookmark,
     deleteBookmark,

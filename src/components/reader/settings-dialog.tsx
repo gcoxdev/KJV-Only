@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -25,6 +28,9 @@ type SettingsDialogProps = {
   onIncreaseFontSize: () => void;
   onDecreaseFontSize: () => void;
   onResetFontSize: () => void;
+  highlightColor: string;
+  onHighlightColorChange: (value: string) => void;
+  onResetHighlightColor: () => void;
   verseSpacing: number;
   onVerseSpacingChange: (value: number) => void;
   hideReadModeVerseNumbers: boolean;
@@ -46,6 +52,9 @@ export function SettingsDialog({
   onIncreaseFontSize,
   onDecreaseFontSize,
   onResetFontSize,
+  highlightColor,
+  onHighlightColorChange,
+  onResetHighlightColor,
   verseSpacing,
   onVerseSpacingChange,
   hideReadModeVerseNumbers,
@@ -57,6 +66,26 @@ export function SettingsDialog({
   tabsOrientation,
   onTabsOrientationChange,
 }: SettingsDialogProps) {
+  const [draftHighlightColor, setDraftHighlightColor] = useState(highlightColor);
+
+  useEffect(() => {
+    setDraftHighlightColor(highlightColor);
+  }, [highlightColor]);
+
+  useEffect(() => {
+    if (draftHighlightColor === highlightColor) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      onHighlightColorChange(draftHighlightColor);
+    }, 120);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [draftHighlightColor, highlightColor, onHighlightColorChange]);
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent
@@ -112,6 +141,34 @@ export function SettingsDialog({
                 onClick={onIncreaseFontSize}
               >
                 <AArrowUpIcon />
+              </Button>
+            </div>
+          </div>
+          <div className="space-y-2 border-t pt-3">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <Label htmlFor="highlight-color">Highlight Color</Label>
+              <span className="font-mono text-xs text-muted-foreground">
+                {draftHighlightColor}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Input
+                id="highlight-color"
+                type="color"
+                value={draftHighlightColor}
+                onChange={(event) =>
+                  setDraftHighlightColor(event.currentTarget.value)
+                }
+                className="h-9 w-14 shrink-0 p-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onResetHighlightColor}
+              >
+                <RotateCcwIcon />
+                Reset
               </Button>
             </div>
           </div>

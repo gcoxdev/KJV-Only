@@ -6,6 +6,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+    --verse-highlight-bg: #fafac5;
+    --verse-highlight-fg: #111111;
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -229,5 +231,6 @@
 }
 
 .verse-reference-highlight {
-    background-color: #fafac5;
+    background-color: var(--verse-highlight-bg);
+    color: var(--verse-highlight-fg);
 }

@@ -167,6 +167,7 @@ type ReaderPanelTreeProps = {
     chapterIndex: number,
   ) => void;
   onSelectVerse: (
+    leafId: string,
     bookIndex: number,
     chapterIndex: number,
     verseNumber: number,
@@ -706,7 +707,12 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                     )
                   }
                   onSelectVerse={(verseNumber) =>
-                    onSelectVerse(leaf.bookIndex, leaf.chapterIndex, verseNumber)
+                    onSelectVerse(
+                      leaf.id,
+                      leaf.bookIndex,
+                      leaf.chapterIndex,
+                      verseNumber,
+                    )
                   }
                 />
               </ScrollArea>
