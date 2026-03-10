@@ -11,10 +11,12 @@ import type {
   HitchcocksPayload,
   OldEnglishPayload,
   ReaderPayload,
+  StrongsCompactPayload,
   StrongsPayload,
   WebstersPayload,
 } from "@/types/reader";
 import { decodeGenealogyPayload } from "@/lib/genealogy";
+import { decodeStrongsPayload } from "@/lib/strongs";
 
 let kjvBooksPromise: Promise<Book[]> | null = null;
 let concordancePromise: Promise<ConcordancePayload> | null = null;
@@ -196,16 +198,16 @@ export function loadGenealogy() {
 
 export function loadStrongsGreek() {
   if (!strongsGreekPromise) {
-    strongsGreekPromise = fetch("/references/strongs-greek.json", {
+    strongsGreekPromise = fetch("/references/strongs-greek.compact.min.json", {
       cache: "force-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
-          throw new Error("Could not load /references/strongs-greek.json");
+          throw new Error("Could not load /references/strongs-greek.compact.min.json");
         }
         return response.json() as Promise<unknown>;
       })
-      .then((payload) => payload as StrongsPayload)
+      .then((payload) => decodeStrongsPayload(payload as StrongsCompactPayload))
       .catch((error) => {
         strongsGreekPromise = null;
         throw error;
@@ -217,16 +219,16 @@ export function loadStrongsGreek() {
 
 export function loadStrongsHebrew() {
   if (!strongsHebrewPromise) {
-    strongsHebrewPromise = fetch("/references/strongs-hebrew.json", {
+    strongsHebrewPromise = fetch("/references/strongs-hebrew.compact.min.json", {
       cache: "force-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
-          throw new Error("Could not load /references/strongs-hebrew.json");
+          throw new Error("Could not load /references/strongs-hebrew.compact.min.json");
         }
         return response.json() as Promise<unknown>;
       })
-      .then((payload) => payload as StrongsPayload)
+      .then((payload) => decodeStrongsPayload(payload as StrongsCompactPayload))
       .catch((error) => {
         strongsHebrewPromise = null;
         throw error;
