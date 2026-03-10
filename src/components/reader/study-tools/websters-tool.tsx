@@ -1,4 +1,4 @@
-import { LoaderCircleIcon } from "lucide-react";
+import { BookTypeIcon, LoaderCircleIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { WebstersEntry } from "@/types/reader";
@@ -42,6 +42,7 @@ export function WebstersTool({
       <AccordionTrigger
         className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
       >
+        <BookTypeIcon />
         Webster&apos;s 1828 Dictionary
       </AccordionTrigger>
       <AccordionContent className="space-y-2 overflow-visible">

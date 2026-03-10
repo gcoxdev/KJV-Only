@@ -1,5 +1,12 @@
 import { type RefObject } from "react";
-import { EllipsisIcon, PlusIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  EllipsisIcon,
+  PencilLineIcon,
+  PlusIcon,
+  XIcon,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { ReaderTab, TabsOrientation } from "@/types/reader";
@@ -92,6 +99,7 @@ export function TabsStrip({
                 <DropdownMenuContent align="start" className="w-40">
                   <DropdownMenuGroup>
                     <DropdownMenuItem onClick={() => onOpenRenameDialog(tab.id)}>
+                      <PencilLineIcon />
                       Relabel Tab
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
@@ -101,11 +109,13 @@ export function TabsStrip({
                       <DropdownMenuGroup>
                         {canMoveLeft ? (
                           <DropdownMenuItem onClick={() => onMoveTab(tab.id, -1)}>
+                            <ArrowLeftIcon />
                             Move Left
                           </DropdownMenuItem>
                         ) : null}
                         {canMoveRight ? (
                           <DropdownMenuItem onClick={() => onMoveTab(tab.id, 1)}>
+                            <ArrowRightIcon />
                             Move Right
                           </DropdownMenuItem>
                         ) : null}
@@ -113,6 +123,7 @@ export function TabsStrip({
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
                         <DropdownMenuItem onClick={() => onCloseTab(tab.id)}>
+                          <XIcon />
                           Close Tab
                         </DropdownMenuItem>
                       </DropdownMenuGroup>

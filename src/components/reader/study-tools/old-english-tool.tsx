@@ -1,4 +1,4 @@
-import { LoaderCircleIcon } from "lucide-react";
+import { BookCheckIcon, LoaderCircleIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
@@ -36,6 +36,7 @@ export function OldEnglishTool({
       <AccordionTrigger
         className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
       >
+        <BookCheckIcon />
         Old English Dictionary
       </AccordionTrigger>
       <AccordionContent className="space-y-2 overflow-visible">

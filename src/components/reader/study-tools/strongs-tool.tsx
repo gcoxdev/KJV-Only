@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode, type Ref } from "react";
-import { LoaderCircleIcon } from "lucide-react";
+import { BookKeyIcon, LoaderCircleIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { StrongsEntry } from "@/types/reader";
@@ -56,6 +56,7 @@ export function StrongsTool({
       <AccordionTrigger
         className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
       >
+        <BookKeyIcon />
         Strong&apos;s Dictionary
       </AccordionTrigger>
       <AccordionContent className="space-y-2 overflow-visible">

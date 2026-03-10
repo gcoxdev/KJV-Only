@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import {
-  BookmarkIcon,
+  BookMarkedIcon,
   Edit3Icon,
   Trash2Icon,
 } from "lucide-react";
@@ -86,7 +86,7 @@ export function BookmarksTool({
           variant={bookmarkModeEnabled ? "default" : "outline"}
           onClick={onToggleBookmarkMode}
         >
-          <BookmarkIcon />
+          <BookMarkedIcon />
           {bookmarkModeEnabled ? "Bookmark Mode: On" : "Bookmark Mode: Off"}
         </Button>
         <Button

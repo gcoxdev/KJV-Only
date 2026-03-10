@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from "react";
-import { LoaderCircleIcon } from "lucide-react";
+import { BookAIcon, LoaderCircleIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
@@ -49,6 +49,7 @@ export function ConcordanceTool({
       <AccordionTrigger
         className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
       >
+        <BookAIcon />
         Concordance
       </AccordionTrigger>
       <AccordionContent className="space-y-2 overflow-visible">
