@@ -487,7 +487,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   {isFullscreenLeaf ? <MinimizeIcon /> : <ExpandIcon />}
                   {isFullscreenLeaf ? "Exit Full Screen" : "Full Screen"}
                 </DropdownMenuItem>
-                {leaf.view === "reader" ? (
+                {leaf.view === "reader" && !isFullscreenLeaf ? (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
