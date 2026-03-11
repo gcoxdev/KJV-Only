@@ -14,14 +14,17 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpIcon,
+  BookmarkIcon,
   BookMarkedIcon,
   BookOpenCheckIcon,
   BookOpenIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  EraserIcon,
   EllipsisVerticalIcon,
   ExpandIcon,
   ExternalLinkIcon,
+  HighlighterIcon,
   MinimizeIcon,
   PauseIcon,
   PlayIcon,
@@ -484,40 +487,54 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   {isFullscreenLeaf ? <MinimizeIcon /> : <ExpandIcon />}
                   {isFullscreenLeaf ? "Exit Full Screen" : "Full Screen"}
                 </DropdownMenuItem>
-                {hasHighlightInLeaf ? (
-                  <DropdownMenuItem
-                    onClick={() => {
-                      onClearLeafHighlights(leaf.id);
-                      closePanelMenu();
-                    }}
-                  >
-                    <XIcon />
-                    Clear Highlights
-                  </DropdownMenuItem>
-                ) : null}
                 {leaf.view === "reader" ? (
-                  <DropdownMenuItem
-                    onClick={() => {
-                      onToggleHighlightMode(leaf.id);
-                      closePanelMenu();
-                    }}
-                  >
-                    <BookOpenIcon />
-                    {highlightModeEnabled
-                      ? "Turn Highlight Mode Off"
-                      : "Turn Highlight Mode On"}
-                  </DropdownMenuItem>
-                ) : null}
-                {leaf.view === "reader" ? (
-                  <DropdownMenuItem
-                    onClick={() => {
-                      onBookmarkLeafSelection(leaf.id);
-                      closePanelMenu();
-                    }}
-                  >
-                    <BookMarkedIcon />
-                    {hasHighlightInLeaf ? "Bookmark Highlighted" : "Bookmark Chapter"}
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          onToggleHighlightMode(leaf.id);
+                          closePanelMenu();
+                        }}
+                      >
+                        <HighlighterIcon />
+                        {highlightModeEnabled
+                          ? "Turn Highlight Mode Off"
+                          : "Turn Highlight Mode On"}
+                      </DropdownMenuItem>
+                      {hasHighlightInLeaf ? (
+                        <DropdownMenuItem
+                          onClick={() => {
+                            onClearLeafHighlights(leaf.id);
+                            closePanelMenu();
+                          }}
+                        >
+                          <EraserIcon />
+                          Clear Highlights
+                        </DropdownMenuItem>
+                      ) : null}
+                      {hasHighlightInLeaf ? (
+                        <DropdownMenuItem
+                          onClick={() => {
+                            onBookmarkLeafSelection(leaf.id);
+                            closePanelMenu();
+                          }}
+                        >
+                          <BookmarkIcon />
+                          Bookmark Highlighted
+                        </DropdownMenuItem>
+                      ) : null}
+                      <DropdownMenuItem
+                        onClick={() => {
+                          onBookmarkLeafSelection(leaf.id);
+                          closePanelMenu();
+                        }}
+                      >
+                        <BookMarkedIcon />
+                        Bookmark Chapter
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </>
                 ) : null}
                 {!isFullscreenLeaf ? (
                   <>
@@ -1070,6 +1087,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
               books={books}
               selectedTestament={leaf.pickerTestament}
               selectedBookIndex={leaf.pickerBookIndex}
+              currentBookIndex={leaf.bookIndex}
+              currentChapterIndex={leaf.chapterIndex}
               onSelectTestament={(testament) =>
                 updateLeafLocation(leaf.id, {
                   pickerTestament: testament,
@@ -1087,8 +1106,17 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   pickerBookIndex: bookIndex,
                 })
               }
-              onBackToBooks={() =>
-                updateLeafLocation(leaf.id, { pickerBookIndex: null })
+              onGoToBookSelection={(testament) =>
+                updateLeafLocation(leaf.id, {
+                  pickerTestament: testament,
+                  pickerBookIndex: null,
+                })
+              }
+              onGoToChapterSelection={(testament, bookIndex) =>
+                updateLeafLocation(leaf.id, {
+                  pickerTestament: testament,
+                  pickerBookIndex: bookIndex,
+                })
               }
               onSelectChapter={(bookIndex, chapterIndex) =>
                 updateLeafLocation(leaf.id, {

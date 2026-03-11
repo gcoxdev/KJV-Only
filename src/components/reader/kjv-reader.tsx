@@ -1151,6 +1151,11 @@ export function KJVReader() {
     const shouldResetScroll =
       patch.bookIndex !== undefined || patch.chapterIndex !== undefined;
 
+    if (shouldResetScroll) {
+      clearLeafHighlights(leafId);
+      setSelectedHighlightScope(null);
+    }
+
     updateActiveTab((tab) => ({
       ...tab,
       root: updateLeafNode(tab.root, leafId, patch),
@@ -2552,12 +2557,22 @@ export function KJVReader() {
                 pickerBookIndex: bookIndex,
               });
             }}
-            onBackToBooks={() => {
+            onGoToBookSelection={(testament) => {
               if (!bookPickerDialogLeaf) {
                 return;
               }
               updateLeafLocation(bookPickerDialogLeaf.id, {
+                pickerTestament: testament,
                 pickerBookIndex: null,
+              });
+            }}
+            onGoToChapterSelection={(testament, bookIndex) => {
+              if (!bookPickerDialogLeaf) {
+                return;
+              }
+              updateLeafLocation(bookPickerDialogLeaf.id, {
+                pickerTestament: testament,
+                pickerBookIndex: bookIndex,
               });
             }}
             onSelectChapter={(bookIndex, chapterIndex) => {
