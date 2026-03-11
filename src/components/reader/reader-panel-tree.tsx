@@ -973,6 +973,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 <Button
                   variant="outline"
                   size="sm"
+                  aria-label={audioVisible ? "Hide audio" : "Show audio"}
                   onClick={() =>
                     setAudioVisible((current) => {
                       const nextVisible = !current;
@@ -989,36 +990,43 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   }
                 >
                   <AudioLinesIcon />
-                  {audioVisible ? "Hide Audio" : "Show Audio"}
+                  <span className="hidden sm:inline">
+                    {audioVisible ? "Hide Audio" : "Show Audio"}
+                  </span>
                 </Button>
                 <div className="flex items-center gap-2">
                   <Button
                     variant={isChapterRead ? "default" : "outline"}
                     size="sm"
+                    aria-label={isChapterRead ? "Mark chapter unread" : "Mark chapter read"}
                     onClick={() =>
                       toggleChapterRead(leaf.bookIndex, leaf.chapterIndex)
                     }
                   >
                     {isChapterRead ? <BookOpenIcon /> : <BookOpenCheckIcon />}
-                    {isChapterRead ? "Read" : "Mark Read"}
+                    <span className="hidden sm:inline">
+                      {isChapterRead ? "Read" : "Mark Read"}
+                    </span>
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
+                    aria-label="Previous chapter"
                     onClick={() => moveLeafChapter(leaf.id, -1)}
                     disabled={!hasPrev}
                   >
                     <ChevronLeftIcon />
-                    Prev
+                    <span className="hidden sm:inline">Prev</span>
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
+                    aria-label="Next chapter"
                     onClick={() => moveLeafChapter(leaf.id, 1)}
                     disabled={!hasNext}
                   >
-                    Next
                     <ChevronRightIcon />
+                    <span className="hidden sm:inline">Next</span>
                   </Button>
                 </div>
               </div>
