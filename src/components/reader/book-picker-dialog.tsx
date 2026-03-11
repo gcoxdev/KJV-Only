@@ -17,7 +17,11 @@ type BookPickerDialogProps = {
   onSelectTestament: (testament: NonNullable<LeafNode["pickerTestament"]>) => void;
   onBackToTestaments: () => void;
   onSelectBook: (bookIndex: number) => void;
-  onBackToBooks: () => void;
+  onGoToBookSelection: (testament: NonNullable<LeafNode["pickerTestament"]>) => void;
+  onGoToChapterSelection: (
+    testament: NonNullable<LeafNode["pickerTestament"]>,
+    bookIndex: number,
+  ) => void;
   onSelectChapter: (bookIndex: number, chapterIndex: number) => void;
   onClose: () => void;
 };
@@ -29,7 +33,8 @@ export function BookPickerDialog({
   onSelectTestament,
   onBackToTestaments,
   onSelectBook,
-  onBackToBooks,
+  onGoToBookSelection,
+  onGoToChapterSelection,
   onSelectChapter,
   onClose,
 }: BookPickerDialogProps) {
@@ -52,10 +57,13 @@ export function BookPickerDialog({
               books={books}
               selectedTestament={leaf.pickerTestament}
               selectedBookIndex={leaf.pickerBookIndex}
+              currentBookIndex={leaf.bookIndex}
+              currentChapterIndex={leaf.chapterIndex}
               onSelectTestament={onSelectTestament}
               onBackToTestaments={onBackToTestaments}
               onSelectBook={onSelectBook}
-              onBackToBooks={onBackToBooks}
+              onGoToBookSelection={onGoToBookSelection}
+              onGoToChapterSelection={onGoToChapterSelection}
               onSelectChapter={onSelectChapter}
             />
           </div>
