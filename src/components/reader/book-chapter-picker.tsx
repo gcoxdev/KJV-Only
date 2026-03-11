@@ -55,7 +55,9 @@ export function BookChapterPicker({
         ? currentBookIndex
         : null;
   const breadcrumbChapterIndex =
-    currentBookMatchesTestament && currentChapterIndex !== null
+    currentBookMatchesTestament &&
+    breadcrumbBookIndex === currentBookIndex &&
+    currentChapterIndex !== null
       ? currentChapterIndex
       : null;
   const pageBook =

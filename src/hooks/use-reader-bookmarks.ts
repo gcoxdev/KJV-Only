@@ -153,6 +153,17 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
     });
   }, []);
 
+  const disableHighlightModeForLeaf = useCallback((leafId: string) => {
+    setHighlightModeEnabledByLeafId((current) => {
+      if (!current[leafId]) {
+        return current;
+      }
+      const next = { ...current };
+      delete next[leafId];
+      return next;
+    });
+  }, []);
+
   const createChapterBookmark = useCallback(
     (bookIndex: number, chapterIndex: number) => {
       upsertBookmark({
@@ -173,6 +184,7 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
     updateBookmark,
     deleteBookmark,
     toggleHighlightModeForLeaf,
+    disableHighlightModeForLeaf,
     createChapterBookmark,
   };
 }

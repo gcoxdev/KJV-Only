@@ -554,6 +554,7 @@ export function KJVReader() {
     updateBookmark,
     deleteBookmark,
     toggleHighlightModeForLeaf,
+    disableHighlightModeForLeaf,
     createChapterBookmark,
   } = useReaderBookmarks({
     books,
@@ -2151,6 +2152,7 @@ export function KJVReader() {
 
         // Already in browser fullscreen: just switch the active fullscreen panel.
         fullscreenRequestedLeafIdRef.current = leafId;
+        disableHighlightModeForLeaf(leafId);
         setFullscreenLeafId(leafId);
         setPanelMenuOpenLeafId(null);
         clearAllPanelPreviews();
@@ -2158,6 +2160,7 @@ export function KJVReader() {
       }
 
       fullscreenRequestedLeafIdRef.current = leafId;
+      disableHighlightModeForLeaf(leafId);
       setFullscreenLeafId(leafId);
       setPanelMenuOpenLeafId(null);
       clearAllPanelPreviews();
