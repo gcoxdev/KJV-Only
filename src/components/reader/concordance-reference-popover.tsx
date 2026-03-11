@@ -3,7 +3,7 @@ import { ExternalLinkIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useSidebar } from "@/components/ui/sidebar";
+import { useOptionalSidebar } from "@/components/ui/sidebar";
 
 type ConcordanceReferencePopoverProps = {
   reference: string;
@@ -20,7 +20,7 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
   onOpenReference,
   onCloseSidebar,
 }: ConcordanceReferencePopoverProps) {
-  const { setOpenMobile } = useSidebar();
+  const sidebar = useOptionalSidebar();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [supportsHover, setSupportsHover] = useState(() => {
     if (typeof window === "undefined" || !window.matchMedia) {
@@ -123,7 +123,7 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
               className="h-7 px-2 text-xs"
               onClick={() => {
                 onOpenReference(reference);
-                setOpenMobile(false);
+                sidebar?.setOpenMobile(false);
                 onCloseSidebar();
                 setIsPopoverOpen(false);
               }}
