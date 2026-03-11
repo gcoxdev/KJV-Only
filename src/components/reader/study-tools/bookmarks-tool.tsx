@@ -1,17 +1,15 @@
 import { useMemo, useState } from "react";
 import {
-  BookMarkedIcon,
   Edit3Icon,
   Trash2Icon,
 } from "lucide-react";
 
 import type { Book } from "@/types/bible";
-import type { BookmarkPoint, ReaderBookmark } from "@/types/bookmarks";
+import type { ReaderBookmark } from "@/types/bookmarks";
 import {
   bookmarkScopeLabel,
 } from "@/lib/bookmarks";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -36,29 +34,14 @@ import {
 type BookmarksToolProps = {
   books: Book[];
   bookmarks: ReaderBookmark[];
-  bookmarkModeEnabled: boolean;
-  pendingRangeStart: BookmarkPoint | null;
-  currentChapter: { bookIndex: number; chapterIndex: number } | null;
-  onToggleBookmarkMode: () => void;
-  onCreateChapterBookmark: (bookIndex: number, chapterIndex: number) => void;
   onOpenBookmark: (bookmark: ReaderBookmark) => void;
   onUpdateBookmark: (bookmarkId: string, patch: Partial<Pick<ReaderBookmark, "label" | "note">>) => void;
   onDeleteBookmark: (bookmarkId: string) => void;
 };
 
-function formatRangeStart(point: BookmarkPoint, books: Book[]) {
-  const bookName = books[point.bookIndex]?.name ?? `Book ${point.bookIndex + 1}`;
-  return `${bookName} ${point.chapterIndex + 1}:${point.verseNumber}`;
-}
-
 export function BookmarksTool({
   books,
   bookmarks,
-  bookmarkModeEnabled,
-  pendingRangeStart,
-  currentChapter,
-  onToggleBookmarkMode,
-  onCreateChapterBookmark,
   onOpenBookmark,
   onUpdateBookmark,
   onDeleteBookmark,
@@ -79,40 +62,6 @@ export function BookmarksTool({
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          type="button"
-          size="sm"
-          variant={bookmarkModeEnabled ? "default" : "outline"}
-          onClick={onToggleBookmarkMode}
-        >
-          <BookMarkedIcon />
-          {bookmarkModeEnabled ? "Bookmark Mode: On" : "Bookmark Mode: Off"}
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          disabled={!currentChapter}
-          onClick={() => {
-            if (!currentChapter) {
-              return;
-            }
-            onCreateChapterBookmark(currentChapter.bookIndex, currentChapter.chapterIndex);
-          }}
-        >
-          + Chapter
-        </Button>
-      </div>
-
-      {pendingRangeStart ? (
-        <p className="text-xs text-muted-foreground">
-          Range start selected at {formatRangeStart(pendingRangeStart, books)}. Navigate and tap another verse to finish.
-        </p>
-      ) : null}
-
-      <Separator />
-
       {sortedBookmarks.length === 0 ? (
         <p className="text-sm text-muted-foreground">No bookmarks yet.</p>
       ) : (
