@@ -147,6 +147,11 @@ const LazyProgressDialog = lazy(async () => {
   return { default: module.ProgressDialog };
 });
 
+const LazyGenealogyTreeDialog = lazy(async () => {
+  const module = await import("@/components/reader/genealogy-tree-dialog");
+  return { default: module.GenealogyTreeDialog };
+});
+
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -164,6 +169,10 @@ export function KJVReader() {
     useState<TabsOrientation>("horizontal");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isProgressOpen, setIsProgressOpen] = useState(false);
+  const [isGenealogyTreeOpen, setIsGenealogyTreeOpen] = useState(false);
+  const [genealogyTreePersonId, setGenealogyTreePersonId] = useState<string | null>(
+    null,
+  );
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [tabs, setTabs] = useState<ReaderTab[]>([]);
@@ -2111,12 +2120,26 @@ export function KJVReader() {
     }
     setGenealogySearchTerm("");
     setSelectedGenealogyIds([personId]);
+    if (isGenealogyTreeOpen) {
+      setGenealogyTreePersonId(personId);
+    }
     setConcordanceAccordionValue((current) => {
       const without = current.filter((value) => value !== "genealogy");
       return without.includes("concordance")
         ? [...without, "genealogy"]
         : ["concordance", ...without, "genealogy"];
     });
+  }, [isGenealogyTreeOpen]);
+
+  const openGenealogyTree = useCallback((personId: string) => {
+    if (!personId) {
+      return;
+    }
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    setGenealogyTreePersonId(personId);
+    setIsGenealogyTreeOpen(true);
   }, []);
 
   const renderGenealogyPersonDetails = useCallback(
@@ -2125,6 +2148,7 @@ export function KJVReader() {
         person={person}
         genealogyById={genealogyById}
         onSelectPerson={selectGenealogyPerson}
+        onOpenTree={openGenealogyTree}
         renderReferencePreview={referencePreviewContent}
         onOpenReference={openConcordanceReference}
         onCloseSidebar={closeRightSidebarForMobile}
@@ -2133,11 +2157,16 @@ export function KJVReader() {
     [
       closeRightSidebarForMobile,
       genealogyById,
+      openGenealogyTree,
       openConcordanceReference,
       referencePreviewContent,
       selectGenealogyPerson,
     ],
   );
+
+  const genealogyTreePerson = genealogyTreePersonId
+    ? genealogyById.get(genealogyTreePersonId) ?? null
+    : null;
 
   async function toggleFullscreenLeaf(leafId: string) {
     try {
@@ -2654,6 +2683,29 @@ export function KJVReader() {
             onOpenChapterInNewTab={openChapterInNewTab}
             onToggleChapterRead={toggleChapterRead}
             onResetAllProgress={resetAllProgress}
+          />
+        </Suspense>
+      ) : null}
+
+      {isGenealogyTreeOpen ? (
+        <Suspense fallback={null}>
+          <LazyGenealogyTreeDialog
+            open={isGenealogyTreeOpen}
+            person={genealogyTreePerson}
+            genealogyById={genealogyById}
+            renderReferencePreview={referencePreviewContent}
+            onOpenReference={openConcordanceReference}
+            onCloseSidebar={closeRightSidebarForMobile}
+            onOpenChange={(open) => {
+              setIsGenealogyTreeOpen(open);
+              if (!open) {
+                setGenealogyTreePersonId(null);
+              }
+            }}
+            onSelectPerson={(personId) => {
+              selectGenealogyPerson(personId);
+              setGenealogyTreePersonId(personId);
+            }}
           />
         </Suspense>
       ) : null}
