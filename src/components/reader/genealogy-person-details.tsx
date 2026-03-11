@@ -63,7 +63,9 @@ export function GenealogyPersonDetails({
                 key={`${person.id}-${entry.name}`}
                 value={`${person.id}-${entry.name}`}
               >
-                <AccordionTrigger>{`${entry.name} (${entry.verses.length})`}</AccordionTrigger>
+                <AccordionTrigger>
+                  {`${entry.name} (${entry.numVerses ?? entry.verses.length})`}
+                </AccordionTrigger>
                 <AccordionContent className="leading-7">
                   {entry.verses.map((reference, index) => (
                     <Fragment key={`${person.id}-${entry.name}-${reference}-${index}`}>
