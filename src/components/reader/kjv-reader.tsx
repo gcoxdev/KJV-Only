@@ -65,6 +65,7 @@ import {
   buildLeafNeighborMapFromDom,
   type LeafNeighbors,
 } from "@/lib/reader-neighbors";
+import { parseLayoutHash, serializeLayoutHash } from "@/lib/layout-hash";
 import type {
   ConcordancePayload,
   CrossRefsPayload,
@@ -84,7 +85,7 @@ import type {
   WebstersEntry,
   WebstersPayload,
 } from "@/types/reader";
-import type { BookmarkPoint, ReaderBookmark } from "@/types/bookmarks";
+import type { ReaderBookmark } from "@/types/bookmarks";
 import {
   SidebarInset,
   SidebarProvider,
@@ -167,6 +168,7 @@ export function KJVReader() {
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [tabs, setTabs] = useState<ReaderTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
+  const [isShareCopied, setIsShareCopied] = useState(false);
   const [tokenPopup, setTokenPopup] = useState<TokenPopupState | null>(null);
   const [fullscreenLeafId, setFullscreenLeafId] = useState<string | null>(null);
   const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(
@@ -209,6 +211,7 @@ export function KJVReader() {
   const addPreviewIsGroupRef = useRef(false);
   const orientationPreviewLeafIdsRef = useRef<string[]>([]);
   const fullscreenRequestedLeafIdRef = useRef<string | null>(null);
+  const syncedLayoutHashRef = useRef("");
   const domNeighborCacheRef = useRef<{
     root: PanelNode | null;
     neighbors: Map<string, LeafNeighbors>;
@@ -221,7 +224,10 @@ export function KJVReader() {
     highlightedVerseRangesByLeafId,
     clearAllVerseHighlights,
     clearLeafHighlights,
+    setLeafHighlights,
     queueVerseHighlight,
+    queueVerseHighlights,
+    setVerseHighlights,
   } = useVerseHighlights({
     panelElementRefs,
     activeTabId,
@@ -415,11 +421,23 @@ export function KJVReader() {
         if (cancelled) {
           return;
         }
-
-        const initialTab = createInitialTab(1);
         setBooks(parsedBooks);
-        setTabs([initialTab]);
-        setActiveTabId(initialTab.id);
+        const parsedLayout = parseLayoutHash(window.location.hash);
+        if (parsedLayout && parsedLayout.tabs.length > 0) {
+          setTabs(parsedLayout.tabs);
+          setActiveTabId(parsedLayout.tabs[parsedLayout.activeTabIndex]?.id ?? parsedLayout.tabs[0]?.id ?? null);
+          setTabsOrientation(parsedLayout.tabsOrientation);
+          setVerseHighlights(parsedLayout.highlightedVerseRangesByLeafId);
+          for (const [leafId, ranges] of Object.entries(
+            parsedLayout.highlightedVerseRangesByLeafId,
+          )) {
+            queueVerseHighlights(leafId, ranges);
+          }
+        } else {
+          const initialTab = createInitialTab(1);
+          setTabs([initialTab]);
+          setActiveTabId(initialTab.id);
+        }
         setLoadError(null);
         setIsLoaded(true);
       } catch (error) {
@@ -440,6 +458,60 @@ export function KJVReader() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!isLoaded || tabs.length === 0) {
+      return;
+    }
+    const nextHash = serializeLayoutHash({
+      tabs,
+      activeTabId,
+      tabsOrientation,
+      highlightedVerseRangesByLeafId,
+    });
+    if (syncedLayoutHashRef.current === nextHash && window.location.hash === nextHash) {
+      return;
+    }
+    syncedLayoutHashRef.current = nextHash;
+    const nextUrl = `${window.location.pathname}${window.location.search}${nextHash}`;
+    window.history.replaceState(null, "", nextUrl);
+  }, [
+    activeTabId,
+    highlightedVerseRangesByLeafId,
+    isLoaded,
+    tabs,
+    tabsOrientation,
+  ]);
+
+  useEffect(() => {
+    function onHashChange() {
+      const parsed = parseLayoutHash(window.location.hash);
+      if (!parsed) {
+        return;
+      }
+      const nextHash = serializeLayoutHash({
+        tabs: parsed.tabs,
+        activeTabId: parsed.tabs[parsed.activeTabIndex]?.id ?? parsed.tabs[0]?.id ?? null,
+        tabsOrientation: parsed.tabsOrientation,
+        highlightedVerseRangesByLeafId: parsed.highlightedVerseRangesByLeafId,
+      });
+      syncedLayoutHashRef.current = nextHash;
+      setTabs(parsed.tabs);
+      setActiveTabId(parsed.tabs[parsed.activeTabIndex]?.id ?? parsed.tabs[0]?.id ?? null);
+      setTabsOrientation(parsed.tabsOrientation);
+      setVerseHighlights(parsed.highlightedVerseRangesByLeafId);
+      for (const [leafId, ranges] of Object.entries(
+        parsed.highlightedVerseRangesByLeafId,
+      )) {
+        queueVerseHighlights(leafId, ranges);
+      }
+    }
+
+    window.addEventListener("hashchange", onHashChange);
+    return () => {
+      window.removeEventListener("hashchange", onHashChange);
+    };
+  }, [queueVerseHighlights, setVerseHighlights]);
 
   const {
     chapterRefs,
@@ -476,15 +548,12 @@ export function KJVReader() {
 
   const {
     readerBookmarks,
-    bookmarkModeEnabled,
-    pendingBookmarkRangeStart,
-    pendingBookmarkRangeStartLeafId,
-    setPendingBookmarkRangeStart,
-    setPendingBookmarkRangeStartLeafId,
+    highlightModeEnabledByLeafId,
+    setSelectedHighlightScope,
     upsertBookmark,
     updateBookmark,
     deleteBookmark,
-    toggleBookmarkMode,
+    toggleHighlightModeForLeaf,
     createChapterBookmark,
   } = useReaderBookmarks({
     books,
@@ -1184,6 +1253,19 @@ export function KJVReader() {
     });
   }, [createDefaultSearchPageState, tabs, tabsOrientation]);
 
+  const shareLayout = useCallback(async () => {
+    const href = window.location.href;
+    try {
+      await navigator.clipboard.writeText(href);
+      setIsShareCopied(true);
+      window.setTimeout(() => {
+        setIsShareCopied(false);
+      }, 1500);
+    } catch {
+      setIsShareCopied(false);
+    }
+  }, []);
+
   const openStaticPageTab = useCallback(
     (pageId: StaticPageId) => {
       const page = getStaticPage(pageId);
@@ -1262,6 +1344,15 @@ export function KJVReader() {
       return;
     }
 
+    if (bookmark.scope.type === "selection") {
+      openChapterHighlightsInNewTab(
+        bookmark.scope.bookIndex,
+        bookmark.scope.chapterIndex,
+        bookmark.scope.ranges,
+      );
+      return;
+    }
+
     const normalized = normalizeRangePoints(bookmark.scope.start, bookmark.scope.end);
     const isSameChapter =
       normalized.start.bookIndex === normalized.end.bookIndex &&
@@ -1281,6 +1372,7 @@ export function KJVReader() {
     verseEnd = verseStart,
   ) => {
     clearAllVerseHighlights();
+    setSelectedHighlightScope(null);
     const nextTabId = createId();
     const nextLeaf = createLeaf(bookIndex, chapterIndex, "reader");
     setTabs((currentTabs) => [
@@ -1305,7 +1397,58 @@ export function KJVReader() {
         inline: tabsOrientation === "vertical" ? "nearest" : "end",
       });
     });
-  }, [clearAllVerseHighlights, queueVerseHighlight, tabsOrientation]);
+  }, [
+    clearAllVerseHighlights,
+    queueVerseHighlight,
+    setSelectedHighlightScope,
+    tabsOrientation,
+  ]);
+
+  const openChapterHighlightsInNewTab = useCallback((
+    bookIndex: number,
+    chapterIndex: number,
+    ranges: Array<{ start: number; end: number }>,
+  ) => {
+    clearAllVerseHighlights();
+    setSelectedHighlightScope(null);
+    const nextTabId = createId();
+    const nextLeaf = createLeaf(bookIndex, chapterIndex, "reader");
+    setTabs((currentTabs) => [
+      ...currentTabs,
+      {
+        id: nextTabId,
+        title: `Tab ${currentTabs.length + 1}`,
+        root: {
+          ...nextLeaf,
+          pickerTestament: null,
+          pickerBookIndex: null,
+        },
+      },
+    ]);
+    queueVerseHighlights(nextLeaf.id, ranges);
+    setActiveTabId(nextTabId);
+    setIsProgressOpen(false);
+    requestAnimationFrame(() => {
+      tabEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: tabsOrientation === "vertical" ? "end" : "nearest",
+        inline: tabsOrientation === "vertical" ? "nearest" : "end",
+      });
+    });
+  }, [
+    clearAllVerseHighlights,
+    queueVerseHighlights,
+    setSelectedHighlightScope,
+    tabsOrientation,
+  ]);
+
+  const handleClearLeafHighlights = useCallback(
+    (leafId: string) => {
+      clearLeafHighlights(leafId);
+      setSelectedHighlightScope(null);
+    },
+    [clearLeafHighlights, setSelectedHighlightScope],
+  );
 
   function setAllBookChaptersRead(bookIndex: number, isRead: boolean) {
     const book = books[bookIndex];
@@ -1432,102 +1575,135 @@ export function KJVReader() {
       chapterIndex: number,
       verseNumber: number,
     ) => {
-      if (!bookmarkModeEnabled) {
+      const highlightModeEnabled = Boolean(highlightModeEnabledByLeafId[leafId]);
+      if (!highlightModeEnabled) {
         openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
         return;
       }
 
-      const point: BookmarkPoint = { bookIndex, chapterIndex, verseNumber };
-      setNotesContext(point);
+      setNotesContext({ bookIndex, chapterIndex, verseNumber });
+      const existingRanges = highlightedVerseRangesByLeafId[leafId] ?? [];
+      const selectedVerses = new Set<number>();
+      for (const range of existingRanges) {
+        for (let current = range.start; current <= range.end; current += 1) {
+          selectedVerses.add(current);
+        }
+      }
 
-      if (!pendingBookmarkRangeStart) {
-        clearAllVerseHighlights();
-        queueVerseHighlight(leafId, { start: verseNumber, end: verseNumber });
-        setPendingBookmarkRangeStart(point);
-        setPendingBookmarkRangeStartLeafId(leafId);
-        setIsRightSidebarOpen(true);
-        setSidebarOpenRequestKey((current) => current + 1);
+      const nextSelectedVerses = new Set(selectedVerses);
+      if (nextSelectedVerses.has(verseNumber)) {
+        nextSelectedVerses.delete(verseNumber);
+      } else {
+        nextSelectedVerses.add(verseNumber);
+      }
+
+      const nextRanges = Array.from(nextSelectedVerses)
+        .sort((left, right) => left - right)
+        .reduce<Array<{ start: number; end: number }>>((ranges, current) => {
+          const previous = ranges[ranges.length - 1];
+          if (!previous || current > previous.end + 1) {
+            ranges.push({ start: current, end: current });
+          } else {
+            previous.end = current;
+          }
+          return ranges;
+        }, []);
+
+      setLeafHighlights(leafId, nextRanges);
+
+      if (nextRanges.length === 1) {
+        const onlyRange = nextRanges[0];
+        if (onlyRange.start === onlyRange.end) {
+          setSelectedHighlightScope({
+            type: "verse",
+            bookIndex,
+            chapterIndex,
+            verseNumber: onlyRange.start,
+          });
+        } else {
+          setSelectedHighlightScope({
+            type: "range",
+            start: {
+              bookIndex,
+              chapterIndex,
+              verseNumber: onlyRange.start,
+            },
+            end: {
+              bookIndex,
+              chapterIndex,
+              verseNumber: onlyRange.end,
+            },
+          });
+        }
+      } else {
+        setSelectedHighlightScope(null);
+      }
+    },
+    [
+      highlightedVerseRangesByLeafId,
+      highlightModeEnabledByLeafId,
+      openCrossReferencesForVerse,
+      setLeafHighlights,
+      setSelectedHighlightScope,
+    ],
+  );
+
+  const bookmarkLeafSelection = useCallback(
+    (leafId: string) => {
+      let matchedLeaf: LeafNode | null = null;
+      for (const tab of tabs) {
+        const leaf = findLeafNode(tab.root, leafId);
+        if (leaf?.view === "reader") {
+          matchedLeaf = leaf;
+          break;
+        }
+      }
+
+      if (!matchedLeaf) {
         return;
       }
 
-      const normalized = normalizeRangePoints(pendingBookmarkRangeStart, point);
-      clearAllVerseHighlights();
-
-      if (
-        normalized.start.bookIndex === normalized.end.bookIndex &&
-        normalized.start.chapterIndex === normalized.end.chapterIndex
-      ) {
-        queueVerseHighlight(leafId, {
-          start: normalized.start.verseNumber,
-          end: normalized.end.verseNumber,
-        });
-      } else {
-        if (
-          pendingBookmarkRangeStartLeafId &&
-          normalized.start.bookIndex === pendingBookmarkRangeStart.bookIndex &&
-          normalized.start.chapterIndex === pendingBookmarkRangeStart.chapterIndex
-        ) {
-          const startChapterVerseCount =
-            books[normalized.start.bookIndex]?.chapters[
-              normalized.start.chapterIndex
-            ]?.verses.length ?? normalized.start.verseNumber;
-          queueVerseHighlight(pendingBookmarkRangeStartLeafId, {
-            start: normalized.start.verseNumber,
-            end: startChapterVerseCount,
-          });
-        }
-
-        if (
-          normalized.end.bookIndex === bookIndex &&
-          normalized.end.chapterIndex === chapterIndex
-        ) {
-          queueVerseHighlight(leafId, {
-            start:
-              normalized.start.bookIndex === bookIndex &&
-              normalized.start.chapterIndex === chapterIndex
-                ? normalized.start.verseNumber
-                : 1,
-            end: normalized.end.verseNumber,
-          });
-        }
+      const ranges = highlightedVerseRangesByLeafId[leafId] ?? [];
+      if (ranges.length === 0) {
+        createChapterBookmark(matchedLeaf.bookIndex, matchedLeaf.chapterIndex);
+        return;
       }
 
-      const isSingleVerse =
-        normalized.start.bookIndex === normalized.end.bookIndex &&
-        normalized.start.chapterIndex === normalized.end.chapterIndex &&
-        normalized.start.verseNumber === normalized.end.verseNumber;
-
-      if (isSingleVerse) {
-        upsertBookmark({
-          type: "verse",
-          bookIndex: normalized.start.bookIndex,
-          chapterIndex: normalized.start.chapterIndex,
-          verseNumber: normalized.start.verseNumber,
-        });
-      } else {
+      if (ranges.length === 1) {
+        const [range] = ranges;
+        if (range.start === range.end) {
+          upsertBookmark({
+            type: "verse",
+            bookIndex: matchedLeaf.bookIndex,
+            chapterIndex: matchedLeaf.chapterIndex,
+            verseNumber: range.start,
+          });
+          return;
+        }
         upsertBookmark({
           type: "range",
-          start: normalized.start,
-          end: normalized.end,
+          start: {
+            bookIndex: matchedLeaf.bookIndex,
+            chapterIndex: matchedLeaf.chapterIndex,
+            verseNumber: range.start,
+          },
+          end: {
+            bookIndex: matchedLeaf.bookIndex,
+            chapterIndex: matchedLeaf.chapterIndex,
+            verseNumber: range.end,
+          },
         });
+        return;
       }
 
-      setPendingBookmarkRangeStart(null);
-      setPendingBookmarkRangeStartLeafId(null);
-      setIsRightSidebarOpen(true);
-      setSidebarOpenRequestKey((current) => current + 1);
+      upsertBookmark({
+        type: "selection",
+        bookIndex: matchedLeaf.bookIndex,
+        chapterIndex: matchedLeaf.chapterIndex,
+        ranges,
+      });
     },
-    [
-      bookmarkModeEnabled,
-      books,
-      clearAllVerseHighlights,
-      openCrossReferencesForVerse,
-      pendingBookmarkRangeStart,
-      pendingBookmarkRangeStartLeafId,
-      queueVerseHighlight,
-      setPendingBookmarkRangeStartLeafId,
-      upsertBookmark,
-    ],
+    [createChapterBookmark, highlightedVerseRangesByLeafId, tabs, upsertBookmark],
   );
 
   const closeRightSidebarForMobile = useCallback(() => {
@@ -1996,26 +2172,6 @@ export function KJVReader() {
     }
   }
 
-  const currentReaderChapterForBookmarks = useMemo(() => {
-    if (!activeTab) {
-      return null;
-    }
-    const readerLeafId = collectLeafIds(activeTab.root).find((leafId) => {
-      const leaf = findLeafNode(activeTab.root, leafId);
-      return leaf?.view === "reader";
-    });
-    if (!readerLeafId) {
-      return null;
-    }
-    const leaf = findLeafNode(activeTab.root, readerLeafId);
-    if (!leaf) {
-      return null;
-    }
-    return {
-      bookIndex: leaf.bookIndex,
-      chapterIndex: leaf.chapterIndex,
-    };
-  }, [activeTab]);
   const highlightTextColor = useMemo(
     () => readableHighlightTextColor(highlightColor),
     [highlightColor],
@@ -2115,8 +2271,10 @@ export function KJVReader() {
         <SidebarInset className="flex h-screen min-h-0 flex-col overflow-hidden">
           <ReaderTopBar
             isStudyMode={isStudyMode}
+            isShareCopied={isShareCopied}
             onStudyModeChange={setIsStudyMode}
             onOpenSearch={openSearchTab}
+            onShareLayout={shareLayout}
             onOpenProgress={() => setIsProgressOpen(true)}
             onOpenSettings={() => setIsSettingsOpen(true)}
             onOpenPage={openStaticPageTab}
@@ -2183,10 +2341,11 @@ export function KJVReader() {
                 moveLeafChapter={moveLeafChapter}
                 toggleChapterRead={toggleChapterRead}
                 updateSplitSize={updateSplitSize}
-                bookmarkModeEnabled={bookmarkModeEnabled}
-                pendingBookmarkRangeStart={pendingBookmarkRangeStart}
+                highlightModeEnabledByLeafId={highlightModeEnabledByLeafId}
                 highlightedVerseRangesByLeafId={highlightedVerseRangesByLeafId}
-                onClearLeafHighlights={clearLeafHighlights}
+                onClearLeafHighlights={handleClearLeafHighlights}
+                onToggleHighlightMode={toggleHighlightModeForLeaf}
+                onBookmarkLeafSelection={bookmarkLeafSelection}
               />
             }
           />
@@ -2312,11 +2471,6 @@ export function KJVReader() {
             bookmarksProps={{
               books,
               bookmarks: readerBookmarks,
-              bookmarkModeEnabled,
-              pendingRangeStart: pendingBookmarkRangeStart,
-              currentChapter: currentReaderChapterForBookmarks,
-              onToggleBookmarkMode: toggleBookmarkMode,
-              onCreateChapterBookmark: createChapterBookmark,
               onOpenBookmark: openBookmarkInNewTab,
               onUpdateBookmark: updateBookmark,
               onDeleteBookmark: deleteBookmark,

@@ -1,4 +1,9 @@
-export type BookmarkType = "chapter" | "verse" | "range";
+export type BookmarkRange = {
+  start: number;
+  end: number;
+};
+
+export type BookmarkType = "chapter" | "verse" | "range" | "selection";
 
 export type BookmarkPoint = {
   bookIndex: number;
@@ -22,6 +27,12 @@ export type BookmarkScope =
       type: "range";
       start: BookmarkPoint;
       end: BookmarkPoint;
+    }
+  | {
+      type: "selection";
+      bookIndex: number;
+      chapterIndex: number;
+      ranges: BookmarkRange[];
     };
 
 export type ReaderBookmark = {
@@ -33,4 +44,3 @@ export type ReaderBookmark = {
   createdAt: number;
   updatedAt: number;
 };
-

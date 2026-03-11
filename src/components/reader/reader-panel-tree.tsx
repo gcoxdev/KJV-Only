@@ -14,6 +14,7 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpIcon,
+  BookMarkedIcon,
   BookOpenCheckIcon,
   BookOpenIcon,
   ChevronLeftIcon,
@@ -87,7 +88,6 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import type { LeafNeighbors } from "@/lib/reader-neighbors";
 import type { NotesContext, NotesTabState, ReaderNote } from "@/types/notes";
-import type { BookmarkPoint } from "@/types/bookmarks";
 
 type ExistingTabTarget = {
   id: string;
@@ -199,15 +199,19 @@ type ReaderPanelTreeProps = {
   moveLeafChapter: (leafId: string, step: -1 | 1) => void;
   toggleChapterRead: (bookIndex: number, chapterIndex: number) => void;
   updateSplitSize: (splitId: string, ratio: number) => void;
-  bookmarkModeEnabled: boolean;
-  pendingBookmarkRangeStart: BookmarkPoint | null;
-  highlightedVerseRangesByLeafId: Record<string, { start: number; end: number }>;
+  highlightModeEnabledByLeafId: Record<string, boolean>;
+  highlightedVerseRangesByLeafId: Record<
+    string,
+    Array<{ start: number; end: number }>
+  >;
   searchPageStateByLeafId: Record<string, SearchPageState>;
   onChangeSearchPageState: (
     leafId: string,
     patch: Partial<SearchPageState>,
   ) => void;
   onClearLeafHighlights: (leafId: string) => void;
+  onToggleHighlightMode: (leafId: string) => void;
+  onBookmarkLeafSelection: (leafId: string) => void;
 };
 
 type ReaderLeafPanelProps = Omit<ReaderPanelTreeProps, "root"> & {
@@ -279,10 +283,11 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   onDeleteNote,
   moveLeafChapter,
   toggleChapterRead,
-  bookmarkModeEnabled,
-  pendingBookmarkRangeStart,
+  highlightModeEnabledByLeafId,
   highlightedVerseRangesByLeafId,
   onClearLeafHighlights,
+  onToggleHighlightMode,
+  onBookmarkLeafSelection,
 }: ReaderLeafPanelProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -384,14 +389,10 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
     ? `/audio/${bookCodeForIndex(leaf.bookIndex)}.${chapter.chapter}.mp3`
     : null;
   const effectiveVolume = audioMuted ? 0 : audioVolume;
-  const pendingRangeStartVerseNumber =
-    pendingBookmarkRangeStart &&
-    pendingBookmarkRangeStart.bookIndex === leaf.bookIndex &&
-    pendingBookmarkRangeStart.chapterIndex === leaf.chapterIndex
-      ? pendingBookmarkRangeStart.verseNumber
-      : null;
   const isFullscreenLeaf = fullscreenLeafId === leaf.id;
-  const hasHighlightInLeaf = Boolean(highlightedVerseRangesByLeafId[leaf.id]);
+  const hasHighlightInLeaf =
+    (highlightedVerseRangesByLeafId[leaf.id]?.length ?? 0) > 0;
+  const highlightModeEnabled = Boolean(highlightModeEnabledByLeafId[leaf.id]);
 
   const closePanelMenu = () => {
     setPanelMenuOpenLeafId(null);
@@ -492,6 +493,30 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   >
                     <XIcon />
                     Clear Highlights
+                  </DropdownMenuItem>
+                ) : null}
+                {leaf.view === "reader" ? (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      onToggleHighlightMode(leaf.id);
+                      closePanelMenu();
+                    }}
+                  >
+                    <BookOpenIcon />
+                    {highlightModeEnabled
+                      ? "Turn Highlight Mode Off"
+                      : "Turn Highlight Mode On"}
+                  </DropdownMenuItem>
+                ) : null}
+                {leaf.view === "reader" ? (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      onBookmarkLeafSelection(leaf.id);
+                      closePanelMenu();
+                    }}
+                  >
+                    <BookMarkedIcon />
+                    {hasHighlightInLeaf ? "Bookmark Highlighted" : "Bookmark Chapter"}
                   </DropdownMenuItem>
                 ) : null}
                 {!isFullscreenLeaf ? (
@@ -696,10 +721,9 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   readModeParagraphIndent={readModeParagraphIndent}
                   showVerseNumbers={showVerseNumbers}
                   isStudyMode={isStudyMode}
-                  enableVerseSelection={isStudyMode || bookmarkModeEnabled}
-                  bookmarkModeEnabled={bookmarkModeEnabled}
-                  pendingRangeStartVerseNumber={pendingRangeStartVerseNumber}
-                  highlightedVerseRange={
+                  enableVerseSelection={isStudyMode || highlightModeEnabled}
+                  highlightModeEnabled={highlightModeEnabled}
+                  highlightedVerseRanges={
                     highlightedVerseRangesByLeafId[leaf.id] ?? null
                   }
                   fontSize={fontSize}
@@ -1140,10 +1164,11 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   moveLeafChapter,
   toggleChapterRead,
   updateSplitSize,
-  bookmarkModeEnabled,
-  pendingBookmarkRangeStart,
+  highlightModeEnabledByLeafId,
   highlightedVerseRangesByLeafId,
   onClearLeafHighlights,
+  onToggleHighlightMode,
+  onBookmarkLeafSelection,
 }: ReaderPanelTreeProps) {
   const renderLeaf = (leaf: LeafNode) => (
     <ReaderLeafPanel
@@ -1204,10 +1229,11 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       moveLeafChapter={moveLeafChapter}
       toggleChapterRead={toggleChapterRead}
       updateSplitSize={updateSplitSize}
-      bookmarkModeEnabled={bookmarkModeEnabled}
-      pendingBookmarkRangeStart={pendingBookmarkRangeStart}
+      highlightModeEnabledByLeafId={highlightModeEnabledByLeafId}
       highlightedVerseRangesByLeafId={highlightedVerseRangesByLeafId}
       onClearLeafHighlights={onClearLeafHighlights}
+      onToggleHighlightMode={onToggleHighlightMode}
+      onBookmarkLeafSelection={onBookmarkLeafSelection}
     />
   );
 
