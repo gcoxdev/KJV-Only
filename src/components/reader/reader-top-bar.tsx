@@ -45,7 +45,7 @@ export function ReaderTopBar({
   onOpenPage,
 }: ReaderTopBarProps) {
   return (
-    <header className="z-20 flex h-10 shrink-0 items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-6">
+    <header className="z-20 flex h-10 shrink-0 items-center justify-between border-b bg-background/95 px-2 backdrop-blur">
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger
