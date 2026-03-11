@@ -1,4 +1,5 @@
 import { Fragment, type ReactNode } from "react";
+import { NetworkIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +15,7 @@ type GenealogyPersonDetailsProps = {
   person: GenealogyPerson;
   genealogyById: Map<string, GenealogyPerson>;
   onSelectPerson: (personId: string) => void;
+  onOpenTree: (personId: string) => void;
   renderReferencePreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
   onCloseSidebar: () => void;
@@ -23,6 +25,7 @@ export function GenealogyPersonDetails({
   person,
   genealogyById,
   onSelectPerson,
+  onOpenTree,
   renderReferencePreview,
   onOpenReference,
   onCloseSidebar,
@@ -41,16 +44,28 @@ export function GenealogyPersonDetails({
 
   return (
     <div className="space-y-2 rounded-md border p-2 text-sm">
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="font-semibold">{primaryName}</span>
-        {person.names.length > 1 ? (
-          <span className="text-muted-foreground">
-            ({person.names.slice(1).join(", ")})
-          </span>
-        ) : null}
-        {person.gender ? (
-          <span className="text-xs text-muted-foreground">{person.gender}</span>
-        ) : null}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="font-semibold">{primaryName}</span>
+          {person.names.length > 1 ? (
+            <span className="text-muted-foreground">
+              ({person.names.slice(1).join(", ")})
+            </span>
+          ) : null}
+          {person.gender ? (
+            <span className="text-xs text-muted-foreground">{person.gender}</span>
+          ) : null}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="shrink-0"
+          onClick={() => onOpenTree(person.id)}
+        >
+          <NetworkIcon data-icon="inline-start" />
+          View Tree
+        </Button>
       </div>
       {byName.length > 0 ? (
         <div className="space-y-1">
@@ -128,20 +143,6 @@ export function GenealogyPersonDetails({
                 >
                   {relation.name || relation.id}
                 </Button>
-                {relation.verse ? (
-                  <>
-                    {" "}
-                    (
-                    <ConcordanceReferencePopover
-                      reference={relation.verse}
-                      highlightWord={relation.name || primaryName}
-                      renderPreview={renderReferencePreview}
-                      onOpenReference={onOpenReference}
-                      onCloseSidebar={onCloseSidebar}
-                    />
-                    )
-                  </>
-                ) : null}
                 {index < spouses.length - 1 ? ", " : null}
               </Fragment>
             ))}
@@ -160,20 +161,6 @@ export function GenealogyPersonDetails({
                 >
                   {relation.name || relation.id}
                 </Button>
-                {relation.verse ? (
-                  <>
-                    {" "}
-                    (
-                    <ConcordanceReferencePopover
-                      reference={relation.verse}
-                      highlightWord={relation.name || primaryName}
-                      renderPreview={renderReferencePreview}
-                      onOpenReference={onOpenReference}
-                      onCloseSidebar={onCloseSidebar}
-                    />
-                    )
-                  </>
-                ) : null}
                 {index < siblings.length - 1 ? ", " : null}
               </Fragment>
             ))}
@@ -192,20 +179,6 @@ export function GenealogyPersonDetails({
                 >
                   {relation.name || relation.id}
                 </Button>
-                {relation.verse ? (
-                  <>
-                    {" "}
-                    (
-                    <ConcordanceReferencePopover
-                      reference={relation.verse}
-                      highlightWord={relation.name || primaryName}
-                      renderPreview={renderReferencePreview}
-                      onOpenReference={onOpenReference}
-                      onCloseSidebar={onCloseSidebar}
-                    />
-                    )
-                  </>
-                ) : null}
                 {index < children.length - 1 ? ", " : null}
               </Fragment>
             ))}
