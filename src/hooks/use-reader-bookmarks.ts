@@ -4,7 +4,6 @@ import { bookmarkCanonicalKey, bookmarkScopeLabel, normalizeRangePoints } from "
 import { createId } from "@/lib/reader-layout";
 import type { Book } from "@/types/bible";
 import type {
-  BookmarkPoint,
   BookmarkScope,
   ReaderBookmark,
 } from "@/types/bookmarks";
@@ -15,11 +14,10 @@ type UseReaderBookmarksArgs = {
 
 export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
   const [readerBookmarks, setReaderBookmarks] = useState<ReaderBookmark[]>([]);
-  const [bookmarkModeEnabled, setBookmarkModeEnabled] = useState(false);
-  const [pendingBookmarkRangeStart, setPendingBookmarkRangeStart] =
-    useState<BookmarkPoint | null>(null);
-  const [pendingBookmarkRangeStartLeafId, setPendingBookmarkRangeStartLeafId] =
-    useState<string | null>(null);
+  const [highlightModeEnabledByLeafId, setHighlightModeEnabledByLeafId] =
+    useState<Record<string, boolean>>({});
+  const [selectedHighlightScope, setSelectedHighlightScope] =
+    useState<BookmarkScope | null>(null);
 
   useEffect(() => {
     try {
@@ -141,12 +139,15 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
     );
   }, []);
 
-  const toggleBookmarkMode = useCallback(() => {
-    setBookmarkModeEnabled((current) => {
-      const next = !current;
-      if (!next) {
-        setPendingBookmarkRangeStart(null);
-        setPendingBookmarkRangeStartLeafId(null);
+  const toggleHighlightModeForLeaf = useCallback((leafId: string) => {
+    setHighlightModeEnabledByLeafId((current) => {
+      const nextValue = !current[leafId];
+      const next = {
+        ...current,
+        [leafId]: nextValue,
+      };
+      if (!nextValue) {
+        delete next[leafId];
       }
       return next;
     });
@@ -165,15 +166,13 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
 
   return {
     readerBookmarks,
-    bookmarkModeEnabled,
-    pendingBookmarkRangeStart,
-    pendingBookmarkRangeStartLeafId,
-    setPendingBookmarkRangeStart,
-    setPendingBookmarkRangeStartLeafId,
+    highlightModeEnabledByLeafId,
+    selectedHighlightScope,
+    setSelectedHighlightScope,
     upsertBookmark,
     updateBookmark,
     deleteBookmark,
-    toggleBookmarkMode,
+    toggleHighlightModeForLeaf,
     createChapterBookmark,
   };
 }

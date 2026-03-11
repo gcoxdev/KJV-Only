@@ -1,4 +1,11 @@
-import { ChartBarIcon, MenuIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import {
+  ChartBarIcon,
+  CheckIcon,
+  MenuIcon,
+  SearchIcon,
+  SettingsIcon,
+  Share2Icon,
+} from "lucide-react";
 import { STATIC_PAGES } from "@/lib/static-pages";
 import type { StaticPageId } from "@/types/reader";
 
@@ -18,8 +25,10 @@ import { Switch } from "@/components/ui/switch";
 
 type ReaderTopBarProps = {
   isStudyMode: boolean;
+  isShareCopied: boolean;
   onStudyModeChange: (checked: boolean) => void;
   onOpenSearch: () => void;
+  onShareLayout: () => void;
   onOpenProgress: () => void;
   onOpenSettings: () => void;
   onOpenPage: (pageId: StaticPageId) => void;
@@ -27,8 +36,10 @@ type ReaderTopBarProps = {
 
 export function ReaderTopBar({
   isStudyMode,
+  isShareCopied,
   onStudyModeChange,
   onOpenSearch,
+  onShareLayout,
   onOpenProgress,
   onOpenSettings,
   onOpenPage,
@@ -86,6 +97,16 @@ export function ReaderTopBar({
           onClick={onOpenSearch}
         >
           <SearchIcon />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label="Share layout"
+          onClick={onShareLayout}
+          title={isShareCopied ? "Layout link copied" : "Share layout"}
+        >
+          {isShareCopied ? <CheckIcon /> : <Share2Icon />}
         </Button>
         <div className="flex items-center gap-2">
           <Label htmlFor="study-mode" className="text-sm">

@@ -83,9 +83,8 @@ type ChapterTextContentProps = {
   showVerseNumbers: boolean;
   isStudyMode: boolean;
   enableVerseSelection: boolean;
-  bookmarkModeEnabled: boolean;
-  pendingRangeStartVerseNumber: number | null;
-  highlightedVerseRange?: { start: number; end: number } | null;
+  highlightModeEnabled: boolean;
+  highlightedVerseRanges?: Array<{ start: number; end: number }> | null;
   fontSize: number;
   verseSpacing: number;
   onOpenTokenDetails: (element: HTMLElement, token: VerseToken) => void;
@@ -102,9 +101,8 @@ export const ChapterTextContent = memo(
     showVerseNumbers,
     isStudyMode,
     enableVerseSelection,
-    bookmarkModeEnabled,
-    pendingRangeStartVerseNumber,
-    highlightedVerseRange,
+    highlightModeEnabled,
+    highlightedVerseRanges,
     fontSize,
     verseSpacing,
     onOpenTokenDetails,
@@ -132,16 +130,19 @@ export const ChapterTextContent = memo(
       return grouped;
     }, [verses]);
 
+    const normalizedHighlightedVerseRanges = highlightedVerseRanges ?? [];
     const isVerseHighlighted = useMemo(
       () =>
-        highlightedVerseRange
+        normalizedHighlightedVerseRanges.length > 0
           ? (verseNumber: number) =>
-              verseNumber >= highlightedVerseRange.start &&
-              verseNumber <= highlightedVerseRange.end
+              normalizedHighlightedVerseRanges.some(
+                (range) =>
+                  verseNumber >= range.start && verseNumber <= range.end,
+              )
           : () => false,
-      [highlightedVerseRange],
+      [normalizedHighlightedVerseRanges],
     );
-    const hasAnyHighlightedVerse = Boolean(highlightedVerseRange);
+    const hasAnyHighlightedVerse = normalizedHighlightedVerseRanges.length > 0;
 
     return (
       <div
@@ -200,13 +201,13 @@ export const ChapterTextContent = memo(
                             data-verse-number={verse.verse}
                             className={cn(
                               hasAnyHighlightedVerse &&
-                                !bookmarkModeEnabled &&
+                                !highlightModeEnabled &&
                                 "pl-1",
                               verse.redLetter && "text-red-700",
                               highlighted && "verse-reference-highlight",
                             )}
                           >
-                            {bookmarkModeEnabled ? (
+                            {highlightModeEnabled ? (
                               <span
                                 className="mr-1 inline-flex items-center pl-1 align-top"
                                 style={{ height: `${lineHeight}px` }}
@@ -215,17 +216,17 @@ export const ChapterTextContent = memo(
                                 }}
                               >
                                 <Checkbox
-                                  checked={
-                                    pendingRangeStartVerseNumber === verse.verse
-                                  }
-                                  aria-label={`Select verse ${verse.verse} for bookmark`}
+                                  checked={highlighted}
+                                  aria-label={`Select verse ${verse.verse} for highlight`}
                                   className={cn(
                                     highlighted &&
                                       "border-[var(--verse-highlight-fg)] text-[var(--verse-highlight-fg)] data-checked:border-[var(--verse-highlight-fg)] data-checked:bg-[var(--verse-highlight-fg)] data-checked:text-[var(--verse-highlight-bg)]",
                                   )}
-                                  onCheckedChange={() => {
+                                  onClick={(event) => {
+                                    event.stopPropagation();
                                     onSelectVerse(verse.verse);
                                   }}
+                                  onCheckedChange={() => {}}
                                 />
                               </span>
                             ) : null}
@@ -267,24 +268,24 @@ export const ChapterTextContent = memo(
                     data-verse-number={verse.verse}
                     className={cn(
                       "[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]",
-                      hasAnyHighlightedVerse && !bookmarkModeEnabled && "pl-1",
+                      hasAnyHighlightedVerse && !highlightModeEnabled && "pl-1",
                       highlighted && "verse-reference-highlight",
                     )}
                     onClick={() => {
-                      if (enableVerseSelection) {
+                      if (enableVerseSelection && !highlightModeEnabled) {
                         onSelectVerse(verse.verse);
                       }
                     }}
                   >
                     <p
                       className={cn(
-                        (showVerseNumbers || bookmarkModeEnabled) &&
+                        (showVerseNumbers || highlightModeEnabled) &&
                           "grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2",
                       )}
                       style={{ lineHeight: `${lineHeight}px` }}
                     >
                       <span className="inline-flex items-center gap-1">
-                        {bookmarkModeEnabled ? (
+                        {highlightModeEnabled ? (
                           <span
                             className="inline-flex items-center pl-1 align-top"
                             style={{ height: `${lineHeight}px` }}
@@ -293,15 +294,17 @@ export const ChapterTextContent = memo(
                             }}
                           >
                             <Checkbox
-                              checked={pendingRangeStartVerseNumber === verse.verse}
-                              aria-label={`Select verse ${verse.verse} for bookmark`}
+                              checked={highlighted}
+                              aria-label={`Select verse ${verse.verse} for highlight`}
                               className={cn(
                                 highlighted &&
                                   "border-[var(--verse-highlight-fg)] text-[var(--verse-highlight-fg)] data-checked:border-[var(--verse-highlight-fg)] data-checked:bg-[var(--verse-highlight-fg)] data-checked:text-[var(--verse-highlight-bg)]",
                               )}
-                              onCheckedChange={() => {
+                              onClick={(event) => {
+                                event.stopPropagation();
                                 onSelectVerse(verse.verse);
                               }}
+                              onCheckedChange={() => {}}
                             />
                           </span>
                         ) : null}
@@ -355,10 +358,13 @@ export const ChapterTextContent = memo(
     prev.showVerseNumbers === next.showVerseNumbers &&
     prev.isStudyMode === next.isStudyMode &&
     prev.enableVerseSelection === next.enableVerseSelection &&
-    prev.bookmarkModeEnabled === next.bookmarkModeEnabled &&
-    prev.pendingRangeStartVerseNumber === next.pendingRangeStartVerseNumber &&
-    prev.highlightedVerseRange?.start === next.highlightedVerseRange?.start &&
-    prev.highlightedVerseRange?.end === next.highlightedVerseRange?.end &&
+    prev.highlightModeEnabled === next.highlightModeEnabled &&
+    (prev.highlightedVerseRanges?.length ?? 0) ===
+      (next.highlightedVerseRanges?.length ?? 0) &&
+    (prev.highlightedVerseRanges ?? []).every((range, index) => {
+      const other = next.highlightedVerseRanges?.[index];
+      return other?.start === range.start && other.end === range.end;
+    }) &&
     prev.fontSize === next.fontSize &&
     prev.verseSpacing === next.verseSpacing,
 );
