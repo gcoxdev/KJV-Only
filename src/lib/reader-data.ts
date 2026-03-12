@@ -29,7 +29,7 @@ let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
 let ancientMapPromise: Promise<AncientMapPayload> | null = null;
 const mapGeoJsonPromiseCache = new Map<string, Promise<MapGeoJsonPayload>>();
-const GENEALOGY_ASSET_VERSION = "20260311-ref-order-2";
+const GENEALOGY_ASSET_VERSION = "20260312-philip-fix-1";
 
 function parseBooks(input: unknown): Book[] | null {
   if (Array.isArray(input)) {

@@ -80,6 +80,7 @@ import type {
   SearchPageState,
   SplitOrientation,
   StrongsPayload,
+  StudyWorkspaceTool,
   TabsOrientation,
   TokenPopupState,
   WebstersEntry,
@@ -108,6 +109,8 @@ import {
   STUDY_ACCORDION_ITEMS,
   deriveStudySidebarState,
 } from "@/hooks/use-study-sidebar-state";
+import { useReaderShellState } from "@/hooks/use-reader-shell-state";
+import { useStudyWorkspaceState } from "@/hooks/use-study-workspace-state";
 import { TabsStrip } from "@/components/reader/tabs-strip";
 import { TokenPopupCard } from "@/components/reader/token-popup-card";
 import { ReaderTopBar } from "@/components/reader/reader-top-bar";
@@ -156,7 +159,6 @@ export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [isStudyMode, setIsStudyMode] = useState(true);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [fontSize, setFontSize] = useState(16);
   const [highlightColor, setHighlightColor] = useState(defaultHighlightColor);
@@ -165,16 +167,23 @@ export function KJVReader() {
     useState(false);
   const [readModeParagraphIndent, setReadModeParagraphIndent] = useState(false);
   const [flowVersesByParagraph, setFlowVersesByParagraph] = useState(false);
-  const [tabsOrientation, setTabsOrientation] =
-    useState<TabsOrientation>("horizontal");
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isProgressOpen, setIsProgressOpen] = useState(false);
-  const [isGenealogyTreeOpen, setIsGenealogyTreeOpen] = useState(false);
-  const [genealogyTreePersonId, setGenealogyTreePersonId] = useState<string | null>(
-    null,
-  );
-  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
+  const {
+    isStudyMode,
+    tabsOrientation,
+    isRightSidebarOpen,
+    isSettingsOpen,
+    isProgressOpen,
+    isGenealogyTreeOpen,
+    genealogyTreePersonId,
+    setIsStudyMode,
+    setTabsOrientation,
+    setIsRightSidebarOpen,
+    setIsSettingsOpen,
+    setIsProgressOpen,
+    setIsGenealogyTreeOpen,
+    setGenealogyTreePersonId,
+  } = useReaderShellState();
   const [tabs, setTabs] = useState<ReaderTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [isShareCopied, setIsShareCopied] = useState(false);
@@ -187,9 +196,6 @@ export function KJVReader() {
     string | null
   >(null);
   const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
-  const [concordanceAccordionValue, setConcordanceAccordionValue] = useState<
-    string[]
-  >([]);
   const [concordanceWordAccordionValue, setConcordanceWordAccordionValue] =
     useState<string[]>([]);
   const [webstersWordAccordionValue, setWebstersWordAccordionValue] = useState<
@@ -227,6 +233,15 @@ export function KJVReader() {
   }>({
     root: null,
     neighbors: new Map(),
+  });
+  const {
+    activeTab: studyWorkspaceTab,
+    accordionValue: concordanceAccordionValue,
+    setActiveTab: setStudyWorkspaceTab,
+    showTool: showStudyTool,
+    setAccordionValue: setConcordanceAccordionValue,
+  } = useStudyWorkspaceState({
+    initialAccordionValue: [],
   });
 
   const {
@@ -1536,6 +1551,17 @@ export function KJVReader() {
     clearAllPanelPreviews,
   });
 
+  const openStudyTool = useCallback(
+    (tool: StudyWorkspaceTool, options?: { openSidebar?: boolean }) => {
+      if (options?.openSidebar !== false) {
+        setIsRightSidebarOpen(true);
+        setSidebarOpenRequestKey((current) => current + 1);
+      }
+      showStudyTool(tool);
+    },
+    [setIsRightSidebarOpen, showStudyTool],
+  );
+
   const openCrossReferencesForVerse = useCallback(
     (bookIndex: number, chapterIndex: number, verseNumber: number) => {
       setNotesContext({
@@ -1545,14 +1571,9 @@ export function KJVReader() {
       });
       const key = chapterVerseKey(bookIndex, chapterIndex, verseNumber);
 
-      setIsRightSidebarOpen(true);
-      setSidebarOpenRequestKey((current) => current + 1);
+      openStudyTool("cross-refs");
       setCrossRefsError(null);
       setIsCrossRefsLoading(true);
-      setConcordanceAccordionValue((current) => {
-        const without = current.filter((value) => value !== "cross-refs");
-        return ["cross-refs", ...without];
-      });
 
       const applyCrossRefsSelection = (data: CrossRefsPayload) => {
         setSelectedCrossReferences({
@@ -1580,7 +1601,7 @@ export function KJVReader() {
           setIsCrossRefsLoading(false);
         });
     },
-    [crossRefs, ensureCrossRefsLoaded],
+    [crossRefs, ensureCrossRefsLoaded, openStudyTool],
   );
 
   const handleVerseSelection = useCallback(
@@ -1778,21 +1799,7 @@ export function KJVReader() {
         return;
       }
 
-      setIsRightSidebarOpen(true);
-      setSidebarOpenRequestKey((current) => current + 1);
-      setConcordanceAccordionValue((current) => {
-        const withoutConcordance = current.filter(
-          (value) => value !== "concordance",
-        );
-        if (!withoutConcordance.includes("cross-refs")) {
-          return ["concordance", ...withoutConcordance];
-        }
-        return [
-          "cross-refs",
-          "concordance",
-          ...withoutConcordance.filter((value) => value !== "cross-refs"),
-        ];
-      });
+      openStudyTool("concordance");
       setConcordanceError(null);
       setIsConcordanceLoading(true);
       if (token.strong) {
@@ -1820,17 +1827,9 @@ export function KJVReader() {
         setSelectedWebstersEntry(
           matchedKey ? { key: matchedKey, entry: data[matchedKey] } : null,
         );
-        setConcordanceAccordionValue((current) => {
-          const withoutWebsters = current.filter(
-            (value) => value !== "websters",
-          );
-          if (!matchedKey) {
-            return withoutWebsters;
-          }
-          return withoutWebsters.includes("concordance")
-            ? [...withoutWebsters, "websters"]
-            : ["concordance", ...withoutWebsters, "websters"];
-        });
+        if (matchedKey) {
+          showStudyTool("websters");
+        }
         setIsWebstersLoading(false);
       };
 
@@ -1839,17 +1838,9 @@ export function KJVReader() {
         setSelectedHitchcocksEntry(
           matchedKey ? { key: matchedKey, definition: data[matchedKey] } : null,
         );
-        setConcordanceAccordionValue((current) => {
-          const withoutHitchcocks = current.filter(
-            (value) => value !== "hitchcocks",
-          );
-          if (!matchedKey) {
-            return withoutHitchcocks;
-          }
-          return withoutHitchcocks.includes("concordance")
-            ? [...withoutHitchcocks, "hitchcocks"]
-            : ["concordance", ...withoutHitchcocks, "hitchcocks"];
-        });
+        if (matchedKey) {
+          showStudyTool("hitchcocks");
+        }
         setIsHitchcocksLoading(false);
       };
 
@@ -1860,17 +1851,9 @@ export function KJVReader() {
             ? { key: matchedKey, definitions: data[matchedKey] ?? [] }
             : null,
         );
-        setConcordanceAccordionValue((current) => {
-          const withoutOldEnglish = current.filter(
-            (value) => value !== "old-english",
-          );
-          if (!matchedKey) {
-            return withoutOldEnglish;
-          }
-          return withoutOldEnglish.includes("concordance")
-            ? [...withoutOldEnglish, "old-english"]
-            : ["concordance", ...withoutOldEnglish, "old-english"];
-        });
+        if (matchedKey) {
+          showStudyTool("old-english");
+        }
         setIsOldEnglishLoading(false);
       };
 
@@ -1884,17 +1867,9 @@ export function KJVReader() {
         );
         const matchIds = [...new Set(matches.map((person) => person.id))];
         setSelectedGenealogyIds(matchIds);
-        setConcordanceAccordionValue((current) => {
-          const withoutGenealogy = current.filter(
-            (value) => value !== "genealogy",
-          );
-          if (matchIds.length === 0) {
-            return withoutGenealogy;
-          }
-          return withoutGenealogy.includes("concordance")
-            ? [...withoutGenealogy, "genealogy"]
-            : ["concordance", ...withoutGenealogy, "genealogy"];
-        });
+        if (matchIds.length > 0) {
+          showStudyTool("genealogy");
+        }
         setIsGenealogyLoading(false);
       };
 
@@ -1903,15 +1878,9 @@ export function KJVReader() {
           matchesMapWord(entry, rawWord, normalizeConcordanceWord),
         );
         setSelectedMapsEntries(matches);
-        setConcordanceAccordionValue((current) => {
-          const withoutMaps = current.filter((value) => value !== "maps");
-          if (matches.length === 0) {
-            return withoutMaps;
-          }
-          return withoutMaps.includes("concordance")
-            ? [...withoutMaps, "maps"]
-            : ["concordance", ...withoutMaps, "maps"];
-        });
+        if (matches.length > 0) {
+          showStudyTool("maps");
+        }
         setIsMapsLoading(false);
       };
 
@@ -1925,9 +1894,6 @@ export function KJVReader() {
         setStrongsWordAccordionValue([]);
         if (!normalizedCode) {
           setSelectedStrongsEntry(null);
-          setConcordanceAccordionValue((current) =>
-            current.filter((value) => value !== "strongs"),
-          );
           setIsStrongsLoading(false);
           return;
         }
@@ -1936,9 +1902,6 @@ export function KJVReader() {
         const entry = source[normalizedCode];
         if (!entry) {
           setSelectedStrongsEntry(null);
-          setConcordanceAccordionValue((current) =>
-            current.filter((value) => value !== "strongs"),
-          );
           setIsStrongsLoading(false);
           return;
         }
@@ -1948,12 +1911,7 @@ export function KJVReader() {
           testament: normalizedCode.startsWith("G") ? "greek" : "hebrew",
           entry,
         });
-        setConcordanceAccordionValue((current) => {
-          const without = current.filter((value) => value !== "strongs");
-          return without.includes("concordance")
-            ? [...without, "strongs"]
-            : ["concordance", ...without, "strongs"];
-        });
+        showStudyTool("strongs");
         setIsStrongsLoading(false);
       };
 
@@ -2097,6 +2055,7 @@ export function KJVReader() {
       ensureGenealogyLoaded,
       ensureOldEnglishLoaded,
       openCrossReferencesForVerse,
+      openStudyTool,
       ensureStrongsLoaded,
       ensureWebstersLoaded,
       genealogy,
@@ -2104,6 +2063,7 @@ export function KJVReader() {
       oldEnglish,
       strongsGreek,
       strongsHebrew,
+      showStudyTool,
       websters,
     ],
   );
@@ -2123,13 +2083,8 @@ export function KJVReader() {
     if (isGenealogyTreeOpen) {
       setGenealogyTreePersonId(personId);
     }
-    setConcordanceAccordionValue((current) => {
-      const without = current.filter((value) => value !== "genealogy");
-      return without.includes("concordance")
-        ? [...without, "genealogy"]
-        : ["concordance", ...without, "genealogy"];
-    });
-  }, [isGenealogyTreeOpen]);
+    showStudyTool("genealogy");
+  }, [isGenealogyTreeOpen, showStudyTool]);
 
   const openGenealogyTree = useCallback((personId: string) => {
     if (!personId) {
@@ -2283,7 +2238,7 @@ export function KJVReader() {
   );
   return (
     <main
-      className="h-screen w-full overflow-hidden bg-background"
+      className="reader-shell h-screen w-full overflow-hidden bg-background"
       style={
         {
           "--verse-highlight-bg": highlightColor,
@@ -2392,8 +2347,10 @@ export function KJVReader() {
           <Suspense fallback={null}>
             <LazyReaderStudySidebar
             visible={isStudyMode}
+            activeTab={studyWorkspaceTab}
             accordionValue={concordanceAccordionValue}
             onAccordionValueChange={setConcordanceAccordionValue}
+            onActiveTabChange={setStudyWorkspaceTab}
             onExpandAll={() =>
               setConcordanceAccordionValue([...STUDY_ACCORDION_ITEMS])
             }

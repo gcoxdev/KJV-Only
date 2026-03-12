@@ -23,6 +23,23 @@ type UseReferencePreviewParams = {
   ) => void;
 };
 
+export function formatReferenceCitation(
+  bookName: string,
+  startChapterIndex: number,
+  startVerse: number,
+  endChapterIndex: number,
+  endVerse: number,
+) {
+  const citationVerse =
+    startChapterIndex === endChapterIndex
+      ? startVerse === endVerse
+        ? `${startChapterIndex + 1}:${startVerse}`
+        : `${startChapterIndex + 1}:${startVerse}-${endVerse}`
+      : `${startChapterIndex + 1}:${startVerse}-${endChapterIndex + 1}:${endVerse}`;
+
+  return `${bookName} ${citationVerse}`;
+}
+
 export function useReferencePreview({
   books,
   openChapterReferenceInNewTab,
@@ -132,15 +149,14 @@ export function useReferencePreview({
         }
       }
 
-      const citationVerse =
-        parsed.startChapterIndex === parsed.endChapterIndex
-          ? parsed.startVerse === parsed.endVerse
-            ? `${parsed.startChapterIndex + 1}:${parsed.startVerse}`
-            : `${parsed.startChapterIndex + 1}:${parsed.startVerse}-${parsed.endVerse}`
-          : `${parsed.startChapterIndex + 1}:${parsed.startVerse}-${parsed.endChapterIndex + 1}:${parsed.endVerse}`;
-
       const computed = {
-        citation: `${book.name} ${citationVerse}`,
+        citation: formatReferenceCitation(
+          book.name,
+          parsed.startChapterIndex,
+          parsed.startVerse,
+          parsed.endChapterIndex,
+          parsed.endVerse,
+        ),
         verseLines,
       };
       referencePreviewCacheRef.current.set(reference, computed);
