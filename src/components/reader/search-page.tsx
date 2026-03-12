@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import {
   ChevronDownIcon,
   ChevronRightIcon,
@@ -10,7 +10,8 @@ import {
 import type { Book, Verse } from "@/types/bible";
 import type { SearchMatch, SearchMode, SearchPageState } from "@/types/reader";
 import { formatDisplayTokenText, isPunctuationToken } from "@/components/reader/chapter-text-content";
-import { bookCodeForIndex, iconPath } from "@/lib/reader-view";
+import { bookCodeForIndex, iconPath, renderHighlightedTerms, renderHighlightedText } from "@/lib/reader-view";
+import { buildRegexMatcher, createSearchableVerseEntry, matchSelectedWords } from "@/lib/search";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -49,6 +50,8 @@ type SearchPageProps = {
 
 type VerseIndexEntry = SearchMatch & {
   textLower: string;
+  searchWords: string[];
+  searchWordsLower: string[];
 };
 
 type BookGroup = {
@@ -64,6 +67,7 @@ const SEARCH_MODE_LABELS: Record<SearchMode, string> = {
   "contains-phrase": "Contains phrase",
   regex: "Regular expression",
 };
+const MAX_CONCORDANCE_SUGGESTIONS = 40;
 
 function formatVerseText(verse: Verse) {
   let value = "";
@@ -116,6 +120,37 @@ export function SearchPage({
     results,
     error,
   } = state;
+  const [chipInputDraft, setChipInputDraft] = useState(chipInput);
+  const [phraseInputDraft, setPhraseInputDraft] = useState(phraseInput);
+  const deferredChipInput = useDeferredValue(chipInputDraft);
+
+  useEffect(() => {
+    setChipInputDraft(chipInput);
+  }, [chipInput]);
+
+  useEffect(() => {
+    setPhraseInputDraft(phraseInput);
+  }, [phraseInput]);
+
+  useEffect(() => {
+    if (chipInputDraft === chipInput) {
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      onStateChange({ chipInput: chipInputDraft });
+    }, 180);
+    return () => window.clearTimeout(timeoutId);
+  }, [chipInput, chipInputDraft, onStateChange]);
+
+  useEffect(() => {
+    if (phraseInputDraft === phraseInput) {
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      onStateChange({ phraseInput: phraseInputDraft });
+    }, 180);
+    return () => window.clearTimeout(timeoutId);
+  }, [onStateChange, phraseInput, phraseInputDraft]);
 
   const expandedBookTree = useMemo(
     () => new Set(state.expandedBookTree),
@@ -171,8 +206,7 @@ export function SearchPage({
             chapterIndex,
             verseNumber: verse.verse,
             bookName: book.name,
-            text,
-            textLower: text.toLowerCase(),
+            ...createSearchableVerseEntry(text),
           });
         });
       });
@@ -180,16 +214,41 @@ export function SearchPage({
     return indexed;
   }, [books]);
 
+  const concordanceWordEntries = useMemo(
+    () =>
+      concordanceWords.map((word) => ({
+        word,
+        lower: word.toLowerCase(),
+      })),
+    [concordanceWords],
+  );
+
   const concordanceSuggestions = useMemo(() => {
-    const query = chipInput.trim().toLowerCase();
-    if (!query) {
+    const query = deferredChipInput.trim().toLowerCase();
+    if (query.length < 2) {
       return [] as string[];
     }
     const selected = new Set(selectedWords.map((word) => word.toLowerCase()));
-    return concordanceWords
-      .filter((word) => word.toLowerCase().includes(query))
-      .filter((word) => !selected.has(word.toLowerCase()));
-  }, [chipInput, concordanceWords, selectedWords]);
+    const startsWith: string[] = [];
+    const includes: string[] = [];
+
+    for (const entry of concordanceWordEntries) {
+      if (selected.has(entry.lower)) {
+        continue;
+      }
+      if (entry.lower.startsWith(query)) {
+        startsWith.push(entry.word);
+      } else if (entry.lower.includes(query)) {
+        includes.push(entry.word);
+      }
+
+      if (startsWith.length + includes.length >= MAX_CONCORDANCE_SUGGESTIONS) {
+        break;
+      }
+    }
+
+    return [...startsWith, ...includes].slice(0, MAX_CONCORDANCE_SUGGESTIONS);
+  }, [concordanceWordEntries, deferredChipInput, selectedWords]);
 
   const allBookIndexes = useMemo(
     () => new Set(books.map((_, index) => index)),
@@ -256,6 +315,7 @@ export function SearchPage({
       }
       return [...current, clean];
     })();
+    setChipInputDraft("");
     onStateChange({ selectedWords: next, chipInput: "" });
   };
 
@@ -321,19 +381,19 @@ export function SearchPage({
         return;
       }
       matcher =
-        searchMode === "contains-any"
+        searchMode === "contains-any" || searchMode === "contains-all"
           ? (entry) =>
-              needles.some((needle) =>
-                (caseSensitive ? entry.text : entry.textLower).includes(needle),
+              matchSelectedWords(
+                entry,
+                needles,
+                searchMode,
+                caseSensitive,
               )
-          : (entry) =>
-              needles.every((needle) =>
-                (caseSensitive ? entry.text : entry.textLower).includes(needle),
-              );
+          : null;
     }
 
     if (searchMode === "contains-phrase") {
-      const phrase = phraseInput.trim();
+      const phrase = phraseInputDraft.trim();
       if (!phrase) {
         onStateChange({ error: "Enter a phrase to search.", results: [] });
         return;
@@ -344,18 +404,26 @@ export function SearchPage({
     }
 
     if (searchMode === "regex") {
-      const pattern = phraseInput.trim();
+      const pattern = phraseInputDraft.trim();
       if (!pattern) {
         onStateChange({ error: "Enter a regular expression.", results: [] });
         return;
       }
       try {
-        const regex = new RegExp(pattern, caseSensitive ? "g" : "gi");
+        const { regex, error: regexError } = buildRegexMatcher(
+          pattern,
+          caseSensitive,
+        );
+        if (!regex) {
+          onStateChange({
+            error: regexError,
+            results: [],
+          });
+          return;
+        }
         matcher = (entry) => regex.test(entry.text);
-      } catch (regexError) {
-        const message =
-          regexError instanceof Error ? regexError.message : "Invalid regular expression.";
-        onStateChange({ error: message, results: [] });
+      } catch {
+        onStateChange({ error: "Invalid regular expression.", results: [] });
         return;
       }
     }
@@ -385,6 +453,34 @@ export function SearchPage({
   };
 
   const allBooksSelected = sameSet(selectedBookIndexes, allBookIndexes);
+  const hasSearchOutput = results.length > 0 || Boolean(error);
+
+  const clearResults = () => {
+    onStateChange({
+      results: [],
+      error: null,
+    });
+  };
+
+  const renderResultText = (match: SearchMatch) => {
+    if (searchMode === "contains-any" || searchMode === "contains-all") {
+      return renderHighlightedTerms(
+        match.text,
+        selectedWords,
+        `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
+      );
+    }
+
+    if (searchMode === "contains-phrase") {
+      return renderHighlightedText(
+        match.text,
+        phraseInputDraft.trim(),
+        `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
+      );
+    }
+
+    return match.text;
+  };
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3 p-3">
@@ -453,9 +549,9 @@ export function SearchPage({
             </div>
             <Input
               id="search-chip-input"
-              value={chipInput}
+              value={chipInputDraft}
               onChange={(event) =>
-                onStateChange({ chipInput: event.currentTarget.value })
+                setChipInputDraft(event.currentTarget.value)
               }
               onKeyDown={(event) => {
                 if (event.key !== "Enter") {
@@ -469,10 +565,14 @@ export function SearchPage({
               }}
               placeholder="Type to find concordance words..."
             />
-            {chipInput.trim() ? (
+            {chipInputDraft.trim() ? (
               <div className="mt-2 max-h-40 overflow-y-auto rounded border">
                 <div className="p-1">
-                  {concordanceSuggestions.length > 0 ? (
+                  {chipInputDraft.trim().length < 2 ? (
+                    <p className="px-2 py-1 text-sm text-muted-foreground">
+                      Type at least 2 characters for suggestions.
+                    </p>
+                  ) : concordanceSuggestions.length > 0 ? (
                     concordanceSuggestions.map((word) => (
                       <button
                         key={word}
@@ -500,9 +600,9 @@ export function SearchPage({
           </Label>
           <Input
             id="search-phrase-input"
-            value={phraseInput}
+            value={phraseInputDraft}
             onChange={(event) =>
-              onStateChange({ phraseInput: event.currentTarget.value })
+              setPhraseInputDraft(event.currentTarget.value)
             }
             onKeyDown={(event) => {
               if (event.key === "Enter") {
@@ -523,6 +623,14 @@ export function SearchPage({
         <Button type="button" onClick={search} disabled={isSearching}>
           <SearchIcon />
           Search
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={clearResults}
+          disabled={!hasSearchOutput}
+        >
+          Clear Results
         </Button>
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
       </div>
@@ -558,7 +666,7 @@ export function SearchPage({
                     {`${match.bookName} ${match.chapterIndex + 1}:${match.verseNumber}`}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground group-hover:text-foreground/90">
-                    {match.text}
+                    {renderResultText(match)}
                   </p>
                 </button>
               ))
