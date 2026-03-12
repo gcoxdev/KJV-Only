@@ -27,6 +27,7 @@ export function StudySearchForm({
 }: StudySearchFormProps) {
   return (
     <form
+      className="w-full"
       onSubmit={(event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -34,21 +35,27 @@ export function StudySearchForm({
         onSearch(typeof value === "string" ? value : "");
       }}
     >
-      <InputGroup>
+      <InputGroup className="bg-workspace-panel-elevated">
         <InputGroupInput
           ref={inputRef}
           name={name}
           placeholder={placeholder}
+          className="bg-transparent"
         />
         <InputGroupAddon align="inline-end">
           <InputGroupButton
             type="submit"
             size="icon-sm"
             variant="ghost"
+            className="justify-center"
             aria-label={ariaLabel}
             disabled={loading}
           >
-            {loading ? <LoaderCircleIcon className="animate-spin" /> : <SearchIcon />}
+            {loading ? (
+              <LoaderCircleIcon className="animate-spin" />
+            ) : (
+              <SearchIcon />
+            )}
           </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>

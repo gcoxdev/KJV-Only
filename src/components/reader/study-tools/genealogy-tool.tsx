@@ -42,7 +42,7 @@ export function GenealogyTool({
         <UserSearchIcon />
         Genealogy
       </AccordionTrigger>
-      <AccordionContent className="space-y-2 overflow-visible">
+      <AccordionContent className="flex flex-col gap-3 overflow-visible">
         {isOpen ? (
           <>
             <StudySearchForm
@@ -66,7 +66,7 @@ export function GenealogyTool({
                   : "Click a name in the text or search genealogy."}
               </p>
             ) : searchTerm.trim() && results.length > 1 ? (
-              <Accordion className="w-full rounded-md border px-2" multiple>
+              <Accordion className="w-full rounded-xl border border-subtle-divider/80 px-2" multiple>
                 {results.map((person) => (
                   <AccordionItem
                     key={`${person.id}-${person.names[0] ?? "person"}`}
@@ -78,7 +78,7 @@ export function GenealogyTool({
                 ))}
               </Accordion>
             ) : (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 {results.map((person) => (
                   <Fragment key={person.id}>{renderPersonDetails(person)}</Fragment>
                 ))}

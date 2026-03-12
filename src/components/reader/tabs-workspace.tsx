@@ -21,7 +21,9 @@ export function TabsWorkspace({
   if (tabsOrientation === "horizontal") {
     return (
       <>
-        <div className="shrink-0 border-b">{tabsStrip}</div>
+        <div className="shrink-0 border-b border-subtle-divider/80 bg-workspace-panel/80">
+          {tabsStrip}
+        </div>
         <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
           {readerContent}
         </div>
@@ -38,7 +40,7 @@ export function TabsWorkspace({
           minSize={150}
           maxSize={300}
           collapsible
-          className="min-h-0 min-w-0 border-r"
+          className="min-h-0 min-w-0 border-r border-subtle-divider/80 bg-workspace-panel/70"
         >
           <div className="h-full w-full">{tabsStrip}</div>
         </ResizablePanel>

@@ -11,11 +11,14 @@ import { HitchcocksTool } from "@/components/reader/study-tools/hitchcocks-tool"
 import { NotesTool } from "@/components/reader/study-tools/notes-tool";
 import { BookmarksTool } from "@/components/reader/study-tools/bookmarks-tool";
 import { StudyToolsSidebar } from "@/components/reader/study-tools-sidebar";
+import type { StudyWorkspaceTab } from "@/types/reader";
 
 type ReaderStudySidebarProps = {
   visible: boolean;
+  activeTab: StudyWorkspaceTab;
   accordionValue: string[];
   onAccordionValueChange: (value: string[]) => void;
+  onActiveTabChange: (value: StudyWorkspaceTab) => void;
   onExpandAll: () => void;
   onCollapseAll: () => void;
   canExpand: boolean;
@@ -34,8 +37,10 @@ type ReaderStudySidebarProps = {
 
 export function ReaderStudySidebar({
   visible,
+  activeTab,
   accordionValue,
   onAccordionValueChange,
+  onActiveTabChange,
   onExpandAll,
   onCollapseAll,
   canExpand,
@@ -54,8 +59,10 @@ export function ReaderStudySidebar({
   return (
     <StudyToolsSidebar
       visible={visible}
+      activeTab={activeTab}
       accordionValue={accordionValue}
       onAccordionValueChange={onAccordionValueChange}
+      onActiveTabChange={onActiveTabChange}
       onExpandAll={onExpandAll}
       onCollapseAll={onCollapseAll}
       canExpand={canExpand}
