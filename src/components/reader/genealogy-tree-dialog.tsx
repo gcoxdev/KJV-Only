@@ -94,6 +94,7 @@ function GenealogyNode({
   label,
   title,
   subtitle,
+  aliases = [],
   person,
   onSelectPerson,
   icon,
@@ -105,6 +106,7 @@ function GenealogyNode({
   label?: string;
   title: string;
   subtitle?: string;
+  aliases?: string[];
   person: GenealogyPerson | null;
   onSelectPerson?: (personId: string) => void;
   icon?: ReactNode;
@@ -114,7 +116,6 @@ function GenealogyNode({
   onCloseSidebar: () => void;
 }) {
   const firstReference = person?.verses?.first;
-  const notesPreview = person?.notes?.trim();
   const [detailsOpen, setDetailsOpen] = useState(false);
   const byNameReferences = person?.verses?.byName ?? [];
 
@@ -182,6 +183,15 @@ function GenealogyNode({
         </div>
       </CardHeader>
       <CardContent className="space-y-2 pt-0 text-xs text-muted-foreground">
+        {aliases.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {aliases.map((alias) => (
+              <Badge key={alias} variant="outline">
+                {alias}
+              </Badge>
+            ))}
+          </div>
+        ) : null}
         {detailsOpen ? (
           <div className="space-y-2 rounded-md border bg-muted/30 p-2">
             {subtitle ? <p>{subtitle}</p> : null}
@@ -218,9 +228,6 @@ function GenealogyNode({
                   onCloseSidebar={onCloseSidebar}
                 />
               </div>
-            ) : null}
-            {notesPreview ? (
-              <p className="line-clamp-4">{notesPreview}</p>
             ) : null}
           </div>
         ) : null}
@@ -289,13 +296,13 @@ export function GenealogyTreeDialog({
   const aliases = person?.names.slice(1) ?? [];
   const father = resolveParent(person?.father, genealogyById);
   const mother = resolveParent(person?.mother, genealogyById);
-  const spouses = (person?.spouses ?? []).map((relation) =>
+  const spouses = (Array.isArray(person?.spouses) ? person.spouses : []).map((relation) =>
     resolveRelation(relation, genealogyById),
   );
-  const siblings = (person?.siblings ?? []).map((relation) =>
+  const siblings = (Array.isArray(person?.siblings) ? person.siblings : []).map((relation) =>
     resolveRelation(relation, genealogyById),
   );
-  const children = (person?.children ?? []).map((relation) =>
+  const children = (Array.isArray(person?.children) ? person.children : []).map((relation) =>
     resolveRelation(relation, genealogyById),
   );
 
@@ -386,6 +393,7 @@ export function GenealogyTreeDialog({
                       <GenealogyNode
                         label="Focus"
                         title={primaryName}
+                        aliases={aliases}
                         person={person}
                         icon={<UserIcon className="size-3.5" />}
                         emphasized
@@ -393,13 +401,6 @@ export function GenealogyTreeDialog({
                         onOpenReference={onOpenReference}
                         onCloseSidebar={onCloseSidebar}
                       />
-                      <div className="flex flex-wrap gap-2">
-                        {aliases.map((alias) => (
-                          <Badge key={alias} variant="outline">
-                            {alias}
-                          </Badge>
-                        ))}
-                      </div>
                     </div>
 
                     <div className="space-y-3">

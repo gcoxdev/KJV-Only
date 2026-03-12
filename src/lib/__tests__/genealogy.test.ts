@@ -13,7 +13,6 @@ describe("decodeGenealogyPayload", () => {
           "adam",
           [0],
           "male",
-          "first man",
           [[[0, [0, 1], 2, 2]], 2, 2, 0],
           "",
           "",
@@ -21,8 +20,8 @@ describe("decodeGenealogyPayload", () => {
           [],
           [["cain", 2]],
         ],
-        ["eve", [1], "female", "", undefined, "", "", [["adam", 1]], [], [["cain", 2]]],
-        ["cain", [2], "male", "", undefined, "adam", "eve", [], [], []],
+        ["eve", [1], "female", undefined, "", "", [["adam", 1]], [], [["cain", 2]]],
+        ["cain", [2], "male", undefined, "adam", "eve", [], [], []],
       ],
     };
 

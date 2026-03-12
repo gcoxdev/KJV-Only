@@ -1,5 +1,39 @@
-const APP_CACHE = "kjv-only-cache-v1"
+const APP_CACHE = "kjv-only-cache-v2"
 const APP_SHELL = ["/", "/index.html", "/manifest.webmanifest"]
+const LIVE_DATA_PREFIXES = ["/references/", "/data/", "/maps/"]
+
+function shouldUseNetworkFirst(requestUrl) {
+  return LIVE_DATA_PREFIXES.some((prefix) => requestUrl.pathname.startsWith(prefix))
+}
+
+async function networkFirst(request) {
+  const cache = await caches.open(APP_CACHE)
+
+  try {
+    const response = await fetch(request)
+    if (response.ok) {
+      await cache.put(request, response.clone())
+    }
+    return response
+  } catch {
+    const cached = await cache.match(request)
+    return cached || Response.error()
+  }
+}
+
+async function cacheFirst(request) {
+  const cached = await caches.match(request)
+  if (cached) {
+    return cached
+  }
+
+  const response = await fetch(request)
+  if (response.ok) {
+    const cache = await caches.open(APP_CACHE)
+    await cache.put(request, response.clone())
+  }
+  return response
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -43,21 +77,10 @@ self.addEventListener("fetch", (event) => {
     return
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) {
-        return cached
-      }
+  if (shouldUseNetworkFirst(requestUrl)) {
+    event.respondWith(networkFirst(event.request))
+    return
+  }
 
-      return fetch(event.request)
-        .then((response) => {
-          if (response.ok) {
-            const clone = response.clone()
-            void caches.open(APP_CACHE).then((cache) => cache.put(event.request, clone))
-          }
-          return response
-        })
-        .catch(() => Response.error())
-    })
-  )
+  event.respondWith(cacheFirst(event.request))
 })
