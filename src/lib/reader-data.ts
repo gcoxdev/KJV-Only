@@ -29,6 +29,7 @@ let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
 let ancientMapPromise: Promise<AncientMapPayload> | null = null;
 const mapGeoJsonPromiseCache = new Map<string, Promise<MapGeoJsonPayload>>();
+const GENEALOGY_ASSET_VERSION = "20260311-ref-order-2";
 
 function parseBooks(input: unknown): Book[] | null {
   if (Array.isArray(input)) {
@@ -47,7 +48,7 @@ function parseBooks(input: unknown): Book[] | null {
 
 export function loadKjvBooks() {
   if (!kjvBooksPromise) {
-    kjvBooksPromise = fetch("/data/kjv.json", { cache: "force-cache" })
+    kjvBooksPromise = fetch("/data/kjv.json", { cache: "no-cache" })
       .then(async (response) => {
         if (!response.ok) {
           throw new Error("Could not load /data/kjv.json");
@@ -73,7 +74,7 @@ export function loadKjvBooks() {
 export function loadConcordance() {
   if (!concordancePromise) {
     concordancePromise = fetch("/references/concordance.compact.delta.min.json", {
-      cache: "force-cache",
+      cache: "no-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -96,7 +97,7 @@ export function loadConcordance() {
 export function loadCrossRefs() {
   if (!crossRefsPromise) {
     crossRefsPromise = fetch("/references/cross-refs.json", {
-      cache: "force-cache",
+      cache: "no-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -116,7 +117,7 @@ export function loadCrossRefs() {
 
 export function loadWebsters() {
   if (!webstersPromise) {
-    webstersPromise = fetch("/references/websters.json", { cache: "force-cache" })
+    webstersPromise = fetch("/references/websters.json", { cache: "no-cache" })
       .then(async (response) => {
         if (!response.ok) {
           throw new Error("Could not load /references/websters.json");
@@ -136,7 +137,7 @@ export function loadWebsters() {
 export function loadHitchcocks() {
   if (!hitchcocksPromise) {
     hitchcocksPromise = fetch("/references/hitchcocks.json", {
-      cache: "force-cache",
+      cache: "no-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -157,7 +158,7 @@ export function loadHitchcocks() {
 export function loadOldEnglish() {
   if (!oldEnglishPromise) {
     oldEnglishPromise = fetch("/references/old-english.json", {
-      cache: "force-cache",
+      cache: "no-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -177,9 +178,12 @@ export function loadOldEnglish() {
 
 export function loadGenealogy() {
   if (!genealogyPromise) {
-    genealogyPromise = fetch("/references/genealogy.compact.min.json", {
-      cache: "force-cache",
-    })
+    genealogyPromise = fetch(
+      `/references/genealogy.compact.min.json?v=${GENEALOGY_ASSET_VERSION}`,
+      {
+      cache: "no-cache",
+      },
+    )
       .then(async (response) => {
         if (!response.ok) {
           throw new Error("Could not load /references/genealogy.compact.min.json");
@@ -199,7 +203,7 @@ export function loadGenealogy() {
 export function loadStrongsGreek() {
   if (!strongsGreekPromise) {
     strongsGreekPromise = fetch("/references/strongs-greek.compact.min.json", {
-      cache: "force-cache",
+      cache: "no-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -220,7 +224,7 @@ export function loadStrongsGreek() {
 export function loadStrongsHebrew() {
   if (!strongsHebrewPromise) {
     strongsHebrewPromise = fetch("/references/strongs-hebrew.compact.min.json", {
-      cache: "force-cache",
+      cache: "no-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -241,7 +245,7 @@ export function loadStrongsHebrew() {
 export function loadAncientMap() {
   if (!ancientMapPromise) {
     ancientMapPromise = fetch("/maps/data/map.json", {
-      cache: "force-cache",
+      cache: "no-cache",
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -266,7 +270,7 @@ export function loadMapGeoJson(geojsonFile: string) {
   }
 
   const promise = fetch(`/maps/geometry/${geojsonFile}`, {
-    cache: "force-cache",
+    cache: "no-cache",
   })
     .then(async (response) => {
       if (!response.ok) {

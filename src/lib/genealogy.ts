@@ -64,7 +64,6 @@ export function decodeGenealogyPayload(compact: GenealogyCompactPayload): Geneal
       id,
       nameIndexes,
       gender = "",
-      notes = "",
       versesValue = 0,
       fatherId = "",
       motherId = "",
@@ -84,9 +83,6 @@ export function decodeGenealogyPayload(compact: GenealogyCompactPayload): Geneal
 
     if (gender) {
       person.gender = gender;
-    }
-    if (notes) {
-      person.notes = notes;
     }
     if (versesValue && Array.isArray(versesValue)) {
       const [byNameValues = [], totalOccurrences = 0, totalVerses = 0, firstVerse = -1] =
@@ -123,7 +119,7 @@ export function decodeGenealogyPayload(compact: GenealogyCompactPayload): Geneal
       person.mother = { id: motherId, name: motherId };
     }
 
-    if (spouses.length > 0) {
+    if (Array.isArray(spouses) && spouses.length > 0) {
       person.spouses = spouses.map(([relationId, verseIndex]) => ({
         id: relationId,
         name: relationId,
@@ -131,7 +127,7 @@ export function decodeGenealogyPayload(compact: GenealogyCompactPayload): Geneal
           typeof verseIndex === "number" && verseIndex >= 0 ? compact.v[verseIndex] : undefined,
       }));
     }
-    if (siblings.length > 0) {
+    if (Array.isArray(siblings) && siblings.length > 0) {
       person.siblings = siblings.map(([relationId, verseIndex]) => ({
         id: relationId,
         name: relationId,
@@ -139,7 +135,7 @@ export function decodeGenealogyPayload(compact: GenealogyCompactPayload): Geneal
           typeof verseIndex === "number" && verseIndex >= 0 ? compact.v[verseIndex] : undefined,
       }));
     }
-    if (children.length > 0) {
+    if (Array.isArray(children) && children.length > 0) {
       person.children = children.map(([relationId, verseIndex]) => ({
         id: relationId,
         name: relationId,
@@ -155,23 +151,23 @@ export function decodeGenealogyPayload(compact: GenealogyCompactPayload): Geneal
 
   for (const [index, person] of people.entries()) {
     const compactPerson = compact.p[index];
-    const spouses = compactPerson[7] ?? [];
-    const siblings = compactPerson[8] ?? [];
-    const children = compactPerson[9] ?? [];
+    const spouses = compactPerson[6] ?? [];
+    const siblings = compactPerson[7] ?? [];
+    const children = compactPerson[8] ?? [];
 
     person.father = decodeParent(peopleById, person.father?.id);
     person.mother = decodeParent(peopleById, person.mother?.id);
-    if (spouses.length > 0) {
+    if (Array.isArray(spouses) && spouses.length > 0) {
       person.spouses = spouses.map((relation) =>
         decodeRelation(compact, peopleById, relation),
       );
     }
-    if (siblings.length > 0) {
+    if (Array.isArray(siblings) && siblings.length > 0) {
       person.siblings = siblings.map((relation) =>
         decodeRelation(compact, peopleById, relation),
       );
     }
-    if (children.length > 0) {
+    if (Array.isArray(children) && children.length > 0) {
       person.children = children.map((relation) =>
         decodeRelation(compact, peopleById, relation),
       );
