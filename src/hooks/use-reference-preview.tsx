@@ -135,8 +135,8 @@ export function useReferencePreview({
       const citationVerse =
         parsed.startChapterIndex === parsed.endChapterIndex
           ? parsed.startVerse === parsed.endVerse
-            ? `${parsed.startVerse}`
-            : `${parsed.startVerse}-${parsed.endVerse}`
+            ? `${parsed.startChapterIndex + 1}:${parsed.startVerse}`
+            : `${parsed.startChapterIndex + 1}:${parsed.startVerse}-${parsed.endVerse}`
           : `${parsed.startChapterIndex + 1}:${parsed.startVerse}-${parsed.endChapterIndex + 1}:${parsed.endVerse}`;
 
       const computed = {

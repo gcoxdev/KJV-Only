@@ -32,9 +32,9 @@ export function GenealogyPersonDetails({
 }: GenealogyPersonDetailsProps) {
   const primaryName = person.names[0] ?? person.id;
   const byName = person.verses?.byName ?? [];
-  const spouses = person.spouses ?? [];
-  const siblings = person.siblings ?? [];
-  const children = person.children ?? [];
+  const spouses = Array.isArray(person.spouses) ? person.spouses : [];
+  const siblings = Array.isArray(person.siblings) ? person.siblings : [];
+  const children = Array.isArray(person.children) ? person.children : [];
   const fatherName =
     person.father?.name ||
     (person.father?.id ? (genealogyById.get(person.father.id)?.names[0] ?? "") : "");
@@ -186,7 +186,6 @@ export function GenealogyPersonDetails({
           </p>
         ) : null}
       </div>
-      {person.notes ? <p className="text-muted-foreground">{person.notes}</p> : null}
     </div>
   );
 }

@@ -34,7 +34,6 @@ export type GenealogyPerson = {
   id: string;
   names: string[];
   gender?: string;
-  notes?: string;
   verses?: {
     byName?: GenealogyVerseByName[];
     totalOccurrences?: number;
@@ -57,7 +56,6 @@ export type GenealogyCompactPayload = {
     [
       string,
       number[],
-      string?,
       string?,
       [
         Array<[number, number[], number?, number?]>,
