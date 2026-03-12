@@ -81,19 +81,20 @@ export function GenealogyPersonDetails({
                 <AccordionTrigger>
                   {`${entry.name} (${entry.numVerses ?? entry.verses.length})`}
                 </AccordionTrigger>
-                <AccordionContent className="leading-7">
-                  {entry.verses.map((reference, index) => (
-                    <Fragment key={`${person.id}-${entry.name}-${reference}-${index}`}>
-                      <ConcordanceReferencePopover
-                        reference={reference}
-                        highlightWord={entry.name}
-                        renderPreview={renderReferencePreview}
-                        onOpenReference={onOpenReference}
-                        onCloseSidebar={onCloseSidebar}
-                      />
-                      {index < entry.verses.length - 1 ? ", " : null}
-                    </Fragment>
-                  ))}
+                <AccordionContent>
+                  <div className="flex flex-wrap gap-2">
+                    {entry.verses.map((reference, index) => (
+                      <Fragment key={`${person.id}-${entry.name}-${reference}-${index}`}>
+                        <ConcordanceReferencePopover
+                          reference={reference}
+                          highlightWord={entry.name}
+                          renderPreview={renderReferencePreview}
+                          onOpenReference={onOpenReference}
+                          onCloseSidebar={onCloseSidebar}
+                        />
+                      </Fragment>
+                    ))}
+                  </div>
                 </AccordionContent>
               </AccordionItem>
             ))}

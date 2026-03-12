@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/accordion";
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
 import { StudySearchForm } from "@/components/reader/study-search-form";
+import { Badge } from "@/components/ui/badge";
 
 type ConcordanceEntry = { key: string; references: string[] };
 
@@ -87,13 +88,16 @@ export function ConcordanceTool({
                 {results.map((entry) => (
                   <AccordionItem key={entry.key} value={entry.key}>
                     <AccordionTrigger>
-                      {`${entry.key} (${entry.references.length})`}
+                      <span className="flex items-center gap-2">
+                        <span>{entry.key}</span>
+                        <Badge variant="outline">{entry.references.length}</Badge>
+                      </span>
                     </AccordionTrigger>
                     <AccordionContent>
                       {entry.references.length === 0 ? (
                         <p className="text-sm text-muted-foreground">No references found.</p>
                       ) : (
-                        <p className="text-sm leading-7">
+                        <div className="flex flex-wrap gap-2">
                           {entry.references.map((reference, index) => (
                             <Fragment key={`${entry.key}-${reference}-${index}`}>
                               <ConcordanceReferencePopover
@@ -103,10 +107,9 @@ export function ConcordanceTool({
                                 onOpenReference={onOpenReference}
                                 onCloseSidebar={onCloseSidebar}
                               />
-                              {index < entry.references.length - 1 ? ", " : null}
                             </Fragment>
                           ))}
-                        </p>
+                        </div>
                       )}
                     </AccordionContent>
                   </AccordionItem>

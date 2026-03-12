@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/accordion";
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
 import { StudySearchForm } from "@/components/reader/study-search-form";
+import { Badge } from "@/components/ui/badge";
 
 type StrongsResult = {
   code: string;
@@ -108,9 +109,14 @@ export function StrongsTool({
                           <Accordion className="w-full rounded-md border px-2" multiple>
                             {Object.entries(entry.kjv_refs).map(([word, references]) => (
                               <AccordionItem key={`${code}-${word}`} value={`${code}-${word}`}>
-                                <AccordionTrigger>{`${word} (${references.length})`}</AccordionTrigger>
+                                <AccordionTrigger>
+                                  <span className="flex items-center gap-2">
+                                    <span>{word}</span>
+                                    <Badge variant="outline">{references.length}</Badge>
+                                  </span>
+                                </AccordionTrigger>
                                 <AccordionContent>
-                                  <p className="leading-7">
+                                  <div className="flex flex-wrap gap-2">
                                     {references.map((reference, index) => (
                                       <Fragment key={`${code}-${word}-${reference}-${index}`}>
                                         <ConcordanceReferencePopover
@@ -120,10 +126,9 @@ export function StrongsTool({
                                           onOpenReference={onOpenReference}
                                           onCloseSidebar={onCloseSidebar}
                                         />
-                                        {index < references.length - 1 ? ", " : null}
                                       </Fragment>
                                     ))}
-                                  </p>
+                                  </div>
                                 </AccordionContent>
                               </AccordionItem>
                             ))}

@@ -9,6 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
 import { StudySearchForm } from "@/components/reader/study-search-form";
@@ -189,11 +190,14 @@ export function MapsTool({
                   <Accordion className="w-full rounded-md border px-2" multiple>
                     <AccordionItem value="maps-references">
                       <AccordionTrigger>
-                        {`References (${references.length})`}
+                        <span className="flex items-center gap-2">
+                          <span>References</span>
+                          <Badge variant="outline">{references.length}</Badge>
+                        </span>
                       </AccordionTrigger>
                       <AccordionContent>
-                        <p className="text-sm leading-7">
-                          {references.map((reference, verseIndex) => (
+                        <div className="flex flex-wrap gap-2">
+                          {references.map((reference) => (
                             <Fragment key={reference}>
                               <ConcordanceReferencePopover
                                 reference={reference}
@@ -202,10 +206,9 @@ export function MapsTool({
                                 onOpenReference={onOpenReference}
                                 onCloseSidebar={onCloseSidebar}
                               />
-                              {verseIndex < references.length - 1 ? ", " : null}
                             </Fragment>
                           ))}
-                        </p>
+                        </div>
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>

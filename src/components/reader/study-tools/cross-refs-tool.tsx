@@ -11,6 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
+import { Badge } from "@/components/ui/badge";
 
 type CrossRefsToolProps = {
   hasInfo: boolean;
@@ -77,10 +78,13 @@ export function CrossRefsTool({
                 <Accordion className="w-full rounded-md border px-2" multiple>
                   <AccordionItem value="cross-refs-references">
                     <AccordionTrigger>
-                      {`References (${selected.references.length})`}
+                      <span className="flex items-center gap-2">
+                        <span>References</span>
+                        <Badge variant="outline">{selected.references.length}</Badge>
+                      </span>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <p className="text-sm leading-7">
+                      <div className="flex flex-wrap gap-2">
                         {selected.references.map((reference, index) => (
                           <Fragment key={`${selected.key}-${reference}-${index}`}>
                             <ConcordanceReferencePopover
@@ -90,10 +94,9 @@ export function CrossRefsTool({
                               onOpenReference={onOpenReference}
                               onCloseSidebar={onCloseSidebar}
                             />
-                            {index < selected.references.length - 1 ? ", " : null}
                           </Fragment>
                         ))}
-                      </p>
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
