@@ -45,13 +45,13 @@ export function ReaderTopBar({
   onOpenPage,
 }: ReaderTopBarProps) {
   return (
-    <header className="z-20 flex h-10 shrink-0 items-center justify-between border-b bg-background/95 px-2 backdrop-blur">
-      <div className="flex items-center gap-2">
+    <header className="z-20 flex shrink-0 items-center justify-between border-b border-subtle-divider/80 bg-workspace-chrome/90 px-3 py-2 backdrop-blur">
+      <div className="flex min-w-0 items-center gap-3">
         <DropdownMenu>
           <DropdownMenuTrigger
             render={<Button variant="ghost" size="icon" aria-label="Open menu" />}
           >
-            <MenuIcon />
+            <MenuIcon aria-hidden="true" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
             <DropdownMenuItem onClick={onOpenProgress}>
@@ -78,17 +78,26 @@ export function ReaderTopBar({
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-3">
           <img
             src="/icons/app-icon.png"
             alt="KJV Only icon"
-            className="size-5 rounded-sm"
+            width={24}
+            height={24}
+            className="size-6"
           />
-          <p className="font-semibold">KJV Only</p>
+          <div className="flex min-w-0 flex-col">
+            <p className="workspace-heading truncate text-lg font-semibold leading-none">
+              KJV Only
+            </p>
+            <p className="truncate text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              {isStudyMode ? "Study Workspace" : "Reading Mode"}
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <Button
           type="button"
           variant="ghost"
@@ -96,7 +105,7 @@ export function ReaderTopBar({
           aria-label="Open search"
           onClick={onOpenSearch}
         >
-          <SearchIcon />
+          <SearchIcon aria-hidden="true" />
         </Button>
         <Button
           type="button"
@@ -106,19 +115,27 @@ export function ReaderTopBar({
           onClick={onShareLayout}
           title={isShareCopied ? "Layout link copied" : "Share layout"}
         >
-          {isShareCopied ? <CheckIcon /> : <Share2Icon />}
+          {isShareCopied ? <CheckIcon aria-hidden="true" /> : <Share2Icon aria-hidden="true" />}
         </Button>
-        <div className="flex items-center gap-2">
-          <Label htmlFor="study-mode" className="text-sm">
-            {isStudyMode ? "Study" : "Read"}
+        <div className="flex items-center gap-3 rounded-full border border-subtle-divider/80 bg-workspace-panel px-3 py-1">
+          <Label
+            htmlFor="study-mode"
+            className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground"
+          >
+            Mode
           </Label>
+          <span className="tabular-data text-sm font-medium">
+            {isStudyMode ? "Study" : "Read"}
+          </span>
           <Switch
             id="study-mode"
             checked={isStudyMode}
             onCheckedChange={onStudyModeChange}
           />
         </div>
-        {isStudyMode ? <SidebarTrigger /> : null}
+        {isStudyMode ? (
+          <SidebarTrigger className="border border-subtle-divider/70 bg-workspace-panel" />
+        ) : null}
       </div>
     </header>
   );

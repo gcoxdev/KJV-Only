@@ -43,7 +43,7 @@ export function GenealogyPersonDetails({
     (person.mother?.id ? (genealogyById.get(person.mother.id)?.names[0] ?? "") : "");
 
   return (
-    <div className="space-y-2 rounded-md border p-2 text-sm">
+    <div className="workspace-panel-elevated flex flex-col gap-3 rounded-2xl border p-3 text-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span className="font-semibold">{primaryName}</span>
@@ -68,11 +68,11 @@ export function GenealogyPersonDetails({
         </Button>
       </div>
       {byName.length > 0 ? (
-        <div className="space-y-1">
+        <div className="flex flex-col gap-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             References
           </p>
-          <Accordion className="w-full rounded-md border px-2" multiple>
+          <Accordion className="w-full rounded-xl border border-subtle-divider/80 px-2" multiple>
             {byName.map((entry) => (
               <AccordionItem
                 key={`${person.id}-${entry.name}`}
@@ -101,7 +101,7 @@ export function GenealogyPersonDetails({
           </Accordion>
         </div>
       ) : null}
-      <div className="space-y-1">
+      <div className="flex flex-col gap-1">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Lineage
         </p>

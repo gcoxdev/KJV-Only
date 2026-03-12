@@ -51,7 +51,7 @@ export function TabsStrip({
     <ScrollArea className="h-full w-full">
       <div
         className={cn(
-          "p-2",
+          "p-2.5",
           tabsOrientation === "vertical"
             ? "flex flex-col items-stretch gap-2"
             : "flex w-max items-center gap-2",
@@ -79,11 +79,11 @@ export function TabsStrip({
                 size="sm"
                 onClick={() => onActivateTab(tab.id)}
                 className={cn(
-                  "min-w-24 justify-start",
+                  "min-w-28 justify-start border-subtle-divider/80 bg-workspace-panel-elevated text-left shadow-none",
                   tabsOrientation === "vertical" &&
                     "h-auto w-full min-w-0 flex-1 whitespace-normal wrap-break-word py-1.5 text-left leading-tight",
                   active &&
-                    "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background!",
+                    "border-primary! bg-primary/92! text-primary-foreground! hover:bg-primary/90! hover:text-primary-foreground!",
                 )}
               >
                 {tab.title}
@@ -95,10 +95,10 @@ export function TabsStrip({
                       variant="outline"
                       size="icon-sm"
                       className={cn(
-                        "relative",
+                        "relative border-subtle-divider/80 bg-workspace-panel-elevated",
                         tabsOrientation === "vertical" && "h-auto self-stretch",
                         active &&
-                          "border-foreground! bg-foreground! text-background! hover:bg-foreground/90! hover:text-background! before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-background/45 before:content-['']",
+                          "border-primary! bg-primary/92! text-primary-foreground! hover:bg-primary/90! hover:text-primary-foreground! before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-primary-foreground/35 before:content-['']",
                       )}
                       aria-label={`Tab options for ${tab.title}`}
                     >
@@ -150,7 +150,10 @@ export function TabsStrip({
           size="icon-sm"
           onClick={onAddTab}
           aria-label="New Tab"
-          className={cn(tabsOrientation === "vertical" && "w-full")}
+          className={cn(
+            "border-dashed border-subtle-divider/80 bg-workspace-panel/70",
+            tabsOrientation === "vertical" && "w-full",
+          )}
         >
           <PlusIcon />
         </Button>

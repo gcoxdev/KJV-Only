@@ -143,6 +143,17 @@ export type StaticPageId =
   | "contact"
   | "help";
 
+export type StudyWorkspaceTab = "tools" | "notes" | "bookmarks";
+export type StudyWorkspaceTool =
+  | "cross-refs"
+  | "concordance"
+  | "websters"
+  | "strongs"
+  | "old-english"
+  | "maps"
+  | "genealogy"
+  | "hitchcocks";
+
 export type PanelDirection = "left" | "right" | "up" | "down";
 export type SplitOrientation = "horizontal" | "vertical";
 export type TabsOrientation = "horizontal" | "vertical";

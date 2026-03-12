@@ -13,6 +13,7 @@ import { formatDisplayTokenText, isPunctuationToken } from "@/components/reader/
 import { bookCodeForIndex, iconPath, renderHighlightedTerms, renderHighlightedText } from "@/lib/reader-view";
 import { buildRegexMatcher, createSearchableVerseEntry, matchSelectedWords } from "@/lib/search";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,15 +25,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type SearchPageProps = {
   books: Book[];
@@ -280,7 +275,7 @@ export function SearchPage({
       { id: "nt-gos-acts", label: "Gospels and Acts", iconCode: "GA", indices: clampGroupIndices([39, 40, 41, 42, 43], books.length) },
       { id: "nt-paul", label: "Pauline Epistles", iconCode: "PE", indices: clampGroupIndices([44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57], books.length) },
       { id: "nt-general", label: "General Epistles", iconCode: "GE", indices: clampGroupIndices([58, 59, 60, 61, 62, 63, 64], books.length) },
-      { id: "nt-rev", label: "Revelation", iconCode: "REV", indices: clampGroupIndices([65], books.length) },
+      { id: "nt-rev", label: "Prophecy", iconCode: "REV", indices: clampGroupIndices([65], books.length) },
     ].filter((group) => group.indices.length > 0);
 
     return { otGroups, ntGroups };
@@ -483,68 +478,74 @@ export function SearchPage({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3 p-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <Select
-          value={searchMode}
-          onValueChange={(value) => onStateChange({ searchMode: value as SearchMode })}
-        >
-          <SelectTrigger className="w-[13rem]">
-            <SelectValue>{SEARCH_MODE_LABELS[searchMode]}</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="contains-any">
-              {SEARCH_MODE_LABELS["contains-any"]}
-            </SelectItem>
-            <SelectItem value="contains-all">
-              {SEARCH_MODE_LABELS["contains-all"]}
-            </SelectItem>
-            <SelectItem value="contains-phrase">
-              {SEARCH_MODE_LABELS["contains-phrase"]}
-            </SelectItem>
-            <SelectItem value="regex">{SEARCH_MODE_LABELS.regex}</SelectItem>
-          </SelectContent>
-        </Select>
+    <div className="flex h-full min-h-0 flex-col gap-1.5 p-2">
+      <div className="workspace-panel-elevated flex flex-col gap-2 rounded-2xl border p-3">
+        <div className="flex min-w-0 flex-col gap-1">
+          <h2 className="workspace-heading text-xl font-semibold">Search</h2>
+        </div>
 
-        <label className="inline-flex items-center gap-2 text-sm">
-          <Checkbox
-            checked={caseSensitive}
-            onCheckedChange={(value) =>
-              onStateChange({ caseSensitive: isChecked(value) })
-            }
-          />
-          Case-sensitive
-        </label>
+        <div className="flex flex-col gap-2">
+          <Label className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+            Search Mode
+          </Label>
+          <ToggleGroup
+            value={[searchMode]}
+            onValueChange={(value) => {
+              const nextValue = value[0];
+              if (nextValue) {
+                onStateChange({ searchMode: nextValue as SearchMode });
+              }
+            }}
+            variant="outline"
+            spacing={0}
+            className="grid w-full grid-cols-2 gap-0 lg:grid-cols-4"
+          >
+            <ToggleGroupItem value="contains-any">{SEARCH_MODE_LABELS["contains-any"]}</ToggleGroupItem>
+            <ToggleGroupItem value="contains-all">{SEARCH_MODE_LABELS["contains-all"]}</ToggleGroupItem>
+            <ToggleGroupItem value="contains-phrase">{SEARCH_MODE_LABELS["contains-phrase"]}</ToggleGroupItem>
+            <ToggleGroupItem value="regex">{SEARCH_MODE_LABELS.regex}</ToggleGroupItem>
+          </ToggleGroup>
+        </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={openBookFilterDialog}
-        >
-          {`Books (${selectedBookCount}/${books.length})`}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="inline-flex items-center gap-2 rounded-full border border-subtle-divider/80 bg-workspace-panel px-3 py-1.5 text-sm">
+            <Checkbox
+              checked={caseSensitive}
+              onCheckedChange={(value) =>
+                onStateChange({ caseSensitive: isChecked(value) })
+              }
+            />
+            Case-sensitive
+          </label>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="bg-workspace-panel"
+            onClick={openBookFilterDialog}
+          >
+            {`Scope • ${selectedBookCount}/${books.length} books`}
+          </Button>
+        </div>
       </div>
 
       {searchMode === "contains-any" || searchMode === "contains-all" ? (
-        <div className="space-y-2">
+        <div className="workspace-panel flex flex-col gap-2 rounded-2xl border p-3">
           <Label htmlFor="search-chip-input">Words</Label>
-          <div className="rounded-md border p-2">
-            <div className="mb-2 flex flex-wrap gap-1">
+          <div className="rounded-2xl border border-subtle-divider/80 bg-workspace-panel-elevated p-2">
+            <div className="mb-2 flex flex-wrap gap-2">
               {selectedWords.map((word) => (
-                <span
+                <button
                   key={word}
-                  className="inline-flex items-center gap-1 rounded bg-muted px-2 py-1 text-xs"
+                  type="button"
+                  className="study-accent-chip inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium"
+                  onClick={() => removeWordChip(word)}
                 >
                   {word}
-                  <button
-                    type="button"
-                    aria-label={`Remove ${word}`}
-                    className="text-muted-foreground hover:text-foreground"
-                    onClick={() => removeWordChip(word)}
-                  >
+                  <span aria-hidden="true" className="text-muted-foreground">
                     ×
-                  </button>
-                </span>
+                  </span>
+                </button>
               ))}
             </div>
             <Input
@@ -566,7 +567,7 @@ export function SearchPage({
               placeholder="Type to find concordance words..."
             />
             {chipInputDraft.trim() ? (
-              <div className="mt-2 max-h-40 overflow-y-auto rounded border">
+              <div className="mt-2 max-h-40 overflow-y-auto rounded-2xl border border-subtle-divider/80 bg-background/60">
                 <div className="p-1">
                   {chipInputDraft.trim().length < 2 ? (
                     <p className="px-2 py-1 text-sm text-muted-foreground">
@@ -594,7 +595,7 @@ export function SearchPage({
           </div>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="workspace-panel flex flex-col gap-2 rounded-2xl border p-3">
           <Label htmlFor="search-phrase-input">
             {searchMode === "regex" ? "Regular expression" : "Phrase"}
           </Label>
@@ -619,7 +620,7 @@ export function SearchPage({
         </div>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Button type="button" onClick={search} disabled={isSearching}>
           <SearchIcon />
           Search
@@ -637,22 +638,31 @@ export function SearchPage({
 
       <Separator />
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <p className="mb-2 px-1 text-sm font-medium text-muted-foreground">
-          {`Results - ${results.length} matches found`}
-        </p>
-        <ScrollArea className="min-h-0 flex-1 rounded border">
-          <div className="divide-y pb-2">
+      <div className="workspace-panel flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border p-2">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-1">
+          <div className="flex flex-col gap-0.5">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Results Summary
+            </p>
+            <p className="text-sm font-medium text-foreground">
+              {results.length === 0
+                ? "No verses loaded yet"
+                : `${results.length} matching verses`}
+            </p>
+          </div>
+        </div>
+        <ScrollArea className="min-h-0 flex-1 rounded-2xl border border-subtle-divider/80 bg-workspace-panel-elevated">
+          <div className="divide-y divide-subtle-divider/70 pb-1">
             {results.length === 0 ? (
               <p className="p-3 text-sm text-muted-foreground">
-                Run a search to see matching verses.
+                Run a search to review matching verses in book order.
               </p>
             ) : (
               results.map((match) => (
                 <button
                   key={`${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`}
                   type="button"
-                  className="group block w-full px-3 py-2 text-left hover:bg-muted/50"
+                  className="group block w-full px-3 py-2 text-left hover:bg-reference-tint/60"
                   onClick={() =>
                     onOpenResult(
                       match.bookIndex,
@@ -662,10 +672,10 @@ export function SearchPage({
                     )
                   }
                 >
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="tabular-data text-sm font-medium text-foreground">
                     {`${match.bookName} ${match.chapterIndex + 1}:${match.verseNumber}`}
                   </p>
-                  <p className="mt-1 text-sm text-muted-foreground group-hover:text-foreground/90">
+                  <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground group-hover:text-foreground/90">
                     {renderResultText(match)}
                   </p>
                 </button>
@@ -682,8 +692,8 @@ export function SearchPage({
           </AlertDialogHeader>
           <div className="min-h-0 flex-1 overflow-hidden">
             <ScrollArea className="h-[60vh] pr-2">
-              <div className="space-y-3">
-                <div className="space-y-1 text-sm">
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1 text-sm">
                   <div className="flex items-center gap-1">
                     <Button
                       type="button"
@@ -710,14 +720,16 @@ export function SearchPage({
                     <img
                       src="/icons/app-icon.png"
                       alt="Entire Bible icon"
+                      width={20}
+                      height={20}
                       className="size-5 rounded-sm"
                     />
                     <span className="font-medium">Entire Bible</span>
                   </div>
 
                   {expandedBookTree.has("entire") ? (
-                    <div className="ml-7 space-y-1 border-l pl-3">
-                      <div className="space-y-1">
+                    <div className="ml-7 flex flex-col gap-1 border-l pl-3">
+                      <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-1">
                           <Button
                             type="button"
@@ -749,6 +761,8 @@ export function SearchPage({
                           <img
                             src={iconPath("color", "OT")}
                             alt="Old Testament icon"
+                            width={20}
+                            height={20}
                             className="size-5 shrink-0"
                           />
                           <span className="font-medium">Old Testament</span>

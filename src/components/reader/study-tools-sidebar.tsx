@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import {
   BookMarkedIcon,
   CopyMinusIcon,
@@ -18,11 +18,14 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import type { StudyWorkspaceTab } from "@/types/reader";
 
 type StudyToolsSidebarProps = {
   visible: boolean;
+  activeTab: StudyWorkspaceTab;
   accordionValue: string[];
   onAccordionValueChange: (value: string[]) => void;
+  onActiveTabChange: (value: StudyWorkspaceTab) => void;
   onExpandAll: () => void;
   onCollapseAll: () => void;
   canExpand: boolean;
@@ -34,8 +37,10 @@ type StudyToolsSidebarProps = {
 
 export function StudyToolsSidebar({
   visible,
+  activeTab,
   accordionValue,
   onAccordionValueChange,
+  onActiveTabChange,
   onExpandAll,
   onCollapseAll,
   canExpand,
@@ -44,17 +49,19 @@ export function StudyToolsSidebar({
   notesContent,
   bookmarksContent,
 }: StudyToolsSidebarProps) {
-  const [activeTab, setActiveTab] = useState<"tools" | "notes" | "bookmarks">("tools");
-
   if (!visible) {
     return null;
   }
 
   return (
-    <Sidebar side="right" className="h-screen">
-      <SidebarHeader className="gap-3 border-b px-3 py-3">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-base font-semibold">Study Workspace</h2>
+    <Sidebar side="right" className="h-screen border-l border-sidebar-border/80 bg-sidebar/95 backdrop-blur-sm">
+      <SidebarHeader className="gap-3 border-b border-sidebar-border/70 bg-sidebar/85 px-3 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-1">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              Study Desk
+            </span>
+          </div>
         </div>
         <ToggleGroup
           value={[activeTab]}
@@ -65,7 +72,7 @@ export function StudyToolsSidebar({
               nextValue === "notes" ||
               nextValue === "bookmarks"
             ) {
-              setActiveTab(nextValue);
+              onActiveTabChange(nextValue);
             }
           }}
           variant="outline"
@@ -89,33 +96,35 @@ export function StudyToolsSidebar({
       <SidebarContent className="px-2 pb-3">
         {activeTab === "tools" ? (
           <div className="flex flex-col gap-2">
-            <div className="sticky top-0 z-10 flex flex-col gap-2 bg-sidebar px-1 pt-1">
+            <div className="sticky top-0 z-10 flex flex-col gap-2 bg-sidebar/95 px-1 pt-1 backdrop-blur-sm">
               <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={onExpandAll}
-                  disabled={!canExpand}
-                >
-                  <CopyPlusIcon />
-                  Expand All
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={onCollapseAll}
-                  disabled={!canCollapse}
-                >
-                  <CopyMinusIcon />
-                  Collapse All
-                </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={onExpandAll}
+                    disabled={!canExpand}
+                  >
+                    <CopyPlusIcon />
+                    Expand All
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={onCollapseAll}
+                    disabled={!canCollapse}
+                  >
+                    <CopyMinusIcon />
+                    Collapse All
+                  </Button>
               </div>
               <Separator />
             </div>
             <Accordion
-              className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+              className="workspace-panel-elevated w-full rounded-2xl border px-3 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
               multiple
               value={accordionValue}
               onValueChange={(value) =>
@@ -126,9 +135,17 @@ export function StudyToolsSidebar({
             </Accordion>
           </div>
         ) : activeTab === "notes" ? (
-          <div className="w-full rounded-md border p-2">{notesContent}</div>
+          <div className="pt-1">
+            <div className="workspace-panel-elevated w-full rounded-2xl border p-3">
+              {notesContent}
+            </div>
+          </div>
         ) : (
-          <div className="w-full rounded-md border p-2">{bookmarksContent}</div>
+          <div className="pt-1">
+            <div className="workspace-panel-elevated w-full rounded-2xl border p-3">
+              {bookmarksContent}
+            </div>
+          </div>
         )}
       </SidebarContent>
     </Sidebar>
