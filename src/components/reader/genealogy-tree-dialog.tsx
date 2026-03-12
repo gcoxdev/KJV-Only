@@ -190,19 +190,20 @@ function GenealogyNode({
                 <span className="font-medium text-foreground/80">Refs:</span>
                 {byNameReferences.map((entry) => (
                   <div key={`${person?.id ?? title}-${entry.name}`} className="text-xs">
-                    <span className="font-medium text-foreground/80">{entry.name}:</span>{" "}
-                    {entry.verses.map((reference, index) => (
-                      <Fragment key={`${entry.name}-${reference}-${index}`}>
-                        <ConcordanceReferencePopover
-                          reference={reference}
-                          highlightWord={entry.name}
-                          renderPreview={renderReferencePreview}
-                          onOpenReference={onOpenReference}
-                          onCloseSidebar={onCloseSidebar}
-                        />
-                        {index < entry.verses.length - 1 ? ", " : null}
-                      </Fragment>
-                    ))}
+                    <div className="mb-1 font-medium text-foreground/80">{entry.name}:</div>
+                    <div className="flex flex-wrap gap-2">
+                      {entry.verses.map((reference, index) => (
+                        <Fragment key={`${entry.name}-${reference}-${index}`}>
+                          <ConcordanceReferencePopover
+                            reference={reference}
+                            highlightWord={entry.name}
+                            renderPreview={renderReferencePreview}
+                            onOpenReference={onOpenReference}
+                            onCloseSidebar={onCloseSidebar}
+                          />
+                        </Fragment>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
