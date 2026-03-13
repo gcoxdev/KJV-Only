@@ -227,7 +227,9 @@ export function ProgressDialog({
           >
             Reset Progress
           </Button>
-          <AlertDialogAction onClick={() => onOpenChange(false)}>Close</AlertDialogAction>
+          <AlertDialogAction onClick={() => onOpenChange(false)}>
+            Close
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

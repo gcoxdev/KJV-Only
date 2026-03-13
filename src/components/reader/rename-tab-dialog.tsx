@@ -53,9 +53,13 @@ export function RenameTabDialog({
           autoFocus
         />
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} disabled={value.trim().length < 1}>
+        <AlertDialogFooter className="group-data-[size=sm]/alert-dialog-content:flex group-data-[size=sm]/alert-dialog-content:flex-row group-data-[size=sm]/alert-dialog-content:justify-end justify-end sm:flex sm:justify-end">
+          <AlertDialogCancel onClick={onCancel} className="w-auto">Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onConfirm}
+            disabled={value.trim().length < 1}
+            className="w-auto"
+          >
             Save
           </AlertDialogAction>
         </AlertDialogFooter>
