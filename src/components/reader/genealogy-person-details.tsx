@@ -72,7 +72,10 @@ export function GenealogyPersonDetails({
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             References
           </p>
-          <Accordion className="w-full rounded-xl border border-subtle-divider/80 px-2" multiple>
+          <Accordion
+            className="w-full rounded-xl border border-subtle-divider/80 px-2 [&_[data-slot=accordion-content]]:pb-1 [&_[data-slot=accordion-trigger]]:py-1"
+            multiple
+          >
             {byName.map((entry) => (
               <AccordionItem
                 key={`${person.id}-${entry.name}`}
