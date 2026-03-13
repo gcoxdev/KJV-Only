@@ -163,6 +163,28 @@ export function useTabActions({
     [setTabs],
   );
 
+  const reorderTab = useCallback(
+    (tabId: string, targetTabId: string) => {
+      if (!tabId || !targetTabId || tabId === targetTabId) {
+        return;
+      }
+
+      setTabs((currentTabs) => {
+        const sourceIndex = currentTabs.findIndex((tab) => tab.id === tabId);
+        const targetIndex = currentTabs.findIndex((tab) => tab.id === targetTabId);
+        if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) {
+          return currentTabs;
+        }
+
+        const nextTabs = [...currentTabs];
+        const [tab] = nextTabs.splice(sourceIndex, 1);
+        nextTabs.splice(targetIndex, 0, tab);
+        return nextTabs;
+      });
+    },
+    [setTabs],
+  );
+
   const openRenameDialog = useCallback(
     (tabId: string) => {
       const tab = tabs.find((item) => item.id === tabId);
@@ -279,6 +301,7 @@ export function useTabActions({
     addTab,
     closeTab,
     moveTab,
+    reorderTab,
     openRenameDialog,
     confirmRenameTab,
     moveLeafToExistingTab,

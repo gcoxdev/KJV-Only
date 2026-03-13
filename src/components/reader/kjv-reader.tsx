@@ -1536,6 +1536,7 @@ export function KJVReader() {
     addTab,
     closeTab,
     moveTab,
+    reorderTab,
     openRenameDialog,
     confirmRenameTab,
     moveLeafToExistingTab,
@@ -2194,6 +2195,7 @@ export function KJVReader() {
       onActivateTab={setActiveTabId}
       onOpenRenameDialog={openRenameDialog}
       onMoveTab={moveTab}
+      onReorderTab={reorderTab}
       onCloseTab={closeTab}
       onAddTab={addTab}
     />
