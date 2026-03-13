@@ -13,8 +13,10 @@ import {
 import type { TabsOrientation } from "@/types/reader";
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
@@ -226,11 +228,11 @@ export function SettingsDialog({
             />
           </div>
         </div>
-        <div className="flex justify-end">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <AlertDialogFooter className="group-data-[size=sm]/alert-dialog-content:flex group-data-[size=sm]/alert-dialog-content:flex-row group-data-[size=sm]/alert-dialog-content:justify-end justify-end sm:flex sm:justify-end">
+          <AlertDialogAction onClick={() => onOpenChange(false)} className="w-auto">
             Close
-          </Button>
-        </div>
+          </AlertDialogAction>
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );

@@ -3,7 +3,7 @@ import type { LeafNode } from "@/types/reader";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 import {
   AlertDialog,
-  AlertDialogCancel,
+  AlertDialogAction,
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
@@ -69,7 +69,7 @@ export function BookPickerDialog({
           </div>
         ) : null}
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>Close</AlertDialogCancel>
+          <AlertDialogAction onClick={onClose}>Close</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
