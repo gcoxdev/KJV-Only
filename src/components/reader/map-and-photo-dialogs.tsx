@@ -76,8 +76,10 @@ export function MapAndPhotoDialogs({
             <p className="text-sm text-muted-foreground">No map data found.</p>
           )}
         </div>
-        <AlertDialogFooter>
-          <AlertDialogAction onClick={onCloseMapDialog}>Close</AlertDialogAction>
+        <AlertDialogFooter className="shrink-0 items-center justify-end py-3 sm:flex sm:justify-end">
+          <AlertDialogAction onClick={onCloseMapDialog} className="w-auto">
+            Close
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

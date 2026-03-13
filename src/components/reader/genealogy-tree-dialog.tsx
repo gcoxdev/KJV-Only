@@ -12,12 +12,14 @@ import {
 import { cn } from "@/lib/utils";
 import type { GenealogyPerson, GenealogyRelation } from "@/types/reader";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -307,19 +309,18 @@ export function GenealogyTreeDialog({
   );
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        showCloseButton={false}
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent
         className="flex h-[min(94vh,900px)] max-h-[calc(100vh-1rem)] w-[min(96vw,1120px)]! max-w-none! flex-col overflow-hidden p-0"
       >
-        <DialogHeader className="gap-1 px-4 pt-4">
-          <DialogTitle>Genealogy Tree</DialogTitle>
-          <DialogDescription>
+        <AlertDialogHeader className="gap-1 px-4 pt-4 sm:place-items-start sm:text-left">
+          <AlertDialogTitle>Genealogy Tree</AlertDialogTitle>
+          <AlertDialogDescription>
             {person
               ? `Focused on ${primaryName}. Click any person in the tree to recenter the graph.`
               : "No genealogy person selected."}
-          </DialogDescription>
-        </DialogHeader>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
         <Separator />
         <div className="min-h-0 flex-1 overflow-hidden">
           <ScrollArea className="h-full">
@@ -443,14 +444,12 @@ export function GenealogyTreeDialog({
             </div>
           </ScrollArea>
         </div>
-        <div className="shrink-0 border-t bg-muted/50 px-4 py-4">
-          <div className="flex justify-end">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <AlertDialogFooter className="mx-0 mb-0 shrink-0 rounded-none border-t px-4 py-4 sm:flex sm:justify-end">
+          <AlertDialogAction onClick={() => onOpenChange(false)} className="w-auto">
             Close
-          </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
