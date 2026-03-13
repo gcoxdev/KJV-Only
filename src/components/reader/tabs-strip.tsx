@@ -1,10 +1,10 @@
-import { type RefObject } from "react";
+import { useEffect, useRef, useState, type DragEvent, type PointerEvent, type RefObject } from "react";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpIcon,
-  EllipsisIcon,
+  EllipsisVerticalIcon,
   PencilLineIcon,
   PlusIcon,
   XIcon,
@@ -32,6 +32,7 @@ type TabsStripProps = {
   onActivateTab: (tabId: string) => void;
   onOpenRenameDialog: (tabId: string) => void;
   onMoveTab: (tabId: string, direction: -1 | 1) => void;
+  onReorderTab: (tabId: string, targetTabId: string) => void;
   onCloseTab: (tabId: string) => void;
   onAddTab: () => void;
 };
@@ -44,18 +45,257 @@ export function TabsStrip({
   onActivateTab,
   onOpenRenameDialog,
   onMoveTab,
+  onReorderTab,
   onCloseTab,
   onAddTab,
 }: TabsStripProps) {
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
+  const [draggedTabId, setDraggedTabId] = useState<string | null>(null);
+  const [dropTargetTabId, setDropTargetTabId] = useState<string | null>(null);
+  const [touchMoveTabId, setTouchMoveTabId] = useState<string | null>(null);
+  const longPressTimerRef = useRef<number | null>(null);
+  const suppressTapRef = useRef(false);
+  const touchPointerRef = useRef<{ x: number; y: number } | null>(null);
+  const touchStartPointerRef = useRef<{ x: number; y: number } | null>(null);
+  const autoScrollFrameRef = useRef<number | null>(null);
+  const touchSourceTabIdRef = useRef<string | null>(null);
+
+  const clearAutoScroll = () => {
+    if (autoScrollFrameRef.current !== null) {
+      window.cancelAnimationFrame(autoScrollFrameRef.current);
+      autoScrollFrameRef.current = null;
+    }
+  };
+
+  const scrollViewportByEdge = () => {
+    if (!touchMoveTabId) {
+      clearAutoScroll();
+      return;
+    }
+
+    const viewport = scrollAreaRef.current?.querySelector<HTMLElement>(
+      "[data-slot='scroll-area-viewport']",
+    );
+    const pointer = touchPointerRef.current;
+    if (!viewport || !pointer) {
+      clearAutoScroll();
+      return;
+    }
+
+    const startPointer = touchStartPointerRef.current;
+    if (!startPointer) {
+      clearAutoScroll();
+      return;
+    }
+
+    const deadZone = 8;
+    const maxDistance = 120;
+    const maxScrollStep = 20;
+    const edgeThreshold = 72;
+    let deltaX = 0;
+    let deltaY = 0;
+    const rect = viewport.getBoundingClientRect();
+
+    if (tabsOrientation === "horizontal") {
+      const distance = pointer.x - startPointer.x;
+      const magnitude = Math.abs(distance);
+      if (magnitude > deadZone) {
+        const normalized = Math.min((magnitude - deadZone) / maxDistance, 1);
+        const step = Math.max(2, Math.round(normalized * maxScrollStep));
+        deltaX = distance < 0 ? -step : step;
+      }
+
+      const leftEdgeDistance = pointer.x - rect.left;
+      const rightEdgeDistance = rect.right - pointer.x;
+      if (leftEdgeDistance >= 0 && leftEdgeDistance < edgeThreshold) {
+        const normalized = 1 - leftEdgeDistance / edgeThreshold;
+        deltaX = Math.min(deltaX, -Math.max(2, Math.round(normalized * maxScrollStep)));
+      } else if (rightEdgeDistance >= 0 && rightEdgeDistance < edgeThreshold) {
+        const normalized = 1 - rightEdgeDistance / edgeThreshold;
+        deltaX = Math.max(deltaX, Math.max(2, Math.round(normalized * maxScrollStep)));
+      }
+    } else {
+      const distance = pointer.y - startPointer.y;
+      const magnitude = Math.abs(distance);
+      if (magnitude > deadZone) {
+        const normalized = Math.min((magnitude - deadZone) / maxDistance, 1);
+        const step = Math.max(2, Math.round(normalized * maxScrollStep));
+        deltaY = distance < 0 ? -step : step;
+      }
+
+      const topEdgeDistance = pointer.y - rect.top;
+      const bottomEdgeDistance = rect.bottom - pointer.y;
+      if (topEdgeDistance >= 0 && topEdgeDistance < edgeThreshold) {
+        const normalized = 1 - topEdgeDistance / edgeThreshold;
+        deltaY = Math.min(deltaY, -Math.max(2, Math.round(normalized * maxScrollStep)));
+      } else if (bottomEdgeDistance >= 0 && bottomEdgeDistance < edgeThreshold) {
+        const normalized = 1 - bottomEdgeDistance / edgeThreshold;
+        deltaY = Math.max(deltaY, Math.max(2, Math.round(normalized * maxScrollStep)));
+      }
+    }
+
+    if (deltaX !== 0 || deltaY !== 0) {
+      viewport.scrollBy({ left: deltaX, top: deltaY });
+      autoScrollFrameRef.current = window.requestAnimationFrame(scrollViewportByEdge);
+      return;
+    }
+
+    clearAutoScroll();
+  };
+
+  useEffect(() => clearAutoScroll, []);
+
+  const handleDragStart = (event: DragEvent<HTMLDivElement>, tabId: string) => {
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", tabId);
+    setDraggedTabId(tabId);
+    setDropTargetTabId(tabId);
+  };
+
+  const handleDragEnter = (event: DragEvent<HTMLDivElement>, tabId: string) => {
+    event.preventDefault();
+    if (draggedTabId && draggedTabId !== tabId) {
+      setDropTargetTabId(tabId);
+    }
+  };
+
+  const handleDragOver = (event: DragEvent<HTMLDivElement>, tabId: string) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    if (draggedTabId && draggedTabId !== tabId) {
+      setDropTargetTabId(tabId);
+    }
+  };
+
+  const clearDragState = () => {
+    setDraggedTabId(null);
+    setDropTargetTabId(null);
+  };
+
+  const clearLongPressTimer = () => {
+    if (longPressTimerRef.current !== null) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  const clearTouchMoveState = () => {
+    setTouchMoveTabId(null);
+    touchSourceTabIdRef.current = null;
+    touchPointerRef.current = null;
+    touchStartPointerRef.current = null;
+    suppressTapRef.current = false;
+    clearLongPressTimer();
+    clearAutoScroll();
+  };
+
+  const handleDrop = (event: DragEvent<HTMLDivElement>, targetTabId: string) => {
+    event.preventDefault();
+    const sourceTabId = event.dataTransfer.getData("text/plain") || draggedTabId;
+    if (sourceTabId && sourceTabId !== targetTabId) {
+      onReorderTab(sourceTabId, targetTabId);
+    }
+    clearDragState();
+  };
+
+  const handlePointerDown = (
+    event: PointerEvent<HTMLDivElement>,
+    tabId: string,
+  ) => {
+    if (event.pointerType !== "touch") {
+      return;
+    }
+    event.currentTarget.setPointerCapture(event.pointerId);
+    clearLongPressTimer();
+    touchSourceTabIdRef.current = tabId;
+    touchPointerRef.current = { x: event.clientX, y: event.clientY };
+    touchStartPointerRef.current = { x: event.clientX, y: event.clientY };
+    longPressTimerRef.current = window.setTimeout(() => {
+      setTouchMoveTabId(tabId);
+      setDropTargetTabId(tabId);
+      suppressTapRef.current = true;
+      scrollViewportByEdge();
+    }, 450);
+  };
+
+  const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "touch") {
+      return;
+    }
+    clearLongPressTimer();
+    if (!touchMoveTabId) {
+      return;
+    }
+
+    const sourceTabId = touchSourceTabIdRef.current;
+    const targetTabId = dropTargetTabId;
+    if (sourceTabId && targetTabId && sourceTabId !== targetTabId) {
+      onReorderTab(sourceTabId, targetTabId);
+    }
+    clearTouchMoveState();
+  };
+
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "touch") {
+      return;
+    }
+
+    touchPointerRef.current = { x: event.clientX, y: event.clientY };
+
+    if (!touchMoveTabId) {
+      const startPointer = touchStartPointerRef.current;
+      if (startPointer) {
+        const deltaX = Math.abs(event.clientX - startPointer.x);
+        const deltaY = Math.abs(event.clientY - startPointer.y);
+        if (deltaX > 8 || deltaY > 8) {
+          clearLongPressTimer();
+        }
+      }
+      return;
+    }
+
+    event.preventDefault();
+
+    const target = document
+      .elementFromPoint(event.clientX, event.clientY)
+      ?.closest<HTMLElement>("[data-tab-id]");
+    const targetTabId = target?.dataset.tabId ?? null;
+
+    if (targetTabId && targetTabId !== dropTargetTabId) {
+      setDropTargetTabId(targetTabId);
+    }
+
+    if (autoScrollFrameRef.current === null) {
+      autoScrollFrameRef.current = window.requestAnimationFrame(scrollViewportByEdge);
+    }
+  };
+
+  const handleTabActivate = (tabId: string) => {
+    if (touchMoveTabId) {
+      return;
+    }
+
+    if (suppressTapRef.current) {
+      suppressTapRef.current = false;
+      return;
+    }
+
+    onActivateTab(tabId);
+  };
+
   return (
-    <ScrollArea className="h-full w-full">
+    <ScrollArea ref={scrollAreaRef} className="h-full w-full">
       <div
         className={cn(
           "p-2.5",
+          touchMoveTabId && "touch-none select-none",
           tabsOrientation === "vertical"
             ? "flex flex-col items-stretch gap-2"
             : "flex w-max items-center gap-2",
         )}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={clearTouchMoveState}
       >
         {tabs.map((tab, index) => {
           const active = tab.id === activeTabId;
@@ -70,78 +310,100 @@ export function TabsStrip({
           const MoveForwardIcon =
             tabsOrientation === "vertical" ? ArrowDownIcon : ArrowRightIcon;
           return (
-            <ButtonGroup
+            <div
               key={tab.id}
-              className={cn(tabsOrientation === "vertical" && "w-full")}
+              draggable
+              data-tab-id={tab.id}
+              onDragStart={(event) => handleDragStart(event, tab.id)}
+              onDragEnter={(event) => handleDragEnter(event, tab.id)}
+              onDragOver={(event) => handleDragOver(event, tab.id)}
+              onDragEnd={clearDragState}
+              onDrop={(event) => handleDrop(event, tab.id)}
+              onPointerDown={(event) => handlePointerDown(event, tab.id)}
+              className={cn(
+                "rounded-lg transition-opacity",
+                draggedTabId === tab.id && "opacity-60",
+                (dropTargetTabId === tab.id && draggedTabId !== tab.id) ||
+                  (touchMoveTabId === tab.id &&
+                    "ring-2 ring-primary/35 ring-offset-2 ring-offset-background"),
+                ((dropTargetTabId === tab.id && draggedTabId !== tab.id) ||
+                  touchMoveTabId === tab.id) &&
+                  "ring-2 ring-primary/35 ring-offset-2 ring-offset-background",
+                tabsOrientation === "vertical" && "w-full",
+              )}
             >
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onActivateTab(tab.id)}
-                className={cn(
-                  "min-w-28 justify-start border-subtle-divider/80 bg-workspace-panel-elevated text-left shadow-none",
-                  tabsOrientation === "vertical" &&
-                    "h-auto w-full min-w-0 flex-1 whitespace-normal wrap-break-word py-1.5 text-left leading-tight",
-                  active &&
-                    "border-primary! bg-primary/92! text-primary-foreground! hover:bg-primary/90! hover:text-primary-foreground!",
-                )}
+              <ButtonGroup
+                className={cn(tabsOrientation === "vertical" && "w-full")}
               >
-                {tab.title}
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  render={
-                    <Button
-                      variant="outline"
-                      size="icon-sm"
-                      className={cn(
-                        "relative border-subtle-divider/80 bg-workspace-panel-elevated",
-                        tabsOrientation === "vertical" && "h-auto self-stretch",
-                        active &&
-                          "border-primary! bg-primary/92! text-primary-foreground! hover:bg-primary/90! hover:text-primary-foreground! before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-primary-foreground/35 before:content-['']",
-                      )}
-                      aria-label={`Tab options for ${tab.title}`}
-                    >
-                      <EllipsisIcon />
-                    </Button>
-                  }
-                />
-                <DropdownMenuContent align="start" className="w-40">
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={() => onOpenRenameDialog(tab.id)}>
-                      <PencilLineIcon />
-                      Relabel Tab
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  {tabs.length > 1 ? (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        {canMoveLeft ? (
-                          <DropdownMenuItem onClick={() => onMoveTab(tab.id, -1)}>
-                            <MoveBackwardIcon />
-                            {moveBackwardLabel}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleTabActivate(tab.id)}
+                  className={cn(
+                    "min-w-28 justify-start border-subtle-divider/80 bg-workspace-panel-elevated text-left shadow-none",
+                    tabsOrientation === "vertical" &&
+                      "h-auto w-full min-w-0 flex-1 whitespace-normal wrap-break-word py-1.5 text-left leading-tight",
+                    active &&
+                      "border-primary! bg-primary/92! text-primary-foreground! hover:bg-primary/90! hover:text-primary-foreground!",
+                  )}
+                >
+                  {tab.title}
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    render={
+                      <Button
+                        variant="outline"
+                        size="icon-sm"
+                        className={cn(
+                          "relative border-subtle-divider/80 bg-workspace-panel-elevated",
+                          tabsOrientation === "vertical" && "h-auto self-stretch",
+                          active &&
+                            "border-primary! bg-primary/92! text-primary-foreground! hover:bg-primary/90! hover:text-primary-foreground! before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-primary-foreground/35 before:content-['']",
+                        )}
+                        aria-label={`Tab options for ${tab.title}`}
+                      >
+                        <EllipsisVerticalIcon />
+                      </Button>
+                    }
+                  />
+                  <DropdownMenuContent align="start" className="w-40">
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem onClick={() => onOpenRenameDialog(tab.id)}>
+                        <PencilLineIcon />
+                        Relabel Tab
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    {tabs.length > 1 ? (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          {canMoveLeft ? (
+                            <DropdownMenuItem onClick={() => onMoveTab(tab.id, -1)}>
+                              <MoveBackwardIcon />
+                              {moveBackwardLabel}
+                            </DropdownMenuItem>
+                          ) : null}
+                          {canMoveRight ? (
+                            <DropdownMenuItem onClick={() => onMoveTab(tab.id, 1)}>
+                              <MoveForwardIcon />
+                              {moveForwardLabel}
+                            </DropdownMenuItem>
+                          ) : null}
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem onClick={() => onCloseTab(tab.id)}>
+                            <XIcon />
+                            Close Tab
                           </DropdownMenuItem>
-                        ) : null}
-                        {canMoveRight ? (
-                          <DropdownMenuItem onClick={() => onMoveTab(tab.id, 1)}>
-                            <MoveForwardIcon />
-                            {moveForwardLabel}
-                          </DropdownMenuItem>
-                        ) : null}
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem onClick={() => onCloseTab(tab.id)}>
-                          <XIcon />
-                          Close Tab
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </>
-                  ) : null}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </ButtonGroup>
+                        </DropdownMenuGroup>
+                      </>
+                    ) : null}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </ButtonGroup>
+            </div>
           );
         })}
 
