@@ -77,7 +77,7 @@ export function ConcordanceTool({
               </p>
             ) : (
               <Accordion
-                className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+                className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-content]]:pb-1 [&_[data-slot=accordion-trigger]]:py-1 [&_[data-slot=accordion-trigger]>svg]:transition-none"
                 multiple
                 value={wordAccordionValue}
                 onValueChange={(value) =>

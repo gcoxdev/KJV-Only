@@ -75,7 +75,10 @@ export function CrossRefsTool({
             ) : (
               <div className="space-y-2">
                 <p className="text-sm font-medium">{selectedLabel(selected.key, books)}</p>
-                <Accordion className="w-full rounded-md border px-2" multiple>
+                <Accordion
+                  className="w-full rounded-md border px-2 [&_[data-slot=accordion-content]]:pb-1 [&_[data-slot=accordion-trigger]]:py-1"
+                  multiple
+                >
                   <AccordionItem value="cross-refs-references">
                     <AccordionTrigger>
                       <span className="flex items-center gap-2">
