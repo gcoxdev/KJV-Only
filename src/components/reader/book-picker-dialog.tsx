@@ -57,8 +57,8 @@ export function BookPickerDialog({
               books={books}
               selectedTestament={leaf.pickerTestament}
               selectedBookIndex={leaf.pickerBookIndex}
-              currentBookIndex={leaf.bookIndex}
-              currentChapterIndex={leaf.chapterIndex}
+              currentBookIndex={leaf.view === "picker" ? null : leaf.bookIndex}
+              currentChapterIndex={leaf.view === "picker" ? null : leaf.chapterIndex}
               onSelectTestament={onSelectTestament}
               onBackToTestaments={onBackToTestaments}
               onSelectBook={onSelectBook}

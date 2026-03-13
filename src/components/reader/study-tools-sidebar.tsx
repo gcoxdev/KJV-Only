@@ -79,15 +79,24 @@ export function StudyToolsSidebar({
           size="sm"
           className="grid w-full grid-cols-3"
         >
-          <ToggleGroupItem value="tools" className="justify-center">
+          <ToggleGroupItem
+            value="tools"
+            className="justify-center data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+          >
             <ToolboxIcon />
             Tools
           </ToggleGroupItem>
-          <ToggleGroupItem value="notes" className="justify-center">
+          <ToggleGroupItem
+            value="notes"
+            className="justify-center data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+          >
             <NotebookPenIcon />
             Notes
           </ToggleGroupItem>
-          <ToggleGroupItem value="bookmarks" className="justify-center">
+          <ToggleGroupItem
+            value="bookmarks"
+            className="justify-center data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+          >
             <BookMarkedIcon />
             Bookmarks
           </ToggleGroupItem>

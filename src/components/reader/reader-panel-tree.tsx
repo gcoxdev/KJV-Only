@@ -1095,8 +1095,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
               books={books}
               selectedTestament={leaf.pickerTestament}
               selectedBookIndex={leaf.pickerBookIndex}
-              currentBookIndex={leaf.bookIndex}
-              currentChapterIndex={leaf.chapterIndex}
+              currentBookIndex={leaf.view === "picker" ? null : leaf.bookIndex}
+              currentChapterIndex={leaf.view === "picker" ? null : leaf.chapterIndex}
               onSelectTestament={(testament) =>
                 updateLeafLocation(leaf.id, {
                   pickerTestament: testament,

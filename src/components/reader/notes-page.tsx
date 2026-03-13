@@ -208,7 +208,7 @@ export function NotesPage({
         JSON.stringify(parseSerializedState(selectedNote.body) ?? null));
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-1 gap-3 px-3 pt-0 pb-3 lg:grid-cols-[22rem_minmax(0,1fr)]">
+    <div className="grid h-full min-h-0 grid-cols-1 gap-3 p-2 lg:grid-cols-[22rem_minmax(0,1fr)]">
       <div className="flex min-h-0 flex-col rounded-md border">
         <div className="space-y-2 border-b p-2">
           <p className="text-sm font-semibold">Notes</p>
