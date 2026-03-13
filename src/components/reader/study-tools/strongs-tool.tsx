@@ -86,7 +86,7 @@ export function StrongsTool({
               </p>
             ) : (
               <Accordion
-                className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+                className="w-full rounded-md border px-2 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-content]]:pb-1 [&_[data-slot=accordion-trigger]]:py-1 [&_[data-slot=accordion-trigger]>svg]:transition-none"
                 multiple
                 value={wordAccordionValue}
                 onValueChange={(value) =>
@@ -106,7 +106,10 @@ export function StrongsTool({
                       {entry.kjv_refs && Object.keys(entry.kjv_refs).length > 0 ? (
                         <div className="space-y-1">
                           <p className="text-muted-foreground">KJV References</p>
-                          <Accordion className="w-full rounded-md border px-2" multiple>
+                          <Accordion
+                            className="w-full rounded-md border px-2 [&_[data-slot=accordion-content]]:pb-1 [&_[data-slot=accordion-trigger]]:py-1"
+                            multiple
+                          >
                             {Object.entries(entry.kjv_refs).map(([word, references]) => (
                               <AccordionItem key={`${code}-${word}`} value={`${code}-${word}`}>
                                 <AccordionTrigger>

@@ -66,7 +66,10 @@ export function GenealogyTool({
                   : "Click a name in the text or search genealogy."}
               </p>
             ) : searchTerm.trim() && results.length > 1 ? (
-              <Accordion className="w-full rounded-xl border border-subtle-divider/80 px-2" multiple>
+              <Accordion
+                className="w-full rounded-xl border border-subtle-divider/80 px-2 [&_[data-slot=accordion-content]]:pb-1 [&_[data-slot=accordion-trigger]]:py-1"
+                multiple
+              >
                 {results.map((person) => (
                   <AccordionItem
                     key={`${person.id}-${person.names[0] ?? "person"}`}

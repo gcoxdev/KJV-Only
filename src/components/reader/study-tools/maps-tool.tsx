@@ -187,7 +187,10 @@ export function MapsTool({
                 ) : null}
 
                 {references.length > 0 ? (
-                  <Accordion className="w-full rounded-md border px-2" multiple>
+                  <Accordion
+                    className="w-full rounded-md border px-2 [&_[data-slot=accordion-content]]:pb-1 [&_[data-slot=accordion-trigger]]:py-1"
+                    multiple
+                  >
                     <AccordionItem value="maps-references">
                       <AccordionTrigger>
                         <span className="flex items-center gap-2">
