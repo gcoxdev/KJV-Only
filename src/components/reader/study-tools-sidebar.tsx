@@ -56,13 +56,6 @@ export function StudyToolsSidebar({
   return (
     <Sidebar side="right" className="h-screen border-l border-sidebar-border/80 bg-sidebar/95 backdrop-blur-sm">
       <SidebarHeader className="gap-3 border-b border-sidebar-border/70 bg-sidebar/85 px-3 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex min-w-0 flex-col gap-1">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-              Study Desk
-            </span>
-          </div>
-        </div>
         <ToggleGroup
           value={[activeTab]}
           onValueChange={(value) => {

@@ -85,14 +85,9 @@ export function ReaderTopBar({
             height={24}
             className="size-6"
           />
-          <div className="flex min-w-0 flex-col">
-            <p className="workspace-heading truncate text-lg font-semibold leading-none">
-              KJV Only
-            </p>
-            <p className="truncate text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-              {isStudyMode ? "Study Workspace" : "Reading Mode"}
-            </p>
-          </div>
+          <p className="workspace-heading truncate text-lg font-semibold leading-none">
+            KJV Only
+          </p>
         </div>
       </div>
 
