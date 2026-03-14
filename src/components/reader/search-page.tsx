@@ -514,29 +514,29 @@ export function SearchPage({
                 }}
                 variant="outline"
                 spacing={0}
-                className="grid w-full grid-cols-2 gap-0 lg:grid-cols-4"
+                className="grid w-full [grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))] gap-0"
               >
                 <ToggleGroupItem
                   value="contains-any"
-                  className="data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+                  className="h-auto min-w-0 w-full overflow-hidden px-2 py-2 text-center leading-tight text-ellipsis whitespace-nowrap data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
                 >
                   {SEARCH_MODE_LABELS["contains-any"]}
                 </ToggleGroupItem>
                 <ToggleGroupItem
                   value="contains-all"
-                  className="data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+                  className="h-auto min-w-0 w-full overflow-hidden px-2 py-2 text-center leading-tight text-ellipsis whitespace-nowrap data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
                 >
                   {SEARCH_MODE_LABELS["contains-all"]}
                 </ToggleGroupItem>
                 <ToggleGroupItem
                   value="contains-phrase"
-                  className="data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+                  className="h-auto min-w-0 w-full overflow-hidden px-2 py-2 text-center leading-tight text-ellipsis whitespace-nowrap data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
                 >
                   {SEARCH_MODE_LABELS["contains-phrase"]}
                 </ToggleGroupItem>
                 <ToggleGroupItem
                   value="regex"
-                  className="data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+                  className="h-auto min-w-0 w-full overflow-hidden px-2 py-2 text-center leading-tight text-ellipsis whitespace-nowrap data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
                 >
                   {SEARCH_MODE_LABELS.regex}
                 </ToggleGroupItem>
