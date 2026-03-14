@@ -1,0 +1,281 @@
+{
+  "phraseCount": 27,
+  "scanned": 27,
+  "addedRefs": 112,
+  "unchanged": 12,
+  "changedPhrases": [
+    {
+      "phrase": "away with",
+      "before": 3,
+      "after": 22,
+      "added": 19,
+      "references": [
+        "GEN.31.27",
+        "LEV.26.39",
+        "JDG.16.3",
+        "JDG.16.14",
+        "1KI.20.34",
+        "EST.2.6",
+        "JOB.34.20",
+        "JOB.36.18",
+        "PSA.28.3",
+        "ISA.1.13",
+        "ISA.22.17",
+        "AMO.4.2",
+        "MAL.2.3",
+        "LUK.23.18",
+        "JHN.19.15",
+        "ACT.10.23",
+        "ACT.21.36",
+        "ACT.22.22",
+        "GAL.2.13",
+        "2TI.3.6",
+        "2PE.3.10",
+        "2PE.3.17"
+      ]
+    },
+    {
+      "phrase": "by and by",
+      "before": 3,
+      "after": 4,
+      "added": 1,
+      "references": [
+        "MAT.13.21",
+        "MRK.6.25",
+        "LUK.17.7",
+        "LUK.21.9"
+      ]
+    },
+    {
+      "phrase": "children of belial",
+      "before": 3,
+      "after": 10,
+      "added": 7,
+      "references": [
+        "DEU.13.13",
+        "JDG.19.22",
+        "JDG.20.13",
+        "1SA.2.12",
+        "1SA.10.27",
+        "2SA.23.6",
+        "1KI.21.10",
+        "1KI.21.13",
+        "2CH.13.7",
+        "2CO.6.15"
+      ]
+    },
+    {
+      "phrase": "fell out",
+      "before": 2,
+      "after": 5,
+      "added": 3,
+      "references": [
+        "2SA.20.8",
+        "2KI.7.20",
+        "2CH.21.19",
+        "LUK.24.14",
+        "ACT.15.39"
+      ]
+    },
+    {
+      "phrase": "fetched a compass",
+      "before": 1,
+      "after": 3,
+      "added": 2,
+      "references": [
+        "JOS.15.3",
+        "2KI.3.9",
+        "ACT.28.13"
+      ]
+    },
+    {
+      "phrase": "gave up the ghost",
+      "before": 3,
+      "after": 12,
+      "added": 9,
+      "references": [
+        "GEN.25.8",
+        "GEN.25.17",
+        "GEN.35.29",
+        "LAM.1.19",
+        "MAT.27.50",
+        "MRK.15.37",
+        "MRK.15.39",
+        "LUK.23.46",
+        "JHN.19.30",
+        "ACT.5.5",
+        "ACT.5.10",
+        "ACT.12.23"
+      ]
+    },
+    {
+      "phrase": "god forbid",
+      "before": 3,
+      "after": 24,
+      "added": 21,
+      "references": [
+        "GEN.44.7",
+        "GEN.44.17",
+        "JOS.22.29",
+        "JOS.24.16",
+        "1SA.12.23",
+        "1SA.14.45",
+        "1SA.20.2",
+        "1CH.11.19",
+        "JOB.27.5",
+        "LUK.20.16",
+        "ROM.3.4",
+        "ROM.3.6",
+        "ROM.3.31",
+        "ROM.6.2",
+        "ROM.6.15",
+        "ROM.7.7",
+        "ROM.7.13",
+        "ROM.9.14",
+        "ROM.11.1",
+        "ROM.11.11",
+        "1CO.6.15",
+        "GAL.2.17",
+        "GAL.3.21",
+        "GAL.6.14"
+      ]
+    },
+    {
+      "phrase": "save alive",
+      "before": 3,
+      "after": 6,
+      "added": 3,
+      "references": [
+        "GEN.12.12",
+        "EXO.1.17",
+        "EXO.1.22",
+        "DEU.20.16",
+        "JOS.2.13",
+        "JOS.6.25"
+      ]
+    },
+    {
+      "phrase": "sit at meat",
+      "before": 3,
+      "after": 5,
+      "added": 2,
+      "references": [
+        "MAT.9.10",
+        "MRK.2.15",
+        "LUK.7.37",
+        "LUK.14.10",
+        "1CO.8.10"
+      ]
+    },
+    {
+      "phrase": "take no thought",
+      "before": 3,
+      "after": 5,
+      "added": 2,
+      "references": [
+        "MAT.6.25",
+        "MAT.6.31",
+        "MAT.10.19",
+        "MRK.13.11",
+        "LUK.12.22"
+      ]
+    },
+    {
+      "phrase": "take thought",
+      "before": 3,
+      "after": 4,
+      "added": 1,
+      "references": [
+        "1SA.9.5",
+        "MAT.6.27",
+        "MAT.6.34",
+        "LUK.12.26"
+      ]
+    },
+    {
+      "phrase": "to wit",
+      "before": 3,
+      "after": 32,
+      "added": 29,
+      "references": [
+        "GEN.24.21",
+        "EXO.2.4",
+        "NUM.22.32",
+        "DEU.4.26",
+        "JOS.17.1",
+        "1KI.2.32",
+        "1KI.7.50",
+        "1KI.13.23",
+        "2KI.10.29",
+        "1CH.7.2",
+        "1CH.27.1",
+        "2CH.4.12",
+        "2CH.13.8",
+        "2CH.20.6",
+        "2CH.25.7",
+        "2CH.25.10",
+        "2CH.31.3",
+        "NEH.11.3",
+        "EST.2.12",
+        "JER.25.18",
+        "JER.34.9",
+        "LAM.2.13",
+        "EZK.13.16",
+        "DAN.11.15",
+        "ACT.10.41",
+        "ROM.8.23",
+        "ROM.8.27",
+        "2CO.5.19",
+        "2CO.8.1",
+        "EPH.6.13",
+        "EPH.6.18",
+        "PHM.1.15"
+      ]
+    },
+    {
+      "phrase": "went softly",
+      "before": 1,
+      "after": 2,
+      "added": 1,
+      "references": [
+        "JDG.4.21",
+        "1KI.21.27"
+      ]
+    },
+    {
+      "phrase": "wist not",
+      "before": 3,
+      "after": 10,
+      "added": 7,
+      "references": [
+        "EXO.16.15",
+        "EXO.34.29",
+        "JOS.2.4",
+        "JOS.8.14",
+        "JDG.16.20",
+        "MRK.9.6",
+        "LUK.2.49",
+        "JHN.5.13",
+        "ACT.12.9",
+        "ACT.23.5"
+      ]
+    },
+    {
+      "phrase": "would god",
+      "before": 3,
+      "after": 8,
+      "added": 5,
+      "references": [
+        "NUM.11.29",
+        "NUM.14.2",
+        "NUM.20.3",
+        "DEU.5.29",
+        "DEU.28.67",
+        "2SA.18.33",
+        "2KI.5.3",
+        "2CO.11.1"
+      ]
+    }
+  ],
+  "noHitPhrases": []
+}
