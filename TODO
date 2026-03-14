@@ -1,4 +1,15 @@
-* Make a lot of the settings per panel (base font size in settings, individual font size in panel)
-* Make search available per panel
-* Store previous search queries
-* Map with english tiles
+- Make a lot of the settings per panel (base font size in settings, individual font size in panel)
+- Make search available per panel
+- Store previous search queries
+- Map with english tiles
+
+- On mobile, when opening notes or creating notes, close sidebar
+- Remove exaggerated shadowing on sidebar tools accordion
+- Make tool search field outlines more visible
+- On mobile, make remove the "MODE" text and surrounding container next to read/study switch
+- On mobile, make notes list collapsible - add full screen mode to note itself in all cases with option to hide tools
+- Make chapter swipeable left / right for prev / next chapter, always have loaded prev, current, next
+- Maybe make infinite scrolling for chapters possible, always have loaded prev, current, next
+- Make search area collapsed after search
+- Congratulatory message or something (confetti) when 100% progress achieved
+- Study mode, hover over Strongs highlights other Strongs within same panel / tab

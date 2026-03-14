@@ -1,4 +1,4 @@
-const APP_CACHE = "kjv-only-cache-v2"
+const APP_CACHE = "kjv-only-cache-v3"
 const APP_SHELL = ["/", "/index.html", "/manifest.webmanifest"]
 const LIVE_DATA_PREFIXES = ["/references/", "/data/", "/maps/"]
 

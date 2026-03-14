@@ -218,6 +218,46 @@ export function normalizeStrongsCode(value: string) {
   return `${prefix}${numeric.padStart(4, "0")}`;
 }
 
+export type StrongsDerivationToken =
+  | {
+      type: "text";
+      value: string;
+    }
+  | {
+      type: "strongs";
+      value: string;
+    };
+
+export function tokenizeStrongsDerivation(input: string): StrongsDerivationToken[] {
+  const tokens: StrongsDerivationToken[] = [];
+  const pattern = /\b([GH]\d{4})\b/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null = null;
+
+  while ((match = pattern.exec(input)) !== null) {
+    if (match.index > lastIndex) {
+      tokens.push({
+        type: "text",
+        value: input.slice(lastIndex, match.index),
+      });
+    }
+    tokens.push({
+      type: "strongs",
+      value: match[1],
+    });
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < input.length) {
+    tokens.push({
+      type: "text",
+      value: input.slice(lastIndex),
+    });
+  }
+
+  return tokens;
+}
+
 export function parseBibleReference(reference: string) {
   const chapterSpanMatch = reference.match(
     /^([1-3]?[A-Z]{2,3})\.(\d+)\.(\d+):(\d+)\.(\d+)$/,

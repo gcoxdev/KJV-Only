@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-03-14T00:28:37.935Z",
+  "summary": {
+    "totalEntries": {
+      "greek": 5523,
+      "hebrew": 8674,
+      "combined": 14197
+    },
+    "findings": {
+      "total": 0,
+      "greek": 0,
+      "hebrew": 0,
+      "normalizable": 0,
+      "crossPrefix": 0,
+      "unresolved": 0,
+      "uniqueRawReferences": 0
+    }
+  },
+  "findings": [],
+  "unresolved": []
+}
