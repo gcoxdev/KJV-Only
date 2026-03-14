@@ -30,6 +30,7 @@ let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
 let ancientMapPromise: Promise<AncientMapPayload> | null = null;
 const mapGeoJsonPromiseCache = new Map<string, Promise<MapGeoJsonPayload>>();
 const GENEALOGY_ASSET_VERSION = "20260312-philip-fix-1";
+const STRONGS_ASSET_VERSION = "20260313-derivation-links-2";
 
 function parseBooks(input: unknown): Book[] | null {
   if (Array.isArray(input)) {
@@ -202,9 +203,10 @@ export function loadGenealogy() {
 
 export function loadStrongsGreek() {
   if (!strongsGreekPromise) {
-    strongsGreekPromise = fetch("/references/strongs-greek.compact.min.json", {
-      cache: "no-cache",
-    })
+    strongsGreekPromise = fetch(
+      `/references/strongs-greek.compact.min.json?v=${STRONGS_ASSET_VERSION}`,
+      { cache: "no-cache" },
+    )
       .then(async (response) => {
         if (!response.ok) {
           throw new Error("Could not load /references/strongs-greek.compact.min.json");
@@ -223,9 +225,10 @@ export function loadStrongsGreek() {
 
 export function loadStrongsHebrew() {
   if (!strongsHebrewPromise) {
-    strongsHebrewPromise = fetch("/references/strongs-hebrew.compact.min.json", {
-      cache: "no-cache",
-    })
+    strongsHebrewPromise = fetch(
+      `/references/strongs-hebrew.compact.min.json?v=${STRONGS_ASSET_VERSION}`,
+      { cache: "no-cache" },
+    )
       .then(async (response) => {
         if (!response.ok) {
           throw new Error("Could not load /references/strongs-hebrew.compact.min.json");

@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode, type Ref } from "react";
 import { BookKeyIcon, LoaderCircleIcon } from "lucide-react";
 
+import { tokenizeStrongsDerivation } from "@/lib/references";
 import { cn } from "@/lib/utils";
 import type { StrongsEntry } from "@/types/reader";
 import {
@@ -30,6 +31,7 @@ type StrongsToolProps = {
   wordAccordionValue: string[];
   onWordAccordionValueChange: (value: string[]) => void;
   onSearch: (term: string) => void;
+  onOpenLinkedStrongsEntry: (code: string) => void;
   inputRef: Ref<HTMLInputElement>;
   renderPreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
@@ -47,6 +49,7 @@ export function StrongsTool({
   wordAccordionValue,
   onWordAccordionValueChange,
   onSearch,
+  onOpenLinkedStrongsEntry,
   inputRef,
   renderPreview,
   onOpenReference,
@@ -165,7 +168,22 @@ export function StrongsTool({
                       {entry.derivation ? (
                         <p>
                           <span className="text-muted-foreground">Derivation:</span>{" "}
-                          {entry.derivation}
+                          {tokenizeStrongsDerivation(entry.derivation).map((token, index) =>
+                            token.type === "strongs" ? (
+                              <button
+                                key={`${code}-derivation-${token.value}-${index}`}
+                                type="button"
+                                className="font-mono text-primary underline-offset-4 hover:underline"
+                                onClick={() => onOpenLinkedStrongsEntry(token.value)}
+                              >
+                                {token.value}
+                              </button>
+                            ) : (
+                              <Fragment key={`${code}-derivation-text-${index}`}>
+                                {token.value}
+                              </Fragment>
+                            ),
+                          )}
                         </p>
                       ) : null}
                     </AccordionContent>

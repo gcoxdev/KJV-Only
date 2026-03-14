@@ -1563,6 +1563,65 @@ export function KJVReader() {
     [setIsRightSidebarOpen, showStudyTool],
   );
 
+  const openLinkedStrongsEntry = useCallback(
+    (code: string) => {
+      setStrongsError(null);
+      setIsStrongsSearching(false);
+      setStrongsSearchTerm("");
+      setStrongsWordAccordionValue([code]);
+      if (strongsSearchInputRef.current) {
+        strongsSearchInputRef.current.value = "";
+      }
+
+      const applySelection = (greek: StrongsPayload, hebrew: StrongsPayload) => {
+        const source = code.startsWith("G") ? greek : hebrew;
+        const entry = source[code];
+        if (!entry) {
+          setSelectedStrongsEntry(null);
+          return;
+        }
+
+        setSelectedStrongsEntry({
+          code,
+          testament: code.startsWith("G") ? "greek" : "hebrew",
+          entry,
+        });
+        openStudyTool("strongs");
+      };
+
+      if (strongsGreek && strongsHebrew) {
+        applySelection(strongsGreek, strongsHebrew);
+        return;
+      }
+
+      setIsStrongsLoading(true);
+      void ensureStrongsLoaded()
+        .then(({ greek, hebrew }) => {
+          applySelection(greek, hebrew);
+        })
+        .catch((error) => {
+          const message =
+            error instanceof Error ? error.message : "Failed to load Strong's data";
+          setStrongsError(message);
+          setSelectedStrongsEntry(null);
+        })
+        .finally(() => {
+          setIsStrongsLoading(false);
+        });
+    },
+    [
+      ensureStrongsLoaded,
+      openStudyTool,
+      setIsStrongsLoading,
+      setIsStrongsSearching,
+      setSelectedStrongsEntry,
+      setStrongsError,
+      setStrongsSearchTerm,
+      strongsGreek,
+      strongsHebrew,
+    ],
+  );
+
   const openCrossReferencesForVerse = useCallback(
     (bookIndex: number, chapterIndex: number, verseNumber: number) => {
       setNotesContext({
@@ -2408,6 +2467,7 @@ export function KJVReader() {
               wordAccordionValue: strongsWordAccordionValue,
               onWordAccordionValueChange: setStrongsWordAccordionValue,
               onSearch: applyStrongsSearch,
+              onOpenLinkedStrongsEntry: openLinkedStrongsEntry,
               inputRef: strongsSearchInputRef,
               renderPreview: referencePreviewContent,
               onOpenReference: openConcordanceReference,
