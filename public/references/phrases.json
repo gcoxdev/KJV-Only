@@ -1,93 +1,180 @@
 {
   "a while ago": {
     "meaning": "a short time ago; recently",
-    "references": ["JHN.9.13", "2CO.7.8"]
+    "references": [
+      "JHN.9.13",
+      "2CO.7.8"
+    ]
+  },
+  "away with": {
+    "meaning": "tolerate, bear, and endure; to take away"
   },
   "bewrayeth thee": {
     "meaning": "reveals or gives you away",
-    "references": ["MAT.26.73"]
+    "references": [
+      "MAT.26.73"
+    ]
   },
   "by and by": {
     "meaning": "immediately; soon afterward",
     "note": "In the KJV this usually means promptly, not 'eventually'.",
-    "references": ["MAT.13.21", "MRK.6.25", "LUK.21.9"]
+    "references": [
+      "MAT.13.21",
+      "MRK.6.25",
+      "LUK.21.9"
+    ]
   },
   "cannot away with": {
     "meaning": "cannot endure; cannot tolerate",
-    "references": ["ISA.1.13"]
+    "references": [
+      "ISA.1.13"
+    ]
   },
   "children of belial": {
     "meaning": "worthless or lawless people",
-    "aliases": ["sons of belial"],
-    "references": ["DEU.13.13", "1SA.2.12", "2CO.6.15"]
+    "aliases": [
+      "sons of belial"
+    ],
+    "references": [
+      "DEU.13.13",
+      "1SA.2.12",
+      "2CO.6.15"
+    ]
   },
-  "fetched a compass": {
-    "meaning": "sailed or traveled around",
-    "references": ["ACT.28.13"]
+  "crisping pins": {
+    "meaning": "curling pins for a women's hair"
+  },
+  "curious arts": {
+    "meaning": "magic, sorcery"
   },
   "fell out": {
     "meaning": "happened; came to pass",
     "note": "In some places this means an event occurred, not a quarrel.",
-    "references": ["LUK.24.14", "ACT.15.39"]
+    "references": [
+      "LUK.24.14",
+      "ACT.15.39"
+    ]
+  },
+  "fetched a compass": {
+    "meaning": "sailed or traveled around",
+    "references": [
+      "ACT.28.13"
+    ]
   },
   "gave up the ghost": {
     "meaning": "died; breathed one's last",
-    "references": ["GEN.25.8", "MAT.27.50", "ACT.5.10"]
+    "references": [
+      "GEN.25.8",
+      "MAT.27.50",
+      "ACT.5.10"
+    ]
   },
   "god forbid": {
     "meaning": "may it never be; certainly not",
-    "references": ["LUK.20.16", "ROM.3.4", "GAL.6.14"]
+    "references": [
+      "LUK.20.16",
+      "ROM.3.4",
+      "GAL.6.14"
+    ]
+  },
+  "lign aloes": {
+    "meaning": "an aromatic wood"
   },
   "made as though": {
     "meaning": "acted as if",
-    "references": ["LUK.24.28"]
+    "references": [
+      "LUK.24.28"
+    ]
+  },
+  "naught or nought": {
+    "meaning": "worthless or nothing"
   },
   "quit you like men": {
     "meaning": "conduct yourselves bravely; be strong",
-    "references": ["1CO.16.13"]
+    "references": [
+      "1CO.16.13"
+    ]
   },
   "save alive": {
     "meaning": "keep alive; preserve from death",
-    "references": ["GEN.12.12", "EXO.1.17", "JOS.6.25"]
+    "references": [
+      "GEN.12.12",
+      "EXO.1.17",
+      "JOS.6.25"
+    ]
   },
   "scrip and staff": {
     "meaning": "traveling bag and walking staff",
-    "references": ["MAT.10.10", "MRK.6.8", "LUK.9.3"]
+    "references": [
+      "MAT.10.10",
+      "MRK.6.8",
+      "LUK.9.3"
+    ]
   },
   "shut up his bowels of compassion": {
     "meaning": "withhold pity or compassion",
-    "references": ["1JN.3.17"]
+    "references": [
+      "1JN.3.17"
+    ]
   },
   "sit at meat": {
     "meaning": "sit down for a meal",
-    "references": ["MAT.9.10", "MRK.2.15", "LUK.7.37"]
+    "references": [
+      "MAT.9.10",
+      "MRK.2.15",
+      "LUK.7.37"
+    ]
   },
   "take no thought": {
     "meaning": "do not be anxious; do not be worried",
-    "references": ["MAT.6.25", "MAT.10.19", "LUK.12.22"]
+    "references": [
+      "MAT.6.25",
+      "MAT.10.19",
+      "LUK.12.22"
+    ]
   },
   "take thought": {
     "meaning": "be anxious; be concerned",
-    "references": ["1SA.9.5", "MAT.6.27", "LUK.12.26"]
+    "references": [
+      "1SA.9.5",
+      "MAT.6.27",
+      "LUK.12.26"
+    ]
   },
   "throughly furnished": {
     "meaning": "thoroughly equipped",
-    "references": ["2TI.3.17"]
+    "references": [
+      "2TI.3.17"
+    ]
   },
   "to wit": {
     "meaning": "namely; that is to say; to know",
-    "references": ["ROM.8.27", "2CO.8.1", "PHM.1.15"]
+    "references": [
+      "ROM.8.27",
+      "2CO.8.1",
+      "PHM.1.15"
+    ]
   },
   "went softly": {
     "meaning": "went in a subdued, mournful, or humble manner",
-    "references": ["1KI.21.27"]
+    "references": [
+      "1KI.21.27"
+    ]
   },
   "wist not": {
     "meaning": "did not know",
-    "references": ["LUK.2.49", "JHN.5.13", "ACT.12.9"]
+    "references": [
+      "LUK.2.49",
+      "JHN.5.13",
+      "ACT.12.9"
+    ]
   },
   "would god": {
     "meaning": "I wish that; if only",
-    "references": ["NUM.11.29", "DEU.5.29", "2CO.11.1"]
+    "references": [
+      "NUM.11.29",
+      "DEU.5.29",
+      "2CO.11.1"
+    ]
   }
 }
