@@ -8,6 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
 import type { GenealogyPerson } from "@/types/reader";
 
@@ -82,7 +83,12 @@ export function GenealogyPersonDetails({
                 value={`${person.id}-${entry.name}`}
               >
                 <AccordionTrigger>
-                  {`${entry.name} (${entry.numVerses ?? entry.verses.length})`}
+                  <span className="flex items-center gap-2">
+                    <span>{entry.name}</span>
+                    <Badge variant="outline">
+                      {entry.numVerses ?? entry.verses.length}
+                    </Badge>
+                  </span>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="flex flex-wrap gap-2">

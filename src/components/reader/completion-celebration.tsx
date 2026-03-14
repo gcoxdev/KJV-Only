@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { type CSSProperties, useMemo } from "react";
 import { PartyPopperIcon, SparklesIcon } from "lucide-react";
 
 import {
@@ -44,7 +44,12 @@ export function CompletionCelebration({
         left: `${Math.random() * 100}%`,
         delay: `${Math.round(Math.random() * 700)}ms`,
         duration: `${2200 + Math.round(Math.random() * 1800)}ms`,
-        rotate: `${Math.round(Math.random() * 360)}deg`,
+        rotateFrom: `${Math.round((Math.random() * 720) - 360)}deg`,
+        rotateTo: `${Math.round((Math.random() * 1440) - 720)}deg`,
+        driftX: `${Math.round((Math.random() * 120) - 60)}px`,
+        width: `${8 + Math.round(Math.random() * 10)}px`,
+        height: `${10 + Math.round(Math.random() * 16)}px`,
+        radius: `${2 + Math.round(Math.random() * 10)}px`,
         color: CONFETTI_COLORS[index % CONFETTI_COLORS.length],
       })),
     [],
@@ -62,8 +67,13 @@ export function CompletionCelebration({
                 left: piece.left,
                 animationDelay: piece.delay,
                 animationDuration: piece.duration,
-                transform: `rotate(${piece.rotate})`,
-              }}
+                "--confetti-rotate-from": piece.rotateFrom,
+                "--confetti-rotate-to": piece.rotateTo,
+                "--confetti-drift-x": piece.driftX,
+                "--confetti-width": piece.width,
+                "--confetti-height": piece.height,
+                "--confetti-radius": piece.radius,
+              } as CSSProperties}
             />
           ))}
         </div>

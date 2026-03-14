@@ -7,11 +7,14 @@ import {
   SearchIcon,
 } from "lucide-react";
 
-import type { Book, Verse } from "@/types/bible";
+import type { Book } from "@/types/bible";
 import type { SearchMatch, SearchMode, SearchPageState } from "@/types/reader";
-import { formatDisplayTokenText, isPunctuationToken } from "@/components/reader/chapter-text-content";
 import { bookCodeForIndex, iconPath, renderHighlightedTerms, renderHighlightedText } from "@/lib/reader-view";
-import { buildRegexMatcher, createSearchableVerseEntry, matchSelectedWords } from "@/lib/search";
+import {
+  buildRegexMatcher,
+  matchSelectedWords,
+  type VerseSearchIndexEntry,
+} from "@/lib/search";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -31,6 +34,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 type SearchPageProps = {
   books: Book[];
   concordanceWords: string[];
+  verseIndex: VerseSearchIndexEntry[];
   ensureConcordanceWordsLoaded: () => Promise<unknown>;
   state: SearchPageState;
   onStateChange: (patch: Partial<SearchPageState>) => void;
@@ -40,12 +44,6 @@ type SearchPageProps = {
     verseStart: number,
     verseEnd?: number,
   ) => void;
-};
-
-type VerseIndexEntry = SearchMatch & {
-  textLower: string;
-  searchWords: string[];
-  searchWordsLower: string[];
 };
 
 type BookGroup = {
@@ -62,17 +60,6 @@ const SEARCH_MODE_LABELS: Record<SearchMode, string> = {
   regex: "Regular expression",
 };
 const MAX_CONCORDANCE_SUGGESTIONS = 40;
-
-function formatVerseText(verse: Verse) {
-  let value = "";
-  verse.tokens.forEach((token, index) => {
-    if (index > 0 && !isPunctuationToken(token.text)) {
-      value += " ";
-    }
-    value += formatDisplayTokenText(token);
-  });
-  return value;
-}
 
 function clampGroupIndices(indices: number[], max: number) {
   return indices.filter((value) => value >= 0 && value < max);
@@ -97,6 +84,7 @@ function isChecked(value: boolean | "indeterminate") {
 export function SearchPage({
   books,
   concordanceWords,
+  verseIndex,
   ensureConcordanceWordsLoaded,
   state,
   onStateChange,
@@ -104,13 +92,13 @@ export function SearchPage({
 }: SearchPageProps) {
   const [isBookFilterOpen, setIsBookFilterOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [isControlsCollapsed, setIsControlsCollapsed] = useState(false);
 
   const {
     searchMode,
     caseSensitive,
     chipInput,
     phraseInput,
+    isControlsCollapsed,
     selectedWords,
     results,
     error,
@@ -189,25 +177,6 @@ export function SearchPage({
       void ensureConcordanceWordsLoaded();
     }
   }, [ensureConcordanceWordsLoaded, searchMode]);
-
-  const verseIndex = useMemo<VerseIndexEntry[]>(() => {
-    const indexed: VerseIndexEntry[] = [];
-    books.forEach((book, bookIndex) => {
-      book.chapters.forEach((chapter, chapterIndex) => {
-        chapter.verses.forEach((verse) => {
-          const text = formatVerseText(verse);
-          indexed.push({
-            bookIndex,
-            chapterIndex,
-            verseNumber: verse.verse,
-            bookName: book.name,
-            ...createSearchableVerseEntry(text),
-          });
-        });
-      });
-    });
-    return indexed;
-  }, [books]);
 
   const concordanceWordEntries = useMemo(
     () =>
@@ -355,7 +324,7 @@ export function SearchPage({
 
   const search = () => {
     onStateChange({ error: null });
-    let matcher: ((entry: VerseIndexEntry) => boolean) | null = null;
+    let matcher: ((entry: VerseSearchIndexEntry) => boolean) | null = null;
 
     if (searchMode === "contains-any" || searchMode === "contains-all") {
       if (selectedWords.length === 0) {
@@ -442,8 +411,7 @@ export function SearchPage({
           bookName,
           text,
         }));
-      onStateChange({ results: matches });
-      setIsControlsCollapsed(true);
+      onStateChange({ results: matches, isControlsCollapsed: true });
       setIsSearching(false);
     });
   };
@@ -512,7 +480,9 @@ export function SearchPage({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => setIsControlsCollapsed((current) => !current)}
+            onClick={() =>
+              onStateChange({ isControlsCollapsed: !isControlsCollapsed })
+            }
           >
             {isControlsCollapsed ? (
               <>

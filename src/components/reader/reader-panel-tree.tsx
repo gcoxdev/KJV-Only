@@ -59,6 +59,7 @@ import {
   iconPath,
   panelViewportElement,
 } from "@/lib/reader-view";
+import type { VerseSearchIndexEntry } from "@/lib/search";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 import { StaticPage } from "@/components/reader/static-page";
 import { getStaticPage } from "@/lib/static-pages";
@@ -178,6 +179,7 @@ type ReaderPanelTreeProps = {
     verseNumber: number,
   ) => void;
   concordanceWords: string[];
+  verseSearchIndex: VerseSearchIndexEntry[];
   ensureConcordanceWordsLoaded: () => Promise<unknown>;
   onOpenSearchResult: (
     bookIndex: number,
@@ -272,6 +274,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   onOpenTokenDetails,
   onSelectVerse,
   concordanceWords,
+  verseSearchIndex,
   ensureConcordanceWordsLoaded,
   onOpenSearchResult,
   notes,
@@ -1044,6 +1047,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
               <LazySearchPage
                 books={books}
                 concordanceWords={concordanceWords}
+                verseIndex={verseSearchIndex}
                 ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
                 state={
                   searchPageStateByLeafId[leaf.id] ?? {
@@ -1051,6 +1055,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                     caseSensitive: false,
                     chipInput: "",
                     phraseInput: "",
+                    isControlsCollapsed: false,
                     selectedWords: [],
                     expandedBookTree: ["entire", "old", "new"],
                     selectedBookIndexes: [],
@@ -1185,6 +1190,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   onOpenTokenDetails,
   onSelectVerse,
   concordanceWords,
+  verseSearchIndex,
   ensureConcordanceWordsLoaded,
   onOpenSearchResult,
   notes,
@@ -1250,6 +1256,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       onOpenTokenDetails={onOpenTokenDetails}
       onSelectVerse={onSelectVerse}
       concordanceWords={concordanceWords}
+      verseSearchIndex={verseSearchIndex}
       ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
       onOpenSearchResult={onOpenSearchResult}
       notes={notes}

@@ -1,12 +1,35 @@
+import type { Book, Verse } from "@/types/bible";
 import { normalizeConcordanceWord } from "@/lib/references";
 import type { SearchMode } from "@/types/reader";
 
-type SearchableVerseEntry = {
+export type SearchableVerseEntry = {
   text: string;
   textLower: string;
   searchWords: string[];
   searchWordsLower: string[];
 };
+
+export type VerseSearchIndexEntry = SearchableVerseEntry & {
+  bookIndex: number;
+  chapterIndex: number;
+  verseNumber: number;
+  bookName: string;
+};
+
+function isPunctuationTokenText(text: string) {
+  return /^[,.;:!?)]$/.test(text) || /^['"]$/.test(text) || /^--?$/.test(text);
+}
+
+function formatVerseText(verse: Verse) {
+  let value = "";
+  verse.tokens.forEach((token, index) => {
+    if (index > 0 && !isPunctuationTokenText(token.text)) {
+      value += " ";
+    }
+    value += token.text;
+  });
+  return value;
+}
 
 export function extractSearchWords(text: string) {
   return text
@@ -23,6 +46,25 @@ export function createSearchableVerseEntry(text: string): SearchableVerseEntry {
     searchWords,
     searchWordsLower: searchWords.map((word) => word.toLowerCase()),
   };
+}
+
+export function buildVerseSearchIndex(books: Book[]): VerseSearchIndexEntry[] {
+  const indexed: VerseSearchIndexEntry[] = [];
+  books.forEach((book, bookIndex) => {
+    book.chapters.forEach((chapter, chapterIndex) => {
+      chapter.verses.forEach((verse) => {
+        const text = formatVerseText(verse);
+        indexed.push({
+          bookIndex,
+          chapterIndex,
+          verseNumber: verse.verse,
+          bookName: book.name,
+          ...createSearchableVerseEntry(text),
+        });
+      });
+    });
+  });
+  return indexed;
 }
 
 export function matchSelectedWords(

@@ -1,4 +1,4 @@
-import { startTransition, useState } from "react";
+import { startTransition, useCallback, useRef, useState } from "react";
 
 import type { TabsOrientation } from "@/types/reader";
 
@@ -23,26 +23,36 @@ export function useReaderShellState({
   const [tabsOrientation, setTabsOrientation] = useState<TabsOrientation>(
     initialTabsOrientation,
   );
-  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(mode === "study");
+  const [isRightSidebarOpenState, setIsRightSidebarOpenState] = useState(
+    mode === "study",
+  );
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isProgressOpen, setIsProgressOpen] = useState(false);
   const [isGenealogyTreeOpen, setIsGenealogyTreeOpen] = useState(false);
-  const [genealogyTreePersonId, setGenealogyTreePersonId] = useState<string | null>(
-    null,
-  );
+  const [genealogyTreePersonId, setGenealogyTreePersonId] = useState<
+    string | null
+  >(null);
+  const lastStudySidebarOpenRef = useRef(isRightSidebarOpenState);
 
-  const setIsStudyMode = (nextIsStudyMode: boolean) => {
+  const setIsRightSidebarOpen = useCallback((nextIsOpen: boolean) => {
+    lastStudySidebarOpenRef.current = nextIsOpen;
+    setIsRightSidebarOpenState(nextIsOpen);
+  }, []);
+
+  const setIsStudyMode = useCallback((nextIsStudyMode: boolean) => {
     startTransition(() => {
       setMode(nextIsStudyMode ? "study" : "read");
-      setIsRightSidebarOpen(nextIsStudyMode);
+      setIsRightSidebarOpenState(
+        nextIsStudyMode ? lastStudySidebarOpenRef.current : false,
+      );
     });
-  };
+  }, []);
 
   return {
     isStudyMode: mode === "study",
     mode,
     tabsOrientation,
-    isRightSidebarOpen,
+    isRightSidebarOpen: isRightSidebarOpenState,
     isSettingsOpen,
     isProgressOpen,
     isGenealogyTreeOpen,
