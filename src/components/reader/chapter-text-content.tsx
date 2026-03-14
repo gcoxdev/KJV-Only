@@ -24,8 +24,13 @@ export function formatDisplayTokenText(token: VerseToken) {
 
 function renderToken(
   token: VerseToken,
+  tokenIndex: number,
   isStudyMode: boolean,
-  onOpenDetails: (element: HTMLElement, token: VerseToken) => void,
+  onOpenDetails: (
+    element: HTMLElement,
+    token: VerseToken,
+    tokenIndex: number,
+  ) => void,
 ) {
   const tokenClassName = cn(token.added && "italic");
   const displayText = formatDisplayTokenText(token);
@@ -42,13 +47,13 @@ function renderToken(
       aria-label={`Details for ${displayText}`}
       onClick={(event) => {
         event.stopPropagation();
-        onOpenDetails(event.currentTarget, token);
+        onOpenDetails(event.currentTarget, token, tokenIndex);
       }}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           event.stopPropagation();
-          onOpenDetails(event.currentTarget, token);
+          onOpenDetails(event.currentTarget, token, tokenIndex);
         }
       }}
     >
@@ -60,7 +65,11 @@ function renderToken(
 function renderVerseTokens(
   tokens: VerseToken[],
   isStudyMode: boolean,
-  onOpenDetails: (element: HTMLElement, token: VerseToken) => void,
+  onOpenDetails: (
+    element: HTMLElement,
+    token: VerseToken,
+    tokenIndex: number,
+  ) => void,
 ) {
   return tokens.map((token, tokenIndex) => {
     const leadingSpace = tokenIndex > 0 && !isPunctuationToken(token.text);
@@ -68,7 +77,7 @@ function renderVerseTokens(
     return (
       <Fragment key={`${token.text}-${tokenIndex}`}>
         {leadingSpace ? " " : null}
-        {renderToken(token, isStudyMode, onOpenDetails)}
+        {renderToken(token, tokenIndex, isStudyMode, onOpenDetails)}
       </Fragment>
     );
   });
@@ -87,7 +96,12 @@ type ChapterTextContentProps = {
   highlightedVerseRanges?: Array<{ start: number; end: number }> | null;
   fontSize: number;
   verseSpacing: number;
-  onOpenTokenDetails: (element: HTMLElement, token: VerseToken) => void;
+  onOpenTokenDetails: (
+    element: HTMLElement,
+    token: VerseToken,
+    verseNumber: number,
+    tokenIndex: number,
+  ) => void;
   onSelectVerse: (verseNumber: number) => void;
 };
 
@@ -130,7 +144,10 @@ export const ChapterTextContent = memo(
       return grouped;
     }, [verses]);
 
-    const normalizedHighlightedVerseRanges = highlightedVerseRanges ?? [];
+    const normalizedHighlightedVerseRanges = useMemo(
+      () => highlightedVerseRanges ?? [],
+      [highlightedVerseRanges],
+    );
     const isVerseHighlighted = useMemo(
       () =>
         normalizedHighlightedVerseRanges.length > 0
@@ -248,7 +265,13 @@ export const ChapterTextContent = memo(
                             {renderVerseTokens(
                               verse.tokens,
                               isStudyMode,
-                              onOpenTokenDetails,
+                              (element, token, tokenIndex) =>
+                                onOpenTokenDetails(
+                                  element,
+                                  token,
+                                  verse.verse,
+                                  tokenIndex,
+                                ),
                             )}
                           </span>
                         </Fragment>
@@ -338,7 +361,13 @@ export const ChapterTextContent = memo(
                         {renderVerseTokens(
                           verse.tokens,
                           isStudyMode,
-                          onOpenTokenDetails,
+                          (element, token, tokenIndex) =>
+                            onOpenTokenDetails(
+                              element,
+                              token,
+                              verse.verse,
+                              tokenIndex,
+                            ),
                         )}
                       </span>
                     </p>

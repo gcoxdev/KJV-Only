@@ -2,9 +2,11 @@ import type {
   ConcordancePayload,
   HitchcocksPayload,
   OldEnglishPayload,
+  PhrasesPayload,
   UnitsPayload,
   WebstersPayload,
 } from "@/types/reader";
+import type { VerseToken } from "@/types/bible";
 
 export const BOOK_ICON_CODES = [
   "GEN",
@@ -238,6 +240,70 @@ export function resolveUnitsKey(units: UnitsPayload, rawWord: string) {
       })
     ) {
       return key;
+    }
+  }
+
+  return null;
+}
+
+export function normalizePhraseText(input: string) {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9' ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function resolvePhraseKey(phrases: PhrasesPayload, rawValue: string) {
+  const normalized = normalizePhraseText(rawValue);
+  if (!normalized) {
+    return null;
+  }
+
+  for (const [key, entry] of Object.entries(phrases)) {
+    if (normalizePhraseText(key) === normalized) {
+      return key;
+    }
+    if (entry.aliases?.some((alias) => normalizePhraseText(alias) === normalized)) {
+      return key;
+    }
+  }
+
+  return null;
+}
+
+export function resolvePhraseKeyForToken(
+  phrases: PhrasesPayload,
+  verseTokens: VerseToken[],
+  tokenIndex: number,
+) {
+  const normalizedWords = verseTokens
+    .map((token, index) => ({
+      sourceIndex: index,
+      word: normalizePhraseText(token.text),
+    }))
+    .filter((item) => item.word.length > 0);
+
+  const clickedWordIndex = normalizedWords.findIndex(
+    (item) => item.sourceIndex === tokenIndex,
+  );
+  if (clickedWordIndex < 0) {
+    return null;
+  }
+
+  const maxPhraseLength = Math.min(6, normalizedWords.length);
+  for (let length = maxPhraseLength; length >= 2; length -= 1) {
+    const startMin = Math.max(0, clickedWordIndex - length + 1);
+    const startMax = Math.min(clickedWordIndex, normalizedWords.length - length);
+    for (let start = startMin; start <= startMax; start += 1) {
+      const candidate = normalizedWords
+        .slice(start, start + length)
+        .map((item) => item.word)
+        .join(" ");
+      const matchedKey = resolvePhraseKey(phrases, candidate);
+      if (matchedKey) {
+        return matchedKey;
+      }
     }
   }
 

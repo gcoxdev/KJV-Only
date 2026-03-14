@@ -10,6 +10,7 @@ import type {
   GenealogyPayload,
   HitchcocksPayload,
   OldEnglishPayload,
+  PhrasesPayload,
   ReaderPayload,
   StrongsCompactPayload,
   StrongsPayload,
@@ -24,6 +25,7 @@ let concordancePromise: Promise<ConcordancePayload> | null = null;
 let crossRefsPromise: Promise<CrossRefsPayload> | null = null;
 let hitchcocksPromise: Promise<HitchcocksPayload> | null = null;
 let oldEnglishPromise: Promise<OldEnglishPayload> | null = null;
+let phrasesPromise: Promise<PhrasesPayload> | null = null;
 let unitsPromise: Promise<UnitsPayload> | null = null;
 let genealogyPromise: Promise<GenealogyPayload> | null = null;
 let webstersPromise: Promise<WebstersPayload> | null = null;
@@ -177,6 +179,27 @@ export function loadOldEnglish() {
   }
 
   return oldEnglishPromise;
+}
+
+export function loadPhrases() {
+  if (!phrasesPromise) {
+    phrasesPromise = fetch("/references/phrases.json", {
+      cache: "no-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/phrases.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as PhrasesPayload)
+      .catch((error) => {
+        phrasesPromise = null;
+        throw error;
+      });
+  }
+
+  return phrasesPromise;
 }
 
 export function loadUnits() {

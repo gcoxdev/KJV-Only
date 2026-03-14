@@ -15,6 +15,7 @@ import {
   loadKjvBooks,
   loadMapGeoJson,
   loadOldEnglish,
+  loadPhrases,
   loadUnits,
   loadWebsters,
 } from "@/lib/reader-data";
@@ -27,6 +28,7 @@ import {
   resolveConcordanceKey,
   resolveHitchcocksKey,
   resolveOldEnglishKey,
+  resolvePhraseKeyForToken,
   resolveUnitsKey,
   resolveWebstersKey,
 } from "@/lib/references";
@@ -71,6 +73,8 @@ import type {
   HitchcocksPayload,
   LeafNode,
   OldEnglishPayload,
+  PhraseEntry,
+  PhrasesPayload,
   PanelDirection,
   PanelNode,
   ReaderTab,
@@ -745,6 +749,10 @@ export function KJVReader() {
     (key: string, definitions: string[]) => ({ key, definitions }),
     [],
   );
+  const mapPhraseResult = useCallback(
+    (key: string, entry: PhraseEntry) => ({ key, entry }),
+    [],
+  );
   const mapUnitsResult = useCallback(
     (key: string, entry: UnitsEntry) => ({ key, entry }),
     [],
@@ -864,6 +872,27 @@ export function KJVReader() {
     load: loadOldEnglish,
     errorMessage: "Failed to load Old English data",
     mapResult: mapOldEnglishResult,
+  });
+
+  const {
+    payload: phrases,
+    searchTerm: phrasesSearchTerm,
+    isSearching: isPhrasesSearching,
+    isLoading: isPhrasesLoading,
+    error: phrasesError,
+    results: phrasesSearchResults,
+    setSelectedResult: setSelectedPhrasesEntry,
+    ensureLoaded: ensurePhrasesLoaded,
+    applySearch: applyPhrasesSearch,
+  } = useDictionarySearchTool<
+    PhrasesPayload,
+    PhraseEntry,
+    { key: string; entry: PhraseEntry }
+  >({
+    load: loadPhrases,
+    errorMessage: "Failed to load phrases data",
+    mapResult: mapPhraseResult,
+    getSearchStrings: (key, entry) => [key, ...(entry.aliases ?? [])],
   });
 
   const {
@@ -1905,6 +1934,35 @@ export function KJVReader() {
     [setIsRightSidebarOpen, showStudyTool],
   );
 
+  const resolvePhraseSelectionAtLocation = useCallback(
+    (
+      phraseData: PhrasesPayload | null,
+      bookIndex: number,
+      chapterIndex: number,
+      verseNumber: number,
+      tokenIndex: number,
+    ) => {
+      if (!phraseData) {
+        return null;
+      }
+      const verse = books[bookIndex]?.chapters[chapterIndex]?.verses.find(
+        (item) => item.verse === verseNumber,
+      );
+      if (!verse) {
+        return null;
+      }
+      const matchedKey = resolvePhraseKeyForToken(
+        phraseData,
+        verse.tokens,
+        tokenIndex,
+      );
+      return matchedKey
+        ? { key: matchedKey, entry: phraseData[matchedKey] }
+        : null;
+    },
+    [books],
+  );
+
   const syncTokenAccordionState = useCallback(
     (
       rawWord: string,
@@ -1915,6 +1973,7 @@ export function KJVReader() {
         webstersData?: WebstersPayload | null;
         hitchcocksData?: HitchcocksPayload | null;
         oldEnglishData?: OldEnglishPayload | null;
+        phraseSelection?: { key: string; entry: PhraseEntry } | null;
         unitsData?: UnitsPayload | null;
         genealogyData?: GenealogyPayload | null;
         ancientMapsData?: AncientMapPayload | null;
@@ -1976,6 +2035,10 @@ export function KJVReader() {
         nextAccordion.push("old-english");
       }
 
+      if (options?.phraseSelection) {
+        nextAccordion.push("phrases");
+      }
+
       const unitsData = options?.unitsData ?? units;
       if (unitsData && resolveUnitsKey(unitsData, rawWord)) {
         nextAccordion.push("units");
@@ -2019,6 +2082,7 @@ export function KJVReader() {
         websters?: WebstersPayload | null;
         hitchcocks?: HitchcocksPayload | null;
         oldEnglish?: OldEnglishPayload | null;
+        phrasesSelection?: { key: string; entry: PhraseEntry } | null;
         units?: UnitsPayload | null;
         genealogy?: GenealogyPayload | null;
         ancientMaps?: AncientMapPayload | null;
@@ -2071,6 +2135,8 @@ export function KJVReader() {
       } else {
         setSelectedOldEnglishEntry(null);
       }
+
+      setSelectedPhrasesEntry(overrides?.phrasesSelection ?? null);
 
       if (nextUnits) {
         const matchedKey = resolveUnitsKey(nextUnits, rawWord);
@@ -2139,6 +2205,7 @@ export function KJVReader() {
       setSelectedHitchcocksEntry,
       setSelectedMapsEntries,
       setSelectedOldEnglishEntry,
+      setSelectedPhrasesEntry,
       setSelectedUnitsEntry,
       setSelectedStrongsEntry,
       setSelectedWebstersEntry,
@@ -2418,6 +2485,8 @@ export function KJVReader() {
       token: VerseToken,
       bookIndex: number,
       chapterIndex: number,
+      verseNumber: number,
+      tokenIndex: number,
     ) => {
       if (!token.strong) {
         const rect = element.getBoundingClientRect();
@@ -2437,14 +2506,6 @@ export function KJVReader() {
       }
 
       const rawWord = normalizeConcordanceWord(token.text);
-      const verseContainer = element.closest<HTMLElement>(
-        "[data-verse-number]",
-      );
-      const rawVerseNumber = verseContainer?.dataset.verseNumber;
-      const verseNumber =
-        rawVerseNumber === undefined
-          ? Number.NaN
-          : Number.parseInt(rawVerseNumber, 10);
       if (Number.isFinite(verseNumber) && verseNumber > 0) {
         openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
         if (rawWord) {
@@ -2479,6 +2540,7 @@ export function KJVReader() {
       setSelectedWebstersEntry(null);
       setSelectedHitchcocksEntry(null);
       setSelectedOldEnglishEntry(null);
+      setSelectedPhrasesEntry(null);
       setSelectedUnitsEntry(null);
       setSelectedGenealogyIds([]);
       setSelectedMapsEntries([]);
@@ -2555,6 +2617,7 @@ export function KJVReader() {
         oldEnglish
           ? Promise.resolve(oldEnglish)
           : ensureOldEnglishLoaded().catch(() => null),
+        phrases ? Promise.resolve(phrases) : ensurePhrasesLoaded().catch(() => null),
         units ? Promise.resolve(units) : ensureUnitsLoaded().catch(() => null),
         genealogy
           ? Promise.resolve(genealogy)
@@ -2569,15 +2632,24 @@ export function KJVReader() {
           nextWebsters,
           nextHitchcocks,
           nextOldEnglish,
+          nextPhrases,
           nextUnits,
           nextGenealogy,
           nextAncientMaps,
           nextStrongs,
         ]) => {
+          const phraseSelection = resolvePhraseSelectionAtLocation(
+            nextPhrases,
+            bookIndex,
+            chapterIndex,
+            verseNumber,
+            tokenIndex,
+          );
           syncWordStudySelections(rawWord, normalizedCode, {
             websters: nextWebsters,
             hitchcocks: nextHitchcocks,
             oldEnglish: nextOldEnglish,
+            phrasesSelection: phraseSelection,
             units: nextUnits,
             genealogy: nextGenealogy,
             ancientMaps: nextAncientMaps,
@@ -2592,6 +2664,7 @@ export function KJVReader() {
             webstersData: nextWebsters,
             hitchcocksData: nextHitchcocks,
             oldEnglishData: nextOldEnglish,
+            phraseSelection,
             unitsData: nextUnits,
             genealogyData: nextGenealogy,
             ancientMapsData: nextAncientMaps,
@@ -2613,6 +2686,8 @@ export function KJVReader() {
       ensureGenealogyLoaded,
       ensureHitchcocksLoaded,
       ensureOldEnglishLoaded,
+      ensurePhrasesLoaded,
+      ensureUnitsLoaded,
       openCrossReferencesForVerse,
       openStudyTool,
       ensureStrongsLoaded,
@@ -2620,6 +2695,8 @@ export function KJVReader() {
       genealogy,
       hitchcocks,
       oldEnglish,
+      phrases,
+      resolvePhraseSelectionAtLocation,
       setConcordanceError,
       setIsConcordanceLoading,
       setIsStrongsLoading,
@@ -2630,7 +2707,9 @@ export function KJVReader() {
       setSelectedHitchcocksEntry,
       setSelectedMapsEntries,
       setSelectedOldEnglishEntry,
+      setSelectedPhrasesEntry,
       setSelectedStrongsEntry,
+      setSelectedUnitsEntry,
       setSelectedWebstersEntry,
       setStrongsError,
       setStrongsSearchTerm,
@@ -2639,6 +2718,7 @@ export function KJVReader() {
       syncTokenAccordionState,
       syncWordStudySelections,
       setConcordanceWordAccordionValue,
+      units,
       websters,
     ],
   );
@@ -2798,6 +2878,7 @@ export function KJVReader() {
     isConcordanceSectionOpen,
     isWebstersSectionOpen,
     isStrongsSectionOpen,
+    isPhrasesSectionOpen,
     isUnitsSectionOpen,
     isMapsSectionOpen,
     isGenealogySectionOpen,
@@ -2807,6 +2888,7 @@ export function KJVReader() {
     hasConcordanceInfo,
     hasWebstersInfo,
     hasStrongsInfo,
+    hasPhrasesInfo,
     hasUnitsInfo,
     hasMapsInfo,
     hasHitchcocksInfo,
@@ -2818,6 +2900,7 @@ export function KJVReader() {
     concordanceCount: concordanceSearchResults.length,
     webstersCount: webstersSearchResults.length,
     strongsCount: strongsSearchResults.length,
+    phrasesCount: phrasesSearchResults.length,
     unitsCount: unitsSearchResults.length,
     mapsCount: mapsSearchResults.length,
     hitchcocksCount: hitchcocksSearchResults.length,
@@ -3026,6 +3109,19 @@ export function KJVReader() {
                 results: oldEnglishSearchResults,
                 onSearch: applyOldEnglishSearch,
               }}
+              phrasesProps={{
+                hasInfo: hasPhrasesInfo,
+                isOpen: isPhrasesSectionOpen,
+                isLoading: isPhrasesLoading,
+                isSearching: isPhrasesSearching,
+                error: phrasesError,
+                searchTerm: phrasesSearchTerm,
+                results: phrasesSearchResults,
+                onSearch: applyPhrasesSearch,
+                renderPreview: referencePreviewContent,
+                onOpenReference: openConcordanceReference,
+                onCloseSidebar: closeRightSidebarForMobile,
+              }}
               unitsProps={{
                 hasInfo: hasUnitsInfo,
                 isOpen: isUnitsSectionOpen,
@@ -3035,6 +3131,9 @@ export function KJVReader() {
                 searchTerm: unitsSearchTerm,
                 results: unitsSearchResults,
                 onSearch: applyUnitsSearch,
+                renderPreview: referencePreviewContent,
+                onOpenReference: openConcordanceReference,
+                onCloseSidebar: closeRightSidebarForMobile,
               }}
               mapsProps={{
                 hasInfo: hasMapsInfo,
