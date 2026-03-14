@@ -22,7 +22,6 @@ import {
   BookOpenCheckIcon,
   BookOpenIcon,
   HouseIcon,
-  LayoutPanelTopIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   EraserIcon,
@@ -33,7 +32,9 @@ import {
   MinimizeIcon,
   PauseIcon,
   PlayIcon,
+  NotebookPenIcon,
   RotateCwIcon,
+  SearchIcon,
   SplitSquareHorizontalIcon,
   SplitSquareVerticalIcon,
   SquareChevronDownIcon,
@@ -43,6 +44,7 @@ import {
   Volume1Icon,
   Volume2Icon,
   VolumeXIcon,
+  ToolboxIcon,
   XIcon,
 } from "lucide-react";
 
@@ -54,7 +56,7 @@ import type {
   SearchPageState,
 } from "@/types/reader";
 import { cn } from "@/lib/utils";
-import { findParentSplitForLeaf } from "@/lib/reader-layout";
+import { countLeaves, findParentSplitForLeaf } from "@/lib/reader-layout";
 import {
   bookCodeForIndex,
   chapterProgressKey,
@@ -409,6 +411,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
     isPanelMenuOpen && activeRoot
       ? findParentSplitForLeaf(activeRoot, leaf.id)
       : null;
+  const isSingleHomePanel =
+    leaf.view === "picker" && activeRoot ? countLeaves(activeRoot) <= 1 : false;
   const groupTargets = parentSplit
     ? parentSplit.orientation === "horizontal"
       ? { left: true, right: true, up: false, down: false }
@@ -616,6 +620,28 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
     setBookPickerDialogLeafId(leaf.id);
   };
 
+  const panelHeaderIcon =
+    leaf.view === "picker" ? (
+      <HouseIcon className="size-4 shrink-0 text-muted-foreground" />
+    ) : leaf.view === "tools" ? (
+      <ToolboxIcon className="size-4 shrink-0 text-muted-foreground" />
+    ) : leaf.view === "notes" ? (
+      <NotebookPenIcon className="size-4 shrink-0 text-muted-foreground" />
+    ) : leaf.view === "bookmarks" ? (
+      <BookMarkedIcon className="size-4 shrink-0 text-muted-foreground" />
+    ) : leaf.view === "search" ? (
+      <SearchIcon className="size-4 shrink-0 text-muted-foreground" />
+    ) : leaf.view === "page" ? (
+      (() => {
+        const PageIcon = getStaticPage(leaf.pageId)?.icon;
+        return PageIcon ? (
+          <PageIcon className="size-4 shrink-0 text-muted-foreground" />
+        ) : (
+          <BookOpenIcon className="size-4 shrink-0 text-muted-foreground" />
+        );
+      })()
+    ) : null;
+
   return (
     <div
       data-panel-leaf-id={leaf.id}
@@ -647,6 +673,25 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 >
                   {`${book?.name ?? "Book"} ${chapter.chapter}`}
                 </Button>
+              </>
+            ) : panelHeaderIcon ? (
+              <>
+                {panelHeaderIcon}
+                {leaf.view === "picker" ? (
+                  <p className="text-sm text-muted-foreground">Panel Home</p>
+                ) : leaf.view === "search" ? (
+                  <p className="text-sm text-muted-foreground">Search</p>
+                ) : leaf.view === "notes" ? (
+                  <p className="text-sm text-muted-foreground">Notes</p>
+                ) : leaf.view === "tools" ? (
+                  <p className="text-sm text-muted-foreground">Tools</p>
+                ) : leaf.view === "bookmarks" ? (
+                  <p className="text-sm text-muted-foreground">Bookmarks</p>
+                ) : leaf.view === "page" ? (
+                  <p className="text-sm text-muted-foreground">
+                    {getStaticPage(leaf.pageId)?.title ?? "Page"}
+                  </p>
+                ) : null}
               </>
             ) : leaf.view === "search" ? (
               <p className="text-sm text-muted-foreground">Search</p>
@@ -997,11 +1042,15 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                       <ExternalLinkIcon />
                       Move to New Tab
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => closeLeaf(leaf.id)}>
-                      <XIcon />
-                      Close Panel
-                    </DropdownMenuItem>
+                    {!isSingleHomePanel ? (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => closeLeaf(leaf.id)}>
+                          <XIcon />
+                          Close Panel
+                        </DropdownMenuItem>
+                      </>
+                    ) : null}
                   </>
                 ) : null}
               </DropdownMenuContent>
@@ -1399,7 +1448,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
         ) : (
           <CardContent className="min-h-0 flex-1 overflow-auto p-2">
             <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr))]">
                 <Button
                   type="button"
                   variant="outline"
@@ -1407,7 +1456,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   className="justify-center"
                   onClick={() => updateLeafLocation(leaf.id, { view: "tools" })}
                 >
-                  <LayoutPanelTopIcon />
+                  <ToolboxIcon />
                   Tools
                 </Button>
                 <Button
@@ -1417,7 +1466,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   className="justify-center"
                   onClick={() => updateLeafLocation(leaf.id, { view: "notes" })}
                 >
-                  <BookOpenIcon />
+                  <NotebookPenIcon />
                   Notes
                 </Button>
                 <Button
@@ -1432,7 +1481,20 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   <BookMarkedIcon />
                   Bookmarks
                 </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="justify-center"
+                  onClick={() => updateLeafLocation(leaf.id, { view: "search" })}
+                >
+                  <SearchIcon />
+                  Search
+                </Button>
               </div>
+              <p className="text-sm text-muted-foreground">
+                Choose a book and chapter
+              </p>
               <BookChapterPicker
                 books={books}
                 selectedTestament={leaf.pickerTestament}
