@@ -114,7 +114,18 @@ export function BibleWordBookTool({
                           Source refs: {entry.sourceReferences.join("; ")}
                         </p>
                       ) : null}
-                      <p className="whitespace-pre-line">{entry.body}</p>
+                      {entry.body ? (
+                        <details className="rounded-md border px-2">
+                          <summary className="cursor-pointer py-2 text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase">
+                            Literary References
+                          </summary>
+                          <div className="pb-2">
+                            <p className="whitespace-pre-line text-sm leading-relaxed">
+                              {entry.body}
+                            </p>
+                          </div>
+                        </details>
+                      ) : null}
                       <p className="flex items-start gap-2 text-xs text-muted-foreground">
                         <BadgeInfoIcon className="mt-0.5 size-3 shrink-0" />
                         <span>
