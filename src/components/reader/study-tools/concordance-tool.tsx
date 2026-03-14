@@ -8,6 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
 import { StudySearchForm } from "@/components/reader/study-search-form";
 
@@ -83,10 +84,15 @@ export function ConcordanceTool({
                 onValueChange={(value) =>
                   onWordAccordionValueChange(value.filter(Boolean) as string[])
                 }
-              >
-                {results.map((entry) => (
-                  <AccordionItem key={entry.key} value={entry.key}>
-                    <AccordionTrigger>{entry.key}</AccordionTrigger>
+                >
+                  {results.map((entry) => (
+                    <AccordionItem key={entry.key} value={entry.key}>
+                      <AccordionTrigger>
+                        <span className="flex items-center gap-2">
+                          <span>{entry.key}</span>
+                          <Badge variant="outline">{entry.references.length}</Badge>
+                        </span>
+                      </AccordionTrigger>
                     <AccordionContent>
                       {entry.references.length === 0 ? (
                         <p className="text-sm text-muted-foreground">No references found.</p>

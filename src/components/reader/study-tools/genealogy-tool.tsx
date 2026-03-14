@@ -9,6 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { StudySearchForm } from "@/components/reader/study-search-form";
 
 type GenealogyToolProps = {
@@ -34,6 +35,12 @@ export function GenealogyTool({
   onSearch,
   renderPersonDetails,
 }: GenealogyToolProps) {
+  const referenceCountForPerson = (person: GenealogyPerson) =>
+    (person.verses?.byName ?? []).reduce(
+      (count, entry) => count + (entry.numVerses ?? entry.verses.length),
+      0,
+    );
+
   return (
     <AccordionItem value="genealogy">
       <AccordionTrigger
@@ -75,7 +82,14 @@ export function GenealogyTool({
                     key={`${person.id}-${person.names[0] ?? "person"}`}
                     value={`genealogy-${person.id}`}
                   >
-                    <AccordionTrigger>{person.names[0] ?? person.id}</AccordionTrigger>
+                    <AccordionTrigger>
+                      <span className="flex items-center gap-2">
+                        <span>{person.names[0] ?? person.id}</span>
+                        <Badge variant="outline">
+                          {referenceCountForPerson(person)}
+                        </Badge>
+                      </span>
+                    </AccordionTrigger>
                     <AccordionContent>{renderPersonDetails(person)}</AccordionContent>
                   </AccordionItem>
                 ))}
