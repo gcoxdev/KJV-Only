@@ -1,4 +1,9 @@
-import { BadgeInfoIcon, BookMarkedIcon, LoaderCircleIcon } from "lucide-react";
+import {
+  BadgeInfoIcon,
+  BookMarkedIcon,
+  ExternalLinkIcon,
+  LoaderCircleIcon,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { BibleWordBookEntry } from "@/types/reader";
@@ -138,6 +143,15 @@ export function BibleWordBookTool({
                 ))}
               </Accordion>
             )}
+            <a
+              href="https://archive.org/details/biblewordbookglo00wrig/mode/2up"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              <ExternalLinkIcon className="size-3.5" />
+              Open scanned book
+            </a>
           </>
         ) : null}
       </AccordionContent>
