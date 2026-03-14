@@ -314,3 +314,29 @@
     background-color: var(--verse-highlight-bg);
     color: var(--verse-highlight-fg);
 }
+
+.confetti-piece {
+    position: absolute;
+    top: -8vh;
+    width: 0.7rem;
+    height: 1.2rem;
+    border-radius: 999px;
+    opacity: 0.95;
+    animation-name: confetti-fall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.95;
+    }
+    100% {
+        transform: translate3d(0, 110vh, 0) rotate(540deg);
+        opacity: 0;
+    }
+}
