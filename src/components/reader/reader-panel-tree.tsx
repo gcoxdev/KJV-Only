@@ -6,6 +6,7 @@ import {
   type ReactNode,
   type RefObject,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -320,6 +321,16 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   const [audioDuration, setAudioDuration] = useState(0);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [audioErrored, setAudioErrored] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [swipeOpacity, setSwipeOpacity] = useState(1);
+  const [swipeTransitionEnabled, setSwipeTransitionEnabled] = useState(false);
+  const swipeGestureRef = useRef<{
+    startX: number;
+    startY: number;
+    active: boolean;
+    lock: "pending" | "horizontal" | "vertical";
+  } | null>(null);
+  const swipeAnimationTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const viewport = panelViewportElement(panelRef.current);
@@ -352,6 +363,14 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
       }
     };
   }, [leaf.id, leaf.bookIndex, leaf.chapterIndex]);
+
+  useEffect(() => {
+    return () => {
+      if (swipeAnimationTimeoutRef.current !== null) {
+        window.clearTimeout(swipeAnimationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const book = books[leaf.bookIndex] ?? null;
   const chapter: Chapter | null = book?.chapters[leaf.chapterIndex] ?? null;
@@ -415,6 +434,162 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   const hasHighlightInLeaf =
     (highlightedVerseRangesByLeafId[leaf.id]?.length ?? 0) > 0;
   const highlightModeEnabled = Boolean(highlightModeEnabledByLeafId[leaf.id]);
+  const canGoPrevChapter = hasPrev;
+  const canGoNextChapter = hasNext;
+  const swipeContainerStyle = useMemo(
+    () => ({
+      transform: swipeOffset === 0 ? undefined : `translateX(${swipeOffset}px)`,
+      opacity: swipeOpacity,
+      transition: swipeTransitionEnabled
+        ? "transform 220ms ease, opacity 220ms ease"
+        : undefined,
+      touchAction: "pan-y",
+    }),
+    [swipeOffset, swipeOpacity, swipeTransitionEnabled],
+  );
+
+  const completeSwipeNavigation = (step: -1 | 1) => {
+    const panelWidth = panelRef.current?.clientWidth ?? 0;
+    const exitOffset =
+      step === 1 ? -Math.max(panelWidth, 240) : Math.max(panelWidth, 240);
+
+    setSwipeTransitionEnabled(true);
+    setSwipeOffset(exitOffset);
+    setSwipeOpacity(0.84);
+
+    if (swipeAnimationTimeoutRef.current !== null) {
+      window.clearTimeout(swipeAnimationTimeoutRef.current);
+    }
+
+    swipeAnimationTimeoutRef.current = window.setTimeout(() => {
+      moveLeafChapter(leaf.id, step);
+      const enterOffset = -exitOffset;
+      setSwipeTransitionEnabled(false);
+      setSwipeOffset(enterOffset);
+      setSwipeOpacity(0.84);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setSwipeTransitionEnabled(true);
+          setSwipeOffset(0);
+          setSwipeOpacity(1);
+        });
+      });
+
+      swipeAnimationTimeoutRef.current = window.setTimeout(() => {
+        setSwipeTransitionEnabled(false);
+        setSwipeOpacity(1);
+        swipeAnimationTimeoutRef.current = null;
+      }, 220);
+    }, 220);
+  };
+
+  const handleReaderTouchStart = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    if (leaf.view !== "reader" || !chapter || isStudyMode) {
+      return;
+    }
+
+    const touch = event.touches[0];
+    if (!touch) {
+      return;
+    }
+
+    swipeGestureRef.current = {
+      startX: touch.clientX,
+      startY: touch.clientY,
+      active: true,
+      lock: "pending",
+    };
+    setSwipeTransitionEnabled(false);
+  };
+
+  const handleReaderTouchMove = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    const gesture = swipeGestureRef.current;
+    if (!gesture || !gesture.active || isStudyMode) {
+      return;
+    }
+
+    const touch = event.touches[0];
+    if (!touch) {
+      return;
+    }
+
+    const deltaX = touch.clientX - gesture.startX;
+    const deltaY = touch.clientY - gesture.startY;
+
+    if (gesture.lock === "pending") {
+      if (Math.abs(deltaX) < 12 && Math.abs(deltaY) < 12) {
+        return;
+      }
+      gesture.lock =
+        Math.abs(deltaX) > Math.abs(deltaY) ? "horizontal" : "vertical";
+    }
+
+    if (gesture.lock !== "horizontal") {
+      return;
+    }
+
+    if (event.cancelable) {
+      event.preventDefault();
+    }
+
+    const constrainedOffset =
+      (deltaX < 0 && !canGoNextChapter) || (deltaX > 0 && !canGoPrevChapter)
+        ? deltaX * 0.2
+        : deltaX * 0.65;
+
+    setSwipeOffset(constrainedOffset);
+    setSwipeOpacity(Math.max(0.76, 1 - Math.abs(constrainedOffset) / 900));
+  };
+
+  const finishReaderSwipe = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    const gesture = swipeGestureRef.current;
+    if (!gesture || !gesture.active || isStudyMode) {
+      return;
+    }
+
+    const touch = event.changedTouches[0];
+    if (!touch) {
+      return;
+    }
+
+    swipeGestureRef.current = null;
+
+    if (gesture.lock !== "horizontal") {
+      setSwipeTransitionEnabled(false);
+      setSwipeOffset(0);
+      setSwipeOpacity(1);
+      return;
+    }
+
+    const deltaX = touch.clientX - gesture.startX;
+    const width = panelRef.current?.clientWidth ?? 0;
+    const threshold = Math.min(140, Math.max(64, width * 0.18));
+
+    if (deltaX <= -threshold && canGoNextChapter) {
+      completeSwipeNavigation(1);
+      return;
+    }
+
+    if (deltaX >= threshold && canGoPrevChapter) {
+      completeSwipeNavigation(-1);
+      return;
+    }
+
+    setSwipeTransitionEnabled(true);
+    setSwipeOffset(0);
+    setSwipeOpacity(1);
+    swipeAnimationTimeoutRef.current = window.setTimeout(() => {
+      setSwipeTransitionEnabled(false);
+      swipeAnimationTimeoutRef.current = null;
+    }, 220);
+  };
 
   const closePanelMenu = () => {
     setPanelMenuOpenLeafId(null);
@@ -804,40 +979,52 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
         {leaf.view === "reader" && chapter ? (
           <>
             <CardContent className="min-h-0 flex-1 p-0">
-              <ScrollArea className="h-full w-full" data-panel-content-scroll>
-                <ChapterTextContent
-                  bookName={book.name}
-                  chapterNumber={chapter.chapter}
-                  verses={chapter.verses}
-                  flowVersesByParagraph={flowVersesByParagraph}
-                  readModeParagraphIndent={readModeParagraphIndent}
-                  showVerseNumbers={showVerseNumbers}
-                  isStudyMode={isStudyMode}
-                  enableVerseSelection={isStudyMode || highlightModeEnabled}
-                  highlightModeEnabled={highlightModeEnabled}
-                  highlightedVerseRanges={
-                    highlightedVerseRangesByLeafId[leaf.id] ?? null
-                  }
-                  fontSize={fontSize}
-                  verseSpacing={verseSpacing}
-                  onOpenTokenDetails={(element, token) =>
-                    onOpenTokenDetails(
-                      element,
-                      token,
-                      leaf.bookIndex,
-                      leaf.chapterIndex,
-                    )
-                  }
-                  onSelectVerse={(verseNumber) =>
-                    onSelectVerse(
-                      leaf.id,
-                      leaf.bookIndex,
-                      leaf.chapterIndex,
-                      verseNumber,
-                    )
-                  }
-                />
-              </ScrollArea>
+              <div
+                className={cn(
+                  "h-full w-full",
+                  !isStudyMode && "select-none touch-pan-y",
+                )}
+                style={swipeContainerStyle}
+                onTouchStartCapture={handleReaderTouchStart}
+                onTouchMoveCapture={handleReaderTouchMove}
+                onTouchEndCapture={finishReaderSwipe}
+                onTouchCancelCapture={finishReaderSwipe}
+              >
+                <ScrollArea className="h-full w-full" data-panel-content-scroll>
+                  <ChapterTextContent
+                    bookName={book.name}
+                    chapterNumber={chapter.chapter}
+                    verses={chapter.verses}
+                    flowVersesByParagraph={flowVersesByParagraph}
+                    readModeParagraphIndent={readModeParagraphIndent}
+                    showVerseNumbers={showVerseNumbers}
+                    isStudyMode={isStudyMode}
+                    enableVerseSelection={isStudyMode || highlightModeEnabled}
+                    highlightModeEnabled={highlightModeEnabled}
+                    highlightedVerseRanges={
+                      highlightedVerseRangesByLeafId[leaf.id] ?? null
+                    }
+                    fontSize={fontSize}
+                    verseSpacing={verseSpacing}
+                    onOpenTokenDetails={(element, token) =>
+                      onOpenTokenDetails(
+                        element,
+                        token,
+                        leaf.bookIndex,
+                        leaf.chapterIndex,
+                      )
+                    }
+                    onSelectVerse={(verseNumber) =>
+                      onSelectVerse(
+                        leaf.id,
+                        leaf.bookIndex,
+                        leaf.chapterIndex,
+                        verseNumber,
+                      )
+                    }
+                  />
+                </ScrollArea>
+              </div>
             </CardContent>
 
             <div className="border-t">
