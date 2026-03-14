@@ -155,6 +155,12 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
             "KJV Archaic Word Dictionary by Scott Childs, used for the old-English / archaic-word lookup data.",
         },
         {
+          label: "PreservedWords.com",
+          href: "https://www.preservedwords.com/wordlist.txt",
+          description:
+            "Supplemental KJV word and phrase definitions used to expand the old-English dictionary and phrase lookup data.",
+        },
+        {
           label: "3Bible.com Audio Bible",
           href: "https://3bible.com/AudioBible.php",
           description:
