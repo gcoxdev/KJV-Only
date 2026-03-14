@@ -1595,7 +1595,14 @@ export function KJVReader() {
   function closeLeaf(leafId: string) {
     updateActiveTab((tab) => {
       if (countLeaves(tab.root) <= 1) {
-        return tab;
+        return {
+          ...tab,
+          root: updateLeafNode(tab.root, leafId, {
+            view: "picker",
+            pickerTestament: null,
+            pickerBookIndex: null,
+          }),
+        };
       }
       const result = removeLeafNode(tab.root, leafId);
       return result.next ? { ...tab, root: result.next } : tab;
