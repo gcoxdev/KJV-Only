@@ -92,6 +92,7 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar";
 import { SidebarOpenRequestSync } from "@/components/reader/sidebar-open-request-sync";
+import { SidebarCloseRequestSync } from "@/components/reader/sidebar-close-request-sync";
 import { GenealogyPersonDetails } from "@/components/reader/genealogy-person-details";
 import { useReferencePreview } from "@/hooks/use-reference-preview";
 import { useTabActions } from "@/hooks/use-tab-actions";
@@ -168,6 +169,7 @@ export function KJVReader() {
   const [readModeParagraphIndent, setReadModeParagraphIndent] = useState(false);
   const [flowVersesByParagraph, setFlowVersesByParagraph] = useState(false);
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
+  const [sidebarCloseRequestKey, setSidebarCloseRequestKey] = useState(0);
   const {
     isStudyMode,
     tabsOrientation,
@@ -1803,7 +1805,7 @@ export function KJVReader() {
   );
 
   const closeRightSidebarForMobile = useCallback(() => {
-    setIsRightSidebarOpen(false);
+    setSidebarCloseRequestKey((current) => current + 1);
   }, []);
 
   const openTokenDetailsFromElement = useCallback(
@@ -2321,6 +2323,10 @@ export function KJVReader() {
           requestKey={sidebarOpenRequestKey}
           enabled={isStudyMode}
         />
+        <SidebarCloseRequestSync
+          requestKey={sidebarCloseRequestKey}
+          enabled={isStudyMode}
+        />
         <SidebarInset className="flex h-screen min-h-0 flex-col overflow-hidden">
           <ReaderTopBar
             isStudyMode={isStudyMode}
@@ -2503,15 +2509,20 @@ export function KJVReader() {
               generalNotes,
               contextNotes,
               context: notesContext,
-              onOpenNotesTab: (noteId) => openNotesTab(noteId),
+              onOpenNotesTab: (noteId) => {
+                openNotesTab(noteId);
+                closeRightSidebarForMobile();
+              },
               onCreateGeneralNote: () => {
                 const noteId = createGeneralNote();
                 openNotesTab(noteId);
+                closeRightSidebarForMobile();
               },
               onCreateContextNote: () => {
                 const noteId = createContextNote(notesContext);
                 if (noteId) {
                   openNotesTab(noteId);
+                  closeRightSidebarForMobile();
                 }
               },
               onSetChapterContext: () => {
