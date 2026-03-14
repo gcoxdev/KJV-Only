@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from "react";
-import { RulerIcon, LoaderCircleIcon, BadgeInfoIcon } from "lucide-react";
+import { BookTypeIcon, LoaderCircleIcon, BadgeInfoIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
@@ -10,33 +10,25 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
 import { StudySearchForm } from "@/components/reader/study-search-form";
-import type { UnitsEntry } from "@/types/reader";
+import type { PhraseEntry } from "@/types/reader";
 
-type UnitsResult = { key: string; entry: UnitsEntry };
+type PhrasesResult = { key: string; entry: PhraseEntry };
 
-type UnitsToolProps = {
+type PhrasesToolProps = {
   hasInfo: boolean;
   isOpen: boolean;
   isLoading: boolean;
   isSearching: boolean;
   error: string | null;
   searchTerm: string;
-  results: UnitsResult[];
+  results: PhrasesResult[];
   onSearch: (term: string) => void;
   renderPreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
   onCloseSidebar: () => void;
 };
 
-const CATEGORY_LABELS: Record<UnitsEntry["category"], string> = {
-  length: "Length",
-  weight: "Weight",
-  volume: "Volume",
-  currency: "Money",
-  time: "Time",
-};
-
-export function UnitsTool({
+export function PhrasesTool({
   hasInfo,
   isOpen,
   isLoading,
@@ -48,37 +40,37 @@ export function UnitsTool({
   renderPreview,
   onOpenReference,
   onCloseSidebar,
-}: UnitsToolProps) {
+}: PhrasesToolProps) {
   return (
-    <AccordionItem value="units">
+    <AccordionItem value="phrases">
       <AccordionTrigger
         className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
       >
-        <RulerIcon />
-        Biblical Units
+        <BookTypeIcon />
+        KJV Phrases
       </AccordionTrigger>
       <AccordionContent className="space-y-2 overflow-visible">
         {isOpen ? (
           <>
             <StudySearchForm
-              name="units-search"
-              placeholder="Search units..."
-              ariaLabel="Search biblical units"
+              name="phrases-search"
+              placeholder="Search phrases..."
+              ariaLabel="Search KJV phrases"
               loading={isLoading || isSearching}
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (
               <p className="flex items-center gap-2 text-sm text-muted-foreground">
                 <LoaderCircleIcon className="size-4 animate-spin" />
-                {isLoading ? "Loading units..." : "Searching units..."}
+                {isLoading ? "Loading phrases..." : "Searching phrases..."}
               </p>
             ) : error ? (
               <p className="text-sm text-destructive">{error}</p>
             ) : results.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 {searchTerm.trim()
-                  ? "No matching unit found."
-                  : "Click a unit in the text or search biblical units."}
+                  ? "No matching phrase found."
+                  : "Click a phrase in the text or search KJV phrases."}
               </p>
             ) : (
               <div className="flex flex-col gap-2 text-sm">
@@ -87,14 +79,11 @@ export function UnitsTool({
                     key={key}
                     className="rounded-xl border border-border/70 bg-background/70 p-3"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="font-semibold">{key}</span>
-                      <Badge variant="outline">
-                        {CATEGORY_LABELS[entry.category]}
-                      </Badge>
+                      <Badge variant="outline">Phrase</Badge>
                     </div>
-                    <p className="mt-2 text-muted-foreground">{entry.summary}</p>
-                    <p className="mt-2 font-medium">{entry.approximate}</p>
+                    <p className="mt-2 text-muted-foreground">{entry.meaning}</p>
                     {entry.aliases?.length ? (
                       <p className="mt-2 text-xs text-muted-foreground">
                         Also: {entry.aliases.join(", ")}

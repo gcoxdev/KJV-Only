@@ -3,9 +3,15 @@ import { describe, expect, it } from "vitest";
 import {
   decodeConcordanceReferences,
   resolveConcordanceKey,
+  resolvePhraseKey,
+  resolvePhraseKeyForToken,
   resolveUnitsKey,
 } from "@/lib/references";
-import type { ConcordancePayload, UnitsPayload } from "@/types/reader";
+import type {
+  ConcordancePayload,
+  PhrasesPayload,
+  UnitsPayload,
+} from "@/types/reader";
 
 describe("concordance helpers", () => {
   const concordance: ConcordancePayload = {
@@ -49,5 +55,48 @@ describe("concordance helpers", () => {
     expect(resolveUnitsKey(units, "Cubit")).toBe("Cubit");
     expect(resolveUnitsKey(units, "cubits")).toBe("Cubit");
     expect(resolveUnitsKey(units, "denarius")).toBe("Penny");
+  });
+
+  it("resolves phrases by exact text and aliases", () => {
+    const phrases: PhrasesPayload = {
+      "by and by": {
+        meaning: "Immediately",
+        aliases: ["anon"],
+      },
+      "god forbid": {
+        meaning: "Certainly not",
+      },
+    };
+
+    expect(resolvePhraseKey(phrases, "By and by")).toBe("by and by");
+    expect(resolvePhraseKey(phrases, "anon")).toBe("by and by");
+    expect(resolvePhraseKey(phrases, "God forbid")).toBe("god forbid");
+  });
+
+  it("resolves phrase matches from a clicked token context", () => {
+    const phrases: PhrasesPayload = {
+      "quit you like men": {
+        meaning: "Behave bravely",
+      },
+    };
+    const verseTokens = [
+      { text: "Watch" },
+      { text: "ye," },
+      { text: "stand" },
+      { text: "fast" },
+      { text: "in" },
+      { text: "the" },
+      { text: "faith," },
+      { text: "quit" },
+      { text: "you" },
+      { text: "like" },
+      { text: "men," },
+      { text: "be" },
+      { text: "strong." },
+    ];
+
+    expect(resolvePhraseKeyForToken(phrases, verseTokens, 8)).toBe(
+      "quit you like men",
+    );
   });
 });
