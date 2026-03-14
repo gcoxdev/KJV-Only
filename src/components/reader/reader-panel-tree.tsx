@@ -1266,7 +1266,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   )}
                 </div>
               ) : null}
-              <div className="flex items-center justify-between p-2">
+              <div className="@container/toolbar flex items-center justify-between p-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -1287,7 +1287,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   }
                 >
                   <AudioLinesIcon />
-                  <span className="hidden sm:inline">
+                  <span className="hidden @md/toolbar:inline">
                     {audioVisible ? "Hide Audio" : "Show Audio"}
                   </span>
                 </Button>
@@ -1301,7 +1301,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                     }
                   >
                     {isChapterRead ? <BookOpenIcon /> : <BookOpenCheckIcon />}
-                    <span className="hidden sm:inline">
+                    <span className="hidden @md/toolbar:inline">
                       {isChapterRead ? "Read" : "Mark Read"}
                     </span>
                   </Button>
@@ -1313,7 +1313,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                     disabled={!hasPrev}
                   >
                     <ChevronLeftIcon />
-                    <span className="hidden sm:inline">Prev</span>
+                    <span className="hidden @md/toolbar:inline">Prev</span>
                   </Button>
                   <Button
                     variant="outline"
@@ -1323,7 +1323,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                     disabled={!hasNext}
                   >
                     <ChevronRightIcon />
-                    <span className="hidden sm:inline">Next</span>
+                    <span className="hidden @md/toolbar:inline">Next</span>
                   </Button>
                 </div>
               </div>
