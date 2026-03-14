@@ -172,6 +172,7 @@ export type StudyWorkspaceTool =
   | "maps"
   | "genealogy"
   | "hitchcocks";
+export type StudyToolOpenTarget = "sidebar" | "panel" | "tab";
 
 export type PanelDirection = "left" | "right" | "up" | "down";
 export type SplitOrientation = "horizontal" | "vertical";
@@ -181,7 +182,14 @@ export type IconVariant = "bw" | "color";
 export type LeafNode = {
   id: string;
   type: "leaf";
-  view: "reader" | "picker" | "search" | "notes" | "page";
+  view:
+    | "reader"
+    | "picker"
+    | "search"
+    | "notes"
+    | "page"
+    | "tools"
+    | "bookmarks";
   bookIndex: number;
   chapterIndex: number;
   pickerTestament: "old" | "new" | null;
