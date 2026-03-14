@@ -1300,7 +1300,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                       toggleChapterRead(leaf.bookIndex, leaf.chapterIndex)
                     }
                   >
-                    {isChapterRead ? <BookOpenIcon /> : <BookOpenCheckIcon />}
+                    {isChapterRead ? <BookOpenCheckIcon /> : <BookOpenIcon />}
                     <span className="hidden @md/toolbar:inline">
                       {isChapterRead ? "Read" : "Mark Read"}
                     </span>
