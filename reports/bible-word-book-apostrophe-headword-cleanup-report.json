@@ -1,0 +1,72 @@
+{
+  "renamed": [
+    {
+      "from": "Baring'",
+      "to": "Baring"
+    },
+    {
+      "from": "Chiding'",
+      "to": "Chiding"
+    },
+    {
+      "from": "Cunning'",
+      "to": "Cunning"
+    },
+    {
+      "from": "Depraving'",
+      "to": "Depraving"
+    },
+    {
+      "from": "GrO'Virn",
+      "to": "Grown"
+    },
+    {
+      "from": "Gro'wen",
+      "to": "Growen"
+    },
+    {
+      "from": "Ja'VlT teeth",
+      "to": "Jaw teeth"
+    },
+    {
+      "from": "LiOdg'e",
+      "to": "Lodge"
+    },
+    {
+      "from": "Man of 'war",
+      "to": "Man of war"
+    },
+    {
+      "from": "Rang'es",
+      "to": "Ranges"
+    },
+    {
+      "from": "Ravening'",
+      "to": "Ravening"
+    },
+    {
+      "from": "S'Waddle",
+      "to": "Swaddle"
+    },
+    {
+      "from": "Sodering'",
+      "to": "Sodering"
+    },
+    {
+      "from": "T'Winned",
+      "to": "Twinned"
+    }
+  ],
+  "added": [
+    "Embassage",
+    "Ambush",
+    "Grudge"
+  ],
+  "removed": [
+    "Love's Labour's Lost"
+  ],
+  "trimmed": [
+    "Grown"
+  ],
+  "totalEntries": 1470
+}
