@@ -3,6 +3,7 @@ import {
   lazy,
   memo,
   Suspense,
+  type ComponentProps,
   type ReactNode,
   type RefObject,
   useEffect,
@@ -20,6 +21,8 @@ import {
   BookMarkedIcon,
   BookOpenCheckIcon,
   BookOpenIcon,
+  HouseIcon,
+  LayoutPanelTopIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   EraserIcon,
@@ -61,6 +64,7 @@ import {
 import type { VerseSearchIndexEntry } from "@/lib/search";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 import { StaticPage } from "@/components/reader/static-page";
+import { StudyToolsPanel } from "@/components/reader/study-tools-panel";
 import { getStaticPage } from "@/lib/static-pages";
 import {
   DropdownMenu,
@@ -79,6 +83,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ChapterTextContent } from "@/components/reader/chapter-text-content";
+import { BookmarksTool } from "@/components/reader/study-tools/bookmarks-tool";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -229,6 +234,8 @@ type ReaderPanelTreeProps = {
   onClearLeafHighlights: (leafId: string) => void;
   onToggleHighlightMode: (leafId: string) => void;
   onBookmarkLeafSelection: (leafId: string) => void;
+  studyToolsPanelProps: ComponentProps<typeof StudyToolsPanel>;
+  bookmarksPanelProps: ComponentProps<typeof BookmarksTool>;
 };
 
 type ReaderLeafPanelProps = Omit<ReaderPanelTreeProps, "root"> & {
@@ -308,6 +315,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   onClearLeafHighlights,
   onToggleHighlightMode,
   onBookmarkLeafSelection,
+  studyToolsPanelProps,
+  bookmarksPanelProps,
 }: ReaderLeafPanelProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -643,6 +652,10 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
               <p className="text-sm text-muted-foreground">Search</p>
             ) : leaf.view === "notes" ? (
               <p className="text-sm text-muted-foreground">Notes</p>
+            ) : leaf.view === "tools" ? (
+              <p className="text-sm text-muted-foreground">Tools</p>
+            ) : leaf.view === "bookmarks" ? (
+              <p className="text-sm text-muted-foreground">Bookmarks</p>
             ) : leaf.view === "page" ? (
               <p className="text-sm text-muted-foreground">
                 {getStaticPage(leaf.pageId)?.title ?? "Page"}
@@ -730,6 +743,24 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                         Bookmark Chapter
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
+                  </>
+                ) : null}
+                {leaf.view !== "picker" ? (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => {
+                        updateLeafLocation(leaf.id, {
+                          view: "picker",
+                          pickerTestament: null,
+                          pickerBookIndex: null,
+                        });
+                        closePanelMenu();
+                      }}
+                    >
+                      <HouseIcon />
+                      Home
+                    </DropdownMenuItem>
                   </>
                 ) : null}
                 {!isFullscreenLeaf ? (
@@ -1353,57 +1384,101 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
               />
             </Suspense>
           </CardContent>
+        ) : leaf.view === "tools" ? (
+          <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
+            <StudyToolsPanel {...studyToolsPanelProps} />
+          </CardContent>
+        ) : leaf.view === "bookmarks" ? (
+          <CardContent className="min-h-0 flex-1 overflow-hidden p-2">
+            <BookmarksTool {...bookmarksPanelProps} />
+          </CardContent>
         ) : leaf.view === "page" ? (
           <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
             <StaticPage pageId={leaf.pageId} />
           </CardContent>
         ) : (
           <CardContent className="min-h-0 flex-1 overflow-auto p-2">
-            <BookChapterPicker
-              books={books}
-              selectedTestament={leaf.pickerTestament}
-              selectedBookIndex={leaf.pickerBookIndex}
-              currentBookIndex={leaf.view === "picker" ? null : leaf.bookIndex}
-              currentChapterIndex={leaf.view === "picker" ? null : leaf.chapterIndex}
-              onSelectTestament={(testament) =>
-                updateLeafLocation(leaf.id, {
-                  pickerTestament: testament,
-                  pickerBookIndex: null,
-                })
-              }
-              onBackToTestaments={() =>
-                updateLeafLocation(leaf.id, {
-                  pickerTestament: null,
-                  pickerBookIndex: null,
-                })
-              }
-              onSelectBook={(bookIndex) =>
-                updateLeafLocation(leaf.id, {
-                  pickerBookIndex: bookIndex,
-                })
-              }
-              onGoToBookSelection={(testament) =>
-                updateLeafLocation(leaf.id, {
-                  pickerTestament: testament,
-                  pickerBookIndex: null,
-                })
-              }
-              onGoToChapterSelection={(testament, bookIndex) =>
-                updateLeafLocation(leaf.id, {
-                  pickerTestament: testament,
-                  pickerBookIndex: bookIndex,
-                })
-              }
-              onSelectChapter={(bookIndex, chapterIndex) =>
-                updateLeafLocation(leaf.id, {
-                  bookIndex,
-                  chapterIndex,
-                  view: "reader",
-                  pickerTestament: null,
-                  pickerBookIndex: null,
-                })
-              }
-            />
+            <div className="flex flex-col gap-3">
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="justify-center"
+                  onClick={() => updateLeafLocation(leaf.id, { view: "tools" })}
+                >
+                  <LayoutPanelTopIcon />
+                  Tools
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="justify-center"
+                  onClick={() => updateLeafLocation(leaf.id, { view: "notes" })}
+                >
+                  <BookOpenIcon />
+                  Notes
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="justify-center"
+                  onClick={() =>
+                    updateLeafLocation(leaf.id, { view: "bookmarks" })
+                  }
+                >
+                  <BookMarkedIcon />
+                  Bookmarks
+                </Button>
+              </div>
+              <BookChapterPicker
+                books={books}
+                selectedTestament={leaf.pickerTestament}
+                selectedBookIndex={leaf.pickerBookIndex}
+                currentBookIndex={leaf.view === "picker" ? null : leaf.bookIndex}
+                currentChapterIndex={leaf.view === "picker" ? null : leaf.chapterIndex}
+                onSelectTestament={(testament) =>
+                  updateLeafLocation(leaf.id, {
+                    pickerTestament: testament,
+                    pickerBookIndex: null,
+                  })
+                }
+                onBackToTestaments={() =>
+                  updateLeafLocation(leaf.id, {
+                    pickerTestament: null,
+                    pickerBookIndex: null,
+                  })
+                }
+                onSelectBook={(bookIndex) =>
+                  updateLeafLocation(leaf.id, {
+                    pickerBookIndex: bookIndex,
+                  })
+                }
+                onGoToBookSelection={(testament) =>
+                  updateLeafLocation(leaf.id, {
+                    pickerTestament: testament,
+                    pickerBookIndex: null,
+                  })
+                }
+                onGoToChapterSelection={(testament, bookIndex) =>
+                  updateLeafLocation(leaf.id, {
+                    pickerTestament: testament,
+                    pickerBookIndex: bookIndex,
+                  })
+                }
+                onSelectChapter={(bookIndex, chapterIndex) =>
+                  updateLeafLocation(leaf.id, {
+                    bookIndex,
+                    chapterIndex,
+                    view: "reader",
+                    pickerTestament: null,
+                    pickerBookIndex: null,
+                  })
+                }
+              />
+            </div>
           </CardContent>
         )}
       </Card>
@@ -1477,6 +1552,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   onClearLeafHighlights,
   onToggleHighlightMode,
   onBookmarkLeafSelection,
+  studyToolsPanelProps,
+  bookmarksPanelProps,
 }: ReaderPanelTreeProps) {
   const renderLeaf = (leaf: LeafNode) => (
     <ReaderLeafPanel
@@ -1546,6 +1623,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       onClearLeafHighlights={onClearLeafHighlights}
       onToggleHighlightMode={onToggleHighlightMode}
       onBookmarkLeafSelection={onBookmarkLeafSelection}
+      studyToolsPanelProps={studyToolsPanelProps}
+      bookmarksPanelProps={bookmarksPanelProps}
     />
   );
 

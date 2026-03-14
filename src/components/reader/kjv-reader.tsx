@@ -81,6 +81,7 @@ import type {
   SearchPageState,
   SplitOrientation,
   StrongsPayload,
+  StudyToolOpenTarget,
   StudyWorkspaceTool,
   TabsOrientation,
   TokenPopupState,
@@ -256,6 +257,20 @@ const LazyGenealogyTreeDialog = lazy(async () => {
   return { default: module.GenealogyTreeDialog };
 });
 
+function panelNodeContainsView(
+  node: PanelNode,
+  view: LeafNode["view"],
+): boolean {
+  if (node.type === "leaf") {
+    return node.view === view;
+  }
+
+  return (
+    panelNodeContainsView(node.first, view) ||
+    panelNodeContainsView(node.second, view)
+  );
+}
+
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -268,6 +283,8 @@ export function KJVReader() {
     useState(false);
   const [readModeParagraphIndent, setReadModeParagraphIndent] = useState(false);
   const [flowVersesByParagraph, setFlowVersesByParagraph] = useState(false);
+  const [studyToolOpenTarget, setStudyToolOpenTarget] =
+    useState<StudyToolOpenTarget>("sidebar");
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [sidebarCloseRequestKey, setSidebarCloseRequestKey] = useState(0);
   const [isCompletionCelebrationOpen, setIsCompletionCelebrationOpen] =
@@ -398,6 +415,7 @@ export function KJVReader() {
         readModeParagraphIndent?: boolean;
         flowVersesByParagraph?: boolean;
         tabsOrientation?: TabsOrientation;
+        studyToolOpenTarget?: StudyToolOpenTarget;
       };
       if (typeof parsed.fontSize === "number") {
         setFontSize(Math.max(8, Math.round(parsed.fontSize)));
@@ -425,6 +443,13 @@ export function KJVReader() {
       ) {
         setTabsOrientation(parsed.tabsOrientation);
       }
+      if (
+        parsed.studyToolOpenTarget === "sidebar" ||
+        parsed.studyToolOpenTarget === "panel" ||
+        parsed.studyToolOpenTarget === "tab"
+      ) {
+        setStudyToolOpenTarget(parsed.studyToolOpenTarget);
+      }
     } catch {
       // Ignore malformed persisted display settings.
     }
@@ -441,6 +466,7 @@ export function KJVReader() {
         readModeParagraphIndent,
         flowVersesByParagraph,
         tabsOrientation,
+        studyToolOpenTarget,
       }),
     );
   }, [
@@ -451,6 +477,7 @@ export function KJVReader() {
     readModeParagraphIndent,
     flowVersesByParagraph,
     tabsOrientation,
+    studyToolOpenTarget,
   ]);
 
   useEffect(() => {
@@ -1640,11 +1667,17 @@ export function KJVReader() {
     (selectedNoteId?: string | null) => {
       const nextTabId = createId();
       const nextLeaf = createLeaf(0, 0, "notes");
+      const selectedNote = selectedNoteId
+        ? readerNotes.find((note) => note.id === selectedNoteId) ?? null
+        : null;
+      const nextTitle = selectedNote
+        ? selectedNote.title.trim() || "Untitled note"
+        : "Notes";
       setTabs((currentTabs) => [
         ...currentTabs,
         {
           id: nextTabId,
-          title: "Notes",
+          title: nextTitle,
           root: nextLeaf,
         },
       ]);
@@ -1662,8 +1695,85 @@ export function KJVReader() {
         });
       });
     },
-    [initializeNotesTabState, notesContext, tabsOrientation],
+    [initializeNotesTabState, notesContext, readerNotes, tabsOrientation],
   );
+
+  const ensureToolsPanelInActiveTab = useCallback(() => {
+    if (!activeTabId) {
+      return;
+    }
+
+    setTabs((currentTabs) => {
+      const activeIndex = currentTabs.findIndex((tab) => tab.id === activeTabId);
+      if (activeIndex < 0) {
+        return currentTabs;
+      }
+
+      const active = currentTabs[activeIndex];
+      if (panelNodeContainsView(active.root, "tools")) {
+        return currentTabs;
+      }
+
+      const nextLeaf = createLeaf(0, 0, "tools");
+      const nextRoot: PanelNode = {
+        id: createId(),
+        type: "split",
+        orientation: "horizontal",
+        ratio: 68,
+        first: active.root,
+        second: nextLeaf,
+      };
+
+      const nextTabs = [...currentTabs];
+      nextTabs[activeIndex] = { ...active, root: nextRoot };
+      return nextTabs;
+    });
+  }, [activeTabId, setTabs]);
+
+  const openToolsTab = useCallback(() => {
+    let targetTabId: string | null = null;
+    let created = false;
+
+    setTabs((currentTabs) => {
+      const existingToolsTab = currentTabs.find((tab) =>
+        panelNodeContainsView(tab.root, "tools"),
+      );
+      if (existingToolsTab) {
+        targetTabId = existingToolsTab.id;
+        return currentTabs;
+      }
+
+      const nextTabId = createId();
+      const nextLeaf = createLeaf(0, 0, "tools");
+      targetTabId = nextTabId;
+      created = true;
+      return [
+        ...currentTabs,
+        {
+          id: nextTabId,
+          title: "Tools",
+          root: nextLeaf,
+        },
+      ];
+    });
+
+    if (!targetTabId) {
+      return;
+    }
+
+    setActiveTabId(targetTabId);
+    if (!created) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      tabEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: tabsOrientation === "vertical" ? "end" : "nearest",
+        inline: tabsOrientation === "vertical" ? "nearest" : "end",
+      });
+    });
+  }, [setActiveTabId, setTabs, tabsOrientation]);
 
   function openBookmarkInNewTab(bookmark: ReaderBookmark) {
     if (bookmark.scope.type === "chapter") {
@@ -1925,13 +2035,26 @@ export function KJVReader() {
 
   const openStudyTool = useCallback(
     (tool: StudyWorkspaceTool, options?: { openSidebar?: boolean }) => {
-      if (options?.openSidebar !== false) {
+      const destination =
+        options?.openSidebar === false ? "panel" : studyToolOpenTarget;
+
+      if (destination === "sidebar") {
         setIsRightSidebarOpen(true);
         setSidebarOpenRequestKey((current) => current + 1);
+      } else if (destination === "panel") {
+        ensureToolsPanelInActiveTab();
+      } else {
+        openToolsTab();
       }
       showStudyTool(tool);
     },
-    [setIsRightSidebarOpen, showStudyTool],
+    [
+      ensureToolsPanelInActiveTab,
+      openToolsTab,
+      setIsRightSidebarOpen,
+      showStudyTool,
+      studyToolOpenTarget,
+    ],
   );
 
   const resolvePhraseSelectionAtLocation = useCallback(
@@ -2911,6 +3034,144 @@ export function KJVReader() {
     genealogyCount: genealogySearchResults.length,
   });
 
+  const sharedStudyToolsProps = {
+    crossRefsProps: {
+      hasInfo: hasCrossRefsInfo,
+      isOpen: isCrossRefsSectionOpen,
+      isLoading: isCrossRefsLoading,
+      error: crossRefsError,
+      selected: selectedCrossReferences,
+      books,
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+    concordanceProps: {
+      hasInfo: hasConcordanceInfo,
+      isOpen: isConcordanceSectionOpen,
+      isLoading: isConcordanceLoading,
+      isSearching: isConcordanceSearching,
+      error: concordanceError,
+      searchTerm: concordanceSearchTerm,
+      results: concordanceSearchResults,
+      wordAccordionValue: concordanceWordAccordionValue,
+      onWordAccordionValueChange: setConcordanceWordAccordionValue,
+      onSearch: applyConcordanceSearch,
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+    webstersProps: {
+      hasInfo: hasWebstersInfo,
+      isOpen: isWebstersSectionOpen,
+      isLoading: isWebstersLoading,
+      isSearching: isWebstersSearching,
+      error: webstersError,
+      searchTerm: webstersSearchTerm,
+      results: webstersSearchResults,
+      wordAccordionValue: webstersWordAccordionValue,
+      onWordAccordionValueChange: setWebstersWordAccordionValue,
+      onSearch: applyWebstersSearch,
+    },
+    strongsProps: {
+      hasInfo: hasStrongsInfo,
+      isOpen: isStrongsSectionOpen,
+      isLoading: isStrongsLoading,
+      isSearching: isStrongsSearching,
+      error: strongsError,
+      searchTerm: strongsSearchTerm,
+      results: strongsSearchResults,
+      wordAccordionValue: strongsWordAccordionValue,
+      onWordAccordionValueChange: setStrongsWordAccordionValue,
+      onSearch: applyStrongsSearch,
+      onOpenLinkedStrongsEntry: openLinkedStrongsEntry,
+      inputRef: strongsSearchInputRef,
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+    oldEnglishProps: {
+      hasInfo: hasOldEnglishInfo,
+      isOpen: isOldEnglishSectionOpen,
+      isLoading: isOldEnglishLoading,
+      isSearching: isOldEnglishSearching,
+      error: oldEnglishError,
+      searchTerm: oldEnglishSearchTerm,
+      results: oldEnglishSearchResults,
+      onSearch: applyOldEnglishSearch,
+    },
+    phrasesProps: {
+      hasInfo: hasPhrasesInfo,
+      isOpen: isPhrasesSectionOpen,
+      isLoading: isPhrasesLoading,
+      isSearching: isPhrasesSearching,
+      error: phrasesError,
+      searchTerm: phrasesSearchTerm,
+      results: phrasesSearchResults,
+      onSearch: applyPhrasesSearch,
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+    unitsProps: {
+      hasInfo: hasUnitsInfo,
+      isOpen: isUnitsSectionOpen,
+      isLoading: isUnitsLoading,
+      isSearching: isUnitsSearching,
+      error: unitsError,
+      searchTerm: unitsSearchTerm,
+      results: unitsSearchResults,
+      onSearch: applyUnitsSearch,
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+    mapsProps: {
+      hasInfo: hasMapsInfo,
+      isOpen: isMapsSectionOpen,
+      isLoading: isMapsLoading,
+      isSearching: isMapsSearching,
+      error: mapsError,
+      searchTerm: mapsSearchTerm,
+      resultsLength: mapsSearchResults.length,
+      displayEntries: mapsDisplayEntries,
+      onSearch: applyMapsSearch,
+      onOpenMapDialog: openMapDialog,
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+    genealogyProps: {
+      hasInfo: hasGenealogyInfo,
+      isOpen: isGenealogySectionOpen,
+      isLoading: isGenealogyLoading,
+      isSearching: isGenealogySearching,
+      error: genealogyError,
+      searchTerm: genealogySearchTerm,
+      results: genealogySearchResults,
+      onSearch: applyGenealogySearch,
+      renderPersonDetails: renderGenealogyPersonDetails,
+    },
+    hitchcocksProps: {
+      hasInfo: hasHitchcocksInfo,
+      isOpen: isHitchcocksSectionOpen,
+      isLoading: isHitchcocksLoading,
+      isSearching: isHitchcocksSearching,
+      error: hitchcocksError,
+      searchTerm: hitchcocksSearchTerm,
+      results: hitchcocksSearchResults,
+      onSearch: applyHitchcocksSearch,
+    },
+  };
+
+  const sharedBookmarksProps = {
+    books,
+    bookmarks: readerBookmarks,
+    onOpenBookmark: openBookmarkInNewTab,
+    onUpdateBookmark: updateBookmark,
+    onDeleteBookmark: deleteBookmark,
+  };
+
   const bookPickerDialogLeaf =
     bookPickerDialogLeafId && activeTab
       ? findLeafNode(activeTab.root, bookPickerDialogLeafId)
@@ -3028,6 +3289,17 @@ export function KJVReader() {
                 onClearLeafHighlights={handleClearLeafHighlights}
                 onToggleHighlightMode={toggleHighlightModeForLeaf}
                 onBookmarkLeafSelection={bookmarkLeafSelection}
+                studyToolsPanelProps={{
+                  accordionValue: concordanceAccordionValue,
+                  onAccordionValueChange: setConcordanceAccordionValue,
+                  onExpandAll: () =>
+                    setConcordanceAccordionValue([...STUDY_ACCORDION_ITEMS]),
+                  onCollapseAll: () => setConcordanceAccordionValue([]),
+                  canExpand: !allStudyAccordionsOpen,
+                  canCollapse: concordanceAccordionValue.length > 0,
+                  ...sharedStudyToolsProps,
+                }}
+                bookmarksPanelProps={sharedBookmarksProps}
               />
             }
           />
@@ -3047,112 +3319,7 @@ export function KJVReader() {
               onCollapseAll={() => setConcordanceAccordionValue([])}
               canExpand={!allStudyAccordionsOpen}
               canCollapse={concordanceAccordionValue.length > 0}
-              crossRefsProps={{
-                hasInfo: hasCrossRefsInfo,
-                isOpen: isCrossRefsSectionOpen,
-                isLoading: isCrossRefsLoading,
-                error: crossRefsError,
-                selected: selectedCrossReferences,
-                books,
-                renderPreview: referencePreviewContent,
-                onOpenReference: openConcordanceReference,
-                onCloseSidebar: closeRightSidebarForMobile,
-              }}
-              concordanceProps={{
-                hasInfo: hasConcordanceInfo,
-                isOpen: isConcordanceSectionOpen,
-                isLoading: isConcordanceLoading,
-                isSearching: isConcordanceSearching,
-                error: concordanceError,
-                searchTerm: concordanceSearchTerm,
-                results: concordanceSearchResults,
-                wordAccordionValue: concordanceWordAccordionValue,
-                onWordAccordionValueChange: setConcordanceWordAccordionValue,
-                onSearch: applyConcordanceSearch,
-                renderPreview: referencePreviewContent,
-                onOpenReference: openConcordanceReference,
-                onCloseSidebar: closeRightSidebarForMobile,
-              }}
-              webstersProps={{
-                hasInfo: hasWebstersInfo,
-                isOpen: isWebstersSectionOpen,
-                isLoading: isWebstersLoading,
-                isSearching: isWebstersSearching,
-                error: webstersError,
-                searchTerm: webstersSearchTerm,
-                results: webstersSearchResults,
-                wordAccordionValue: webstersWordAccordionValue,
-                onWordAccordionValueChange: setWebstersWordAccordionValue,
-                onSearch: applyWebstersSearch,
-              }}
-              strongsProps={{
-                hasInfo: hasStrongsInfo,
-                isOpen: isStrongsSectionOpen,
-                isLoading: isStrongsLoading,
-                isSearching: isStrongsSearching,
-                error: strongsError,
-                searchTerm: strongsSearchTerm,
-                results: strongsSearchResults,
-                wordAccordionValue: strongsWordAccordionValue,
-                onWordAccordionValueChange: setStrongsWordAccordionValue,
-                onSearch: applyStrongsSearch,
-                onOpenLinkedStrongsEntry: openLinkedStrongsEntry,
-                inputRef: strongsSearchInputRef,
-                renderPreview: referencePreviewContent,
-                onOpenReference: openConcordanceReference,
-                onCloseSidebar: closeRightSidebarForMobile,
-              }}
-              oldEnglishProps={{
-                hasInfo: hasOldEnglishInfo,
-                isOpen: isOldEnglishSectionOpen,
-                isLoading: isOldEnglishLoading,
-                isSearching: isOldEnglishSearching,
-                error: oldEnglishError,
-                searchTerm: oldEnglishSearchTerm,
-                results: oldEnglishSearchResults,
-                onSearch: applyOldEnglishSearch,
-              }}
-              phrasesProps={{
-                hasInfo: hasPhrasesInfo,
-                isOpen: isPhrasesSectionOpen,
-                isLoading: isPhrasesLoading,
-                isSearching: isPhrasesSearching,
-                error: phrasesError,
-                searchTerm: phrasesSearchTerm,
-                results: phrasesSearchResults,
-                onSearch: applyPhrasesSearch,
-                renderPreview: referencePreviewContent,
-                onOpenReference: openConcordanceReference,
-                onCloseSidebar: closeRightSidebarForMobile,
-              }}
-              unitsProps={{
-                hasInfo: hasUnitsInfo,
-                isOpen: isUnitsSectionOpen,
-                isLoading: isUnitsLoading,
-                isSearching: isUnitsSearching,
-                error: unitsError,
-                searchTerm: unitsSearchTerm,
-                results: unitsSearchResults,
-                onSearch: applyUnitsSearch,
-                renderPreview: referencePreviewContent,
-                onOpenReference: openConcordanceReference,
-                onCloseSidebar: closeRightSidebarForMobile,
-              }}
-              mapsProps={{
-                hasInfo: hasMapsInfo,
-                isOpen: isMapsSectionOpen,
-                isLoading: isMapsLoading,
-                isSearching: isMapsSearching,
-                error: mapsError,
-                searchTerm: mapsSearchTerm,
-                resultsLength: mapsSearchResults.length,
-                displayEntries: mapsDisplayEntries,
-                onSearch: applyMapsSearch,
-                onOpenMapDialog: openMapDialog,
-                renderPreview: referencePreviewContent,
-                onOpenReference: openConcordanceReference,
-                onCloseSidebar: closeRightSidebarForMobile,
-              }}
+              {...sharedStudyToolsProps}
               notesProps={{
                 books,
                 generalNotes,
@@ -3184,34 +3351,7 @@ export function KJVReader() {
                   });
                 },
               }}
-              bookmarksProps={{
-                books,
-                bookmarks: readerBookmarks,
-                onOpenBookmark: openBookmarkInNewTab,
-                onUpdateBookmark: updateBookmark,
-                onDeleteBookmark: deleteBookmark,
-              }}
-              genealogyProps={{
-                hasInfo: hasGenealogyInfo,
-                isOpen: isGenealogySectionOpen,
-                isLoading: isGenealogyLoading,
-                isSearching: isGenealogySearching,
-                error: genealogyError,
-                searchTerm: genealogySearchTerm,
-                results: genealogySearchResults,
-                onSearch: applyGenealogySearch,
-                renderPersonDetails: renderGenealogyPersonDetails,
-              }}
-              hitchcocksProps={{
-                hasInfo: hasHitchcocksInfo,
-                isOpen: isHitchcocksSectionOpen,
-                isLoading: isHitchcocksLoading,
-                isSearching: isHitchcocksSearching,
-                error: hitchcocksError,
-                searchTerm: hitchcocksSearchTerm,
-                results: hitchcocksSearchResults,
-                onSearch: applyHitchcocksSearch,
-              }}
+              bookmarksProps={sharedBookmarksProps}
             />
           </Suspense>
         ) : null}
@@ -3345,6 +3485,8 @@ export function KJVReader() {
             onFlowVersesByParagraphChange={setFlowVersesByParagraph}
             tabsOrientation={tabsOrientation}
             onTabsOrientationChange={setTabsOrientation}
+            studyToolOpenTarget={studyToolOpenTarget}
+            onStudyToolOpenTargetChange={setStudyToolOpenTarget}
           />
         </Suspense>
       ) : null}

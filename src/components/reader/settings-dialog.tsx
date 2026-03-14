@@ -6,11 +6,18 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   AArrowDownIcon,
   AArrowUpIcon,
   RotateCcwIcon,
 } from "lucide-react";
-import type { TabsOrientation } from "@/types/reader";
+import type { StudyToolOpenTarget, TabsOrientation } from "@/types/reader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +50,8 @@ type SettingsDialogProps = {
   onFlowVersesByParagraphChange: (checked: boolean) => void;
   tabsOrientation: TabsOrientation;
   onTabsOrientationChange: (orientation: TabsOrientation) => void;
+  studyToolOpenTarget: StudyToolOpenTarget;
+  onStudyToolOpenTargetChange: (target: StudyToolOpenTarget) => void;
 };
 
 export function SettingsDialog({
@@ -67,8 +76,16 @@ export function SettingsDialog({
   onFlowVersesByParagraphChange,
   tabsOrientation,
   onTabsOrientationChange,
+  studyToolOpenTarget,
+  onStudyToolOpenTargetChange,
 }: SettingsDialogProps) {
   const [draftHighlightColor, setDraftHighlightColor] = useState(highlightColor);
+  const studyToolTargetLabel =
+    studyToolOpenTarget === "sidebar"
+      ? "Sidebar"
+      : studyToolOpenTarget === "panel"
+        ? "Panel"
+        : "Tab";
 
   useEffect(() => {
     setDraftHighlightColor(highlightColor);
@@ -226,6 +243,28 @@ export function SettingsDialog({
                 onTabsOrientationChange(checked ? "vertical" : "horizontal")
               }
             />
+          </div>
+          <div className="space-y-2 border-t pt-3">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <Label htmlFor="tool-open-target">Word / Verse Tool Open Target</Label>
+            </div>
+            <Select
+              value={studyToolOpenTarget}
+              onValueChange={(value) => {
+                if (value === "sidebar" || value === "panel" || value === "tab") {
+                  onStudyToolOpenTargetChange(value);
+                }
+              }}
+            >
+              <SelectTrigger id="tool-open-target" className="w-full">
+                <SelectValue>{studyToolTargetLabel}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sidebar">Sidebar</SelectItem>
+                <SelectItem value="panel">Panel</SelectItem>
+                <SelectItem value="tab">Tab</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <AlertDialogFooter className="group-data-[size=sm]/alert-dialog-content:flex group-data-[size=sm]/alert-dialog-content:flex-row group-data-[size=sm]/alert-dialog-content:justify-end justify-end sm:flex sm:justify-end">
