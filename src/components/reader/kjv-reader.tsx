@@ -15,6 +15,7 @@ import {
   loadKjvBooks,
   loadMapGeoJson,
   loadOldEnglish,
+  loadUnits,
   loadWebsters,
 } from "@/lib/reader-data";
 import { buildVerseSearchIndex } from "@/lib/search";
@@ -26,6 +27,7 @@ import {
   resolveConcordanceKey,
   resolveHitchcocksKey,
   resolveOldEnglishKey,
+  resolveUnitsKey,
   resolveWebstersKey,
 } from "@/lib/references";
 import { normalizeRangePoints } from "@/lib/bookmarks";
@@ -78,6 +80,8 @@ import type {
   StudyWorkspaceTool,
   TabsOrientation,
   TokenPopupState,
+  UnitsEntry,
+  UnitsPayload,
   WebstersEntry,
   WebstersPayload,
 } from "@/types/reader";
@@ -741,6 +745,10 @@ export function KJVReader() {
     (key: string, definitions: string[]) => ({ key, definitions }),
     [],
   );
+  const mapUnitsResult = useCallback(
+    (key: string, entry: UnitsEntry) => ({ key, entry }),
+    [],
+  );
 
   const {
     concordance,
@@ -856,6 +864,27 @@ export function KJVReader() {
     load: loadOldEnglish,
     errorMessage: "Failed to load Old English data",
     mapResult: mapOldEnglishResult,
+  });
+
+  const {
+    payload: units,
+    searchTerm: unitsSearchTerm,
+    isSearching: isUnitsSearching,
+    isLoading: isUnitsLoading,
+    error: unitsError,
+    results: unitsSearchResults,
+    setSelectedResult: setSelectedUnitsEntry,
+    ensureLoaded: ensureUnitsLoaded,
+    applySearch: applyUnitsSearch,
+  } = useDictionarySearchTool<
+    UnitsPayload,
+    UnitsEntry,
+    { key: string; entry: UnitsEntry }
+  >({
+    load: loadUnits,
+    errorMessage: "Failed to load units data",
+    mapResult: mapUnitsResult,
+    getSearchStrings: (key, entry) => [key, ...(entry.aliases ?? [])],
   });
 
   const {
@@ -1886,6 +1915,7 @@ export function KJVReader() {
         webstersData?: WebstersPayload | null;
         hitchcocksData?: HitchcocksPayload | null;
         oldEnglishData?: OldEnglishPayload | null;
+        unitsData?: UnitsPayload | null;
         genealogyData?: GenealogyPayload | null;
         ancientMapsData?: AncientMapPayload | null;
         strongsGreekData?: StrongsPayload | null;
@@ -1946,6 +1976,11 @@ export function KJVReader() {
         nextAccordion.push("old-english");
       }
 
+      const unitsData = options?.unitsData ?? units;
+      if (unitsData && resolveUnitsKey(unitsData, rawWord)) {
+        nextAccordion.push("units");
+      }
+
       const genealogyData = options?.genealogyData ?? genealogy;
       if (
         genealogyData &&
@@ -1968,6 +2003,7 @@ export function KJVReader() {
       genealogy,
       hitchcocks,
       oldEnglish,
+      units,
       setConcordanceAccordionValue,
       strongsGreek,
       strongsHebrew,
@@ -1983,6 +2019,7 @@ export function KJVReader() {
         websters?: WebstersPayload | null;
         hitchcocks?: HitchcocksPayload | null;
         oldEnglish?: OldEnglishPayload | null;
+        units?: UnitsPayload | null;
         genealogy?: GenealogyPayload | null;
         ancientMaps?: AncientMapPayload | null;
         strongsGreek?: StrongsPayload | null;
@@ -1992,6 +2029,7 @@ export function KJVReader() {
       const nextWebsters = overrides?.websters ?? websters;
       const nextHitchcocks = overrides?.hitchcocks ?? hitchcocks;
       const nextOldEnglish = overrides?.oldEnglish ?? oldEnglish;
+      const nextUnits = overrides?.units ?? units;
       const nextGenealogy = overrides?.genealogy ?? genealogy;
       const nextAncientMaps = overrides?.ancientMaps ?? ancientMaps;
       const nextStrongsGreek = overrides?.strongsGreek ?? strongsGreek;
@@ -2032,6 +2070,15 @@ export function KJVReader() {
         );
       } else {
         setSelectedOldEnglishEntry(null);
+      }
+
+      if (nextUnits) {
+        const matchedKey = resolveUnitsKey(nextUnits, rawWord);
+        setSelectedUnitsEntry(
+          matchedKey ? { key: matchedKey, entry: nextUnits[matchedKey] } : null,
+        );
+      } else {
+        setSelectedUnitsEntry(null);
       }
 
       if (nextGenealogy) {
@@ -2087,10 +2134,12 @@ export function KJVReader() {
       genealogy,
       hitchcocks,
       oldEnglish,
+      units,
       setSelectedGenealogyIds,
       setSelectedHitchcocksEntry,
       setSelectedMapsEntries,
       setSelectedOldEnglishEntry,
+      setSelectedUnitsEntry,
       setSelectedStrongsEntry,
       setSelectedWebstersEntry,
       strongsGreek,
@@ -2430,6 +2479,7 @@ export function KJVReader() {
       setSelectedWebstersEntry(null);
       setSelectedHitchcocksEntry(null);
       setSelectedOldEnglishEntry(null);
+      setSelectedUnitsEntry(null);
       setSelectedGenealogyIds([]);
       setSelectedMapsEntries([]);
       setStrongsWordAccordionValue([]);
@@ -2505,6 +2555,7 @@ export function KJVReader() {
         oldEnglish
           ? Promise.resolve(oldEnglish)
           : ensureOldEnglishLoaded().catch(() => null),
+        units ? Promise.resolve(units) : ensureUnitsLoaded().catch(() => null),
         genealogy
           ? Promise.resolve(genealogy)
           : ensureGenealogyLoaded().catch(() => null),
@@ -2518,6 +2569,7 @@ export function KJVReader() {
           nextWebsters,
           nextHitchcocks,
           nextOldEnglish,
+          nextUnits,
           nextGenealogy,
           nextAncientMaps,
           nextStrongs,
@@ -2526,6 +2578,7 @@ export function KJVReader() {
             websters: nextWebsters,
             hitchcocks: nextHitchcocks,
             oldEnglish: nextOldEnglish,
+            units: nextUnits,
             genealogy: nextGenealogy,
             ancientMaps: nextAncientMaps,
             strongsGreek: nextStrongs?.greek ?? null,
@@ -2539,6 +2592,7 @@ export function KJVReader() {
             webstersData: nextWebsters,
             hitchcocksData: nextHitchcocks,
             oldEnglishData: nextOldEnglish,
+            unitsData: nextUnits,
             genealogyData: nextGenealogy,
             ancientMapsData: nextAncientMaps,
             strongsGreekData: nextStrongs?.greek ?? null,
@@ -2744,6 +2798,7 @@ export function KJVReader() {
     isConcordanceSectionOpen,
     isWebstersSectionOpen,
     isStrongsSectionOpen,
+    isUnitsSectionOpen,
     isMapsSectionOpen,
     isGenealogySectionOpen,
     isHitchcocksSectionOpen,
@@ -2752,6 +2807,7 @@ export function KJVReader() {
     hasConcordanceInfo,
     hasWebstersInfo,
     hasStrongsInfo,
+    hasUnitsInfo,
     hasMapsInfo,
     hasHitchcocksInfo,
     hasOldEnglishInfo,
@@ -2762,6 +2818,7 @@ export function KJVReader() {
     concordanceCount: concordanceSearchResults.length,
     webstersCount: webstersSearchResults.length,
     strongsCount: strongsSearchResults.length,
+    unitsCount: unitsSearchResults.length,
     mapsCount: mapsSearchResults.length,
     hitchcocksCount: hitchcocksSearchResults.length,
     oldEnglishCount: oldEnglishSearchResults.length,
@@ -2968,6 +3025,16 @@ export function KJVReader() {
                 searchTerm: oldEnglishSearchTerm,
                 results: oldEnglishSearchResults,
                 onSearch: applyOldEnglishSearch,
+              }}
+              unitsProps={{
+                hasInfo: hasUnitsInfo,
+                isOpen: isUnitsSectionOpen,
+                isLoading: isUnitsLoading,
+                isSearching: isUnitsSearching,
+                error: unitsError,
+                searchTerm: unitsSearchTerm,
+                results: unitsSearchResults,
+                onSearch: applyUnitsSearch,
               }}
               mapsProps={{
                 hasInfo: hasMapsInfo,

@@ -1,7 +1,10 @@
 - Make a lot of the settings per panel (base font size in settings, individual font size in panel)
-- Make search available per panel
 - Store previous search queries
 - Map with english tiles
 
-- Make chapter swipeable left / right for prev / next chapter, always have loaded prev, current, next
 - Maybe make infinite scrolling for chapters possible, always have loaded prev, current, next
+
+My recommendation:
+
+then implement Obsolete Phrases with phrase-first matching around clicked words
+keep TSK on deck after that

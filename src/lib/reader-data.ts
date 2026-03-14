@@ -13,6 +13,7 @@ import type {
   ReaderPayload,
   StrongsCompactPayload,
   StrongsPayload,
+  UnitsPayload,
   WebstersPayload,
 } from "@/types/reader";
 import { decodeGenealogyPayload } from "@/lib/genealogy";
@@ -23,6 +24,7 @@ let concordancePromise: Promise<ConcordancePayload> | null = null;
 let crossRefsPromise: Promise<CrossRefsPayload> | null = null;
 let hitchcocksPromise: Promise<HitchcocksPayload> | null = null;
 let oldEnglishPromise: Promise<OldEnglishPayload> | null = null;
+let unitsPromise: Promise<UnitsPayload> | null = null;
 let genealogyPromise: Promise<GenealogyPayload> | null = null;
 let webstersPromise: Promise<WebstersPayload> | null = null;
 let strongsGreekPromise: Promise<StrongsPayload> | null = null;
@@ -175,6 +177,27 @@ export function loadOldEnglish() {
   }
 
   return oldEnglishPromise;
+}
+
+export function loadUnits() {
+  if (!unitsPromise) {
+    unitsPromise = fetch("/references/units.json", {
+      cache: "no-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/units.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as UnitsPayload)
+      .catch((error) => {
+        unitsPromise = null;
+        throw error;
+      });
+  }
+
+  return unitsPromise;
 }
 
 export function loadGenealogy() {
