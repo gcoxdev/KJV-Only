@@ -1968,6 +1968,8 @@ export function KJVReader() {
       rawWord: string,
       options?: {
         verseNumber?: number | null;
+        bookIndex?: number;
+        chapterIndex?: number;
         strongCode?: string | null;
         concordanceData?: ConcordancePayload | null;
         webstersData?: WebstersPayload | null;
@@ -2302,21 +2304,20 @@ export function KJVReader() {
 
       if (crossRefs) {
         applyCrossRefsSelection(crossRefs);
-        return;
+      } else {
+        void ensureCrossRefsLoaded()
+          .then((data) => {
+            applyCrossRefsSelection(data);
+          })
+          .catch((error) => {
+            const message =
+              error instanceof Error
+                ? error.message
+                : "Failed to load cross-reference data";
+            setCrossRefsError(message);
+            setIsCrossRefsLoading(false);
+          });
       }
-
-      void ensureCrossRefsLoaded()
-        .then((data) => {
-          applyCrossRefsSelection(data);
-        })
-        .catch((error) => {
-          const message =
-            error instanceof Error
-              ? error.message
-              : "Failed to load cross-reference data";
-          setCrossRefsError(message);
-          setIsCrossRefsLoading(false);
-        });
     },
     [
       crossRefs,
@@ -2657,6 +2658,8 @@ export function KJVReader() {
             strongsHebrew: nextStrongs?.hebrew ?? null,
           });
           syncTokenAccordionState(rawWord, {
+            bookIndex,
+            chapterIndex,
             verseNumber:
               Number.isFinite(verseNumber) && verseNumber > 0 ? verseNumber : null,
             strongCode: normalizedCode,

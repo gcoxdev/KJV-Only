@@ -1,0 +1,7336 @@
+{
+  "summary": {
+    "verseCount": 29364,
+    "currentVerseCount": 29364,
+    "tskVerseCount": 29319,
+    "exactOrderMatches": 2007,
+    "sameReferenceSet": 27570,
+    "orderOnlyDifferences": 25563,
+    "currentOnlyVerses": 45,
+    "tskOnlyVerses": 0,
+    "currentTotalReferences": 344799,
+    "tskTotalReferences": 341297,
+    "overlapReferences": 341297,
+    "currentOnlyReferences": 3502,
+    "tskOnlyReferences": 0
+  },
+  "currentOnlyVerseList": [
+    "1CO.11.14",
+    "1KI.19.7",
+    "1KI.3.17",
+    "1KI.3.22",
+    "1KI.4.32",
+    "1SA.14.33",
+    "1SA.30.25",
+    "2KI.3.16",
+    "2PE.1.20",
+    "2SA.1.1",
+    "2TI.1.17",
+    "DEU.25.11",
+    "EXO.14.1",
+    "EZK.47.4",
+    "GEN.1.8",
+    "GEN.18.3",
+    "GEN.23.1",
+    "GEN.49.12",
+    "GEN.6.1",
+    "GEN.8.5",
+    "HAB.1.14",
+    "JAS.3.7",
+    "JDG.11.40",
+    "JHN.1.22",
+    "JHN.2.15",
+    "JHN.21.8",
+    "JOB.3.2",
+    "JON.4.10",
+    "LEV.17.12",
+    "LUK.15.11",
+    "LUK.17.7",
+    "LUK.22.36",
+    "LUK.7.11",
+    "MAT.24.26",
+    "MAT.27.53",
+    "MAT.9.17",
+    "PRO.25.10",
+    "PRO.25.17",
+    "PRO.30.19",
+    "PRO.31.12",
+    "PRO.6.30",
+    "PSA.78.31",
+    "PSA.84.8",
+    "RUT.3.4",
+    "SNG.1.1"
+  ],
+  "tskOnlyVerseList": [],
+  "largestDifferences": [
+    {
+      "verse": "ZEP.1.17",
+      "currentCount": 36,
+      "tskCount": 12,
+      "commonCount": 12,
+      "currentOnlyCount": 24,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "DAN.9.5-19",
+        "JER.2.19",
+        "ISA.24.5-6",
+        "ISA.50.1",
+        "LAM.1.14",
+        "LAM.2.21",
+        "LAM.1.18",
+        "2KI.9.33-37",
+        "ROM.11.25",
+        "2CO.4.4",
+        "JER.16.4-6",
+        "JER.15.3",
+        "LAM.1.8",
+        "DEU.28.28-29",
+        "PSA.79.2-3",
+        "MIC.3.9-12",
+        "AMO.4.10",
+        "JHN.9.40-41",
+        "ISA.59.12-15",
+        "EZK.22.25-31",
+        "JER.18.21",
+        "LAM.4.13-15",
+        "ISA.59.9-10",
+        "JER.9.21-22"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "DAN.9.5-19",
+        "ISA.29.10",
+        "1JN.2.11",
+        "JER.2.19",
+        "ISA.24.5-6",
+        "ISA.50.1",
+        "MIC.7.13",
+        "LAM.1.14",
+        "LAM.2.21",
+        "LAM.5.16-17"
+      ],
+      "tskTop": [
+        "PSA.83.10",
+        "REV.3.17",
+        "2PE.1.9",
+        "JER.10.18",
+        "JER.2.17",
+        "MAT.15.14",
+        "MIC.7.13",
+        "1JN.2.11",
+        "ISA.29.10",
+        "JER.4.18"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "PSA.83.10",
+          "votes": 4
+        },
+        {
+          "reference": "REV.3.17",
+          "votes": 4
+        },
+        {
+          "reference": "2PE.1.9",
+          "votes": 3
+        },
+        {
+          "reference": "JER.10.18",
+          "votes": 3
+        },
+        {
+          "reference": "JER.2.17",
+          "votes": 3
+        },
+        {
+          "reference": "MAT.15.14",
+          "votes": 3
+        },
+        {
+          "reference": "MIC.7.13",
+          "votes": 3
+        },
+        {
+          "reference": "1JN.2.11",
+          "votes": 1
+        },
+        {
+          "reference": "ISA.29.10",
+          "votes": 1
+        },
+        {
+          "reference": "JER.4.18",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "ISA.1.1",
+      "currentCount": 26,
+      "tskCount": 5,
+      "commonCount": 5,
+      "currentOnlyCount": 21,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "2KI.15.1",
+        "AMO.1.1",
+        "NUM.12.6",
+        "2PE.1.21",
+        "MIC.1.1",
+        "ISA.6.1",
+        "ISA.13.1",
+        "ACT.10.17",
+        "MAT.17.9",
+        "HAB.2.2",
+        "HOS.1.1",
+        "2KI.15.7",
+        "2KI.15.32:16.20",
+        "ISA.21.2",
+        "ISA.40.9",
+        "2CO.12.1",
+        "JER.23.16",
+        "NUM.24.16",
+        "NAM.1.1",
+        "NUM.24.4",
+        "ACT.26.19"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "2KI.15.1",
+        "AMO.1.1",
+        "NUM.12.6",
+        "2PE.1.21",
+        "MIC.1.1",
+        "ISA.6.1",
+        "2KI.18.1:20.21",
+        "ISA.13.1",
+        "ACT.10.17",
+        "MAT.17.9"
+      ],
+      "tskTop": [
+        "2CH.26.1:32.33",
+        "2KI.18.1:20.21",
+        "ISA.2.1",
+        "ISA.7.1",
+        "PSA.89.19"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "2CH.26.1:32.33",
+          "votes": 5
+        },
+        {
+          "reference": "2KI.18.1:20.21",
+          "votes": 4
+        },
+        {
+          "reference": "ISA.2.1",
+          "votes": 1
+        },
+        {
+          "reference": "ISA.7.1",
+          "votes": 1
+        },
+        {
+          "reference": "PSA.89.19",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "ECC.9.1",
+      "currentCount": 26,
+      "tskCount": 6,
+      "commonCount": 6,
+      "currentOnlyCount": 20,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JER.1.18-19",
+        "PSA.73.3",
+        "ISA.49.1-4",
+        "PSA.73.11-13",
+        "PRO.16.3",
+        "PSA.31.5",
+        "ECC.12.9-10",
+        "ISA.26.12",
+        "PSA.10.14",
+        "1SA.2.9",
+        "1CO.3.5-15",
+        "2TI.1.12",
+        "ECC.8.16",
+        "JOB.5.8",
+        "ECC.10.14",
+        "MAL.3.15-18",
+        "ECC.7.25",
+        "PSA.37.5-6",
+        "2SA.15.25-26",
+        "ECC.1.17"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "JER.1.18-19",
+        "PSA.73.3",
+        "ISA.49.1-4",
+        "JHN.10.27-30",
+        "PSA.73.11-13",
+        "PRO.16.3",
+        "PSA.31.5",
+        "ECC.12.9-10",
+        "ISA.26.12",
+        "ECC.8.14"
+      ],
+      "tskTop": [
+        "DEU.33.3",
+        "JHN.10.27-30",
+        "1PE.1.5",
+        "ECC.7.15",
+        "ECC.8.14",
+        "JOB.12.10"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "DEU.33.3",
+          "votes": 5
+        },
+        {
+          "reference": "JHN.10.27-30",
+          "votes": 2
+        },
+        {
+          "reference": "1PE.1.5",
+          "votes": 1
+        },
+        {
+          "reference": "ECC.7.15",
+          "votes": 1
+        },
+        {
+          "reference": "ECC.8.14",
+          "votes": 1
+        },
+        {
+          "reference": "JOB.12.10",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "2SA.21.1",
+      "currentCount": 24,
+      "tskCount": 5,
+      "commonCount": 5,
+      "currentOnlyCount": 19,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "GEN.41.57:42.1",
+        "1SA.22.17-19",
+        "LEV.26.19-20",
+        "PSA.50.15",
+        "2KI.8.1",
+        "1SA.23.2",
+        "1SA.23.4",
+        "1KI.18.2",
+        "1SA.23.11",
+        "2SA.5.23",
+        "2SA.5.19",
+        "GEN.43.1",
+        "JOB.10.2",
+        "NUM.27.21",
+        "2KI.6.25",
+        "LEV.26.26",
+        "JOB.5.8-10",
+        "1KI.17.1",
+        "JOS.7.1"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "GEN.41.57:42.1",
+        "JOS.7.11-12",
+        "1SA.22.17-19",
+        "LEV.26.19-20",
+        "PSA.50.15",
+        "2KI.8.1",
+        "GEN.26.1",
+        "1SA.23.2",
+        "1SA.23.4",
+        "1KI.18.2"
+      ],
+      "tskTop": [
+        "JOS.7.11-12",
+        "GEN.12.10",
+        "GEN.26.1",
+        "JER.14.1-18",
+        "PSA.91.15"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "JOS.7.11-12",
+          "votes": 6
+        },
+        {
+          "reference": "GEN.12.10",
+          "votes": 2
+        },
+        {
+          "reference": "GEN.26.1",
+          "votes": 2
+        },
+        {
+          "reference": "JER.14.1-18",
+          "votes": 1
+        },
+        {
+          "reference": "PSA.91.15",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "PHP.2.1",
+      "currentCount": 41,
+      "tskCount": 25,
+      "commonCount": 25,
+      "currentOnlyCount": 16,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "EPH.4.4",
+        "JHN.16.22-24",
+        "1PE.1.6-8",
+        "1CO.15.31",
+        "2CO.2.14",
+        "1PE.1.22-23",
+        "LUK.2.10-11",
+        "LUK.2.25",
+        "JHN.14.27",
+        "EPH.1.13-14",
+        "1PE.1.2",
+        "ROM.5.1-2",
+        "PHP.1.8",
+        "1CO.6.19-20",
+        "JHN.14.18",
+        "HEB.6.18"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ROM.8.26",
+        "EPH.4.4",
+        "ACT.2.46",
+        "1CO.12.13",
+        "ROM.5.5",
+        "1JN.4.16",
+        "JHN.16.22-24",
+        "EPH.4.30-32",
+        "PSA.133.1",
+        "1PE.1.6-8"
+      ],
+      "tskTop": [
+        "COL.3.12",
+        "1JN.4.12",
+        "1JN.4.7-8",
+        "2CO.13.14",
+        "COL.2.2",
+        "1CO.12.13",
+        "PSA.133.1",
+        "EPH.2.18-22",
+        "GAL.5.22",
+        "GAL.4.6"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "COL.3.12",
+          "votes": 52
+        },
+        {
+          "reference": "1JN.4.12",
+          "votes": 20
+        },
+        {
+          "reference": "1JN.4.7-8",
+          "votes": 19
+        },
+        {
+          "reference": "2CO.13.14",
+          "votes": 17
+        },
+        {
+          "reference": "COL.2.2",
+          "votes": 12
+        },
+        {
+          "reference": "1CO.12.13",
+          "votes": 11
+        },
+        {
+          "reference": "PSA.133.1",
+          "votes": 11
+        },
+        {
+          "reference": "EPH.2.18-22",
+          "votes": 8
+        },
+        {
+          "reference": "GAL.5.22",
+          "votes": 6
+        },
+        {
+          "reference": "GAL.4.6",
+          "votes": 5
+        }
+      ]
+    },
+    {
+      "verse": "JAS.4.5",
+      "currentCount": 22,
+      "tskCount": 6,
+      "commonCount": 6,
+      "currentOnlyCount": 16,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "GAL.3.8",
+        "ROM.1.29",
+        "GEN.26.14",
+        "GEN.6.5",
+        "PSA.106.16",
+        "ACT.7.9",
+        "PRO.21.10",
+        "ROM.9.17",
+        "ISA.11.13",
+        "GEN.30.1",
+        "JHN.19.37",
+        "GEN.37.11",
+        "GEN.4.5-6",
+        "JHN.10.35",
+        "JHN.7.42",
+        "ECC.4.4"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "GEN.8.21",
+        "PSA.37.1",
+        "GAL.3.8",
+        "NUM.11.29",
+        "ROM.1.29",
+        "GEN.26.14",
+        "GEN.6.5",
+        "PSA.106.16",
+        "ACT.7.9",
+        "PRO.21.10"
+      ],
+      "tskTop": [
+        "2CO.6.16",
+        "1CO.6.19",
+        "NUM.11.29",
+        "TIT.3.3",
+        "GEN.8.21",
+        "PSA.37.1"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "2CO.6.16",
+          "votes": 36
+        },
+        {
+          "reference": "1CO.6.19",
+          "votes": 32
+        },
+        {
+          "reference": "NUM.11.29",
+          "votes": 27
+        },
+        {
+          "reference": "TIT.3.3",
+          "votes": 5
+        },
+        {
+          "reference": "GEN.8.21",
+          "votes": 2
+        },
+        {
+          "reference": "PSA.37.1",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "ACT.8.39",
+      "currentCount": 26,
+      "tskCount": 11,
+      "commonCount": 11,
+      "currentOnlyCount": 15,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PHP.4.4",
+        "MAT.3.16",
+        "PSA.119.14",
+        "PSA.119.111",
+        "JAS.1.9-10",
+        "ACT.13.52",
+        "JAS.4.16",
+        "ISA.61.10",
+        "ACT.8.8",
+        "MAT.13.44",
+        "ISA.66.13-14",
+        "ROM.5.2",
+        "ISA.35.1-2",
+        "ACT.16.34",
+        "ISA.55.12-13"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "PHP.4.4",
+        "MAT.3.16",
+        "EZK.43.5",
+        "PSA.119.14",
+        "MRK.1.10",
+        "PSA.119.111",
+        "JAS.1.9-10",
+        "PHP.3.3",
+        "EZK.11.1",
+        "ACT.13.52"
+      ],
+      "tskTop": [
+        "1KI.18.12",
+        "2KI.2.16",
+        "EZK.8.3",
+        "EZK.43.5",
+        "EZK.11.1",
+        "EZK.11.24",
+        "EZK.3.12-14",
+        "2CO.12.2-4",
+        "MRK.1.10",
+        "ROM.15.10-13"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "1KI.18.12",
+          "votes": 13
+        },
+        {
+          "reference": "2KI.2.16",
+          "votes": 10
+        },
+        {
+          "reference": "EZK.8.3",
+          "votes": 9
+        },
+        {
+          "reference": "EZK.43.5",
+          "votes": 8
+        },
+        {
+          "reference": "EZK.11.1",
+          "votes": 7
+        },
+        {
+          "reference": "EZK.11.24",
+          "votes": 6
+        },
+        {
+          "reference": "EZK.3.12-14",
+          "votes": 6
+        },
+        {
+          "reference": "2CO.12.2-4",
+          "votes": 5
+        },
+        {
+          "reference": "MRK.1.10",
+          "votes": 4
+        },
+        {
+          "reference": "ROM.15.10-13",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "REV.6.2",
+      "currentCount": 21,
+      "tskCount": 6,
+      "commonCount": 6,
+      "currentOnlyCount": 15,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "2CO.10.3-5",
+        "ROM.15.18-19",
+        "REV.11.15",
+        "PSA.76.7",
+        "REV.19.14",
+        "PSA.110.2",
+        "REV.15.2",
+        "1CO.15.55-57",
+        "ZEC.6.11-13",
+        "PSA.98.1",
+        "REV.17.14",
+        "ISA.25.8",
+        "1CO.15.25",
+        "MAT.28.18",
+        "REV.11.18"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "REV.3.21",
+        "PSA.45.3-5",
+        "2CO.10.3-5",
+        "ROM.15.18-19",
+        "REV.11.15",
+        "PSA.76.7",
+        "ZEC.6.3-8",
+        "REV.19.14",
+        "ZEC.1.8",
+        "PSA.110.2"
+      ],
+      "tskTop": [
+        "ZEC.6.3-8",
+        "ZEC.1.8",
+        "PSA.45.3-5",
+        "REV.19.11-12",
+        "REV.14.14",
+        "REV.3.21"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "ZEC.6.3-8",
+          "votes": 12
+        },
+        {
+          "reference": "ZEC.1.8",
+          "votes": 5
+        },
+        {
+          "reference": "PSA.45.3-5",
+          "votes": 3
+        },
+        {
+          "reference": "REV.19.11-12",
+          "votes": 3
+        },
+        {
+          "reference": "REV.14.14",
+          "votes": 2
+        },
+        {
+          "reference": "REV.3.21",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "MAT.18.10",
+      "currentCount": 44,
+      "tskCount": 32,
+      "commonCount": 32,
+      "currentOnlyCount": 12,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ROM.15.1",
+        "ZEC.13.7",
+        "GAL.4.13-14",
+        "MAT.12.20",
+        "GAL.6.1",
+        "EST.1.14",
+        "2SA.14.28",
+        "2CO.10.1",
+        "LUK.10.16",
+        "1CO.9.22",
+        "REV.8.2",
+        "1TI.4.12"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1CO.16.11",
+        "PSA.17.15",
+        "ROM.15.1",
+        "ACT.27.23",
+        "PSA.91.11",
+        "2CO.10.10",
+        "ZEC.13.7",
+        "GAL.4.13-14",
+        "LUK.1.19",
+        "1CO.11.22"
+      ],
+      "tskTop": [
+        "PSA.91.11",
+        "HEB.1.14",
+        "PSA.34.7",
+        "LUK.16.22",
+        "2KI.6.16-17",
+        "ACT.12.7-11",
+        "MAT.1.20",
+        "MAT.18.14",
+        "MAT.18.6",
+        "GEN.32.1-2"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "PSA.91.11",
+          "votes": 26
+        },
+        {
+          "reference": "HEB.1.14",
+          "votes": 18
+        },
+        {
+          "reference": "PSA.34.7",
+          "votes": 18
+        },
+        {
+          "reference": "LUK.16.22",
+          "votes": 12
+        },
+        {
+          "reference": "2KI.6.16-17",
+          "votes": 9
+        },
+        {
+          "reference": "ACT.12.7-11",
+          "votes": 9
+        },
+        {
+          "reference": "MAT.1.20",
+          "votes": 7
+        },
+        {
+          "reference": "MAT.18.14",
+          "votes": 7
+        },
+        {
+          "reference": "MAT.18.6",
+          "votes": 7
+        },
+        {
+          "reference": "GEN.32.1-2",
+          "votes": 6
+        }
+      ]
+    },
+    {
+      "verse": "EXO.34.7",
+      "currentCount": 43,
+      "tskCount": 31,
+      "commonCount": 31,
+      "currentOnlyCount": 12,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MAT.18.32-35",
+        "LUK.7.48",
+        "REV.20.15",
+        "MAT.6.14-15",
+        "LUK.7.42",
+        "PSA.58.10-11",
+        "PSA.136.10",
+        "PSA.136.15",
+        "REV.21.8",
+        "MIC.6.11",
+        "MAT.12.31",
+        "ISA.45.21"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "NAM.1.2-3",
+        "MAT.18.32-35",
+        "LUK.7.48",
+        "JER.32.18",
+        "NUM.14.18-23",
+        "EXO.20.5-6",
+        "MIC.7.18",
+        "ACT.13.38",
+        "REV.20.15",
+        "ACT.5.31"
+      ],
+      "tskTop": [
+        "EXO.20.5-6",
+        "PSA.103.3",
+        "DEU.5.9-10",
+        "EPH.1.7",
+        "1JN.1.9",
+        "JER.32.18",
+        "NAM.1.2-3",
+        "NUM.14.18-23",
+        "PSA.130.4",
+        "DAN.9.9"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "EXO.20.5-6",
+          "votes": 29
+        },
+        {
+          "reference": "PSA.103.3",
+          "votes": 22
+        },
+        {
+          "reference": "DEU.5.9-10",
+          "votes": 19
+        },
+        {
+          "reference": "EPH.1.7",
+          "votes": 13
+        },
+        {
+          "reference": "1JN.1.9",
+          "votes": 11
+        },
+        {
+          "reference": "JER.32.18",
+          "votes": 11
+        },
+        {
+          "reference": "NAM.1.2-3",
+          "votes": 11
+        },
+        {
+          "reference": "NUM.14.18-23",
+          "votes": 11
+        },
+        {
+          "reference": "PSA.130.4",
+          "votes": 8
+        },
+        {
+          "reference": "DAN.9.9",
+          "votes": 6
+        }
+      ]
+    },
+    {
+      "verse": "JOB.2.10",
+      "currentCount": 24,
+      "tskCount": 12,
+      "commonCount": 12,
+      "currentOnlyCount": 12,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MAT.25.2",
+        "PRO.9.13",
+        "JOB.1.10",
+        "JOB.1.1-3",
+        "2SA.6.20-21",
+        "2SA.19.28",
+        "PSA.59.12",
+        "2SA.13.13",
+        "JAS.3.2",
+        "2SA.19.22",
+        "PRO.9.6",
+        "2CH.16.9"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "LAM.3.38-41",
+        "2SA.24.10",
+        "MAT.12.34-37",
+        "MAT.25.2",
+        "PRO.9.13",
+        "GEN.3.17",
+        "JOB.1.10",
+        "JAS.1.12",
+        "JOB.1.1-3",
+        "JHN.18.11"
+      ],
+      "tskTop": [
+        "JAS.1.12",
+        "LAM.3.38-41",
+        "JOB.1.21-22",
+        "ROM.12.12",
+        "JAS.5.10-11",
+        "HEB.12.9-11",
+        "MAT.16.23",
+        "JHN.18.11",
+        "MAT.12.34-37",
+        "2SA.24.10"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "JAS.1.12",
+          "votes": 44
+        },
+        {
+          "reference": "LAM.3.38-41",
+          "votes": 40
+        },
+        {
+          "reference": "JOB.1.21-22",
+          "votes": 23
+        },
+        {
+          "reference": "ROM.12.12",
+          "votes": 21
+        },
+        {
+          "reference": "JAS.5.10-11",
+          "votes": 17
+        },
+        {
+          "reference": "HEB.12.9-11",
+          "votes": 14
+        },
+        {
+          "reference": "MAT.16.23",
+          "votes": 14
+        },
+        {
+          "reference": "JHN.18.11",
+          "votes": 6
+        },
+        {
+          "reference": "MAT.12.34-37",
+          "votes": 4
+        },
+        {
+          "reference": "2SA.24.10",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "ROM.1.7",
+      "currentCount": 59,
+      "tskCount": 48,
+      "commonCount": 48,
+      "currentOnlyCount": 11,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "REV.3.7",
+        "1TI.6.2",
+        "REV.2.18",
+        "REV.2.29:3.1",
+        "REV.3.14",
+        "1TH.5.28-2TH.1.2",
+        "REV.2.8",
+        "SNG.5.1",
+        "REV.3.22",
+        "EPH.6.23-PHP.1.2",
+        "REV.2.12"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "GAL.1.3-4",
+        "EPH.1.2",
+        "REV.3.7",
+        "2CO.1.1-2",
+        "JAS.1.1",
+        "1TH.3.11-13",
+        "1TH.1.3",
+        "COL.1.2",
+        "1TI.6.2",
+        "2TI.1.2"
+      ],
+      "tskTop": [
+        "COL.1.2",
+        "JUD.1.1-2",
+        "EPH.1.2",
+        "1TH.1.1",
+        "2CO.13.14",
+        "2JN.1.3",
+        "2TH.3.16",
+        "2PE.1.2-3",
+        "2TH.2.16-17",
+        "2TH.3.18"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "COL.1.2",
+          "votes": 11
+        },
+        {
+          "reference": "JUD.1.1-2",
+          "votes": 9
+        },
+        {
+          "reference": "EPH.1.2",
+          "votes": 8
+        },
+        {
+          "reference": "1TH.1.1",
+          "votes": 7
+        },
+        {
+          "reference": "2CO.13.14",
+          "votes": 7
+        },
+        {
+          "reference": "2JN.1.3",
+          "votes": 6
+        },
+        {
+          "reference": "2TH.3.16",
+          "votes": 6
+        },
+        {
+          "reference": "2PE.1.2-3",
+          "votes": 5
+        },
+        {
+          "reference": "2TH.2.16-17",
+          "votes": 5
+        },
+        {
+          "reference": "2TH.3.18",
+          "votes": 5
+        }
+      ]
+    },
+    {
+      "verse": "MAT.10.1",
+      "currentCount": 23,
+      "tskCount": 12,
+      "commonCount": 12,
+      "currentOnlyCount": 11,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MAT.19.28",
+        "MAT.26.20",
+        "MAT.6.13",
+        "JHN.17.2",
+        "REV.12.1",
+        "JHN.3.35",
+        "JHN.20.21-23",
+        "ACT.3.15-16",
+        "MAT.26.47",
+        "ACT.19.15",
+        "REV.21.12-14"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MAT.19.28",
+        "MAT.26.20",
+        "MAT.28.18-19",
+        "MAT.6.13",
+        "MRK.16.17-18",
+        "LUK.21.15",
+        "JHN.17.2",
+        "REV.12.1",
+        "JHN.3.35",
+        "JHN.20.21-23"
+      ],
+      "tskTop": [
+        "LUK.9.1-6",
+        "MRK.3.13-15",
+        "MRK.6.7-13",
+        "LUK.10.19",
+        "MRK.16.17-18",
+        "LUK.24.49",
+        "ACT.1.8",
+        "LUK.6.13",
+        "JHN.3.27",
+        "JHN.6.70"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "LUK.9.1-6",
+          "votes": 29
+        },
+        {
+          "reference": "MRK.3.13-15",
+          "votes": 25
+        },
+        {
+          "reference": "MRK.6.7-13",
+          "votes": 22
+        },
+        {
+          "reference": "LUK.10.19",
+          "votes": 17
+        },
+        {
+          "reference": "MRK.16.17-18",
+          "votes": 14
+        },
+        {
+          "reference": "LUK.24.49",
+          "votes": 9
+        },
+        {
+          "reference": "ACT.1.8",
+          "votes": 6
+        },
+        {
+          "reference": "LUK.6.13",
+          "votes": 6
+        },
+        {
+          "reference": "JHN.3.27",
+          "votes": 5
+        },
+        {
+          "reference": "JHN.6.70",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "ISA.45.15",
+      "currentCount": 19,
+      "tskCount": 8,
+      "commonCount": 8,
+      "currentOnlyCount": 11,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ISA.43.3",
+        "PSA.68.26",
+        "ISA.60.16",
+        "ACT.13.23",
+        "ACT.5.31",
+        "MAT.1.22-23",
+        "JHN.4.42",
+        "ISA.12.2",
+        "ISA.43.11",
+        "JHN.13.7",
+        "2PE.3.18"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ISA.45.17",
+        "ISA.46.13",
+        "ISA.43.3",
+        "PSA.68.26",
+        "ROM.11.33-34",
+        "JHN.4.22",
+        "PSA.77.19",
+        "ISA.60.16",
+        "ACT.13.23",
+        "ACT.5.31"
+      ],
+      "tskTop": [
+        "ISA.8.17",
+        "PSA.44.24",
+        "ISA.57.17",
+        "ISA.46.13",
+        "PSA.77.19",
+        "ROM.11.33-34",
+        "ISA.45.17",
+        "JHN.4.22"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "ISA.8.17",
+          "votes": 8
+        },
+        {
+          "reference": "PSA.44.24",
+          "votes": 7
+        },
+        {
+          "reference": "ISA.57.17",
+          "votes": 6
+        },
+        {
+          "reference": "ISA.46.13",
+          "votes": 4
+        },
+        {
+          "reference": "PSA.77.19",
+          "votes": 4
+        },
+        {
+          "reference": "ROM.11.33-34",
+          "votes": 3
+        },
+        {
+          "reference": "ISA.45.17",
+          "votes": 1
+        },
+        {
+          "reference": "JHN.4.22",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "REV.4.7",
+      "currentCount": 17,
+      "tskCount": 6,
+      "commonCount": 6,
+      "currentOnlyCount": 11,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "1CO.14.20",
+        "DEU.28.49",
+        "2SA.1.23",
+        "GEN.49.9",
+        "PRO.28.2",
+        "1CO.9.9-10",
+        "OBA.1.4",
+        "ISA.40.31",
+        "NUM.2.2-34",
+        "NUM.23.24",
+        "NUM.24.9"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "EZK.1.10",
+        "1CO.14.20",
+        "EZK.10.21",
+        "DEU.28.49",
+        "2SA.1.23",
+        "GEN.49.9",
+        "PRO.28.2",
+        "1CO.9.9-10",
+        "OBA.1.4",
+        "EZK.10.14"
+      ],
+      "tskTop": [
+        "EZK.10.14",
+        "EZK.1.10",
+        "EZK.10.21",
+        "DAN.7.4",
+        "EZK.1.8",
+        "REV.4.6"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "EZK.10.14",
+          "votes": 22
+        },
+        {
+          "reference": "EZK.1.10",
+          "votes": 21
+        },
+        {
+          "reference": "EZK.10.21",
+          "votes": 8
+        },
+        {
+          "reference": "DAN.7.4",
+          "votes": 6
+        },
+        {
+          "reference": "EZK.1.8",
+          "votes": 6
+        },
+        {
+          "reference": "REV.4.6",
+          "votes": 6
+        }
+      ]
+    },
+    {
+      "verse": "2PE.1.6",
+      "currentCount": 40,
+      "tskCount": 30,
+      "commonCount": 30,
+      "currentOnlyCount": 10,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JAS.1.3-4",
+        "1TI.6.3",
+        "GEN.5.24",
+        "2TH.1.4",
+        "ISA.57.1",
+        "TIT.1.1",
+        "1TI.3.16",
+        "1TI.4.7-8",
+        "REV.13.10",
+        "REV.1.9"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ROM.15.4",
+        "ROM.2.7",
+        "ROM.8.25",
+        "COL.1.11",
+        "JAS.1.3-4",
+        "1TI.6.11",
+        "LUK.21.19",
+        "REV.14.12",
+        "1TI.6.3",
+        "GEN.5.24"
+      ],
+      "tskTop": [
+        "HEB.10.36",
+        "ROM.5.3-4",
+        "LUK.21.19",
+        "2PE.1.3",
+        "HEB.12.1",
+        "1CO.9.25",
+        "2CO.6.4",
+        "GAL.5.23",
+        "TIT.2.2",
+        "REV.14.12"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "HEB.10.36",
+          "votes": 16
+        },
+        {
+          "reference": "ROM.5.3-4",
+          "votes": 16
+        },
+        {
+          "reference": "LUK.21.19",
+          "votes": 14
+        },
+        {
+          "reference": "2PE.1.3",
+          "votes": 13
+        },
+        {
+          "reference": "HEB.12.1",
+          "votes": 9
+        },
+        {
+          "reference": "1CO.9.25",
+          "votes": 8
+        },
+        {
+          "reference": "2CO.6.4",
+          "votes": 6
+        },
+        {
+          "reference": "GAL.5.23",
+          "votes": 6
+        },
+        {
+          "reference": "TIT.2.2",
+          "votes": 6
+        },
+        {
+          "reference": "REV.14.12",
+          "votes": 5
+        }
+      ]
+    },
+    {
+      "verse": "ACT.13.48",
+      "currentCount": 26,
+      "tskCount": 16,
+      "commonCount": 16,
+      "currentOnlyCount": 10,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ACT.13.42",
+        "ACT.15.2",
+        "LUK.2.10-11",
+        "ACT.8.8",
+        "MAT.28.16",
+        "2TH.3.1",
+        "ACT.20.13",
+        "ACT.15.31",
+        "PSA.138.2",
+        "1CO.16.15"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ROM.11.7",
+        "EPH.1.4",
+        "ACT.13.42",
+        "ACT.2.47",
+        "JHN.10.16",
+        "ROM.13.1",
+        "ACT.15.2",
+        "EPH.1.19",
+        "LUK.7.8",
+        "LUK.2.10-11"
+      ],
+      "tskTop": [
+        "ROM.8.29-30",
+        "EPH.1.4",
+        "ROM.11.7",
+        "JHN.10.16",
+        "JHN.10.26-27",
+        "JHN.11.52",
+        "2TH.2.13-14",
+        "EPH.2.5-10",
+        "ACT.2.41",
+        "EPH.1.19"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "ROM.8.29-30",
+          "votes": 15
+        },
+        {
+          "reference": "EPH.1.4",
+          "votes": 14
+        },
+        {
+          "reference": "ROM.11.7",
+          "votes": 12
+        },
+        {
+          "reference": "JHN.10.16",
+          "votes": 10
+        },
+        {
+          "reference": "JHN.10.26-27",
+          "votes": 10
+        },
+        {
+          "reference": "JHN.11.52",
+          "votes": 8
+        },
+        {
+          "reference": "2TH.2.13-14",
+          "votes": 5
+        },
+        {
+          "reference": "EPH.2.5-10",
+          "votes": 5
+        },
+        {
+          "reference": "ACT.2.41",
+          "votes": 4
+        },
+        {
+          "reference": "EPH.1.19",
+          "votes": 4
+        }
+      ]
+    },
+    {
+      "verse": "1PE.3.1",
+      "currentCount": 25,
+      "tskCount": 15,
+      "commonCount": 15,
+      "currentOnlyCount": 10,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "1PE.4.17",
+        "HEB.11.8",
+        "2TH.1.8",
+        "1PE.1.22",
+        "PRO.11.30",
+        "HEB.5.9",
+        "ROM.10.16",
+        "PRO.18.19",
+        "COL.4.5",
+        "ROM.6.17"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1PE.4.17",
+        "ROM.7.2",
+        "COL.3.18",
+        "HEB.11.8",
+        "2TH.1.8",
+        "1CO.11.3",
+        "1CO.14.34",
+        "MAT.18.15",
+        "1CO.7.16",
+        "1PE.1.22"
+      ],
+      "tskTop": [
+        "COL.3.18",
+        "EPH.5.33",
+        "EPH.5.22-24",
+        "TIT.2.3-6",
+        "1CO.11.3",
+        "1CO.7.16",
+        "GEN.3.16",
+        "1PE.3.7",
+        "ROM.7.2",
+        "EST.1.16-20"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "COL.3.18",
+          "votes": 22
+        },
+        {
+          "reference": "EPH.5.33",
+          "votes": 21
+        },
+        {
+          "reference": "EPH.5.22-24",
+          "votes": 18
+        },
+        {
+          "reference": "TIT.2.3-6",
+          "votes": 16
+        },
+        {
+          "reference": "1CO.11.3",
+          "votes": 15
+        },
+        {
+          "reference": "1CO.7.16",
+          "votes": 11
+        },
+        {
+          "reference": "GEN.3.16",
+          "votes": 9
+        },
+        {
+          "reference": "1PE.3.7",
+          "votes": 7
+        },
+        {
+          "reference": "ROM.7.2",
+          "votes": 5
+        },
+        {
+          "reference": "EST.1.16-20",
+          "votes": 4
+        }
+      ]
+    },
+    {
+      "verse": "REV.21.2",
+      "currentCount": 25,
+      "tskCount": 15,
+      "commonCount": 15,
+      "currentOnlyCount": 10,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "EPH.5.30-32",
+        "PSA.45.9-14",
+        "JHN.3.29",
+        "REV.1.9",
+        "JER.31.23",
+        "REV.1.1",
+        "PSA.87.3",
+        "ISA.1.21",
+        "REV.1.4",
+        "REV.11.2"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ISA.62.4",
+        "ISA.54.5",
+        "REV.19.7-8",
+        "HEB.12.22",
+        "ISA.52.1",
+        "GAL.4.25-26",
+        "HEB.11.10",
+        "2CO.11.2",
+        "ISA.61.10",
+        "EPH.5.30-32"
+      ],
+      "tskTop": [
+        "HEB.11.10",
+        "REV.3.12",
+        "REV.21.10",
+        "HEB.13.14",
+        "ISA.61.10",
+        "HEB.12.22",
+        "REV.19.7-8",
+        "REV.22.19",
+        "2CO.11.2",
+        "EPH.5.25-27"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "HEB.11.10",
+          "votes": 21
+        },
+        {
+          "reference": "REV.3.12",
+          "votes": 20
+        },
+        {
+          "reference": "REV.21.10",
+          "votes": 16
+        },
+        {
+          "reference": "HEB.13.14",
+          "votes": 12
+        },
+        {
+          "reference": "ISA.61.10",
+          "votes": 12
+        },
+        {
+          "reference": "HEB.12.22",
+          "votes": 8
+        },
+        {
+          "reference": "REV.19.7-8",
+          "votes": 7
+        },
+        {
+          "reference": "REV.22.19",
+          "votes": 6
+        },
+        {
+          "reference": "2CO.11.2",
+          "votes": 3
+        },
+        {
+          "reference": "EPH.5.25-27",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "REV.7.2",
+      "currentCount": 24,
+      "tskCount": 14,
+      "commonCount": 14,
+      "currentOnlyCount": 10,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "1SA.17.36",
+        "DEU.5.26",
+        "ACT.7.30-32",
+        "MAL.3.1",
+        "MAL.4.2",
+        "1SA.17.26",
+        "2KI.19.4",
+        "1TH.1.9",
+        "MAT.26.63",
+        "HEB.12.22"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1SA.17.36",
+        "DEU.5.26",
+        "ACT.7.30-32",
+        "EPH.1.13",
+        "REV.9.4",
+        "MAL.3.1",
+        "REV.1.3",
+        "REV.7.3-8",
+        "REV.8.3",
+        "MAL.4.2"
+      ],
+      "tskTop": [
+        "EPH.4.30",
+        "2CO.1.22",
+        "REV.7.3-8",
+        "2TI.2.19",
+        "EPH.1.13",
+        "REV.9.4",
+        "REV.5.2",
+        "JHN.6.27",
+        "REV.1.3",
+        "REV.8.7-12"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "EPH.4.30",
+          "votes": 9
+        },
+        {
+          "reference": "2CO.1.22",
+          "votes": 8
+        },
+        {
+          "reference": "REV.7.3-8",
+          "votes": 7
+        },
+        {
+          "reference": "2TI.2.19",
+          "votes": 6
+        },
+        {
+          "reference": "EPH.1.13",
+          "votes": 6
+        },
+        {
+          "reference": "REV.9.4",
+          "votes": 6
+        },
+        {
+          "reference": "REV.5.2",
+          "votes": 4
+        },
+        {
+          "reference": "JHN.6.27",
+          "votes": 3
+        },
+        {
+          "reference": "REV.1.3",
+          "votes": 2
+        },
+        {
+          "reference": "REV.8.7-12",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "PSA.146.9",
+      "currentCount": 21,
+      "tskCount": 11,
+      "commonCount": 11,
+      "currentOnlyCount": 10,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "DEU.16.11",
+        "EST.7.10",
+        "1CO.3.19",
+        "PSA.18.26",
+        "JOB.5.12-14",
+        "HOS.14.3",
+        "2SA.17.23",
+        "EST.5.14",
+        "2SA.15.31",
+        "EST.9.25"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "PRO.4.19",
+        "PSA.68.5",
+        "MAL.3.5",
+        "DEU.16.11",
+        "EST.7.10",
+        "1CO.3.19",
+        "PSA.147.6",
+        "PSA.18.26",
+        "DEU.10.18-19",
+        "JOB.5.12-14"
+      ],
+      "tskTop": [
+        "PSA.68.5",
+        "DEU.10.18-19",
+        "PSA.147.6",
+        "EXO.22.21-22",
+        "PRO.15.25",
+        "JER.49.11",
+        "MAL.3.5",
+        "JAS.1.27",
+        "PRO.4.19",
+        "PSA.145.20"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "PSA.68.5",
+          "votes": 8
+        },
+        {
+          "reference": "DEU.10.18-19",
+          "votes": 7
+        },
+        {
+          "reference": "PSA.147.6",
+          "votes": 7
+        },
+        {
+          "reference": "EXO.22.21-22",
+          "votes": 5
+        },
+        {
+          "reference": "PRO.15.25",
+          "votes": 5
+        },
+        {
+          "reference": "JER.49.11",
+          "votes": 4
+        },
+        {
+          "reference": "MAL.3.5",
+          "votes": 4
+        },
+        {
+          "reference": "JAS.1.27",
+          "votes": 3
+        },
+        {
+          "reference": "PRO.4.19",
+          "votes": 1
+        },
+        {
+          "reference": "PSA.145.20",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "ROM.3.7",
+      "currentCount": 17,
+      "tskCount": 7,
+      "commonCount": 7,
+      "currentOnlyCount": 10,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "1KI.13.17-18",
+        "EXO.14.30",
+        "1KI.13.26-32",
+        "EXO.3.19",
+        "GEN.37.8-9",
+        "GEN.37.20",
+        "GEN.50.18-20",
+        "GEN.44.1-14",
+        "ACT.2.23",
+        "EXO.14.5"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1KI.13.17-18",
+        "2KI.8.10-15",
+        "EXO.14.30",
+        "1KI.13.26-32",
+        "EXO.3.19",
+        "ROM.9.19-20",
+        "ACT.13.27-29",
+        "GEN.37.8-9",
+        "GEN.37.20",
+        "MAT.26.34"
+      ],
+      "tskTop": [
+        "ROM.3.4",
+        "ROM.9.19-20",
+        "ACT.13.27-29",
+        "2KI.8.10-15",
+        "ISA.10.6-7",
+        "MAT.26.34",
+        "MAT.26.69-75"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "ROM.3.4",
+          "votes": 5
+        },
+        {
+          "reference": "ROM.9.19-20",
+          "votes": 3
+        },
+        {
+          "reference": "ACT.13.27-29",
+          "votes": 2
+        },
+        {
+          "reference": "2KI.8.10-15",
+          "votes": 1
+        },
+        {
+          "reference": "ISA.10.6-7",
+          "votes": 1
+        },
+        {
+          "reference": "MAT.26.34",
+          "votes": 1
+        },
+        {
+          "reference": "MAT.26.69-75",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "1TH.4.15",
+      "currentCount": 13,
+      "tskCount": 3,
+      "commonCount": 3,
+      "currentOnlyCount": 10,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JOB.41.11",
+        "MAT.17.25",
+        "1KI.13.1",
+        "PSA.119.147-148",
+        "1KI.22.14",
+        "1KI.13.22",
+        "PSA.88.13",
+        "1KI.13.9",
+        "1KI.20.35",
+        "1KI.13.17-18"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "JOB.41.11",
+        "MAT.17.25",
+        "1KI.13.1",
+        "2CO.4.14",
+        "PSA.119.147-148",
+        "1KI.22.14",
+        "1CO.15.51-53",
+        "1TH.2.19",
+        "1KI.13.22",
+        "PSA.88.13"
+      ],
+      "tskTop": [
+        "1CO.15.51-53",
+        "2CO.4.14",
+        "1TH.2.19"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "1CO.15.51-53",
+          "votes": 28
+        },
+        {
+          "reference": "2CO.4.14",
+          "votes": 10
+        },
+        {
+          "reference": "1TH.2.19",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "2CO.5.14",
+      "currentCount": 39,
+      "tskCount": 30,
+      "commonCount": 30,
+      "currentOnlyCount": 9,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ROM.2.2",
+        "LUK.24.29",
+        "2CO.3.7",
+        "JOB.32.18",
+        "ACT.18.5",
+        "LUK.15.32",
+        "ACT.4.19-20",
+        "1JN.2.1-2",
+        "JHN.5.25"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "EPH.3.18-19",
+        "1TI.2.6",
+        "MAT.10.37-38",
+        "ROM.2.2",
+        "LUK.24.29",
+        "2CO.3.7",
+        "EPH.2.1-5",
+        "1CO.16.22",
+        "JHN.14.21-23",
+        "SNG.8.6-7"
+      ],
+      "tskTop": [
+        "GAL.2.20",
+        "ROM.14.7-9",
+        "MAT.10.37-38",
+        "1PE.1.8",
+        "MAT.20.28",
+        "ROM.5.15",
+        "EPH.3.18-19",
+        "JHN.14.21-23",
+        "JHN.1.29",
+        "2CO.3.9"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "GAL.2.20",
+          "votes": 39
+        },
+        {
+          "reference": "ROM.14.7-9",
+          "votes": 17
+        },
+        {
+          "reference": "MAT.10.37-38",
+          "votes": 11
+        },
+        {
+          "reference": "1PE.1.8",
+          "votes": 8
+        },
+        {
+          "reference": "MAT.20.28",
+          "votes": 8
+        },
+        {
+          "reference": "ROM.5.15",
+          "votes": 8
+        },
+        {
+          "reference": "EPH.3.18-19",
+          "votes": 6
+        },
+        {
+          "reference": "JHN.14.21-23",
+          "votes": 6
+        },
+        {
+          "reference": "JHN.1.29",
+          "votes": 5
+        },
+        {
+          "reference": "2CO.3.9",
+          "votes": 4
+        }
+      ]
+    },
+    {
+      "verse": "REV.12.1",
+      "currentCount": 34,
+      "tskCount": 25,
+      "commonCount": 25,
+      "currentOnlyCount": 9,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "HOS.2.19-20",
+        "EPH.5.25-27",
+        "ROM.13.14",
+        "GAL.3.27",
+        "JHN.3.29",
+        "2CO.11.2",
+        "ROM.3.22",
+        "REV.21.14",
+        "REV.1.20"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "HOS.2.19-20",
+        "REV.21.23",
+        "PSA.84.11",
+        "EPH.5.32",
+        "REV.12.3",
+        "REV.15.1",
+        "MAT.24.30",
+        "LUK.21.11",
+        "2CH.32.31",
+        "PSA.104.2"
+      ],
+      "tskTop": [
+        "LUK.21.25",
+        "EPH.5.32",
+        "ISA.62.3",
+        "LUK.21.11",
+        "ISA.54.5-7",
+        "ISA.60.19-20",
+        "PSA.84.11",
+        "SNG.6.10",
+        "MRK.13.25",
+        "2CH.32.31"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "LUK.21.25",
+          "votes": 16
+        },
+        {
+          "reference": "EPH.5.32",
+          "votes": 12
+        },
+        {
+          "reference": "ISA.62.3",
+          "votes": 9
+        },
+        {
+          "reference": "LUK.21.11",
+          "votes": 9
+        },
+        {
+          "reference": "ISA.54.5-7",
+          "votes": 7
+        },
+        {
+          "reference": "ISA.60.19-20",
+          "votes": 7
+        },
+        {
+          "reference": "PSA.84.11",
+          "votes": 7
+        },
+        {
+          "reference": "SNG.6.10",
+          "votes": 7
+        },
+        {
+          "reference": "MRK.13.25",
+          "votes": 6
+        },
+        {
+          "reference": "2CH.32.31",
+          "votes": 5
+        }
+      ]
+    },
+    {
+      "verse": "MAT.18.17",
+      "currentCount": 23,
+      "tskCount": 14,
+      "commonCount": 14,
+      "currentOnlyCount": 9,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ACT.6.1-3",
+        "MAT.11.19",
+        "LUK.18.11",
+        "MAT.21.31-32",
+        "MAT.6.7",
+        "LUK.19.2-3",
+        "MAT.5.46",
+        "1TI.6.5",
+        "LUK.15.1"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "EZK.11.12",
+        "2TH.3.14-15",
+        "ACT.6.1-3",
+        "MAT.11.19",
+        "ACT.15.6-7",
+        "LUK.18.11",
+        "2JN.1.10-11",
+        "MAT.21.31-32",
+        "ROM.16.17-18",
+        "MAT.6.7"
+      ],
+      "tskTop": [
+        "2TH.3.6",
+        "1CO.5.9:6.7",
+        "2TH.3.14-15",
+        "1CO.5.3-5",
+        "2JN.1.10-11",
+        "EPH.5.11-12",
+        "3JN.1.9-10",
+        "EPH.4.17-19",
+        "EZK.11.12",
+        "2CO.2.6-7"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "2TH.3.6",
+          "votes": 12
+        },
+        {
+          "reference": "1CO.5.9:6.7",
+          "votes": 9
+        },
+        {
+          "reference": "2TH.3.14-15",
+          "votes": 8
+        },
+        {
+          "reference": "1CO.5.3-5",
+          "votes": 6
+        },
+        {
+          "reference": "2JN.1.10-11",
+          "votes": 5
+        },
+        {
+          "reference": "EPH.5.11-12",
+          "votes": 5
+        },
+        {
+          "reference": "3JN.1.9-10",
+          "votes": 4
+        },
+        {
+          "reference": "EPH.4.17-19",
+          "votes": 4
+        },
+        {
+          "reference": "EZK.11.12",
+          "votes": 4
+        },
+        {
+          "reference": "2CO.2.6-7",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "LUK.4.23",
+      "currentCount": 16,
+      "tskCount": 7,
+      "commonCount": 7,
+      "currentOnlyCount": 9,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "LUK.6.42",
+        "MRK.1.21-28",
+        "JHN.7.3-4",
+        "MAT.13.54",
+        "LUK.4.16",
+        "2CO.5.16",
+        "JHN.4.28",
+        "ROM.11.34-35",
+        "MAT.4.23"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "LUK.6.42",
+        "ROM.2.21-22",
+        "MRK.1.21-28",
+        "JHN.7.3-4",
+        "MAT.4.13",
+        "MAT.13.54",
+        "LUK.4.16",
+        "JHN.2.3-4",
+        "JHN.4.46-53",
+        "MRK.6.1"
+      ],
+      "tskTop": [
+        "JHN.4.46-53",
+        "MAT.11.23-24",
+        "MRK.2.1-12",
+        "JHN.2.3-4",
+        "MAT.4.13",
+        "MRK.6.1",
+        "ROM.2.21-22"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "JHN.4.46-53",
+          "votes": 3
+        },
+        {
+          "reference": "MAT.11.23-24",
+          "votes": 3
+        },
+        {
+          "reference": "MRK.2.1-12",
+          "votes": 2
+        },
+        {
+          "reference": "JHN.2.3-4",
+          "votes": 1
+        },
+        {
+          "reference": "MAT.4.13",
+          "votes": 1
+        },
+        {
+          "reference": "MRK.6.1",
+          "votes": 1
+        },
+        {
+          "reference": "ROM.2.21-22",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "JHN.12.15",
+      "currentCount": 15,
+      "tskCount": 6,
+      "commonCount": 6,
+      "currentOnlyCount": 9,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JDG.12.14",
+        "2SA.15.1",
+        "ISA.40.9-10",
+        "DEU.17.16",
+        "JDG.5.10",
+        "MIC.4.8",
+        "ZEC.2.9-11",
+        "1KI.1.33",
+        "ISA.41.14"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "2SA.16.2",
+        "JDG.12.14",
+        "2SA.15.1",
+        "ISA.40.9-10",
+        "DEU.17.16",
+        "ZEC.9.9",
+        "JDG.5.10",
+        "MIC.4.8",
+        "ZEC.2.9-11",
+        "1KI.1.33"
+      ],
+      "tskTop": [
+        "ZEC.9.9",
+        "ISA.62.11",
+        "MAT.2.2-6",
+        "ISA.35.4-5",
+        "ZEP.3.16-17",
+        "2SA.16.2"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "ZEC.9.9",
+          "votes": 55
+        },
+        {
+          "reference": "ISA.62.11",
+          "votes": 6
+        },
+        {
+          "reference": "MAT.2.2-6",
+          "votes": 3
+        },
+        {
+          "reference": "ISA.35.4-5",
+          "votes": 2
+        },
+        {
+          "reference": "ZEP.3.16-17",
+          "votes": 2
+        },
+        {
+          "reference": "2SA.16.2",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "PRO.17.11",
+      "currentCount": 12,
+      "tskCount": 3,
+      "commonCount": 3,
+      "currentOnlyCount": 9,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MAT.21.41",
+        "LUK.19.27",
+        "2SA.20.1",
+        "2SA.20.22",
+        "2SA.18.19",
+        "2SA.15.12",
+        "1KI.2.31",
+        "1KI.2.24-25",
+        "MAT.22.7"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1KI.2.46",
+        "MAT.21.41",
+        "LUK.19.27",
+        "2SA.18.15",
+        "2SA.20.1",
+        "2SA.20.22",
+        "2SA.18.19",
+        "2SA.15.12",
+        "1KI.2.31",
+        "2SA.16.5-9"
+      ],
+      "tskTop": [
+        "1KI.2.46",
+        "2SA.16.5-9",
+        "2SA.18.15"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "1KI.2.46",
+          "votes": 4
+        },
+        {
+          "reference": "2SA.16.5-9",
+          "votes": 3
+        },
+        {
+          "reference": "2SA.18.15",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "MRK.14.26",
+      "currentCount": 11,
+      "tskCount": 2,
+      "commonCount": 2,
+      "currentOnlyCount": 9,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MAT.21.1",
+        "1CO.14.15",
+        "JDG.18.1-4",
+        "ACT.16.25",
+        "JAS.5.13",
+        "COL.3.16",
+        "REV.5.9",
+        "EPH.5.18-20",
+        "PSA.47.6-7"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MAT.21.1",
+        "1CO.14.15",
+        "LUK.22.39",
+        "JDG.18.1-4",
+        "MAT.26.30",
+        "ACT.16.25",
+        "JAS.5.13",
+        "COL.3.16",
+        "REV.5.9",
+        "EPH.5.18-20"
+      ],
+      "tskTop": [
+        "MAT.26.30",
+        "LUK.22.39"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "MAT.26.30",
+          "votes": 5
+        },
+        {
+          "reference": "LUK.22.39",
+          "votes": 4
+        }
+      ]
+    },
+    {
+      "verse": "1CO.13.5",
+      "currentCount": 35,
+      "tskCount": 27,
+      "commonCount": 27,
+      "currentOnlyCount": 8,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "2TI.2.10",
+        "NUM.20.10-12",
+        "1CO.11.13-16",
+        "JER.11.19",
+        "PRO.14.17",
+        "NUM.16.15",
+        "JOB.21.27",
+        "NUM.12.3"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1CO.11.18",
+        "1CO.14.33-40",
+        "JER.18.18-20",
+        "1CO.10.24",
+        "1CO.12.25",
+        "2TI.2.10",
+        "PSA.106.32-33",
+        "1CO.7.36",
+        "ROM.14.12-15",
+        "ROM.15.1-2"
+      ],
+      "tskTop": [
+        "1CO.10.24",
+        "PHP.2.3-5",
+        "1JN.3.16-17",
+        "JAS.1.19",
+        "PHP.2.21",
+        "GAL.6.1-2",
+        "PHP.4.8",
+        "ROM.15.1-2",
+        "GAL.5.13",
+        "1CO.12.25"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "1CO.10.24",
+          "votes": 33
+        },
+        {
+          "reference": "PHP.2.3-5",
+          "votes": 26
+        },
+        {
+          "reference": "1JN.3.16-17",
+          "votes": 18
+        },
+        {
+          "reference": "JAS.1.19",
+          "votes": 17
+        },
+        {
+          "reference": "PHP.2.21",
+          "votes": 16
+        },
+        {
+          "reference": "GAL.6.1-2",
+          "votes": 13
+        },
+        {
+          "reference": "PHP.4.8",
+          "votes": 12
+        },
+        {
+          "reference": "ROM.15.1-2",
+          "votes": 12
+        },
+        {
+          "reference": "GAL.5.13",
+          "votes": 10
+        },
+        {
+          "reference": "1CO.12.25",
+          "votes": 9
+        }
+      ]
+    },
+    {
+      "verse": "JOL.2.32",
+      "currentCount": 30,
+      "tskCount": 22,
+      "commonCount": 22,
+      "currentOnlyCount": 8,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "OBA.1.21",
+        "MIC.4.6-7",
+        "ROM.11.5",
+        "ACT.15.17",
+        "ROM.9.24",
+        "HEB.12.22",
+        "ROM.11.7",
+        "2TH.2.13-14"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "JHN.4.22",
+        "OBA.1.21",
+        "ISA.11.16",
+        "JER.33.3",
+        "MIC.4.6-7",
+        "ROM.11.5",
+        "MIC.5.7-8",
+        "ISA.59.20-21",
+        "ROM.8.28-30",
+        "JHN.10.16"
+      ],
+      "tskTop": [
+        "ROM.10.11-14",
+        "ACT.2.20-21",
+        "ISA.46.13",
+        "JER.31.7",
+        "JER.33.3",
+        "PSA.50.15",
+        "ROM.11.26",
+        "ROM.9.27",
+        "ZEC.13.9",
+        "ISA.11.11"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "ROM.10.11-14",
+          "votes": 20
+        },
+        {
+          "reference": "ACT.2.20-21",
+          "votes": 13
+        },
+        {
+          "reference": "ISA.46.13",
+          "votes": 8
+        },
+        {
+          "reference": "JER.31.7",
+          "votes": 7
+        },
+        {
+          "reference": "JER.33.3",
+          "votes": 7
+        },
+        {
+          "reference": "PSA.50.15",
+          "votes": 7
+        },
+        {
+          "reference": "ROM.11.26",
+          "votes": 7
+        },
+        {
+          "reference": "ROM.9.27",
+          "votes": 6
+        },
+        {
+          "reference": "ZEC.13.9",
+          "votes": 6
+        },
+        {
+          "reference": "ISA.11.11",
+          "votes": 5
+        }
+      ]
+    },
+    {
+      "verse": "2PE.1.8",
+      "currentCount": 27,
+      "tskCount": 19,
+      "commonCount": 19,
+      "currentOnlyCount": 8,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JHN.5.42",
+        "MAT.25.26",
+        "MAT.13.22",
+        "2CO.8.7",
+        "MAT.20.6",
+        "MAT.20.3",
+        "PRO.19.15",
+        "2CO.5.13-17"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "JHN.5.42",
+        "PHP.1.9",
+        "2TH.1.3",
+        "TIT.3.14",
+        "JHN.15.6-8",
+        "MAT.25.26",
+        "HEB.6.12",
+        "COL.2.7",
+        "COL.3.16",
+        "MAT.13.22"
+      ],
+      "tskTop": [
+        "TIT.3.14",
+        "JHN.15.2",
+        "COL.3.16",
+        "HEB.6.12",
+        "PHP.1.9",
+        "1TH.3.12",
+        "1CO.15.58",
+        "1TH.4.1",
+        "2PE.1.2",
+        "PHM.1.6"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "TIT.3.14",
+          "votes": 11
+        },
+        {
+          "reference": "JHN.15.2",
+          "votes": 10
+        },
+        {
+          "reference": "COL.3.16",
+          "votes": 9
+        },
+        {
+          "reference": "HEB.6.12",
+          "votes": 9
+        },
+        {
+          "reference": "PHP.1.9",
+          "votes": 8
+        },
+        {
+          "reference": "1TH.3.12",
+          "votes": 6
+        },
+        {
+          "reference": "1CO.15.58",
+          "votes": 5
+        },
+        {
+          "reference": "1TH.4.1",
+          "votes": 5
+        },
+        {
+          "reference": "2PE.1.2",
+          "votes": 5
+        },
+        {
+          "reference": "PHM.1.6",
+          "votes": 5
+        }
+      ]
+    },
+    {
+      "verse": "2TH.3.14",
+      "currentCount": 25,
+      "tskCount": 17,
+      "commonCount": 17,
+      "currentOnlyCount": 8,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "EZK.36.31-32",
+        "JER.3.3",
+        "LUK.15.18-21",
+        "2CO.7.15",
+        "PHP.2.12",
+        "JER.31.18-20",
+        "HEB.13.17",
+        "EZR.9.6"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1TH.4.8",
+        "NUM.12.14",
+        "MAT.18.17",
+        "JER.6.15",
+        "EZK.36.31-32",
+        "1CO.5.11",
+        "TIT.3.10",
+        "PHM.1.21",
+        "JER.3.3",
+        "LUK.15.18-21"
+      ],
+      "tskTop": [
+        "TIT.3.10",
+        "1CO.5.11",
+        "2TH.3.6",
+        "PSA.83.16",
+        "1TH.4.8",
+        "JER.6.15",
+        "PRO.5.13",
+        "1CO.5.9",
+        "PHM.1.21",
+        "ROM.16.17"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "TIT.3.10",
+          "votes": 10
+        },
+        {
+          "reference": "1CO.5.11",
+          "votes": 8
+        },
+        {
+          "reference": "2TH.3.6",
+          "votes": 8
+        },
+        {
+          "reference": "PSA.83.16",
+          "votes": 6
+        },
+        {
+          "reference": "1TH.4.8",
+          "votes": 5
+        },
+        {
+          "reference": "JER.6.15",
+          "votes": 3
+        },
+        {
+          "reference": "PRO.5.13",
+          "votes": 3
+        },
+        {
+          "reference": "1CO.5.9",
+          "votes": 2
+        },
+        {
+          "reference": "PHM.1.21",
+          "votes": 2
+        },
+        {
+          "reference": "ROM.16.17",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "ROM.8.15",
+      "currentCount": 24,
+      "tskCount": 16,
+      "commonCount": 16,
+      "currentOnlyCount": 8,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "LUK.8.37",
+        "JAS.2.19",
+        "EXO.20.19",
+        "ACT.16.29",
+        "LUK.8.28",
+        "ACT.2.37",
+        "JHN.16.8",
+        "NUM.17.12"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "LUK.22.42",
+        "JER.3.19",
+        "LUK.8.37",
+        "JAS.2.19",
+        "EPH.1.11-14",
+        "ROM.8.23",
+        "ISA.56.5",
+        "JHN.20.17",
+        "EXO.20.19",
+        "HEB.12.18-24"
+      ],
+      "tskTop": [
+        "GAL.4.5-7",
+        "2TI.1.7",
+        "1CO.2.12",
+        "ROM.8.16",
+        "EPH.1.5",
+        "HEB.2.15",
+        "MRK.14.36",
+        "1JN.4.18",
+        "JER.3.19",
+        "ISA.56.5"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "GAL.4.5-7",
+          "votes": 55
+        },
+        {
+          "reference": "2TI.1.7",
+          "votes": 53
+        },
+        {
+          "reference": "1CO.2.12",
+          "votes": 37
+        },
+        {
+          "reference": "ROM.8.16",
+          "votes": 34
+        },
+        {
+          "reference": "EPH.1.5",
+          "votes": 27
+        },
+        {
+          "reference": "HEB.2.15",
+          "votes": 24
+        },
+        {
+          "reference": "MRK.14.36",
+          "votes": 17
+        },
+        {
+          "reference": "1JN.4.18",
+          "votes": 15
+        },
+        {
+          "reference": "JER.3.19",
+          "votes": 13
+        },
+        {
+          "reference": "ISA.56.5",
+          "votes": 11
+        }
+      ]
+    },
+    {
+      "verse": "ISA.4.5",
+      "currentCount": 22,
+      "tskCount": 14,
+      "commonCount": 14,
+      "currentOnlyCount": 8,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PSA.111.1",
+        "EXO.14.19-20",
+        "EXO.26.7",
+        "EXO.26.1",
+        "ISA.37.35",
+        "ISA.32.18",
+        "PSA.87.2-3",
+        "MAT.18.20"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "PSA.111.1",
+        "EXO.13.21-22",
+        "EXO.14.19-20",
+        "ISA.31.4-5",
+        "EXO.14.24",
+        "EXO.26.7",
+        "PSA.89.7",
+        "EXO.26.1",
+        "ISA.37.35",
+        "EXO.40.34-38"
+      ],
+      "tskTop": [
+        "EXO.13.21-22",
+        "NEH.9.12",
+        "EXO.40.34-38",
+        "NUM.9.15-22",
+        "PSA.78.14",
+        "ISA.33.20",
+        "ISA.46.13",
+        "ISA.60.1",
+        "PSA.85.9",
+        "EXO.14.24"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "EXO.13.21-22",
+          "votes": 12
+        },
+        {
+          "reference": "NEH.9.12",
+          "votes": 10
+        },
+        {
+          "reference": "EXO.40.34-38",
+          "votes": 9
+        },
+        {
+          "reference": "NUM.9.15-22",
+          "votes": 8
+        },
+        {
+          "reference": "PSA.78.14",
+          "votes": 7
+        },
+        {
+          "reference": "ISA.33.20",
+          "votes": 2
+        },
+        {
+          "reference": "ISA.46.13",
+          "votes": 2
+        },
+        {
+          "reference": "ISA.60.1",
+          "votes": 2
+        },
+        {
+          "reference": "PSA.85.9",
+          "votes": 2
+        },
+        {
+          "reference": "EXO.14.24",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "1PE.3.3",
+      "currentCount": 21,
+      "tskCount": 13,
+      "commonCount": 13,
+      "currentOnlyCount": 8,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "2KI.9.30",
+        "EXO.35.22",
+        "EXO.32.2",
+        "EZK.23.40",
+        "EXO.3.22",
+        "EXO.38.8",
+        "PSA.45.9",
+        "EST.5.1"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1TI.2.9-10",
+        "ISA.61.10",
+        "ROM.12.2",
+        "2KI.9.30",
+        "JER.4.30",
+        "JER.2.32",
+        "GEN.24.47",
+        "EXO.35.22",
+        "TIT.2.3-15",
+        "GEN.24.53"
+      ],
+      "tskTop": [
+        "1TI.2.9-10",
+        "ROM.12.2",
+        "ISA.3.18-24",
+        "TIT.2.3-15",
+        "ISA.61.10",
+        "JER.4.30",
+        "EZK.16.7-13",
+        "JER.2.32",
+        "EXO.33.4",
+        "GEN.24.53"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "1TI.2.9-10",
+          "votes": 37
+        },
+        {
+          "reference": "ROM.12.2",
+          "votes": 19
+        },
+        {
+          "reference": "ISA.3.18-24",
+          "votes": 12
+        },
+        {
+          "reference": "TIT.2.3-15",
+          "votes": 10
+        },
+        {
+          "reference": "ISA.61.10",
+          "votes": 6
+        },
+        {
+          "reference": "JER.4.30",
+          "votes": 6
+        },
+        {
+          "reference": "EZK.16.7-13",
+          "votes": 5
+        },
+        {
+          "reference": "JER.2.32",
+          "votes": 4
+        },
+        {
+          "reference": "EXO.33.4",
+          "votes": 3
+        },
+        {
+          "reference": "GEN.24.53",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "ECC.5.6",
+      "currentCount": 18,
+      "tskCount": 10,
+      "commonCount": 10,
+      "currentOnlyCount": 8,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "HAG.1.9-11",
+        "1TI.5.21",
+        "ACT.7.30-35",
+        "LEV.27.9-10",
+        "1CO.11.10",
+        "HOS.12.4-5",
+        "MAL.3.1",
+        "HAG.2.14-17"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "HAG.1.9-11",
+        "ECC.5.1-2",
+        "1TI.5.21",
+        "ACT.7.30-35",
+        "JAS.3.2",
+        "JAS.1.26",
+        "LEV.5.4-6",
+        "LEV.27.9-10",
+        "1CO.11.10",
+        "MAL.2.7"
+      ],
+      "tskTop": [
+        "2JN.1.8",
+        "JAS.1.26",
+        "JAS.3.2",
+        "MAL.2.7",
+        "ECC.5.1-2",
+        "LEV.5.4-6",
+        "GEN.48.16",
+        "1CO.3.13-15",
+        "NUM.15.25",
+        "HEB.1.14"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "2JN.1.8",
+          "votes": 10
+        },
+        {
+          "reference": "JAS.1.26",
+          "votes": 10
+        },
+        {
+          "reference": "JAS.3.2",
+          "votes": 8
+        },
+        {
+          "reference": "MAL.2.7",
+          "votes": 7
+        },
+        {
+          "reference": "ECC.5.1-2",
+          "votes": 6
+        },
+        {
+          "reference": "LEV.5.4-6",
+          "votes": 4
+        },
+        {
+          "reference": "GEN.48.16",
+          "votes": 3
+        },
+        {
+          "reference": "1CO.3.13-15",
+          "votes": 2
+        },
+        {
+          "reference": "NUM.15.25",
+          "votes": 2
+        },
+        {
+          "reference": "HEB.1.14",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "ECC.4.10",
+      "currentCount": 15,
+      "tskCount": 7,
+      "commonCount": 7,
+      "currentOnlyCount": 8,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "2SA.12.7-14",
+        "GAL.2.11-14",
+        "EXO.32.21",
+        "2SA.11.27",
+        "GEN.4.8",
+        "2SA.14.6",
+        "DEU.9.19-20",
+        "EXO.32.2-4"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "2SA.12.7-14",
+        "GAL.2.11-14",
+        "EXO.32.21",
+        "2SA.11.27",
+        "GAL.6.1",
+        "GEN.4.8",
+        "1TH.4.18",
+        "1TH.5.11",
+        "2SA.14.6",
+        "ISA.35.3-4"
+      ],
+      "tskTop": [
+        "1TH.5.11",
+        "1TH.4.18",
+        "GAL.6.1",
+        "ISA.35.3-4",
+        "JOB.4.3-4",
+        "1SA.23.16",
+        "LUK.22.31-32"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "1TH.5.11",
+          "votes": 17
+        },
+        {
+          "reference": "1TH.4.18",
+          "votes": 10
+        },
+        {
+          "reference": "GAL.6.1",
+          "votes": 7
+        },
+        {
+          "reference": "ISA.35.3-4",
+          "votes": 7
+        },
+        {
+          "reference": "JOB.4.3-4",
+          "votes": 4
+        },
+        {
+          "reference": "1SA.23.16",
+          "votes": 3
+        },
+        {
+          "reference": "LUK.22.31-32",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "MAT.22.30",
+      "currentCount": 13,
+      "tskCount": 5,
+      "commonCount": 5,
+      "currentOnlyCount": 8,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MAT.18.10",
+        "PSA.103.20",
+        "REV.19.10",
+        "MAT.13.43",
+        "1JN.3.1-2",
+        "LUK.17.27",
+        "ZEC.3.7",
+        "REV.5.9-11"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "LUK.20.34-36",
+        "MRK.12.24-25",
+        "MAT.18.10",
+        "1CO.7.29-31",
+        "MAT.24.38",
+        "PSA.103.20",
+        "REV.19.10",
+        "MAT.13.43",
+        "1JN.3.1-2",
+        "LUK.17.27"
+      ],
+      "tskTop": [
+        "LUK.20.34-36",
+        "MRK.12.24-25",
+        "1CO.7.29-31",
+        "JHN.5.28-29",
+        "MAT.24.38"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "LUK.20.34-36",
+          "votes": 22
+        },
+        {
+          "reference": "MRK.12.24-25",
+          "votes": 17
+        },
+        {
+          "reference": "1CO.7.29-31",
+          "votes": 1
+        },
+        {
+          "reference": "JHN.5.28-29",
+          "votes": 1
+        },
+        {
+          "reference": "MAT.24.38",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "MRK.9.41",
+      "currentCount": 10,
+      "tskCount": 2,
+      "commonCount": 2,
+      "currentOnlyCount": 8,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "GAL.3.29",
+        "2CO.10.7",
+        "1CO.15.23",
+        "GAL.5.24",
+        "1CO.3.23",
+        "ROM.14.15",
+        "ROM.8.9",
+        "JHN.19.25-27"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "GAL.3.29",
+        "2CO.10.7",
+        "1CO.15.23",
+        "GAL.5.24",
+        "1CO.3.23",
+        "MAT.10.42",
+        "ROM.14.15",
+        "ROM.8.9",
+        "MAT.25.40",
+        "JHN.19.25-27"
+      ],
+      "tskTop": [
+        "MAT.10.42",
+        "MAT.25.40"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "MAT.10.42",
+          "votes": 18
+        },
+        {
+          "reference": "MAT.25.40",
+          "votes": 12
+        }
+      ]
+    },
+    {
+      "verse": "JHN.21.15",
+      "currentCount": 47,
+      "tskCount": 40,
+      "commonCount": 40,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JHN.1.42",
+        "JHN.13.37",
+        "MAT.26.35",
+        "MAT.26.33",
+        "2KI.20.3",
+        "MAT.10.37",
+        "2SA.7.20"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "JHN.1.42",
+        "1JN.5.1",
+        "1PE.5.1-4",
+        "LUK.22.32",
+        "1CO.3.1-3",
+        "HEB.12.12-13",
+        "JHN.16.27",
+        "JER.23.4",
+        "JHN.8.42",
+        "JHN.13.37"
+      ],
+      "tskTop": [
+        "1JN.4.19",
+        "ISA.40.11",
+        "ROM.15.1",
+        "2CO.5.14-15",
+        "1PE.1.8",
+        "1PE.5.1-4",
+        "EPH.6.24",
+        "ACT.20.28",
+        "EZK.34.23",
+        "JER.3.15"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "1JN.4.19",
+          "votes": 19
+        },
+        {
+          "reference": "ISA.40.11",
+          "votes": 19
+        },
+        {
+          "reference": "ROM.15.1",
+          "votes": 18
+        },
+        {
+          "reference": "2CO.5.14-15",
+          "votes": 14
+        },
+        {
+          "reference": "1PE.1.8",
+          "votes": 12
+        },
+        {
+          "reference": "1PE.5.1-4",
+          "votes": 12
+        },
+        {
+          "reference": "EPH.6.24",
+          "votes": 11
+        },
+        {
+          "reference": "ACT.20.28",
+          "votes": 10
+        },
+        {
+          "reference": "EZK.34.23",
+          "votes": 10
+        },
+        {
+          "reference": "JER.3.15",
+          "votes": 10
+        }
+      ]
+    },
+    {
+      "verse": "ROM.12.3",
+      "currentCount": 45,
+      "tskCount": 38,
+      "commonCount": 38,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "COL.1.29",
+        "2CO.12.13",
+        "EPH.3.2",
+        "GAL.2.8-9",
+        "COL.2.13",
+        "3JN.1.9",
+        "ROM.15.15-16"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1CO.4.7-8",
+        "COL.1.29",
+        "TIT.2.2",
+        "ROM.11.20",
+        "1PE.4.7",
+        "1PE.1.13",
+        "2CO.12.7",
+        "PRO.16.18-19",
+        "JHN.3.34",
+        "1PE.4.11"
+      ],
+      "tskTop": [
+        "GAL.6.3",
+        "PHP.2.3-8",
+        "PRO.26.12",
+        "1PE.5.5",
+        "ROM.12.16",
+        "ECC.7.16",
+        "1PE.5.8",
+        "JAS.4.6",
+        "1PE.4.11",
+        "1PE.4.7"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "GAL.6.3",
+          "votes": 58
+        },
+        {
+          "reference": "PHP.2.3-8",
+          "votes": 52
+        },
+        {
+          "reference": "PRO.26.12",
+          "votes": 34
+        },
+        {
+          "reference": "1PE.5.5",
+          "votes": 28
+        },
+        {
+          "reference": "ROM.12.16",
+          "votes": 28
+        },
+        {
+          "reference": "ECC.7.16",
+          "votes": 26
+        },
+        {
+          "reference": "1PE.5.8",
+          "votes": 23
+        },
+        {
+          "reference": "JAS.4.6",
+          "votes": 20
+        },
+        {
+          "reference": "1PE.4.11",
+          "votes": 17
+        },
+        {
+          "reference": "1PE.4.7",
+          "votes": 17
+        }
+      ]
+    },
+    {
+      "verse": "TIT.3.2",
+      "currentCount": 35,
+      "tskCount": 28,
+      "commonCount": 28,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "1PE.4.4",
+        "JUD.1.8",
+        "2PE.2.10",
+        "1CO.6.10",
+        "JUD.1.10",
+        "ISA.40.11",
+        "PRO.19.19"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "2TI.2.24-25",
+        "EPH.4.2",
+        "2SA.22.36",
+        "1CO.9.19",
+        "JAS.4.11",
+        "PSA.140.11",
+        "2CO.10.1",
+        "1PE.2.1",
+        "MAT.11.29",
+        "GAL.6.1"
+      ],
+      "tskTop": [
+        "EPH.4.31",
+        "2TI.2.24-25",
+        "COL.3.12-13",
+        "EPH.4.2",
+        "1TI.3.3",
+        "1PE.3.10",
+        "1PE.3.8",
+        "1PE.2.17-18",
+        "GAL.5.22",
+        "JAS.4.11"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "EPH.4.31",
+          "votes": 14
+        },
+        {
+          "reference": "2TI.2.24-25",
+          "votes": 13
+        },
+        {
+          "reference": "COL.3.12-13",
+          "votes": 10
+        },
+        {
+          "reference": "EPH.4.2",
+          "votes": 10
+        },
+        {
+          "reference": "1TI.3.3",
+          "votes": 9
+        },
+        {
+          "reference": "1PE.3.10",
+          "votes": 8
+        },
+        {
+          "reference": "1PE.3.8",
+          "votes": 7
+        },
+        {
+          "reference": "1PE.2.17-18",
+          "votes": 6
+        },
+        {
+          "reference": "GAL.5.22",
+          "votes": 6
+        },
+        {
+          "reference": "JAS.4.11",
+          "votes": 6
+        }
+      ]
+    },
+    {
+      "verse": "LUK.14.23",
+      "currentCount": 34,
+      "tskCount": 27,
+      "commonCount": 27,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "LUK.24.29",
+        "ISA.66.19-20",
+        "ACT.16.15",
+        "GEN.19.2-3",
+        "ISA.19.24-25",
+        "ZEC.14.8-9",
+        "PSA.110.3"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ACT.18.6",
+        "1CO.9.19-23",
+        "ROM.10.18",
+        "ISA.27.13",
+        "MAL.1.11",
+        "ROM.11.13-14",
+        "LUK.24.29",
+        "MAT.21.43",
+        "ISA.66.19-20",
+        "2TI.4.2"
+      ],
+      "tskTop": [
+        "MAT.22.9-10",
+        "COL.1.28",
+        "2CO.5.11",
+        "ACT.13.47-48",
+        "2CO.5.20",
+        "2TI.4.2",
+        "MAT.28.19-20",
+        "ACT.18.6",
+        "ACT.28.28",
+        "COL.1.23"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "MAT.22.9-10",
+          "votes": 14
+        },
+        {
+          "reference": "COL.1.28",
+          "votes": 8
+        },
+        {
+          "reference": "2CO.5.11",
+          "votes": 7
+        },
+        {
+          "reference": "ACT.13.47-48",
+          "votes": 7
+        },
+        {
+          "reference": "2CO.5.20",
+          "votes": 6
+        },
+        {
+          "reference": "2TI.4.2",
+          "votes": 6
+        },
+        {
+          "reference": "MAT.28.19-20",
+          "votes": 6
+        },
+        {
+          "reference": "ACT.18.6",
+          "votes": 5
+        },
+        {
+          "reference": "ACT.28.28",
+          "votes": 5
+        },
+        {
+          "reference": "COL.1.23",
+          "votes": 5
+        }
+      ]
+    },
+    {
+      "verse": "MAT.1.1",
+      "currentCount": 34,
+      "tskCount": 27,
+      "commonCount": 27,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PSA.89.36",
+        "GEN.5.1",
+        "ZEC.12.8",
+        "AMO.9.11",
+        "MAT.3.16",
+        "GEN.2.4",
+        "LUK.1.69-70"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "PSA.89.36",
+        "GEN.26.3-5",
+        "GEN.5.1",
+        "MAT.22.42-45",
+        "ZEC.12.8",
+        "LUK.1.31-32",
+        "ISA.53.8",
+        "GEN.12.3",
+        "GEN.28.13-14",
+        "MAT.9.27"
+      ],
+      "tskTop": [
+        "GEN.22.18",
+        "ROM.1.3",
+        "GAL.3.16",
+        "REV.22.16",
+        "PSA.132.11",
+        "JER.23.5",
+        "ISA.11.1",
+        "ISA.9.6-7",
+        "GEN.12.3",
+        "JHN.7.42"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "GEN.22.18",
+          "votes": 29
+        },
+        {
+          "reference": "ROM.1.3",
+          "votes": 29
+        },
+        {
+          "reference": "GAL.3.16",
+          "votes": 25
+        },
+        {
+          "reference": "REV.22.16",
+          "votes": 21
+        },
+        {
+          "reference": "PSA.132.11",
+          "votes": 20
+        },
+        {
+          "reference": "JER.23.5",
+          "votes": 15
+        },
+        {
+          "reference": "ISA.11.1",
+          "votes": 12
+        },
+        {
+          "reference": "ISA.9.6-7",
+          "votes": 11
+        },
+        {
+          "reference": "GEN.12.3",
+          "votes": 10
+        },
+        {
+          "reference": "JHN.7.42",
+          "votes": 10
+        }
+      ]
+    },
+    {
+      "verse": "REV.10.5",
+      "currentCount": 29,
+      "tskCount": 22,
+      "commonCount": 22,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "EZK.36.7",
+        "EZK.47.14",
+        "EZK.20.23",
+        "EZK.20.15",
+        "JER.10.10-13",
+        "EZK.20.28",
+        "EZK.20.42"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "EZK.36.7",
+        "ACT.14.15",
+        "EZK.47.14",
+        "REV.4.11",
+        "EZK.20.23",
+        "GEN.22.15-16",
+        "PSA.146.5",
+        "GEN.14.22",
+        "ACT.17.23",
+        "REV.14.7"
+      ],
+      "tskTop": [
+        "DAN.12.7",
+        "DEU.32.40",
+        "ACT.14.15",
+        "REV.10.2",
+        "REV.14.7",
+        "REV.16.17",
+        "REV.4.11",
+        "REV.1.18",
+        "REV.4.9",
+        "EXO.20.11"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "DAN.12.7",
+          "votes": 8
+        },
+        {
+          "reference": "DEU.32.40",
+          "votes": 7
+        },
+        {
+          "reference": "ACT.14.15",
+          "votes": 4
+        },
+        {
+          "reference": "REV.10.2",
+          "votes": 4
+        },
+        {
+          "reference": "REV.14.7",
+          "votes": 4
+        },
+        {
+          "reference": "REV.16.17",
+          "votes": 4
+        },
+        {
+          "reference": "REV.4.11",
+          "votes": 4
+        },
+        {
+          "reference": "REV.1.18",
+          "votes": 3
+        },
+        {
+          "reference": "REV.4.9",
+          "votes": 3
+        },
+        {
+          "reference": "EXO.20.11",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "ISA.64.6",
+      "currentCount": 27,
+      "tskCount": 20,
+      "commonCount": 20,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "HOS.4.19",
+        "PSA.1.4",
+        "ISA.48.1",
+        "ZEC.5.8-11",
+        "JAS.1.10-11",
+        "JER.4.11-12",
+        "1PE.1.24-25"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ISA.57.12-13",
+        "ZEC.3.3",
+        "HOS.4.19",
+        "REV.7.13",
+        "REV.3.17-18",
+        "TIT.3.3",
+        "PSA.1.4",
+        "JOB.14.4",
+        "ISA.48.1",
+        "EPH.2.1-2"
+      ],
+      "tskTop": [
+        "ROM.7.18",
+        "ROM.7.24",
+        "EPH.2.1-2",
+        "REV.3.17-18",
+        "ISA.53.6",
+        "ZEC.3.3",
+        "JOB.42.5-6",
+        "TIT.3.3",
+        "JOB.14.4",
+        "JOB.25.4"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "ROM.7.18",
+          "votes": 35
+        },
+        {
+          "reference": "ROM.7.24",
+          "votes": 27
+        },
+        {
+          "reference": "EPH.2.1-2",
+          "votes": 21
+        },
+        {
+          "reference": "REV.3.17-18",
+          "votes": 14
+        },
+        {
+          "reference": "ISA.53.6",
+          "votes": 13
+        },
+        {
+          "reference": "ZEC.3.3",
+          "votes": 13
+        },
+        {
+          "reference": "JOB.42.5-6",
+          "votes": 11
+        },
+        {
+          "reference": "TIT.3.3",
+          "votes": 11
+        },
+        {
+          "reference": "JOB.14.4",
+          "votes": 9
+        },
+        {
+          "reference": "JOB.25.4",
+          "votes": 9
+        }
+      ]
+    },
+    {
+      "verse": "1CO.10.4",
+      "currentCount": 23,
+      "tskCount": 16,
+      "commonCount": 16,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MAT.13.38-39",
+        "GEN.40.12",
+        "GAL.4.25",
+        "GEN.41.26",
+        "DAN.2.38",
+        "DAN.7.17",
+        "EZK.5.4-5"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "JHN.4.14",
+        "REV.22.17",
+        "COL.2.17",
+        "PSA.78.20",
+        "JHN.7.37",
+        "MAT.13.38-39",
+        "GEN.40.12",
+        "HEB.10.1",
+        "ISA.48.21",
+        "DEU.9.21"
+      ],
+      "tskTop": [
+        "EXO.17.6",
+        "JHN.7.37",
+        "ISA.48.21",
+        "JHN.4.14",
+        "PSA.105.41",
+        "NUM.20.11",
+        "PSA.78.15",
+        "PSA.78.20",
+        "JHN.4.10",
+        "ISA.43.20"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "EXO.17.6",
+          "votes": 26
+        },
+        {
+          "reference": "JHN.7.37",
+          "votes": 18
+        },
+        {
+          "reference": "ISA.48.21",
+          "votes": 16
+        },
+        {
+          "reference": "JHN.4.14",
+          "votes": 14
+        },
+        {
+          "reference": "PSA.105.41",
+          "votes": 14
+        },
+        {
+          "reference": "NUM.20.11",
+          "votes": 13
+        },
+        {
+          "reference": "PSA.78.15",
+          "votes": 13
+        },
+        {
+          "reference": "PSA.78.20",
+          "votes": 13
+        },
+        {
+          "reference": "JHN.4.10",
+          "votes": 12
+        },
+        {
+          "reference": "ISA.43.20",
+          "votes": 10
+        }
+      ]
+    },
+    {
+      "verse": "EZK.20.38",
+      "currentCount": 22,
+      "tskCount": 15,
+      "commonCount": 15,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JUD.1.5",
+        "ROM.9.27-29",
+        "MAT.3.12",
+        "MAT.3.9-10",
+        "HEB.4.3",
+        "1CO.10.5",
+        "HEB.4.6"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "EZK.15.7",
+        "JUD.1.5",
+        "EZK.13.9",
+        "NUM.14.28-30",
+        "MAL.4.1-3",
+        "ROM.9.27-29",
+        "EZK.11.21",
+        "MAT.3.12",
+        "PSA.9.16",
+        "MAT.3.9-10"
+      ],
+      "tskTop": [
+        "AMO.9.9-10",
+        "EZK.13.9",
+        "PSA.95.11",
+        "EZK.6.7",
+        "JER.44.14",
+        "MAL.3.3",
+        "MAL.4.1-3",
+        "ZEC.13.8-9",
+        "EZK.11.21",
+        "EZK.15.7"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "AMO.9.9-10",
+          "votes": 5
+        },
+        {
+          "reference": "EZK.13.9",
+          "votes": 5
+        },
+        {
+          "reference": "PSA.95.11",
+          "votes": 5
+        },
+        {
+          "reference": "EZK.6.7",
+          "votes": 4
+        },
+        {
+          "reference": "JER.44.14",
+          "votes": 4
+        },
+        {
+          "reference": "MAL.3.3",
+          "votes": 4
+        },
+        {
+          "reference": "MAL.4.1-3",
+          "votes": 4
+        },
+        {
+          "reference": "ZEC.13.8-9",
+          "votes": 4
+        },
+        {
+          "reference": "EZK.11.21",
+          "votes": 3
+        },
+        {
+          "reference": "EZK.15.7",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "ACT.2.1",
+      "currentCount": 20,
+      "tskCount": 13,
+      "commonCount": 13,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "2CH.30.12",
+        "EXO.23.16",
+        "2CH.5.13",
+        "PSA.133.1",
+        "ACT.5.12",
+        "NUM.28.16-31",
+        "ACT.2.46"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "JER.32.39",
+        "DEU.16.9-12",
+        "2CH.30.12",
+        "ACT.4.24",
+        "EXO.23.16",
+        "1CO.16.8",
+        "ACT.4.32",
+        "2CH.5.13",
+        "ACT.1.13-15",
+        "PHP.2.2"
+      ],
+      "tskTop": [
+        "ROM.15.6",
+        "PHP.2.2",
+        "ACT.1.13-15",
+        "PHP.1.27",
+        "1CO.16.8",
+        "ACT.4.32",
+        "ZEP.3.9",
+        "ACT.4.24",
+        "EXO.34.22",
+        "LEV.23.15-21"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "ROM.15.6",
+          "votes": 24
+        },
+        {
+          "reference": "PHP.2.2",
+          "votes": 15
+        },
+        {
+          "reference": "ACT.1.13-15",
+          "votes": 13
+        },
+        {
+          "reference": "PHP.1.27",
+          "votes": 9
+        },
+        {
+          "reference": "1CO.16.8",
+          "votes": 7
+        },
+        {
+          "reference": "ACT.4.32",
+          "votes": 6
+        },
+        {
+          "reference": "ZEP.3.9",
+          "votes": 6
+        },
+        {
+          "reference": "ACT.4.24",
+          "votes": 4
+        },
+        {
+          "reference": "EXO.34.22",
+          "votes": 4
+        },
+        {
+          "reference": "LEV.23.15-21",
+          "votes": 4
+        }
+      ]
+    },
+    {
+      "verse": "1PE.3.7",
+      "currentCount": 19,
+      "tskCount": 12,
+      "commonCount": 12,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "1CO.12.22-24",
+        "EPH.6.18",
+        "HEB.1.14",
+        "JOB.42.8",
+        "EPH.4.30",
+        "EPH.3.6",
+        "TIT.3.7"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1CO.12.22-24",
+        "MAT.19.3-9",
+        "GEN.2.23-24",
+        "EPH.6.18",
+        "HEB.1.14",
+        "MAL.2.14-16",
+        "EPH.5.33",
+        "JOB.42.8",
+        "MAT.18.19",
+        "EPH.4.30"
+      ],
+      "tskTop": [
+        "COL.3.19",
+        "GEN.2.23-24",
+        "MAT.19.3-9",
+        "EPH.5.25-28",
+        "EPH.5.33",
+        "1CO.7.3",
+        "MAL.2.14-16",
+        "MAT.18.19",
+        "1TH.4.4",
+        "PRO.5.15-19"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "COL.3.19",
+          "votes": 84
+        },
+        {
+          "reference": "GEN.2.23-24",
+          "votes": 56
+        },
+        {
+          "reference": "MAT.19.3-9",
+          "votes": 36
+        },
+        {
+          "reference": "EPH.5.25-28",
+          "votes": 35
+        },
+        {
+          "reference": "EPH.5.33",
+          "votes": 16
+        },
+        {
+          "reference": "1CO.7.3",
+          "votes": 15
+        },
+        {
+          "reference": "MAL.2.14-16",
+          "votes": 15
+        },
+        {
+          "reference": "MAT.18.19",
+          "votes": 6
+        },
+        {
+          "reference": "1TH.4.4",
+          "votes": 5
+        },
+        {
+          "reference": "PRO.5.15-19",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "JHN.2.4",
+      "currentCount": 17,
+      "tskCount": 10,
+      "commonCount": 10,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "2CO.5.16",
+        "GAL.2.5-6",
+        "LUK.2.49",
+        "JHN.20.15",
+        "MAT.15.28",
+        "DEU.33.9",
+        "JHN.20.13"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "2CO.5.16",
+        "GAL.2.5-6",
+        "ECC.3.1",
+        "LUK.2.49",
+        "JHN.8.20",
+        "2SA.19.22",
+        "JHN.13.1",
+        "JHN.20.15",
+        "2SA.16.10",
+        "JHN.12.23"
+      ],
+      "tskTop": [
+        "JHN.7.6",
+        "JHN.13.1",
+        "JHN.7.30",
+        "JHN.8.20",
+        "JHN.12.23",
+        "ECC.3.1",
+        "JHN.19.26-27",
+        "MAT.8.29",
+        "2SA.16.10",
+        "2SA.19.22"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "JHN.7.6",
+          "votes": 26
+        },
+        {
+          "reference": "JHN.13.1",
+          "votes": 22
+        },
+        {
+          "reference": "JHN.7.30",
+          "votes": 22
+        },
+        {
+          "reference": "JHN.8.20",
+          "votes": 22
+        },
+        {
+          "reference": "JHN.12.23",
+          "votes": 20
+        },
+        {
+          "reference": "ECC.3.1",
+          "votes": 11
+        },
+        {
+          "reference": "JHN.19.26-27",
+          "votes": 9
+        },
+        {
+          "reference": "MAT.8.29",
+          "votes": 5
+        },
+        {
+          "reference": "2SA.16.10",
+          "votes": 3
+        },
+        {
+          "reference": "2SA.19.22",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "JHN.2.1",
+      "currentCount": 16,
+      "tskCount": 9,
+      "commonCount": 9,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JHN.1.35",
+        "PRO.19.14",
+        "HEB.13.4",
+        "1TI.4.1-3",
+        "EPH.5.30-33",
+        "JOS.19.28",
+        "GEN.1.27-28"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "JHN.1.29",
+        "PRO.31.10-12",
+        "GEN.2.18-25",
+        "JHN.1.35",
+        "PRO.19.14",
+        "JHN.21.2",
+        "HEB.13.4",
+        "PSA.128.1-4",
+        "MAT.12.46",
+        "JHN.4.46"
+      ],
+      "tskTop": [
+        "JHN.4.46",
+        "PRO.31.10-12",
+        "JHN.21.2",
+        "JHN.1.43",
+        "MAT.12.46",
+        "PRO.18.22",
+        "GEN.2.18-25",
+        "JHN.1.29",
+        "PSA.128.1-4"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "JHN.4.46",
+          "votes": 9
+        },
+        {
+          "reference": "PRO.31.10-12",
+          "votes": 4
+        },
+        {
+          "reference": "JHN.21.2",
+          "votes": 3
+        },
+        {
+          "reference": "JHN.1.43",
+          "votes": 2
+        },
+        {
+          "reference": "MAT.12.46",
+          "votes": 2
+        },
+        {
+          "reference": "PRO.18.22",
+          "votes": 2
+        },
+        {
+          "reference": "GEN.2.18-25",
+          "votes": 1
+        },
+        {
+          "reference": "JHN.1.29",
+          "votes": 1
+        },
+        {
+          "reference": "PSA.128.1-4",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "MRK.15.32",
+      "currentCount": 14,
+      "tskCount": 7,
+      "commonCount": 7,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ROM.3.3",
+        "JHN.20.25-29",
+        "MRK.15.26",
+        "MRK.14.61-62",
+        "JHN.12.13",
+        "JHN.1.49",
+        "JHN.19.12-15"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ISA.44.6",
+        "LUK.23.39-43",
+        "ZEP.3.15",
+        "ROM.3.3",
+        "2TI.2.18",
+        "MAT.1.17",
+        "ZEC.9.9",
+        "JHN.20.25-29",
+        "MRK.15.26",
+        "MRK.14.61-62"
+      ],
+      "tskTop": [
+        "LUK.23.39-43",
+        "MAT.27.44",
+        "2TI.2.18",
+        "ISA.44.6",
+        "MAT.1.17",
+        "ZEC.9.9",
+        "ZEP.3.15"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "LUK.23.39-43",
+          "votes": 6
+        },
+        {
+          "reference": "MAT.27.44",
+          "votes": 6
+        },
+        {
+          "reference": "2TI.2.18",
+          "votes": 1
+        },
+        {
+          "reference": "ISA.44.6",
+          "votes": 1
+        },
+        {
+          "reference": "MAT.1.17",
+          "votes": 1
+        },
+        {
+          "reference": "ZEC.9.9",
+          "votes": 1
+        },
+        {
+          "reference": "ZEP.3.15",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "EXO.18.23",
+      "currentCount": 13,
+      "tskCount": 6,
+      "commonCount": 6,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PHP.1.24-25",
+        "GEN.30.25",
+        "2SA.19.39",
+        "GAL.2.2",
+        "EXO.16.29",
+        "ACT.15.2",
+        "2SA.21.17"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1SA.8.6-7",
+        "PHP.1.24-25",
+        "2SA.18.3",
+        "GEN.30.25",
+        "GEN.18.33",
+        "GEN.21.10-12",
+        "2SA.19.39",
+        "GAL.2.2",
+        "1SA.8.22",
+        "EXO.18.18"
+      ],
+      "tskTop": [
+        "1SA.8.6-7",
+        "EXO.18.18",
+        "1SA.8.22",
+        "2SA.18.3",
+        "GEN.18.33",
+        "GEN.21.10-12"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "1SA.8.6-7",
+          "votes": 3
+        },
+        {
+          "reference": "EXO.18.18",
+          "votes": 3
+        },
+        {
+          "reference": "1SA.8.22",
+          "votes": 2
+        },
+        {
+          "reference": "2SA.18.3",
+          "votes": 1
+        },
+        {
+          "reference": "GEN.18.33",
+          "votes": 1
+        },
+        {
+          "reference": "GEN.21.10-12",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "PSA.99.8",
+      "currentCount": 13,
+      "tskCount": 6,
+      "commonCount": 6,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "NUM.11.33-34",
+        "NUM.20.24",
+        "EXO.32.2",
+        "ZEP.3.7",
+        "EXO.32.34-35",
+        "DEU.3.26",
+        "ROM.1.21"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "DEU.9.19-20",
+        "NUM.11.33-34",
+        "NUM.14.20-34",
+        "NUM.20.24",
+        "EXO.32.2",
+        "ZEP.3.7",
+        "ECC.7.29",
+        "JER.46.28",
+        "EXO.32.34-35",
+        "PSA.89.33"
+      ],
+      "tskTop": [
+        "NUM.20.12",
+        "PSA.89.33",
+        "JER.46.28",
+        "ECC.7.29",
+        "DEU.9.19-20",
+        "NUM.14.20-34"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "NUM.20.12",
+          "votes": 5
+        },
+        {
+          "reference": "PSA.89.33",
+          "votes": 4
+        },
+        {
+          "reference": "JER.46.28",
+          "votes": 3
+        },
+        {
+          "reference": "ECC.7.29",
+          "votes": 2
+        },
+        {
+          "reference": "DEU.9.19-20",
+          "votes": 1
+        },
+        {
+          "reference": "NUM.14.20-34",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "HEB.4.7",
+      "currentCount": 12,
+      "tskCount": 5,
+      "commonCount": 5,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ACT.13.20-23",
+        "LUK.20.42",
+        "ACT.28.25",
+        "1KI.6.1",
+        "ACT.2.29",
+        "MRK.12.36",
+        "ACT.2.31"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ACT.13.20-23",
+        "LUK.20.42",
+        "PSA.95.7",
+        "ACT.28.25",
+        "2SA.23.1-2",
+        "1KI.6.1",
+        "ACT.2.29",
+        "MRK.12.36",
+        "ACT.2.31",
+        "MAT.22.43"
+      ],
+      "tskTop": [
+        "PSA.95.7",
+        "HEB.3.7-8",
+        "HEB.3.15",
+        "2SA.23.1-2",
+        "MAT.22.43"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "PSA.95.7",
+          "votes": 20
+        },
+        {
+          "reference": "HEB.3.7-8",
+          "votes": 13
+        },
+        {
+          "reference": "HEB.3.15",
+          "votes": 8
+        },
+        {
+          "reference": "2SA.23.1-2",
+          "votes": 1
+        },
+        {
+          "reference": "MAT.22.43",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "LUK.21.9",
+      "currentCount": 12,
+      "tskCount": 5,
+      "commonCount": 5,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PSA.46.1-2",
+        "PSA.112.7",
+        "LUK.21.8",
+        "PRO.3.25-26",
+        "PSA.27.1-3",
+        "JER.4.19-20",
+        "ISA.8.12"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "PSA.46.1-2",
+        "PSA.112.7",
+        "LUK.21.8",
+        "LUK.21.18-19",
+        "ISA.51.12-13",
+        "MAT.24.6-8",
+        "PRO.3.25-26",
+        "LUK.21.28",
+        "PSA.27.1-3",
+        "JER.4.19-20"
+      ],
+      "tskTop": [
+        "LUK.21.28",
+        "MAT.24.6-8",
+        "MRK.13.7-8",
+        "ISA.51.12-13",
+        "LUK.21.18-19"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "LUK.21.28",
+          "votes": 11
+        },
+        {
+          "reference": "MAT.24.6-8",
+          "votes": 8
+        },
+        {
+          "reference": "MRK.13.7-8",
+          "votes": 6
+        },
+        {
+          "reference": "ISA.51.12-13",
+          "votes": 4
+        },
+        {
+          "reference": "LUK.21.18-19",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "LUK.2.1",
+      "currentCount": 10,
+      "tskCount": 3,
+      "commonCount": 3,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MRK.14.9",
+        "MAT.22.17",
+        "ROM.1.8",
+        "MRK.16.15",
+        "ACT.11.28",
+        "PHP.4.22",
+        "ACT.25.11"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MRK.14.9",
+        "ACT.25.21",
+        "LUK.3.1",
+        "MAT.22.17",
+        "ROM.1.8",
+        "MRK.16.15",
+        "MAT.24.14",
+        "ACT.11.28",
+        "PHP.4.22",
+        "ACT.25.11"
+      ],
+      "tskTop": [
+        "LUK.3.1",
+        "MAT.24.14",
+        "ACT.25.21"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "LUK.3.1",
+          "votes": 7
+        },
+        {
+          "reference": "MAT.24.14",
+          "votes": 4
+        },
+        {
+          "reference": "ACT.25.21",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "ROM.9.13",
+      "currentCount": 8,
+      "tskCount": 1,
+      "commonCount": 1,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MAT.10.37",
+        "PRO.13.24",
+        "DEU.21.15",
+        "LUK.14.26",
+        "GEN.29.33",
+        "JHN.12.25",
+        "GEN.29.31"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MAT.10.37",
+        "PRO.13.24",
+        "DEU.21.15",
+        "LUK.14.26",
+        "GEN.29.33",
+        "MAL.1.2-3",
+        "JHN.12.25",
+        "GEN.29.31"
+      ],
+      "tskTop": [
+        "MAL.1.2-3"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "MAL.1.2-3",
+          "votes": 43
+        }
+      ]
+    },
+    {
+      "verse": "GEN.1.8",
+      "currentCount": 7,
+      "tskCount": 0,
+      "commonCount": 0,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "GEN.1.19",
+        "GEN.5.2",
+        "GEN.1.31",
+        "GEN.1.23",
+        "GEN.1.13",
+        "GEN.1.5",
+        "GEN.1.10"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "GEN.1.19",
+        "GEN.5.2",
+        "GEN.1.31",
+        "GEN.1.23",
+        "GEN.1.13",
+        "GEN.1.5",
+        "GEN.1.10"
+      ],
+      "tskTop": [],
+      "tskTopWithVotes": []
+    },
+    {
+      "verse": "MAT.27.53",
+      "currentCount": 7,
+      "tskCount": 0,
+      "commonCount": 0,
+      "currentOnlyCount": 7,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "REV.22.19",
+        "MAT.4.5",
+        "REV.11.2",
+        "NEH.11.1",
+        "REV.21.2",
+        "DAN.9.24",
+        "ISA.48.2"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "REV.22.19",
+        "MAT.4.5",
+        "REV.11.2",
+        "NEH.11.1",
+        "REV.21.2",
+        "DAN.9.24",
+        "ISA.48.2"
+      ],
+      "tskTop": [],
+      "tskTopWithVotes": []
+    },
+    {
+      "verse": "EXO.13.3",
+      "currentCount": 32,
+      "tskCount": 26,
+      "commonCount": 26,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MAT.10.12",
+        "LUK.22.19",
+        "1CH.16.12",
+        "1CO.5.8",
+        "1CO.11.24",
+        "NEH.9.10"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "EXO.12.8",
+        "DEU.5.15",
+        "DEU.24.22",
+        "DEU.8.14",
+        "MAT.10.12",
+        "DEU.24.18",
+        "EXO.13.14",
+        "LUK.22.19",
+        "EXO.12.15",
+        "EXO.6.1"
+      ],
+      "tskTop": [
+        "DEU.24.18",
+        "DEU.5.15",
+        "EXO.20.2",
+        "DEU.16.12",
+        "DEU.5.6",
+        "DEU.15.15",
+        "DEU.6.12",
+        "DEU.16.3",
+        "DEU.8.14",
+        "EXO.13.14"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "DEU.24.18",
+          "votes": 31
+        },
+        {
+          "reference": "DEU.5.15",
+          "votes": 26
+        },
+        {
+          "reference": "EXO.20.2",
+          "votes": 23
+        },
+        {
+          "reference": "DEU.16.12",
+          "votes": 21
+        },
+        {
+          "reference": "DEU.5.6",
+          "votes": 21
+        },
+        {
+          "reference": "DEU.15.15",
+          "votes": 20
+        },
+        {
+          "reference": "DEU.6.12",
+          "votes": 18
+        },
+        {
+          "reference": "DEU.16.3",
+          "votes": 16
+        },
+        {
+          "reference": "DEU.8.14",
+          "votes": 16
+        },
+        {
+          "reference": "EXO.13.14",
+          "votes": 16
+        }
+      ]
+    },
+    {
+      "verse": "EPH.5.4",
+      "currentCount": 28,
+      "tskCount": 22,
+      "commonCount": 22,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "1TH.3.9",
+        "EPH.1.16",
+        "PHM.1.8",
+        "JHN.6.23",
+        "2PE.2.7",
+        "DAN.6.10"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1TH.3.9",
+        "PSA.107.21-22",
+        "2PE.2.18",
+        "PRO.15.2",
+        "JUD.1.13",
+        "EPH.4.29",
+        "JAS.3.4-8",
+        "2CO.9.15",
+        "EPH.1.16",
+        "PHM.1.8"
+      ],
+      "tskTop": [
+        "COL.3.8",
+        "EPH.4.29",
+        "1TH.5.18",
+        "PRO.15.2",
+        "JAS.3.4-8",
+        "MAT.12.34-37",
+        "ECC.10.13",
+        "COL.3.15-17",
+        "2PE.2.18",
+        "EPH.5.19-20"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "COL.3.8",
+          "votes": 31
+        },
+        {
+          "reference": "EPH.4.29",
+          "votes": 27
+        },
+        {
+          "reference": "1TH.5.18",
+          "votes": 13
+        },
+        {
+          "reference": "PRO.15.2",
+          "votes": 12
+        },
+        {
+          "reference": "JAS.3.4-8",
+          "votes": 10
+        },
+        {
+          "reference": "MAT.12.34-37",
+          "votes": 10
+        },
+        {
+          "reference": "ECC.10.13",
+          "votes": 6
+        },
+        {
+          "reference": "COL.3.15-17",
+          "votes": 5
+        },
+        {
+          "reference": "2PE.2.18",
+          "votes": 4
+        },
+        {
+          "reference": "EPH.5.19-20",
+          "votes": 4
+        }
+      ]
+    },
+    {
+      "verse": "REV.17.3",
+      "currentCount": 23,
+      "tskCount": 17,
+      "commonCount": 17,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "REV.4.2",
+        "REV.1.10",
+        "1KI.18.12",
+        "ACT.8.39",
+        "DAN.11.36",
+        "2KI.2.16"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "DAN.7.8",
+        "EZK.8.3",
+        "REV.17.6-7",
+        "REV.4.2",
+        "EZK.3.12",
+        "REV.12.6",
+        "REV.12.14",
+        "SNG.8.5",
+        "REV.21.10",
+        "DAN.7.20"
+      ],
+      "tskTop": [
+        "REV.12.3",
+        "REV.13.1-6",
+        "REV.12.6",
+        "REV.17.18",
+        "REV.17.6-7",
+        "REV.17.9-12",
+        "DAN.7.20",
+        "DAN.7.25",
+        "DAN.7.8",
+        "REV.12.14"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "REV.12.3",
+          "votes": 10
+        },
+        {
+          "reference": "REV.13.1-6",
+          "votes": 7
+        },
+        {
+          "reference": "REV.12.6",
+          "votes": 5
+        },
+        {
+          "reference": "REV.17.18",
+          "votes": 5
+        },
+        {
+          "reference": "REV.17.6-7",
+          "votes": 5
+        },
+        {
+          "reference": "REV.17.9-12",
+          "votes": 5
+        },
+        {
+          "reference": "DAN.7.20",
+          "votes": 4
+        },
+        {
+          "reference": "DAN.7.25",
+          "votes": 4
+        },
+        {
+          "reference": "DAN.7.8",
+          "votes": 4
+        },
+        {
+          "reference": "REV.12.14",
+          "votes": 4
+        }
+      ]
+    },
+    {
+      "verse": "1PE.3.9",
+      "currentCount": 21,
+      "tskCount": 15,
+      "commonCount": 15,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MRK.10.17",
+        "HEB.6.14",
+        "MAT.19.29",
+        "ROM.8.30",
+        "LUK.18.18",
+        "LUK.10.25"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MRK.10.17",
+        "MAT.25.34",
+        "LUK.6.27-29",
+        "1PE.5.10",
+        "ROM.12.19-21",
+        "HEB.6.14",
+        "1PE.2.20-23",
+        "EPH.4.32",
+        "MAT.19.29",
+        "PRO.17.13"
+      ],
+      "tskTop": [
+        "ROM.12.17",
+        "PRO.20.22",
+        "ROM.12.14",
+        "ROM.12.19-21",
+        "1TH.5.15",
+        "LUK.6.27-29",
+        "MAT.5.44",
+        "PRO.17.13",
+        "EPH.4.32",
+        "MAT.5.39"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "ROM.12.17",
+          "votes": 41
+        },
+        {
+          "reference": "PRO.20.22",
+          "votes": 40
+        },
+        {
+          "reference": "ROM.12.14",
+          "votes": 35
+        },
+        {
+          "reference": "ROM.12.19-21",
+          "votes": 33
+        },
+        {
+          "reference": "1TH.5.15",
+          "votes": 30
+        },
+        {
+          "reference": "LUK.6.27-29",
+          "votes": 28
+        },
+        {
+          "reference": "MAT.5.44",
+          "votes": 26
+        },
+        {
+          "reference": "PRO.17.13",
+          "votes": 23
+        },
+        {
+          "reference": "EPH.4.32",
+          "votes": 22
+        },
+        {
+          "reference": "MAT.5.39",
+          "votes": 22
+        }
+      ]
+    },
+    {
+      "verse": "ACT.16.14",
+      "currentCount": 21,
+      "tskCount": 15,
+      "commonCount": 15,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "REV.1.11",
+        "PSA.110.3",
+        "JHN.12.20",
+        "SNG.5.4",
+        "ACT.8.27",
+        "ACT.10.2"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ACT.11.21",
+        "ROM.9.16",
+        "ACT.18.7",
+        "ISA.50.5",
+        "EPH.1.17-18",
+        "REV.3.7",
+        "JHN.6.44-45",
+        "2CO.4.4-6",
+        "PHP.2.13",
+        "REV.1.11"
+      ],
+      "tskTop": [
+        "LUK.24.45",
+        "EPH.1.17-18",
+        "ISA.50.5",
+        "JHN.6.44-45",
+        "REV.3.20",
+        "2CO.3.14-16",
+        "2CO.4.4-6",
+        "ROM.9.16",
+        "1CO.3.6-7",
+        "PHP.2.13"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "LUK.24.45",
+          "votes": 25
+        },
+        {
+          "reference": "EPH.1.17-18",
+          "votes": 24
+        },
+        {
+          "reference": "ISA.50.5",
+          "votes": 21
+        },
+        {
+          "reference": "JHN.6.44-45",
+          "votes": 21
+        },
+        {
+          "reference": "REV.3.20",
+          "votes": 13
+        },
+        {
+          "reference": "2CO.3.14-16",
+          "votes": 12
+        },
+        {
+          "reference": "2CO.4.4-6",
+          "votes": 11
+        },
+        {
+          "reference": "ROM.9.16",
+          "votes": 11
+        },
+        {
+          "reference": "1CO.3.6-7",
+          "votes": 7
+        },
+        {
+          "reference": "PHP.2.13",
+          "votes": 7
+        }
+      ]
+    },
+    {
+      "verse": "JER.3.3",
+      "currentCount": 20,
+      "tskCount": 14,
+      "commonCount": 14,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ZEC.7.11-12",
+        "JER.44.16-17",
+        "JER.5.3",
+        "NEH.9.17",
+        "HEB.12.25",
+        "ZEP.3.5"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "EZK.16.30-34",
+        "JER.14.22",
+        "ZEC.7.11-12",
+        "HAG.1.11",
+        "EZK.3.7",
+        "JER.44.16-17",
+        "ISA.5.6",
+        "JER.9.12",
+        "JER.14.4",
+        "JER.5.3"
+      ],
+      "tskTop": [
+        "LEV.26.19",
+        "JER.5.24",
+        "AMO.4.7",
+        "DEU.28.23",
+        "ISA.5.6",
+        "JER.14.22",
+        "JER.14.4",
+        "HAG.1.11",
+        "JOL.1.16-20",
+        "EZK.16.30-34"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "LEV.26.19",
+          "votes": 10
+        },
+        {
+          "reference": "JER.5.24",
+          "votes": 9
+        },
+        {
+          "reference": "AMO.4.7",
+          "votes": 8
+        },
+        {
+          "reference": "DEU.28.23",
+          "votes": 8
+        },
+        {
+          "reference": "ISA.5.6",
+          "votes": 8
+        },
+        {
+          "reference": "JER.14.22",
+          "votes": 8
+        },
+        {
+          "reference": "JER.14.4",
+          "votes": 8
+        },
+        {
+          "reference": "HAG.1.11",
+          "votes": 7
+        },
+        {
+          "reference": "JOL.1.16-20",
+          "votes": 6
+        },
+        {
+          "reference": "EZK.16.30-34",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "JOL.2.10",
+      "currentCount": 19,
+      "tskCount": 13,
+      "commonCount": 13,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "AMO.5.8",
+        "MAT.27.51",
+        "PSA.114.7",
+        "REV.20.11",
+        "LUK.21.25-26",
+        "JOL.2.2"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MAT.24.29",
+        "ISA.13.10",
+        "EZK.32.7-8",
+        "MRK.13.24-25",
+        "JOL.2.31",
+        "AMO.5.8",
+        "ACT.2.20",
+        "NAM.1.5",
+        "ISA.34.4",
+        "REV.8.12"
+      ],
+      "tskTop": [
+        "MAT.24.29",
+        "ISA.13.10",
+        "JOL.3.15-16",
+        "PSA.18.7",
+        "ACT.2.20",
+        "EZK.32.7-8",
+        "MRK.13.24-25",
+        "JER.4.23",
+        "REV.6.12",
+        "ISA.34.4"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "MAT.24.29",
+          "votes": 13
+        },
+        {
+          "reference": "ISA.13.10",
+          "votes": 9
+        },
+        {
+          "reference": "JOL.3.15-16",
+          "votes": 7
+        },
+        {
+          "reference": "PSA.18.7",
+          "votes": 5
+        },
+        {
+          "reference": "ACT.2.20",
+          "votes": 4
+        },
+        {
+          "reference": "EZK.32.7-8",
+          "votes": 3
+        },
+        {
+          "reference": "MRK.13.24-25",
+          "votes": 3
+        },
+        {
+          "reference": "JER.4.23",
+          "votes": 2
+        },
+        {
+          "reference": "REV.6.12",
+          "votes": 2
+        },
+        {
+          "reference": "ISA.34.4",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "PRO.23.15",
+      "currentCount": 19,
+      "tskCount": 13,
+      "commonCount": 13,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "LUK.15.32",
+        "JHN.21.5",
+        "JER.32.41",
+        "LUK.15.23-24",
+        "MAT.9.2",
+        "1TH.2.19-20"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "LUK.15.32",
+        "PRO.23.24-25",
+        "PRO.2.1",
+        "PRO.29.3",
+        "ZEP.3.17",
+        "PRO.10.1",
+        "3JN.1.3-4",
+        "PRO.15.20",
+        "1TH.3.8-9",
+        "JHN.21.5"
+      ],
+      "tskTop": [
+        "PRO.23.24-25",
+        "2JN.1.4",
+        "PRO.29.3",
+        "3JN.1.3-4",
+        "ZEP.3.17",
+        "1JN.2.1",
+        "1TH.3.8-9",
+        "PRO.2.1",
+        "PRO.4.1",
+        "JHN.15.11"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "PRO.23.24-25",
+          "votes": 10
+        },
+        {
+          "reference": "2JN.1.4",
+          "votes": 5
+        },
+        {
+          "reference": "PRO.29.3",
+          "votes": 4
+        },
+        {
+          "reference": "3JN.1.3-4",
+          "votes": 3
+        },
+        {
+          "reference": "ZEP.3.17",
+          "votes": 3
+        },
+        {
+          "reference": "1JN.2.1",
+          "votes": 2
+        },
+        {
+          "reference": "1TH.3.8-9",
+          "votes": 2
+        },
+        {
+          "reference": "PRO.2.1",
+          "votes": 2
+        },
+        {
+          "reference": "PRO.4.1",
+          "votes": 2
+        },
+        {
+          "reference": "JHN.15.11",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "EPH.1.1",
+      "currentCount": 18,
+      "tskCount": 12,
+      "commonCount": 12,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "REV.2.13",
+        "1CO.4.12",
+        "NUM.12.7",
+        "REV.17.14",
+        "GAL.3.9",
+        "ACT.16.15"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ROM.8.1",
+        "1CO.1.1-2",
+        "ACT.19.1-20",
+        "1CO.4.17",
+        "REV.2.13",
+        "COL.1.2",
+        "EPH.6.21",
+        "1CO.4.12",
+        "GAL.1.1",
+        "ROM.1.1"
+      ],
+      "tskTop": [
+        "COL.1.2",
+        "2CO.1.1",
+        "1CO.1.1-2",
+        "ROM.1.1",
+        "GAL.1.1",
+        "REV.2.10",
+        "ROM.1.7",
+        "1CO.4.17",
+        "EPH.6.21",
+        "LUK.16.10"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "COL.1.2",
+          "votes": 23
+        },
+        {
+          "reference": "2CO.1.1",
+          "votes": 20
+        },
+        {
+          "reference": "1CO.1.1-2",
+          "votes": 16
+        },
+        {
+          "reference": "ROM.1.1",
+          "votes": 8
+        },
+        {
+          "reference": "GAL.1.1",
+          "votes": 7
+        },
+        {
+          "reference": "REV.2.10",
+          "votes": 4
+        },
+        {
+          "reference": "ROM.1.7",
+          "votes": 4
+        },
+        {
+          "reference": "1CO.4.17",
+          "votes": 3
+        },
+        {
+          "reference": "EPH.6.21",
+          "votes": 2
+        },
+        {
+          "reference": "LUK.16.10",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "MRK.9.42",
+      "currentCount": 18,
+      "tskCount": 12,
+      "commonCount": 12,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PHP.1.10",
+        "REV.6.9-10",
+        "1TI.5.14",
+        "REV.16.6-7",
+        "ROM.15.21",
+        "1CO.10.32-33"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MAT.25.45-46",
+        "PHP.1.10",
+        "MAT.18.10",
+        "ROM.14.13",
+        "1CO.8.10-13",
+        "ROM.16.17",
+        "ACT.9.4",
+        "REV.6.9-10",
+        "2PE.2.2",
+        "1TI.5.14"
+      ],
+      "tskTop": [
+        "MAT.18.6",
+        "LUK.17.1-2",
+        "MAT.18.10",
+        "2CO.6.3",
+        "ROM.14.13",
+        "ROM.16.17",
+        "1CO.8.10-13",
+        "2PE.2.2",
+        "2TH.1.6-9",
+        "ACT.26.11-14"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "MAT.18.6",
+          "votes": 12
+        },
+        {
+          "reference": "LUK.17.1-2",
+          "votes": 8
+        },
+        {
+          "reference": "MAT.18.10",
+          "votes": 7
+        },
+        {
+          "reference": "2CO.6.3",
+          "votes": 2
+        },
+        {
+          "reference": "ROM.14.13",
+          "votes": 2
+        },
+        {
+          "reference": "ROM.16.17",
+          "votes": 2
+        },
+        {
+          "reference": "1CO.8.10-13",
+          "votes": 1
+        },
+        {
+          "reference": "2PE.2.2",
+          "votes": 1
+        },
+        {
+          "reference": "2TH.1.6-9",
+          "votes": 1
+        },
+        {
+          "reference": "ACT.26.11-14",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "PRO.16.18",
+      "currentCount": 18,
+      "tskCount": 12,
+      "commonCount": 12,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MAT.26.74",
+        "ISA.37.38",
+        "EST.3.5",
+        "DAN.5.24",
+        "ISA.37.10-13",
+        "DAN.5.22"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1TI.3.6",
+        "MAT.26.74",
+        "PRO.11.2",
+        "PRO.18.12",
+        "DAN.4.30-37",
+        "MAT.26.33-35",
+        "PRO.29.23",
+        "ISA.37.38",
+        "EST.3.5",
+        "DAN.5.24"
+      ],
+      "tskTop": [
+        "PRO.11.2",
+        "ISA.2.11-12",
+        "PRO.18.12",
+        "OBA.1.3-4",
+        "PRO.29.23",
+        "1TI.3.6",
+        "PRO.17.19",
+        "ROM.11.20",
+        "EST.6.6",
+        "DAN.4.30-37"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "PRO.11.2",
+          "votes": 42
+        },
+        {
+          "reference": "ISA.2.11-12",
+          "votes": 29
+        },
+        {
+          "reference": "PRO.18.12",
+          "votes": 24
+        },
+        {
+          "reference": "OBA.1.3-4",
+          "votes": 19
+        },
+        {
+          "reference": "PRO.29.23",
+          "votes": 14
+        },
+        {
+          "reference": "1TI.3.6",
+          "votes": 7
+        },
+        {
+          "reference": "PRO.17.19",
+          "votes": 6
+        },
+        {
+          "reference": "ROM.11.20",
+          "votes": 6
+        },
+        {
+          "reference": "EST.6.6",
+          "votes": 4
+        },
+        {
+          "reference": "DAN.4.30-37",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "PRO.27.9",
+      "currentCount": 18,
+      "tskCount": 12,
+      "commonCount": 12,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PRO.7.17",
+        "1SA.23.16-17",
+        "SNG.1.3",
+        "ACT.28.15",
+        "EXO.18.17-24",
+        "EZR.10.2-4"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "PSA.133.2",
+        "PRO.7.17",
+        "1SA.23.16-17",
+        "2CO.2.15-16",
+        "PRO.15.23",
+        "PRO.16.23-24",
+        "PSA.104.15",
+        "SNG.1.3",
+        "PSA.45.7-8",
+        "ACT.28.15"
+      ],
+      "tskTop": [
+        "PRO.16.23-24",
+        "PRO.16.21",
+        "PSA.23.5",
+        "PRO.15.23",
+        "PSA.104.15",
+        "2CO.2.15-16",
+        "SNG.4.10",
+        "JHN.12.3",
+        "PSA.133.2",
+        "PSA.45.7-8"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "PRO.16.23-24",
+          "votes": 10
+        },
+        {
+          "reference": "PRO.16.21",
+          "votes": 6
+        },
+        {
+          "reference": "PSA.23.5",
+          "votes": 6
+        },
+        {
+          "reference": "PRO.15.23",
+          "votes": 4
+        },
+        {
+          "reference": "PSA.104.15",
+          "votes": 4
+        },
+        {
+          "reference": "2CO.2.15-16",
+          "votes": 3
+        },
+        {
+          "reference": "SNG.4.10",
+          "votes": 3
+        },
+        {
+          "reference": "JHN.12.3",
+          "votes": 2
+        },
+        {
+          "reference": "PSA.133.2",
+          "votes": 2
+        },
+        {
+          "reference": "PSA.45.7-8",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "ACT.2.3",
+      "currentCount": 17,
+      "tskCount": 11,
+      "commonCount": 11,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ACT.1.15",
+        "ISA.6.5",
+        "REV.11.3",
+        "MAT.3.15",
+        "PSA.55.9",
+        "JAS.3.6"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ACT.2.11",
+        "ACT.2.4",
+        "ACT.1.15",
+        "GEN.11.6",
+        "ISA.11.2-3",
+        "ISA.6.5",
+        "JHN.1.32-33",
+        "1CO.12.10",
+        "MAL.3.2-3",
+        "REV.11.3"
+      ],
+      "tskTop": [
+        "MAT.3.11",
+        "JHN.1.32-33",
+        "JER.23.29",
+        "ACT.2.4",
+        "ISA.11.2-3",
+        "LUK.24.32",
+        "GEN.11.6",
+        "1CO.12.10",
+        "ACT.2.11",
+        "MAL.3.2-3"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "MAT.3.11",
+          "votes": 17
+        },
+        {
+          "reference": "JHN.1.32-33",
+          "votes": 7
+        },
+        {
+          "reference": "JER.23.29",
+          "votes": 6
+        },
+        {
+          "reference": "ACT.2.4",
+          "votes": 4
+        },
+        {
+          "reference": "ISA.11.2-3",
+          "votes": 4
+        },
+        {
+          "reference": "LUK.24.32",
+          "votes": 4
+        },
+        {
+          "reference": "GEN.11.6",
+          "votes": 3
+        },
+        {
+          "reference": "1CO.12.10",
+          "votes": 2
+        },
+        {
+          "reference": "ACT.2.11",
+          "votes": 2
+        },
+        {
+          "reference": "MAL.3.2-3",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "MAT.2.23",
+      "currentCount": 17,
+      "tskCount": 11,
+      "commonCount": 11,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "AMO.2.10-12",
+        "NUM.6.13",
+        "PSA.69.9-10",
+        "ISA.53.1-2",
+        "ACT.2.22",
+        "1SA.1.11"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MAT.1.22",
+        "JHN.1.45-46",
+        "AMO.2.10-12",
+        "NUM.6.13",
+        "PSA.69.9-10",
+        "JDG.13.5",
+        "LUK.1.26",
+        "JHN.18.7",
+        "ISA.53.1-2",
+        "LUK.2.39"
+      ],
+      "tskTop": [
+        "JDG.13.5",
+        "JHN.1.45-46",
+        "MRK.1.24",
+        "ACT.24.5",
+        "JHN.18.5",
+        "JHN.18.7",
+        "JHN.19.19",
+        "LUK.1.26",
+        "LUK.2.39",
+        "MAT.1.22"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "JDG.13.5",
+          "votes": 14
+        },
+        {
+          "reference": "JHN.1.45-46",
+          "votes": 7
+        },
+        {
+          "reference": "MRK.1.24",
+          "votes": 2
+        },
+        {
+          "reference": "ACT.24.5",
+          "votes": 1
+        },
+        {
+          "reference": "JHN.18.5",
+          "votes": 1
+        },
+        {
+          "reference": "JHN.18.7",
+          "votes": 1
+        },
+        {
+          "reference": "JHN.19.19",
+          "votes": 1
+        },
+        {
+          "reference": "LUK.1.26",
+          "votes": 1
+        },
+        {
+          "reference": "LUK.2.39",
+          "votes": 1
+        },
+        {
+          "reference": "MAT.1.22",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "REV.6.4",
+      "currentCount": 16,
+      "tskCount": 10,
+      "commonCount": 10,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PSA.17.13",
+        "DAN.2.37-38",
+        "ISA.10.5-6",
+        "ISA.37.26-27",
+        "EZK.29.18-20",
+        "EXO.9.16-17"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "EZK.30.24-25",
+        "MAT.10.34",
+        "REV.17.3",
+        "PSA.17.13",
+        "ZEC.1.8",
+        "REV.17.6",
+        "DAN.2.37-38",
+        "ISA.10.5-6",
+        "ISA.37.26-27",
+        "EZK.29.18-20"
+      ],
+      "tskTop": [
+        "ZEC.6.2",
+        "MAT.10.34",
+        "REV.13.10",
+        "REV.17.6",
+        "ZEC.1.8",
+        "DAN.5.19",
+        "EZK.30.24-25",
+        "JHN.19.11",
+        "REV.12.3",
+        "REV.17.3"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "ZEC.6.2",
+          "votes": 8
+        },
+        {
+          "reference": "MAT.10.34",
+          "votes": 6
+        },
+        {
+          "reference": "REV.13.10",
+          "votes": 5
+        },
+        {
+          "reference": "REV.17.6",
+          "votes": 5
+        },
+        {
+          "reference": "ZEC.1.8",
+          "votes": 4
+        },
+        {
+          "reference": "DAN.5.19",
+          "votes": 1
+        },
+        {
+          "reference": "EZK.30.24-25",
+          "votes": 1
+        },
+        {
+          "reference": "JHN.19.11",
+          "votes": 1
+        },
+        {
+          "reference": "REV.12.3",
+          "votes": 1
+        },
+        {
+          "reference": "REV.17.3",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "2CO.9.1",
+      "currentCount": 15,
+      "tskCount": 9,
+      "commonCount": 9,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ROM.11.28",
+        "GEN.27.42",
+        "MAT.22.31",
+        "2KI.22.18",
+        "JOB.37.23",
+        "PHP.3.5-6"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1TH.5.1",
+        "1JN.2.27",
+        "PSA.45.1",
+        "ROM.11.28",
+        "GEN.27.42",
+        "1SA.20.23",
+        "MAT.22.31",
+        "2CO.8.4-15",
+        "GAL.2.10",
+        "2KI.22.18"
+      ],
+      "tskTop": [
+        "GAL.6.10",
+        "1TH.4.9-10",
+        "2CO.8.4-15",
+        "1TH.5.1",
+        "2CO.9.12-14",
+        "GAL.2.10",
+        "1JN.2.27",
+        "1SA.20.23",
+        "PSA.45.1"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "GAL.6.10",
+          "votes": 4
+        },
+        {
+          "reference": "1TH.4.9-10",
+          "votes": 3
+        },
+        {
+          "reference": "2CO.8.4-15",
+          "votes": 3
+        },
+        {
+          "reference": "1TH.5.1",
+          "votes": 2
+        },
+        {
+          "reference": "2CO.9.12-14",
+          "votes": 2
+        },
+        {
+          "reference": "GAL.2.10",
+          "votes": 2
+        },
+        {
+          "reference": "1JN.2.27",
+          "votes": 1
+        },
+        {
+          "reference": "1SA.20.23",
+          "votes": 1
+        },
+        {
+          "reference": "PSA.45.1",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "ACT.4.13",
+      "currentCount": 14,
+      "tskCount": 8,
+      "commonCount": 8,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JHN.7.49",
+        "LUK.22.56-60",
+        "LUK.22.8",
+        "MAT.26.57-58",
+        "LUK.22.52-54",
+        "JHN.19.26"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MAT.26.71",
+        "JHN.18.16-17",
+        "MAT.4.18-22",
+        "MAT.26.73",
+        "1CO.1.27",
+        "JHN.7.49",
+        "LUK.22.56-60",
+        "LUK.22.8",
+        "JHN.7.15",
+        "MAT.11.25"
+      ],
+      "tskTop": [
+        "1CO.1.27",
+        "JHN.7.15",
+        "MAT.11.25",
+        "ACT.2.7-12",
+        "MAT.26.73",
+        "MAT.26.71",
+        "JHN.18.16-17",
+        "MAT.4.18-22"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "1CO.1.27",
+          "votes": 32
+        },
+        {
+          "reference": "JHN.7.15",
+          "votes": 29
+        },
+        {
+          "reference": "MAT.11.25",
+          "votes": 25
+        },
+        {
+          "reference": "ACT.2.7-12",
+          "votes": 7
+        },
+        {
+          "reference": "MAT.26.73",
+          "votes": 5
+        },
+        {
+          "reference": "MAT.26.71",
+          "votes": 2
+        },
+        {
+          "reference": "JHN.18.16-17",
+          "votes": 1
+        },
+        {
+          "reference": "MAT.4.18-22",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "ISA.40.21",
+      "currentCount": 13,
+      "tskCount": 7,
+      "commonCount": 7,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PSA.19.1-5",
+        "JER.10.8-12",
+        "ISA.44.20",
+        "ISA.51.13",
+        "ISA.27.11",
+        "ROM.3.1-2"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ISA.48.13",
+        "ISA.46.8",
+        "PSA.19.1-5",
+        "JER.10.8-12",
+        "ISA.44.20",
+        "PSA.115.8",
+        "ACT.14.17",
+        "ISA.51.13",
+        "ROM.1.28",
+        "ISA.27.11"
+      ],
+      "tskTop": [
+        "ACT.14.17",
+        "ISA.46.8",
+        "ISA.48.13",
+        "PSA.50.6",
+        "PSA.115.8",
+        "ROM.1.19-21",
+        "ROM.1.28"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "ACT.14.17",
+          "votes": 2
+        },
+        {
+          "reference": "ISA.46.8",
+          "votes": 2
+        },
+        {
+          "reference": "ISA.48.13",
+          "votes": 2
+        },
+        {
+          "reference": "PSA.50.6",
+          "votes": 2
+        },
+        {
+          "reference": "PSA.115.8",
+          "votes": 1
+        },
+        {
+          "reference": "ROM.1.19-21",
+          "votes": 1
+        },
+        {
+          "reference": "ROM.1.28",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "JHN.13.38",
+      "currentCount": 12,
+      "tskCount": 6,
+      "commonCount": 6,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PRO.28.26",
+        "JHN.18.25-27",
+        "MRK.14.66-72",
+        "1CO.10.12",
+        "JHN.18.16-17",
+        "PRO.29.23"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MAT.26.69-75",
+        "PRO.28.26",
+        "JHN.18.25-27",
+        "PRO.16.18",
+        "MRK.14.66-72",
+        "1CO.10.12",
+        "MRK.14.30",
+        "JHN.18.16-17",
+        "PRO.29.23",
+        "LUK.22.34"
+      ],
+      "tskTop": [
+        "LUK.22.34",
+        "MAT.26.34",
+        "MRK.14.30",
+        "LUK.22.56-62",
+        "MAT.26.69-75",
+        "PRO.16.18"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "LUK.22.34",
+          "votes": 12
+        },
+        {
+          "reference": "MAT.26.34",
+          "votes": 11
+        },
+        {
+          "reference": "MRK.14.30",
+          "votes": 10
+        },
+        {
+          "reference": "LUK.22.56-62",
+          "votes": 1
+        },
+        {
+          "reference": "MAT.26.69-75",
+          "votes": 1
+        },
+        {
+          "reference": "PRO.16.18",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "JHN.10.34",
+      "currentCount": 11,
+      "tskCount": 5,
+      "commonCount": 5,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "EXO.22.28",
+        "JHN.15.25",
+        "JHN.8.17",
+        "ROM.3.10-19",
+        "1CO.14.21",
+        "JHN.12.34"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "EXO.22.28",
+        "JHN.15.25",
+        "JHN.8.17",
+        "PSA.82.1",
+        "PSA.82.6-7",
+        "EXO.7.1",
+        "ROM.3.10-19",
+        "1CO.14.21",
+        "EXO.4.16",
+        "JHN.12.34"
+      ],
+      "tskTop": [
+        "PSA.82.6-7",
+        "EXO.7.1",
+        "PSA.82.1",
+        "EXO.4.16",
+        "PSA.138.1"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "PSA.82.6-7",
+          "votes": 125
+        },
+        {
+          "reference": "EXO.7.1",
+          "votes": 34
+        },
+        {
+          "reference": "PSA.82.1",
+          "votes": 29
+        },
+        {
+          "reference": "EXO.4.16",
+          "votes": 25
+        },
+        {
+          "reference": "PSA.138.1",
+          "votes": 15
+        }
+      ]
+    },
+    {
+      "verse": "LEV.19.19",
+      "currentCount": 10,
+      "tskCount": 4,
+      "commonCount": 4,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "2SA.13.29",
+        "2SA.18.9",
+        "1KI.1.33",
+        "EZR.2.66",
+        "GEN.36.24",
+        "ROM.11.6"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "2SA.13.29",
+        "2SA.18.9",
+        "1KI.1.33",
+        "EZR.2.66",
+        "DEU.22.9-11",
+        "MAT.9.16-17",
+        "GEN.36.24",
+        "GAL.3.9-11",
+        "ROM.11.6",
+        "2CO.6.14-17"
+      ],
+      "tskTop": [
+        "2CO.6.14-17",
+        "DEU.22.9-11",
+        "MAT.9.16-17",
+        "GAL.3.9-11"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "2CO.6.14-17",
+          "votes": 43
+        },
+        {
+          "reference": "DEU.22.9-11",
+          "votes": 13
+        },
+        {
+          "reference": "MAT.9.16-17",
+          "votes": 6
+        },
+        {
+          "reference": "GAL.3.9-11",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "MRK.14.44",
+      "currentCount": 10,
+      "tskCount": 4,
+      "commonCount": 4,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PHP.1.28",
+        "2TH.3.17",
+        "1SA.23.22-23",
+        "2SA.20.9-10",
+        "ACT.16.23",
+        "JOS.2.12"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "PHP.1.28",
+        "2TH.3.17",
+        "1SA.23.22-23",
+        "2SA.20.9-10",
+        "PRO.27.6",
+        "MAT.26.48-50",
+        "PSA.55.20-21",
+        "ACT.16.23",
+        "EXO.12.13",
+        "JOS.2.12"
+      ],
+      "tskTop": [
+        "MAT.26.48-50",
+        "PRO.27.6",
+        "EXO.12.13",
+        "PSA.55.20-21"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "MAT.26.48-50",
+          "votes": 5
+        },
+        {
+          "reference": "PRO.27.6",
+          "votes": 2
+        },
+        {
+          "reference": "EXO.12.13",
+          "votes": 1
+        },
+        {
+          "reference": "PSA.55.20-21",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "PRO.18.13",
+      "currentCount": 10,
+      "tskCount": 4,
+      "commonCount": 4,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "2SA.16.4",
+        "EST.3.10-15",
+        "2SA.19.24-30",
+        "EST.8.5-17",
+        "DAN.6.14",
+        "DAN.6.9"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "2SA.16.4",
+        "EST.3.10-15",
+        "PRO.20.25",
+        "2SA.19.24-30",
+        "EST.8.5-17",
+        "JHN.7.51",
+        "DAN.6.14",
+        "JOB.29.16",
+        "DAN.6.9",
+        "DEU.13.14"
+      ],
+      "tskTop": [
+        "JHN.7.51",
+        "DEU.13.14",
+        "PRO.20.25",
+        "JOB.29.16"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "JHN.7.51",
+          "votes": 21
+        },
+        {
+          "reference": "DEU.13.14",
+          "votes": 6
+        },
+        {
+          "reference": "PRO.20.25",
+          "votes": 5
+        },
+        {
+          "reference": "JOB.29.16",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "GEN.15.3",
+      "currentCount": 9,
+      "tskCount": 3,
+      "commonCount": 3,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PRO.13.12",
+        "GEN.13.16",
+        "GEN.12.2",
+        "PRO.30.23",
+        "JER.12.1",
+        "HEB.10.35-36"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "GEN.14.14",
+        "PRO.13.12",
+        "GEN.13.16",
+        "PRO.29.21",
+        "GEN.12.2",
+        "PRO.30.23",
+        "JER.12.1",
+        "ECC.2.7",
+        "HEB.10.35-36"
+      ],
+      "tskTop": [
+        "GEN.14.14",
+        "PRO.29.21",
+        "ECC.2.7"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "GEN.14.14",
+          "votes": 6
+        },
+        {
+          "reference": "PRO.29.21",
+          "votes": 4
+        },
+        {
+          "reference": "ECC.2.7",
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "verse": "ISA.32.8",
+      "currentCount": 9,
+      "tskCount": 3,
+      "commonCount": 3,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ACT.9.39",
+        "JOB.31.16-21",
+        "2CO.9.6-11",
+        "LUK.6.33-35",
+        "PSA.112.9",
+        "2CO.8.2"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ACT.9.39",
+        "JOB.31.16-21",
+        "ACT.11.29-30",
+        "2CO.9.6-11",
+        "2SA.9.1-13",
+        "LUK.6.33-35",
+        "PSA.112.9",
+        "2CO.8.2",
+        "PRO.11.24-25"
+      ],
+      "tskTop": [
+        "2SA.9.1-13",
+        "ACT.11.29-30",
+        "PRO.11.24-25"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "2SA.9.1-13",
+          "votes": 1
+        },
+        {
+          "reference": "ACT.11.29-30",
+          "votes": 1
+        },
+        {
+          "reference": "PRO.11.24-25",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "MAT.22.34",
+      "currentCount": 8,
+      "tskCount": 2,
+      "commonCount": 2,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JHN.11.47-50",
+        "ACT.19.23-28",
+        "ISA.41.5-7",
+        "MAT.12.14",
+        "ACT.21.28-30",
+        "ACT.5.24-28"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "JHN.11.47-50",
+        "MAT.25.3-5",
+        "MRK.12.28-31",
+        "ACT.19.23-28",
+        "ISA.41.5-7",
+        "MAT.12.14",
+        "ACT.21.28-30",
+        "ACT.5.24-28"
+      ],
+      "tskTop": [
+        "MRK.12.28-31",
+        "MAT.25.3-5"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "MRK.12.28-31",
+          "votes": 18
+        },
+        {
+          "reference": "MAT.25.3-5",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "MRK.2.25",
+      "currentCount": 8,
+      "tskCount": 2,
+      "commonCount": 2,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "MAT.19.4",
+        "MAT.22.31",
+        "MAT.21.16",
+        "MRK.12.20",
+        "MRK.12.26",
+        "MAT.21.42"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MAT.19.4",
+        "MAT.22.31",
+        "LUK.10.26",
+        "MAT.21.16",
+        "MRK.12.20",
+        "MRK.12.26",
+        "MAT.21.42",
+        "1SA.21.3-6"
+      ],
+      "tskTop": [
+        "1SA.21.3-6",
+        "LUK.10.26"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "1SA.21.3-6",
+          "votes": 26
+        },
+        {
+          "reference": "LUK.10.26",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "2SA.6.23",
+      "currentCount": 7,
+      "tskCount": 1,
+      "commonCount": 1,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "1SA.1.6-8",
+        "ISA.4.1",
+        "ISA.22.14",
+        "HOS.9.11",
+        "LUK.1.25",
+        "1SA.15.35"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "MAT.1.25",
+        "1SA.1.6-8",
+        "ISA.4.1",
+        "ISA.22.14",
+        "HOS.9.11",
+        "LUK.1.25",
+        "1SA.15.35"
+      ],
+      "tskTop": [
+        "MAT.1.25"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "MAT.1.25",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "LUK.2.2",
+      "currentCount": 7,
+      "tskCount": 1,
+      "commonCount": 1,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ACT.13.7",
+        "MAT.4.24",
+        "ACT.26.30",
+        "ACT.23.26",
+        "ACT.5.37",
+        "ACT.18.12"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ACT.13.7",
+        "MAT.4.24",
+        "LUK.3.1",
+        "ACT.26.30",
+        "ACT.23.26",
+        "ACT.5.37",
+        "ACT.18.12"
+      ],
+      "tskTop": [
+        "LUK.3.1"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "LUK.3.1",
+          "votes": 2
+        }
+      ]
+    },
+    {
+      "verse": "PSA.41.10",
+      "currentCount": 7,
+      "tskCount": 1,
+      "commonCount": 1,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "PSA.3.3",
+        "PSA.109.6-21",
+        "PSA.57.1",
+        "PSA.69.22-28",
+        "PSA.18.37-42",
+        "PSA.21.8-10"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "PSA.3.3",
+        "PSA.109.6-21",
+        "PSA.57.1",
+        "PSA.69.22-28",
+        "LUK.19.27",
+        "PSA.18.37-42",
+        "PSA.21.8-10"
+      ],
+      "tskTop": [
+        "LUK.19.27"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "LUK.19.27",
+          "votes": 1
+        }
+      ]
+    },
+    {
+      "verse": "2PE.1.20",
+      "currentCount": 6,
+      "tskCount": 0,
+      "commonCount": 0,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ROM.12.6",
+        "ROM.13.11",
+        "1TI.1.9",
+        "JAS.1.3",
+        "ROM.6.6",
+        "2PE.3.3"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ROM.12.6",
+        "ROM.13.11",
+        "1TI.1.9",
+        "JAS.1.3",
+        "ROM.6.6",
+        "2PE.3.3"
+      ],
+      "tskTop": [],
+      "tskTopWithVotes": []
+    },
+    {
+      "verse": "LUK.22.36",
+      "currentCount": 6,
+      "tskCount": 0,
+      "commonCount": 0,
+      "currentOnlyCount": 6,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JHN.15.20",
+        "1PE.4.1",
+        "JHN.16.33",
+        "1TH.2.14-15",
+        "1TH.3.4",
+        "MAT.10.22-25"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "JHN.15.20",
+        "1PE.4.1",
+        "JHN.16.33",
+        "1TH.2.14-15",
+        "1TH.3.4",
+        "MAT.10.22-25"
+      ],
+      "tskTop": [],
+      "tskTopWithVotes": []
+    },
+    {
+      "verse": "PHP.1.1",
+      "currentCount": 37,
+      "tskCount": 32,
+      "commonCount": 32,
+      "currentOnlyCount": 5,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "REV.2.12",
+        "ACT.1.20",
+        "REV.22.9",
+        "REV.1.20:2.1",
+        "REV.2.8"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "1TI.1.2",
+        "REV.19.10",
+        "2TH.1.1",
+        "REV.2.12",
+        "TIT.1.1",
+        "1TI.3.1-2",
+        "ACT.1.20",
+        "TIT.1.7",
+        "REV.22.9",
+        "1TI.3.8"
+      ],
+      "tskTop": [
+        "2CO.1.1",
+        "ACT.16.12-15",
+        "ROM.1.1",
+        "COL.1.1-2",
+        "1CO.1.1-2",
+        "1TH.1.1",
+        "1TI.3.8",
+        "2TH.1.1",
+        "EPH.1.1",
+        "ROM.1.7"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "2CO.1.1",
+          "votes": 19
+        },
+        {
+          "reference": "ACT.16.12-15",
+          "votes": 16
+        },
+        {
+          "reference": "ROM.1.1",
+          "votes": 14
+        },
+        {
+          "reference": "COL.1.1-2",
+          "votes": 8
+        },
+        {
+          "reference": "1CO.1.1-2",
+          "votes": 7
+        },
+        {
+          "reference": "1TH.1.1",
+          "votes": 7
+        },
+        {
+          "reference": "1TI.3.8",
+          "votes": 7
+        },
+        {
+          "reference": "2TH.1.1",
+          "votes": 7
+        },
+        {
+          "reference": "EPH.1.1",
+          "votes": 7
+        },
+        {
+          "reference": "ROM.1.7",
+          "votes": 7
+        }
+      ]
+    },
+    {
+      "verse": "COL.2.13",
+      "currentCount": 35,
+      "tskCount": 30,
+      "commonCount": 30,
+      "currentOnlyCount": 5,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "JAS.2.20",
+        "PSA.32.1",
+        "1TI.6.13",
+        "JAS.2.17",
+        "HEB.8.10-12"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "ISA.1.18",
+        "LUK.15.32",
+        "JAS.2.20",
+        "ROM.8.11",
+        "PSA.119.50",
+        "EPH.2.1",
+        "1CO.15.36",
+        "2CO.3.6",
+        "JHN.6.63",
+        "ROM.4.17"
+      ],
+      "tskTop": [
+        "EPH.2.5-6",
+        "ROM.8.11",
+        "EPH.2.1",
+        "2CO.5.19",
+        "HEB.9.14",
+        "2CO.3.6",
+        "1JN.1.7-9",
+        "EPH.2.11",
+        "LUK.15.24",
+        "LUK.15.32"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "EPH.2.5-6",
+          "votes": 21
+        },
+        {
+          "reference": "ROM.8.11",
+          "votes": 14
+        },
+        {
+          "reference": "EPH.2.1",
+          "votes": 12
+        },
+        {
+          "reference": "2CO.5.19",
+          "votes": 9
+        },
+        {
+          "reference": "HEB.9.14",
+          "votes": 9
+        },
+        {
+          "reference": "2CO.3.6",
+          "votes": 8
+        },
+        {
+          "reference": "1JN.1.7-9",
+          "votes": 7
+        },
+        {
+          "reference": "EPH.2.11",
+          "votes": 7
+        },
+        {
+          "reference": "LUK.15.24",
+          "votes": 5
+        },
+        {
+          "reference": "LUK.15.32",
+          "votes": 5
+        }
+      ]
+    },
+    {
+      "verse": "HEB.6.4",
+      "currentCount": 33,
+      "tskCount": 28,
+      "commonCount": 28,
+      "currentOnlyCount": 5,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "GAL.3.5",
+        "JHN.4.10",
+        "ROM.1.11",
+        "2TI.4.14",
+        "ACT.15.8"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "GAL.3.2",
+        "GAL.3.5",
+        "EPH.2.8",
+        "HEB.2.4",
+        "NUM.24.3",
+        "NUM.24.15-16",
+        "JHN.3.27",
+        "2TI.2.25",
+        "HEB.12.15-17",
+        "1CO.13.1-2"
+      ],
+      "tskTop": [
+        "HEB.10.26-29",
+        "2PE.2.20-22",
+        "MAT.5.13",
+        "JHN.15.6",
+        "MAT.7.21-22",
+        "HEB.12.15-17",
+        "MAT.12.31-32",
+        "LUK.11.24-26",
+        "HEB.10.32",
+        "EPH.2.8"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "HEB.10.26-29",
+          "votes": 54
+        },
+        {
+          "reference": "2PE.2.20-22",
+          "votes": 41
+        },
+        {
+          "reference": "MAT.5.13",
+          "votes": 28
+        },
+        {
+          "reference": "JHN.15.6",
+          "votes": 25
+        },
+        {
+          "reference": "MAT.7.21-22",
+          "votes": 16
+        },
+        {
+          "reference": "HEB.12.15-17",
+          "votes": 14
+        },
+        {
+          "reference": "MAT.12.31-32",
+          "votes": 11
+        },
+        {
+          "reference": "LUK.11.24-26",
+          "votes": 10
+        },
+        {
+          "reference": "HEB.10.32",
+          "votes": 8
+        },
+        {
+          "reference": "EPH.2.8",
+          "votes": 7
+        }
+      ]
+    },
+    {
+      "verse": "EXO.34.6",
+      "currentCount": 32,
+      "tskCount": 27,
+      "commonCount": 27,
+      "currentOnlyCount": 5,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "ISA.12.4",
+        "EXO.33.20-23",
+        "PSA.146.6",
+        "1KI.19.11",
+        "PSA.111.8"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "DEU.5.10",
+        "LAM.3.23",
+        "PSA.86.5",
+        "PSA.57.10",
+        "MIC.7.18",
+        "ISA.12.4",
+        "ROM.5.20-21",
+        "JON.4.2",
+        "PSA.116.5",
+        "EXO.33.20-23"
+      ],
+      "tskTop": [
+        "PSA.86.15",
+        "JOL.2.13",
+        "PSA.103.8-13",
+        "PSA.145.8",
+        "NEH.9.17",
+        "JON.4.2",
+        "NUM.14.17-19",
+        "PSA.86.5",
+        "2CH.30.9",
+        "MIC.7.18"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "PSA.86.15",
+          "votes": 146
+        },
+        {
+          "reference": "JOL.2.13",
+          "votes": 130
+        },
+        {
+          "reference": "PSA.103.8-13",
+          "votes": 109
+        },
+        {
+          "reference": "PSA.145.8",
+          "votes": 104
+        },
+        {
+          "reference": "NEH.9.17",
+          "votes": 90
+        },
+        {
+          "reference": "JON.4.2",
+          "votes": 76
+        },
+        {
+          "reference": "NUM.14.17-19",
+          "votes": 69
+        },
+        {
+          "reference": "PSA.86.5",
+          "votes": 61
+        },
+        {
+          "reference": "2CH.30.9",
+          "votes": 44
+        },
+        {
+          "reference": "MIC.7.18",
+          "votes": 42
+        }
+      ]
+    },
+    {
+      "verse": "HEB.10.29",
+      "currentCount": 32,
+      "tskCount": 27,
+      "commonCount": 27,
+      "currentOnlyCount": 5,
+      "tskOnlyCount": 0,
+      "currentOnlyRefs": [
+        "1CO.15.27",
+        "EZK.16.6",
+        "PSA.91.13",
+        "ISA.28.3",
+        "JER.1.5"
+      ],
+      "tskOnlyRefs": [],
+      "currentTop": [
+        "LUK.12.10",
+        "1CO.15.27",
+        "HEB.9.13",
+        "HEB.2.11",
+        "EZK.16.6",
+        "1CO.11.29",
+        "LAM.1.15",
+        "HEB.13.20",
+        "MAT.26.28",
+        "HEB.12.25"
+      ],
+      "tskTop": [
+        "EPH.4.30",
+        "HEB.6.6",
+        "ISA.63.10",
+        "1CO.11.27",
+        "LUK.12.10",
+        "ACT.7.51",
+        "HEB.2.3",
+        "MAT.12.31-32",
+        "1CO.11.29",
+        "HEB.12.25"
+      ],
+      "tskTopWithVotes": [
+        {
+          "reference": "EPH.4.30",
+          "votes": 13
+        },
+        {
+          "reference": "HEB.6.6",
+          "votes": 13
+        },
+        {
+          "reference": "ISA.63.10",
+          "votes": 10
+        },
+        {
+          "reference": "1CO.11.27",
+          "votes": 8
+        },
+        {
+          "reference": "LUK.12.10",
+          "votes": 8
+        },
+        {
+          "reference": "ACT.7.51",
+          "votes": 6
+        },
+        {
+          "reference": "HEB.2.3",
+          "votes": 6
+        },
+        {
+          "reference": "MAT.12.31-32",
+          "votes": 6
+        },
+        {
+          "reference": "1CO.11.29",
+          "votes": 4
+        },
+        {
+          "reference": "HEB.12.25",
+          "votes": 4
+        }
+      ]
+    }
+  ]
+}
