@@ -47,10 +47,7 @@
   "Abhorred": {
     "pronunciation": "ABHOR'RED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Hated extremely, detested."
-      }
+      { "type": "participle passive", "text": "Hated extremely, detested." }
     ]
   },
   "Abhorring": {
@@ -87,10 +84,7 @@
         "type": "participle present tense",
         "text": "Abounding<br/> Having great plenty; being great plenty, being very prevalent; generally prevailing."
       },
-      {
-        "type": "noun",
-        "text": "Increase."
-      }
+      { "type": "noun", "text": "Increase." }
     ]
   },
   "Acceptation": {
@@ -195,19 +189,13 @@
   "Adulteress": {
     "pronunciation": "ADUL'TERESS",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "married woman guilty of incontinence."
-      }
+      { "type": "noun", "text": "married woman guilty of incontinence." }
     ]
   },
   "Advantaged": {
     "pronunciation": "ADV'ANTAGED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Benefitted; promoted."
-      }
+      { "type": "participle passive", "text": "Benefitted; promoted." }
     ]
   },
   "Adventured": {
@@ -283,12 +271,7 @@
   },
   "Aforetime": {
     "pronunciation": "AFO'RETIME, [afore and time.]",
-    "definitions": [
-      {
-        "type": "adverb",
-        "text": "In past; in a former time."
-      }
-    ]
+    "definitions": [{ "type": "adverb", "text": "In past; in a former time." }]
   },
   "Afterward": {
     "pronunciation": "'AFTERWARD, [See Ward.]",
@@ -367,29 +350,16 @@
   },
   "Alway": {
     "pronunciation": "AL'WAY [all and way]",
-    "definitions": [
-      {
-        "type": "adverb",
-        "text": "or AL'WAYS, [all and way]"
-      }
-    ]
+    "definitions": [{ "type": "adverb", "text": "or AL'WAYS, [all and way]" }]
   },
   "Ambushment": {
     "pronunciation": "AM'BUSHMENT",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "An ambush; which see."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "An ambush; which see." }]
   },
   "Amerce": {
     "pronunciation": "AMERCE",
     "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "Amerce<br/> amers'. [A"
-      },
+      { "type": "verb transitive", "text": "Amerce<br/> amers'. [A" },
       {
         "type": "verb",
         "text": "formed from a for on or at, from Latin merces, reward.]<br/>1. To inflict a penalty at mercy; to punish by a pecuniary penalty, the amount of which is not fixed by law, but left to the discretion or mercy of the court; as, the court amerced the criminal in the sum of one hundred dollars.<br/>2. To inflict a pecuniary penalty; to punish in general. Milton uses of after amerce; 'Millions of spirits amerced of heaven; ' but this use seems to be a poetic license."
@@ -412,10 +382,7 @@
         "type": "noun",
         "text": "Anise<br/> an'nis. [Latin anisum; Gr.] annual plant, placed by Linne under the genus Pimpinella. It grows naturally in Egypt, and cultivated in Spain and Malta, whence the seeds are imported. The stalk rises a foot and a half high, dividing into slender branches, garnished with narrow leaves, cut into three or four narrow segments. The branches terminate in large loose umbels, composed of smaller umbels or rays, on long footstalks. The flowers are small and of a yellowish white; the seeds oblong and swelling. anise seeds have an aromatic smell, and a pleasant warm taste; they are useful in warming the stomach and expelling wind. SEED,"
       },
-      {
-        "type": "noun",
-        "text": "The seed of anise"
-      }
+      { "type": "noun", "text": "The seed of anise" }
     ]
   },
   "Anoint": {
@@ -537,10 +504,7 @@
         "type": "noun",
         "text": "Arkite<br/> term used by Bryant to denote one of the persons who were preserved in the ark; or who, according to pagan fables, belonged to the ark.'ARKITE,"
       },
-      {
-        "type": "adjective",
-        "text": "Belonging to the ark."
-      }
+      { "type": "adjective", "text": "Belonging to the ark." }
     ]
   },
   "Arrayed": {
@@ -555,10 +519,7 @@
   "Arrogancy": {
     "pronunciation": "AR'ROGANCY",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "Arrogance. [This orthography is less usual.]"
-      }
+      { "type": "noun", "text": "Arrogance. [This orthography is less usual.]" }
     ]
   },
   "Artificer": {
@@ -572,12 +533,7 @@
   },
   "Asp": {
     "pronunciation": "'ASP, ASPAL'ATHUS",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "plant."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "plant." }]
   },
   "Assaying": {
     "pronunciation": "ASSA'YING",
@@ -590,12 +546,7 @@
   },
   "Asswage": {
     "pronunciation": "ASSWA'GE",
-    "definitions": [
-      {
-        "type": "",
-        "text": ""
-      }
-    ]
+    "definitions": [{ "type": "", "text": "" }]
   },
   "Athirst": {
     "pronunciation": "ATHIRST'",
@@ -609,10 +560,7 @@
   "Attent": {
     "pronunciation": "ATTENT'",
     "definitions": [
-      {
-        "type": "adjective",
-        "text": "Attentive. 2 Chronicles 6:40."
-      }
+      { "type": "adjective", "text": "Attentive. 2 Chronicles 6:40." }
     ]
   },
   "Avenged": {
@@ -712,10 +660,7 @@
   "Bakemeats": {
     "pronunciation": "BA'KEMEATS",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "Meats prepared for food in an oven. Gen.xl."
-      }
+      { "type": "noun", "text": "Meats prepared for food in an oven. Gen.xl." }
     ]
   },
   "Baken": {
@@ -797,14 +742,8 @@
   "Beget": {
     "pronunciation": "BEGET'",
     "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "Beget"
-      },
-      {
-        "type": "preterit tense",
-        "text": "begot, begat;"
-      },
+      { "type": "verb transitive", "text": "Beget" },
+      { "type": "preterit tense", "text": "begot, begat;" },
       {
         "type": "participle passive",
         "text": "begot, begotten.<br/>1. To procreate, as a father or sire; to generate; as, to beget a son.<br/>2. To produce, as an effect; to cause to exist; to generate; as, luxury begets vice."
@@ -818,19 +757,13 @@
         "type": "adjective",
         "text": "Beggarly<br/> Mean; poor; in the condition of beggar; extremely indigent."
       },
-      {
-        "type": "adverb",
-        "text": "Meanly; indigently; despicable."
-      }
+      { "type": "adverb", "text": "Meanly; indigently; despicable." }
     ]
   },
   "Begotten": {
     "pronunciation": "BEGOT', BEGOT'TEN",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "of get. Procreated; generated."
-      }
+      { "type": "participle passive", "text": "of get. Procreated; generated." }
     ]
   },
   "Beguile": {
@@ -863,14 +796,8 @@
   "Beheld": {
     "pronunciation": "BEHELD'",
     "definitions": [
-      {
-        "type": "preterit tense",
-        "text": "Beheld<br/> and"
-      },
-      {
-        "type": "participle passive",
-        "text": "of behold, which see."
-      }
+      { "type": "preterit tense", "text": "Beheld<br/> and" },
+      { "type": "participle passive", "text": "of behold, which see." }
     ]
   },
   "Behemoth": {
@@ -879,19 +806,6 @@
       {
         "type": "noun",
         "text": "] Heb. a beast or brute; from an Arabic vert, which signifies, to shut, to lie hid, to be dumb. In Eth.dumb.]<br/>Authors are divided in opinion as to the animal intended in scripture by this name; some supposing it to be an ox, others, an elephant; and Bochart labors to prove it the hippopotamus, or river horse. The latter opinion is most probably. [See Hippopotamus.] The original word in Arabic signifies a brute or beast in general, especially a quadruped.<br/>First Occurrence in the Bible(KJV): Job 40:15"
-      }
-    ]
-  },
-  "Behold": {
-    "pronunciation": "BEHO'LD, verb transitive preterit tense and participle passive beheld' [Latin observo, from servo, to keep.]",
-    "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "1. To fix the eyes upon; to see with attention; to observe with care.<br/>Behold the lamb of God which taketh away the sin of the world. John 1:29.<br/>2. In a less intensive sense, to look upon; to see.<br/>When he beheld the serpent of brass, he lived. Numbers 21:9."
-      },
-      {
-        "type": "verb intransitive",
-        "text": "To look; to direct the eyes to an object.<br/>1. To fix the attention upon an object; to attend; to direct or fix the mind.<br/>Behold, I stand at the door and knock. Revelation 3:8 word is much used in this manner for exciting attention, or admiration. It is in the imperative mode, expressing command, or exhortation; and by no means a mere exclamation."
       }
     ]
   },
@@ -938,23 +852,14 @@
   "Bemoaned": {
     "pronunciation": "BEMOANED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Lamented; bewailed."
-      }
+      { "type": "participle passive", "text": "Lamented; bewailed." }
     ]
   },
   "Bereave": {
     "pronunciation": "BERE'AVE",
     "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "Bereave"
-      },
-      {
-        "type": "preterit tense",
-        "text": "bereaved, bereft:"
-      },
+      { "type": "verb transitive", "text": "Bereave" },
+      { "type": "preterit tense", "text": "bereaved, bereft:" },
       {
         "type": "participle passive",
         "text": "bereaved, bereft.<br/>1. To deprive; to strip; to make destitute; with of before the thing taken away.<br/>Me have ye bereaved of my children. Genesis 42:36.<br/>It is sometimes used without of, and is particularly applied to express the loss of friends by death.<br/>2. To take away from."
@@ -964,14 +869,8 @@
   "Beseech": {
     "pronunciation": "BESEE'CH",
     "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "Beseech"
-      },
-      {
-        "type": "preterit tense",
-        "text": "and"
-      },
+      { "type": "verb transitive", "text": "Beseech" },
+      { "type": "preterit tense", "text": "and" },
       {
         "type": "participle passive",
         "text": "besought. To entreat; to supplicate; to implore; to ask or pray with urgency; followed by a person; as, 'I Paul beseech you by the meekness of Christ, ', 2 Corinthians 10:1; or by a thing; as, I beseech your patience."
@@ -981,10 +880,7 @@
   "Beseeching": {
     "pronunciation": "BESEE'CHING",
     "definitions": [
-      {
-        "type": "participle present tense",
-        "text": "Entreating."
-      }
+      { "type": "participle present tense", "text": "Entreating." }
     ]
   },
   "Besiege": {
@@ -1021,14 +917,8 @@
   "Bestead": {
     "pronunciation": "BESTEAD'",
     "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "Bestead<br/> bested'"
-      },
-      {
-        "type": "preterit tense",
-        "text": "and"
-      },
+      { "type": "verb transitive", "text": "Bestead<br/> bested'" },
+      { "type": "preterit tense", "text": "and" },
       {
         "type": "participle passive",
         "text": "bested. [be and stead.] To profit. How little you bestead<br/>1. To accommodate. They shall pass through it, hardly bestead Isaiah 8:21. That is, distressed; perplexed.<br/>2. To dispose."
@@ -1069,19 +959,13 @@
         "type": "verb transitive",
         "text": "Bewail<br/> [be and wail.] To bemoan; to lament; to express sorrow for. It expresses deep sorrow; as, to bewail the loss of child. The true penitent bewails his ingratitude to God."
       },
-      {
-        "type": "verb intransitive",
-        "text": "To express grief."
-      }
+      { "type": "verb intransitive", "text": "To express grief." }
     ]
   },
   "Bewailed": {
     "pronunciation": "BEWA'ILED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Lamented; bemoaned."
-      }
+      { "type": "participle passive", "text": "Lamented; bemoaned." }
     ]
   },
   "Bewray": {
@@ -1158,18 +1042,9 @@
   "Bleating": {
     "pronunciation": "BLE'ATING",
     "definitions": [
-      {
-        "type": "participle present tense",
-        "text": "Bleating<br/> or"
-      },
-      {
-        "type": "adjective",
-        "text": "Crying as sheep."
-      },
-      {
-        "type": "noun",
-        "text": "The cry of sheep."
-      }
+      { "type": "participle present tense", "text": "Bleating<br/> or" },
+      { "type": "adjective", "text": "Crying as sheep." },
+      { "type": "noun", "text": "The cry of sheep." }
     ]
   },
   "Blessedness": {
@@ -1229,10 +1104,7 @@
   "Bondservice": {
     "pronunciation": "BOND'SERVICE, [bond and service.]",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "The condition of a bond-servant; slavery."
-      }
+      { "type": "noun", "text": "The condition of a bond-servant; slavery." }
     ]
   },
   "Botch": {
@@ -1251,10 +1123,7 @@
   "Bountifully": {
     "pronunciation": "BOUN'TIFULLY",
     "definitions": [
-      {
-        "type": "adverb",
-        "text": "Liberally; largely; in a bountiful manner."
-      }
+      { "type": "adverb", "text": "Liberally; largely; in a bountiful manner." }
     ]
   },
   "Bountifulness": {
@@ -1286,21 +1155,11 @@
   },
   "Brawler": {
     "pronunciation": "BRAWL'ER",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "noisy fellow; wrangler."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "noisy fellow; wrangler." }]
   },
   "Brawling": {
     "pronunciation": "BRAWL'ING",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "The act of quarreling."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "The act of quarreling." }]
   },
   "Breastplate": {
     "pronunciation": "BREAST'PLATE, [breast and plate.]",
@@ -1323,10 +1182,7 @@
   "Bridechamber": {
     "pronunciation": "BRI'DECHAMBER",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "The nuptial apartment. Matthew 9:15."
-      }
+      { "type": "noun", "text": "The nuptial apartment. Matthew 9:15." }
     ]
   },
   "Brier": {
@@ -1350,23 +1206,14 @@
   "Broiled": {
     "pronunciation": "BROIL'ED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Agitated or dressed by heat."
-      }
+      { "type": "participle passive", "text": "Agitated or dressed by heat." }
     ]
   },
   "Bruit": {
     "pronunciation": "BRUIT",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "Bruit<br/> Report; rumor; fame."
-      },
-      {
-        "type": "verb transitive",
-        "text": "To report; to noise abroad."
-      }
+      { "type": "noun", "text": "Bruit<br/> Report; rumor; fame." },
+      { "type": "verb transitive", "text": "To report; to noise abroad." }
     ]
   },
   "Buckler": {
@@ -1385,20 +1232,12 @@
   "Budded": {
     "pronunciation": "BUD'DED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Put forth in buds; inoculated."
-      }
+      { "type": "participle passive", "text": "Put forth in buds; inoculated." }
     ]
   },
   "Bul": {
     "pronunciation": "BUL,noun",
-    "definitions": [
-      {
-        "type": "",
-        "text": "The common flounder."
-      }
-    ]
+    "definitions": [{ "type": "", "text": "The common flounder." }]
   },
   "Bulrush": {
     "pronunciation": "BUL'RUSH, [bole, or boll, and rush.]",
@@ -1421,10 +1260,7 @@
   "Butlership": {
     "pronunciation": "BUT'LERSHIP",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "The office of a butler. Genesis 40:21."
-      }
+      { "type": "noun", "text": "The office of a butler. Genesis 40:21." }
     ]
   },
   "Calamus": {
@@ -1483,10 +1319,7 @@
         "type": "participle passive",
         "text": "Cankered<br/>1. Corrupted.<br/>2."
       },
-      {
-        "type": "adjective",
-        "text": "Crabbed; uncivil."
-      }
+      { "type": "adjective", "text": "Crabbed; uncivil." }
     ]
   },
   "Cannot": {
@@ -1519,10 +1352,7 @@
   "Carpus": {
     "pronunciation": "CARPUS",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "The wrist, but not an English word."
-      }
+      { "type": "noun", "text": "The wrist, but not an English word." }
     ]
   },
   "Cassia": {
@@ -1541,10 +1371,7 @@
         "type": "noun",
         "text": "Castaway<br/> That which is thrown away. person abandoned by God, unworthy of his favor; reprobate. 1 Corinthians 9:27."
       },
-      {
-        "type": "adjective",
-        "text": "Rejected; useless; of no value."
-      }
+      { "type": "adjective", "text": "Rejected; useless; of no value." }
     ]
   },
   "Caul": {
@@ -1594,12 +1421,7 @@
   },
   "Chaldean": {
     "pronunciation": "CHALDEAN",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "An inhabitant of Chaldea."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "An inhabitant of Chaldea." }]
   },
   "Chambering": {
     "pronunciation": "CHAMBERING, CHAMBERING",
@@ -1662,10 +1484,7 @@
   "Chastised": {
     "pronunciation": "CHASTISED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Punished; corrected."
-      }
+      { "type": "participle passive", "text": "Punished; corrected." }
     ]
   },
   "Chastisement": {
@@ -1697,10 +1516,7 @@
         "type": "verb intransitive",
         "text": "1. To scold; to clamor; to find fault; to contend in words of anger; sometimes followed by with. The people did chide with Moses. Exodus 17:2.<br/>2. To quarrel.<br/>3. To make a rough, clamorous, roaring noise; as the chiding flood."
       },
-      {
-        "type": "noun",
-        "text": "Murmur; gentle noise."
-      }
+      { "type": "noun", "text": "Murmur; gentle noise." }
     ]
   },
   "Chiding": {
@@ -1710,10 +1526,7 @@
         "type": "participle present tense",
         "text": "Chiding<br/> Scolding; clamoring; rebuking; making a harsh or continued noise."
       },
-      {
-        "type": "noun",
-        "text": "A scolding or clamoring; rebuke; reproof."
-      }
+      { "type": "noun", "text": "A scolding or clamoring; rebuke; reproof." }
     ]
   },
   "Chisleu": {
@@ -1728,10 +1541,7 @@
   "Chode": {
     "pronunciation": "CHODE",
     "definitions": [
-      {
-        "type": "preterit",
-        "text": "the old of chide, which see."
-      }
+      { "type": "preterit", "text": "the old of chide, which see." }
     ]
   },
   "Choler": {
@@ -1790,12 +1600,7 @@
   },
   "Clave": {
     "pronunciation": "CLAVE",
-    "definitions": [
-      {
-        "type": "preterit tense",
-        "text": "Of cleave."
-      }
-    ]
+    "definitions": [{ "type": "preterit tense", "text": "Of cleave." }]
   },
   "Cleanness": {
     "pronunciation": "CLEANNESS",
@@ -1835,10 +1640,7 @@
   "Cleaved": {
     "pronunciation": "CLEAVED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Split; rived; divided."
-      }
+      { "type": "participle passive", "text": "Split; rived; divided." }
     ]
   },
   "Cloke": {
@@ -1875,10 +1677,7 @@
   "Cockatrice": {
     "pronunciation": "COCKATRICE",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "serpent imagined to proceed from cocks egg."
-      }
+      { "type": "noun", "text": "serpent imagined to proceed from cocks egg." }
     ]
   },
   "Cockle": {
@@ -1950,10 +1749,7 @@
         "type": "participle present tense",
         "text": "Communing<br/> Conversing familiarly; having familiar intercourse."
       },
-      {
-        "type": "noun",
-        "text": "Familiar converse; private intercourse."
-      }
+      { "type": "noun", "text": "Familiar converse; private intercourse." }
     ]
   },
   "Compassed": {
@@ -2049,15 +1845,6 @@
       }
     ]
   },
-  "Congregation": {
-    "pronunciation": "CONGREGATION, noun",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "1. The act of bringing together, or assembling.<br/>2. A collection or assemblage of separate things; as a congregation of vapors.<br/>3. More generally, an assembly or persons; and appropriately, an assembly of persons met for the worship of God, and for religious instruction.<br/>4. An assembly of rulers. Numbers 35:12.<br/>5. An assembly of ecclesiastics or cardinals appointed by the pope; as the congregation of the holy office, etc. Also, a company or society of religious cantoned out of an order.<br/>6. An academical assembly for transacting business of the university."
-      }
-    ]
-  },
   "Consecrate": {
     "pronunciation": "CONSECRATE, [Latin , to consecrate sacred. See Sacred.]",
     "definitions": [
@@ -2074,10 +1861,7 @@
   "Consorted": {
     "pronunciation": "CONSORTED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "United in marriage."
-      }
+      { "type": "participle passive", "text": "United in marriage." }
     ]
   },
   "Consulter": {
@@ -2190,20 +1974,12 @@
         "type": "participle present tense",
         "text": "Couching<br/> Lying down; laying down; lying close; involving; including; expressing; depressing a cataract."
       },
-      {
-        "type": "noun",
-        "text": "The act of stooping or bowing."
-      }
+      { "type": "noun", "text": "The act of stooping or bowing." }
     ]
   },
   "Coulter": {
     "pronunciation": "COULTER.",
-    "definitions": [
-      {
-        "type": "",
-        "text": ""
-      }
-    ]
+    "definitions": [{ "type": "", "text": "" }]
   },
   "Countervail": {
     "pronunciation": "COUNTERVAIL, [counter and Latin , to avail or be strong.]",
@@ -2215,23 +1991,6 @@
       {
         "type": "noun",
         "text": "Equal weight or strength; power or value sufficient to obviate any effect; equal weight or value; compensation; requital."
-      }
-    ]
-  },
-  "Covenant": {
-    "pronunciation": "COVENANT, noun [L, to come; a coming together; a meeting or agreement of minds.]",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "1. A mutual consent or agreement of two or more persons, to do or to forbear some act or thing; a contract; stipulation.<br/>2. A writing containing the terms of agreement or contract between parties; or the clause of agreement in a deed containing the covenant.<br/>3. In theology, the covenant of works, is that implied in the commands, prohibitions, and promises of God; the promise of God to man, that mans perfect obedience should entitle him to happiness. This do, and live; that do, and die.<br/>The covenant of redemption, is the mutual agreement between the Father and Son, respecting the redemption of sinners by Christ.<br/>The covenant of grace, is that by which God engages to bestow salvation on man, upon the condition that man shall believe in Christ and yield obedience to the terms of the gospel.<br/>4. In church affairs, a solemn agreement between the members of a church, that they will walk together according to the precepts of the gospel, in brotherly affection."
-      },
-      {
-        "type": "verb intransitive",
-        "text": "To enter into a formal agreement; to stipulate; to bind ones self by contract."
-      },
-      {
-        "type": "verb transitive",
-        "text": "To grant or promise by covenant."
       }
     ]
   },
@@ -2277,12 +2036,7 @@
   },
   "Coz": {
     "pronunciation": "COZ.",
-    "definitions": [
-      {
-        "type": "",
-        "text": "A contraction of cousin."
-      }
-    ]
+    "definitions": [{ "type": "", "text": "A contraction of cousin." }]
   },
   "Craftiness": {
     "pronunciation": "CRAFTINESS",
@@ -2296,10 +2050,7 @@
   "Crisping": {
     "pronunciation": "CRISPING",
     "definitions": [
-      {
-        "type": "participle present tense",
-        "text": "Curling; frizzling."
-      }
+      { "type": "participle present tense", "text": "Curling; frizzling." }
     ]
   },
   "Crucify": {
@@ -2350,10 +2101,7 @@
   "Curdled": {
     "pronunciation": "CURDLED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Coagulated; congealed."
-      }
+      { "type": "participle passive", "text": "Coagulated; congealed." }
     ]
   },
   "Cuth": {
@@ -2394,12 +2142,7 @@
   },
   "Darkish": {
     "pronunciation": "D'ARKISH",
-    "definitions": [
-      {
-        "type": "adjective",
-        "text": "Dusky; somewhat dark."
-      }
-    ]
+    "definitions": [{ "type": "adjective", "text": "Dusky; somewhat dark." }]
   },
   "Daub": {
     "pronunciation": "DAUB",
@@ -2421,10 +2164,7 @@
         "type": "participle present tense",
         "text": "Daubing<br/> Plastering; painting coarsely; disguising clumsily; decking ostentatiously; flattering grossly."
       },
-      {
-        "type": "noun",
-        "text": "Plastering; coarse painting; gross flattery."
-      }
+      { "type": "noun", "text": "Plastering; coarse painting; gross flattery." }
     ]
   },
   "Daysman": {
@@ -2537,10 +2277,7 @@
         "type": "participle present tense",
         "text": "Defaming<br/> Slandering; injuring the character by false reports."
       },
-      {
-        "type": "noun",
-        "text": "Defamation; slander."
-      }
+      { "type": "noun", "text": "Defamation; slander." }
     ]
   },
   "Defile": {
@@ -2590,10 +2327,7 @@
   "Delightsome": {
     "pronunciation": "DELIGHTSOME",
     "definitions": [
-      {
-        "type": "adjective",
-        "text": "Very pleasing; delightful."
-      }
+      { "type": "adjective", "text": "Very pleasing; delightful." }
     ]
   },
   "Deliverer": {
@@ -2630,10 +2364,7 @@
         "type": "verb transitive",
         "text": "Descry<br/>1. To espy; to explore; to examine by observation. The house of Joseph sent to descry Bethel. Judges 1:23.<br/>2. To detect; to find out; to discover any thing concealed.<br/>3. To see; to behold; to have a sight of from a distance; as, the seamen descried land.<br/>4. To give notice of something suddenly discovered."
       },
-      {
-        "type": "noun",
-        "text": "Discovery; thing descovered."
-      }
+      { "type": "noun", "text": "Discovery; thing descovered." }
     ]
   },
   "Despiteful": {
@@ -2675,14 +2406,8 @@
   "Digged": {
     "pronunciation": "DIGGED",
     "definitions": [
-      {
-        "type": "preterit tense",
-        "text": "Digged<br/> and"
-      },
-      {
-        "type": "participle passive",
-        "text": "of dig."
-      }
+      { "type": "preterit tense", "text": "Digged<br/> and" },
+      { "type": "participle passive", "text": "of dig." }
     ]
   },
   "Disallow": {
@@ -2706,10 +2431,7 @@
   "Disannulled": {
     "pronunciation": "DISANNULLED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Annulled; vacated; made void."
-      }
+      { "type": "participle passive", "text": "Annulled; vacated; made void." }
     ]
   },
   "Disannulling": {
@@ -2733,19 +2455,13 @@
   "Discomfited": {
     "pronunciation": "DISCOMFITED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Routed; defeated; overthrown."
-      }
+      { "type": "participle passive", "text": "Routed; defeated; overthrown." }
     ]
   },
   "Disdained": {
     "pronunciation": "DISDAINED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Despised; contemned; scorned."
-      }
+      { "type": "participle passive", "text": "Despised; contemned; scorned." }
     ]
   },
   "Disfigure": {
@@ -2769,10 +2485,7 @@
   "Dismaying": {
     "pronunciation": "DISMAYING",
     "definitions": [
-      {
-        "type": "participle present tense",
-        "text": "Depriving of courage."
-      }
+      { "type": "participle present tense", "text": "Depriving of courage." }
     ]
   },
   "Disobeyed": {
@@ -2931,10 +2644,7 @@
   "Drave": {
     "pronunciation": "DRAVE",
     "definitions": [
-      {
-        "type": "participle",
-        "text": "the old of drive. We now use drove."
-      }
+      { "type": "participle", "text": "the old of drive. We now use drove." }
     ]
   },
   "Dromedary": {
@@ -2958,10 +2668,7 @@
   "Dryshod": {
     "pronunciation": "DRYSHOD",
     "definitions": [
-      {
-        "type": "adjective",
-        "text": "Without wetting the feet. Isaiah 11:15."
-      }
+      { "type": "adjective", "text": "Without wetting the feet. Isaiah 11:15." }
     ]
   },
   "Dulcimer": {
@@ -2988,12 +2695,7 @@
   },
   "Durst": {
     "pronunciation": "DURST",
-    "definitions": [
-      {
-        "type": "preterit tense",
-        "text": "Of dare."
-      }
-    ]
+    "definitions": [{ "type": "preterit tense", "text": "Of dare." }]
   },
   "Eared": {
     "pronunciation": "E'ARED",
@@ -3011,10 +2713,7 @@
         "type": "noun",
         "text": "Earing<br/> In seamen's language, small rope employed to fasten the upper corner of sail to its yard.<br/>E'ARING,"
       },
-      {
-        "type": "noun",
-        "text": "plowing of land. Genesis 45:6."
-      }
+      { "type": "noun", "text": "plowing of land. Genesis 45:6." }
     ]
   },
   "Edification": {
@@ -3117,12 +2816,7 @@
   },
   "Embroiderer": {
     "pronunciation": "EMBROID'ERER",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "One who embroiders."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "One who embroiders." }]
   },
   "Emerods": {
     "pronunciation": "EM'ERODS",
@@ -3185,14 +2879,8 @@
   "Engrave": {
     "pronunciation": "ENGRA'VE",
     "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "Engrave"
-      },
-      {
-        "type": "preterit tense",
-        "text": "engraved;"
-      },
+      { "type": "verb transitive", "text": "Engrave" },
+      { "type": "preterit tense", "text": "engraved;" },
       {
         "type": "participle passive",
         "text": "engraved or engraven.<br/>Literally, to scratch or scrape. Hence,<br/>1. To cut, as metals, stones or other hard substances, with chisel or graver; to cut figures, letters or devices, on stone or metal; to mark by incision.<br/>Thou shalt engrave the two stones with the names of the children of Israel. Exodus  28:11.<br/>2. To picture or represent by incisions.<br/>3. To imprint; to impress deeply; to infix.<br/>Let the laws of God and the principles of morality be engraved on the minds in early years.<br/>4. To bury; to deposit in the grave; to inter; to inhume. [Not now used.]"
@@ -3237,10 +2925,7 @@
         "type": "verb transitive",
         "text": "To exemplify; to shew by example. This word is seldom used, either as"
       },
-      {
-        "type": "noun",
-        "text": "or verb. [See Example.]"
-      }
+      { "type": "noun", "text": "or verb. [See Example.]" }
     ]
   },
   "Entangle": {
@@ -3321,10 +3006,7 @@
         "type": "verb intransitive",
         "text": "To look narrowly; to look about; to watch.<br/>Stand by the way and espy Jeremiah 48:19.<br/>[This word is often pronounced spy, which see.]<br/>ESPY',"
       },
-      {
-        "type": "noun",
-        "text": "A spy; a scout."
-      }
+      { "type": "noun", "text": "A spy; a scout." }
     ]
   },
   "Esteeming": {
@@ -3441,10 +3123,7 @@
         "type": "adverb",
         "text": "Gladly; with joy or pleasure.<br/>He would fain flee out of his hand. Job 27:22.<br/>He would fain have filled his belly with husks. Luke 15:16.<br/>FAIN,"
       },
-      {
-        "type": "verb intransitive",
-        "text": "to wish or desire. [Not used.]"
-      }
+      { "type": "verb intransitive", "text": "to wish or desire. [Not used.]" }
     ]
   },
   "Fainthearted": {
@@ -3553,10 +3232,7 @@
   "Feignedly": {
     "pronunciation": "FEIGNEDLY",
     "definitions": [
-      {
-        "type": "adverb",
-        "text": "In fiction; in pretense; not really."
-      }
+      { "type": "adverb", "text": "In fiction; in pretense; not really." }
     ]
   },
   "Fewness": {
@@ -3638,10 +3314,7 @@
   "Flayed": {
     "pronunciation": "FLA'YED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Skinned; stripped of the skin."
-      }
+      { "type": "participle passive", "text": "Skinned; stripped of the skin." }
     ]
   },
   "Fleshhook": {
@@ -3682,24 +3355,13 @@
   },
   "Forbad": {
     "pronunciation": "FORBAD'",
-    "definitions": [
-      {
-        "type": "preterit tense",
-        "text": "of forbid."
-      }
-    ]
+    "definitions": [{ "type": "preterit tense", "text": "of forbid." }]
   },
   "Forbear": {
     "pronunciation": "FORBEAR",
     "definitions": [
-      {
-        "type": "verb",
-        "text": "Forbear<br/> intransitive;"
-      },
-      {
-        "type": "preterit tense",
-        "text": "forbore;"
-      },
+      { "type": "verb", "text": "Forbear<br/> intransitive;" },
+      { "type": "preterit tense", "text": "forbore;" },
       {
         "type": "participle passive",
         "text": "forborne.<br/>1. To stop; to cease; to hold from proceeding; as, forbear to repeat these reproachful words.<br/>2. To pause; to delay; as, forbear while.<br/>3. To abstain; to omit; to hold one's self from motion entering on an affair.<br/>Shall I go against Ramoth Gilead to battle, shall I forbear? 1 Kings 22:6.<br/>4. To refuse; to decline.<br/>Whether they will hear, whether they will forbear Ezekiel 2:5.<br/>5. To patient; to restrain from action violence. Proverbs 25:15.<br/>FORBEAR,"
@@ -3717,10 +3379,7 @@
         "type": "participle present tense",
         "text": "Forbearing<br/>1. Ceasing; pausing; withholding from action; exercising patience and indulgence.<br/>2."
       },
-      {
-        "type": "adjective",
-        "text": "Patient; long suffering."
-      },
+      { "type": "adjective", "text": "Patient; long suffering." },
       {
         "type": "noun",
         "text": "ceasing restraining from action; patience; long suffering."
@@ -3757,10 +3416,7 @@
   "Foreship": {
     "pronunciation": "FO'RESHIP",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "The forepart of a ship. Acts 28:1."
-      }
+      { "type": "noun", "text": "The forepart of a ship. Acts 28:1." }
     ]
   },
   "Foretell": {
@@ -3810,31 +3466,19 @@
         "type": "participle present tense",
         "text": "Forsaking<br/> Leaving deserting."
       },
-      {
-        "type": "noun",
-        "text": "The act of deserting; dereliction."
-      }
+      { "type": "noun", "text": "The act of deserting; dereliction." }
     ]
   },
   "Forswear": {
     "pronunciation": "FORSWEAR",
     "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "Forswear"
-      },
-      {
-        "type": "preterit tense",
-        "text": "forswore;"
-      },
+      { "type": "verb transitive", "text": "Forswear" },
+      { "type": "preterit tense", "text": "forswore;" },
       {
         "type": "participle passive",
         "text": "forsworn. See Swear and Answer.]<br/>1. To reject renounce upon oath.<br/>2. To deny upon oath. Like innocence, and as serenely bold as truth, how loudly he forswears thy gold. To forswear one's self, is to falsely; to perjure one's self. Thou shalt not forswear thyself. Matthew 5:33."
       },
-      {
-        "type": "verb intransitive",
-        "text": "To falsely; to commit perjury."
-      }
+      { "type": "verb intransitive", "text": "To falsely; to commit perjury." }
     ]
   },
   "Fortify": {
@@ -3844,10 +3488,7 @@
         "type": "verb transitive",
         "text": "Fortify<br/>1. To surround with a wall, ditch, palisades other works, with a view to defend against the attacks of an enemy; to strengthen and secure by forts, batteries and other works of art; as, to fortify a city, town harbor.<br/>2. To strengthen against any attack; as, to fortify the mind against sudden calamity.<br/>3. To confirm; to add strength and firmness to; as, to fortify an opinion resolution; to fortify hope desire.<br/>4. To furnish with strength means of resisting force, violence assault."
       },
-      {
-        "type": "verb intransitive",
-        "text": "To raise strong places."
-      }
+      { "type": "verb intransitive", "text": "To raise strong places." }
     ]
   },
   "Forwardness": {
@@ -3866,10 +3507,7 @@
         "type": "adjective",
         "text": "Fourfold<br/> double; quadruple; four times told; as a fourfold division. He shall restore the lamb fourfold 2 Samuel 12:6."
       },
-      {
-        "type": "noun",
-        "text": "times as much."
-      }
+      { "type": "noun", "text": "times as much." }
     ]
   },
   "Fourfooted": {
@@ -3919,12 +3557,7 @@
   },
   "Freewoman": {
     "pronunciation": "FREE'WOMAN",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "not slave."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "not slave." }]
   },
   "Froward": {
     "pronunciation": "FRO'WARD, [Latin versus:turned or looking from.]Perverse",
@@ -3938,10 +3571,7 @@
   "Frowardly": {
     "pronunciation": "FRO'WARDLY",
     "definitions": [
-      {
-        "type": "adverb",
-        "text": "Perversely; in peevish manner."
-      }
+      { "type": "adverb", "text": "Perversely; in peevish manner." }
     ]
   },
   "Frowardness": {
@@ -3983,10 +3613,7 @@
   "Furthered": {
     "pronunciation": "FUR'THERED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Promoted; advanced."
-      }
+      { "type": "participle passive", "text": "Promoted; advanced." }
     ]
   },
   "Gad": {
@@ -4022,12 +3649,7 @@
   },
   "Gat": {
     "pronunciation": "GAT",
-    "definitions": [
-      {
-        "type": "preterit tense",
-        "text": "of get."
-      }
-    ]
+    "definitions": [{ "type": "preterit tense", "text": "of get." }]
   },
   "Gatherer": {
     "pronunciation": "GATH'ERER",
@@ -4063,14 +3685,8 @@
         "type": "noun",
         "text": "Gird<br/> gurd. [Eng. a yard.]<br/>1. A twitch or pang; a sudden spasm, which resembles the stroke of a rod or the pressure of a band.<br/>2. In popular language, a severe stroke of a stick or whip."
       },
-      {
-        "type": "verb transitive",
-        "text": "gurd."
-      },
-      {
-        "type": "preterit tense",
-        "text": "and"
-      },
+      { "type": "verb transitive", "text": "gurd." },
+      { "type": "preterit tense", "text": "and" },
       {
         "type": "participle passive",
         "text": "girded or girt.<br/>1. To bind by surrounding with any flexible substance, as with a twig, a cord, bandage or cloth; as, to gird the loins with sackcloth.<br/>2. To make fast by binding; to put on; usually with on; as, to gird on a harness; to gird on a sword.<br/>3. To invest; to surround. The Son appeared, Girt with omnipotence.<br/>4. To clothe; to dress; to habit. girded thee about with fine linen. Ezekiel 16:10.<br/>5. To furnish; to equip. GIRDed with snaky wiles.<br/>6. To surround; to encircle; to inclose; to encompass. The Nyseian isle, Girt with the river Triton.<br/>7. To gibe; to reproach severly; to lash."
@@ -4097,23 +3713,14 @@
         "type": "participle present tense",
         "text": "Girding<br/> Binding; surrounding; investing."
       },
-      {
-        "type": "noun",
-        "text": "A covering. Isaiah 3:24."
-      }
+      { "type": "noun", "text": "A covering. Isaiah 3:24." }
     ]
   },
   "Girt": {
     "pronunciation": "GIRT",
     "definitions": [
-      {
-        "type": "preterit tense and participle passive",
-        "text": "of gird"
-      },
-      {
-        "type": "verb transitive",
-        "text": "To gird; to surround."
-      }
+      { "type": "preterit tense and participle passive", "text": "of gird" },
+      { "type": "verb transitive", "text": "To gird; to surround." }
     ]
   },
   "Gladness": {
@@ -4322,12 +3929,7 @@
   },
   "Graff": {
     "pronunciation": "GRAFF, [See Grave.]",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "ditch or moat. for graft."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "ditch or moat. for graft." }]
   },
   "Graved": {
     "pronunciation": "GRA'VED, [See the Verb.]",
@@ -4424,12 +4026,7 @@
   },
   "Haling": {
     "pronunciation": "HALING.",
-    "definitions": [
-      {
-        "type": "",
-        "text": ""
-      }
-    ]
+    "definitions": [{ "type": "", "text": "" }]
   },
   "Hallow": {
     "pronunciation": "HAL'LOW, [Latin calleo, to be able.]",
@@ -4496,14 +4093,8 @@
         "type": "noun",
         "text": "Harlot<br/>1. woman who prostitutes her body for hire; prostitute; common woman.<br/>2. In Scripture, one who forsakes the true God and worships idols. Isaiah 1:21.<br/>3. servant; rogue; cheat."
       },
-      {
-        "type": "adjective",
-        "text": "Wanton; lewd; low; base."
-      },
-      {
-        "type": "verb intransitive",
-        "text": "To practice lewdness."
-      }
+      { "type": "adjective", "text": "Wanton; lewd; low; base." },
+      { "type": "verb intransitive", "text": "To practice lewdness." }
     ]
   },
   "Harping": {
@@ -4539,10 +4130,7 @@
   "Hasting": {
     "pronunciation": "HASTINGHASTING-PEAR",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "An early pear, called also green chissel."
-      }
+      { "type": "noun", "text": "An early pear, called also green chissel." }
     ]
   },
   "Hatefully": {
@@ -4600,12 +4188,7 @@
   },
   "Hebrewess": {
     "pronunciation": "HE'BREWESS",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "An Israelitish woman."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "An Israelitish woman." }]
   },
   "Helve": {
     "pronunciation": "HELVE",
@@ -4641,10 +4224,7 @@
   "Heretofore": {
     "pronunciation": "HERETOFO'RE",
     "definitions": [
-      {
-        "type": "adverb",
-        "text": "In times before the present; formerly."
-      }
+      { "type": "adverb", "text": "In times before the present; formerly." }
     ]
   },
   "Herodians": {
@@ -4659,14 +4239,8 @@
   "Hew": {
     "pronunciation": "HEW",
     "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "Hew"
-      },
-      {
-        "type": "preterit tense",
-        "text": "hewed;"
-      },
+      { "type": "verb transitive", "text": "Hew" },
+      { "type": "preterit tense", "text": "hewed;" },
       {
         "type": "participle passive",
         "text": "hewed or hewn.<br/>1. To cut with an ax, or other like instrument, for the purpose of making an even surface or side; as, to hew timber.<br/>2. To chop; to cut; to hack; as, to hew in pieces.<br/>3. To cut with a chisel; to make smooth; as, to hew stone.<br/>4. To form or shape with an edged instrument; with out; as, to hew out a sepulcher. Isaiah 22:16.<br/>5. To form laboriously. I now pass my days, not studious nor idle, rather polishing old works than hewing out new ones. [Unusual.] To hew down, to cut down; to fell by cutting. To hew off, to cut off; to separate by a cutting instrument."
@@ -4684,12 +4258,7 @@
   },
   "Hewer": {
     "pronunciation": "HEW'ER",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "One who hews wood or stone."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "One who hews wood or stone." }]
   },
   "Hin": {
     "pronunciation": "HIN",
@@ -4738,10 +4307,7 @@
         "type": "adjective",
         "text": "Hoar<br/>1. White; as hoar frost; hoar cliffs.<br/>2. Gray; white with age; hoary; as matron grave and hoar"
       },
-      {
-        "type": "noun",
-        "text": "Hoariness; antiquity."
-      },
+      { "type": "noun", "text": "Hoariness; antiquity." },
       {
         "type": "verb intransitive",
         "text": "To become moldy or musty. [Little Used.]"
@@ -4769,23 +4335,8 @@
   "Holpen": {
     "pronunciation": "HOLP, HOLPEN",
     "definitions": [
-      {
-        "type": "preterit tense",
-        "text": "Holpen<br/> the antiquated and"
-      },
-      {
-        "type": "participle passive",
-        "text": "of help."
-      }
-    ]
-  },
-  "Holy": {
-    "pronunciation": "HO'LY, adjective",
-    "definitions": [
-      {
-        "type": "adjective",
-        "text": "1. Properly, whole, entire or perfect, in a moral sense. Hence, pure in heart, temper or dispositions; free from sin and sinful affections. Applied to the Supreme Being, holy signifies perfectly pure, immaculate and complete in moral character; and man is more or less holy as his heart is more or less sanctified, or purified from evil dispositions. We call a man holy when his heart is conformed in some degree to the image of God, and his life is regulated by the divine precepts. Hence, holy is used as nearly synonymous with good, pious, godly.<br/>2. Hallowed; consecrated or set apart to a sacred use, or to the service or worship of God.<br/>3. Proceeding from pious principles, or directed to pious purposes.<br/>4. Perfectly just and good.<br/>5. Sacred.<br/>Holy of holies, in Scripture, the innermost apartment of the Jewish tabernacle or temple, where the ark was kept, and where no person entered, except the high priest, once a year.<br/>Holy Ghost, or holy Spirit, the Divine Spirit; the third person in the Trinity."
-      }
+      { "type": "preterit tense", "text": "Holpen<br/> the antiquated and" },
+      { "type": "participle passive", "text": "of help." }
     ]
   },
   "Holyday": {
@@ -4858,10 +4409,7 @@
   "Hungred": {
     "pronunciation": "HUN'GRED",
     "definitions": [
-      {
-        "type": "adjective",
-        "text": "Hungry; pinched by want of food."
-      }
+      { "type": "adjective", "text": "Hungry; pinched by want of food." }
     ]
   },
   "Husbandman": {
@@ -4916,10 +4464,7 @@
         "type": "adjective",
         "text": "Impenitent<br/> Not penitent; not repenting of sin; not contrite; obdurate; of a hard heart. They died impenitent"
       },
-      {
-        "type": "noun",
-        "text": "One who does not repent; a hardened sinner."
-      }
+      { "type": "noun", "text": "One who does not repent; a hardened sinner." }
     ]
   },
   "Implead": {
@@ -5032,10 +4577,7 @@
         "type": "verb transitive",
         "text": "Inflame<br/> [Latin inflammo; in and flamma, flame.]<br/>1. To set on fire; to kindle; to cause to burn; in literal sense. But more generally,<br/>2. To excite or increase, as passion or appetite; to enkindle into violent action; as, to inflame love, lust or thirst; to inflame desire or anger.<br/>3. To exaggerate; to aggravate in description. friend exaggerates man's virtues, an enemy inflames his crimes. [Unusual.]<br/>4. To heat; to excite excessive action in the blood; as to inflame the blood or body; to inflame with wine.<br/>5. To provoke; to irritate; to anger.<br/>6. To increase; to exasperate; as, to inflame the enmity of parties, or the spirit of sedition.<br/>7. To increase; to augment; as, to inflame presumption."
       },
-      {
-        "type": "verb intransitive",
-        "text": "To grow hot, angry and painful."
-      }
+      { "type": "verb intransitive", "text": "To grow hot, angry and painful." }
     ]
   },
   "Infolding": {
@@ -5056,22 +4598,10 @@
       }
     ]
   },
-  "Inheritance": {
-    "pronunciation": "INHER'ITANCE, noun An estate derived from an ancestor to an heir by succession or in course of law; or an estate which the law casts on a child or other person, as the representative of the deceased ancestor.",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "1. The reception of an estate by hereditary right, or the descent by which an estate or title is cast on the heir; as, the heir received the estate by inheritance.<br/>2. The estate or possession which may descend to an heir, though it has not descended.<br/>And Rachel and Leah answered and said, is there yet any portion or inheritance for us in our father's house? Genesis 31:14.<br/>3. An estate given or possessed by donation or divine appropriation. Numbers 26:53.<br/>4. That which is possessed or enjoyed.<br/>Ask of me, and I will give thee the heathen for thine inheritance Psalms 2:8."
-      }
-    ]
-  },
   "Inheritor": {
     "pronunciation": "INHER'ITOR",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "An heir; one who inherits may inherit."
-      }
+      { "type": "noun", "text": "An heir; one who inherits may inherit." }
     ]
   },
   "Inkhorn": {
@@ -5121,12 +4651,7 @@
   },
   "Israelite": {
     "pronunciation": "IS'RAELITE",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "descendant of or Jacob; Jew."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "descendant of or Jacob; Jew." }]
   },
   "Jacinth": {
     "pronunciation": "JA'CINTH, [a different orthography of Hyacinth.]",
@@ -5139,12 +4664,7 @@
   },
   "Jah": {
     "pronunciation": "JAH",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "Jehovah."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "Jehovah." }]
   },
   "Jesting": {
     "pronunciation": "JEST'ING",
@@ -5161,20 +4681,12 @@
   },
   "Jewess": {
     "pronunciation": "JEW'ESS",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "A Hebrew woman. Acts 24:24."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "A Hebrew woman. Acts 24:24." }]
   },
   "Jezebel": {
     "pronunciation": "JEZ'EBEL",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "An impudent, daring, vitious woman."
-      }
+      { "type": "noun", "text": "An impudent, daring, vitious woman." }
     ]
   },
   "Journeying": {
@@ -5193,19 +4705,13 @@
   "Joyed": {
     "pronunciation": "JOY'ED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Gladdened; enjoyed."
-      }
+      { "type": "participle passive", "text": "Gladdened; enjoyed." }
     ]
   },
   "Joyfulness": {
     "pronunciation": "JOY'FULNESS",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "Great gladness; joy. Deuteronomy 28:47."
-      }
+      { "type": "noun", "text": "Great gladness; joy. Deuteronomy 28:47." }
     ]
   },
   "Justifier": {
@@ -5276,12 +4782,7 @@
   },
   "Kinswoman": {
     "pronunciation": "KINS'WOMAN",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "female relation."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "female relation." }]
   },
   "Kneaded": {
     "pronunciation": "KNE'ADED",
@@ -5304,22 +4805,13 @@
   "Lade": {
     "pronunciation": "LADE",
     "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "Lade"
-      },
-      {
-        "type": "preterit tense",
-        "text": "laded;"
-      },
+      { "type": "verb transitive", "text": "Lade" },
+      { "type": "preterit tense", "text": "laded;" },
       {
         "type": "participle passive",
         "text": "laded, laden.<br/>1. To load; to put on or in, as burden or freight. We lade ship with cotton. We lade horse or other beast with corn. And they laded their asses with the corn and departed thence. Genesis 42:26.<br/>2. To dip; to throw in or out, as fluid, with ladle or dipper; as, to lade water out of tub or into cistern.<br/>3. To draw water. [Not in use.]"
       },
-      {
-        "type": "noun",
-        "text": "The mouth of river. obsolete"
-      }
+      { "type": "noun", "text": "The mouth of river. obsolete" }
     ]
   },
   "Laded": {
@@ -5329,10 +4821,7 @@
         "type": "participle passive",
         "text": "Laded<br/>1. Loaded; charged with burden or freight.<br/>2."
       },
-      {
-        "type": "adjective",
-        "text": "Oppressed; burdened."
-      }
+      { "type": "adjective", "text": "Oppressed; burdened." }
     ]
   },
   "Lamentation": {
@@ -5364,10 +4853,7 @@
   "Lapwing": {
     "pronunciation": "LAP'WING",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "bird of the genus Tringa; the tewit."
-      }
+      { "type": "noun", "text": "bird of the genus Tringa; the tewit." }
     ]
   },
   "Largeness": {
@@ -5391,10 +4877,7 @@
   "Latchet": {
     "pronunciation": "LATCH'ET, [from latch.]",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "The string that fastens shoe. Mark 1:7."
-      }
+      { "type": "noun", "text": "The string that fastens shoe. Mark 1:7." }
     ]
   },
   "Laver": {
@@ -5409,10 +4892,7 @@
   "Lawgiver": {
     "pronunciation": "LAW'GIVER, [law and give.]",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "One who makes or enacts law; legislator."
-      }
+      { "type": "noun", "text": "One who makes or enacts law; legislator." }
     ]
   },
   "Leanness": {
@@ -5461,15 +4941,6 @@
       {
         "type": "adjective",
         "text": "Infected with leprosy; covered with white scales. His hand was leprous as snow. Exodus 4:6."
-      }
-    ]
-  },
-  "Lest": {
-    "pronunciation": "LEST, conjunction",
-    "definitions": [
-      {
-        "type": "conjunction",
-        "text": "That not; for fear that."
       }
     ]
   },
@@ -5529,12 +5000,7 @@
   },
   "Ligure": {
     "pronunciation": "LIG'URE",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "A kind of precious stone."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "A kind of precious stone." }]
   },
   "Liken": {
     "pronunciation": "LIKEN",
@@ -5547,12 +5013,7 @@
   },
   "Lionlike": {
     "pronunciation": "LI'ONLIKE",
-    "definitions": [
-      {
-        "type": "adjective",
-        "text": "Like a lion; fierce."
-      }
-    ]
+    "definitions": [{ "type": "adjective", "text": "Like a lion; fierce." }]
   },
   "Locust": {
     "pronunciation": "LO'CUST, [Latin locusta.]",
@@ -5605,10 +5066,7 @@
         "type": "noun",
         "text": "that which is cut from trees. Else both body and lop will be of little value."
       },
-      {
-        "type": "noun",
-        "text": "a flea. [Local.]"
-      }
+      { "type": "noun", "text": "a flea. [Local.]" }
     ]
   },
   "Lothe": {
@@ -5636,10 +5094,7 @@
         "type": "participle present tense",
         "text": "Lothing<br/>1. Feeling disgust at; having extreme aversion to; as lothing food.<br/>2. Hating; abhorring; as lothing sin.<br/>LO'THING,"
       },
-      {
-        "type": "noun",
-        "text": "Extreme disgust; abhorrence. Ezekiel 16:5."
-      }
+      { "type": "noun", "text": "Extreme disgust; abhorrence. Ezekiel 16:5." }
     ]
   },
   "Lowing": {
@@ -5649,10 +5104,7 @@
         "type": "participle present tense",
         "text": "Lowing<br/> Bellowing, as an ox."
       },
-      {
-        "type": "noun",
-        "text": "the bellowing or cry of cattle."
-      }
+      { "type": "noun", "text": "the bellowing or cry of cattle." }
     ]
   },
   "Lowliness": {
@@ -5752,10 +5204,7 @@
   "Mattock": {
     "pronunciation": "MAT'TOCK",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "tool grub up weeds or roots; grubbing hoe."
-      }
+      { "type": "noun", "text": "tool grub up weeds or roots; grubbing hoe." }
     ]
   },
   "Maw": {
@@ -5816,19 +5265,6 @@
       }
     ]
   },
-  "Midst": {
-    "pronunciation": "MIDST, noun [contracted from middest, the superlative of mid.]",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "The middle.<br/>The phrase, in the midst often signifies involved in, surrounded or overwhelmed by, or in the thickest part, or in the depths of; as in the midst of afflictions, troubles or cares; in the midst of our contemplations; in the midst of the battle; in the midst of pagan darkness and error; in the midst of gospel light; in the midst of the ocean; in the midst of civil dissensions.<br/>From the midst from the middle, or from among. Deuteronomy 18:15."
-      },
-      {
-        "type": "adverb",
-        "text": "In the middle."
-      }
-    ]
-  },
   "Milch": {
     "pronunciation": "MILCH",
     "definitions": [
@@ -5859,10 +5295,7 @@
   "Ministered": {
     "pronunciation": "MIN'ISTERED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Served; afforded; supplied."
-      }
+      { "type": "participle passive", "text": "Served; afforded; supplied." }
     ]
   },
   "Ministering": {
@@ -5913,20 +5346,12 @@
   "Mollified": {
     "pronunciation": "MOL'LIFIED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Softened; appeased."
-      }
+      { "type": "participle passive", "text": "Softened; appeased." }
     ]
   },
   "Morter": {
     "pronunciation": "MOR'TER",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "A lamp light."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "A lamp light." }]
   },
   "Mortify": {
     "pronunciation": "MOR'TIFY, [Latin mors, death, and facio, to make.]",
@@ -5953,10 +5378,7 @@
   "Motheaten": {
     "pronunciation": "MOTH'EATEN",
     "definitions": [
-      {
-        "type": "adjective",
-        "text": "Eaten by moths. Job 13:1."
-      }
+      { "type": "adjective", "text": "Eaten by moths. Job 13:1." }
     ]
   },
   "Mourner": {
@@ -5998,10 +5420,7 @@
   "Nailing": {
     "pronunciation": "NAILING",
     "definitions": [
-      {
-        "type": "",
-        "text": "ppr. Fastening with nails; studding."
-      }
+      { "type": "", "text": "ppr. Fastening with nails; studding." }
     ]
   },
   "Narcissus": {
@@ -6109,19 +5528,13 @@
         "type": "noun",
         "text": "Noontide<br/> [See Tide, which signifies time.] The time of noon; mid-day."
       },
-      {
-        "type": "adjective",
-        "text": "Pertaining to noon; meridional."
-      }
+      { "type": "adjective", "text": "Pertaining to noon; meridional." }
     ]
   },
   "Nourisher": {
     "pronunciation": "NOURISHER",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "The person or thing that nourishes."
-      }
+      { "type": "noun", "text": "The person or thing that nourishes." }
     ]
   },
   "Obeisance": {
@@ -6145,10 +5558,7 @@
   "Occurrent": {
     "pronunciation": "OCCUR'RENT",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "Incident; any thing that happens. obsolete"
-      }
+      { "type": "noun", "text": "Incident; any thing that happens. obsolete" }
     ]
   },
   "Offscouring": {
@@ -6171,22 +5581,9 @@
   },
   "Ofttimes": {
     "pronunciation": "OFT'TIMES, [oft and times.]",
-    "definitions": [
-      {
-        "type": "adverb",
-        "text": "Frequently; often."
-      }
-    ]
+    "definitions": [{ "type": "adverb", "text": "Frequently; often." }]
   },
-  "Og": {
-    "pronunciation": "OG.",
-    "definitions": [
-      {
-        "type": "",
-        "text": ""
-      }
-    ]
-  },
+  "Og": { "pronunciation": "OG.", "definitions": [{ "type": "", "text": "" }] },
   "Oldness": {
     "pronunciation": "OLDNESS",
     "definitions": [
@@ -6226,10 +5623,7 @@
   "Oppressing": {
     "pronunciation": "OPPRESS'ING",
     "definitions": [
-      {
-        "type": "participle present tense",
-        "text": "Overburdening."
-      }
+      { "type": "participle present tense", "text": "Overburdening." }
     ]
   },
   "Oration": {
@@ -6270,12 +5664,7 @@
   },
   "Outwent": {
     "pronunciation": "OUTWENT'",
-    "definitions": [
-      {
-        "type": "preterit tense",
-        "text": "of outgo."
-      }
-    ]
+    "definitions": [{ "type": "preterit tense", "text": "of outgo." }]
   },
   "Overcharge": {
     "pronunciation": "OVERCH'ARGE",
@@ -6293,10 +5682,7 @@
   "Overlaying": {
     "pronunciation": "OVERLA'YING",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "superficial covering. Exodus 38:17."
-      }
+      { "type": "noun", "text": "superficial covering. Exodus 38:17." }
     ]
   },
   "Overmuch": {
@@ -6306,14 +5692,8 @@
         "type": "adjective",
         "text": "Overmuch<br/> Too much; exceeding what is necessary or proper."
       },
-      {
-        "type": "adverb",
-        "text": "In too great a degree."
-      },
-      {
-        "type": "noun",
-        "text": "More than sufficient."
-      }
+      { "type": "adverb", "text": "In too great a degree." },
+      { "type": "noun", "text": "More than sufficient." }
     ]
   },
   "Overpass": {
@@ -6359,10 +5739,7 @@
   "Pacified": {
     "pronunciation": "PACIFIED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Appeased; tranquilized."
-      }
+      { "type": "participle passive", "text": "Appeased; tranquilized." }
     ]
   },
   "Painfulness": {
@@ -6390,10 +5767,7 @@
         "type": "verb intransitive",
         "text": "Pant<br/>1. To palpitate; to beat with preternatural violence or rapidity, as the heart in terror, or after hard labor, or in anxious desire or suspense.<br/>Yet might her piteous heart be seen to pant and quake.<br/>2. To have the breast heaving, as in short respiration or want of breath.<br/>Pluto pants for breath from out his cell.<br/>3. To play with intermission or declining strength.<br/>The whispering breeze<br/>Pants on the leaves and dies upon the trees.<br/>4. To long; to desire ardently.<br/>Who pants for glory, finds but short repose.<br/>As the heart panteth after the water brooks, so panteth my soul after thee, O God. Psalms 42:1."
       },
-      {
-        "type": "noun",
-        "text": "Palpitation of the heart.z"
-      }
+      { "type": "noun", "text": "Palpitation of the heart.z" }
     ]
   },
   "Pare": {
@@ -6586,10 +5960,7 @@
         "type": "noun",
         "text": "small piece of ground, usually portion of flat even ground; as flowery plat; plat of willows.<br/>PLAT,"
       },
-      {
-        "type": "adjective",
-        "text": "Plain; flat. [Not used.]<br/>PLAT,"
-      },
+      { "type": "adjective", "text": "Plain; flat. [Not used.]<br/>PLAT," },
       {
         "type": "adverb",
         "text": "Plainly; flatly; downright. [Not used.]<br/>1. Smoothly; evenly. [Not used.]"
@@ -6626,10 +5997,7 @@
   "Plentifully": {
     "pronunciation": "PLEN'TIFULLY",
     "definitions": [
-      {
-        "type": "adverb",
-        "text": "Copiously; abundantly; with ample supply."
-      }
+      { "type": "adverb", "text": "Copiously; abundantly; with ample supply." }
     ]
   },
   "Plow": {
@@ -6643,10 +6011,7 @@
         "type": "verb transitive",
         "text": "To trench and turn up with a plow; as, to plow the ground for wheat; to plow it into ridges.<br/>1. To furrow; to divide; to run through in sailing.<br/>With speed we plow the watery wave.<br/>2. To tear; to furrow.<br/>3. In Scripture, to labor in any calling.<br/>He that ploweth should plow in hope. 1 Corinthians 9:10.<br/>To plow on the back, to scourge; to mangle, or to persecute and torment. Psalms 129:3.<br/>To plow with one's heifer, to deal with the wife to obtain something from the husband. Judges 14:18.<br/>To plow iniquity or wickedness, and reap it, to devise and practice it, and at last suffer the punishment of it. Job 4:8. Hosea 10:11.<br/>To plow in, to cover by plowing; as, to plow in wheat.<br/>To plow up or out, to turn out of the ground by plowing.<br/>To put one's hand to the plow and look back, is to enter on the service of Christ and afterwards abandon it. Luke 17:7.<br/>[This difference of orthography often made between the"
       },
-      {
-        "type": "noun",
-        "text": "and"
-      },
+      { "type": "noun", "text": "and" },
       {
         "type": "verb",
         "text": "is wholly unwarrantable, and contrary to settled analogy in our language. Such a difference is never made in changing into verbs, plot, harrow, notice, question, and most other words. See Practice.]"
@@ -6682,10 +6047,7 @@
         "type": "noun",
         "text": "Plowman<br/> One that plows or holds plow. At last the robber binds the plowman and carries him off with the oxen.<br/>1. cultivator of grain; husbandman.<br/>2. rustic; countryman; hardy laborer. PLOW'-MONDAY,"
       },
-      {
-        "type": "noun",
-        "text": "The Monday after twelfth-day."
-      }
+      { "type": "noun", "text": "The Monday after twelfth-day." }
     ]
   },
   "Plummet": {
@@ -6775,10 +6137,7 @@
         "type": "verb intransitive",
         "text": "To think, consider or revolve in the mind beforehand; to deliberate; to have formed in the mind by previous thought or meditation."
       },
-      {
-        "type": "adjective",
-        "text": "Contrived by previous meditation."
-      }
+      { "type": "adjective", "text": "Contrived by previous meditation." }
     ]
   },
   "Preserver": {
@@ -6796,15 +6155,6 @@
       {
         "type": "adverb",
         "text": "With rash confidence.<br/>1. Arrogantly; insolently.<br/>2. Willfully; in bold defiance of conscience or violation of known duty; as, to sin presumptuously Numbers 15:30.<br/>3. With groundless and vain confidence in the divine favor."
-      }
-    ]
-  },
-  "Priest": {
-    "pronunciation": "PRIEST, noun [Latin proestes, a chief, one that presides; proe, before, and sto, to stand, or sisto.]",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "1. A man who officiates in sacred offices. Among pagans, priests were persons whose appropriate business was to offer sacrifices and perform other sacred rites of religion. In primitive ages, the fathers of families, princes and kings were priests. Thus Cain and Abel, Noah, Abraham, Melchizedek, Job, Isaac and Jacob offered their own sacrifices.<br/>Every priest taken from among men is ordained for men in things pertaining to God, that he may offer both gifts and sacrifices for sins. Hebrews 5:1.<br/>2. In the modern church, a person who is set apart or consecrated to the ministry of the gospel; a man in orders or licensed to preach the gospel; a presbyter."
       }
     ]
   },
@@ -6873,10 +6223,7 @@
         "type": "participle present tense",
         "text": "Prophesying<br/> Foretelling events."
       },
-      {
-        "type": "noun",
-        "text": "The act of foretelling or of preaching."
-      }
+      { "type": "noun", "text": "The act of foretelling or of preaching." }
     ]
   },
   "Prophetess": {
@@ -6913,10 +6260,7 @@
   "Prosperously": {
     "pronunciation": "PROS'PEROUSLY",
     "definitions": [
-      {
-        "type": "adverb",
-        "text": "With gain or increase; successfully."
-      }
+      { "type": "adverb", "text": "With gain or increase; successfully." }
     ]
   },
   "Provender": {
@@ -6953,14 +6297,8 @@
         "type": "verb intransitive",
         "text": "Pur<br/> To utter a low murmuring continued sound, as a cat."
       },
-      {
-        "type": "verb transitive",
-        "text": "to signify by purring."
-      },
-      {
-        "type": "noun",
-        "text": "The low murmuring continued sound of a cat."
-      }
+      { "type": "verb transitive", "text": "to signify by purring." },
+      { "type": "noun", "text": "The low murmuring continued sound of a cat." }
     ]
   },
   "Pureness": {
@@ -7023,10 +6361,7 @@
         "type": "participle present tense",
         "text": "Purloining<br/> Stealing; committing literary theft."
       },
-      {
-        "type": "noun",
-        "text": "Theft; plagiarism."
-      }
+      { "type": "noun", "text": "Theft; plagiarism." }
     ]
   },
   "Purposed": {
@@ -7081,10 +6416,7 @@
   "Quieted": {
     "pronunciation": "QUI'ETED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Made still; calmed; pacified."
-      }
+      { "type": "participle passive", "text": "Made still; calmed; pacified." }
     ]
   },
   "Raca": {
@@ -7148,19 +6480,13 @@
         "type": "participle present tense",
         "text": "Ravening<br/> Preying with rapacity; voraciously devouring; as ravening wolf."
       },
-      {
-        "type": "noun",
-        "text": "Eagerness for plunder. Luke 11:39."
-      }
+      { "type": "noun", "text": "Eagerness for plunder. Luke 11:39." }
     ]
   },
   "Ravin": {
     "pronunciation": "RAVIN.",
     "definitions": [
-      {
-        "type": "adjective",
-        "text": "RAV'IN, Ravenous. [Not use.]"
-      }
+      { "type": "adjective", "text": "RAV'IN, Ravenous. [Not use.]" }
     ]
   },
   "Ravished": {
@@ -7175,10 +6501,7 @@
   "Reaper": {
     "pronunciation": "RE'APER",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "One that cuts grain with sickle."
-      }
+      { "type": "noun", "text": "One that cuts grain with sickle." }
     ]
   },
   "Rebuker": {
@@ -7202,10 +6525,7 @@
   "Recompensed": {
     "pronunciation": "REC'OMPENSED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Rewarded; requited."
-      }
+      { "type": "participle passive", "text": "Rewarded; requited." }
     ]
   },
   "Recompensing": {
@@ -7253,30 +6573,11 @@
       }
     ]
   },
-  "Rejoice": {
-    "pronunciation": "REJOICE, verb intransitive rejois'.",
-    "definitions": [
-      {
-        "type": "verb intransitive",
-        "text": "To experience joy and gladness in a high degree; to be exhilarated with lively and pleasurable sensations; to exult."
-      },
-      {
-        "type": "verb transitive",
-        "text": "To make joyful; to gladden; to animate with lively pleasurable sensations; to exhilarate."
-      }
-    ]
-  },
   "Rend": {
     "pronunciation": "REND",
     "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "Rend"
-      },
-      {
-        "type": "preterit tense",
-        "text": "and"
-      },
+      { "type": "verb transitive", "text": "Rend" },
+      { "type": "preterit tense", "text": "and" },
       {
         "type": "participle passive",
         "text": "rent. [Eng. cranny, Latin crena, Gr.]<br/>1. To separate any substance into parts with force or sudden violence; to tear asunder; to split; as, powder rends a rock in blasting; lightning rends an oak. An empire from its old foundation rent. I rend my tresses, and by breast I wound. Neither rend your clothes, lest ye die. Leviticus 10:6.<br/>2. To separate or part with violence. I will surely rend the kingdom from thee. 1 Kings 11:11. To rend the heart, in Scripture, to have bitter sorrow for sin. Joel 2:13. To rend the heavens, to appear in majesty. Isaiah 64:1. differs somewhat from lacerate. We never say, to lacerate a rock or a kingdom, when we mean to express splitting or division. Lacerate is properly applicable to the tearing off of small pieces of a thing, as to lacerate the body with a whip or scourge; or to the tearing of the flesh or other thing without entire separation."
@@ -7290,19 +6591,13 @@
         "type": "participle present tense",
         "text": "Repenting<br/> Grieving for what is past; feeling pain or contrition for sin.<br/>REPENT'ING,"
       },
-      {
-        "type": "noun",
-        "text": "Act of repenting Hosea 11:8."
-      }
+      { "type": "noun", "text": "Act of repenting Hosea 11:8." }
     ]
   },
   "Replenished": {
     "pronunciation": "REPLEN'ISHED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Filled; abundantly supplied."
-      }
+      { "type": "participle passive", "text": "Filled; abundantly supplied." }
     ]
   },
   "Reprobate": {
@@ -7352,10 +6647,7 @@
   "Requited": {
     "pronunciation": "REQUI'TED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Repaid; recompensed; rewarded."
-      }
+      { "type": "participle passive", "text": "Repaid; recompensed; rewarded." }
     ]
   },
   "Requiting": {
@@ -7454,12 +6746,7 @@
   },
   "Rie": {
     "pronunciation": "RIE.",
-    "definitions": [
-      {
-        "type": "",
-        "text": ""
-      }
-    ]
+    "definitions": [{ "type": "", "text": "" }]
   },
   "Rifled": {
     "pronunciation": "RI'FLED",
@@ -7470,30 +6757,12 @@
       }
     ]
   },
-  "Righteous": {
-    "pronunciation": "RIGHTEOUS, adjective ri'chus.",
-    "definitions": [
-      {
-        "type": "adjective",
-        "text": "1. Just; accordant to the divine law. Applied to persons, it denotes one who is holy in heart, and observant of the divine commands in practice; as a righteous man. Applied to things, it denotes consonant to the divine will or to justice; as a righteous act. It is used chiefly in theology, and applied to God, to his testimonies and to his saints.<br/>The righteous in Scripture, denote the servants of God, the saints.<br/>2. Just; equitable; merited."
-      }
-    ]
-  },
   "Righteously": {
     "pronunciation": "RIGHTEOUSLY",
     "definitions": [
       {
         "type": "adverb",
         "text": "ri'chusly. Justly; in accordance with the laws of justice; equitably; as a criminal righteously condemned. Thou shalt judge the people righteously Psalms 67:4."
-      }
-    ]
-  },
-  "Righteousness": {
-    "pronunciation": "RIGHTEOUSNESS, noun ri'chusness.",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "1. Purity of heart and rectitude of life; conformity of heart and life to the divine law. righteousness as used in Scripture and theology, in which it is chiefly used, is nearly equivalent to holiness, comprehending holy principles and affections of heart, and conformity of life to the divine law. It includes all we call justice, honesty and virtue, with holy affections; in short, it is true religion.<br/>2. Applied to God, the perfection or holiness of his nature; exact rectitude; faithfulness.<br/>3. The active and passive obedience of Christ, by which the law of God is fulfilled. Daniel 9:7.<br/>4. Justice; equity between man and man. Luke 1:75.<br/>5. The cause of our justification.<br/>The Lord our righteousness Jeremiah 23:6."
       }
     ]
   },
@@ -7704,10 +6973,7 @@
         "type": "adjective",
         "text": "Scythian<br/> Pretaining to Scythia, name given to the northern part of Asia, and Europe adjoining to Asia."
       },
-      {
-        "type": "noun",
-        "text": "native of Scythia."
-      }
+      { "type": "noun", "text": "native of Scythia." }
     ]
   },
   "Seared": {
@@ -7731,10 +6997,7 @@
   "Seethe": {
     "pronunciation": "SEETHE",
     "definitions": [
-      {
-        "type": "preterit tense",
-        "text": "Seethe<br/> v. t. seethed, sod;"
-      },
+      { "type": "preterit tense", "text": "Seethe<br/> v. t. seethed, sod;" },
       {
         "type": "participle passive",
         "text": "seethed, sodden. [Heb. to seethe to boil, to swell, to be inflated.] To boil; to decoct or prepare for food in hot liquor; as, to seethe flesh. Thou shalt not seethe a kid in its mother's milk. Exodus 23:19. v. i. To be in a state of ebullition; to be hot. [This word is rarely used in common concerns of life.]"
@@ -7766,33 +7029,19 @@
   "Shamefacedness": {
     "pronunciation": "SHA'MEFACEDNESS",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "Bashfulness; excess of modesty."
-      }
+      { "type": "noun", "text": "Bashfulness; excess of modesty." }
     ]
   },
   "Shamer": {
     "pronunciation": "SHA'MER",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "One who makes ashamed; that which confounds."
-      }
+      { "type": "noun", "text": "One who makes ashamed; that which confounds." }
     ]
   },
-  "Shapen": {
-    "pronunciation": "SHA'PEN",
-    "definitions": []
-  },
+  "Shapen": { "pronunciation": "SHA'PEN", "definitions": [] },
   "Sheal": {
     "pronunciation": "SHEAL",
-    "definitions": [
-      {
-        "type": "",
-        "text": "to shell, not used."
-      }
-    ]
+    "definitions": [{ "type": "", "text": "to shell, not used." }]
   },
   "Shedder": {
     "pronunciation": "SHED'DER",
@@ -7832,12 +7081,7 @@
   },
   "Shewing": {
     "pronunciation": "SHEWING.",
-    "definitions": [
-      {
-        "type": "",
-        "text": ""
-      }
-    ]
+    "definitions": [{ "type": "", "text": "" }]
   },
   "Shibboleth": {
     "pronunciation": "SHIB'BOLETH, [Heb. an ear of corn, or a stream of water.]",
@@ -7851,10 +7095,7 @@
   "Shipmaster": {
     "pronunciation": "SHIP'M'ASTER, [ship and master.]",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "The captain, or commander of ship."
-      }
+      { "type": "noun", "text": "The captain, or commander of ship." }
     ]
   },
   "Shittah": {
@@ -7891,19 +7132,13 @@
         "type": "noun",
         "text": "Sinew<br/>1. In anatomy, a tendon; that which unites a muscle to a bone.<br/>2. In the plural, strength; or rather that which supplies strength. Money is the sinews of war.<br/>3. Muscle; nerve."
       },
-      {
-        "type": "verb intransitive",
-        "text": "To knit as by sinews."
-      }
+      { "type": "verb intransitive", "text": "To knit as by sinews." }
     ]
   },
   "Singed": {
     "pronunciation": "SING'ED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Burnt superficially."
-      }
+      { "type": "participle passive", "text": "Burnt superficially." }
     ]
   },
   "Singleness": {
@@ -7917,12 +7152,7 @@
   },
   "Sith": {
     "pronunciation": "SITH",
-    "definitions": [
-      {
-        "type": "adverb",
-        "text": "Since; in later times."
-      }
-    ]
+    "definitions": [{ "type": "adverb", "text": "Since; in later times." }]
   },
   "Situate": {
     "pronunciation": "SIT'UATE, [Latin situs, sedeo.]",
@@ -7945,10 +7175,7 @@
   "Sixscore": {
     "pronunciation": "SIX'SCORE, [six and score.]",
     "definitions": [
-      {
-        "type": "adjective",
-        "text": "times twenty; one hundred and twenty."
-      }
+      { "type": "adjective", "text": "times twenty; one hundred and twenty." }
     ]
   },
   "Slackness": {
@@ -8021,27 +7248,15 @@
         "type": "noun",
         "text": "Sluggard<br/> [from slug and ard, slow kind.] person habitually lazy, idle and inactive; drone."
       },
-      {
-        "type": "adjective",
-        "text": "Sluggish; lazy."
-      }
+      { "type": "adjective", "text": "Sluggish; lazy." }
     ]
   },
   "Smite": {
     "pronunciation": "SMITE",
     "definitions": [
-      {
-        "type": "verb transitive",
-        "text": "Smite"
-      },
-      {
-        "type": "preterit tense",
-        "text": "smote;"
-      },
-      {
-        "type": "participle passive",
-        "text": "smitten, smil. [This"
-      },
+      { "type": "verb transitive", "text": "Smite" },
+      { "type": "preterit tense", "text": "smote;" },
+      { "type": "participle passive", "text": "smitten, smil. [This" },
       {
         "type": "verb",
         "text": "is the Latin mitto.]<br/>1. To strike; to throw, drive or force against, as the fist or hand, a stone or a weapon; to reach with a blow or a weapon; as, to smite one with the fist; to smite with a rod or with a stone. Whoever shall smite thee on the right cheek, turn to him the other also. Matthew 5:39.<br/>2. To kill; to destroy the life of by beating or by weapons of any kind; as, to smite one with the sword, or with an arrow or other engine. David smote Goliath with a sling and a stone. The Philistines were often smitten with great slaughter. [This word, like slay, usually or always signification, that of beating, striking, the primitive mode of killing. We never apply to the destruction of life by poison, by accident or by legal execution.]<br/>3. To blast; to destroy life; as by a stroke or by something sent. The flax and the barley were smitten. Exodus 9:15.<br/>4. To afflict; to chasten; to punish. Let us not mistake God's goodness, nor imagine, because he smites us, that we are forsaken by him.<br/>5. To strike or affect with passion. See what the charms that smite the simple heart. with the love of sister arts we came. TO smite WITH THE TONGUE, to reproach or upbraid. Jeremiah 18:18."
@@ -8050,10 +7265,7 @@
         "type": "verb intransitive",
         "text": "To strike; to collide. The heart melteth and the kness smite together. Nahum<br/>2."
       },
-      {
-        "type": "noun",
-        "text": "A blow."
-      }
+      { "type": "noun", "text": "A blow." }
     ]
   },
   "Snared": {
@@ -8166,10 +7378,7 @@
         "type": "participle present tense",
         "text": "Sorrowing<br/> Feeling sorrow, grief regret."
       },
-      {
-        "type": "noun",
-        "text": "Expression of sorrow."
-      }
+      { "type": "noun", "text": "Expression of sorrow." }
     ]
   },
   "Sottish": {
@@ -8178,23 +7387,6 @@
       {
         "type": "adjective",
         "text": "1. Dull; stupid; senseless; doltish; very foolish. How ignorant are sottish pretenders to astrology!<br/>2. Dull with intemperance."
-      }
-    ]
-  },
-  "Soul": {
-    "pronunciation": "SOUL, noun",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "1. The spiritual, rational and immortal substance in man, which distinguishes him from brutes; that part of man which enables him to think and reason, and which renders him a subject of moral government.<br/>2. The understanding; the intellectual principle.<br/>3. Vital principle.<br/>4. Spirit; essence; chief part.<br/>5. Life; animation principle or part.<br/>6. Internal power.<br/>7. A human being; a person.<br/>8. Animal life.<br/>9. Active power.<br/>10. Spirit; courage; fire; grandeur of mind.<br/>11. Generosity; nobleness of mind.<br/>12. An intelligent being.<br/>13. Heart; affection.<br/>14. In Scripture, appetite.<br/>15. A familiar compellation of a person, but often expressing some qualities of the mind."
-      },
-      {
-        "type": "verb transitive",
-        "text": "To endure with a soul. [Not in use.]"
-      },
-      {
-        "type": "verb intransitive",
-        "text": "To afford suitable sustenance. [Not in use.]"
       }
     ]
   },
@@ -8231,19 +7423,6 @@
       {
         "type": "noun",
         "text": "spik'nard. [Latin spica nardi.]<br/>1. plant of the genus Nardus.<br/>2. The oil of balsam procured from the spikenard"
-      }
-    ]
-  },
-  "Spirit": {
-    "pronunciation": "SPIR'IT, noun [Latin spiritus, from spiro, to breathe, to blow. The primary sense is to rush or drive.]",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "1. Primarily, wind; air in motion; hence, breath.<br/>2. Animal excitement, or the effect of it; life; ardor; fire; courage; elevation or vehemence of mind.<br/>3. Vigor of intellect; genius.<br/>4. Temper; disposition of mind, habitual or temporary.<br/>5. The soul of man; the intelligent, immaterial and immortal part of human beings.<br/>6. An immaterial intelligent substance.<br/>7. An immaterial intelligent being.<br/>8. Turn of mind; temper; occasions; state of the mind.<br/>9. Powers of mind distinct from the body.<br/>10. Sentiment; perception.<br/>11. Eager desire; disposition of mind excited and directed to a particular object.<br/>12. A person of activity; a man of life, vigor or enterprise.<br/>13. Persons distinguished by qualities of the mind.<br/>14. Excitement of mind; animation; cheerfulness; usually in the plural.<br/>15. Life or strength of resemblance; essential qualities.<br/>16. Something eminently pure and refined.<br/>17. That which hath power or energy.<br/>18. A strong, pungent or stimulation liquor, usually obtained by distillation.<br/>19. An apparition; a ghost.<br/>20. The renewed nature of man. Matthew 26:41. Galatians 5:5.<br/>21. The influences of the Holy spirit Matthew 22:43.<br/>HOLY SPIRIT, the third person in the Trinity."
-      },
-      {
-        "type": "verb transitive",
-        "text": "1. To animate; to actuate.<br/>2. To animate with vigor; to excite; to encourage.<br/>3. To kidnap.<br/>To spirit away, to entice or seduce."
       }
     ]
   },
@@ -8307,10 +7486,7 @@
         "type": "participle present tense",
         "text": "Stammering<br/>1. Stopping or hesitating the uttering of syllables and words; stuttering.<br/>2."
       },
-      {
-        "type": "adjective",
-        "text": "Apt to stammer."
-      },
+      { "type": "adjective", "text": "Apt to stammer." },
       {
         "type": "noun",
         "text": "The act of stopping or hesitating speaking; impediment speech."
@@ -8365,10 +7541,7 @@
   "Stork": {
     "pronunciation": "STORK",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "A large fowl of the genus Ardea Heron kind."
-      }
+      { "type": "noun", "text": "A large fowl of the genus Ardea Heron kind." }
     ]
   },
   "Stoutness": {
@@ -8530,10 +7703,7 @@
   "Sundered": {
     "pronunciation": "SUN'DERED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Separated; divided; parted."
-      }
+      { "type": "participle passive", "text": "Separated; divided; parted." }
     ]
   },
   "Superfluity": {
@@ -8603,10 +7773,7 @@
       }
     ]
   },
-  "Sware": {
-    "pronunciation": "SWARE",
-    "definitions": []
-  },
+  "Sware": { "pronunciation": "SWARE", "definitions": [] },
   "Swoon": {
     "pronunciation": "SWOON",
     "definitions": [
@@ -8614,20 +7781,12 @@
         "type": "verb intransitive",
         "text": "Swoon<br/> To faint; to sink into a fainting fit, in which there is a suspension of the apparent vital functions and mental powers. The most in years swoon'd first away for pain. He seemed ready to swoon away in the surprise of joy."
       },
-      {
-        "type": "noun",
-        "text": "A fainting fit; lipothymy; syncope."
-      }
+      { "type": "noun", "text": "A fainting fit; lipothymy; syncope." }
     ]
   },
   "Sycamine": {
     "pronunciation": "SYCAMINE.",
-    "definitions": [
-      {
-        "type": "",
-        "text": ""
-      }
-    ]
+    "definitions": [{ "type": "", "text": "" }]
   },
   "Tabor": {
     "pronunciation": "TA'BOR, [Eng. tap.]",
@@ -8644,12 +7803,7 @@
   },
   "Tabret": {
     "pronunciation": "TAB'RET, [See Tabor.]",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "tabor. 1 Samuel 18:6."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "tabor. 1 Samuel 18:6." }]
   },
   "Talebearer": {
     "pronunciation": "TA'LEBEARER, [tale and bear.]",
@@ -8675,10 +7829,7 @@
         "type": "verb transitive",
         "text": "To ascertain or mark the amount of tare<br/>TARE, old"
       },
-      {
-        "type": "preterit tense",
-        "text": "of tear. WE now use tore."
-      }
+      { "type": "preterit tense", "text": "of tear. WE now use tore." }
     ]
   },
   "Tarry": {
@@ -8692,10 +7843,7 @@
         "type": "verb transitive",
         "text": "To wait for. I cannot tarry dinner. [Not in use.] T'ARRY,"
       },
-      {
-        "type": "adjective",
-        "text": "Consisting of tar, or like tar."
-      }
+      { "type": "adjective", "text": "Consisting of tar, or like tar." }
     ]
   },
   "Tarrying": {
@@ -8723,10 +7871,7 @@
   "Teil": {
     "pronunciation": "TEILTEIL-TREE, [Latin tilia.]",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "The lime tree, otherwise called the linden."
-      }
+      { "type": "noun", "text": "The lime tree, otherwise called the linden." }
     ]
   },
   "Tempter": {
@@ -8740,12 +7885,7 @@
   },
   "Teraphim": {
     "pronunciation": "TER'APHIM",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "Household deities or images."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "Household deities or images." }]
   },
   "Terribleness": {
     "pronunciation": "TER'RIBLENESS",
@@ -8801,40 +7941,14 @@
       }
     ]
   },
-  "Therefore": {
-    "pronunciation": "THEREFORE, adverb ther'fore. [there and for.]",
-    "definitions": [
-      {
-        "type": "adverb",
-        "text": "1. For that; for that or this reason, referring to something previously stated.<br/>2. Consequently.<br/>3. In return or recompense for this or that."
-      }
-    ]
-  },
   "Thereinto": {
     "pronunciation": "THEREINTO', [there and into.]",
-    "definitions": [
-      {
-        "type": "adverb",
-        "text": "Into that."
-      }
-    ]
-  },
-  "Thereof": {
-    "pronunciation": "THEREOF', adv. [there and of.]",
-    "definitions": [
-      {
-        "type": "adverb",
-        "text": "Of that or this."
-      }
-    ]
+    "definitions": [{ "type": "adverb", "text": "Into that." }]
   },
   "Thereout": {
     "pronunciation": "THEREOUT', [there and out.]",
     "definitions": [
-      {
-        "type": "adverb",
-        "text": "Out of that or this. Leviticus 2:2."
-      }
+      { "type": "adverb", "text": "Out of that or this. Leviticus 2:2." }
     ]
   },
   "Thereunto": {
@@ -8889,10 +8003,7 @@
         "type": "participle present tense",
         "text": "Thronging<br/> Crowding together; pressing with a multitude of persons."
       },
-      {
-        "type": "noun",
-        "text": "The act of crowding together."
-      }
+      { "type": "noun", "text": "The act of crowding together." }
     ]
   },
   "Throughly": {
@@ -9025,19 +8136,13 @@
         "type": "verb intransitive",
         "text": "1. To trade; to pass goods and commodities from one person to another for an equivalent in goods or money; to barter; to buy and sell wares; to carry on commerce. The English and Americans traffick with all the world. Genesis 42:34.<br/>2. To trade meanly or mercenarily."
       },
-      {
-        "type": "verb transitive",
-        "text": "To exchange in traffick"
-      }
+      { "type": "verb transitive", "text": "To exchange in traffick" }
     ]
   },
   "Transfigured": {
     "pronunciation": "TRANSFIG'URED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Changed in form."
-      }
+      { "type": "participle passive", "text": "Changed in form." }
     ]
   },
   "Transgress": {
@@ -9056,10 +8161,7 @@
   "Transgressed": {
     "pronunciation": "TRANSGRESS'ED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Overpassed; violated."
-      }
+      { "type": "participle passive", "text": "Overpassed; violated." }
     ]
   },
   "Transgressing": {
@@ -9118,10 +8220,7 @@
   "Treader": {
     "pronunciation": "TREADER",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "tred'er. One who treads. Isaiah 16:10."
-      }
+      { "type": "noun", "text": "tred'er. One who treads. Isaiah 16:10." }
     ]
   },
   "Tribulation": {
@@ -9145,14 +8244,8 @@
   "Trode": {
     "pronunciation": "TRODE",
     "definitions": [
-      {
-        "type": "preterit tense",
-        "text": "Trode<br/> old of tread."
-      },
-      {
-        "type": "noun",
-        "text": "Tread; footing."
-      }
+      { "type": "preterit tense", "text": "Trode<br/> old of tread." },
+      { "type": "noun", "text": "Tread; footing." }
     ]
   },
   "Troubler": {
@@ -9185,10 +8278,7 @@
   "Twined": {
     "pronunciation": "TWI'NED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Twisted; wound round."
-      }
+      { "type": "participle passive", "text": "Twisted; wound round." }
     ]
   },
   "Twoedged": {
@@ -9220,20 +8310,12 @@
   },
   "Uncircumcised": {
     "pronunciation": "UNCIR'CUMCISED",
-    "definitions": [
-      {
-        "type": "adjective",
-        "text": "as z. Not circumcised."
-      }
-    ]
+    "definitions": [{ "type": "adjective", "text": "as z. Not circumcised." }]
   },
   "Uncircumcision": {
     "pronunciation": "UNCIRCUMCI'SION",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "Absence or want of circumcision."
-      }
+      { "type": "noun", "text": "Absence or want of circumcision." }
     ]
   },
   "Uncleanness": {
@@ -9284,10 +8366,7 @@
   "Uncorruptness": {
     "pronunciation": "UNCORRUPT'NESS",
     "definitions": [
-      {
-        "type": "noun",
-        "text": "Integrity; uprightness. Titus 2:7."
-      }
+      { "type": "noun", "text": "Integrity; uprightness. Titus 2:7." }
     ]
   },
   "Unction": {
@@ -9338,10 +8417,7 @@
   "Ungirded": {
     "pronunciation": "UNGIRD'ED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Loosed from a girth or band."
-      }
+      { "type": "participle passive", "text": "Loosed from a girth or band." }
     ]
   },
   "Ungodliness": {
@@ -9454,10 +8530,7 @@
   "Unrighteously": {
     "pronunciation": "UNRIGHTEOUSLY",
     "definitions": [
-      {
-        "type": "adverb",
-        "text": "unri'chusly. Unjustly; wickedly; sinfully."
-      }
+      { "type": "adverb", "text": "unri'chusly. Unjustly; wickedly; sinfully." }
     ]
   },
   "Unrighteousness": {
@@ -9499,10 +8572,7 @@
   "Unshod": {
     "pronunciation": "UNSHOD'",
     "definitions": [
-      {
-        "type": "adjective",
-        "text": "Not shod; having no shoes."
-      }
+      { "type": "adjective", "text": "Not shod; having no shoes." }
     ]
   },
   "Unspotted": {
@@ -9521,10 +8591,7 @@
         "type": "participle passive",
         "text": "Unstopped<br/>1. Opened.<br/>2."
       },
-      {
-        "type": "adjective",
-        "text": "Not meeting any resistance."
-      }
+      { "type": "adjective", "text": "Not meeting any resistance." }
     ]
   },
   "Untaken": {
@@ -9719,10 +8786,7 @@
         "type": "noun",
         "text": "Boast; vain display of what one is or has, or has done; ostentation from vanity. Him I seduc'd with other vaunts and other promises."
       },
-      {
-        "type": "noun",
-        "text": "The first part. [Not used.]"
-      }
+      { "type": "noun", "text": "The first part. [Not used.]" }
     ]
   },
   "Verily": {
@@ -9822,10 +8886,7 @@
   "Wallow": {
     "pronunciation": "WALLOW, [Latin , G. This verb seems to be connected with well, walk, etc.]",
     "definitions": [
-      {
-        "type": "verb intransitive",
-        "text": "Wallow<br/> [Latin G. This"
-      },
+      { "type": "verb intransitive", "text": "Wallow<br/> [Latin G. This" },
       {
         "type": "verb",
         "text": "seems to be connected with well, walk, etc.]<br/>1. To roll ones body on the earth, in mire, or on other substance; to tumble and roll in water. Swine wallow in the mire.<br/>2. To move heavily and clumsily. Part huge of bulk, wallowing unwieldy, enormous in their gait, tempest the ocean. [Unusual.]<br/>3. To live in filth or gross vice; as man wallowing in his native impurity."
@@ -9834,10 +8895,7 @@
         "type": "verb transitive",
         "text": "To roll ones body. thyself in ashes. Jeremiah 6:26."
       },
-      {
-        "type": "noun",
-        "text": "kind of rolling walk."
-      }
+      { "type": "noun", "text": "kind of rolling walk." }
     ]
   },
   "Wantonness": {
@@ -9888,10 +8946,7 @@
   "Waxen": {
     "pronunciation": "WAXEN",
     "definitions": [
-      {
-        "type": "adjective",
-        "text": "Made of wax; as waxen cells."
-      }
+      { "type": "adjective", "text": "Made of wax; as waxen cells." }
     ]
   },
   "Waxing": {
@@ -9950,10 +9005,7 @@
   "Whensoever": {
     "pronunciation": "WHENSOEVER, [when, so, and ever.]",
     "definitions": [
-      {
-        "type": "adverb",
-        "text": "At what time soever; at whatever time."
-      }
+      { "type": "adverb", "text": "At what time soever; at whatever time." }
     ]
   },
   "Whereabout": {
@@ -9974,23 +9026,9 @@
       }
     ]
   },
-  "Wherein": {
-    "pronunciation": "WHEREIN, adverb [where and in.]",
-    "definitions": [
-      {
-        "type": "adverb",
-        "text": "1. In which; in which thing, time, respect, book, etc. This is the thing wherein you have erred.<br/>2. In what.<br/>Yet ye say, wherein have we wearied him? Malachi 2:17."
-      }
-    ]
-  },
   "Whereinto": {
     "pronunciation": "WHEREINTO, [where and into.]",
-    "definitions": [
-      {
-        "type": "adverb",
-        "text": "Into which."
-      }
-    ]
+    "definitions": [{ "type": "adverb", "text": "Into which." }]
   },
   "Whereon": {
     "pronunciation": "WHEREON, [where and on.]",
@@ -10022,10 +9060,7 @@
   "Whereunto": {
     "pronunciation": "WHEREUNTO, [where and unto.]",
     "definitions": [
-      {
-        "type": "adverb",
-        "text": "The same as whereto. [Little Used.]"
-      }
+      { "type": "adverb", "text": "The same as whereto. [Little Used.]" }
     ]
   },
   "Wherewith": {
@@ -10049,10 +9084,7 @@
   "Whited": {
     "pronunciation": "WHITED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Made white; whitened."
-      }
+      { "type": "participle passive", "text": "Made white; whitened." }
     ]
   },
   "Whithersoever": {
@@ -10084,12 +9116,7 @@
   },
   "Whoremonger": {
     "pronunciation": "WHOREMONGER",
-    "definitions": [
-      {
-        "type": "noun",
-        "text": "The same as whoremaster."
-      }
-    ]
+    "definitions": [{ "type": "noun", "text": "The same as whoremaster." }]
   },
   "Whorish": {
     "pronunciation": "WHORISH",
@@ -10103,10 +9130,7 @@
   "Whoso": {
     "pronunciation": "WHOSO",
     "definitions": [
-      {
-        "type": "pronoun",
-        "text": "Hooso. Any person whatever."
-      }
+      { "type": "pronoun", "text": "Hooso. Any person whatever." }
     ]
   },
   "Whosoever": {
@@ -10115,15 +9139,6 @@
       {
         "type": "pronoun",
         "text": "Any one; any person whatever. will, let him take of the water of life freely. Revelations<br/>22."
-      }
-    ]
-  },
-  "Wicked": {
-    "pronunciation": "WICKED, adjective [The primary sense is to wind and turn, or to depart, to fall away.]",
-    "definitions": [
-      {
-        "type": "adjective",
-        "text": "1. Evil in principle or practice; deviating from the divine law; addicted to vice; sinful; immoral.<br/>2. A word of slight blame.<br/>3. Cursed; baneful; pernicious.<br/>The wicked in Scripture, persons who live in sin; transgressors of the divine law; all who are unreconciled to God, unsanctified or impenitent."
       }
     ]
   },
@@ -10170,20 +9185,12 @@
   "Wintered": {
     "pronunciation": "WINTERED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Kept through the winter."
-      }
+      { "type": "participle passive", "text": "Kept through the winter." }
     ]
   },
   "Wist": {
     "pronunciation": "WIST",
-    "definitions": [
-      {
-        "type": "preterit tense",
-        "text": "of wis."
-      }
-    ]
+    "definitions": [{ "type": "preterit tense", "text": "of wis." }]
   },
   "Withal": {
     "pronunciation": "WITHAL",
@@ -10197,10 +9204,7 @@
   "Withholden": {
     "pronunciation": "WITHHOLDEN",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Withholden<br/> The"
-      },
+      { "type": "participle passive", "text": "Withholden<br/> The" },
       {
         "type": "participle",
         "text": "of withhold; now obsolete. We use withheld."
@@ -10290,10 +9294,7 @@
   "Wronged": {
     "pronunciation": "WRONGED",
     "definitions": [
-      {
-        "type": "participle passive",
-        "text": "Treated unjustly; injured."
-      }
+      { "type": "participle passive", "text": "Treated unjustly; injured." }
     ]
   },
   "Wroth": {

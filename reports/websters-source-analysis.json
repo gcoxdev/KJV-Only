@@ -1,0 +1,88 @@
+{
+  "localSubset": {
+    "path": "public/references/websters.json",
+    "entryCount": 1019,
+    "format": {
+      "pronunciation": "string | undefined",
+      "definitions": [
+        {
+          "type": "string",
+          "text": "string"
+        }
+      ]
+    }
+  },
+  "siteCompatibility": {
+    "likelySameUpstream": true,
+    "confidence": "high",
+    "evidence": [
+      {
+        "word": "Abaddon",
+        "siteUrl": "https://webstersdictionary1828.com/Dictionary/abaddon",
+        "result": "exact wording match in sampled pronunciation/definition text"
+      },
+      {
+        "word": "Abase",
+        "siteUrl": "https://webstersdictionary1828.com/Dictionary/Abase",
+        "result": "exact wording match in sampled pronunciation/definition text"
+      },
+      {
+        "word": "Abib",
+        "siteUrl": "https://webstersdictionary1828.com/Dictionary/abib",
+        "result": "exact wording match in sampled pronunciation/definition text"
+      }
+    ],
+    "notes": [
+      "Current local data is transformed beyond the site format.",
+      "Local file separates pronunciation from definitions and normalizes part-of-speech into definitions[].type."
+    ]
+  },
+  "candidateSourceForLest": {
+    "word": "Lest",
+    "siteUrl": "https://webstersdictionary1828.com/Dictionary/lest",
+    "recommended": true,
+    "reason": "Compatible with the likely wording source used by the current subset."
+  },
+  "swordModule": {
+    "moduleId": "Webster1828",
+    "category": "Lexicon / Dictionary",
+    "version": "1.1",
+    "crosswireModulesIndex": "https://www.crosswire.org/sword/modules/index.jsp",
+    "crosswireRawModsIndex": "https://www.crosswire.org/ftpmirror/pub/sword/raw/mods.d/",
+    "releaseAnnouncement": "https://lists.crosswire.org/pipermail/sword-devel/2024-August/050162.html",
+    "releaseNotes": [
+      "Updated for Akai Tsurugi",
+      "Fixed definitions for a few words",
+      "Updated metadata files",
+      "Cleaned up unknown characters, and double spaces"
+    ],
+    "creditedWork": "Christian_Liberty_Institute"
+  },
+  "swordUpstreamEvidence": {
+    "akaiPage": "https://akaitsurugi.org/library/study/webster1828",
+    "observations": [
+      "Source is available on GitHub",
+      "Main source file is webster1828.csv",
+      "webster1828.csv uses two columns: word and definition",
+      "words-in-progress.csv exists",
+      "Approximately 600 words still need to be fixed and added"
+    ]
+  },
+  "entryCountStatus": {
+    "verifiedEntryCountAvailable": false,
+    "notes": [
+      "SWORD Webster1828 is clearly much larger than the local 1019-entry subset.",
+      "Exact entry count was not verified in this pass."
+    ]
+  },
+  "recommendation": {
+    "shortTerm": [
+      "Use webstersdictionary1828.com wording for approved targeted additions.",
+      "Normalize each entry into the existing local WebstersEntry structure."
+    ],
+    "longTerm": [
+      "Inspect the SWORD Webster1828 source repo/module directly.",
+      "Count entries and evaluate whether it should become the master import source."
+    ]
+  }
+}

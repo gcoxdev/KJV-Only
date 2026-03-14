@@ -1,0 +1,281 @@
+{
+  "summary": {
+    "targetFormat": {
+      "pronunciation": "string | undefined",
+      "definitions": [
+        {
+          "type": "string",
+          "text": "string"
+        }
+      ]
+    },
+    "notes": [
+      "This file is a schema-normalized scaffold for review only.",
+      "It matches the shape used by public/references/websters.json.",
+      "Pronunciations are not yet populated from source pages.",
+      "Definition text is currently based on the paraphrased preview summaries, not imported Webster body text.",
+      "Source URLs are kept here for audit only and would not be written into websters.json."
+    ]
+  },
+  "entries": {
+    "Priest": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/priest",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun",
+            "text": "One who officiates in sacred duties; in Christian usage, a minister or presbyter."
+          }
+        ]
+      }
+    },
+    "Priests": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/priests",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun plural",
+            "text": "Plural KJV form using the Webster entry for priest and priesthood-related senses."
+          }
+        ]
+      }
+    },
+    "Congregation": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/congregations",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun",
+            "text": "An assembly; especially a gathered body of people for worship or religious instruction."
+          }
+        ]
+      }
+    },
+    "Righteousness": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/righteousness",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun",
+            "text": "Conformity of heart and life to divine law; holiness, justice, and rectitude in theological use."
+          }
+        ]
+      }
+    },
+    "Righteous": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/right",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "adjective",
+            "text": "Just or in accord with divine law; especially used in theology for the godly or upright."
+          }
+        ]
+      }
+    },
+    "Inheritance": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/inheritance",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun",
+            "text": "An estate or possession received by descent, or something possessed by divine grant or appointment."
+          }
+        ]
+      }
+    },
+    "Thereof": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/thereof",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "adverb",
+            "text": "Of that or this."
+          }
+        ]
+      }
+    },
+    "Therein": {
+      "sourceUrl": "https://www.kingjamesbibledictionary.com/Dictionary/there",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "adverb",
+            "text": "In that or this place, time, or thing."
+          }
+        ]
+      }
+    },
+    "Wherein": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/wherein",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "adverb",
+            "text": "In which; in what thing, time, respect, or writing."
+          }
+        ]
+      }
+    },
+    "Behold": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/behold",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "verb transitive",
+            "text": "To look upon with attention; also used imperatively to call attention or admiration."
+          }
+        ]
+      }
+    },
+    "Offering": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/offering",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun",
+            "text": "Something presented to God in worship, sacrifice, thanksgiving, or atonement; an oblation."
+          }
+        ]
+      }
+    },
+    "Offerings": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/offering",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun plural",
+            "text": "Plural uses can derive from Webster's offering entry covering sacrificial and devotional offerings."
+          }
+        ]
+      }
+    },
+    "Brethren": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/brethren",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun plural",
+            "text": "The scriptural or solemn plural of brother, used chiefly in serious or biblical language."
+          }
+        ]
+      }
+    },
+    "Spirit": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/spirit",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun",
+            "text": "Breath, life, disposition, soul, immaterial being, or the divine Spirit depending on context."
+          }
+        ]
+      }
+    },
+    "Soul": {
+      "sourceUrl": "https://www.kingjamesbibledictionary.com/Dictionary/soul",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun",
+            "text": "The immortal rational part of man; also life, inward affection, person, or appetite in Scripture."
+          }
+        ]
+      }
+    },
+    "Altar": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/altars",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun",
+            "text": "An elevated place for sacrifice; in Christian use, also communion table or figurative place of worship."
+          }
+        ]
+      }
+    },
+    "Midst": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/midst",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun",
+            "text": "The middle; often used for being surrounded by or in the thick of something."
+          }
+        ]
+      }
+    },
+    "Covenant": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/covenant",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "noun",
+            "text": "A mutual agreement or stipulation; in theology, the covenant of works, redemption, or grace."
+          }
+        ]
+      }
+    },
+    "Holy": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/holy",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "adjective",
+            "text": "Morally pure, free from sin, and also consecrated or set apart for sacred use."
+          }
+        ]
+      }
+    },
+    "Burnt": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/burnt",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "adjective",
+            "text": "Burned or consumed by fire; in sacrificial use, tied to burnt-offering as an atoning sacrifice."
+          }
+        ]
+      }
+    },
+    "Wicked": {
+      "sourceUrl": "https://www.kingjamesbibledictionary.com/Dictionary/wicked",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "adjective",
+            "text": "Evil in principle or practice; sinful, immoral, pernicious, or opposed to divine law."
+          }
+        ]
+      }
+    },
+    "Rejoice": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/rejoice",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "verb intransitive",
+            "text": "To experience lively joy or gladness; also to make joyful or gladden."
+          }
+        ]
+      }
+    },
+    "Therefore": {
+      "sourceUrl": "https://kingjamesbibledictionary.com/Dictionary/Therefore",
+      "normalizedEntry": {
+        "definitions": [
+          {
+            "type": "adverb",
+            "text": "For that reason; consequently; or sometimes in return for that."
+          }
+        ]
+      }
+    }
+  },
+  "unresolved": [
+    {
+      "word": "Lest",
+      "reason": "No direct Webster preview page was found in the current sourcing pass."
+    }
+  ]
+}
