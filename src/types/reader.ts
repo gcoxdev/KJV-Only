@@ -11,6 +11,14 @@ export type ConcordancePayload = {
 export type CrossRefsPayload = Record<string, string[]>;
 export type HitchcocksPayload = Record<string, string>;
 export type OldEnglishPayload = Record<string, string[]>;
+export type UnitsEntry = {
+  category: "length" | "weight" | "volume" | "currency" | "time";
+  summary: string;
+  approximate: string;
+  aliases?: string[];
+  note?: string;
+};
+export type UnitsPayload = Record<string, UnitsEntry>;
 
 export type GenealogyVerseByName = {
   name: string;
@@ -151,6 +159,7 @@ export type StudyWorkspaceTool =
   | "websters"
   | "strongs"
   | "old-english"
+  | "units"
   | "maps"
   | "genealogy"
   | "hitchcocks";

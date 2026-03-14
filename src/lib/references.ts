@@ -2,6 +2,7 @@ import type {
   ConcordancePayload,
   HitchcocksPayload,
   OldEnglishPayload,
+  UnitsPayload,
   WebstersPayload,
 } from "@/types/reader";
 
@@ -207,6 +208,40 @@ export function resolveOldEnglishKey(
     (key) => key.toLowerCase() === lowered,
   );
   return fallback ?? null;
+}
+
+export function resolveUnitsKey(units: UnitsPayload, rawWord: string) {
+  const cleaned = normalizeConcordanceWord(rawWord);
+  if (!cleaned) {
+    return null;
+  }
+
+  const lowered = cleaned.toLowerCase();
+  const singular = lowered.endsWith("s") ? lowered.slice(0, -1) : lowered;
+  const candidates = new Set([
+    cleaned,
+    lowered,
+    singular,
+    cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase(),
+    cleaned.toUpperCase(),
+  ]);
+
+  for (const [key, entry] of Object.entries(units)) {
+    const keyLower = key.toLowerCase();
+    if (candidates.has(key) || candidates.has(keyLower)) {
+      return key;
+    }
+    if (
+      entry.aliases?.some((alias) => {
+        const aliasLower = alias.toLowerCase();
+        return candidates.has(alias) || candidates.has(aliasLower);
+      })
+    ) {
+      return key;
+    }
+  }
+
+  return null;
 }
 
 export function normalizeStrongsCode(value: string) {

@@ -5,6 +5,7 @@ import { ConcordanceTool } from "@/components/reader/study-tools/concordance-too
 import { WebstersTool } from "@/components/reader/study-tools/websters-tool";
 import { StrongsTool } from "@/components/reader/study-tools/strongs-tool";
 import { OldEnglishTool } from "@/components/reader/study-tools/old-english-tool";
+import { UnitsTool } from "@/components/reader/study-tools/units-tool";
 import { MapsTool } from "@/components/reader/study-tools/maps-tool";
 import { GenealogyTool } from "@/components/reader/study-tools/genealogy-tool";
 import { HitchcocksTool } from "@/components/reader/study-tools/hitchcocks-tool";
@@ -28,6 +29,7 @@ type ReaderStudySidebarProps = {
   webstersProps: ComponentProps<typeof WebstersTool>;
   strongsProps: ComponentProps<typeof StrongsTool>;
   oldEnglishProps: ComponentProps<typeof OldEnglishTool>;
+  unitsProps: ComponentProps<typeof UnitsTool>;
   mapsProps: ComponentProps<typeof MapsTool>;
   genealogyProps: ComponentProps<typeof GenealogyTool>;
   hitchcocksProps: ComponentProps<typeof HitchcocksTool>;
@@ -50,6 +52,7 @@ export function ReaderStudySidebar({
   webstersProps,
   strongsProps,
   oldEnglishProps,
+  unitsProps,
   mapsProps,
   genealogyProps,
   hitchcocksProps,
@@ -76,6 +79,7 @@ export function ReaderStudySidebar({
           <WebstersTool {...webstersProps} />
           <StrongsTool {...strongsProps} />
           <OldEnglishTool {...oldEnglishProps} />
+          <UnitsTool {...unitsProps} />
           <MapsTool {...mapsProps} />
           <GenealogyTool {...genealogyProps} />
           <HitchcocksTool {...hitchcocksProps} />

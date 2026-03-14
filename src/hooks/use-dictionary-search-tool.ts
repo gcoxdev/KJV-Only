@@ -4,13 +4,19 @@ type UseDictionarySearchToolArgs<TPayload extends Record<string, TValue>, TValue
   load: () => Promise<TPayload>;
   errorMessage: string;
   mapResult: (key: string, value: TValue) => TResult;
+  getSearchStrings?: (key: string, value: TValue) => string[];
 };
 
 export function useDictionarySearchTool<
   TPayload extends Record<string, TValue>,
   TValue,
   TResult,
->({ load, errorMessage, mapResult }: UseDictionarySearchToolArgs<TPayload, TValue, TResult>) {
+>({
+  load,
+  errorMessage,
+  mapResult,
+  getSearchStrings,
+}: UseDictionarySearchToolArgs<TPayload, TValue, TResult>) {
   const [payload, setPayload] = useState<TPayload | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -26,10 +32,13 @@ export function useDictionarySearchTool<
             .map((key) => ({
               key,
               keyLower: key.toLowerCase(),
+              searchStrings: (
+                getSearchStrings ? getSearchStrings(key, payload[key] as TValue) : [key]
+              ).map((value) => value.toLowerCase()),
               value: payload[key] as TValue,
             }))
         : [],
-    [payload],
+    [getSearchStrings, payload],
   );
 
   const ensureLoaded = useCallback(async () => {
@@ -60,7 +69,11 @@ export function useDictionarySearchTool<
       return [] as TResult[];
     }
     return indexedEntries
-      .filter((item) => item.keyLower.includes(term))
+      .filter(
+        (item) =>
+          item.keyLower.includes(term) ||
+          item.searchStrings.some((value) => value.includes(term)),
+      )
       .map((item) => mapResult(item.key, item.value));
   }, [indexedEntries, mapResult, searchTerm, selectedResult]);
 

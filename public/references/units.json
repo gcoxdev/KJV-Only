@@ -1,0 +1,137 @@
+{
+  "Cubit": {
+    "category": "length",
+    "summary": "A common biblical unit of length based on the forearm.",
+    "approximate": "About 18 inches or 45 centimeters.",
+    "aliases": ["cubits"],
+    "note": "The long or royal cubit could be somewhat greater."
+  },
+  "Span": {
+    "category": "length",
+    "summary": "A short measure of length based on the spread of the hand.",
+    "approximate": "About 9 inches or 23 centimeters.",
+    "aliases": ["spans"]
+  },
+  "Handbreadth": {
+    "category": "length",
+    "summary": "A very small unit of length based on the breadth of the hand.",
+    "approximate": "About 3 to 4 inches or 7.5 to 10 centimeters.",
+    "aliases": ["handbreadths"]
+  },
+  "Reed": {
+    "category": "length",
+    "summary": "A measuring reed used for larger distances.",
+    "approximate": "Often about 6 cubits, or roughly 9 feet / 2.7 meters.",
+    "aliases": ["reeds"]
+  },
+  "Furlong": {
+    "category": "length",
+    "summary": "A Roman distance measure.",
+    "approximate": "About 1/8 mile, or roughly 201 meters.",
+    "aliases": ["furlongs"]
+  },
+  "Measure": {
+    "category": "volume",
+    "summary": "A general English rendering for a quantity, often context-dependent.",
+    "approximate": "Varies by context.",
+    "aliases": ["measures"],
+    "note": "The exact modern equivalent depends on the underlying Hebrew or Greek unit."
+  },
+  "Omer": {
+    "category": "volume",
+    "summary": "A dry measure used in the Old Testament.",
+    "approximate": "About 2.2 liters or 2 dry quarts.",
+    "aliases": ["omers"]
+  },
+  "Ephah": {
+    "category": "volume",
+    "summary": "A larger dry measure used for grain and similar goods.",
+    "approximate": "About 22 liters or roughly 5.8 gallons.",
+    "aliases": ["ephahs"]
+  },
+  "Bath": {
+    "category": "volume",
+    "summary": "A liquid measure used in the Old Testament.",
+    "approximate": "About 22 liters or roughly 5.8 gallons.",
+    "aliases": ["baths"]
+  },
+  "Hin": {
+    "category": "volume",
+    "summary": "A smaller liquid measure.",
+    "approximate": "About 3.5 to 4 liters, close to 1 gallon.",
+    "aliases": ["hins"]
+  },
+  "Log": {
+    "category": "volume",
+    "summary": "A small liquid measure.",
+    "approximate": "About 0.3 liters, or a little over half a pint.",
+    "aliases": ["logs"]
+  },
+  "Firkin": {
+    "category": "volume",
+    "summary": "A Greek liquid measure.",
+    "approximate": "Roughly 8 to 10 gallons, depending on the standard used.",
+    "aliases": ["firkins"]
+  },
+  "Cor": {
+    "category": "volume",
+    "summary": "A large dry or liquid measure, related to the homer.",
+    "approximate": "About 220 liters or roughly 58 gallons.",
+    "aliases": ["cors", "cor"],
+    "note": "Often treated as equivalent to a homer."
+  },
+  "Homer": {
+    "category": "volume",
+    "summary": "A very large measure for dry or liquid goods.",
+    "approximate": "About 220 liters or roughly 58 gallons.",
+    "aliases": ["homers"]
+  },
+  "Shekel": {
+    "category": "weight",
+    "summary": "A standard biblical unit of weight and also a monetary weight.",
+    "approximate": "About 11 grams, or about 0.4 ounces.",
+    "aliases": ["shekels"]
+  },
+  "Talent": {
+    "category": "weight",
+    "summary": "A very large unit of weight, often for precious metals.",
+    "approximate": "Often estimated around 75 pounds or 34 kilograms.",
+    "aliases": ["talents"]
+  },
+  "Pound": {
+    "category": "weight",
+    "summary": "A Roman pound used as a weight and money-weight.",
+    "approximate": "About 12 ounces or roughly 327 grams.",
+    "aliases": ["pounds"]
+  },
+  "Penny": {
+    "category": "currency",
+    "summary": "The KJV rendering of the Roman denarius.",
+    "approximate": "Commonly viewed as a laborer's wage for a day.",
+    "aliases": ["pennies"]
+  },
+  "Farthing": {
+    "category": "currency",
+    "summary": "A very small coin in the New Testament.",
+    "approximate": "A tiny fraction of a denarius.",
+    "aliases": ["farthings"]
+  },
+  "Mite": {
+    "category": "currency",
+    "summary": "A very small coin, famously mentioned in the widow's offering.",
+    "approximate": "Smaller than a farthing; among the least-value coins mentioned.",
+    "aliases": ["mites"]
+  },
+  "Watch": {
+    "category": "time",
+    "summary": "A division of the night for keeping guard and marking time.",
+    "approximate": "Usually around 3 hours in the Roman system.",
+    "aliases": ["watches"]
+  },
+  "Hour": {
+    "category": "time",
+    "summary": "A standard time division used in Scripture.",
+    "approximate": "About 60 minutes.",
+    "aliases": ["hours"]
+  }
+}

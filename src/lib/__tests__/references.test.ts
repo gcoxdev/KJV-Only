@@ -3,8 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   decodeConcordanceReferences,
   resolveConcordanceKey,
+  resolveUnitsKey,
 } from "@/lib/references";
-import type { ConcordancePayload } from "@/types/reader";
+import type { ConcordancePayload, UnitsPayload } from "@/types/reader";
 
 describe("concordance helpers", () => {
   const concordance: ConcordancePayload = {
@@ -27,5 +28,26 @@ describe("concordance helpers", () => {
       "GEN.1.2",
       "GEN.1.3",
     ]);
+  });
+
+  it("resolves units by singular, plural, and aliases", () => {
+    const units: UnitsPayload = {
+      Cubit: {
+        category: "length",
+        summary: "Length",
+        approximate: "About 18 inches",
+        aliases: ["cubits"],
+      },
+      Penny: {
+        category: "currency",
+        summary: "Money",
+        approximate: "A laborer's wage",
+        aliases: ["pennies", "denarius"],
+      },
+    };
+
+    expect(resolveUnitsKey(units, "Cubit")).toBe("Cubit");
+    expect(resolveUnitsKey(units, "cubits")).toBe("Cubit");
+    expect(resolveUnitsKey(units, "denarius")).toBe("Penny");
   });
 });
