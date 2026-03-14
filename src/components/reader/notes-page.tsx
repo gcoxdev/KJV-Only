@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  Maximize2Icon,
-  Minimize2Icon,
+  ExpandIcon,
+  MinimizeIcon,
   PanelTopIcon,
   PencilIcon,
   PlusIcon,
@@ -202,6 +202,8 @@ export function NotesPage({
   const [isNotesListCollapsed, setIsNotesListCollapsed] = useState(false);
   const [isEditorFullscreen, setIsEditorFullscreen] = useState(false);
   const [showEditorTools, setShowEditorTools] = useState(true);
+  const pageRef = useRef<HTMLDivElement | null>(null);
+  const [isCompactLayout, setIsCompactLayout] = useState(false);
 
   useEffect(() => {
     if (!selectedNote) {
@@ -216,17 +218,30 @@ export function NotesPage({
   }, [selectedNote?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (typeof window === "undefined") {
+    const element = pageRef.current;
+    if (!element || typeof ResizeObserver === "undefined") {
       return;
     }
 
-    if (window.matchMedia("(max-width: 1023px)").matches) {
+    const observer = new ResizeObserver(([entry]) => {
+      const width = entry.contentRect.width;
+      setIsCompactLayout(width < 1024);
+    });
+
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isCompactLayout) {
       setIsNotesListCollapsed(Boolean(selectedNote));
       return;
     }
 
     setIsNotesListCollapsed(false);
-  }, [selectedNote]);
+  }, [isCompactLayout, selectedNote]);
 
   const hasDraftChanges =
     selectedNote !== null &&
@@ -235,11 +250,18 @@ export function NotesPage({
         JSON.stringify(parseSerializedState(selectedNote.body) ?? null));
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-1 gap-3 p-2 lg:grid-cols-[22rem_minmax(0,1fr)]">
+    <div
+      ref={pageRef}
+      className={cn(
+        "grid h-full min-h-0 gap-3 p-2",
+        isCompactLayout ? "grid-cols-1" : "grid-cols-[22rem_minmax(0,1fr)]",
+      )}
+    >
       <div
         className={cn(
           "flex min-h-0 flex-col rounded-md border",
-          isNotesListCollapsed && "hidden lg:flex",
+          isNotesListCollapsed && "hidden",
+          !isCompactLayout && "flex",
         )}
       >
         <div className="space-y-2 border-b p-2">
@@ -249,7 +271,7 @@ export function NotesPage({
               type="button"
               size="sm"
               variant="outline"
-              className="lg:hidden"
+              className={cn(!isCompactLayout && "hidden")}
               onClick={() => setIsNotesListCollapsed(true)}
             >
               Hide List
@@ -362,7 +384,7 @@ export function NotesPage({
                   type="button"
                   variant="outline"
                   size="icon-sm"
-                  className="lg:hidden"
+                  className={cn(!isCompactLayout && "hidden")}
                   onClick={() => setIsNotesListCollapsed((current) => !current)}
                   aria-label={isNotesListCollapsed ? "Show notes list" : "Hide notes list"}
                 >
@@ -397,7 +419,7 @@ export function NotesPage({
                       onClick={() => setIsEditorFullscreen((current) => !current)}
                       aria-label={isEditorFullscreen ? "Exit fullscreen note editor" : "Enter fullscreen note editor"}
                     >
-                      {isEditorFullscreen ? <Minimize2Icon /> : <Maximize2Icon />}
+                      {isEditorFullscreen ? <MinimizeIcon /> : <ExpandIcon />}
                     </Button>
                     <Button
                       type="button"
@@ -441,7 +463,7 @@ export function NotesPage({
                       onClick={() => setIsEditorFullscreen((current) => !current)}
                       aria-label={isEditorFullscreen ? "Exit fullscreen note editor" : "Enter fullscreen note editor"}
                     >
-                      {isEditorFullscreen ? <Minimize2Icon /> : <Maximize2Icon />}
+                      {isEditorFullscreen ? <MinimizeIcon /> : <ExpandIcon />}
                     </Button>
                     <Button
                       type="button"
@@ -568,7 +590,7 @@ export function NotesPage({
               type="button"
               variant="outline"
               size="sm"
-              className="lg:hidden"
+              className={cn(!isCompactLayout && "hidden")}
               onClick={() => setIsNotesListCollapsed(false)}
             >
               Show List
