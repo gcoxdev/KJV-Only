@@ -5,5 +5,3 @@
 
 - Make chapter swipeable left / right for prev / next chapter, always have loaded prev, current, next
 - Maybe make infinite scrolling for chapters possible, always have loaded prev, current, next
-- Congratulatory message or something (confetti) when 100% progress achieved
-- Study mode, hover over Strongs highlights other Strongs within same panel / tab
