@@ -4,12 +4,20 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpIcon,
+  BlendIcon,
+  BookMarkedIcon,
+  BookOpenIcon,
   EllipsisVerticalIcon,
+  HouseIcon,
+  NotebookPenIcon,
   PencilLineIcon,
   PlusIcon,
+  SearchIcon,
+  ToolboxIcon,
   XIcon,
 } from "lucide-react";
 
+import { getStaticPage } from "@/lib/static-pages";
 import { cn } from "@/lib/utils";
 import type { ReaderTab, TabsOrientation } from "@/types/reader";
 import { Button } from "@/components/ui/button";
@@ -36,6 +44,68 @@ type TabsStripProps = {
   onCloseTab: (tabId: string) => void;
   onAddTab: () => void;
 };
+
+function collectLeafStates(tab: ReaderTab) {
+  const leaves: Array<
+    ReaderTab["root"] extends infer Root
+      ? Root extends { type: "leaf" }
+        ? Root
+        : never
+      : never
+  > = [];
+
+  const visit = (node: ReaderTab["root"]) => {
+    if (node.type === "leaf") {
+      leaves.push(node);
+      return;
+    }
+    visit(node.first);
+    visit(node.second);
+  };
+
+  visit(tab.root);
+  return leaves;
+}
+
+function getTabIcon(tab: ReaderTab) {
+  const leaves = collectLeafStates(tab);
+  if (leaves.length === 0) {
+    return null;
+  }
+
+  const firstLeaf = leaves[0];
+  const allSameView = leaves.every((leaf) => leaf.view === firstLeaf.view);
+  if (!allSameView) {
+    return BlendIcon;
+  }
+
+  if (firstLeaf.view === "picker") {
+    return HouseIcon;
+  }
+  if (firstLeaf.view === "tools") {
+    return ToolboxIcon;
+  }
+  if (firstLeaf.view === "notes") {
+    return NotebookPenIcon;
+  }
+  if (firstLeaf.view === "bookmarks") {
+    return BookMarkedIcon;
+  }
+  if (firstLeaf.view === "search") {
+    return SearchIcon;
+  }
+  if (firstLeaf.view === "page") {
+    const samePageId = leaves.every((leaf) => leaf.pageId === firstLeaf.pageId);
+    return samePageId
+      ? (getStaticPage(firstLeaf.pageId)?.icon ?? BookOpenIcon)
+      : BookOpenIcon;
+  }
+  if (firstLeaf.view === "reader") {
+    return BookOpenIcon;
+  }
+
+  return null;
+}
 
 export function TabsStrip({
   tabs,
@@ -299,6 +369,7 @@ export function TabsStrip({
       >
         {tabs.map((tab, index) => {
           const active = tab.id === activeTabId;
+          const TabIcon = getTabIcon(tab);
           const canMoveLeft = tabs.length > 1 && index > 0;
           const canMoveRight = tabs.length > 1 && index < tabs.length - 1;
           const moveBackwardLabel =
@@ -347,7 +418,8 @@ export function TabsStrip({
                       "border-primary! bg-primary/92! text-primary-foreground! hover:bg-primary/90! hover:text-primary-foreground!",
                   )}
                 >
-                  {tab.title}
+                  {TabIcon ? <TabIcon className="size-4 shrink-0" /> : null}
+                  <span className="min-w-0 truncate">{tab.title}</span>
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger
