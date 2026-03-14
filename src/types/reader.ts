@@ -11,6 +11,15 @@ export type ConcordancePayload = {
 export type CrossRefsPayload = Record<string, string[]>;
 export type HitchcocksPayload = Record<string, string>;
 export type OldEnglishPayload = Record<string, string[]>;
+export type BibleWordBookEntry = {
+  partOfSpeech?: string | null;
+  partOfSpeechLabel?: string | null;
+  meaning: string;
+  body: string;
+  aliases?: string[];
+  sourceReferences?: string[];
+};
+export type BibleWordBookPayload = Record<string, BibleWordBookEntry>;
 export type PhraseEntry = {
   meaning: string;
   note?: string;
@@ -167,6 +176,7 @@ export type StudyWorkspaceTool =
   | "websters"
   | "strongs"
   | "old-english"
+  | "bible-word-book"
   | "phrases"
   | "units"
   | "maps"
