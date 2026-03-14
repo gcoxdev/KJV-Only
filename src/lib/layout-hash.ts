@@ -123,6 +123,12 @@ function serializeLeaf(
   if (node.view === "notes") {
     return "notes";
   }
+  if (node.view === "tools") {
+    return "tools";
+  }
+  if (node.view === "bookmarks") {
+    return "bookmarks";
+  }
   return "picker";
 }
 
@@ -144,6 +150,12 @@ function parseLeafToken(token: string): [LeafNode | null, SerializedVerseRange[]
   }
   if (token === "notes") {
     return [{ ...createReaderLeaf(0, 0, "notes"), pageId: null }, []];
+  }
+  if (token === "tools") {
+    return [{ ...createReaderLeaf(0, 0, "tools"), pageId: null }, []];
+  }
+  if (token === "bookmarks") {
+    return [{ ...createReaderLeaf(0, 0, "bookmarks"), pageId: null }, []];
   }
   if (token === "picker") {
     return [{ ...createReaderLeaf(0, 0, "picker"), pageId: null }, []];

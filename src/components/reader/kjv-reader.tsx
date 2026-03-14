@@ -271,6 +271,13 @@ function panelNodeContainsView(
   );
 }
 
+function isDedicatedLeafViewTab(
+  tab: ReaderTab,
+  view: LeafNode["view"],
+): boolean {
+  return tab.root.type === "leaf" && tab.root.view === view;
+}
+
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -285,6 +292,7 @@ export function KJVReader() {
   const [flowVersesByParagraph, setFlowVersesByParagraph] = useState(false);
   const [studyToolOpenTarget, setStudyToolOpenTarget] =
     useState<StudyToolOpenTarget>("sidebar");
+  const studyToolOpenTargetRef = useRef<StudyToolOpenTarget>("sidebar");
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [sidebarCloseRequestKey, setSidebarCloseRequestKey] = useState(0);
   const [isCompletionCelebrationOpen, setIsCompletionCelebrationOpen] =
@@ -294,6 +302,9 @@ export function KJVReader() {
     COMPLETION_CELEBRATION_VERSES[0],
   );
   const previousBibleCompletionRef = useRef(false);
+  const pendingActiveTabIdRef = useRef<string | null>(null);
+  const pendingToolsTabScrollRef = useRef(false);
+  const pendingToolsTabIdRef = useRef<string | null>(null);
   const {
     isStudyMode,
     tabsOrientation,
@@ -330,6 +341,7 @@ export function KJVReader() {
   const [strongsWordAccordionValue, setStrongsWordAccordionValue] = useState<
     string[]
   >([]);
+  const tabsRef = useRef<ReaderTab[]>([]);
   const {
     isMapDialogOpen,
     activeMapDialogEntry,
@@ -481,6 +493,10 @@ export function KJVReader() {
   ]);
 
   useEffect(() => {
+    studyToolOpenTargetRef.current = studyToolOpenTarget;
+  }, [studyToolOpenTarget]);
+
+  useEffect(() => {
     if (!tokenPopup) {
       return;
     }
@@ -583,6 +599,10 @@ export function KJVReader() {
   }, [queueVerseHighlights, setTabsOrientation, setVerseHighlights]);
 
   useEffect(() => {
+    tabsRef.current = tabs;
+  }, [tabs]);
+
+  useEffect(() => {
     if (!isLoaded || tabs.length === 0) {
       return;
     }
@@ -608,6 +628,38 @@ export function KJVReader() {
     tabs,
     tabsOrientation,
   ]);
+
+  useEffect(() => {
+    const pendingTabId = pendingActiveTabIdRef.current;
+    if (!pendingTabId) {
+      return;
+    }
+
+    if (!tabs.some((tab) => tab.id === pendingTabId)) {
+      return;
+    }
+
+    if (pendingToolsTabScrollRef.current) {
+      pendingToolsTabScrollRef.current = false;
+      requestAnimationFrame(() => {
+        tabEndRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: tabsOrientation === "vertical" ? "end" : "nearest",
+          inline: tabsOrientation === "vertical" ? "nearest" : "end",
+        });
+      });
+    }
+
+    if (activeTabId === pendingTabId) {
+      if (pendingToolsTabIdRef.current === pendingTabId) {
+        pendingToolsTabIdRef.current = null;
+      }
+      pendingActiveTabIdRef.current = null;
+      return;
+    }
+
+    setActiveTabId(pendingTabId);
+  }, [activeTabId, tabs, tabsOrientation]);
 
   useEffect(() => {
     function onHashChange() {
@@ -1731,22 +1783,31 @@ export function KJVReader() {
   }, [activeTabId, setTabs]);
 
   const openToolsTab = useCallback(() => {
-    let targetTabId: string | null = null;
-    let created = false;
+    const pendingToolsTabId = pendingToolsTabIdRef.current;
+    if (pendingToolsTabId) {
+      pendingActiveTabIdRef.current = pendingToolsTabId;
+      setActiveTabId(pendingToolsTabId);
+      return;
+    }
+
+    const existingToolsTab = tabsRef.current.find((tab) =>
+      isDedicatedLeafViewTab(tab, "tools"),
+    );
+    if (existingToolsTab) {
+      pendingActiveTabIdRef.current = null;
+      pendingToolsTabScrollRef.current = false;
+      pendingToolsTabIdRef.current = null;
+      setActiveTabId(existingToolsTab.id);
+      return;
+    }
+
+    const nextTabId = createId();
+    const nextLeaf = createLeaf(0, 0, "tools");
+    pendingActiveTabIdRef.current = nextTabId;
+    pendingToolsTabScrollRef.current = true;
+    pendingToolsTabIdRef.current = nextTabId;
 
     setTabs((currentTabs) => {
-      const existingToolsTab = currentTabs.find((tab) =>
-        panelNodeContainsView(tab.root, "tools"),
-      );
-      if (existingToolsTab) {
-        targetTabId = existingToolsTab.id;
-        return currentTabs;
-      }
-
-      const nextTabId = createId();
-      const nextLeaf = createLeaf(0, 0, "tools");
-      targetTabId = nextTabId;
-      created = true;
       return [
         ...currentTabs,
         {
@@ -1756,24 +1817,7 @@ export function KJVReader() {
         },
       ];
     });
-
-    if (!targetTabId) {
-      return;
-    }
-
-    setActiveTabId(targetTabId);
-    if (!created) {
-      return;
-    }
-
-    requestAnimationFrame(() => {
-      tabEndRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: tabsOrientation === "vertical" ? "end" : "nearest",
-        inline: tabsOrientation === "vertical" ? "nearest" : "end",
-      });
-    });
-  }, [setActiveTabId, setTabs, tabsOrientation]);
+  }, [setActiveTabId, setTabs]);
 
   function openBookmarkInNewTab(bookmark: ReaderBookmark) {
     if (bookmark.scope.type === "chapter") {
@@ -2036,7 +2080,9 @@ export function KJVReader() {
   const openStudyTool = useCallback(
     (tool: StudyWorkspaceTool, options?: { openSidebar?: boolean }) => {
       const destination =
-        options?.openSidebar === false ? "panel" : studyToolOpenTarget;
+        options?.openSidebar === false
+          ? "panel"
+          : studyToolOpenTargetRef.current;
 
       if (destination === "sidebar") {
         setIsRightSidebarOpen(true);
@@ -2053,7 +2099,6 @@ export function KJVReader() {
       openToolsTab,
       setIsRightSidebarOpen,
       showStudyTool,
-      studyToolOpenTarget,
     ],
   );
 

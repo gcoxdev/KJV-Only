@@ -82,4 +82,75 @@ describe("layout hash", () => {
       { start: 11, end: 12 },
     ]);
   });
+
+  it("serializes and parses tools and bookmarks leaves distinctly", () => {
+    const tabs: ReaderTab[] = [
+      {
+        id: "tab-tools",
+        title: "Workspace",
+        root: {
+          id: "split-tools",
+          type: "split",
+          orientation: "horizontal",
+          ratio: 68,
+          first: {
+            id: "leaf-picker",
+            type: "leaf",
+            view: "picker",
+            bookIndex: 0,
+            chapterIndex: 0,
+            pickerTestament: null,
+            pickerBookIndex: null,
+            pageId: null,
+          },
+          second: {
+            id: "leaf-tools",
+            type: "leaf",
+            view: "tools",
+            bookIndex: 0,
+            chapterIndex: 0,
+            pickerTestament: null,
+            pickerBookIndex: null,
+            pageId: null,
+          },
+        },
+      },
+      {
+        id: "tab-bookmarks",
+        title: "Bookmarks",
+        root: {
+          id: "leaf-bookmarks",
+          type: "leaf",
+          view: "bookmarks",
+          bookIndex: 0,
+          chapterIndex: 0,
+          pickerTestament: null,
+          pickerBookIndex: null,
+          pageId: null,
+        },
+      },
+    ];
+
+    const hash = serializeLayoutHash({
+      tabs,
+      activeTabId: "tab-tools",
+      tabsOrientation: "horizontal",
+    });
+
+    expect(hash).toContain("Workspace:h68(picker;tools)");
+    expect(hash).toContain("Bookmarks:bookmarks");
+
+    const parsed = parseLayoutHash(hash);
+    expect(parsed?.tabs[0]?.root.type).toBe("split");
+    expect(parsed?.tabs[1]?.root.type).toBe("leaf");
+    expect(parsed?.tabs[1]?.root.type === "leaf" ? parsed.tabs[1].root.view : null).toBe(
+      "bookmarks",
+    );
+    expect(
+      parsed?.tabs[0]?.root.type === "split" &&
+        parsed.tabs[0].root.second.type === "leaf"
+        ? parsed.tabs[0].root.second.view
+        : null,
+    ).toBe("tools");
+  });
 });

@@ -257,7 +257,9 @@ export function SettingsDialog({
               }}
             >
               <SelectTrigger id="tool-open-target" className="w-full">
-                <SelectValue>{studyToolTargetLabel}</SelectValue>
+                <SelectValue placeholder="Sidebar">
+                  {studyToolTargetLabel}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="sidebar">Sidebar</SelectItem>
