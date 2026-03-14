@@ -32,6 +32,34 @@ export function StaticPage({ pageId }: StaticPageProps) {
           {page.content.paragraphs.map((paragraph, index) => (
             <p key={`${page.id}-paragraph-${index}`}>{paragraph}</p>
           ))}
+          {page.content.links ? (
+            <div className="flex flex-col gap-3 pt-2">
+              {page.content.links.map((link) => (
+                <div
+                  key={`${page.id}-${link.href ?? link.label}`}
+                  className="rounded-lg border border-border/70 bg-card/70 p-3"
+                >
+                  {link.href ? (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm font-medium text-foreground underline underline-offset-4"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <p className="text-sm font-medium text-foreground">
+                      {link.label}
+                    </p>
+                  )}
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {link.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
