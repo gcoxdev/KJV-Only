@@ -9,7 +9,7 @@ import {
 } from "react";
 
 import { type Book, type VerseToken } from "@/types/bible";
-import { type AncientMapPayload, matchesMapWord } from "@/lib/maps";
+import { matchesMapWord, type AncientMapPayload } from "@/lib/maps";
 import {
   loadHitchcocks,
   loadKjvBooks,
@@ -17,6 +17,7 @@ import {
   loadOldEnglish,
   loadWebsters,
 } from "@/lib/reader-data";
+import { buildVerseSearchIndex } from "@/lib/search";
 import {
   decodeConcordanceReferences,
   chapterVerseKey,
@@ -365,53 +366,12 @@ export function KJVReader() {
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
       setTheme("dark");
     }
-  }, []);
+  }, [queueVerseHighlights, setTabsOrientation, setVerseHighlights]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
     window.localStorage.setItem("theme", theme);
   }, [theme]);
-
-  useEffect(() => {
-    if (isStudyMode) {
-      return;
-    }
-    setIsRightSidebarOpen(false);
-    setConcordanceAccordionValue([]);
-    setSelectedCrossReferences(null);
-    setCrossRefsError(null);
-    setIsCrossRefsLoading(false);
-    setSelectedConcordanceWord(null);
-    setConcordanceError(null);
-    setIsConcordanceLoading(false);
-    setWebstersError(null);
-    setIsWebstersLoading(false);
-    setIsWebstersSearching(false);
-    setWebstersWordAccordionValue([]);
-    setSelectedWebstersEntry(null);
-    setHitchcocksError(null);
-    setIsHitchcocksLoading(false);
-    setIsHitchcocksSearching(false);
-    setSelectedHitchcocksEntry(null);
-    setOldEnglishError(null);
-    setIsOldEnglishLoading(false);
-    setIsOldEnglishSearching(false);
-    setSelectedOldEnglishEntry(null);
-    setGenealogyError(null);
-    setIsGenealogyLoading(false);
-    setIsGenealogySearching(false);
-    setSelectedGenealogyIds([]);
-    setStrongsError(null);
-    setIsStrongsLoading(false);
-    setIsStrongsSearching(false);
-    setStrongsWordAccordionValue([]);
-    setSelectedStrongsEntry(null);
-    setMapsError(null);
-    setIsMapsLoading(false);
-    setIsMapsSearching(false);
-    setSelectedMapsEntries([]);
-    resetMapDialogState();
-  }, [isStudyMode, resetMapDialogState]);
 
   useEffect(() => {
     try {
@@ -457,7 +417,7 @@ export function KJVReader() {
     } catch {
       // Ignore malformed persisted display settings.
     }
-  }, []);
+  }, [setTabsOrientation]);
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -524,7 +484,7 @@ export function KJVReader() {
     } catch {
       // Ignore malformed local progress.
     }
-  }, []);
+  }, [queueVerseHighlights, setTabsOrientation, setVerseHighlights]);
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -582,7 +542,7 @@ export function KJVReader() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [queueVerseHighlights, setTabsOrientation, setVerseHighlights]);
 
   useEffect(() => {
     if (!isLoaded || tabs.length === 0) {
@@ -642,7 +602,7 @@ export function KJVReader() {
     return () => {
       window.removeEventListener("hashchange", onHashChange);
     };
-  }, [queueVerseHighlights, setVerseHighlights]);
+  }, [queueVerseHighlights, setTabsOrientation, setVerseHighlights]);
 
   const {
     chapterRefs,
@@ -728,6 +688,7 @@ export function KJVReader() {
       caseSensitive: false,
       chipInput: "",
       phraseInput: "",
+      isControlsCollapsed: false,
       selectedWords: [],
       expandedBookTree: ["entire", "old", "new"],
       selectedBookIndexes: books.map((_, index) => index),
@@ -815,6 +776,7 @@ export function KJVReader() {
         : [],
     [concordance],
   );
+  const verseSearchIndex = useMemo(() => buildVerseSearchIndex(books), [books]);
 
   const {
     payload: websters,
@@ -959,39 +921,84 @@ export function KJVReader() {
   );
 
   useEffect(() => {
-    domNeighborCacheRef.current = { root: null, neighbors: new Map() };
-  }, [activeTab]);
-  useEffect(() => {
-    function onFullscreenChange() {
-      const element = document.fullscreenElement as HTMLElement | null;
-      const leafId = element
-        ? (fullscreenRequestedLeafIdRef.current ?? null)
-        : null;
-      setFullscreenLeafId(leafId);
-      setPanelMenuOpenLeafId(null);
-      clearAllPanelPreviews();
-      if (!element) {
-        fullscreenRequestedLeafIdRef.current = null;
-      }
-    }
-
-    document.addEventListener("fullscreenchange", onFullscreenChange);
-    return () => {
-      document.removeEventListener("fullscreenchange", onFullscreenChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!panelMenuOpenLeafId || !activeTab) {
+    if (isStudyMode) {
       return;
     }
+    setIsRightSidebarOpen(false);
+    setConcordanceAccordionValue([]);
+    setSelectedCrossReferences(null);
+    setCrossRefsError(null);
+    setIsCrossRefsLoading(false);
+    setSelectedConcordanceWord(null);
+    setConcordanceError(null);
+    setIsConcordanceLoading(false);
+    setWebstersError(null);
+    setIsWebstersLoading(false);
+    setIsWebstersSearching(false);
+    setWebstersWordAccordionValue([]);
+    setSelectedWebstersEntry(null);
+    setHitchcocksError(null);
+    setIsHitchcocksLoading(false);
+    setIsHitchcocksSearching(false);
+    setSelectedHitchcocksEntry(null);
+    setOldEnglishError(null);
+    setIsOldEnglishLoading(false);
+    setIsOldEnglishSearching(false);
+    setSelectedOldEnglishEntry(null);
+    setGenealogyError(null);
+    setIsGenealogyLoading(false);
+    setIsGenealogySearching(false);
+    setSelectedGenealogyIds([]);
+    setStrongsError(null);
+    setIsStrongsLoading(false);
+    setIsStrongsSearching(false);
+    setStrongsWordAccordionValue([]);
+    setSelectedStrongsEntry(null);
+    setMapsError(null);
+    setIsMapsLoading(false);
+    setIsMapsSearching(false);
+    setSelectedMapsEntries([]);
+    resetMapDialogState();
+  }, [
+    isStudyMode,
+    resetMapDialogState,
+    setConcordanceAccordionValue,
+    setConcordanceError,
+    setCrossRefsError,
+    setGenealogyError,
+    setHitchcocksError,
+    setIsConcordanceLoading,
+    setIsCrossRefsLoading,
+    setIsGenealogyLoading,
+    setIsGenealogySearching,
+    setIsHitchcocksLoading,
+    setIsHitchcocksSearching,
+    setIsMapsLoading,
+    setIsMapsSearching,
+    setIsOldEnglishLoading,
+    setIsOldEnglishSearching,
+    setIsRightSidebarOpen,
+    setIsStrongsLoading,
+    setIsStrongsSearching,
+    setIsWebstersLoading,
+    setIsWebstersSearching,
+    setMapsError,
+    setOldEnglishError,
+    setSelectedConcordanceWord,
+    setSelectedCrossReferences,
+    setSelectedGenealogyIds,
+    setSelectedHitchcocksEntry,
+    setSelectedMapsEntries,
+    setSelectedOldEnglishEntry,
+    setSelectedStrongsEntry,
+    setSelectedWebstersEntry,
+    setStrongsError,
+    setWebstersError,
+  ]);
 
-    if (!findLeafNode(activeTab.root, panelMenuOpenLeafId)) {
-      setPanelMenuOpenLeafId(null);
-      clearAllPanelPreviews();
-    }
-  }, [activeTab, panelMenuOpenLeafId]);
-
+  useEffect(() => {
+    domNeighborCacheRef.current = { root: null, neighbors: new Map() };
+  }, [activeTab]);
   function updateActiveTab(updater: (tab: ReaderTab) => ReaderTab) {
     if (!activeTabId) {
       return;
@@ -1037,15 +1044,15 @@ export function KJVReader() {
     );
   }
 
-  function panelCardElement(leafId: string) {
+  const panelCardElement = useCallback((leafId: string) => {
     const panelElement = panelElementRefs.current[leafId];
     return (
       panelElement?.querySelector<HTMLElement>(':scope > [data-slot="card"]') ??
       null
     );
-  }
+  }, []);
 
-  function clearMovePreview() {
+  const clearMovePreview = useCallback(() => {
     const previewId = previewLeafIdRef.current;
     if (!previewId) {
       return;
@@ -1054,7 +1061,7 @@ export function KJVReader() {
     const previewSurface = panelCardElement(previewId);
     previewSurface?.classList.remove("panel-move-preview-surface");
     previewLeafIdRef.current = null;
-  }
+  }, [panelCardElement]);
 
   function applyMovePreview(targetLeafId: string | null) {
     clearMovePreview();
@@ -1071,7 +1078,7 @@ export function KJVReader() {
     previewLeafIdRef.current = targetLeafId;
   }
 
-  function clearAddPreview() {
+  const clearAddPreview = useCallback(() => {
     const leafIds = addPreviewLeafIdsRef.current;
     const direction = addPreviewDirectionRef.current;
     const isGroup = addPreviewIsGroupRef.current;
@@ -1095,9 +1102,9 @@ export function KJVReader() {
     addPreviewLeafIdsRef.current = [];
     addPreviewDirectionRef.current = null;
     addPreviewIsGroupRef.current = false;
-  }
+  }, [panelCardElement]);
 
-  function clearOrientationPreview() {
+  const clearOrientationPreview = useCallback(() => {
     const leafIds = orientationPreviewLeafIdsRef.current;
     if (leafIds.length === 0) {
       return;
@@ -1109,13 +1116,44 @@ export function KJVReader() {
     }
 
     orientationPreviewLeafIdsRef.current = [];
-  }
+  }, [panelCardElement]);
 
-  function clearAllPanelPreviews() {
+  const clearAllPanelPreviews = useCallback(() => {
     clearMovePreview();
     clearAddPreview();
     clearOrientationPreview();
-  }
+  }, [clearAddPreview, clearMovePreview, clearOrientationPreview]);
+
+  useEffect(() => {
+    function onFullscreenChange() {
+      const element = document.fullscreenElement as HTMLElement | null;
+      const leafId = element
+        ? (fullscreenRequestedLeafIdRef.current ?? null)
+        : null;
+      setFullscreenLeafId(leafId);
+      setPanelMenuOpenLeafId(null);
+      clearAllPanelPreviews();
+      if (!element) {
+        fullscreenRequestedLeafIdRef.current = null;
+      }
+    }
+
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+    };
+  }, [clearAllPanelPreviews]);
+
+  useEffect(() => {
+    if (!panelMenuOpenLeafId || !activeTab) {
+      return;
+    }
+
+    if (!findLeafNode(activeTab.root, panelMenuOpenLeafId)) {
+      setPanelMenuOpenLeafId(null);
+      clearAllPanelPreviews();
+    }
+  }, [activeTab, clearAllPanelPreviews, panelMenuOpenLeafId]);
 
   function applyAddPreview(
     leafIds: string[],
@@ -1583,6 +1621,7 @@ export function KJVReader() {
     [
       clearAllVerseHighlights,
       queueVerseHighlight,
+      setIsProgressOpen,
       setSelectedHighlightScope,
       tabsOrientation,
     ],
@@ -1624,6 +1663,7 @@ export function KJVReader() {
     [
       clearAllVerseHighlights,
       queueVerseHighlights,
+      setIsProgressOpen,
       setSelectedHighlightScope,
       tabsOrientation,
     ],
@@ -1754,6 +1794,229 @@ export function KJVReader() {
     [setIsRightSidebarOpen, showStudyTool],
   );
 
+  const syncTokenAccordionState = useCallback(
+    (
+      rawWord: string,
+      options?: {
+        verseNumber?: number | null;
+        strongCode?: string | null;
+        concordanceData?: ConcordancePayload | null;
+        webstersData?: WebstersPayload | null;
+        hitchcocksData?: HitchcocksPayload | null;
+        oldEnglishData?: OldEnglishPayload | null;
+        genealogyData?: GenealogyPayload | null;
+        ancientMapsData?: AncientMapPayload | null;
+        strongsGreekData?: StrongsPayload | null;
+        strongsHebrewData?: StrongsPayload | null;
+      },
+    ) => {
+      const nextAccordion: string[] = [];
+
+      if ((options?.verseNumber ?? null) !== null) {
+        nextAccordion.push("cross-refs");
+      }
+
+      const concordanceData = options?.concordanceData ?? concordance;
+      if (concordanceData) {
+        const matchedKey = resolveConcordanceKey(concordanceData, rawWord);
+        const references = matchedKey
+          ? decodeConcordanceReferences(concordanceData, matchedKey)
+          : [];
+        if (references.length > 0) {
+          nextAccordion.push("concordance");
+        }
+      }
+
+      const webstersData = options?.webstersData ?? websters;
+      if (webstersData && resolveWebstersKey(webstersData, rawWord)) {
+        nextAccordion.push("websters");
+      }
+
+      const strongCode = options?.strongCode ?? null;
+      const strongsGreekData = options?.strongsGreekData ?? strongsGreek;
+      const strongsHebrewData = options?.strongsHebrewData ?? strongsHebrew;
+      if (strongCode && strongsGreekData && strongsHebrewData) {
+        const source = strongCode.startsWith("G")
+          ? strongsGreekData
+          : strongsHebrewData;
+        if (source[strongCode]) {
+          nextAccordion.push("strongs");
+        }
+      }
+
+      const ancientMapsData = options?.ancientMapsData ?? ancientMaps;
+      if (
+        ancientMapsData &&
+        ancientMapsData.some((entry) =>
+          matchesMapWord(entry, rawWord, normalizeConcordanceWord),
+        )
+      ) {
+        nextAccordion.push("maps");
+      }
+
+      const hitchcocksData = options?.hitchcocksData ?? hitchcocks;
+      if (hitchcocksData && resolveHitchcocksKey(hitchcocksData, rawWord)) {
+        nextAccordion.push("hitchcocks");
+      }
+
+      const oldEnglishData = options?.oldEnglishData ?? oldEnglish;
+      if (oldEnglishData && resolveOldEnglishKey(oldEnglishData, rawWord)) {
+        nextAccordion.push("old-english");
+      }
+
+      const genealogyData = options?.genealogyData ?? genealogy;
+      if (
+        genealogyData &&
+        genealogyData.some((person) =>
+          person.names.some(
+            (name) =>
+              normalizeConcordanceWord(name).toLowerCase() ===
+              rawWord.toLowerCase(),
+          ),
+        )
+      ) {
+        nextAccordion.push("genealogy");
+      }
+
+      setConcordanceAccordionValue(nextAccordion);
+    },
+    [
+      ancientMaps,
+      concordance,
+      genealogy,
+      hitchcocks,
+      oldEnglish,
+      setConcordanceAccordionValue,
+      strongsGreek,
+      strongsHebrew,
+      websters,
+    ],
+  );
+
+  const syncWordStudySelections = useCallback(
+    (
+      rawWord: string,
+      strongCode: string | null,
+      overrides?: {
+        websters?: WebstersPayload | null;
+        hitchcocks?: HitchcocksPayload | null;
+        oldEnglish?: OldEnglishPayload | null;
+        genealogy?: GenealogyPayload | null;
+        ancientMaps?: AncientMapPayload | null;
+        strongsGreek?: StrongsPayload | null;
+        strongsHebrew?: StrongsPayload | null;
+      },
+    ) => {
+      const nextWebsters = overrides?.websters ?? websters;
+      const nextHitchcocks = overrides?.hitchcocks ?? hitchcocks;
+      const nextOldEnglish = overrides?.oldEnglish ?? oldEnglish;
+      const nextGenealogy = overrides?.genealogy ?? genealogy;
+      const nextAncientMaps = overrides?.ancientMaps ?? ancientMaps;
+      const nextStrongsGreek = overrides?.strongsGreek ?? strongsGreek;
+      const nextStrongsHebrew = overrides?.strongsHebrew ?? strongsHebrew;
+
+      if (nextWebsters) {
+        const matchedKey = resolveWebstersKey(nextWebsters, rawWord);
+        setWebstersWordAccordionValue([]);
+        setSelectedWebstersEntry(
+          matchedKey
+            ? { key: matchedKey, entry: nextWebsters[matchedKey] }
+            : null,
+        );
+      } else {
+        setSelectedWebstersEntry(null);
+      }
+
+      if (nextHitchcocks) {
+        const matchedKey = resolveHitchcocksKey(nextHitchcocks, rawWord);
+        setSelectedHitchcocksEntry(
+          matchedKey
+            ? { key: matchedKey, definition: nextHitchcocks[matchedKey] }
+            : null,
+        );
+      } else {
+        setSelectedHitchcocksEntry(null);
+      }
+
+      if (nextOldEnglish) {
+        const matchedKey = resolveOldEnglishKey(nextOldEnglish, rawWord);
+        setSelectedOldEnglishEntry(
+          matchedKey
+            ? {
+                key: matchedKey,
+                definitions: nextOldEnglish[matchedKey] ?? [],
+              }
+            : null,
+        );
+      } else {
+        setSelectedOldEnglishEntry(null);
+      }
+
+      if (nextGenealogy) {
+        const matches = nextGenealogy.filter((person) =>
+          person.names.some(
+            (name) =>
+              normalizeConcordanceWord(name).toLowerCase() ===
+              rawWord.toLowerCase(),
+          ),
+        );
+        setSelectedGenealogyIds([...new Set(matches.map((person) => person.id))]);
+      } else {
+        setSelectedGenealogyIds([]);
+      }
+
+      if (nextAncientMaps) {
+        setSelectedMapsEntries(
+          nextAncientMaps.filter((entry) =>
+            matchesMapWord(entry, rawWord, normalizeConcordanceWord),
+          ),
+        );
+      } else {
+        setSelectedMapsEntries([]);
+      }
+
+      if (!strongCode) {
+        setStrongsWordAccordionValue([]);
+        setSelectedStrongsEntry(null);
+        return;
+      }
+
+      if (!nextStrongsGreek || !nextStrongsHebrew) {
+        return;
+      }
+
+      const source = strongCode.startsWith("G")
+        ? nextStrongsGreek
+        : nextStrongsHebrew;
+      const entry = source[strongCode];
+      setStrongsWordAccordionValue([]);
+      setSelectedStrongsEntry(
+        entry
+          ? {
+              code: strongCode,
+              testament: strongCode.startsWith("G") ? "greek" : "hebrew",
+              entry,
+            }
+          : null,
+      );
+    },
+    [
+      ancientMaps,
+      genealogy,
+      hitchcocks,
+      oldEnglish,
+      setSelectedGenealogyIds,
+      setSelectedHitchcocksEntry,
+      setSelectedMapsEntries,
+      setSelectedOldEnglishEntry,
+      setSelectedStrongsEntry,
+      setSelectedWebstersEntry,
+      strongsGreek,
+      strongsHebrew,
+      websters,
+    ],
+  );
+
   const openLinkedStrongsEntry = useCallback(
     (code: string) => {
       setStrongsError(null);
@@ -1857,7 +2120,15 @@ export function KJVReader() {
           setIsCrossRefsLoading(false);
         });
     },
-    [crossRefs, ensureCrossRefsLoaded, openStudyTool],
+    [
+      crossRefs,
+      ensureCrossRefsLoaded,
+      openStudyTool,
+      setCrossRefsError,
+      setIsCrossRefsLoading,
+      setNotesContext,
+      setSelectedCrossReferences,
+    ],
   );
 
   const handleVerseSelection = useCallback(
@@ -1938,6 +2209,7 @@ export function KJVReader() {
       highlightModeEnabledByLeafId,
       openCrossReferencesForVerse,
       setLeafHighlights,
+      setNotesContext,
       setSelectedHighlightScope,
     ],
   );
@@ -2064,15 +2336,23 @@ export function KJVReader() {
         return;
       }
 
+      const normalizedCode = token.strong
+        ? normalizeStrongsCode(token.strong)
+        : null;
+
       openStudyTool("concordance");
       setConcordanceError(null);
       setIsConcordanceLoading(true);
-      if (token.strong) {
-        setStrongsSearchTerm("");
-        setIsStrongsSearching(false);
-        if (strongsSearchInputRef.current) {
-          strongsSearchInputRef.current.value = "";
-        }
+
+      setWebstersWordAccordionValue([]);
+      setSelectedWebstersEntry(null);
+      setSelectedHitchcocksEntry(null);
+      setSelectedOldEnglishEntry(null);
+      setSelectedGenealogyIds([]);
+      setSelectedMapsEntries([]);
+      setStrongsWordAccordionValue([]);
+      if (!normalizedCode) {
+        setSelectedStrongsEntry(null);
       }
 
       const applyConcordanceSelection = (data: ConcordancePayload) => {
@@ -2084,240 +2364,118 @@ export function KJVReader() {
           references,
         });
         setIsConcordanceLoading(false);
+        return data;
       };
 
-      const applyWebstersSelection = (data: WebstersPayload) => {
-        const matchedKey = resolveWebstersKey(data, rawWord);
-        setWebstersWordAccordionValue([]);
-        setSelectedWebstersEntry(
-          matchedKey ? { key: matchedKey, entry: data[matchedKey] } : null,
-        );
-        if (matchedKey) {
-          showStudyTool("websters");
-        }
-        setIsWebstersLoading(false);
-      };
-
-      const applyHitchcocksSelection = (data: HitchcocksPayload) => {
-        const matchedKey = resolveHitchcocksKey(data, rawWord);
-        setSelectedHitchcocksEntry(
-          matchedKey ? { key: matchedKey, definition: data[matchedKey] } : null,
-        );
-        if (matchedKey) {
-          showStudyTool("hitchcocks");
-        }
-        setIsHitchcocksLoading(false);
-      };
-
-      const applyOldEnglishSelection = (data: OldEnglishPayload) => {
-        const matchedKey = resolveOldEnglishKey(data, rawWord);
-        setSelectedOldEnglishEntry(
-          matchedKey
-            ? { key: matchedKey, definitions: data[matchedKey] ?? [] }
-            : null,
-        );
-        if (matchedKey) {
-          showStudyTool("old-english");
-        }
-        setIsOldEnglishLoading(false);
-      };
-
-      const applyGenealogySelection = (data: GenealogyPayload) => {
-        const matches = data.filter((person) =>
-          person.names.some(
-            (name) =>
-              normalizeConcordanceWord(name).toLowerCase() ===
-              rawWord.toLowerCase(),
-          ),
-        );
-        const matchIds = [...new Set(matches.map((person) => person.id))];
-        setSelectedGenealogyIds(matchIds);
-        if (matchIds.length > 0) {
-          showStudyTool("genealogy");
-        }
-        setIsGenealogyLoading(false);
-      };
-
-      const applyMapsSelection = (data: AncientMapPayload) => {
-        const matches = data.filter((entry) =>
-          matchesMapWord(entry, rawWord, normalizeConcordanceWord),
-        );
-        setSelectedMapsEntries(matches);
-        if (matches.length > 0) {
-          showStudyTool("maps");
-        }
-        setIsMapsLoading(false);
-      };
-
-      const applyStrongsSelection = (
-        greek: StrongsPayload,
-        hebrew: StrongsPayload,
-      ) => {
-        const normalizedCode = token.strong
-          ? normalizeStrongsCode(token.strong)
-          : null;
-        setStrongsWordAccordionValue([]);
-        if (!normalizedCode) {
-          setSelectedStrongsEntry(null);
-          setIsStrongsLoading(false);
-          return;
-        }
-
-        const source = normalizedCode.startsWith("G") ? greek : hebrew;
-        const entry = source[normalizedCode];
-        if (!entry) {
-          setSelectedStrongsEntry(null);
-          setIsStrongsLoading(false);
-          return;
-        }
-
-        setSelectedStrongsEntry({
-          code: normalizedCode,
-          testament: normalizedCode.startsWith("G") ? "greek" : "hebrew",
-          entry,
-        });
-        showStudyTool("strongs");
-        setIsStrongsLoading(false);
-      };
+      const concordancePromise = concordance
+        ? Promise.resolve(concordance)
+        : ensureConcordanceLoaded().catch(() => null);
 
       if (concordance) {
         applyConcordanceSelection(concordance);
       } else {
-        void ensureConcordanceLoaded()
+        void concordancePromise
           .then((data) => {
+            if (!data) {
+              return;
+            }
             applyConcordanceSelection(data);
           })
-          .catch((error) => {
-            const message =
-              error instanceof Error
-                ? error.message
-                : "Failed to load concordance data";
-            setConcordanceError(message);
+          .catch(() => {
+            setSelectedConcordanceWord(null);
+            setConcordanceWordAccordionValue([]);
             setIsConcordanceLoading(false);
           });
       }
 
-      setWebstersError(null);
-      setIsWebstersLoading(true);
-      if (websters) {
-        applyWebstersSelection(websters);
-      } else {
-        void ensureWebstersLoaded()
-          .then((data) => {
-            applyWebstersSelection(data);
-          })
-          .catch((error) => {
-            const message =
-              error instanceof Error
-                ? error.message
-                : "Failed to load Webster's data";
-            setWebstersError(message);
-            setIsWebstersLoading(false);
-          });
+      let strongsPromise:
+        | Promise<{ greek: StrongsPayload; hebrew: StrongsPayload } | null>
+        | null = null;
+
+      if (normalizedCode) {
+        setStrongsError(null);
+        setIsStrongsLoading(true);
+        setStrongsSearchTerm("");
+        setIsStrongsSearching(false);
+        if (strongsSearchInputRef.current) {
+          strongsSearchInputRef.current.value = "";
+        }
+
+        strongsPromise =
+          strongsGreek && strongsHebrew
+            ? Promise.resolve({ greek: strongsGreek, hebrew: strongsHebrew })
+            : ensureStrongsLoaded().catch((error) => {
+                const message =
+                  error instanceof Error
+                    ? error.message
+                    : "Failed to load Strong's data";
+                setStrongsError(message);
+                return null;
+              });
       }
 
-      setStrongsError(null);
-      setIsStrongsLoading(true);
-      if (strongsGreek && strongsHebrew) {
-        applyStrongsSelection(strongsGreek, strongsHebrew);
-      } else {
-        void ensureStrongsLoaded()
-          .then(({ greek, hebrew }) => {
-            applyStrongsSelection(greek, hebrew);
-          })
-          .catch((error) => {
-            const message =
-              error instanceof Error
-                ? error.message
-                : "Failed to load Strong's data";
-            setStrongsError(message);
-            setIsStrongsLoading(false);
+      void Promise.all([
+        concordancePromise,
+        websters ? Promise.resolve(websters) : ensureWebstersLoaded().catch(() => null),
+        hitchcocks
+          ? Promise.resolve(hitchcocks)
+          : ensureHitchcocksLoaded().catch(() => null),
+        oldEnglish
+          ? Promise.resolve(oldEnglish)
+          : ensureOldEnglishLoaded().catch(() => null),
+        genealogy
+          ? Promise.resolve(genealogy)
+          : ensureGenealogyLoaded().catch(() => null),
+        ancientMaps
+          ? Promise.resolve(ancientMaps)
+          : ensureAncientMapsLoaded().catch(() => null),
+        strongsPromise ?? Promise.resolve(null),
+      ]).then(
+        ([
+          nextConcordance,
+          nextWebsters,
+          nextHitchcocks,
+          nextOldEnglish,
+          nextGenealogy,
+          nextAncientMaps,
+          nextStrongs,
+        ]) => {
+          syncWordStudySelections(rawWord, normalizedCode, {
+            websters: nextWebsters,
+            hitchcocks: nextHitchcocks,
+            oldEnglish: nextOldEnglish,
+            genealogy: nextGenealogy,
+            ancientMaps: nextAncientMaps,
+            strongsGreek: nextStrongs?.greek ?? null,
+            strongsHebrew: nextStrongs?.hebrew ?? null,
           });
-      }
-
-      setHitchcocksError(null);
-      setIsHitchcocksLoading(true);
-      if (hitchcocks) {
-        applyHitchcocksSelection(hitchcocks);
-      } else {
-        void ensureHitchcocksLoaded()
-          .then((data) => {
-            applyHitchcocksSelection(data);
-          })
-          .catch((error) => {
-            const message =
-              error instanceof Error
-                ? error.message
-                : "Failed to load Hitchcock's data";
-            setHitchcocksError(message);
-            setIsHitchcocksLoading(false);
+          syncTokenAccordionState(rawWord, {
+            verseNumber:
+              Number.isFinite(verseNumber) && verseNumber > 0 ? verseNumber : null,
+            strongCode: normalizedCode,
+            concordanceData: nextConcordance,
+            webstersData: nextWebsters,
+            hitchcocksData: nextHitchcocks,
+            oldEnglishData: nextOldEnglish,
+            genealogyData: nextGenealogy,
+            ancientMapsData: nextAncientMaps,
+            strongsGreekData: nextStrongs?.greek ?? null,
+            strongsHebrewData: nextStrongs?.hebrew ?? null,
           });
-      }
-
-      setOldEnglishError(null);
-      setIsOldEnglishLoading(true);
-      if (oldEnglish) {
-        applyOldEnglishSelection(oldEnglish);
-      } else {
-        void ensureOldEnglishLoaded()
-          .then((data) => {
-            applyOldEnglishSelection(data);
-          })
-          .catch((error) => {
-            const message =
-              error instanceof Error
-                ? error.message
-                : "Failed to load Old English data";
-            setOldEnglishError(message);
-            setIsOldEnglishLoading(false);
-          });
-      }
-
-      setGenealogyError(null);
-      setIsGenealogyLoading(true);
-      if (genealogy) {
-        applyGenealogySelection(genealogy);
-      } else {
-        void ensureGenealogyLoaded()
-          .then((data) => {
-            applyGenealogySelection(data);
-          })
-          .catch((error) => {
-            const message =
-              error instanceof Error
-                ? error.message
-                : "Failed to load genealogy data";
-            setGenealogyError(message);
-            setIsGenealogyLoading(false);
-          });
-      }
-
-      setMapsError(null);
-      setIsMapsLoading(true);
-      if (ancientMaps) {
-        applyMapsSelection(ancientMaps);
-      } else {
-        void ensureAncientMapsLoaded()
-          .then((data) => {
-            applyMapsSelection(data);
-          })
-          .catch((error) => {
-            const message =
-              error instanceof Error
-                ? error.message
-                : "Failed to load ancient map data";
-            setMapsError(message);
-            setIsMapsLoading(false);
-          });
-      }
+        },
+      ).finally(() => {
+        if (normalizedCode) {
+          setIsStrongsLoading(false);
+        }
+      });
     },
     [
       ancientMaps,
       concordance,
       ensureConcordanceLoaded,
       ensureAncientMapsLoaded,
-      ensureHitchcocksLoaded,
       ensureGenealogyLoaded,
+      ensureHitchcocksLoaded,
       ensureOldEnglishLoaded,
       openCrossReferencesForVerse,
       openStudyTool,
@@ -2326,9 +2484,25 @@ export function KJVReader() {
       genealogy,
       hitchcocks,
       oldEnglish,
+      setConcordanceError,
+      setIsConcordanceLoading,
+      setIsStrongsLoading,
+      setIsStrongsSearching,
+      setNotesContext,
+      setSelectedConcordanceWord,
+      setSelectedGenealogyIds,
+      setSelectedHitchcocksEntry,
+      setSelectedMapsEntries,
+      setSelectedOldEnglishEntry,
+      setSelectedStrongsEntry,
+      setSelectedWebstersEntry,
+      setStrongsError,
+      setStrongsSearchTerm,
       strongsGreek,
       strongsHebrew,
-      showStudyTool,
+      syncTokenAccordionState,
+      syncWordStudySelections,
+      setConcordanceWordAccordionValue,
       websters,
     ],
   );
@@ -2353,7 +2527,13 @@ export function KJVReader() {
       }
       showStudyTool("genealogy");
     },
-    [isGenealogyTreeOpen, showStudyTool],
+    [
+      isGenealogyTreeOpen,
+      setGenealogySearchTerm,
+      setGenealogyTreePersonId,
+      setSelectedGenealogyIds,
+      showStudyTool,
+    ],
   );
 
   const openGenealogyTree = useCallback((personId: string) => {
@@ -2365,7 +2545,7 @@ export function KJVReader() {
     }
     setGenealogyTreePersonId(personId);
     setIsGenealogyTreeOpen(true);
-  }, []);
+  }, [setGenealogyTreePersonId, setIsGenealogyTreeOpen]);
 
   const renderGenealogyPersonDetails = useCallback(
     (person: GenealogyPerson) => (
@@ -2599,6 +2779,7 @@ export function KJVReader() {
                 onOpenTokenDetails={openTokenDetailsFromElement}
                 onSelectVerse={handleVerseSelection}
                 concordanceWords={concordanceWords}
+                verseSearchIndex={verseSearchIndex}
                 ensureConcordanceWordsLoaded={ensureConcordanceLoaded}
                 onOpenSearchResult={openChapterReferenceInNewTab}
                 notes={readerNotes}

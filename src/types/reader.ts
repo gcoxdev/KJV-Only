@@ -123,6 +123,7 @@ export type SearchPageState = {
   caseSensitive: boolean;
   chipInput: string;
   phraseInput: string;
+  isControlsCollapsed: boolean;
   selectedWords: string[];
   expandedBookTree: string[];
   selectedBookIndexes: number[];

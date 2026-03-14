@@ -1,4 +1,4 @@
-import { startTransition, useCallback, useEffect, useState } from "react";
+import { startTransition, useCallback, useState } from "react";
 
 import type { StudyWorkspaceTab, StudyWorkspaceTool } from "@/types/reader";
 
@@ -42,15 +42,6 @@ export function useStudyWorkspaceState({
   const [accordionValue, setAccordionValue] = useState<string[]>(
     initialAccordionValue,
   );
-
-  useEffect(() => {
-    setAccordionValue((current) => {
-      if (current.includes(activeTool)) {
-        return current;
-      }
-      return [...current, activeTool];
-    });
-  }, [activeTool]);
 
   const showTool = useCallback((tool: StudyWorkspaceTool) => {
     startTransition(() => {

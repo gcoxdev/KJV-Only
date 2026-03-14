@@ -41,7 +41,7 @@ export function useReaderNotes({ activeTab }: UseReaderNotesArgs) {
   }, [readerNotes]);
 
   useEffect(() => {
-    if (!activeTab || notesContext) {
+    if (!activeTab) {
       return;
     }
     const readerLeafId = collectLeafIds(activeTab.root).find((leafId) => {
@@ -55,11 +55,19 @@ export function useReaderNotes({ activeTab }: UseReaderNotesArgs) {
     if (!leaf) {
       return;
     }
-    setNotesContext({
-      bookIndex: leaf.bookIndex,
-      chapterIndex: leaf.chapterIndex,
+    setNotesContext((current) => {
+      if (
+        current?.bookIndex === leaf.bookIndex &&
+        current.chapterIndex === leaf.chapterIndex
+      ) {
+        return current;
+      }
+      return {
+        bookIndex: leaf.bookIndex,
+        chapterIndex: leaf.chapterIndex,
+      };
     });
-  }, [activeTab, notesContext]);
+  }, [activeTab]);
 
   const createGeneralNote = useCallback(() => {
     const noteId = createId();
