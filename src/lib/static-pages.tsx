@@ -121,8 +121,9 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
       eyebrow: "Acknowledgements",
       heading: "Credits",
       paragraphs: [
-        "This page will acknowledge the data sources, tools, libraries, maintainers, and contributors that make the project possible.",
-        "It should later include source attribution, licenses, and links where appropriate.",
+        "This project uses Bible text, reference data, dictionaries, maps, genealogy data, and open-source libraries that each deserve clear attribution.",
+        "Cross-reference ordering incorporates OpenBible.info cross-reference vote data, which is licensed CC BY and described by OpenBible as drawing primarily from the public-domain Treasury of Scripture Knowledge.",
+        "Additional attribution, licenses, and source links should continue to be documented here as data sources are added or updated.",
       ],
     },
   },
