@@ -104,6 +104,7 @@ export function SearchPage({
 }: SearchPageProps) {
   const [isBookFilterOpen, setIsBookFilterOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [isControlsCollapsed, setIsControlsCollapsed] = useState(false);
 
   const {
     searchMode,
@@ -442,6 +443,7 @@ export function SearchPage({
           text,
         }));
       onStateChange({ results: matches });
+      setIsControlsCollapsed(true);
       setIsSearching(false);
     });
   };
@@ -476,164 +478,238 @@ export function SearchPage({
     return match.text;
   };
 
+  const searchSummary = useMemo(() => {
+    const modeLabel = SEARCH_MODE_LABELS[searchMode];
+    const scopeLabel = `${selectedBookCount}/${books.length} books`;
+    if (searchMode === "contains-any" || searchMode === "contains-all") {
+      const terms =
+        selectedWords.length > 0 ? selectedWords.join(", ") : "no words selected";
+      return `${modeLabel} • ${terms} • ${scopeLabel}${caseSensitive ? " • case-sensitive" : ""}`;
+    }
+
+    const phrase = phraseInputDraft.trim() || (searchMode === "regex" ? "no pattern" : "no phrase");
+    return `${modeLabel} • ${phrase} • ${scopeLabel}${caseSensitive ? " • case-sensitive" : ""}`;
+  }, [
+    books.length,
+    caseSensitive,
+    phraseInputDraft,
+    searchMode,
+    selectedBookCount,
+    selectedWords,
+  ]);
+
   return (
     <div className="flex h-full min-h-0 flex-col gap-1.5 p-2">
       <div className="workspace-panel-elevated flex flex-col gap-2 rounded-2xl border p-3">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h2 className="workspace-heading text-xl font-semibold">Search</h2>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-            Search Mode
-          </Label>
-          <ToggleGroup
-            value={[searchMode]}
-            onValueChange={(value) => {
-              const nextValue = value[0];
-              if (nextValue) {
-                onStateChange({ searchMode: nextValue as SearchMode });
-              }
-            }}
-            variant="outline"
-            spacing={0}
-            className="grid w-full grid-cols-2 gap-0 lg:grid-cols-4"
-          >
-            <ToggleGroupItem value="contains-any">{SEARCH_MODE_LABELS["contains-any"]}</ToggleGroupItem>
-            <ToggleGroupItem value="contains-all">{SEARCH_MODE_LABELS["contains-all"]}</ToggleGroupItem>
-            <ToggleGroupItem value="contains-phrase">{SEARCH_MODE_LABELS["contains-phrase"]}</ToggleGroupItem>
-            <ToggleGroupItem value="regex">{SEARCH_MODE_LABELS.regex}</ToggleGroupItem>
-          </ToggleGroup>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="inline-flex items-center gap-2 rounded-full border border-subtle-divider/80 bg-workspace-panel px-3 py-1.5 text-sm">
-            <Checkbox
-              checked={caseSensitive}
-              onCheckedChange={(value) =>
-                onStateChange({ caseSensitive: isChecked(value) })
-              }
-            />
-            Case-sensitive
-          </label>
-
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <h2 className="workspace-heading text-xl font-semibold">Search</h2>
+            {isControlsCollapsed ? (
+              <p className="text-sm text-muted-foreground">{searchSummary}</p>
+            ) : null}
+          </div>
           <Button
             type="button"
             variant="outline"
-            className="bg-workspace-panel"
-            onClick={openBookFilterDialog}
+            size="sm"
+            onClick={() => setIsControlsCollapsed((current) => !current)}
           >
-            {`Scope • ${selectedBookCount}/${books.length} books`}
+            {isControlsCollapsed ? (
+              <>
+                <ChevronRightIcon />
+                Show
+              </>
+            ) : (
+              <>
+                <ChevronDownIcon />
+                Hide
+              </>
+            )}
           </Button>
         </div>
-      </div>
 
-      {searchMode === "contains-any" || searchMode === "contains-all" ? (
-        <div className="workspace-panel flex flex-col gap-2 rounded-2xl border p-3">
-          <Label htmlFor="search-chip-input">Words</Label>
-          <div className="rounded-2xl border border-subtle-divider/80 bg-workspace-panel-elevated p-2">
-            <div className="mb-2 flex flex-wrap gap-2">
-              {selectedWords.map((word) => (
-                <button
-                  key={word}
-                  type="button"
-                  className="study-accent-chip inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium"
-                  onClick={() => removeWordChip(word)}
+        {!isControlsCollapsed ? (
+          <>
+            <div className="flex flex-col gap-2">
+              <Label className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                Search Mode
+              </Label>
+              <ToggleGroup
+                value={[searchMode]}
+                onValueChange={(value) => {
+                  const nextValue = value[0];
+                  if (nextValue) {
+                    onStateChange({ searchMode: nextValue as SearchMode });
+                  }
+                }}
+                variant="outline"
+                spacing={0}
+                className="grid w-full grid-cols-2 gap-0 lg:grid-cols-4"
+              >
+                <ToggleGroupItem
+                  value="contains-any"
+                  className="data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
                 >
-                  {word}
-                  <span aria-hidden="true" className="text-muted-foreground">
-                    ×
-                  </span>
-                </button>
-              ))}
+                  {SEARCH_MODE_LABELS["contains-any"]}
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="contains-all"
+                  className="data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+                >
+                  {SEARCH_MODE_LABELS["contains-all"]}
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="contains-phrase"
+                  className="data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+                >
+                  {SEARCH_MODE_LABELS["contains-phrase"]}
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="regex"
+                  className="data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+                >
+                  {SEARCH_MODE_LABELS.regex}
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
-            <Input
-              id="search-chip-input"
-              value={chipInputDraft}
-              onChange={(event) =>
-                setChipInputDraft(event.currentTarget.value)
-              }
-              onKeyDown={(event) => {
-                if (event.key !== "Enter") {
-                  return;
-                }
-                event.preventDefault();
-                const topSuggestion = concordanceSuggestions[0];
-                if (topSuggestion) {
-                  addWordChip(topSuggestion);
-                }
-              }}
-              placeholder="Type to find concordance words..."
-            />
-            {chipInputDraft.trim() ? (
-              <div className="mt-2 max-h-40 overflow-y-auto rounded-2xl border border-subtle-divider/80 bg-background/60">
-                <div className="p-1">
-                  {chipInputDraft.trim().length < 2 ? (
-                    <p className="px-2 py-1 text-sm text-muted-foreground">
-                      Type at least 2 characters for suggestions.
-                    </p>
-                  ) : concordanceSuggestions.length > 0 ? (
-                    concordanceSuggestions.map((word) => (
-                      <button
-                        key={word}
-                        type="button"
-                        className="block w-full rounded px-2 py-1 text-left text-sm text-foreground hover:bg-muted/50 hover:text-foreground"
-                        onClick={() => addWordChip(word)}
-                      >
-                        {word}
-                      </button>
-                    ))
-                  ) : (
-                    <p className="px-2 py-1 text-sm text-muted-foreground">
-                      No matching concordance words.
-                    </p>
-                  )}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        </div>
-      ) : (
-        <div className="workspace-panel flex flex-col gap-2 rounded-2xl border p-3">
-          <Label htmlFor="search-phrase-input">
-            {searchMode === "regex" ? "Regular expression" : "Phrase"}
-          </Label>
-          <Input
-            id="search-phrase-input"
-            value={phraseInputDraft}
-            onChange={(event) =>
-              setPhraseInputDraft(event.currentTarget.value)
-            }
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                search();
-              }
-            }}
-            placeholder={
-              searchMode === "regex"
-                ? "Example: \\bfaith\\b"
-                : "Enter exact phrase..."
-            }
-          />
-        </div>
-      )}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" onClick={search} disabled={isSearching}>
-          <SearchIcon />
-          Search
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={clearResults}
-          disabled={!hasSearchOutput}
-        >
-          Clear Results
-        </Button>
-        {error ? <p className="text-sm text-destructive">{error}</p> : null}
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="inline-flex items-center gap-2 rounded-full border border-subtle-divider/80 bg-workspace-panel px-3 py-1.5 text-sm">
+                <Checkbox
+                  checked={caseSensitive}
+                  onCheckedChange={(value) =>
+                    onStateChange({ caseSensitive: isChecked(value) })
+                  }
+                />
+                Case-sensitive
+              </label>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="border-subtle-divider bg-workspace-panel"
+                onClick={openBookFilterDialog}
+              >
+                {`Scope • ${selectedBookCount}/${books.length} books`}
+              </Button>
+            </div>
+          </>
+        ) : null}
       </div>
+
+      {!isControlsCollapsed ? (
+        <>
+          {searchMode === "contains-any" || searchMode === "contains-all" ? (
+            <div className="workspace-panel flex flex-col gap-2 rounded-2xl border p-3">
+              <Label htmlFor="search-chip-input">Words</Label>
+              <div className="rounded-2xl border border-subtle-divider/80 bg-workspace-panel-elevated p-2">
+                <div className="mb-2 flex flex-wrap gap-2">
+                  {selectedWords.map((word) => (
+                    <button
+                      key={word}
+                      type="button"
+                      className="study-accent-chip inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium"
+                      onClick={() => removeWordChip(word)}
+                    >
+                      {word}
+                      <span aria-hidden="true" className="text-muted-foreground">
+                        ×
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <Input
+                  id="search-chip-input"
+                  value={chipInputDraft}
+                  onChange={(event) =>
+                    setChipInputDraft(event.currentTarget.value)
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter") {
+                      return;
+                    }
+                    event.preventDefault();
+                    const topSuggestion = concordanceSuggestions[0];
+                    if (topSuggestion) {
+                      addWordChip(topSuggestion);
+                    }
+                  }}
+                  placeholder="Type to find concordance words..."
+                />
+                {chipInputDraft.trim() ? (
+                  <div className="mt-2 max-h-40 overflow-y-auto rounded-2xl border border-subtle-divider/80 bg-background/60">
+                    <div className="p-1">
+                      {chipInputDraft.trim().length < 2 ? (
+                        <p className="px-2 py-1 text-sm text-muted-foreground">
+                          Type at least 2 characters for suggestions.
+                        </p>
+                      ) : concordanceSuggestions.length > 0 ? (
+                        concordanceSuggestions.map((word) => (
+                          <button
+                            key={word}
+                            type="button"
+                            className="block w-full rounded px-2 py-1 text-left text-sm text-foreground hover:bg-muted/50 hover:text-foreground"
+                            onClick={() => addWordChip(word)}
+                          >
+                            {word}
+                          </button>
+                        ))
+                      ) : (
+                        <p className="px-2 py-1 text-sm text-muted-foreground">
+                          No matching concordance words.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ) : (
+            <div className="workspace-panel flex flex-col gap-2 rounded-2xl border p-3">
+              <Label htmlFor="search-phrase-input">
+                {searchMode === "regex" ? "Regular expression" : "Phrase"}
+              </Label>
+              <Input
+                id="search-phrase-input"
+                value={phraseInputDraft}
+                onChange={(event) =>
+                  setPhraseInputDraft(event.currentTarget.value)
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    search();
+                  }
+                }}
+                placeholder={
+                  searchMode === "regex"
+                    ? "Example: \\bfaith\\b"
+                    : "Enter exact phrase..."
+                }
+              />
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="button" onClick={search} disabled={isSearching}>
+              <SearchIcon />
+              Search
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="border-subtle-divider"
+              onClick={clearResults}
+              disabled={!hasSearchOutput}
+            >
+              Clear Results
+            </Button>
+            {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          </div>
+        </>
+      ) : error ? (
+        <p className="text-sm text-destructive">{error}</p>
+      ) : null}
 
       <Separator />
 
