@@ -54,6 +54,7 @@ type ProgressDialogProps = {
   onOpenChange: (open: boolean) => void;
   totalProgressPercent: number;
   progressByTestament: ProgressByTestament;
+  onSetAllTestamentChaptersRead: (testament: "old" | "new", read: boolean) => void;
   onSetAllBookChaptersRead: (bookIndex: number, read: boolean) => void;
   onOpenChapterInNewTab: (bookIndex: number, chapterIndex: number) => void;
   onToggleChapterRead: (bookIndex: number, chapterIndex: number) => void;
@@ -65,6 +66,7 @@ export function ProgressDialog({
   onOpenChange,
   totalProgressPercent,
   progressByTestament,
+  onSetAllTestamentChaptersRead,
   onSetAllBookChaptersRead,
   onOpenChapterInNewTab,
   onToggleChapterRead,
@@ -154,22 +156,6 @@ export function ProgressDialog({
                               </div>
                             </AccordionTrigger>
                             <AccordionContent className="space-y-2 px-1">
-                              <div className="flex justify-end">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    onSetAllBookChaptersRead(
-                                      book.bookIndex,
-                                      book.read !== book.total,
-                                    )
-                                  }
-                                >
-                                  {book.read === book.total
-                                    ? "Mark all incomplete"
-                                    : "Mark all complete"}
-                                </Button>
-                              </div>
                               <div className="space-y-1">
                                 {book.chapters.map((chapter) => (
                                   <div
@@ -205,11 +191,43 @@ export function ProgressDialog({
                                   </div>
                                 ))}
                               </div>
+                              <div className="flex justify-end">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() =>
+                                    onSetAllBookChaptersRead(
+                                      book.bookIndex,
+                                      book.read !== book.total,
+                                    )
+                                  }
+                                >
+                                  {book.read === book.total
+                                    ? "Mark all incomplete"
+                                    : "Mark all complete"}
+                                </Button>
+                              </div>
                             </AccordionContent>
                           </AccordionItem>
                         );
                       })}
                     </Accordion>
+                    <div className="flex justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          onSetAllTestamentChaptersRead(
+                            testamentCode === "OT" ? "old" : "new",
+                            testament.read !== testament.total,
+                          )
+                        }
+                      >
+                        {testament.read === testament.total
+                          ? "Mark testament incomplete"
+                          : "Mark testament complete"}
+                      </Button>
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
               );
