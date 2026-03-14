@@ -5,6 +5,7 @@ import { ConcordanceTool } from "@/components/reader/study-tools/concordance-too
 import { WebstersTool } from "@/components/reader/study-tools/websters-tool";
 import { StrongsTool } from "@/components/reader/study-tools/strongs-tool";
 import { OldEnglishTool } from "@/components/reader/study-tools/old-english-tool";
+import { BibleWordBookTool } from "@/components/reader/study-tools/bible-word-book-tool";
 import { PhrasesTool } from "@/components/reader/study-tools/phrases-tool";
 import { UnitsTool } from "@/components/reader/study-tools/units-tool";
 import { MapsTool } from "@/components/reader/study-tools/maps-tool";
@@ -17,6 +18,7 @@ export type ReaderStudyToolsContentProps = {
   webstersProps: ComponentProps<typeof WebstersTool>;
   strongsProps: ComponentProps<typeof StrongsTool>;
   oldEnglishProps: ComponentProps<typeof OldEnglishTool>;
+  bibleWordBookProps: ComponentProps<typeof BibleWordBookTool>;
   phrasesProps: ComponentProps<typeof PhrasesTool>;
   unitsProps: ComponentProps<typeof UnitsTool>;
   mapsProps: ComponentProps<typeof MapsTool>;
@@ -30,6 +32,7 @@ export function ReaderStudyToolsContent({
   webstersProps,
   strongsProps,
   oldEnglishProps,
+  bibleWordBookProps,
   phrasesProps,
   unitsProps,
   mapsProps,
@@ -43,6 +46,7 @@ export function ReaderStudyToolsContent({
       <WebstersTool {...webstersProps} />
       <StrongsTool {...strongsProps} />
       <OldEnglishTool {...oldEnglishProps} />
+      <BibleWordBookTool {...bibleWordBookProps} />
       <PhrasesTool {...phrasesProps} />
       <UnitsTool {...unitsProps} />
       <MapsTool {...mapsProps} />

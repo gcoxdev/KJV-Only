@@ -9,6 +9,7 @@ import type {
   GenealogyCompactPayload,
   GenealogyPayload,
   HitchcocksPayload,
+  BibleWordBookPayload,
   OldEnglishPayload,
   PhrasesPayload,
   ReaderPayload,
@@ -24,6 +25,7 @@ let kjvBooksPromise: Promise<Book[]> | null = null;
 let concordancePromise: Promise<ConcordancePayload> | null = null;
 let crossRefsPromise: Promise<CrossRefsPayload> | null = null;
 let hitchcocksPromise: Promise<HitchcocksPayload> | null = null;
+let bibleWordBookPromise: Promise<BibleWordBookPayload> | null = null;
 let oldEnglishPromise: Promise<OldEnglishPayload> | null = null;
 let phrasesPromise: Promise<PhrasesPayload> | null = null;
 let unitsPromise: Promise<UnitsPayload> | null = null;
@@ -158,6 +160,27 @@ export function loadHitchcocks() {
   }
 
   return hitchcocksPromise;
+}
+
+export function loadBibleWordBook() {
+  if (!bibleWordBookPromise) {
+    bibleWordBookPromise = fetch("/references/bible-word-book.json", {
+      cache: "no-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/bible-word-book.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as BibleWordBookPayload)
+      .catch((error) => {
+        bibleWordBookPromise = null;
+        throw error;
+      });
+  }
+
+  return bibleWordBookPromise;
 }
 
 export function loadOldEnglish() {

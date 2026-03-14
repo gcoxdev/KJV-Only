@@ -3,6 +3,7 @@ export const STUDY_ACCORDION_ITEMS = [
   "concordance",
   "websters",
   "strongs",
+  "bible-word-book",
   "phrases",
   "units",
   "maps",
@@ -18,6 +19,7 @@ type UseStudySidebarStateArgs = {
   webstersCount: number;
   strongsCount: number;
   phrasesCount: number;
+  bibleWordBookCount: number;
   unitsCount: number;
   mapsCount: number;
   hitchcocksCount: number;
@@ -32,6 +34,7 @@ export function useStudySidebarState({
   webstersCount,
   strongsCount,
   phrasesCount,
+  bibleWordBookCount,
   unitsCount,
   mapsCount,
   hitchcocksCount,
@@ -49,6 +52,7 @@ export function useStudySidebarState({
     isConcordanceSectionOpen: openStudySections.has("concordance"),
     isWebstersSectionOpen: openStudySections.has("websters"),
     isStrongsSectionOpen: openStudySections.has("strongs"),
+    isBibleWordBookSectionOpen: openStudySections.has("bible-word-book"),
     isPhrasesSectionOpen: openStudySections.has("phrases"),
     isUnitsSectionOpen: openStudySections.has("units"),
     isMapsSectionOpen: openStudySections.has("maps"),
@@ -59,6 +63,7 @@ export function useStudySidebarState({
     hasConcordanceInfo: concordanceCount > 0,
     hasWebstersInfo: webstersCount > 0,
     hasStrongsInfo: strongsCount > 0,
+    hasBibleWordBookInfo: bibleWordBookCount > 0,
     hasPhrasesInfo: phrasesCount > 0,
     hasUnitsInfo: unitsCount > 0,
     hasMapsInfo: mapsCount > 0,

@@ -1,6 +1,7 @@
 import type {
   ConcordancePayload,
   HitchcocksPayload,
+  BibleWordBookPayload,
   OldEnglishPayload,
   PhrasesPayload,
   UnitsPayload,
@@ -207,6 +208,46 @@ export function resolveOldEnglishKey(
 
   const lowered = cleaned.toLowerCase();
   const fallback = Object.keys(oldEnglish).find(
+    (key) => key.toLowerCase() === lowered,
+  );
+  return fallback ?? null;
+}
+
+export function resolveBibleWordBookKey(
+  bibleWordBook: BibleWordBookPayload,
+  rawWord: string,
+) {
+  const cleaned = normalizeConcordanceWord(rawWord);
+  if (!cleaned) {
+    return null;
+  }
+
+  const candidates = [
+    cleaned,
+    cleaned.toLowerCase(),
+    cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase(),
+    cleaned.toUpperCase(),
+  ];
+
+  for (const candidate of candidates) {
+    if (bibleWordBook[candidate]) {
+      return candidate;
+    }
+  }
+
+  for (const [key, entry] of Object.entries(bibleWordBook)) {
+    if (
+      entry.aliases?.some((alias) => {
+        const aliasLower = alias.toLowerCase();
+        return candidates.includes(alias) || candidates.includes(aliasLower);
+      })
+    ) {
+      return key;
+    }
+  }
+
+  const lowered = cleaned.toLowerCase();
+  const fallback = Object.keys(bibleWordBook).find(
     (key) => key.toLowerCase() === lowered,
   );
   return fallback ?? null;

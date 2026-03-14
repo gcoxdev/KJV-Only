@@ -161,6 +161,12 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
             "Supplemental KJV word and phrase definitions used to expand the old-English dictionary and phrase lookup data.",
         },
         {
+          label: "The Bible Word-Book",
+          href: "https://archive.org/details/biblewordbookglo00wrigiala",
+          description:
+            "Public-domain source for the separate Bible Word-Book tool, based on William Aldis Wright's glossary of archaic Bible and prayer-book words and phrases.",
+        },
+        {
           label: "3Bible.com Audio Bible",
           href: "https://3bible.com/AudioBible.php",
           description:
