@@ -1,0 +1,36 @@
+{
+  "sourceUrl": "https://archive.org/download/biblewordbookglo00wrigiala/biblewordbookglo00wrigiala_djvu.txt",
+  "parsedEntries": 1443,
+  "sampleEntries": [
+    "Abate",
+    "Abhor",
+    "Abhorring",
+    "Abide",
+    "Abject",
+    "Abroad",
+    "Abuse",
+    "Accept",
+    "Acceptable",
+    "Access",
+    "Accomplish",
+    "Accordingly",
+    "AcCUrse",
+    "Accustomably",
+    "Acquaint",
+    "Acquaintance",
+    "Adjure",
+    "Admiration",
+    "Adventure",
+    "Adversary",
+    "Advertise",
+    "Advise",
+    "Advisement",
+    "Afar off",
+    "Affect"
+  ],
+  "suspectHeadwords": [],
+  "manualHeadwordCorrections": {
+    "AcCUrse": "Accurse",
+    "ITestemight": "Yesternight"
+  }
+}

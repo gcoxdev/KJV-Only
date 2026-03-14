@@ -1,0 +1,70 @@
+{
+  "renamed": [
+    {
+      "from": "RefUse",
+      "to": "Refuse"
+    },
+    {
+      "from": "Ijeatheril",
+      "to": "Leathern"
+    },
+    {
+      "from": "IKEockingstOCk",
+      "to": "Mocking-stock"
+    },
+    {
+      "from": "IMEolten",
+      "to": "Molten"
+    },
+    {
+      "from": "IVEanicles",
+      "to": "Manicles"
+    },
+    {
+      "from": "IVEount",
+      "to": "Mount"
+    },
+    {
+      "from": "IiUCk",
+      "to": "Luck"
+    },
+    {
+      "from": "Iiie",
+      "to": "Lie"
+    },
+    {
+      "from": "Iiien",
+      "to": "Lien"
+    },
+    {
+      "from": "Iiiken",
+      "to": "Liken"
+    },
+    {
+      "from": "IMIuch",
+      "to": "Much"
+    }
+  ],
+  "added": [
+    "Betimes",
+    "Wag",
+    "Moe",
+    "Mollify",
+    "Regard",
+    "Monarchy",
+    "Likewise"
+  ],
+  "removed": [
+    "You Like It"
+  ],
+  "meaningMerged": [
+    "Bidden",
+    "Adventure"
+  ],
+  "trimmed": [
+    "Bethink",
+    "Liken",
+    "Mocking-stock"
+  ],
+  "totalEntries": 1462
+}

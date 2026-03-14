@@ -9,6 +9,7 @@ const STUDY_WORKSPACE_TOOLS: StudyWorkspaceTool[] = [
   "websters",
   "strongs",
   "old-english",
+  "bible-word-book",
   "phrases",
   "units",
   "maps",

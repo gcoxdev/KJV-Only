@@ -1,0 +1,43 @@
+{
+  "removed": [
+    "As You Like It",
+    "Bacon",
+    "Compare Cymbeline",
+    "Compare also Othello",
+    "Holland's Pliny",
+    "fulius Ccesar",
+    "Merry Wives",
+    "Hamlet",
+    "to divide in two"
+  ],
+  "renamed": {
+    "ISatter": "Matter",
+    "Iiight": "Light",
+    "Uncomiptness": "Uncorruptness",
+    "Entring in": "Entering in"
+  },
+  "aliasExamples": {
+    "Abject": [
+      "abjects"
+    ],
+    "Accurse": [
+      "accursed"
+    ],
+    "Commonweal": [
+      "commonwealth"
+    ],
+    "Gainsayer": [
+      "gainsayers"
+    ],
+    "Light": [
+      "lighted",
+      "lightest",
+      "lighteth",
+      "lights"
+    ],
+    "Matter": [
+      "matters"
+    ]
+  },
+  "finalCount": 1433
+}

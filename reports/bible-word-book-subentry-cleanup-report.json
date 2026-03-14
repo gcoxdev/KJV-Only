@@ -1,0 +1,14 @@
+{
+  "duplicateBodyStrips": 1,
+  "pageMarkerCleanups": 130,
+  "lineNoiseRemovals": 55,
+  "targetedSplits": 2,
+  "addedEntries": [
+    "What time",
+    "What man",
+    "Whatsoever",
+    "What time as",
+    "When as"
+  ],
+  "totalEntries": 1447
+}
