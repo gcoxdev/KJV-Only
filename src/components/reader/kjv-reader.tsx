@@ -41,15 +41,18 @@ import {
   createId,
   createInitialTab,
   createLeaf,
-  findGroupTargetNodeId,
+  directionOrientation,
+  findContiguousGroupRootId,
   findLeafNode,
   findNodeById,
   findParentSplitForLeaf,
+  insertLeafIntoParentGroup,
   removeLeafNode,
   splitNodeById,
   splitPanelNode,
   swapLeafContent,
   updateLeafNode,
+  updateSameOrientationGroupLayout,
   updateSplitOrientation,
   updateSplitRatio,
 } from "@/lib/reader-layout";
@@ -1197,17 +1200,51 @@ export function KJVReader() {
     applyAddPreview([leafId], direction, false);
   }
 
-  function setGroupAddPreviewTarget(leafId: string, direction: PanelDirection) {
+  function setGroupInsertPreviewTarget(
+    leafId: string,
+    direction: PanelDirection,
+  ) {
     clearMovePreview();
     clearOrientationPreview();
     if (!activeTab) {
       return;
     }
 
-    const targetNodeId = findGroupTargetNodeId(
+    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
+    if (
+      !parentSplit ||
+      parentSplit.orientation !== directionOrientation(direction)
+    ) {
+      return;
+    }
+
+    applyAddPreview([leafId], direction, true);
+  }
+
+  function setAroundGroupPreviewTarget(
+    leafId: string,
+    direction: PanelDirection,
+  ) {
+    clearMovePreview();
+    clearOrientationPreview();
+    if (!activeTab) {
+      return;
+    }
+
+    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
+    if (!parentSplit) {
+      return;
+    }
+
+    const targetOrientation = parentSplit.orientation;
+    if (targetOrientation === directionOrientation(direction)) {
+      return;
+    }
+
+    const targetNodeId = findContiguousGroupRootId(
       activeTab.root,
       leafId,
-      direction,
+      targetOrientation,
     );
     if (!targetNodeId) {
       return;
@@ -1274,15 +1311,44 @@ export function KJVReader() {
     orientationPreviewLeafIdsRef.current = leafIds;
   }
 
-  function splitPanelGroup(leafId: string, direction: PanelDirection) {
+  function insertPanelInGroup(leafId: string, direction: PanelDirection) {
     if (!activeTab) {
       return;
     }
 
-    const targetNodeId = findGroupTargetNodeId(
+    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
+    if (
+      !parentSplit ||
+      parentSplit.orientation !== directionOrientation(direction)
+    ) {
+      return;
+    }
+
+    updateActiveTab((tab) => {
+      const result = insertLeafIntoParentGroup(tab.root, leafId, direction);
+      return result.changed ? { ...tab, root: result.next } : tab;
+    });
+  }
+
+  function addAroundGroup(leafId: string, direction: PanelDirection) {
+    if (!activeTab) {
+      return;
+    }
+
+    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
+    if (!parentSplit) {
+      return;
+    }
+
+    const targetOrientation = parentSplit.orientation;
+    if (targetOrientation === directionOrientation(direction)) {
+      return;
+    }
+
+    const targetNodeId = findContiguousGroupRootId(
       activeTab.root,
       leafId,
-      direction,
+      targetOrientation,
     );
     if (!targetNodeId) {
       return;
@@ -1736,6 +1802,22 @@ export function KJVReader() {
     updateActiveTab((tab) => ({
       ...tab,
       root: updateSplitRatio(tab.root, splitId, ratio),
+    }));
+  }
+
+  function updateSplitGroupLayout(
+    groupRootId: string,
+    orientation: SplitOrientation,
+    sizes: number[],
+  ) {
+    updateActiveTab((tab) => ({
+      ...tab,
+      root: updateSameOrientationGroupLayout(
+        tab.root,
+        groupRootId,
+        orientation,
+        sizes,
+      ),
     }));
   }
 
@@ -2765,8 +2847,10 @@ export function KJVReader() {
                 splitLeaf={splitLeaf}
                 setAddPreviewTarget={setAddPreviewTarget}
                 clearAddPreview={clearAddPreview}
-                splitPanelGroup={splitPanelGroup}
-                setGroupAddPreviewTarget={setGroupAddPreviewTarget}
+                insertPanelInGroup={insertPanelInGroup}
+                setGroupInsertPreviewTarget={setGroupInsertPreviewTarget}
+                addAroundGroup={addAroundGroup}
+                setAroundGroupPreviewTarget={setAroundGroupPreviewTarget}
                 existingTabTargets={existingTabTargets}
                 moveLeafToExistingTab={moveLeafToExistingTab}
                 moveLeafToNewTab={moveLeafToNewTab}
@@ -2795,6 +2879,7 @@ export function KJVReader() {
                 moveLeafChapter={moveLeafChapter}
                 toggleChapterRead={toggleChapterRead}
                 updateSplitSize={updateSplitSize}
+                updateSplitGroupLayout={updateSplitGroupLayout}
                 highlightModeEnabledByLeafId={highlightModeEnabledByLeafId}
                 highlightedVerseRangesByLeafId={highlightedVerseRangesByLeafId}
                 onClearLeafHighlights={handleClearLeafHighlights}

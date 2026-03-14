@@ -6,6 +6,7 @@ import {
   findGroupTargetNodeId,
   findLeafNode,
   findParentSplitForLeaf,
+  insertLeafIntoParentGroup,
   removeLeafNode,
   splitPanelNode,
   swapLeafContent,
@@ -73,7 +74,47 @@ describe("reader layout helpers", () => {
     );
 
     expect(findParentSplitForLeaf(root, "top")?.id).toBe("inner");
-    expect(findGroupTargetNodeId(root, "top", "left")).toBe("inner");
-    expect(findGroupTargetNodeId(root, "top", "down")).toBe("outer");
+    expect(findGroupTargetNodeId(root, "top", "left")).toBe("outer");
+    expect(findGroupTargetNodeId(root, "top", "down")).toBe("inner");
+  });
+
+  it("inserts around a leaf within the current parent group", () => {
+    const root = split("root", "horizontal", leaf("a", 0, 0), leaf("b", 1, 0));
+
+    const insertedRight = insertLeafIntoParentGroup(root, "a", "right");
+    expect(insertedRight.changed).toBe(true);
+    expect(collectLeafIds(insertedRight.next)).toEqual([
+      "a",
+      insertedRight.createdLeafId!,
+      "b",
+    ]);
+
+    const insertedLeft = insertLeafIntoParentGroup(root, "b", "left");
+    expect(insertedLeft.changed).toBe(true);
+    expect(collectLeafIds(insertedLeft.next)).toEqual([
+      "a",
+      insertedLeft.createdLeafId!,
+      "b",
+    ]);
+  });
+
+  it("keeps inserting into the same conceptual group on repeated inserts", () => {
+    const root = split("root", "horizontal", leaf("a", 0, 0), leaf("b", 1, 0));
+
+    const firstInsert = insertLeafIntoParentGroup(root, "a", "right");
+    expect(firstInsert.changed).toBe(true);
+
+    const secondInsert = insertLeafIntoParentGroup(
+      firstInsert.next,
+      "a",
+      "right",
+    );
+    expect(secondInsert.changed).toBe(true);
+    expect(collectLeafIds(secondInsert.next)).toEqual([
+      "a",
+      secondInsert.createdLeafId!,
+      firstInsert.createdLeafId!,
+      "b",
+    ]);
   });
 });
