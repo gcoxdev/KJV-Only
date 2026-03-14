@@ -1,5 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { PencilIcon, PlusIcon, SaveIcon, Trash2Icon, XIcon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  Maximize2Icon,
+  Minimize2Icon,
+  PanelTopIcon,
+  PencilIcon,
+  PlusIcon,
+  SaveIcon,
+  Trash2Icon,
+  XIcon,
+} from "lucide-react";
 import type { SerializedEditorState } from "lexical";
 
 import type { Book } from "@/types/bible";
@@ -188,6 +199,9 @@ export function NotesPage({
   const [isEditing, setIsEditing] = useState(false);
   const [draftTitle, setDraftTitle] = useState("");
   const [draftBody, setDraftBody] = useState<SerializedEditorState | undefined>(undefined);
+  const [isNotesListCollapsed, setIsNotesListCollapsed] = useState(false);
+  const [isEditorFullscreen, setIsEditorFullscreen] = useState(false);
+  const [showEditorTools, setShowEditorTools] = useState(true);
 
   useEffect(() => {
     if (!selectedNote) {
@@ -201,6 +215,19 @@ export function NotesPage({
     setIsEditing(isNewNote(selectedNote));
   }, [selectedNote?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (window.matchMedia("(max-width: 1023px)").matches) {
+      setIsNotesListCollapsed(Boolean(selectedNote));
+      return;
+    }
+
+    setIsNotesListCollapsed(false);
+  }, [selectedNote]);
+
   const hasDraftChanges =
     selectedNote !== null &&
     (draftTitle !== selectedNote.title ||
@@ -209,9 +236,26 @@ export function NotesPage({
 
   return (
     <div className="grid h-full min-h-0 grid-cols-1 gap-3 p-2 lg:grid-cols-[22rem_minmax(0,1fr)]">
-      <div className="flex min-h-0 flex-col rounded-md border">
+      <div
+        className={cn(
+          "flex min-h-0 flex-col rounded-md border",
+          isNotesListCollapsed && "hidden lg:flex",
+        )}
+      >
         <div className="space-y-2 border-b p-2">
-          <p className="text-sm font-semibold">Notes</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-semibold">Notes</p>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="lg:hidden"
+              onClick={() => setIsNotesListCollapsed(true)}
+            >
+              Hide List
+              <ChevronUpIcon />
+            </Button>
+          </div>
           <p className="text-xs text-muted-foreground">{contextLabel(pageContext, books)}</p>
           <div className="flex flex-wrap gap-1">
             <Button
@@ -303,11 +347,27 @@ export function NotesPage({
         </ScrollArea>
       </div>
 
-      <div className="flex min-h-0 flex-col rounded-md border">
+      <div
+        className={cn(
+          "flex min-h-0 flex-col rounded-md border",
+          isEditorFullscreen &&
+            "fixed inset-2 z-50 rounded-xl border bg-background shadow-2xl",
+        )}
+      >
         {selectedNote ? (
           <>
             <div className="border-b p-2">
               <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon-sm"
+                  className="lg:hidden"
+                  onClick={() => setIsNotesListCollapsed((current) => !current)}
+                  aria-label={isNotesListCollapsed ? "Show notes list" : "Hide notes list"}
+                >
+                  {isNotesListCollapsed ? <ChevronDownIcon /> : <ChevronUpIcon />}
+                </Button>
                 {isEditing ? (
                   <Input
                     value={draftTitle}
@@ -321,6 +381,24 @@ export function NotesPage({
                 )}
                 {isEditing ? (
                   <>
+                    <Button
+                      type="button"
+                      variant={showEditorTools ? "default" : "outline"}
+                      size="icon-sm"
+                      onClick={() => setShowEditorTools((current) => !current)}
+                      aria-label={showEditorTools ? "Hide rich text tools" : "Show rich text tools"}
+                    >
+                      <PanelTopIcon />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      onClick={() => setIsEditorFullscreen((current) => !current)}
+                      aria-label={isEditorFullscreen ? "Exit fullscreen note editor" : "Enter fullscreen note editor"}
+                    >
+                      {isEditorFullscreen ? <Minimize2Icon /> : <Maximize2Icon />}
+                    </Button>
                     <Button
                       type="button"
                       variant="outline"
@@ -347,6 +425,7 @@ export function NotesPage({
                         setDraftTitle(selectedNote.title);
                         setDraftBody(parseSerializedState(selectedNote.body));
                         setIsEditing(false);
+                        setShowEditorTools(true);
                       }}
                       aria-label="Cancel editing"
                     >
@@ -354,15 +433,29 @@ export function NotesPage({
                     </Button>
                   </>
                 ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon-sm"
-                    onClick={() => setIsEditing(true)}
-                    aria-label="Edit note"
-                  >
-                    <PencilIcon />
-                  </Button>
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      onClick={() => setIsEditorFullscreen((current) => !current)}
+                      aria-label={isEditorFullscreen ? "Exit fullscreen note editor" : "Enter fullscreen note editor"}
+                    >
+                      {isEditorFullscreen ? <Minimize2Icon /> : <Maximize2Icon />}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      onClick={() => {
+                        setIsEditing(true);
+                        setShowEditorTools(true);
+                      }}
+                      aria-label="Edit note"
+                    >
+                      <PencilIcon />
+                    </Button>
+                  </>
                 )}
                 <AlertDialog>
                   <AlertDialogTrigger
@@ -458,7 +551,7 @@ export function NotesPage({
                 key={`${selectedNote.id}-${isEditing ? "edit" : "view"}`}
                 editorSerializedState={isEditing ? draftBody : parseSerializedState(selectedNote.body)}
                 readOnly={!isEditing}
-                showToolbar={isEditing}
+                showToolbar={isEditing && showEditorTools}
                 autoFocus={isEditing}
                 onSerializedChange={(editorSerializedState) => {
                   if (isEditing) {
@@ -469,8 +562,18 @@ export function NotesPage({
             </div>
           </>
         ) : (
-          <div className="p-3 text-sm text-muted-foreground">
-            Select a note or create one.
+          <div className="flex items-center justify-between gap-2 p-3 text-sm text-muted-foreground">
+            <span>Select a note or create one.</span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="lg:hidden"
+              onClick={() => setIsNotesListCollapsed(false)}
+            >
+              Show List
+              <ChevronDownIcon />
+            </Button>
           </div>
         )}
       </div>

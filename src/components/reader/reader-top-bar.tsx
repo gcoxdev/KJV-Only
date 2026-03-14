@@ -19,7 +19,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Label } from "@/components/ui/label";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Switch } from "@/components/ui/switch";
 
@@ -117,13 +116,7 @@ export function ReaderTopBar({
         >
           {isShareCopied ? <CheckIcon aria-hidden="true" /> : <Share2Icon aria-hidden="true" />}
         </Button>
-        <div className="flex items-center gap-3 rounded-full border border-subtle-divider/80 bg-workspace-panel px-3 py-1">
-          <Label
-            htmlFor="study-mode"
-            className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground"
-          >
-            Mode
-          </Label>
+        <div className="flex items-center gap-2">
           <span className="tabular-data text-sm font-medium">
             {isStudyMode ? "Study" : "Read"}
           </span>
@@ -131,6 +124,7 @@ export function ReaderTopBar({
             id="study-mode"
             checked={isStudyMode}
             onCheckedChange={onStudyModeChange}
+            aria-label={isStudyMode ? "Switch to read mode" : "Switch to study mode"}
           />
         </div>
         {isStudyMode ? (
