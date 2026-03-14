@@ -63,6 +63,15 @@ function wrapNodeWithNewPanel(node: PanelNode, direction: PanelDirection): Split
   };
 }
 
+function createdLeafIdFromWrappedNode(
+  wrapped: SplitNode,
+  direction: PanelDirection,
+) {
+  return direction === "left" || direction === "up"
+    ? wrapped.first.id
+    : wrapped.second.id;
+}
+
 export function splitPanelNode(
   node: PanelNode,
   targetLeafId: string,
@@ -73,8 +82,7 @@ export function splitPanelNode(
       return { next: node, createdLeafId: null };
     }
     const split = wrapNodeWithNewPanel(node, direction);
-    const createdLeaf = split.first.type === "leaf" ? split.first : split.second;
-    return { next: split, createdLeafId: createdLeaf.id };
+    return { next: split, createdLeafId: createdLeafIdFromWrappedNode(split, direction) };
   }
 
   const firstResult = splitPanelNode(node.first, targetLeafId, direction);
@@ -120,6 +128,200 @@ export function splitNodeById(
   }
 
   return { next: node, changed: false };
+}
+
+export function insertLeafIntoParentGroup(
+  node: PanelNode,
+  targetLeafId: string,
+  direction: PanelDirection,
+): { next: PanelNode; changed: boolean; createdLeafId: string | null } {
+  const desiredOrientation = directionOrientation(direction);
+  const path = pathToLeaf(node, targetLeafId);
+  if (!path) {
+    return { next: node, changed: false, createdLeafId: null };
+  }
+
+  let groupRoot: SplitNode | null = null;
+  for (let index = path.length - 2; index >= 0; index -= 1) {
+    const current = path[index];
+    if (current.type !== "split" || current.orientation !== desiredOrientation) {
+      break;
+    }
+    groupRoot = current;
+  }
+
+  if (!groupRoot) {
+    return { next: node, changed: false, createdLeafId: null };
+  }
+
+  const children = flattenSameOrientationGroup(groupRoot, desiredOrientation);
+  const targetIndex = children.findIndex((child) => Boolean(findLeafNode(child, targetLeafId)));
+  if (targetIndex === -1) {
+    return { next: node, changed: false, createdLeafId: null };
+  }
+
+  const createdLeaf = createLeaf();
+  const insertIndex =
+    direction === "left" || direction === "up" ? targetIndex : targetIndex + 1;
+  const nextChildren = [
+    ...children.slice(0, insertIndex),
+    createdLeaf,
+    ...children.slice(insertIndex),
+  ];
+
+  const rebuiltGroup = rebuildSameOrientationGroup(
+    groupRoot.id,
+    desiredOrientation,
+    nextChildren,
+  );
+
+  return {
+    next: replaceNodeById(node, groupRoot.id, rebuiltGroup),
+    changed: true,
+    createdLeafId: createdLeaf.id,
+  };
+}
+
+function flattenSameOrientationGroup(
+  node: PanelNode,
+  orientation: SplitOrientation,
+): PanelNode[] {
+  if (node.type === "split" && node.orientation === orientation) {
+    return [
+      ...flattenSameOrientationGroup(node.first, orientation),
+      ...flattenSameOrientationGroup(node.second, orientation),
+    ];
+  }
+
+  return [node];
+}
+
+function rebuildSameOrientationGroup(
+  rootId: string,
+  orientation: SplitOrientation,
+  children: PanelNode[],
+): PanelNode {
+  if (children.length === 1) {
+    return children[0];
+  }
+
+  let current = children[0];
+  let currentItemCount = 1;
+
+  for (let index = 1; index < children.length; index += 1) {
+    const nextChild = children[index];
+    const nextItemCount = currentItemCount + 1;
+    current = {
+      id: index === children.length - 1 ? rootId : createId(),
+      type: "split",
+      orientation,
+      ratio: Math.round((currentItemCount / nextItemCount) * 100),
+      first: current,
+      second: nextChild,
+    };
+    currentItemCount = nextItemCount;
+  }
+
+  return current;
+}
+
+function collectSameOrientationSplitIds(
+  node: PanelNode,
+  orientation: SplitOrientation,
+  ids: string[] = [],
+) {
+  if (node.type !== "split" || node.orientation !== orientation) {
+    return ids;
+  }
+
+  collectSameOrientationSplitIds(node.first, orientation, ids);
+  collectSameOrientationSplitIds(node.second, orientation, ids);
+  ids.push(node.id);
+  return ids;
+}
+
+function rebuildSameOrientationGroupWithLayout(
+  orientation: SplitOrientation,
+  children: PanelNode[],
+  splitIds: string[],
+  sizes: number[],
+): PanelNode {
+  if (children.length === 1) {
+    return children[0];
+  }
+
+  let current = children[0];
+  let currentSize = sizes[0] ?? 100;
+
+  for (let index = 1; index < children.length; index += 1) {
+    const nextChild = children[index];
+    const nextSize = sizes[index] ?? 100;
+    const total = currentSize + nextSize;
+    current = {
+      id: splitIds[index - 1] ?? createId(),
+      type: "split",
+      orientation,
+      ratio: total <= 0 ? 50 : Math.round((currentSize / total) * 100),
+      first: current,
+      second: nextChild,
+    };
+    currentSize = total;
+  }
+
+  return current;
+}
+
+function replaceNodeById(
+  node: PanelNode,
+  targetNodeId: string,
+  replacement: PanelNode,
+): PanelNode {
+  if (node.id === targetNodeId) {
+    return replacement;
+  }
+
+  if (node.type === "leaf") {
+    return node;
+  }
+
+  const nextFirst = replaceNodeById(node.first, targetNodeId, replacement);
+  if (nextFirst !== node.first) {
+    return { ...node, first: nextFirst };
+  }
+
+  const nextSecond = replaceNodeById(node.second, targetNodeId, replacement);
+  if (nextSecond !== node.second) {
+    return { ...node, second: nextSecond };
+  }
+
+  return node;
+}
+
+export function updateSameOrientationGroupLayout(
+  node: PanelNode,
+  groupRootId: string,
+  orientation: SplitOrientation,
+  sizes: number[],
+): PanelNode {
+  const groupRoot = findNodeById(node, groupRootId);
+  if (!groupRoot || groupRoot.type !== "split" || groupRoot.orientation !== orientation) {
+    return node;
+  }
+
+  const children = flattenSameOrientationGroup(groupRoot, orientation);
+  if (children.length !== sizes.length) {
+    return node;
+  }
+
+  const splitIds = collectSameOrientationSplitIds(groupRoot, orientation);
+  const rebuilt = rebuildSameOrientationGroupWithLayout(
+    orientation,
+    children,
+    splitIds,
+    sizes,
+  );
+
+  return replaceNodeById(node, groupRootId, rebuilt);
 }
 
 export function removeLeafNode(
@@ -375,12 +577,34 @@ export function findGroupTargetNodeId(
 
   for (let index = path.length - 2; index >= 0; index -= 1) {
     const node = path[index];
-    if (node.type === "split" && node.orientation !== desiredOrientation) {
+    if (node.type === "split" && node.orientation === desiredOrientation) {
       return node.id;
     }
   }
 
   return null;
+}
+
+export function findContiguousGroupRootId(
+  root: PanelNode,
+  leafId: string,
+  orientation: SplitOrientation,
+) {
+  const path = pathToLeaf(root, leafId);
+  if (!path) {
+    return null;
+  }
+
+  let groupRootId: string | null = null;
+  for (let index = path.length - 2; index >= 0; index -= 1) {
+    const node = path[index];
+    if (node.type !== "split" || node.orientation !== orientation) {
+      break;
+    }
+    groupRootId = node.id;
+  }
+
+  return groupRootId;
 }
 
 export function findParentSplitForLeaf(

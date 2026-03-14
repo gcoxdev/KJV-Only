@@ -1,4 +1,5 @@
 import {
+  Fragment,
   lazy,
   memo,
   Suspense,
@@ -49,10 +50,7 @@ import type {
   SearchPageState,
 } from "@/types/reader";
 import { cn } from "@/lib/utils";
-import {
-  findGroupTargetNodeId,
-  findParentSplitForLeaf,
-} from "@/lib/reader-layout";
+import { findParentSplitForLeaf } from "@/lib/reader-layout";
 import {
   bookCodeForIndex,
   chapterProgressKey,
@@ -68,6 +66,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -152,8 +151,13 @@ type ReaderPanelTreeProps = {
   splitLeaf: (leafId: string, direction: PanelDirection) => void;
   setAddPreviewTarget: (leafId: string, direction: PanelDirection) => void;
   clearAddPreview: () => void;
-  splitPanelGroup: (leafId: string, direction: PanelDirection) => void;
-  setGroupAddPreviewTarget: (
+  insertPanelInGroup: (leafId: string, direction: PanelDirection) => void;
+  setGroupInsertPreviewTarget: (
+    leafId: string,
+    direction: PanelDirection,
+  ) => void;
+  addAroundGroup: (leafId: string, direction: PanelDirection) => void;
+  setAroundGroupPreviewTarget: (
     leafId: string,
     direction: PanelDirection,
   ) => void;
@@ -204,6 +208,11 @@ type ReaderPanelTreeProps = {
   moveLeafChapter: (leafId: string, step: -1 | 1) => void;
   toggleChapterRead: (bookIndex: number, chapterIndex: number) => void;
   updateSplitSize: (splitId: string, ratio: number) => void;
+  updateSplitGroupLayout: (
+    groupRootId: string,
+    orientation: "horizontal" | "vertical",
+    sizes: number[],
+  ) => void;
   highlightModeEnabledByLeafId: Record<string, boolean>;
   highlightedVerseRangesByLeafId: Record<
     string,
@@ -260,8 +269,10 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   splitLeaf,
   setAddPreviewTarget,
   clearAddPreview,
-  splitPanelGroup,
-  setGroupAddPreviewTarget,
+  insertPanelInGroup,
+  setGroupInsertPreviewTarget,
+  addAroundGroup,
+  setAroundGroupPreviewTarget,
   existingTabTargets,
   moveLeafToExistingTab,
   moveLeafToNewTab,
@@ -364,19 +375,20 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
         (direction) => Boolean(neighbors[direction]),
       )
     : [];
-  const groupTargets =
-    isPanelMenuOpen && activeRoot
-      ? {
-          left: findGroupTargetNodeId(activeRoot, leaf.id, "left"),
-          right: findGroupTargetNodeId(activeRoot, leaf.id, "right"),
-          up: findGroupTargetNodeId(activeRoot, leaf.id, "up"),
-          down: findGroupTargetNodeId(activeRoot, leaf.id, "down"),
-        }
-      : { left: null, right: null, up: null, down: null };
   const parentSplit =
     isPanelMenuOpen && activeRoot
       ? findParentSplitForLeaf(activeRoot, leaf.id)
       : null;
+  const groupTargets = parentSplit
+    ? parentSplit.orientation === "horizontal"
+      ? { left: true, right: true, up: false, down: false }
+      : { left: false, right: false, up: true, down: true }
+    : { left: false, right: false, up: false, down: false };
+  const aroundGroupTargets = parentSplit
+    ? parentSplit.orientation === "horizontal"
+      ? { left: false, right: false, up: true, down: true }
+      : { left: true, right: true, up: false, down: false }
+    : { left: false, right: false, up: false, down: false };
   const nextOrientationLabel = parentSplit
     ? parentSplit.orientation === "horizontal"
       ? "Make Group Vertical"
@@ -386,7 +398,11 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
     groupTargets.left ||
       groupTargets.right ||
       groupTargets.up ||
-      groupTargets.down,
+      groupTargets.down ||
+      aroundGroupTargets.left ||
+      aroundGroupTargets.right ||
+      aroundGroupTargets.up ||
+      aroundGroupTargets.down,
   );
   const refIndex = chapterRefIndex.get(key) ?? -1;
   const hasPrev = refIndex > 0;
@@ -607,88 +623,144 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                         <DropdownMenuSeparator />
                       </>
                     ) : null}
-                    <DropdownMenuItem
-                      onClick={() => splitLeaf(leaf.id, "left")}
-                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "left")}
-                      onPointerLeave={() => clearAddPreview()}
-                    >
-                      <SplitSquareHorizontalIcon />
-                      Add Panel Left
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => splitLeaf(leaf.id, "right")}
-                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "right")}
-                      onPointerLeave={() => clearAddPreview()}
-                    >
-                      <SplitSquareHorizontalIcon className="rotate-180" />
-                      Add Panel Right
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => splitLeaf(leaf.id, "up")}
-                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "up")}
-                      onPointerLeave={() => clearAddPreview()}
-                    >
-                      <SplitSquareVerticalIcon />
-                      Add Panel Above
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => splitLeaf(leaf.id, "down")}
-                      onPointerEnter={() => setAddPreviewTarget(leaf.id, "down")}
-                      onPointerLeave={() => clearAddPreview()}
-                    >
-                      <SplitSquareVerticalIcon className="rotate-180" />
-                      Add Panel Below
-                    </DropdownMenuItem>
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>Split Panel</DropdownMenuLabel>
+                      <DropdownMenuItem
+                        onClick={() => splitLeaf(leaf.id, "left")}
+                        onPointerEnter={() => setAddPreviewTarget(leaf.id, "left")}
+                        onPointerLeave={() => clearAddPreview()}
+                      >
+                        <SplitSquareHorizontalIcon />
+                        Split Left
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => splitLeaf(leaf.id, "right")}
+                        onPointerEnter={() => setAddPreviewTarget(leaf.id, "right")}
+                        onPointerLeave={() => clearAddPreview()}
+                      >
+                        <SplitSquareHorizontalIcon className="rotate-180" />
+                        Split Right
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => splitLeaf(leaf.id, "up")}
+                        onPointerEnter={() => setAddPreviewTarget(leaf.id, "up")}
+                        onPointerLeave={() => clearAddPreview()}
+                      >
+                        <SplitSquareVerticalIcon />
+                        Split Above
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => splitLeaf(leaf.id, "down")}
+                        onPointerEnter={() => setAddPreviewTarget(leaf.id, "down")}
+                        onPointerLeave={() => clearAddPreview()}
+                      >
+                        <SplitSquareVerticalIcon className="rotate-180" />
+                        Split Below
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
                     {hasGroupAddOptions ? (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
+                          <DropdownMenuLabel>Insert In Group</DropdownMenuLabel>
                           {groupTargets.left ? (
                             <DropdownMenuItem
-                              onClick={() => splitPanelGroup(leaf.id, "left")}
+                              onClick={() => insertPanelInGroup(leaf.id, "left")}
                               onPointerEnter={() =>
-                                setGroupAddPreviewTarget(leaf.id, "left")
+                                setGroupInsertPreviewTarget(leaf.id, "left")
                               }
                               onPointerLeave={() => clearAddPreview()}
                             >
                               <SquareChevronLeftIcon />
-                              Add Panel Left (Group)
+                              Add Left
                             </DropdownMenuItem>
                           ) : null}
                           {groupTargets.right ? (
                             <DropdownMenuItem
-                              onClick={() => splitPanelGroup(leaf.id, "right")}
+                              onClick={() => insertPanelInGroup(leaf.id, "right")}
                               onPointerEnter={() =>
-                                setGroupAddPreviewTarget(leaf.id, "right")
+                                setGroupInsertPreviewTarget(leaf.id, "right")
                               }
                               onPointerLeave={() => clearAddPreview()}
                             >
                               <SquareChevronRightIcon />
-                              Add Panel Right (Group)
+                              Add Right
                             </DropdownMenuItem>
                           ) : null}
                           {groupTargets.up ? (
                             <DropdownMenuItem
-                              onClick={() => splitPanelGroup(leaf.id, "up")}
+                              onClick={() => insertPanelInGroup(leaf.id, "up")}
                               onPointerEnter={() =>
-                                setGroupAddPreviewTarget(leaf.id, "up")
+                                setGroupInsertPreviewTarget(leaf.id, "up")
                               }
                               onPointerLeave={() => clearAddPreview()}
                             >
                               <SquareChevronUpIcon />
-                              Add Panel Above (Group)
+                              Add Above
                             </DropdownMenuItem>
                           ) : null}
                           {groupTargets.down ? (
                             <DropdownMenuItem
-                              onClick={() => splitPanelGroup(leaf.id, "down")}
+                              onClick={() => insertPanelInGroup(leaf.id, "down")}
                               onPointerEnter={() =>
-                                setGroupAddPreviewTarget(leaf.id, "down")
+                                setGroupInsertPreviewTarget(leaf.id, "down")
                               }
                               onPointerLeave={() => clearAddPreview()}
                             >
                               <SquareChevronDownIcon />
-                              Add Panel Below (Group)
+                              Add Below
+                            </DropdownMenuItem>
+                          ) : null}
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuLabel>Add Around Group</DropdownMenuLabel>
+                          {aroundGroupTargets.left ? (
+                            <DropdownMenuItem
+                              onClick={() => addAroundGroup(leaf.id, "left")}
+                              onPointerEnter={() =>
+                                setAroundGroupPreviewTarget(leaf.id, "left")
+                              }
+                              onPointerLeave={() => clearAddPreview()}
+                            >
+                              <SquareChevronLeftIcon />
+                              Add Left
+                            </DropdownMenuItem>
+                          ) : null}
+                          {aroundGroupTargets.right ? (
+                            <DropdownMenuItem
+                              onClick={() => addAroundGroup(leaf.id, "right")}
+                              onPointerEnter={() =>
+                                setAroundGroupPreviewTarget(leaf.id, "right")
+                              }
+                              onPointerLeave={() => clearAddPreview()}
+                            >
+                              <SquareChevronRightIcon />
+                              Add Right
+                            </DropdownMenuItem>
+                          ) : null}
+                          {aroundGroupTargets.up ? (
+                            <DropdownMenuItem
+                              onClick={() => addAroundGroup(leaf.id, "up")}
+                              onPointerEnter={() =>
+                                setAroundGroupPreviewTarget(leaf.id, "up")
+                              }
+                              onPointerLeave={() => clearAddPreview()}
+                            >
+                              <SquareChevronUpIcon />
+                              Add Above
+                            </DropdownMenuItem>
+                          ) : null}
+                          {aroundGroupTargets.down ? (
+                            <DropdownMenuItem
+                              onClick={() => addAroundGroup(leaf.id, "down")}
+                              onPointerEnter={() =>
+                                setAroundGroupPreviewTarget(leaf.id, "down")
+                              }
+                              onPointerLeave={() => clearAddPreview()}
+                            >
+                              <SquareChevronDownIcon />
+                              Add Below
                             </DropdownMenuItem>
                           ) : null}
                         </DropdownMenuGroup>
@@ -1176,8 +1248,10 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   splitLeaf,
   setAddPreviewTarget,
   clearAddPreview,
-  splitPanelGroup,
-  setGroupAddPreviewTarget,
+  insertPanelInGroup,
+  setGroupInsertPreviewTarget,
+  addAroundGroup,
+  setAroundGroupPreviewTarget,
   existingTabTargets,
   moveLeafToExistingTab,
   moveLeafToNewTab,
@@ -1206,6 +1280,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   moveLeafChapter,
   toggleChapterRead,
   updateSplitSize,
+  updateSplitGroupLayout,
   highlightModeEnabledByLeafId,
   highlightedVerseRangesByLeafId,
   onClearLeafHighlights,
@@ -1242,8 +1317,10 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       splitLeaf={splitLeaf}
       setAddPreviewTarget={setAddPreviewTarget}
       clearAddPreview={clearAddPreview}
-      splitPanelGroup={splitPanelGroup}
-      setGroupAddPreviewTarget={setGroupAddPreviewTarget}
+      insertPanelInGroup={insertPanelInGroup}
+      setGroupInsertPreviewTarget={setGroupInsertPreviewTarget}
+      addAroundGroup={addAroundGroup}
+      setAroundGroupPreviewTarget={setAroundGroupPreviewTarget}
       existingTabTargets={existingTabTargets}
       moveLeafToExistingTab={moveLeafToExistingTab}
       moveLeafToNewTab={moveLeafToNewTab}
@@ -1272,6 +1349,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       moveLeafChapter={moveLeafChapter}
       toggleChapterRead={toggleChapterRead}
       updateSplitSize={updateSplitSize}
+      updateSplitGroupLayout={updateSplitGroupLayout}
       highlightModeEnabledByLeafId={highlightModeEnabledByLeafId}
       highlightedVerseRangesByLeafId={highlightedVerseRangesByLeafId}
       onClearLeafHighlights={onClearLeafHighlights}
@@ -1280,33 +1358,74 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
     />
   );
 
+  const flattenRenderableChildren = (
+    node: PanelNode,
+    orientation: "horizontal" | "vertical",
+  ): PanelNode[] => {
+    if (node.type === "split" && node.orientation === orientation) {
+      return [
+        ...flattenRenderableChildren(node.first, orientation),
+        ...flattenRenderableChildren(node.second, orientation),
+      ];
+    }
+
+    return [node];
+  };
+
   const renderNode = (node: PanelNode): ReactNode => {
     if (node.type === "leaf") {
       return renderLeaf(node);
     }
 
+    const groupChildren = flattenRenderableChildren(node, node.orientation);
+
     return (
       <ResizablePanelGroup
         orientation={node.orientation}
         onLayoutChanged={(layout) => {
-          const nextSize = layout[`${node.id}-first`];
-          if (typeof nextSize === "number") {
-            updateSplitSize(node.id, nextSize);
+          if (groupChildren.length <= 2) {
+            const nextSize = layout[`${node.id}-first`];
+            if (typeof nextSize === "number") {
+              updateSplitSize(node.id, nextSize);
+            }
+            return;
+          }
+
+          const nextSizes = groupChildren
+            .map((_, index) => layout[`${node.id}-item-${index}`])
+            .filter((value): value is number => typeof value === "number");
+
+          if (nextSizes.length === groupChildren.length) {
+            updateSplitGroupLayout(node.id, node.orientation, nextSizes);
           }
         }}
         className="min-h-0 min-w-0 flex-1"
       >
-        <ResizablePanel id={`${node.id}-first`} defaultSize={node.ratio} minSize={15}>
-          {renderNode(node.first)}
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel
-          id={`${node.id}-second`}
-          defaultSize={100 - node.ratio}
-          minSize={15}
-        >
-          {renderNode(node.second)}
-        </ResizablePanel>
+        {groupChildren.map((child, index) => {
+          const defaultSize =
+            groupChildren.length <= 2
+              ? index === 0
+                ? node.ratio
+                : 100 - node.ratio
+              : 100 / groupChildren.length;
+
+          return (
+            <Fragment key={`${node.id}-item-${index}`}>
+              {index > 0 ? <ResizableHandle withHandle /> : null}
+              <ResizablePanel
+                id={
+                  groupChildren.length <= 2
+                    ? `${node.id}-${index === 0 ? "first" : "second"}`
+                    : `${node.id}-item-${index}`
+                }
+                defaultSize={defaultSize}
+                minSize={15}
+              >
+                {renderNode(child)}
+              </ResizablePanel>
+            </Fragment>
+          );
+        })}
       </ResizablePanelGroup>
     );
   };
