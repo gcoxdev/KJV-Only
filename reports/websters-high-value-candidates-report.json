@@ -1,0 +1,1123 @@
+{
+  "summary": {
+    "filteredModernCommonWords": 107,
+    "highValueCandidates": 173,
+    "strongestCandidates": 25,
+    "archaicStyleCandidates": 7,
+    "biblicalTheologicalCandidates": 22
+  },
+  "strongestCandidates": [
+    {
+      "word": "priest",
+      "sampleForm": "priest",
+      "occurrences": 497,
+      "booksCount": 30,
+      "forms": [
+        {
+          "form": "priest",
+          "count": 496
+        },
+        {
+          "form": "Priest",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 26
+    },
+    {
+      "word": "congregation",
+      "sampleForm": "congregation",
+      "occurrences": 364,
+      "booksCount": 22,
+      "forms": [
+        {
+          "form": "congregation",
+          "count": 364
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 21
+    },
+    {
+      "word": "righteousness",
+      "sampleForm": "righteousness",
+      "occurrences": 306,
+      "booksCount": 40,
+      "forms": [
+        {
+          "form": "righteousness",
+          "count": 302
+        },
+        {
+          "form": "Righteousness",
+          "count": 3
+        },
+        {
+          "form": "RIGHTEOUSNESS",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 21
+    },
+    {
+      "word": "inheritance",
+      "sampleForm": "inheritance",
+      "occurrences": 239,
+      "booksCount": 33,
+      "forms": [
+        {
+          "form": "inheritance",
+          "count": 239
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 21
+    },
+    {
+      "word": "thereof",
+      "sampleForm": "thereof",
+      "occurrences": 908,
+      "booksCount": 49,
+      "forms": [
+        {
+          "form": "thereof",
+          "count": 908
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 20
+    },
+    {
+      "word": "therein",
+      "sampleForm": "therein",
+      "occurrences": 230,
+      "booksCount": 43,
+      "forms": [
+        {
+          "form": "therein",
+          "count": 230
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 20
+    },
+    {
+      "word": "wherein",
+      "sampleForm": "wherein",
+      "occurrences": 167,
+      "booksCount": 43,
+      "forms": [
+        {
+          "form": "wherein",
+          "count": 152
+        },
+        {
+          "form": "Wherein",
+          "count": 15
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 20
+    },
+    {
+      "word": "behold",
+      "sampleForm": "behold",
+      "occurrences": 1326,
+      "booksCount": 52,
+      "forms": [
+        {
+          "form": "behold",
+          "count": 730
+        },
+        {
+          "form": "Behold",
+          "count": 596
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "offering",
+      "sampleForm": "offering",
+      "occurrences": 724,
+      "booksCount": 28,
+      "forms": [
+        {
+          "form": "offering",
+          "count": 724
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "brethren",
+      "sampleForm": "brethren",
+      "occurrences": 563,
+      "booksCount": 48,
+      "forms": [
+        {
+          "form": "brethren",
+          "count": 551
+        },
+        {
+          "form": "Brethren",
+          "count": 12
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "spirit",
+      "sampleForm": "spirit",
+      "occurrences": 505,
+      "booksCount": 52,
+      "forms": [
+        {
+          "form": "spirit",
+          "count": 336
+        },
+        {
+          "form": "Spirit",
+          "count": 169
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "soul",
+      "sampleForm": "soul",
+      "occurrences": 458,
+      "booksCount": 42,
+      "forms": [
+        {
+          "form": "soul",
+          "count": 457
+        },
+        {
+          "form": "Soul",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "priests",
+      "sampleForm": "priests",
+      "occurrences": 401,
+      "booksCount": 34,
+      "forms": [
+        {
+          "form": "priests",
+          "count": 400
+        },
+        {
+          "form": "Priests",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "altar",
+      "sampleForm": "altar",
+      "occurrences": 378,
+      "booksCount": 30,
+      "forms": [
+        {
+          "form": "altar",
+          "count": 378
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "midst",
+      "sampleForm": "midst",
+      "occurrences": 364,
+      "booksCount": 41,
+      "forms": [
+        {
+          "form": "midst",
+          "count": 364
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "covenant",
+      "sampleForm": "covenant",
+      "occurrences": 292,
+      "booksCount": 31,
+      "forms": [
+        {
+          "form": "covenant",
+          "count": 292
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "offerings",
+      "sampleForm": "offerings",
+      "occurrences": 265,
+      "booksCount": 29,
+      "forms": [
+        {
+          "form": "offerings",
+          "count": 265
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "holy",
+      "sampleForm": "holy",
+      "occurrences": 611,
+      "booksCount": 50,
+      "forms": [
+        {
+          "form": "holy",
+          "count": 467
+        },
+        {
+          "form": "Holy",
+          "count": 144
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 14
+    },
+    {
+      "word": "burnt",
+      "sampleForm": "burnt",
+      "occurrences": 366,
+      "booksCount": 26,
+      "forms": [
+        {
+          "form": "burnt",
+          "count": 366
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 14
+    },
+    {
+      "word": "wicked",
+      "sampleForm": "wicked",
+      "occurrences": 344,
+      "booksCount": 34,
+      "forms": [
+        {
+          "form": "wicked",
+          "count": 343
+        },
+        {
+          "form": "Wicked",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 14
+    },
+    {
+      "word": "rejoice",
+      "sampleForm": "rejoice",
+      "occurrences": 192,
+      "booksCount": 38,
+      "forms": [
+        {
+          "form": "rejoice",
+          "count": 168
+        },
+        {
+          "form": "Rejoice",
+          "count": 24
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 14
+    },
+    {
+      "word": "rest",
+      "sampleForm": "rest",
+      "occurrences": 275,
+      "booksCount": 43,
+      "forms": [
+        {
+          "form": "rest",
+          "count": 274
+        },
+        {
+          "form": "Rest",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 13
+    },
+    {
+      "word": "lest",
+      "sampleForm": "lest",
+      "occurrences": 240,
+      "booksCount": 40,
+      "forms": [
+        {
+          "form": "lest",
+          "count": 209
+        },
+        {
+          "form": "Lest",
+          "count": 31
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 13
+    },
+    {
+      "word": "therefore",
+      "sampleForm": "therefore",
+      "occurrences": 1237,
+      "booksCount": 62,
+      "forms": [
+        {
+          "form": "therefore",
+          "count": 802
+        },
+        {
+          "form": "Therefore",
+          "count": 435
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 12
+    },
+    {
+      "word": "righteous",
+      "sampleForm": "righteous",
+      "occurrences": 238,
+      "booksCount": 38,
+      "forms": [
+        {
+          "form": "righteous",
+          "count": 235
+        },
+        {
+          "form": "Righteous",
+          "count": 3
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 11
+    }
+  ],
+  "biblicalTheologicalCandidates": [
+    {
+      "word": "priest",
+      "sampleForm": "priest",
+      "occurrences": 497,
+      "booksCount": 30,
+      "forms": [
+        {
+          "form": "priest",
+          "count": 496
+        },
+        {
+          "form": "Priest",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 26
+    },
+    {
+      "word": "congregation",
+      "sampleForm": "congregation",
+      "occurrences": 364,
+      "booksCount": 22,
+      "forms": [
+        {
+          "form": "congregation",
+          "count": 364
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 21
+    },
+    {
+      "word": "righteousness",
+      "sampleForm": "righteousness",
+      "occurrences": 306,
+      "booksCount": 40,
+      "forms": [
+        {
+          "form": "righteousness",
+          "count": 302
+        },
+        {
+          "form": "Righteousness",
+          "count": 3
+        },
+        {
+          "form": "RIGHTEOUSNESS",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 21
+    },
+    {
+      "word": "inheritance",
+      "sampleForm": "inheritance",
+      "occurrences": 239,
+      "booksCount": 33,
+      "forms": [
+        {
+          "form": "inheritance",
+          "count": 239
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 21
+    },
+    {
+      "word": "thereof",
+      "sampleForm": "thereof",
+      "occurrences": 908,
+      "booksCount": 49,
+      "forms": [
+        {
+          "form": "thereof",
+          "count": 908
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 20
+    },
+    {
+      "word": "therein",
+      "sampleForm": "therein",
+      "occurrences": 230,
+      "booksCount": 43,
+      "forms": [
+        {
+          "form": "therein",
+          "count": 230
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 20
+    },
+    {
+      "word": "wherein",
+      "sampleForm": "wherein",
+      "occurrences": 167,
+      "booksCount": 43,
+      "forms": [
+        {
+          "form": "wherein",
+          "count": 152
+        },
+        {
+          "form": "Wherein",
+          "count": 15
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 20
+    },
+    {
+      "word": "behold",
+      "sampleForm": "behold",
+      "occurrences": 1326,
+      "booksCount": 52,
+      "forms": [
+        {
+          "form": "behold",
+          "count": 730
+        },
+        {
+          "form": "Behold",
+          "count": 596
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "offering",
+      "sampleForm": "offering",
+      "occurrences": 724,
+      "booksCount": 28,
+      "forms": [
+        {
+          "form": "offering",
+          "count": 724
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "brethren",
+      "sampleForm": "brethren",
+      "occurrences": 563,
+      "booksCount": 48,
+      "forms": [
+        {
+          "form": "brethren",
+          "count": 551
+        },
+        {
+          "form": "Brethren",
+          "count": 12
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "spirit",
+      "sampleForm": "spirit",
+      "occurrences": 505,
+      "booksCount": 52,
+      "forms": [
+        {
+          "form": "spirit",
+          "count": 336
+        },
+        {
+          "form": "Spirit",
+          "count": 169
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "soul",
+      "sampleForm": "soul",
+      "occurrences": 458,
+      "booksCount": 42,
+      "forms": [
+        {
+          "form": "soul",
+          "count": 457
+        },
+        {
+          "form": "Soul",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "priests",
+      "sampleForm": "priests",
+      "occurrences": 401,
+      "booksCount": 34,
+      "forms": [
+        {
+          "form": "priests",
+          "count": 400
+        },
+        {
+          "form": "Priests",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "altar",
+      "sampleForm": "altar",
+      "occurrences": 378,
+      "booksCount": 30,
+      "forms": [
+        {
+          "form": "altar",
+          "count": 378
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "midst",
+      "sampleForm": "midst",
+      "occurrences": 364,
+      "booksCount": 41,
+      "forms": [
+        {
+          "form": "midst",
+          "count": 364
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "covenant",
+      "sampleForm": "covenant",
+      "occurrences": 292,
+      "booksCount": 31,
+      "forms": [
+        {
+          "form": "covenant",
+          "count": 292
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "offerings",
+      "sampleForm": "offerings",
+      "occurrences": 265,
+      "booksCount": 29,
+      "forms": [
+        {
+          "form": "offerings",
+          "count": 265
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 19
+    },
+    {
+      "word": "holy",
+      "sampleForm": "holy",
+      "occurrences": 611,
+      "booksCount": 50,
+      "forms": [
+        {
+          "form": "holy",
+          "count": 467
+        },
+        {
+          "form": "Holy",
+          "count": 144
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 14
+    },
+    {
+      "word": "burnt",
+      "sampleForm": "burnt",
+      "occurrences": 366,
+      "booksCount": 26,
+      "forms": [
+        {
+          "form": "burnt",
+          "count": 366
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 14
+    },
+    {
+      "word": "wicked",
+      "sampleForm": "wicked",
+      "occurrences": 344,
+      "booksCount": 34,
+      "forms": [
+        {
+          "form": "wicked",
+          "count": 343
+        },
+        {
+          "form": "Wicked",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 14
+    },
+    {
+      "word": "rejoice",
+      "sampleForm": "rejoice",
+      "occurrences": 192,
+      "booksCount": 38,
+      "forms": [
+        {
+          "form": "rejoice",
+          "count": 168
+        },
+        {
+          "form": "Rejoice",
+          "count": 24
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 14
+    },
+    {
+      "word": "righteous",
+      "sampleForm": "righteous",
+      "occurrences": 238,
+      "booksCount": 38,
+      "forms": [
+        {
+          "form": "righteous",
+          "count": 235
+        },
+        {
+          "form": "Righteous",
+          "count": 3
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 11
+    }
+  ],
+  "archaicStyleCandidates": [
+    {
+      "word": "priest",
+      "sampleForm": "priest",
+      "occurrences": 497,
+      "booksCount": 30,
+      "forms": [
+        {
+          "form": "priest",
+          "count": 496
+        },
+        {
+          "form": "Priest",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 26
+    },
+    {
+      "word": "thereof",
+      "sampleForm": "thereof",
+      "occurrences": 908,
+      "booksCount": 49,
+      "forms": [
+        {
+          "form": "thereof",
+          "count": 908
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 20
+    },
+    {
+      "word": "therein",
+      "sampleForm": "therein",
+      "occurrences": 230,
+      "booksCount": 43,
+      "forms": [
+        {
+          "form": "therein",
+          "count": 230
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 20
+    },
+    {
+      "word": "wherein",
+      "sampleForm": "wherein",
+      "occurrences": 167,
+      "booksCount": 43,
+      "forms": [
+        {
+          "form": "wherein",
+          "count": 152
+        },
+        {
+          "form": "Wherein",
+          "count": 15
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 20
+    },
+    {
+      "word": "rest",
+      "sampleForm": "rest",
+      "occurrences": 275,
+      "booksCount": 43,
+      "forms": [
+        {
+          "form": "rest",
+          "count": 274
+        },
+        {
+          "form": "Rest",
+          "count": 1
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 13
+    },
+    {
+      "word": "lest",
+      "sampleForm": "lest",
+      "occurrences": 240,
+      "booksCount": 40,
+      "forms": [
+        {
+          "form": "lest",
+          "count": 209
+        },
+        {
+          "form": "Lest",
+          "count": 31
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 13
+    },
+    {
+      "word": "therefore",
+      "sampleForm": "therefore",
+      "occurrences": 1237,
+      "booksCount": 62,
+      "forms": [
+        {
+          "form": "therefore",
+          "count": 802
+        },
+        {
+          "form": "Therefore",
+          "count": 435
+        }
+      ],
+      "mostlyCapitalized": false,
+      "webstersKey": null,
+      "oldEnglishKey": null,
+      "hitchcocksKey": null,
+      "unitsKey": null,
+      "score": 12
+    }
+  ]
+}
