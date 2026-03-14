@@ -176,6 +176,8 @@ type ReaderPanelTreeProps = {
     token: VerseToken,
     bookIndex: number,
     chapterIndex: number,
+    verseNumber: number,
+    tokenIndex: number,
   ) => void;
   onSelectVerse: (
     leafId: string,
@@ -1006,12 +1008,14 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                     }
                     fontSize={fontSize}
                     verseSpacing={verseSpacing}
-                    onOpenTokenDetails={(element, token) =>
+                    onOpenTokenDetails={(element, token, verseNumber, tokenIndex) =>
                       onOpenTokenDetails(
                         element,
                         token,
                         leaf.bookIndex,
                         leaf.chapterIndex,
+                        verseNumber,
+                        tokenIndex,
                       )
                     }
                     onSelectVerse={(verseNumber) =>

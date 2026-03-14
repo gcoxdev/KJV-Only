@@ -11,12 +11,20 @@ export type ConcordancePayload = {
 export type CrossRefsPayload = Record<string, string[]>;
 export type HitchcocksPayload = Record<string, string>;
 export type OldEnglishPayload = Record<string, string[]>;
+export type PhraseEntry = {
+  meaning: string;
+  note?: string;
+  aliases?: string[];
+  references?: string[];
+};
+export type PhrasesPayload = Record<string, PhraseEntry>;
 export type UnitsEntry = {
   category: "length" | "weight" | "volume" | "currency" | "time";
   summary: string;
   approximate: string;
   aliases?: string[];
   note?: string;
+  references?: string[];
 };
 export type UnitsPayload = Record<string, UnitsEntry>;
 
@@ -159,6 +167,7 @@ export type StudyWorkspaceTool =
   | "websters"
   | "strongs"
   | "old-english"
+  | "phrases"
   | "units"
   | "maps"
   | "genealogy"
