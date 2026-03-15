@@ -36,6 +36,13 @@ export type UnitsEntry = {
   references?: string[];
 };
 export type UnitsPayload = Record<string, UnitsEntry>;
+export type AIDictionaryEntry = {
+  definitions: string[];
+  aliases?: string[];
+  note?: string;
+  confidence?: "high" | "medium" | "low";
+};
+export type AIDictionaryPayload = Record<string, AIDictionaryEntry>;
 
 export type GenealogyVerseByName = {
   name: string;
@@ -179,6 +186,7 @@ export type StudyWorkspaceTool =
   | "cross-refs"
   | "concordance"
   | "websters"
+  | "ai-dictionary"
   | "strongs"
   | "kjv-words-phrases"
   | "bible-word-book"
