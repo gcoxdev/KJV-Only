@@ -8,10 +8,8 @@ const STUDY_WORKSPACE_TOOLS: StudyWorkspaceTool[] = [
   "concordance",
   "websters",
   "strongs",
-  "old-english",
+  "kjv-words-phrases",
   "bible-word-book",
-  "phrases",
-  "units",
   "maps",
   "genealogy",
   "hitchcocks",
@@ -28,6 +26,9 @@ export function normalizeStudyWorkspaceTab(
 export function normalizeStudyWorkspaceTool(
   value: string | null | undefined,
 ): StudyWorkspaceTool {
+  if (value === "old-english" || value === "phrases" || value === "units") {
+    return "kjv-words-phrases";
+  }
   return STUDY_WORKSPACE_TOOLS.includes(value as StudyWorkspaceTool)
     ? (value as StudyWorkspaceTool)
     : "concordance";

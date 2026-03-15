@@ -2282,17 +2282,13 @@ export function KJVReader() {
       }
 
       const oldEnglishData = options?.oldEnglishData ?? oldEnglish;
-      if (oldEnglishData && resolveOldEnglishKey(oldEnglishData, rawWord)) {
-        nextAccordion.push("old-english");
-      }
-
-      if (options?.phraseSelection) {
-        nextAccordion.push("phrases");
-      }
-
       const unitsData = options?.unitsData ?? units;
-      if (unitsData && resolveUnitsKey(unitsData, rawWord)) {
-        nextAccordion.push("units");
+      if (
+        (oldEnglishData && resolveOldEnglishKey(oldEnglishData, rawWord)) ||
+        options?.phraseSelection ||
+        (unitsData && resolveUnitsKey(unitsData, rawWord))
+      ) {
+        nextAccordion.push("kjv-words-phrases");
       }
 
       const genealogyData = options?.genealogyData ?? genealogy;
@@ -3157,22 +3153,18 @@ export function KJVReader() {
     isWebstersSectionOpen,
     isStrongsSectionOpen,
     isBibleWordBookSectionOpen,
-    isPhrasesSectionOpen,
-    isUnitsSectionOpen,
+    isKjvWordsPhrasesSectionOpen,
     isMapsSectionOpen,
     isGenealogySectionOpen,
     isHitchcocksSectionOpen,
-    isOldEnglishSectionOpen,
     hasCrossRefsInfo,
     hasConcordanceInfo,
     hasWebstersInfo,
     hasStrongsInfo,
     hasBibleWordBookInfo,
-    hasPhrasesInfo,
-    hasUnitsInfo,
+    hasKjvWordsPhrasesInfo,
     hasMapsInfo,
     hasHitchcocksInfo,
-    hasOldEnglishInfo,
     hasGenealogyInfo,
   } = deriveStudySidebarState({
     accordionValue: concordanceAccordionValue,
@@ -3181,11 +3173,12 @@ export function KJVReader() {
     webstersCount: webstersSearchResults.length,
     strongsCount: strongsSearchResults.length,
     bibleWordBookCount: bibleWordBookSearchResults.length,
-    phrasesCount: phrasesSearchResults.length,
-    unitsCount: unitsSearchResults.length,
+    kjvWordsPhrasesCount:
+      oldEnglishSearchResults.length +
+      phrasesSearchResults.length +
+      unitsSearchResults.length,
     mapsCount: mapsSearchResults.length,
     hitchcocksCount: hitchcocksSearchResults.length,
-    oldEnglishCount: oldEnglishSearchResults.length,
     genealogyCount: genealogySearchResults.length,
   });
 
@@ -3245,15 +3238,38 @@ export function KJVReader() {
       onOpenReference: openConcordanceReference,
       onCloseSidebar: closeRightSidebarForMobile,
     },
-    oldEnglishProps: {
-      hasInfo: hasOldEnglishInfo,
-      isOpen: isOldEnglishSectionOpen,
-      isLoading: isOldEnglishLoading,
-      isSearching: isOldEnglishSearching,
-      error: oldEnglishError,
-      searchTerm: oldEnglishSearchTerm,
-      results: oldEnglishSearchResults,
-      onSearch: applyOldEnglishSearch,
+    kjvWordsPhrasesProps: {
+      hasInfo: hasKjvWordsPhrasesInfo,
+      isOpen: isKjvWordsPhrasesSectionOpen,
+      oldEnglish: {
+        isLoading: isOldEnglishLoading,
+        isSearching: isOldEnglishSearching,
+        error: oldEnglishError,
+        searchTerm: oldEnglishSearchTerm,
+        results: oldEnglishSearchResults,
+      },
+      phrases: {
+        isLoading: isPhrasesLoading,
+        isSearching: isPhrasesSearching,
+        error: phrasesError,
+        searchTerm: phrasesSearchTerm,
+        results: phrasesSearchResults,
+      },
+      units: {
+        isLoading: isUnitsLoading,
+        isSearching: isUnitsSearching,
+        error: unitsError,
+        searchTerm: unitsSearchTerm,
+        results: unitsSearchResults,
+      },
+      onSearch: (term: string) => {
+        applyOldEnglishSearch(term);
+        applyPhrasesSearch(term);
+        applyUnitsSearch(term);
+      },
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
     },
     bibleWordBookProps: {
       hasInfo: hasBibleWordBookInfo,
@@ -3266,32 +3282,6 @@ export function KJVReader() {
       wordAccordionValue: bibleWordBookWordAccordionValue,
       onWordAccordionValueChange: setBibleWordBookWordAccordionValue,
       onSearch: applyBibleWordBookSearch,
-    },
-    phrasesProps: {
-      hasInfo: hasPhrasesInfo,
-      isOpen: isPhrasesSectionOpen,
-      isLoading: isPhrasesLoading,
-      isSearching: isPhrasesSearching,
-      error: phrasesError,
-      searchTerm: phrasesSearchTerm,
-      results: phrasesSearchResults,
-      onSearch: applyPhrasesSearch,
-      renderPreview: referencePreviewContent,
-      onOpenReference: openConcordanceReference,
-      onCloseSidebar: closeRightSidebarForMobile,
-    },
-    unitsProps: {
-      hasInfo: hasUnitsInfo,
-      isOpen: isUnitsSectionOpen,
-      isLoading: isUnitsLoading,
-      isSearching: isUnitsSearching,
-      error: unitsError,
-      searchTerm: unitsSearchTerm,
-      results: unitsSearchResults,
-      onSearch: applyUnitsSearch,
-      renderPreview: referencePreviewContent,
-      onOpenReference: openConcordanceReference,
-      onCloseSidebar: closeRightSidebarForMobile,
     },
     mapsProps: {
       hasInfo: hasMapsInfo,
