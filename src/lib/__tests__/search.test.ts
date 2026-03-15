@@ -5,6 +5,8 @@ import {
   createSearchableVerseEntry,
   extractSearchWords,
   matchSelectedWords,
+  scoreSmartSearch,
+  suggestSmartCorrections,
 } from "@/lib/search";
 
 describe("search helpers", () => {
@@ -54,5 +56,114 @@ describe("search helpers", () => {
 
     expect(regex).toBeNull();
     expect(error).toBeTruthy();
+  });
+
+  it("scores exact smart matches above typo-tolerant ones", () => {
+    const exact = createSearchableVerseEntry("Faith cometh by hearing");
+    const typo = createSearchableVerseEntry("Faint hearted men departed");
+
+    expect(scoreSmartSearch(exact, "faith cometh", false)).toBeGreaterThan(
+      scoreSmartSearch(typo, "faith cometh", false) ?? 0,
+    );
+  });
+
+  it("finds useful smart matches for misspelled words", () => {
+    const entry = createSearchableVerseEntry("Righteousness exalteth a nation");
+
+    expect(scoreSmartSearch(entry, "righteosness", false)).toBeGreaterThan(0);
+  });
+
+  it("prefers verses where remembered words stay close together", () => {
+    const close = createSearchableVerseEntry("Faith cometh by hearing");
+    const scattered = createSearchableVerseEntry(
+      "Faith is precious and hearing is needful",
+    );
+
+    expect(scoreSmartSearch(close, "faith hearing", false)).toBeGreaterThan(
+      scoreSmartSearch(scattered, "faith hearing", false) ?? 0,
+    );
+  });
+
+  it("rejects very weak multiword smart matches", () => {
+    const unrelated = createSearchableVerseEntry("The king went down to battle");
+
+    expect(scoreSmartSearch(unrelated, "righteosness sanctificashun glory", false)).toBeNull();
+  });
+
+  it("does not let filler words dominate smart ranking", () => {
+    const substance = createSearchableVerseEntry("Faith cometh by hearing");
+    const filler = createSearchableVerseEntry("The and of the and of");
+
+    expect(scoreSmartSearch(substance, "the faith of", false)).toBeGreaterThan(
+      scoreSmartSearch(filler, "the faith of", false) ?? 0,
+    );
+  });
+
+  it("rewards compact partial remembered phrases", () => {
+    const compact = createSearchableVerseEntry("The kingdom of heaven is at hand");
+    const loose = createSearchableVerseEntry(
+      "The kingdom was proclaimed, and later heaven itself was spoken of at hand",
+    );
+
+    expect(scoreSmartSearch(compact, "kingdom heaven at hand", false)).toBeGreaterThan(
+      scoreSmartSearch(loose, "kingdom heaven at hand", false) ?? 0,
+    );
+  });
+
+  it("finds phonetically similar Bible names", () => {
+    const methuselah = createSearchableVerseEntry("Methuselah lived nine hundred years");
+    const melchisedec = createSearchableVerseEntry("Melchisedec king of Salem brought forth bread");
+
+    expect(scoreSmartSearch(methuselah, "muthuzula", false)).toBeGreaterThan(0);
+    expect(scoreSmartSearch(melchisedec, "melchizedek", false)).toBeGreaterThan(0);
+  });
+
+  it("prefers the right phonetically similar name over unrelated text", () => {
+    const target = createSearchableVerseEntry("Mathusala begat Lamech");
+    const unrelated = createSearchableVerseEntry("Many men gathered to battle");
+
+    expect(scoreSmartSearch(target, "methuzalu", false)).toBeGreaterThan(
+      scoreSmartSearch(unrelated, "methuzalu", false) ?? 0,
+    );
+  });
+
+  it("requires quoted smart phrases exactly", () => {
+    const exact = createSearchableVerseEntry("For God so loved the world");
+    const fuzzyOnly = createSearchableVerseEntry("God loveth all the world");
+
+    expect(scoreSmartSearch(exact, '"loved the world"', false)).toBeGreaterThan(0);
+    expect(scoreSmartSearch(fuzzyOnly, '"loved the world"', false)).toBeNull();
+  });
+
+  it("prefers exact word matches over fuzzy lookalikes", () => {
+    const exact = createSearchableVerseEntry("God loved Jacob");
+    const fuzzy = createSearchableVerseEntry("God liveth for ever");
+
+    expect(scoreSmartSearch(exact, "god loved", false)).toBeGreaterThan(
+      scoreSmartSearch(fuzzy, "god loved", false) ?? 0,
+    );
+  });
+
+  it("suggests likely Bible-name completions before short generic words", () => {
+    const suggestions = suggestSmartCorrections(
+      "methu",
+      ["met", "mithcah", "methuselah", "mathusala", "metal"],
+      3,
+    ).map((entry) => entry.word);
+
+    expect(suggestions[0]).toBe("methuselah");
+    expect(suggestions).toContain("mathusala");
+    expect(suggestions).not.toContain("met");
+  });
+
+  it("uses phonetic similarity for hard Bible-name suggestions", () => {
+    const suggestions = suggestSmartCorrections(
+      "methus",
+      ["mithcah", "melchisedec", "methuselah", "mathusala"],
+      3,
+    ).map((entry) => entry.word);
+
+    expect(suggestions[0]).toBe("methuselah");
+    expect(suggestions[1]).toBe("mathusala");
   });
 });

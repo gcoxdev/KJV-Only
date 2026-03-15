@@ -1,10 +1,14 @@
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import {
+  CircleHelpIcon,
   ChevronDownIcon,
+  ChevronLeftIcon,
   ChevronRightIcon,
+  LoaderCircleIcon,
   MinusSquareIcon,
   PlusSquareIcon,
   SearchIcon,
+  XIcon,
 } from "lucide-react";
 
 import type { Book } from "@/types/bible";
@@ -12,7 +16,14 @@ import type { SearchMatch, SearchMode, SearchPageState } from "@/types/reader";
 import { bookCodeForIndex, iconPath, renderHighlightedTerms, renderHighlightedText } from "@/lib/reader-view";
 import {
   buildRegexMatcher,
+  getSmartPhoneticCode,
+  getSmartHighlightWords,
+  isSmartSearchCandidate,
+  isSmartSearchStopWord,
   matchSelectedWords,
+  prepareSmartSearch,
+  scorePreparedSmartSearch,
+  suggestSmartCorrections,
   type VerseSearchIndexEntry,
 } from "@/lib/search";
 import { Button } from "@/components/ui/button";
@@ -30,6 +41,11 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type SearchPageProps = {
   books: Book[];
@@ -54,12 +70,58 @@ type BookGroup = {
 };
 
 const SEARCH_MODE_LABELS: Record<SearchMode, string> = {
+  smart: "Smart",
   "contains-any": "Contains any",
   "contains-all": "Contains all",
-  "contains-phrase": "Contains phrase",
   regex: "Regular expression",
 };
+const SEARCH_HELP_ITEMS: Array<{
+  mode: string;
+  description: string;
+  example: string;
+  links?: Array<{
+    label: string;
+    href: string;
+  }>;
+}> = [
+  {
+    mode: "Smart",
+    description:
+      "Best for remembered fragments, misspellings, Bible names, and loose phrases. Use quotes inside Smart for an exact phrase.",
+    example: `Example: God loved world or "loved the world"`,
+  },
+  {
+    mode: "Contains Any",
+    description:
+      "Find verses containing any selected word chip.",
+    example: "Example: faith + grace",
+  },
+  {
+    mode: "Contains All",
+    description:
+      "Find verses containing every selected word chip, in any order.",
+    example: "Example: faith + hope + charity",
+  },
+  {
+    mode: "Regular Expression",
+    description:
+      "Use a regex when you need precise pattern matching.",
+    example: String.raw`Example: \bfaith\w*\b`,
+    links: [
+      {
+        label: "RegexOne",
+        href: "https://www.regexone.com/",
+      },
+      {
+        label: "regular-expressions.info",
+        href: "https://www.regular-expressions.info/",
+      },
+    ],
+  },
+];
 const MAX_CONCORDANCE_SUGGESTIONS = 40;
+const SEARCH_RESULTS_PAGE_SIZE = 50;
+const SEARCH_RESULTS_CAP = 500;
 
 function clampGroupIndices(indices: number[], max: number) {
   return indices.filter((value) => value >= 0 && value < max);
@@ -81,6 +143,13 @@ function isChecked(value: boolean | "indeterminate") {
   return value === true;
 }
 
+function normalizeSearchMode(mode: SearchMode | string | null | undefined): SearchMode {
+  if (mode === "contains-any" || mode === "contains-all" || mode === "regex") {
+    return mode;
+  }
+  return "smart";
+}
+
 export function SearchPage({
   books,
   concordanceWords,
@@ -92,20 +161,36 @@ export function SearchPage({
 }: SearchPageProps) {
   const [isBookFilterOpen, setIsBookFilterOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchProgress, setSearchProgress] = useState<{
+    processed: number;
+    total: number;
+  } | null>(null);
+  const searchRunIdRef = useRef(0);
+  const resultsScrollRef = useRef<HTMLDivElement | null>(null);
 
   const {
-    searchMode,
+    searchMode: rawSearchMode,
     caseSensitive,
     chipInput,
     phraseInput,
+    lastSearchMode: rawLastSearchMode,
+    lastSearchCaseSensitive,
+    lastSearchPhraseInput,
+    lastSearchSelectedWords,
     isControlsCollapsed,
     selectedWords,
+    currentPage,
     results,
     error,
   } = state;
+  const searchMode = normalizeSearchMode(rawSearchMode);
+  const lastSearchMode = rawLastSearchMode
+    ? normalizeSearchMode(rawLastSearchMode)
+    : null;
   const [chipInputDraft, setChipInputDraft] = useState(chipInput);
   const [phraseInputDraft, setPhraseInputDraft] = useState(phraseInput);
   const deferredChipInput = useDeferredValue(chipInputDraft);
+  const deferredPhraseInput = useDeferredValue(phraseInputDraft);
 
   useEffect(() => {
     setChipInputDraft(chipInput);
@@ -114,26 +199,6 @@ export function SearchPage({
   useEffect(() => {
     setPhraseInputDraft(phraseInput);
   }, [phraseInput]);
-
-  useEffect(() => {
-    if (chipInputDraft === chipInput) {
-      return;
-    }
-    const timeoutId = window.setTimeout(() => {
-      onStateChange({ chipInput: chipInputDraft });
-    }, 180);
-    return () => window.clearTimeout(timeoutId);
-  }, [chipInput, chipInputDraft, onStateChange]);
-
-  useEffect(() => {
-    if (phraseInputDraft === phraseInput) {
-      return;
-    }
-    const timeoutId = window.setTimeout(() => {
-      onStateChange({ phraseInput: phraseInputDraft });
-    }, 180);
-    return () => window.clearTimeout(timeoutId);
-  }, [onStateChange, phraseInput, phraseInputDraft]);
 
   const expandedBookTree = useMemo(
     () => new Set(state.expandedBookTree),
@@ -213,6 +278,117 @@ export function SearchPage({
 
     return [...startsWith, ...includes].slice(0, MAX_CONCORDANCE_SUGGESTIONS);
   }, [concordanceWordEntries, deferredChipInput, selectedWords]);
+
+  const smartVocabulary = useMemo(() => {
+    const values = new Set<string>();
+    const prefix3Buckets = new Map<string, string[]>();
+    const prefix5Buckets = new Map<string, string[]>();
+    const phoneticBuckets = new Map<string, string[]>();
+    const initialBuckets = new Map<string, string[]>();
+
+    const addToBucket = (map: Map<string, string[]>, key: string, word: string) => {
+      if (!key) {
+        return;
+      }
+      const bucket = map.get(key);
+      if (bucket) {
+        bucket.push(word);
+      } else {
+        map.set(key, [word]);
+      }
+    };
+
+    for (const entry of verseIndex) {
+      entry.searchWordsLower.forEach((word) => {
+        if (values.has(word)) {
+          return;
+        }
+        values.add(word);
+        addToBucket(prefix3Buckets, word.slice(0, 3), word);
+        addToBucket(prefix5Buckets, word.slice(0, 5), word);
+        addToBucket(phoneticBuckets, getSmartPhoneticCode(word), word);
+        addToBucket(initialBuckets, word.slice(0, 1), word);
+      });
+    }
+
+    return {
+      words: Array.from(values),
+      wordSet: values,
+      prefix3Buckets,
+      prefix5Buckets,
+      phoneticBuckets,
+      initialBuckets,
+    };
+  }, [verseIndex]);
+
+  const smartSuggestions = useMemo(() => {
+    if (searchMode !== "smart") {
+      return [] as string[];
+    }
+
+    const query = deferredPhraseInput.trim().toLowerCase();
+    if (query.length < 3) {
+      return [] as string[];
+    }
+
+    const words = query.split(/\s+/).filter(Boolean);
+    const replacementOptions = words.map((word) => {
+      if (isSmartSearchStopWord(word) || smartVocabulary.wordSet.has(word)) {
+        return [] as Array<{ word: string; score: number }>;
+      }
+
+      const candidates = new Set<string>();
+      const prefix3 = word.slice(0, 3);
+      const prefix5 = word.slice(0, 5);
+      const phonetic = getSmartPhoneticCode(word);
+      const initial = word.slice(0, 1);
+
+      for (const candidate of smartVocabulary.prefix5Buckets.get(prefix5) ?? []) {
+        candidates.add(candidate);
+      }
+      for (const candidate of smartVocabulary.prefix3Buckets.get(prefix3) ?? []) {
+        candidates.add(candidate);
+      }
+      for (const candidate of smartVocabulary.phoneticBuckets.get(phonetic) ?? []) {
+        candidates.add(candidate);
+      }
+
+      if (candidates.size < 12) {
+        for (const candidate of smartVocabulary.initialBuckets.get(initial) ?? []) {
+          candidates.add(candidate);
+          if (candidates.size >= 80) {
+            break;
+          }
+        }
+      }
+
+      return suggestSmartCorrections(
+        word,
+        candidates.size > 0 ? candidates : smartVocabulary.words,
+        3,
+      );
+    });
+
+    const suggestions: Array<{ value: string; score: number }> = [];
+    replacementOptions.forEach((options, wordIndex) => {
+      options.forEach((option) => {
+        const nextWords = [...words];
+        nextWords[wordIndex] = option.word;
+        suggestions.push({
+          value: nextWords.join(" "),
+          score: option.score,
+        });
+      });
+    });
+
+    return Array.from(
+      new Map(
+        suggestions
+          .sort((left, right) => right.score - left.score)
+          .map((suggestion) => [suggestion.value, suggestion.value]),
+      ).values(),
+    ).slice(0, 3);
+  }, [deferredPhraseInput, searchMode, smartVocabulary]);
 
   const allBookIndexes = useMemo(
     () => new Set(books.map((_, index) => index)),
@@ -325,6 +501,18 @@ export function SearchPage({
   const search = () => {
     onStateChange({ error: null });
     let matcher: ((entry: VerseSearchIndexEntry) => boolean) | null = null;
+    let smartQuery: string | null = null;
+    const nextSearchRunId = searchRunIdRef.current + 1;
+    searchRunIdRef.current = nextSearchRunId;
+
+    if (searchMode === "smart") {
+      const query = phraseInputDraft.trim();
+      if (!query) {
+        onStateChange({ error: "Enter a word or phrase to search.", results: [] });
+        return;
+      }
+      smartQuery = query;
+    }
 
     if (searchMode === "contains-any" || searchMode === "contains-all") {
       if (selectedWords.length === 0) {
@@ -356,17 +544,6 @@ export function SearchPage({
           : null;
     }
 
-    if (searchMode === "contains-phrase") {
-      const phrase = phraseInputDraft.trim();
-      if (!phrase) {
-        onStateChange({ error: "Enter a phrase to search.", results: [] });
-        return;
-      }
-      const needle = caseSensitive ? phrase : phrase.toLowerCase();
-      matcher = (entry) =>
-        (caseSensitive ? entry.text : entry.textLower).includes(needle);
-    }
-
     if (searchMode === "regex") {
       const pattern = phraseInputDraft.trim();
       if (!pattern) {
@@ -392,17 +569,150 @@ export function SearchPage({
       }
     }
 
-    if (!matcher) {
+    if (!matcher && !smartQuery) {
       onStateChange({ results: [] });
       return;
     }
 
     setIsSearching(true);
+    setSearchProgress(null);
+    const commitSearch = (matches: SearchMatch[]) => {
+      if (searchRunIdRef.current !== nextSearchRunId) {
+        return;
+      }
+      onStateChange({
+        chipInput: chipInputDraft,
+        phraseInput: phraseInputDraft,
+        results: matches,
+        currentPage: 1,
+        isControlsCollapsed: true,
+        lastSearchMode: searchMode,
+        lastSearchCaseSensitive: caseSensitive,
+        lastSearchPhraseInput: phraseInputDraft.trim(),
+        lastSearchSelectedWords: [...selectedWords],
+      });
+      setIsSearching(false);
+      setSearchProgress(null);
+    };
+
+    const cancelSearch = () => {
+      if (searchRunIdRef.current === nextSearchRunId) {
+        setIsSearching(false);
+        setSearchProgress(null);
+      }
+    };
+
+    if (smartQuery) {
+      const selected = selectedBookIndexes;
+      const preparedSmartSearch = prepareSmartSearch(smartQuery, caseSensitive);
+      if (!preparedSmartSearch) {
+        onStateChange({ error: "Enter a word or phrase to search.", results: [] });
+        setIsSearching(false);
+        return;
+      }
+      const candidates = verseIndex.filter(
+        (entry) =>
+          selected.has(entry.bookIndex) &&
+          isSmartSearchCandidate(entry, preparedSmartSearch),
+      );
+      const scored: Array<{
+        entry: VerseSearchIndexEntry;
+        index: number;
+        score: number;
+      }> = [];
+      const similarityCache = new Map<string, number>();
+      const batchSize = 500;
+      let startIndex = 0;
+      let batchesSincePublish = 0;
+      let publishedInitialPage = false;
+
+      const buildMatches = () =>
+        scored
+          .slice()
+          .sort((a, b) => b.score - a.score || a.index - b.index)
+          .slice(0, SEARCH_RESULTS_CAP)
+          .map(({ entry }) => ({
+            bookIndex: entry.bookIndex,
+            chapterIndex: entry.chapterIndex,
+            verseNumber: entry.verseNumber,
+            bookName: entry.bookName,
+            text: entry.text,
+          }));
+
+      const publishPartial = () => {
+        if (searchRunIdRef.current !== nextSearchRunId || scored.length === 0) {
+          return;
+        }
+        onStateChange({
+          chipInput: chipInputDraft,
+          phraseInput: phraseInputDraft,
+          results: buildMatches(),
+          currentPage: 1,
+          isControlsCollapsed: true,
+          lastSearchMode: searchMode,
+          lastSearchCaseSensitive: caseSensitive,
+          lastSearchPhraseInput: phraseInputDraft.trim(),
+          lastSearchSelectedWords: [...selectedWords],
+        });
+      };
+
+      const processBatch = () => {
+        if (searchRunIdRef.current !== nextSearchRunId) {
+          cancelSearch();
+          return;
+        }
+
+        const endIndex = Math.min(startIndex + batchSize, candidates.length);
+        for (let index = startIndex; index < endIndex; index += 1) {
+          const entry = candidates[index];
+          const score = scorePreparedSmartSearch(
+            entry,
+            preparedSmartSearch,
+            similarityCache,
+          );
+          if (score !== null) {
+            scored.push({ entry, index, score });
+          }
+        }
+
+        startIndex = endIndex;
+        batchesSincePublish += 1;
+        setSearchProgress({
+          processed: startIndex,
+          total: candidates.length,
+        });
+        if (
+          (!publishedInitialPage &&
+            (scored.length >= SEARCH_RESULTS_PAGE_SIZE ||
+              startIndex >= candidates.length ||
+              startIndex >= Math.min(candidates.length, batchSize * 2))) ||
+          batchesSincePublish >= 4
+        ) {
+          publishPartial();
+          publishedInitialPage = true;
+          batchesSincePublish = 0;
+        }
+        if (startIndex < candidates.length) {
+          window.setTimeout(processBatch, 0);
+          return;
+        }
+
+        commitSearch(buildMatches());
+      };
+
+      window.setTimeout(processBatch, 0);
+      return;
+    }
+
     window.requestAnimationFrame(() => {
+      if (searchRunIdRef.current !== nextSearchRunId) {
+        cancelSearch();
+        return;
+      }
       const selected = selectedBookIndexes;
       const matches = verseIndex
         .filter((entry) => selected.has(entry.bookIndex))
-        .filter((entry) => matcher(entry))
+        .filter((entry) => matcher?.(entry))
         .slice(0, 500)
         .map(({ bookIndex, chapterIndex, verseNumber, bookName, text }) => ({
           bookIndex,
@@ -411,9 +721,14 @@ export function SearchPage({
           bookName,
           text,
         }));
-      onStateChange({ results: matches, isControlsCollapsed: true });
-      setIsSearching(false);
+      commitSearch(matches);
     });
+  };
+
+  const stopSearch = () => {
+    searchRunIdRef.current += 1;
+    setIsSearching(false);
+    setSearchProgress(null);
   };
 
   const allBooksSelected = sameSet(selectedBookIndexes, allBookIndexes);
@@ -422,23 +737,43 @@ export function SearchPage({
   const clearResults = () => {
     onStateChange({
       results: [],
+      currentPage: 1,
       error: null,
     });
   };
 
   const renderResultText = (match: SearchMatch) => {
-    if (searchMode === "contains-any" || searchMode === "contains-all") {
+    if (lastSearchMode === "smart") {
+      const smartTerms = getSmartHighlightWords(
+        {
+          searchWords: match.text.split(/\s+/),
+          searchWordsLower: match.text
+            .split(/\s+/)
+            .map((word) => word.toLowerCase().replace(/^[^a-z0-9']+|[^a-z0-9']+$/gi, ""))
+            .filter(Boolean),
+        },
+        lastSearchPhraseInput.trim(),
+        false,
+      );
       return renderHighlightedTerms(
         match.text,
-        selectedWords,
+        smartTerms,
         `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
       );
     }
 
-    if (searchMode === "contains-phrase") {
+    if (lastSearchMode === "contains-any" || lastSearchMode === "contains-all") {
+      return renderHighlightedTerms(
+        match.text,
+        lastSearchSelectedWords,
+        `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
+      );
+    }
+
+    if (lastSearchMode === "regex") {
       return renderHighlightedText(
         match.text,
-        phraseInputDraft.trim(),
+        lastSearchPhraseInput.trim(),
         `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
       );
     }
@@ -447,31 +782,153 @@ export function SearchPage({
   };
 
   const searchSummary = useMemo(() => {
-    const modeLabel = SEARCH_MODE_LABELS[searchMode];
+    const summaryMode = lastSearchMode ?? searchMode;
+    const summaryCaseSensitive =
+      lastSearchMode === null ? caseSensitive : lastSearchCaseSensitive;
+    const modeLabel = SEARCH_MODE_LABELS[summaryMode];
     const scopeLabel = `${selectedBookCount}/${books.length} books`;
-    if (searchMode === "contains-any" || searchMode === "contains-all") {
+    if (summaryMode === "smart") {
+      const phrase =
+        (lastSearchMode === null ? phraseInputDraft : lastSearchPhraseInput).trim() ||
+        "no query";
+      return `${modeLabel} • ${phrase} • ${scopeLabel}${summaryCaseSensitive ? " • case-sensitive" : ""}`;
+    }
+    if (summaryMode === "contains-any" || summaryMode === "contains-all") {
       const terms =
-        selectedWords.length > 0 ? selectedWords.join(", ") : "no words selected";
-      return `${modeLabel} • ${terms} • ${scopeLabel}${caseSensitive ? " • case-sensitive" : ""}`;
+        (lastSearchMode === null ? selectedWords : lastSearchSelectedWords).length > 0
+          ? (lastSearchMode === null ? selectedWords : lastSearchSelectedWords).join(", ")
+          : "no words selected";
+      return `${modeLabel} • ${terms} • ${scopeLabel}${summaryCaseSensitive ? " • case-sensitive" : ""}`;
     }
 
-    const phrase = phraseInputDraft.trim() || (searchMode === "regex" ? "no pattern" : "no phrase");
-    return `${modeLabel} • ${phrase} • ${scopeLabel}${caseSensitive ? " • case-sensitive" : ""}`;
+    const phrase =
+      (lastSearchMode === null ? phraseInputDraft : lastSearchPhraseInput).trim() ||
+      (summaryMode === "regex" ? "no pattern" : "no phrase");
+    return `${modeLabel} • ${phrase} • ${scopeLabel}${summaryCaseSensitive ? " • case-sensitive" : ""}`;
   }, [
     books.length,
     caseSensitive,
+    lastSearchCaseSensitive,
+    lastSearchMode,
+    lastSearchPhraseInput,
+    lastSearchSelectedWords,
     phraseInputDraft,
     searchMode,
     selectedBookCount,
     selectedWords,
   ]);
 
+  const renderedResults = useMemo(
+    () =>
+      results.map((match) => (
+        <button
+          key={`${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`}
+          type="button"
+          className="group block w-full px-3 py-2 text-left hover:bg-reference-tint/60"
+          onClick={() =>
+            onOpenResult(
+              match.bookIndex,
+              match.chapterIndex,
+              match.verseNumber,
+              match.verseNumber,
+            )
+          }
+        >
+          <p className="tabular-data text-sm font-medium text-foreground">
+            {`${match.bookName} ${match.chapterIndex + 1}:${match.verseNumber}`}
+          </p>
+          <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground group-hover:text-foreground/90">
+            {renderResultText(match)}
+          </p>
+        </button>
+      )),
+    [lastSearchMode, lastSearchPhraseInput, lastSearchSelectedWords, onOpenResult, results],
+  );
+  const totalPages = Math.max(
+    1,
+    Math.ceil(results.length / SEARCH_RESULTS_PAGE_SIZE),
+  );
+  const activePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const pagedRenderedResults = useMemo(() => {
+    const startIndex = (activePage - 1) * SEARCH_RESULTS_PAGE_SIZE;
+    return renderedResults.slice(
+      startIndex,
+      startIndex + SEARCH_RESULTS_PAGE_SIZE,
+    );
+  }, [activePage, renderedResults]);
+
+  useEffect(() => {
+    const viewport = resultsScrollRef.current?.querySelector<HTMLElement>(
+      "[data-slot='scroll-area-viewport']",
+    );
+    viewport?.scrollTo({ top: 0, behavior: "auto" });
+  }, [activePage]);
+
   return (
     <div className="flex h-full min-h-0 flex-col gap-1.5 p-2">
       <div className="workspace-panel-elevated flex flex-col gap-2 rounded-2xl border p-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <h2 className="workspace-heading text-xl font-semibold">Search</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="workspace-heading text-xl font-semibold">Search</h2>
+              <Popover>
+                <PopoverTrigger
+                  render={
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      className="size-7 rounded-full text-muted-foreground"
+                      aria-label="Search tips"
+                    >
+                      <CircleHelpIcon className="size-4" />
+                    </Button>
+                  }
+                />
+                <PopoverContent
+                  side="bottom"
+                  align="start"
+                  className="w-[min(26rem,calc(100vw-2rem))] p-3 text-sm"
+                >
+                    <div className="flex flex-col gap-2.5">
+                      <p className="font-medium text-foreground">Search Tips</p>
+                      <div className="grid gap-2">
+                        {SEARCH_HELP_ITEMS.map((item) => (
+                          <div
+                            key={item.mode}
+                            className="rounded-xl border border-subtle-divider/70 bg-background/70 px-3 py-2"
+                          >
+                            <p className="font-medium text-foreground">
+                              {item.mode}
+                            </p>
+                            <p className="mt-0.5 text-muted-foreground">
+                              {item.description}
+                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              {item.example}
+                            </p>
+                            {item.links?.length ? (
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {item.links.map((link) => (
+                                  <a
+                                    key={link.href}
+                                    href={link.href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-xs font-medium text-primary underline-offset-2 hover:underline"
+                                  >
+                                    {link.label}
+                                  </a>
+                                ))}
+                              </div>
+                            ) : null}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                </PopoverContent>
+              </Popover>
+            </div>
             {isControlsCollapsed ? (
               <p className="text-sm text-muted-foreground">{searchSummary}</p>
             ) : null}
@@ -517,6 +974,12 @@ export function SearchPage({
                 className="grid w-full [grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))] gap-0"
               >
                 <ToggleGroupItem
+                  value="smart"
+                  className="h-auto min-w-0 w-full overflow-hidden px-2 py-2 text-center leading-tight text-ellipsis whitespace-nowrap data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+                >
+                  {SEARCH_MODE_LABELS.smart}
+                </ToggleGroupItem>
+                <ToggleGroupItem
                   value="contains-any"
                   className="h-auto min-w-0 w-full overflow-hidden px-2 py-2 text-center leading-tight text-ellipsis whitespace-nowrap data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
                 >
@@ -527,12 +990,6 @@ export function SearchPage({
                   className="h-auto min-w-0 w-full overflow-hidden px-2 py-2 text-center leading-tight text-ellipsis whitespace-nowrap data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
                 >
                   {SEARCH_MODE_LABELS["contains-all"]}
-                </ToggleGroupItem>
-                <ToggleGroupItem
-                  value="contains-phrase"
-                  className="h-auto min-w-0 w-full overflow-hidden px-2 py-2 text-center leading-tight text-ellipsis whitespace-nowrap data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
-                >
-                  {SEARCH_MODE_LABELS["contains-phrase"]}
                 </ToggleGroupItem>
                 <ToggleGroupItem
                   value="regex"
@@ -594,6 +1051,7 @@ export function SearchPage({
                   onChange={(event) =>
                     setChipInputDraft(event.currentTarget.value)
                   }
+                  onBlur={() => onStateChange({ chipInput: chipInputDraft })}
                   onKeyDown={(event) => {
                     if (event.key !== "Enter") {
                       return;
@@ -637,7 +1095,11 @@ export function SearchPage({
           ) : (
             <div className="workspace-panel flex flex-col gap-2 rounded-2xl border p-3">
               <Label htmlFor="search-phrase-input">
-                {searchMode === "regex" ? "Regular expression" : "Phrase"}
+                {searchMode === "regex"
+                  ? "Regular expression"
+                  : searchMode === "smart"
+                    ? "Word or phrase"
+                    : "Phrase"}
               </Label>
               <Input
                 id="search-phrase-input"
@@ -645,6 +1107,7 @@ export function SearchPage({
                 onChange={(event) =>
                   setPhraseInputDraft(event.currentTarget.value)
                 }
+                onBlur={() => onStateChange({ phraseInput: phraseInputDraft })}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     event.preventDefault();
@@ -654,9 +1117,26 @@ export function SearchPage({
                 placeholder={
                   searchMode === "regex"
                     ? "Example: \\bfaith\\b"
-                    : "Enter exact phrase..."
+                    : searchMode === "smart"
+                      ? 'Enter any word or phrase... Use "quotes" for exact phrases.'
+                      : "Enter phrase..."
                 }
               />
+              {searchMode === "smart" && smartSuggestions.length > 0 ? (
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <span>Did you mean</span>
+                  {smartSuggestions.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      className="rounded-full border border-subtle-divider/80 px-2 py-0.5 text-foreground hover:bg-muted/50"
+                      onClick={() => setPhraseInputDraft(suggestion)}
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
           )}
 
@@ -690,41 +1170,72 @@ export function SearchPage({
               Results Summary
             </p>
             <p className="text-sm font-medium text-foreground">
-              {results.length === 0
+              {isSearching
+                ? "Searching verses..."
+                : results.length === 0
                 ? "No verses loaded yet"
-                : `${results.length} matching verses`}
+                : `${results.length} matching verses loaded`}
             </p>
+            {isSearching && searchProgress ? (
+              <p className="text-xs text-muted-foreground">
+                {`${searchProgress.processed.toLocaleString()} / ${searchProgress.total.toLocaleString()} candidates`}
+              </p>
+            ) : results.length > 0 ? (
+              <p className="text-xs text-muted-foreground">
+                {`Page ${activePage} of ${totalPages}`}
+              </p>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {results.length > SEARCH_RESULTS_PAGE_SIZE ? (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={activePage <= 1}
+                  onClick={() => onStateChange({ currentPage: activePage - 1 })}
+                >
+                  <ChevronLeftIcon />
+                  Prev
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={activePage >= totalPages}
+                  onClick={() => onStateChange({ currentPage: activePage + 1 })}
+                >
+                  Next
+                  <ChevronRightIcon />
+                </Button>
+              </>
+            ) : null}
+            {isSearching ? (
+              <>
+                <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                  <LoaderCircleIcon className="size-3.5 animate-spin" />
+                  Working
+                </p>
+                <Button type="button" variant="outline" size="sm" onClick={stopSearch}>
+                  <XIcon />
+                  Stop
+                </Button>
+              </>
+            ) : null}
           </div>
         </div>
-        <ScrollArea className="min-h-0 flex-1 rounded-2xl border border-subtle-divider/80 bg-workspace-panel-elevated">
+        <ScrollArea
+          ref={resultsScrollRef}
+          className="min-h-0 flex-1 rounded-2xl border border-subtle-divider/80 bg-workspace-panel-elevated"
+        >
           <div className="divide-y divide-subtle-divider/70 pb-1">
             {results.length === 0 ? (
               <p className="p-3 text-sm text-muted-foreground">
                 Run a search to review matching verses in book order.
               </p>
             ) : (
-              results.map((match) => (
-                <button
-                  key={`${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`}
-                  type="button"
-                  className="group block w-full px-3 py-2 text-left hover:bg-reference-tint/60"
-                  onClick={() =>
-                    onOpenResult(
-                      match.bookIndex,
-                      match.chapterIndex,
-                      match.verseNumber,
-                      match.verseNumber,
-                    )
-                  }
-                >
-                  <p className="tabular-data text-sm font-medium text-foreground">
-                    {`${match.bookName} ${match.chapterIndex + 1}:${match.verseNumber}`}
-                  </p>
-                  <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground group-hover:text-foreground/90">
-                    {renderResultText(match)}
-                  </p>
-                </button>
-              ))
+              pagedRenderedResults
             )}
           </div>
         </ScrollArea>
