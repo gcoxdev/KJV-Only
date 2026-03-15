@@ -180,10 +180,8 @@ export type StudyWorkspaceTool =
   | "concordance"
   | "websters"
   | "strongs"
-  | "old-english"
+  | "kjv-words-phrases"
   | "bible-word-book"
-  | "phrases"
-  | "units"
   | "maps"
   | "genealogy"
   | "hitchcocks";
