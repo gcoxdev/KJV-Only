@@ -1394,14 +1394,19 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
                 state={
                   searchPageStateByLeafId[leaf.id] ?? {
-                    searchMode: "contains-any",
+                    searchMode: "smart",
                     caseSensitive: false,
                     chipInput: "",
                     phraseInput: "",
+                    lastSearchMode: null,
+                    lastSearchCaseSensitive: false,
+                    lastSearchPhraseInput: "",
+                    lastSearchSelectedWords: [],
                     isControlsCollapsed: false,
                     selectedWords: [],
                     expandedBookTree: ["entire", "old", "new"],
                     selectedBookIndexes: [],
+                    currentPage: 1,
                     results: [],
                     error: null,
                   }

@@ -130,9 +130,9 @@ export type StrongsCompactPayload = {
 };
 
 export type SearchMode =
+  | "smart"
   | "contains-any"
   | "contains-all"
-  | "contains-phrase"
   | "regex";
 
 export type SearchMatch = {
@@ -148,10 +148,15 @@ export type SearchPageState = {
   caseSensitive: boolean;
   chipInput: string;
   phraseInput: string;
+  lastSearchMode: SearchMode | null;
+  lastSearchCaseSensitive: boolean;
+  lastSearchPhraseInput: string;
+  lastSearchSelectedWords: string[];
   isControlsCollapsed: boolean;
   selectedWords: string[];
   expandedBookTree: string[];
   selectedBookIndexes: number[];
+  currentPage: number;
   results: SearchMatch[];
   error: string | null;
 };

@@ -780,14 +780,19 @@ export function KJVReader() {
 
   const createDefaultSearchPageState = useCallback(
     (): SearchPageState => ({
-      searchMode: "contains-any",
+      searchMode: "smart",
       caseSensitive: false,
       chipInput: "",
       phraseInput: "",
+      lastSearchMode: null,
+      lastSearchCaseSensitive: false,
+      lastSearchPhraseInput: "",
+      lastSearchSelectedWords: [],
       isControlsCollapsed: false,
       selectedWords: [],
       expandedBookTree: ["entire", "old", "new"],
       selectedBookIndexes: books.map((_, index) => index),
+      currentPage: 1,
       results: [],
       error: null,
     }),
