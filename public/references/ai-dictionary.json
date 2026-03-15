@@ -1,0 +1,7300 @@
+{
+  "abide": {
+    "definitions": [
+      "To remain, continue, or stay.",
+      "Often to endure or bear with firmness."
+    ],
+    "aliases": [
+      "abideth",
+      "abode"
+    ],
+    "confidence": "high"
+  },
+  "abomination": {
+    "definitions": [
+      "A thing greatly detested as unclean, idolatrous, or morally hateful.",
+      "Often used of what is especially offensive before God."
+    ],
+    "aliases": [
+      "abominations"
+    ],
+    "confidence": "high"
+  },
+  "abound": {
+    "definitions": [
+      "To overflow, be plentiful, or increase richly."
+    ],
+    "aliases": [
+      "abounded",
+      "aboundeth"
+    ],
+    "confidence": "high"
+  },
+  "abundance": {
+    "definitions": [
+      "Plenty; fullness; more than enough."
+    ],
+    "confidence": "high"
+  },
+  "acceptable": {
+    "definitions": [
+      "Well-pleasing; received with favor; fit to be admitted or approved."
+    ],
+    "confidence": "high"
+  },
+  "accounted": {
+    "definitions": [
+      "Counted, reckoned, or regarded as being such."
+    ],
+    "aliases": [
+      "account"
+    ],
+    "confidence": "high"
+  },
+  "acknowledge": {
+    "definitions": [
+      "To own, confess, or recognize openly as true or due."
+    ],
+    "aliases": [
+      "acknowledged",
+      "acknowledgeth"
+    ],
+    "confidence": "high"
+  },
+  "admonish": {
+    "definitions": [
+      "To warn, counsel, or gently charge another toward right conduct."
+    ],
+    "aliases": [
+      "admonished",
+      "admonition"
+    ],
+    "confidence": "high"
+  },
+  "adoption": {
+    "definitions": [
+      "The placing of one in the standing and privileges of a son."
+    ],
+    "confidence": "high"
+  },
+  "adversary": {
+    "definitions": [
+      "An opponent, enemy, or one who stands against another.",
+      "At times an accuser in a legal or spiritual sense."
+    ],
+    "aliases": [
+      "adversaries"
+    ],
+    "confidence": "high"
+  },
+  "adversity": {
+    "definitions": [
+      "Trouble, hardship, or an afflicted condition."
+    ],
+    "confidence": "high"
+  },
+  "affection": {
+    "definitions": [
+      "An inward inclination, desire, or set of the heart.",
+      "Often strong feeling directed toward a person or thing."
+    ],
+    "aliases": [
+      "affections"
+    ],
+    "confidence": "high"
+  },
+  "affliction": {
+    "definitions": [
+      "Trouble, distress, or suffering laid upon a person.",
+      "Often outward hardship, but sometimes inward grief as well."
+    ],
+    "aliases": [
+      "afflictions"
+    ],
+    "confidence": "high"
+  },
+  "afore": {
+    "definitions": [
+      "Before; beforehand; previously."
+    ],
+    "confidence": "high"
+  },
+  "aforehand": {
+    "definitions": [
+      "Beforehand; in advance; previously."
+    ],
+    "confidence": "high"
+  },
+  "aforetime": {
+    "definitions": [
+      "In former time; previously; in earlier days."
+    ],
+    "confidence": "high"
+  },
+  "afterward": {
+    "definitions": [
+      "After this; later in time; following upon what went before."
+    ],
+    "confidence": "high"
+  },
+  "against": {
+    "definitions": [
+      "In opposition to; toward so as to meet or resist; over against."
+    ],
+    "confidence": "high"
+  },
+  "aileth": {
+    "definitions": [
+      "Ails; troubles; is the matter with."
+    ],
+    "aliases": [
+      "ail"
+    ],
+    "confidence": "high"
+  },
+  "albeit": {
+    "definitions": [
+      "Although; even though; notwithstanding."
+    ],
+    "confidence": "high"
+  },
+  "alms": {
+    "definitions": [
+      "Merciful gifts to the poor; charitable relief bestowed on the needy."
+    ],
+    "confidence": "high"
+  },
+  "altar": {
+    "definitions": [
+      "A raised place or structure for sacrifice, offering, or sacred service."
+    ],
+    "aliases": [
+      "altars"
+    ],
+    "confidence": "high"
+  },
+  "alway": {
+    "definitions": [
+      "Always; at all times."
+    ],
+    "confidence": "high"
+  },
+  "ambassador": {
+    "definitions": [
+      "A messenger sent in another's name with authority to represent him."
+    ],
+    "aliases": [
+      "ambassadors"
+    ],
+    "confidence": "high"
+  },
+  "amen": {
+    "definitions": [
+      "A solemn affirmation meaning truly, surely, or so be it."
+    ],
+    "confidence": "high"
+  },
+  "amend": {
+    "definitions": [
+      "To correct, reform, or make better."
+    ],
+    "aliases": [
+      "amended"
+    ],
+    "confidence": "high"
+  },
+  "amongst": {
+    "definitions": [
+      "Among; in the midst of."
+    ],
+    "confidence": "high"
+  },
+  "anoint": {
+    "definitions": [
+      "To apply oil to; to consecrate, set apart, or mark for office or favor."
+    ],
+    "aliases": [
+      "anointed",
+      "anointing"
+    ],
+    "confidence": "high"
+  },
+  "anon": {
+    "definitions": [
+      "Soon; shortly; after only a brief delay."
+    ],
+    "confidence": "high"
+  },
+  "answer": {
+    "definitions": [
+      "A reply or response.",
+      "Sometimes the outcome or correspondence that answers to a thing."
+    ],
+    "aliases": [
+      "answered",
+      "answereth"
+    ],
+    "confidence": "medium"
+  },
+  "answerest": {
+    "definitions": [
+      "Answerest; thou answerest; you answer, reply, or respond."
+    ],
+    "confidence": "high"
+  },
+  "appearance": {
+    "definitions": [
+      "Outward aspect, visible form, or what presents itself to the eye.",
+      "Sometimes the coming into sight or manifestation of a person or thing."
+    ],
+    "aliases": [
+      "appearances"
+    ],
+    "confidence": "high"
+  },
+  "appeareth": {
+    "definitions": [
+      "Appears; comes into sight; becomes manifest."
+    ],
+    "aliases": [
+      "appear"
+    ],
+    "confidence": "high"
+  },
+  "appoint": {
+    "definitions": [
+      "To fix, set, assign, or ordain for a purpose or time."
+    ],
+    "aliases": [
+      "appointed"
+    ],
+    "confidence": "high"
+  },
+  "approve": {
+    "definitions": [
+      "To prove, test, and show to be sound.",
+      "Often more than merely liking something."
+    ],
+    "aliases": [
+      "approved"
+    ],
+    "confidence": "high"
+  },
+  "apt": {
+    "definitions": [
+      "Fit, suitable, or well-disposed for a task.",
+      "Ready and able, not merely naturally clever."
+    ],
+    "confidence": "high"
+  },
+  "ariseth": {
+    "definitions": [
+      "Arises; rises up; springs forth.",
+      "It may also mean comes into being or comes forward in action."
+    ],
+    "aliases": [
+      "arise"
+    ],
+    "confidence": "high"
+  },
+  "asketh": {
+    "definitions": [
+      "Asks; requests; inquires."
+    ],
+    "aliases": [
+      "ask"
+    ],
+    "confidence": "high"
+  },
+  "assay": {
+    "definitions": [
+      "To attempt; to try; to undertake."
+    ],
+    "aliases": [
+      "assayed"
+    ],
+    "confidence": "high"
+  },
+  "assemble": {
+    "definitions": [
+      "To gather together into one place or company."
+    ],
+    "aliases": [
+      "assembled",
+      "assembly"
+    ],
+    "confidence": "high"
+  },
+  "assurance": {
+    "definitions": [
+      "Confidence, certainty, and settled persuasion."
+    ],
+    "confidence": "high"
+  },
+  "astonied": {
+    "definitions": [
+      "Astonished, appalled, or struck with overwhelming amazement.",
+      "Often carrying a stronger sense than simple surprise."
+    ],
+    "confidence": "high"
+  },
+  "astonishment": {
+    "definitions": [
+      "Great amazement; overwhelming wonder or dismay."
+    ],
+    "confidence": "high"
+  },
+  "atonement": {
+    "definitions": [
+      "A covering or reconciling work by which offense is dealt with and peace is made.",
+      "In Scripture often the sacrificial dealing with sin by which guilt is expiated and fellowship with God is maintained or restored."
+    ],
+    "confidence": "high"
+  },
+  "attain": {
+    "definitions": [
+      "To reach, obtain, or come unto by effort or course."
+    ],
+    "aliases": [
+      "attained"
+    ],
+    "confidence": "high"
+  },
+  "author": {
+    "definitions": [
+      "The originator or first cause of a thing."
+    ],
+    "confidence": "high"
+  },
+  "authority": {
+    "definitions": [
+      "Lawful power, right to command, or delegated rule.",
+      "Also weight and force that demand obedience."
+    ],
+    "aliases": [
+      "authorities"
+    ],
+    "confidence": "high"
+  },
+  "avenge": {
+    "definitions": [
+      "To vindicate or punish in response to wrong done."
+    ],
+    "aliases": [
+      "avenged"
+    ],
+    "confidence": "high"
+  },
+  "awake": {
+    "definitions": [
+      "To rouse from sleep or inactivity.",
+      "Often used figuratively of spiritual stirring or alertness."
+    ],
+    "aliases": [
+      "awaked",
+      "awaketh"
+    ],
+    "confidence": "high"
+  },
+  "backbiting": {
+    "definitions": [
+      "Speaking against another behind his back; slanderous detraction."
+    ],
+    "confidence": "high"
+  },
+  "banquet": {
+    "definitions": [
+      "A feast or rich entertainment of food and drink."
+    ],
+    "aliases": [
+      "banqueting"
+    ],
+    "confidence": "high"
+  },
+  "bare": {
+    "definitions": [
+      "Bore; carried; brought forth.",
+      "Sometimes uncovered or naked, according to context."
+    ],
+    "confidence": "medium"
+  },
+  "bearest": {
+    "definitions": [
+      "Bearest; thou bearest; you bear, carry, endure, or bring forth.",
+      "The precise sense depends on context."
+    ],
+    "confidence": "high"
+  },
+  "beareth": {
+    "definitions": [
+      "Bears; carries; sustains; endures.",
+      "It may also mean brings forth, produces, or conveys testimony according to context."
+    ],
+    "aliases": [
+      "bear"
+    ],
+    "confidence": "high"
+  },
+  "beautiful": {
+    "definitions": [
+      "Fair, comely, or lovely to behold.",
+      "It may refer to outward beauty, but sometimes to moral fitness or pleasant excellence."
+    ],
+    "confidence": "high"
+  },
+  "becometh": {
+    "definitions": [
+      "Is fitting, suitable, or proper for."
+    ],
+    "aliases": [
+      "become"
+    ],
+    "confidence": "high"
+  },
+  "begotten": {
+    "definitions": [
+      "Brought forth; fathered; generated."
+    ],
+    "aliases": [
+      "beget",
+      "begat"
+    ],
+    "confidence": "high"
+  },
+  "beguile": {
+    "definitions": [
+      "To deceive, cheat, or lead astray by subtlety."
+    ],
+    "aliases": [
+      "beguiled"
+    ],
+    "confidence": "high"
+  },
+  "behold": {
+    "definitions": [
+      "Look; see; attend carefully to what is before you."
+    ],
+    "confidence": "high"
+  },
+  "beholdest": {
+    "definitions": [
+      "Beholdest; thou beholdest; you behold, look upon, or regard with attention."
+    ],
+    "confidence": "high"
+  },
+  "believed": {
+    "definitions": [
+      "Trusted, received as true, or rested upon with confidence.",
+      "Often more than bare assent, carrying the sense of inward reliance."
+    ],
+    "confidence": "high"
+  },
+  "believest": {
+    "definitions": [
+      "Believest; thou believest; you believe, trust, or receive as true.",
+      "Often in Scripture it means not mere opinion, but personal reliance."
+    ],
+    "confidence": "high"
+  },
+  "believeth": {
+    "definitions": [
+      "Believes; places trust or confidence in.",
+      "Often more than bare agreement, carrying the sense of relying upon as true and sure."
+    ],
+    "aliases": [
+      "believe"
+    ],
+    "confidence": "high"
+  },
+  "belly": {
+    "definitions": [
+      "The stomach or inward appetite.",
+      "Often used figuratively for bodily craving or appetite."
+    ],
+    "aliases": [
+      "bellies"
+    ],
+    "confidence": "medium"
+  },
+  "belongeth": {
+    "definitions": [
+      "Pertains properly to; is due to; is the rightful possession or portion of."
+    ],
+    "confidence": "high"
+  },
+  "beloved": {
+    "definitions": [
+      "Dearly loved; much loved and prized."
+    ],
+    "confidence": "high"
+  },
+  "beneath": {
+    "definitions": [
+      "Below; under; in a lower place or condition than another thing."
+    ],
+    "confidence": "high"
+  },
+  "benefit": {
+    "definitions": [
+      "A favor, good turn, or profitable advantage."
+    ],
+    "aliases": [
+      "benefits"
+    ],
+    "confidence": "high"
+  },
+  "beseech": {
+    "definitions": [
+      "To entreat earnestly; to beg or plead with urgency."
+    ],
+    "aliases": [
+      "besought"
+    ],
+    "confidence": "high"
+  },
+  "best": {
+    "definitions": [
+      "Most excellent, choice, or chief among several."
+    ],
+    "confidence": "high"
+  },
+  "betimes": {
+    "definitions": [
+      "Early; in good time; seasonably."
+    ],
+    "confidence": "high"
+  },
+  "bewray": {
+    "definitions": [
+      "To disclose, reveal, or betray by outward sign or speech."
+    ],
+    "aliases": [
+      "bewrayeth"
+    ],
+    "confidence": "high"
+  },
+  "bindeth": {
+    "definitions": [
+      "Binds; ties, fastens, or places under bond."
+    ],
+    "aliases": [
+      "bind"
+    ],
+    "confidence": "high"
+  },
+  "blameless": {
+    "definitions": [
+      "Without just cause of accusation; free from reproach in conduct."
+    ],
+    "confidence": "high"
+  },
+  "blaspheme": {
+    "definitions": [
+      "To speak irreverently against God or sacred things; to rail profanely."
+    ],
+    "aliases": [
+      "blasphemed",
+      "blasphemy"
+    ],
+    "confidence": "high"
+  },
+  "bless": {
+    "definitions": [
+      "To speak good upon, invoke favor upon, or pronounce well of.",
+      "When used of God, often to bestow good, favor, fruitfulness, or peace."
+    ],
+    "aliases": [
+      "blessed",
+      "blesseth"
+    ],
+    "confidence": "high"
+  },
+  "blessedness": {
+    "definitions": [
+      "The state of being blessed; true happiness under divine favor."
+    ],
+    "confidence": "high"
+  },
+  "blessest": {
+    "definitions": [
+      "Blessest; thou blessest; you bless, speak good upon, or invoke favor upon."
+    ],
+    "confidence": "high"
+  },
+  "blessing": {
+    "definitions": [
+      "A good bestowed, spoken, or invoked; favor resulting in benefit, peace, or increase.",
+      "It may also mean the act of pronouncing blessing."
+    ],
+    "aliases": [
+      "blessings"
+    ],
+    "confidence": "high"
+  },
+  "blood": {
+    "definitions": [
+      "The blood of the body as the seat and sign of life.",
+      "In Scripture often bound up with life given up, guilt, kinship, cleansing, or sacrificial atonement."
+    ],
+    "confidence": "high"
+  },
+  "bloodguiltiness": {
+    "definitions": [
+      "The guilt of bloodshed, especially of blood wrongfully shed."
+    ],
+    "confidence": "high"
+  },
+  "boast": {
+    "definitions": [
+      "To glory, make one's boast, or speak proudly of a thing.",
+      "At times to glory rightly in God rather than in self."
+    ],
+    "aliases": [
+      "boasting"
+    ],
+    "confidence": "medium"
+  },
+  "boldness": {
+    "definitions": [
+      "Courage, confidence, and freedom of speech or action."
+    ],
+    "confidence": "high"
+  },
+  "bondage": {
+    "definitions": [
+      "Servitude, slavery, or a state of binding subjection."
+    ],
+    "confidence": "high"
+  },
+  "borne": {
+    "definitions": [
+      "Carried; endured; supported."
+    ],
+    "confidence": "high"
+  },
+  "bosom": {
+    "definitions": [
+      "The breast or chest.",
+      "Figuratively, the place of closeness, affection, or inward keeping."
+    ],
+    "aliases": [
+      "bosoms"
+    ],
+    "confidence": "high"
+  },
+  "both": {
+    "definitions": [
+      "The two together; each of the two named or implied."
+    ],
+    "confidence": "high"
+  },
+  "bowels": {
+    "definitions": [
+      "The inward parts, especially as the imagined seat of tender feeling, compassion, or deep affection.",
+      "In some places, the literal inner organs."
+    ],
+    "confidence": "high"
+  },
+  "breadth": {
+    "definitions": [
+      "The measure from side to side; width."
+    ],
+    "confidence": "high"
+  },
+  "breaketh": {
+    "definitions": [
+      "Breaks; shatters, divides, interrupts, or violates.",
+      "According to context it may mean to break an object, break off a course, or break a command."
+    ],
+    "aliases": [
+      "break"
+    ],
+    "confidence": "high"
+  },
+  "breath": {
+    "definitions": [
+      "The breathing of life; the air drawn from the mouth or nostrils.",
+      "Often used for life itself, or that which is frail and quickly vanishing."
+    ],
+    "aliases": [
+      "breaths"
+    ],
+    "confidence": "high"
+  },
+  "brethren": {
+    "definitions": [
+      "Brothers; kinsmen; fellow members of a people or spiritual family."
+    ],
+    "confidence": "high"
+  },
+  "bridle": {
+    "definitions": [
+      "To restrain, govern, or hold in check.",
+      "Literally, the headgear used to control a horse."
+    ],
+    "aliases": [
+      "bridled"
+    ],
+    "confidence": "high"
+  },
+  "bringest": {
+    "definitions": [
+      "Bringest; thou bringest; you bring.",
+      "Used in address to one person, often meaning you carry, cause to come, or bring to pass."
+    ],
+    "confidence": "high"
+  },
+  "bringeth": {
+    "definitions": [
+      "Brings; carries or causes to come.",
+      "Often used of producing, introducing, or bringing something to pass."
+    ],
+    "aliases": [
+      "bring"
+    ],
+    "confidence": "high"
+  },
+  "brotherly": {
+    "definitions": [
+      "Like that which becomes brethren: affectionate, kind, and united."
+    ],
+    "confidence": "high"
+  },
+  "broughtest": {
+    "definitions": [
+      "Broughtest; thou broughtest; you brought or caused to come."
+    ],
+    "confidence": "high"
+  },
+  "bruit": {
+    "definitions": [
+      "A report, rumor, or noise spread abroad."
+    ],
+    "aliases": [
+      "bruited"
+    ],
+    "confidence": "high"
+  },
+  "buildest": {
+    "definitions": [
+      "Buildest; thou buildest; you build, establish, or raise up."
+    ],
+    "confidence": "high"
+  },
+  "buildeth": {
+    "definitions": [
+      "Builds; constructs; establishes or strengthens."
+    ],
+    "aliases": [
+      "build"
+    ],
+    "confidence": "high"
+  },
+  "built": {
+    "definitions": [
+      "Constructed, established, or set up."
+    ],
+    "confidence": "high"
+  },
+  "burden": {
+    "definitions": [
+      "A load carried or laid upon one.",
+      "Also a weighty message or heavy matter pressing on the spirit."
+    ],
+    "aliases": [
+      "burdens"
+    ],
+    "confidence": "high"
+  },
+  "burneth": {
+    "definitions": [
+      "Burns; is on fire; is consumed with heat.",
+      "It may also mean burns with desire, anger, or zeal according to context."
+    ],
+    "aliases": [
+      "burn"
+    ],
+    "confidence": "high"
+  },
+  "burning": {
+    "definitions": [
+      "Ablaze, fervent, or glowing with heat.",
+      "Sometimes inwardly zealous or intensely felt."
+    ],
+    "confidence": "medium"
+  },
+  "business": {
+    "definitions": [
+      "A matter in hand; an affair, duty, or piece of work to be done.",
+      "Not limited to trade or commerce."
+    ],
+    "confidence": "high"
+  },
+  "byword": {
+    "definitions": [
+      "A proverb-like saying about someone; a name used in reproach or mockery."
+    ],
+    "aliases": [
+      "bywords"
+    ],
+    "confidence": "high"
+  },
+  "calleth": {
+    "definitions": [
+      "Calls; names; summons.",
+      "It may also mean appoints, invites, or effectually calls according to context."
+    ],
+    "aliases": [
+      "call"
+    ],
+    "confidence": "high"
+  },
+  "calling": {
+    "definitions": [
+      "A summons, vocation, or state to which one is called.",
+      "Often the divine call or place assigned by God."
+    ],
+    "confidence": "high"
+  },
+  "camest": {
+    "definitions": [
+      "Camest; thou camest; you came."
+    ],
+    "confidence": "high"
+  },
+  "captain": {
+    "definitions": [
+      "A chief leader, commander, or head over a company."
+    ],
+    "aliases": [
+      "captains"
+    ],
+    "confidence": "high"
+  },
+  "captivity": {
+    "definitions": [
+      "A state of being taken captive or carried away under bondage."
+    ],
+    "confidence": "high"
+  },
+  "careful": {
+    "definitions": [
+      "Full of care; anxious; troubled with concern.",
+      "Not chiefly cautious in the modern favorable sense."
+    ],
+    "confidence": "high"
+  },
+  "carefulness": {
+    "definitions": [
+      "Earnest care, diligence, and sober concern."
+    ],
+    "confidence": "high"
+  },
+  "careth": {
+    "definitions": [
+      "Cares; is concerned for; gives heed to.",
+      "It may also carry the sense of anxious concern."
+    ],
+    "aliases": [
+      "care"
+    ],
+    "confidence": "high"
+  },
+  "carnal": {
+    "definitions": [
+      "Pertaining to the flesh, especially man's natural and unspiritual state.",
+      "Often worldly, fleshly, or governed by corrupt appetite."
+    ],
+    "confidence": "high"
+  },
+  "carriage": {
+    "definitions": [
+      "That which is carried along; baggage, supplies, or portable goods.",
+      "In some contexts, manner of conduct or bearing."
+    ],
+    "confidence": "high"
+  },
+  "cast": {
+    "definitions": [
+      "To throw, put, or send forth.",
+      "Also to set or place down, according to context."
+    ],
+    "aliases": [
+      "casted"
+    ],
+    "confidence": "medium"
+  },
+  "casteth": {
+    "definitions": [
+      "Casts; throws; sends away; causes to fall or be placed."
+    ],
+    "aliases": [
+      "cast"
+    ],
+    "confidence": "high"
+  },
+  "causeth": {
+    "definitions": [
+      "Causes; makes to happen; brings about by power or ordering."
+    ],
+    "aliases": [
+      "cause"
+    ],
+    "confidence": "high"
+  },
+  "ceaseth": {
+    "definitions": [
+      "Ceases; stops; comes to an end."
+    ],
+    "aliases": [
+      "cease"
+    ],
+    "confidence": "high"
+  },
+  "chambering": {
+    "definitions": [
+      "Lewd or wanton behavior connected with secret chambers; sensual indulgence."
+    ],
+    "confidence": "high"
+  },
+  "charger": {
+    "definitions": [
+      "A large dish, platter, or serving tray."
+    ],
+    "aliases": [
+      "chargers"
+    ],
+    "confidence": "high"
+  },
+  "charity": {
+    "definitions": [
+      "Christian love: a gracious, self-giving love toward God and man.",
+      "Not chiefly almsgiving, but the inward love from which merciful acts may spring."
+    ],
+    "confidence": "high"
+  },
+  "chasten": {
+    "definitions": [
+      "To discipline, correct, or train by rebuke or suffering.",
+      "Not merely to punish, but often to amend."
+    ],
+    "aliases": [
+      "chastened",
+      "chasteneth"
+    ],
+    "confidence": "high"
+  },
+  "cheweth": {
+    "definitions": [
+      "Chews; grinds with the teeth.",
+      "In legal distinctions, often used of beasts that chew the cud."
+    ],
+    "aliases": [
+      "chew"
+    ],
+    "confidence": "high"
+  },
+  "chief": {
+    "definitions": [
+      "Foremost, principal, or highest in rank or importance."
+    ],
+    "confidence": "high"
+  },
+  "chiefest": {
+    "definitions": [
+      "Chiefest; foremost, principal, or greatest in rank among those compared."
+    ],
+    "confidence": "high"
+  },
+  "chosen": {
+    "definitions": [
+      "Selected, picked out, or appointed by choice."
+    ],
+    "confidence": "high"
+  },
+  "circumcision": {
+    "definitions": [
+      "The cutting away of the foreskin as the covenant sign given to Abraham and his seed.",
+      "By extension, the covenant people marked by that sign, or the inward spiritual cutting away of impurity."
+    ],
+    "confidence": "high"
+  },
+  "circumspect": {
+    "definitions": [
+      "Careful on every side; watchful, prudent, and wary."
+    ],
+    "confidence": "high"
+  },
+  "city": {
+    "definitions": [
+      "A walled or settled town; a place of organized habitation and rule.",
+      "Often a chief urban center distinguished from villages or fields."
+    ],
+    "aliases": [
+      "cities"
+    ],
+    "confidence": "high"
+  },
+  "cleanness": {
+    "definitions": [
+      "Purity, freedom from defilement, or ceremonial cleanliness."
+    ],
+    "confidence": "high"
+  },
+  "cleave": {
+    "definitions": [
+      "To cling fast, adhere, or hold closely to.",
+      "In other contexts, to split or divide."
+    ],
+    "aliases": [
+      "clave",
+      "cleaving"
+    ],
+    "confidence": "medium"
+  },
+  "cleaveth": {
+    "definitions": [
+      "Cleaves; either splits apart or clings closely, according to context.",
+      "In many places it means to adhere firmly, especially in loyalty or affection."
+    ],
+    "aliases": [
+      "cleave"
+    ],
+    "confidence": "high"
+  },
+  "cloke": {
+    "definitions": [
+      "A cloak or outer garment.",
+      "Figuratively, a cover or pretense used to hide something."
+    ],
+    "aliases": [
+      "cloak"
+    ],
+    "confidence": "high"
+  },
+  "closet": {
+    "definitions": [
+      "A private chamber or inner room.",
+      "A place of retirement, not chiefly a storage space."
+    ],
+    "aliases": [
+      "closets"
+    ],
+    "confidence": "high"
+  },
+  "coast": {
+    "definitions": [
+      "A border, region, or surrounding district.",
+      "Not always the seashore specifically."
+    ],
+    "aliases": [
+      "coasts"
+    ],
+    "confidence": "high"
+  },
+  "comely": {
+    "definitions": [
+      "Becoming, seemly, or pleasant to behold."
+    ],
+    "confidence": "high"
+  },
+  "comest": {
+    "definitions": [
+      "Comest; thou comest; you come.",
+      "Often used not only of bodily arrival but of appearing or coming forward in a matter."
+    ],
+    "confidence": "high"
+  },
+  "cometh": {
+    "definitions": [
+      "Comes; approaches; arrives.",
+      "Often used not only of movement in place but of the arrival of a time, event, or person in appointed course."
+    ],
+    "aliases": [
+      "come"
+    ],
+    "confidence": "high"
+  },
+  "comfort": {
+    "definitions": [
+      "Strengthening help, consolation, and encouragement under sorrow or weakness.",
+      "Not merely ease, but inward support."
+    ],
+    "aliases": [
+      "comforted",
+      "comforteth"
+    ],
+    "confidence": "high"
+  },
+  "comforter": {
+    "definitions": [
+      "One who strengthens, helps, and consoles."
+    ],
+    "aliases": [
+      "comforters"
+    ],
+    "confidence": "high"
+  },
+  "commandeth": {
+    "definitions": [
+      "Commands; orders with authority; gives charge or direction."
+    ],
+    "aliases": [
+      "command"
+    ],
+    "confidence": "high"
+  },
+  "commandment": {
+    "definitions": [
+      "A charge, order, or authoritative precept."
+    ],
+    "aliases": [
+      "commandments"
+    ],
+    "confidence": "high"
+  },
+  "commend": {
+    "definitions": [
+      "To entrust, commit, or set forth with approval.",
+      "Sometimes to recommend or praise."
+    ],
+    "aliases": [
+      "commended",
+      "commendeth"
+    ],
+    "confidence": "medium"
+  },
+  "committeth": {
+    "definitions": [
+      "Commits; does or performs.",
+      "It may also mean entrusts or delivers into another's charge, according to context."
+    ],
+    "aliases": [
+      "commit"
+    ],
+    "confidence": "high"
+  },
+  "commonwealth": {
+    "definitions": [
+      "An ordered community or body politic sharing one public state."
+    ],
+    "confidence": "high"
+  },
+  "communicate": {
+    "definitions": [
+      "To share with another; to impart; to distribute to one in need.",
+      "Not merely to speak, but often to give or have in common."
+    ],
+    "aliases": [
+      "communicated",
+      "communicateth"
+    ],
+    "confidence": "high"
+  },
+  "communication": {
+    "definitions": [
+      "Speech, talk, or discourse.",
+      "Sometimes fellowship or sharing, depending on context."
+    ],
+    "aliases": [
+      "communications"
+    ],
+    "confidence": "medium"
+  },
+  "communion": {
+    "definitions": [
+      "Shared participation, fellowship, or common partaking."
+    ],
+    "confidence": "high"
+  },
+  "compass": {
+    "definitions": [
+      "To go around, surround, or encircle.",
+      "Sometimes to bring about by contrivance or effort."
+    ],
+    "aliases": [
+      "compassed",
+      "compasseth"
+    ],
+    "confidence": "medium"
+  },
+  "compassed": {
+    "definitions": [
+      "Surrounded, enclosed, or gone around."
+    ],
+    "confidence": "high"
+  },
+  "compassion": {
+    "definitions": [
+      "Tender pity and merciful fellow-feeling toward misery."
+    ],
+    "aliases": [
+      "compassions"
+    ],
+    "confidence": "high"
+  },
+  "compel": {
+    "definitions": [
+      "To force, constrain, or press strongly."
+    ],
+    "aliases": [
+      "compelled"
+    ],
+    "confidence": "high"
+  },
+  "conceit": {
+    "definitions": [
+      "Thought, opinion, or imagination.",
+      "Often a vain or inflated opinion of oneself."
+    ],
+    "confidence": "medium"
+  },
+  "concupiscence": {
+    "definitions": [
+      "Strong desire, especially unlawful or disordered desire.",
+      "Often used of lustful or covetous craving."
+    ],
+    "confidence": "high"
+  },
+  "condemn": {
+    "definitions": [
+      "To pronounce guilty, sentence against, or judge adversely."
+    ],
+    "aliases": [
+      "condemned"
+    ],
+    "confidence": "high"
+  },
+  "condemnation": {
+    "definitions": [
+      "Sentence of guilt; adverse judgment pronounced against a person.",
+      "Not always the final state alone, but the judicial sentence itself."
+    ],
+    "confidence": "high"
+  },
+  "confess": {
+    "definitions": [
+      "To acknowledge openly, whether sin, truth, or allegiance."
+    ],
+    "aliases": [
+      "confessed",
+      "confessing"
+    ],
+    "confidence": "high"
+  },
+  "confession": {
+    "definitions": [
+      "An open acknowledgment, whether of sin or of faith and allegiance."
+    ],
+    "aliases": [
+      "confess"
+    ],
+    "confidence": "high"
+  },
+  "confidence": {
+    "definitions": [
+      "Firm trust, boldness, or assured persuasion.",
+      "It may be either well-grounded confidence or fleshly self-reliance, according to context."
+    ],
+    "confidence": "high"
+  },
+  "confirm": {
+    "definitions": [
+      "To make firm, establish, strengthen, or ratify."
+    ],
+    "aliases": [
+      "confirmed"
+    ],
+    "confidence": "high"
+  },
+  "confound": {
+    "definitions": [
+      "To bring to shame, overthrow, or throw into confusion."
+    ],
+    "aliases": [
+      "confounded"
+    ],
+    "confidence": "high"
+  },
+  "confusion": {
+    "definitions": [
+      "Disorder, disturbance, shame, or overthrow of due order.",
+      "Often carries the sense of disgrace or public dismay."
+    ],
+    "confidence": "high"
+  },
+  "congregation": {
+    "definitions": [
+      "An assembly gathered together; the people meeting as one body.",
+      "Often the gathered body of Israel, and by extension an assembled company for worship or public business."
+    ],
+    "aliases": [
+      "congregations"
+    ],
+    "confidence": "high"
+  },
+  "conscience": {
+    "definitions": [
+      "The inward awareness that bears witness concerning right, wrong, and obligation."
+    ],
+    "confidence": "high"
+  },
+  "considereth": {
+    "definitions": [
+      "Considers; observes thoughtfully; takes due notice of."
+    ],
+    "aliases": [
+      "consider"
+    ],
+    "confidence": "high"
+  },
+  "consolation": {
+    "definitions": [
+      "Comfort, encouragement, and strengthening under sorrow or difficulty."
+    ],
+    "confidence": "high"
+  },
+  "constrain": {
+    "definitions": [
+      "To compel, press, or hold within forceful bounds.",
+      "Sometimes to urge strongly by inward influence."
+    ],
+    "aliases": [
+      "constrained"
+    ],
+    "confidence": "high"
+  },
+  "consume": {
+    "definitions": [
+      "To use up, devour, or bring to an end."
+    ],
+    "aliases": [
+      "consumed",
+      "consumeth"
+    ],
+    "confidence": "high"
+  },
+  "content": {
+    "definitions": [
+      "Satisfied; at rest with what one has or is given."
+    ],
+    "aliases": [
+      "contentment"
+    ],
+    "confidence": "high"
+  },
+  "contrary": {
+    "definitions": [
+      "Opposite in direction, temper, or purpose; opposed."
+    ],
+    "confidence": "high"
+  },
+  "convenient": {
+    "definitions": [
+      "Suitable; fitting; proper to the occasion.",
+      "Not chiefly easy or comfortable in the modern sense."
+    ],
+    "confidence": "high"
+  },
+  "conversation": {
+    "definitions": [
+      "The whole manner of life; conduct; daily walk.",
+      "Not merely spoken talk."
+    ],
+    "aliases": [
+      "conversations"
+    ],
+    "confidence": "high"
+  },
+  "convert": {
+    "definitions": [
+      "To turn back, turn around, or bring into another state.",
+      "Often to turn from sin unto God."
+    ],
+    "aliases": [
+      "converted",
+      "conversion"
+    ],
+    "confidence": "high"
+  },
+  "convince": {
+    "definitions": [
+      "To prove a person wrong, bring to conviction, or show clearly the truth."
+    ],
+    "aliases": [
+      "convinced"
+    ],
+    "confidence": "high"
+  },
+  "corrupt": {
+    "definitions": [
+      "To spoil, defile, or make unsound morally or otherwise."
+    ],
+    "aliases": [
+      "corruption",
+      "corruptible"
+    ],
+    "confidence": "high"
+  },
+  "counsel": {
+    "definitions": [
+      "Advice, purpose, or deliberate plan.",
+      "At times the settled design of the mind."
+    ],
+    "aliases": [
+      "counselled"
+    ],
+    "confidence": "high"
+  },
+  "count": {
+    "definitions": [
+      "To reckon, esteem, or regard as such."
+    ],
+    "aliases": [
+      "counted"
+    ],
+    "confidence": "medium"
+  },
+  "counted": {
+    "definitions": [
+      "Reckoned, esteemed, or regarded as being such."
+    ],
+    "confidence": "high"
+  },
+  "countenance": {
+    "definitions": [
+      "The face or outward expression of the face.",
+      "By extension, favor, approval, or support."
+    ],
+    "confidence": "high"
+  },
+  "covenant": {
+    "definitions": [
+      "A solemn agreement, bond, or arrangement established by promise and obligation.",
+      "In Scripture often a divinely established relationship ordered by God's word, promises, and appointed signs."
+    ],
+    "aliases": [
+      "covenants"
+    ],
+    "confidence": "high"
+  },
+  "covereth": {
+    "definitions": [
+      "Covers; spreads over; hides from view.",
+      "In some places it carries the sense of concealing, protecting, or dealing with sin so that it is not exposed."
+    ],
+    "aliases": [
+      "cover"
+    ],
+    "confidence": "high"
+  },
+  "covet": {
+    "definitions": [
+      "To desire eagerly, especially what belongs to another.",
+      "Often to set the heart improperly on possession."
+    ],
+    "aliases": [
+      "covetous",
+      "coveted"
+    ],
+    "confidence": "high"
+  },
+  "craft": {
+    "definitions": [
+      "Skill in making or doing.",
+      "Often also subtle cunning or deceitful art."
+    ],
+    "confidence": "medium"
+  },
+  "creature": {
+    "definitions": [
+      "A created thing; that which God has made.",
+      "Sometimes used broadly of mankind or the whole creation."
+    ],
+    "aliases": [
+      "creatures"
+    ],
+    "confidence": "high"
+  },
+  "creepeth": {
+    "definitions": [
+      "Creeps; moves low, slowly, or close to the ground."
+    ],
+    "aliases": [
+      "creep"
+    ],
+    "confidence": "high"
+  },
+  "criest": {
+    "definitions": [
+      "Criest; thou criest; you cry out, call aloud, or make earnest appeal."
+    ],
+    "confidence": "high"
+  },
+  "crieth": {
+    "definitions": [
+      "Cries; calls aloud; makes urgent appeal.",
+      "Often used of fervent pleading, proclamation, or complaint."
+    ],
+    "aliases": [
+      "cry"
+    ],
+    "confidence": "high"
+  },
+  "cross": {
+    "definitions": [
+      "The instrument of crucifixion.",
+      "Also the shame, suffering, or burden connected with following Christ."
+    ],
+    "aliases": [
+      "crosses"
+    ],
+    "confidence": "high"
+  },
+  "crown": {
+    "definitions": [
+      "A royal headpiece or emblem of honor.",
+      "Also a reward, dignity, or mark of triumph."
+    ],
+    "aliases": [
+      "crowns"
+    ],
+    "confidence": "high"
+  },
+  "crucify": {
+    "definitions": [
+      "To put to death by fastening to a cross.",
+      "Figuratively, to put to death or renounce by severe mortification."
+    ],
+    "aliases": [
+      "crucified"
+    ],
+    "confidence": "high"
+  },
+  "curious": {
+    "definitions": [
+      "Skillfully made; artfully wrought; finely worked.",
+      "In some contexts, occupied with occult or magical arts."
+    ],
+    "aliases": [
+      "curiously"
+    ],
+    "confidence": "medium"
+  },
+  "curse": {
+    "definitions": [
+      "A sentence or speaking of evil against one; a state of being under divine or judicial displeasure.",
+      "Also the evil or judgment so invoked or inflicted."
+    ],
+    "aliases": [
+      "cursed",
+      "curseth"
+    ],
+    "confidence": "high"
+  },
+  "cursest": {
+    "definitions": [
+      "Cursest; thou cursest; you curse or speak evil against."
+    ],
+    "confidence": "high"
+  },
+  "cutteth": {
+    "definitions": [
+      "Cuts; severs; divides; cuts off."
+    ],
+    "aliases": [
+      "cut"
+    ],
+    "confidence": "high"
+  },
+  "damnable": {
+    "definitions": [
+      "Destructive and worthy of condemnation.",
+      "Not a mere exclamation, but carrying the sense of ruinous guilt."
+    ],
+    "confidence": "high"
+  },
+  "damnation": {
+    "definitions": [
+      "Condemnation under judgment.",
+      "The word may speak of judicial sentence, not always the final state alone."
+    ],
+    "confidence": "medium"
+  },
+  "darkness": {
+    "definitions": [
+      "Lack of light.",
+      "Often spiritual blindness, ignorance, evil, or judgment."
+    ],
+    "confidence": "high"
+  },
+  "deacon": {
+    "definitions": [
+      "A servant or minister in the church, especially one entrusted with practical service."
+    ],
+    "aliases": [
+      "deacons"
+    ],
+    "confidence": "high"
+  },
+  "dealeth": {
+    "definitions": [
+      "Deals; acts toward; distributes; handles a matter.",
+      "The sense depends on context."
+    ],
+    "aliases": [
+      "deal"
+    ],
+    "confidence": "high"
+  },
+  "death": {
+    "definitions": [
+      "The end of bodily life; departure of life from the body.",
+      "Also a state of condemnation, separation, or deadly ruin, according to context."
+    ],
+    "aliases": [
+      "deaths"
+    ],
+    "confidence": "high"
+  },
+  "deceit": {
+    "definitions": [
+      "Fraud, guile, or hidden false dealing."
+    ],
+    "confidence": "high"
+  },
+  "deceive": {
+    "definitions": [
+      "To mislead, delude, or cause one to believe what is false."
+    ],
+    "aliases": [
+      "deceived",
+      "deceiveth"
+    ],
+    "confidence": "high"
+  },
+  "declare": {
+    "definitions": [
+      "To make known plainly; to proclaim; to show forth."
+    ],
+    "aliases": [
+      "declared",
+      "declareth"
+    ],
+    "confidence": "high"
+  },
+  "declareth": {
+    "definitions": [
+      "An older third-person form meaning 'declares' or 'makes known.'"
+    ],
+    "confidence": "high"
+  },
+  "deeds": {
+    "definitions": [
+      "Acts, works, or actions done."
+    ],
+    "confidence": "high"
+  },
+  "defileth": {
+    "definitions": [
+      "Defiles; makes unclean, polluted, or profane."
+    ],
+    "aliases": [
+      "defile"
+    ],
+    "confidence": "high"
+  },
+  "defraud": {
+    "definitions": [
+      "To deprive by deceit, withhold what is due, or wrongfully overreach."
+    ],
+    "confidence": "high"
+  },
+  "delight": {
+    "definitions": [
+      "Pleasure, joy, or a thing greatly pleasing.",
+      "As a verb, to take pleasure in."
+    ],
+    "aliases": [
+      "delighted"
+    ],
+    "confidence": "high"
+  },
+  "delighteth": {
+    "definitions": [
+      "Delights; takes pleasure in; finds joy in."
+    ],
+    "aliases": [
+      "delight"
+    ],
+    "confidence": "high"
+  },
+  "deliver": {
+    "definitions": [
+      "To rescue, release, or bring safely out.",
+      "Also to hand over or commit."
+    ],
+    "aliases": [
+      "delivered",
+      "delivereth"
+    ],
+    "confidence": "high"
+  },
+  "deliverance": {
+    "definitions": [
+      "Rescue, release, or setting free from danger or bondage."
+    ],
+    "confidence": "high"
+  },
+  "deny": {
+    "definitions": [
+      "To refuse, reject, or declare not to be so."
+    ],
+    "aliases": [
+      "denied",
+      "denieth"
+    ],
+    "confidence": "high"
+  },
+  "depart": {
+    "definitions": [
+      "To go away, withdraw, or leave.",
+      "At times to turn aside from a course."
+    ],
+    "aliases": [
+      "departed",
+      "departeth"
+    ],
+    "confidence": "high"
+  },
+  "desire": {
+    "definitions": [
+      "Wish, longing, or earnest inclination toward a thing."
+    ],
+    "aliases": [
+      "desired",
+      "desires"
+    ],
+    "confidence": "high"
+  },
+  "desireth": {
+    "definitions": [
+      "Desires; longs for; seeks after with inward inclination."
+    ],
+    "aliases": [
+      "desire"
+    ],
+    "confidence": "high"
+  },
+  "desolate": {
+    "definitions": [
+      "Laid waste, lonely, bereft, or emptied."
+    ],
+    "aliases": [
+      "desolation"
+    ],
+    "confidence": "high"
+  },
+  "despiseth": {
+    "definitions": [
+      "Despises; regards as little, vile, or unworthy."
+    ],
+    "aliases": [
+      "despise"
+    ],
+    "confidence": "high"
+  },
+  "destroyest": {
+    "definitions": [
+      "Destroyest; thou destroyest; you ruin, overthrow, or bring to nothing."
+    ],
+    "confidence": "high"
+  },
+  "destroyeth": {
+    "definitions": [
+      "Destroys; ruins, consumes, or brings to nothing."
+    ],
+    "aliases": [
+      "destroy"
+    ],
+    "confidence": "high"
+  },
+  "destruction": {
+    "definitions": [
+      "Ruin, overthrow, or bringing to nought.",
+      "It may describe waste and perdition, not always immediate annihilation."
+    ],
+    "confidence": "medium"
+  },
+  "device": {
+    "definitions": [
+      "A plan, contrivance, or purpose formed in the mind."
+    ],
+    "aliases": [
+      "devices"
+    ],
+    "confidence": "high"
+  },
+  "devise": {
+    "definitions": [
+      "To plan, imagine, or frame in the mind."
+    ],
+    "aliases": [
+      "devised",
+      "devices"
+    ],
+    "confidence": "high"
+  },
+  "deviseth": {
+    "definitions": [
+      "Devises; plans, contrives, or forms in the mind."
+    ],
+    "aliases": [
+      "devise"
+    ],
+    "confidence": "high"
+  },
+  "devoureth": {
+    "definitions": [
+      "Devours; consumes greedily or utterly."
+    ],
+    "aliases": [
+      "devour"
+    ],
+    "confidence": "high"
+  },
+  "dieth": {
+    "definitions": [
+      "Dies; departs this life; ceases to live."
+    ],
+    "aliases": [
+      "die"
+    ],
+    "confidence": "high"
+  },
+  "diligence": {
+    "definitions": [
+      "Steady care, earnest effort, and careful attention."
+    ],
+    "confidence": "high"
+  },
+  "disannul": {
+    "definitions": [
+      "To make void; to set aside; to cancel or invalidate."
+    ],
+    "aliases": [
+      "disannulled"
+    ],
+    "confidence": "high"
+  },
+  "discern": {
+    "definitions": [
+      "To distinguish, perceive, or judge accurately between things."
+    ],
+    "aliases": [
+      "discerned",
+      "discerneth"
+    ],
+    "confidence": "high"
+  },
+  "discretion": {
+    "definitions": [
+      "Sound judgment, wise restraint, and prudent decision."
+    ],
+    "confidence": "high"
+  },
+  "disobedience": {
+    "definitions": [
+      "Refusal or failure to obey rightful authority."
+    ],
+    "confidence": "high"
+  },
+  "dispensation": {
+    "definitions": [
+      "A stewardship, ordering, or administration committed to one.",
+      "Sometimes the arrangement or management of divine dealings."
+    ],
+    "aliases": [
+      "dispensations"
+    ],
+    "confidence": "medium"
+  },
+  "disputation": {
+    "definitions": [
+      "Debate, doubtful argument, or contentious reasoning."
+    ],
+    "aliases": [
+      "disputations"
+    ],
+    "confidence": "high"
+  },
+  "divers": {
+    "definitions": [
+      "Various; several; of different kinds.",
+      "Not the same as the modern noun for one who dives."
+    ],
+    "confidence": "high"
+  },
+  "divideth": {
+    "definitions": [
+      "Divides; parts, separates, or distributes."
+    ],
+    "aliases": [
+      "divide"
+    ],
+    "confidence": "high"
+  },
+  "doctrine": {
+    "definitions": [
+      "Teaching; instruction; that which is taught as truth."
+    ],
+    "aliases": [
+      "doctrines"
+    ],
+    "confidence": "high"
+  },
+  "doest": {
+    "definitions": [
+      "Doest; thou doest; you do."
+    ],
+    "confidence": "high"
+  },
+  "doeth": {
+    "definitions": [
+      "Does; performs; acts."
+    ],
+    "aliases": [
+      "do"
+    ],
+    "confidence": "high"
+  },
+  "draweth": {
+    "definitions": [
+      "Draws; pulls; brings near; leads forth.",
+      "It may also mean to draw water, a weapon, or near in approach."
+    ],
+    "aliases": [
+      "draw"
+    ],
+    "confidence": "high"
+  },
+  "drinketh": {
+    "definitions": [
+      "Drinks; takes in drink; partakes by drinking."
+    ],
+    "aliases": [
+      "drink"
+    ],
+    "confidence": "high"
+  },
+  "dross": {
+    "definitions": [
+      "The refuse or base matter separated from metal; worthless impurity."
+    ],
+    "confidence": "high"
+  },
+  "due": {
+    "definitions": [
+      "Owed, proper, fitting, or appointed to be rendered."
+    ],
+    "confidence": "high"
+  },
+  "durst": {
+    "definitions": [
+      "An older past form meaning 'dared.'"
+    ],
+    "confidence": "high"
+  },
+  "dwell": {
+    "definitions": [
+      "To abide, live, or remain in a place or state."
+    ],
+    "aliases": [
+      "dwelt",
+      "dwelleth"
+    ],
+    "confidence": "high"
+  },
+  "dwellest": {
+    "definitions": [
+      "Dwellest; thou dwellest; you abide, live, or remain in a place."
+    ],
+    "confidence": "high"
+  },
+  "dwelling": {
+    "definitions": [
+      "Abiding place, habitation, or remaining in a place."
+    ],
+    "confidence": "high"
+  },
+  "earnest": {
+    "definitions": [
+      "A pledge or first part given in assurance that the rest will follow.",
+      "A token securing a future full possession."
+    ],
+    "confidence": "high"
+  },
+  "earnestly": {
+    "definitions": [
+      "With sincere force, zeal, and serious intent."
+    ],
+    "confidence": "high"
+  },
+  "eastward": {
+    "definitions": [
+      "Toward the east."
+    ],
+    "confidence": "high"
+  },
+  "eatest": {
+    "definitions": [
+      "Eatest; thou eatest; you eat or partake of food."
+    ],
+    "confidence": "high"
+  },
+  "eateth": {
+    "definitions": [
+      "Eats; takes food; partakes."
+    ],
+    "aliases": [
+      "eat"
+    ],
+    "confidence": "high"
+  },
+  "edify": {
+    "definitions": [
+      "To build up, especially in spiritual strength and understanding."
+    ],
+    "aliases": [
+      "edified",
+      "edifieth"
+    ],
+    "confidence": "high"
+  },
+  "edifying": {
+    "definitions": [
+      "Building up spiritually; strengthening in faith and godliness."
+    ],
+    "aliases": [
+      "edify",
+      "edified",
+      "edifieth",
+      "edification"
+    ],
+    "confidence": "high"
+  },
+  "effectual": {
+    "definitions": [
+      "Powerful in producing the intended effect; working efficiently."
+    ],
+    "confidence": "high"
+  },
+  "eighth": {
+    "definitions": [
+      "The one next after the seventh; occupying the eighth place."
+    ],
+    "confidence": "high"
+  },
+  "eldest": {
+    "definitions": [
+      "Oldest; first in age among children or others compared."
+    ],
+    "confidence": "high"
+  },
+  "elect": {
+    "definitions": [
+      "Chosen out; selected.",
+      "Often chosen by God to privilege, office, or saving mercy according to context."
+    ],
+    "confidence": "medium"
+  },
+  "emerods": {
+    "definitions": [
+      "Painful swellings or tumors, commonly understood as hemorrhoidal boils."
+    ],
+    "confidence": "medium"
+  },
+  "endeavour": {
+    "definitions": [
+      "Earnest effort; diligent attempt; striving toward a thing."
+    ],
+    "aliases": [
+      "endeavoured"
+    ],
+    "confidence": "high"
+  },
+  "endureth": {
+    "definitions": [
+      "Endures; continues; remains under trial without failing.",
+      "Often speaks of lasting steadfastly or abiding through time."
+    ],
+    "aliases": [
+      "endure"
+    ],
+    "confidence": "high"
+  },
+  "enlarge": {
+    "definitions": [
+      "To make greater, widen, or set at liberty into a larger room."
+    ],
+    "aliases": [
+      "enlarged"
+    ],
+    "confidence": "medium"
+  },
+  "enmity": {
+    "definitions": [
+      "Hostility, deep opposition, or settled hatred."
+    ],
+    "confidence": "high"
+  },
+  "ensample": {
+    "definitions": [
+      "An example or pattern set before others for imitation or warning."
+    ],
+    "aliases": [
+      "ensamples"
+    ],
+    "confidence": "high"
+  },
+  "entangle": {
+    "definitions": [
+      "To involve, ensnare, or twist into hindering difficulty."
+    ],
+    "aliases": [
+      "entangled"
+    ],
+    "confidence": "high"
+  },
+  "entereth": {
+    "definitions": [
+      "Enters; goes in; comes into a place or state."
+    ],
+    "aliases": [
+      "enter"
+    ],
+    "confidence": "high"
+  },
+  "entice": {
+    "definitions": [
+      "To lure, draw on, or lead by persuasion toward a desired end.",
+      "Often toward evil."
+    ],
+    "aliases": [
+      "enticed",
+      "enticeth"
+    ],
+    "confidence": "high"
+  },
+  "entreat": {
+    "definitions": [
+      "To beseech, plead with, or earnestly ask.",
+      "In some contexts, to deal with or treat in a certain manner."
+    ],
+    "aliases": [
+      "entreated",
+      "entreaty"
+    ],
+    "confidence": "medium"
+  },
+  "envy": {
+    "definitions": [
+      "Painful resentment at another's good; grudging another's advantage."
+    ],
+    "aliases": [
+      "envying"
+    ],
+    "confidence": "high"
+  },
+  "error": {
+    "definitions": [
+      "Mistake, wandering from truth, or false belief and conduct."
+    ],
+    "aliases": [
+      "errors"
+    ],
+    "confidence": "high"
+  },
+  "escape": {
+    "definitions": [
+      "To get free from danger, judgment, or confinement."
+    ],
+    "aliases": [
+      "escaped"
+    ],
+    "confidence": "high"
+  },
+  "establish": {
+    "definitions": [
+      "To make firm, settled, or stable."
+    ],
+    "aliases": [
+      "established"
+    ],
+    "confidence": "high"
+  },
+  "establisheth": {
+    "definitions": [
+      "Establishes; makes firm, settled, or secure.",
+      "Often means confirming, strengthening, or setting on a sure footing."
+    ],
+    "aliases": [
+      "establish"
+    ],
+    "confidence": "high"
+  },
+  "estate": {
+    "definitions": [
+      "Condition, standing, or state of life.",
+      "Sometimes rank, dignity, or outward circumstances."
+    ],
+    "aliases": [
+      "estates"
+    ],
+    "confidence": "high"
+  },
+  "esteem": {
+    "definitions": [
+      "To value, account, or regard with a certain judgment."
+    ],
+    "aliases": [
+      "esteemed"
+    ],
+    "confidence": "high"
+  },
+  "evangelist": {
+    "definitions": [
+      "A preacher or bearer of the good tidings of the gospel."
+    ],
+    "aliases": [
+      "evangelists"
+    ],
+    "confidence": "high"
+  },
+  "even": {
+    "definitions": [
+      "Indeed; exactly; fully; likewise, according to context.",
+      "A flexible word often used for emphasis or exactness."
+    ],
+    "confidence": "medium"
+  },
+  "ever": {
+    "definitions": [
+      "At any time; always; continually; in all time, according to context."
+    ],
+    "confidence": "high"
+  },
+  "evident": {
+    "definitions": [
+      "Clear, plain, and able to be readily seen or known."
+    ],
+    "confidence": "high"
+  },
+  "exalteth": {
+    "definitions": [
+      "Exalts; lifts up; raises in dignity or station."
+    ],
+    "aliases": [
+      "exalt"
+    ],
+    "confidence": "high"
+  },
+  "exceed": {
+    "definitions": [
+      "To go beyond, surpass, or be greater than."
+    ],
+    "aliases": [
+      "exceeding"
+    ],
+    "confidence": "high"
+  },
+  "excellency": {
+    "definitions": [
+      "Outstanding worth, dignity, or surpassing quality."
+    ],
+    "confidence": "high"
+  },
+  "executeth": {
+    "definitions": [
+      "Executes; carries out; performs, especially by authority or sentence."
+    ],
+    "aliases": [
+      "execute"
+    ],
+    "confidence": "high"
+  },
+  "exercise": {
+    "definitions": [
+      "To train, employ, or practice in a discipline.",
+      "Also actual use or activity."
+    ],
+    "aliases": [
+      "exercised"
+    ],
+    "confidence": "medium"
+  },
+  "exhort": {
+    "definitions": [
+      "To urge, encourage, or press earnestly toward duty or steadfastness."
+    ],
+    "aliases": [
+      "exhorted",
+      "exhortation"
+    ],
+    "confidence": "high"
+  },
+  "exhortation": {
+    "definitions": [
+      "Earnest urging, encouragement, or admonition toward duty and steadfastness."
+    ],
+    "confidence": "high"
+  },
+  "expedient": {
+    "definitions": [
+      "Advantageous, profitable, or fitting for the purpose at hand.",
+      "Not merely convenient in a weak modern sense."
+    ],
+    "confidence": "high"
+  },
+  "fadeth": {
+    "definitions": [
+      "Fades; withers or loses freshness and strength."
+    ],
+    "aliases": [
+      "fade"
+    ],
+    "confidence": "high"
+  },
+  "faileth": {
+    "definitions": [
+      "Fails; comes short; ceases; falls away.",
+      "It may speak of weakness, want, or something coming to an end."
+    ],
+    "aliases": [
+      "fail"
+    ],
+    "confidence": "high"
+  },
+  "fain": {
+    "definitions": [
+      "Gladly; willingly; with desire.",
+      "Sometimes meaning gladly disposed to do a thing."
+    ],
+    "confidence": "high"
+  },
+  "faint": {
+    "definitions": [
+      "To grow weary, lose strength, or give way in courage.",
+      "Not only to swoon, but often to lose heart."
+    ],
+    "aliases": [
+      "fainted",
+      "fainthearted"
+    ],
+    "confidence": "high"
+  },
+  "faith": {
+    "definitions": [
+      "Firm belief, trust, and confidence resting upon what God has spoken.",
+      "It may mean personal believing, fidelity, or the body of truth believed, according to context."
+    ],
+    "confidence": "high"
+  },
+  "faithful": {
+    "definitions": [
+      "Trustworthy, loyal, and steadfast in keeping faith or duty."
+    ],
+    "confidence": "high"
+  },
+  "faithfulness": {
+    "definitions": [
+      "Steadfast fidelity, constancy, and truth in keeping what is owed or promised."
+    ],
+    "confidence": "high"
+  },
+  "falleth": {
+    "definitions": [
+      "Falls; drops down; comes down from a standing place.",
+      "It may also mean comes to ruin, is overcome, or happens to one's lot."
+    ],
+    "aliases": [
+      "fall"
+    ],
+    "confidence": "high"
+  },
+  "farther": {
+    "definitions": [
+      "More forward; more remote; at a greater distance or degree."
+    ],
+    "confidence": "high"
+  },
+  "fashion": {
+    "definitions": [
+      "Form, shape, or outward appearance.",
+      "Also to frame, make, or order."
+    ],
+    "aliases": [
+      "fashioned"
+    ],
+    "confidence": "high"
+  },
+  "fast": {
+    "definitions": [
+      "Firmly fixed, secure, or steadfast.",
+      "As a verb in other contexts, to abstain from food."
+    ],
+    "confidence": "medium"
+  },
+  "fatherless": {
+    "definitions": [
+      "Without a father; orphaned.",
+      "Often used for those specially exposed and needing justice, pity, and protection."
+    ],
+    "confidence": "high"
+  },
+  "feareth": {
+    "definitions": [
+      "Fears; stands in awe of; is afraid.",
+      "Often in Scripture it means reveres with holy fear, not merely dreads."
+    ],
+    "aliases": [
+      "fear"
+    ],
+    "confidence": "high"
+  },
+  "feeble": {
+    "definitions": [
+      "Weak, lacking strength, or infirm."
+    ],
+    "confidence": "high"
+  },
+  "feedeth": {
+    "definitions": [
+      "Feeds; gives food to; nourishes.",
+      "It may also mean to feed oneself or pasture."
+    ],
+    "aliases": [
+      "feed"
+    ],
+    "confidence": "high"
+  },
+  "fellowship": {
+    "definitions": [
+      "Shared participation, communion, or joint interest."
+    ],
+    "confidence": "high"
+  },
+  "fervent": {
+    "definitions": [
+      "Hot, earnest, and glowing with zeal or intensity."
+    ],
+    "confidence": "high"
+  },
+  "fifth": {
+    "definitions": [
+      "The one next after the fourth; occupying the fifth place."
+    ],
+    "confidence": "high"
+  },
+  "filleth": {
+    "definitions": [
+      "Fills; makes full; satisfies or occupies completely."
+    ],
+    "aliases": [
+      "fill"
+    ],
+    "confidence": "high"
+  },
+  "filthy": {
+    "definitions": [
+      "Defiled, foul, or morally base."
+    ],
+    "confidence": "high"
+  },
+  "findest": {
+    "definitions": [
+      "Findest; thou findest; you find or discover.",
+      "It may also mean you obtain or come to know by experience."
+    ],
+    "confidence": "high"
+  },
+  "findeth": {
+    "definitions": [
+      "Finds; discovers; comes upon.",
+      "Often also obtains or proves by experience."
+    ],
+    "aliases": [
+      "find"
+    ],
+    "confidence": "high"
+  },
+  "flattereth": {
+    "definitions": [
+      "Flatters; speaks smooth words to please or deceive."
+    ],
+    "aliases": [
+      "flatter"
+    ],
+    "confidence": "high"
+  },
+  "fleeth": {
+    "definitions": [
+      "Flees; runs away; escapes."
+    ],
+    "aliases": [
+      "flee"
+    ],
+    "confidence": "high"
+  },
+  "flesh": {
+    "definitions": [
+      "The bodily nature of man or beast.",
+      "Often man's frail, natural, and corrupt condition as opposed to the Spirit."
+    ],
+    "confidence": "high"
+  },
+  "fleshly": {
+    "definitions": [
+      "Belonging to the flesh; governed by bodily or natural desires."
+    ],
+    "confidence": "high"
+  },
+  "floweth": {
+    "definitions": [
+      "Flows; runs in a stream; issues forth freely."
+    ],
+    "aliases": [
+      "flow"
+    ],
+    "confidence": "high"
+  },
+  "followeth": {
+    "definitions": [
+      "Follows; comes after; goes in the way of another.",
+      "Often also means imitates, obeys, or pursues."
+    ],
+    "aliases": [
+      "follow"
+    ],
+    "confidence": "high"
+  },
+  "foolishness": {
+    "definitions": [
+      "Folly, want of wisdom, or that which seems foolish to natural judgment."
+    ],
+    "confidence": "high"
+  },
+  "forasmuch": {
+    "definitions": [
+      "Since; because; inasmuch as."
+    ],
+    "confidence": "high"
+  },
+  "forbear": {
+    "definitions": [
+      "To refrain, hold back, or cease from a thing.",
+      "Also to bear patiently with another."
+    ],
+    "aliases": [
+      "forbearing"
+    ],
+    "confidence": "high"
+  },
+  "forbearance": {
+    "definitions": [
+      "Patient restraint; holding back what one has power to do."
+    ],
+    "confidence": "high"
+  },
+  "forest": {
+    "definitions": [
+      "A wooded region; a tract thick with trees."
+    ],
+    "aliases": [
+      "forests"
+    ],
+    "confidence": "high"
+  },
+  "forgive": {
+    "definitions": [
+      "To remit, pardon, or release from debt or offense."
+    ],
+    "aliases": [
+      "forgiven",
+      "forgave",
+      "forgiveness"
+    ],
+    "confidence": "high"
+  },
+  "forgiveth": {
+    "definitions": [
+      "Forgives; remits the offense; releases from the debt or guilt of a wrong."
+    ],
+    "aliases": [
+      "forgive"
+    ],
+    "confidence": "high"
+  },
+  "fornication": {
+    "definitions": [
+      "Sexual uncleanness; unlawful sexual commerce."
+    ],
+    "aliases": [
+      "fornications"
+    ],
+    "confidence": "high"
+  },
+  "forsaketh": {
+    "definitions": [
+      "Forsakes; leaves, abandons, or gives up."
+    ],
+    "aliases": [
+      "forsake"
+    ],
+    "confidence": "high"
+  },
+  "forth": {
+    "definitions": [
+      "Forward or outward from a place; out into view or action.",
+      "Frequently used to mark going out, being brought out, or proceeding onward."
+    ],
+    "confidence": "high"
+  },
+  "forward": {
+    "definitions": [
+      "Eager, ready, or zealous.",
+      "At times over-bold or presumptuous, depending on context."
+    ],
+    "confidence": "medium"
+  },
+  "foundation": {
+    "definitions": [
+      "That which is laid as the base of a building.",
+      "Figuratively, the ground, beginning, or settled basis upon which something stands."
+    ],
+    "aliases": [
+      "foundations"
+    ],
+    "confidence": "high"
+  },
+  "fourteenth": {
+    "definitions": [
+      "The one next after the thirteenth; occupying the fourteenth place."
+    ],
+    "confidence": "high"
+  },
+  "fourth": {
+    "definitions": [
+      "The one next after the third; occupying the fourth place."
+    ],
+    "confidence": "high"
+  },
+  "frame": {
+    "definitions": [
+      "To form, shape, or fashion.",
+      "Also the formed structure or inward constitution of a thing."
+    ],
+    "confidence": "medium"
+  },
+  "froward": {
+    "definitions": [
+      "Perverse; willfully contrary; hard to govern or persuade."
+    ],
+    "confidence": "high"
+  },
+  "frowardness": {
+    "definitions": [
+      "Perverseness; stubborn contrary temper."
+    ],
+    "confidence": "high"
+  },
+  "fruitful": {
+    "definitions": [
+      "Bearing fruit; productive; yielding increase.",
+      "Also rich in good works or spiritual increase."
+    ],
+    "confidence": "high"
+  },
+  "fulness": {
+    "definitions": [
+      "Fullness; the state of being full or complete.",
+      "Often abundance brought to completion or the whole measure appointed."
+    ],
+    "confidence": "high"
+  },
+  "gainsay": {
+    "definitions": [
+      "To speak against, contradict, or oppose by words."
+    ],
+    "aliases": [
+      "gainsaying"
+    ],
+    "confidence": "high"
+  },
+  "garment": {
+    "definitions": [
+      "A piece of clothing; an article of raiment worn upon the body."
+    ],
+    "aliases": [
+      "garments"
+    ],
+    "confidence": "high"
+  },
+  "garner": {
+    "definitions": [
+      "A granary or storehouse for grain."
+    ],
+    "aliases": [
+      "garners"
+    ],
+    "confidence": "high"
+  },
+  "gathered": {
+    "definitions": [
+      "Collected together; assembled; brought into one place.",
+      "In some contexts also taken in, harvested, or brought to one's people in death."
+    ],
+    "confidence": "high"
+  },
+  "gathereth": {
+    "definitions": [
+      "Gathers; collects into one; brings together.",
+      "It may also mean harvests, takes in, or draws by degrees."
+    ],
+    "aliases": [
+      "gather"
+    ],
+    "confidence": "high"
+  },
+  "gavest": {
+    "definitions": [
+      "Gavest; thou gavest; you gave or bestowed."
+    ],
+    "confidence": "high"
+  },
+  "gay": {
+    "definitions": [
+      "Showy; fine in outward appearance; splendidly dressed."
+    ],
+    "confidence": "high"
+  },
+  "generation": {
+    "definitions": [
+      "The people of one age or descent; an age or family line springing from common stock.",
+      "Sometimes the race or class of men marked by a certain character."
+    ],
+    "aliases": [
+      "generations"
+    ],
+    "confidence": "high"
+  },
+  "getteth": {
+    "definitions": [
+      "Gets; obtains; gains; begets, according to context."
+    ],
+    "aliases": [
+      "get"
+    ],
+    "confidence": "high"
+  },
+  "ghost": {
+    "definitions": [
+      "Spirit; breath of life.",
+      "In the phrase 'gave up the ghost,' to yield up life."
+    ],
+    "confidence": "high"
+  },
+  "gird": {
+    "definitions": [
+      "To bind about, equip, or prepare by fastening on what is needed."
+    ],
+    "aliases": [
+      "girded",
+      "girdeth",
+      "girt"
+    ],
+    "confidence": "high"
+  },
+  "givest": {
+    "definitions": [
+      "Givest; thou givest; you give, bestow, or grant."
+    ],
+    "confidence": "high"
+  },
+  "giveth": {
+    "definitions": [
+      "Gives; bestows; grants."
+    ],
+    "aliases": [
+      "give"
+    ],
+    "confidence": "high"
+  },
+  "gladness": {
+    "definitions": [
+      "Joy, cheerfulness, and inward delight."
+    ],
+    "confidence": "high"
+  },
+  "glistering": {
+    "definitions": [
+      "Shining brightly; sparkling."
+    ],
+    "confidence": "high"
+  },
+  "glorify": {
+    "definitions": [
+      "To honor, magnify, and make glorious in esteem or display."
+    ],
+    "aliases": [
+      "glorified"
+    ],
+    "confidence": "high"
+  },
+  "godliness": {
+    "definitions": [
+      "Reverent piety; a life shaped by the fear of God and likeness to His holiness."
+    ],
+    "confidence": "high"
+  },
+  "goest": {
+    "definitions": [
+      "Goest; thou goest; you go, depart, or proceed."
+    ],
+    "confidence": "high"
+  },
+  "goeth": {
+    "definitions": [
+      "Goes; proceeds; departs.",
+      "Often used of a person's course, movement, or the advancing of a matter."
+    ],
+    "aliases": [
+      "go"
+    ],
+    "confidence": "high"
+  },
+  "goodly": {
+    "definitions": [
+      "Fair, handsome, stately, or of pleasing appearance."
+    ],
+    "confidence": "high"
+  },
+  "goodness": {
+    "definitions": [
+      "Moral excellence, kindness, and beneficent quality."
+    ],
+    "confidence": "high"
+  },
+  "gospel": {
+    "definitions": [
+      "The good tidings, especially the glad message of Christ and salvation in Him."
+    ],
+    "confidence": "high"
+  },
+  "governor": {
+    "definitions": [
+      "A ruler, overseer, or one set over others in authority."
+    ],
+    "aliases": [
+      "governors"
+    ],
+    "confidence": "high"
+  },
+  "grace": {
+    "definitions": [
+      "Favor freely shown, especially the unmerited favor of God.",
+      "Also gracious influence and beauty of manner, according to context."
+    ],
+    "confidence": "high"
+  },
+  "gracious": {
+    "definitions": [
+      "Full of grace, favor, kindness, and readiness to show mercy."
+    ],
+    "confidence": "high"
+  },
+  "grave": {
+    "definitions": [
+      "Weighty, serious, or dignified.",
+      "Not only the burial place."
+    ],
+    "confidence": "high"
+  },
+  "gravity": {
+    "definitions": [
+      "Seriousness, dignity, and weightiness of behavior."
+    ],
+    "confidence": "high"
+  },
+  "greatest": {
+    "definitions": [
+      "Greatest; chiefest in size, rank, weight, or importance among those compared."
+    ],
+    "confidence": "high"
+  },
+  "greatness": {
+    "definitions": [
+      "Great extent, dignity, power, or excellence."
+    ],
+    "confidence": "high"
+  },
+  "grievous": {
+    "definitions": [
+      "Heavy, painful, burdensome, or severe."
+    ],
+    "confidence": "high"
+  },
+  "groweth": {
+    "definitions": [
+      "Grows; increases; develops; waxes greater."
+    ],
+    "aliases": [
+      "grow"
+    ],
+    "confidence": "high"
+  },
+  "grudge": {
+    "definitions": [
+      "To murmur, begrudge, or feel ill will at another's good."
+    ],
+    "aliases": [
+      "grudging"
+    ],
+    "confidence": "high"
+  },
+  "guile": {
+    "definitions": [
+      "Subtle deceit, craft, or treacherous cunning."
+    ],
+    "confidence": "high"
+  },
+  "habergeon": {
+    "definitions": [
+      "A coat or breastpiece of armor, commonly of mail."
+    ],
+    "aliases": [
+      "habergeons"
+    ],
+    "confidence": "high"
+  },
+  "habitation": {
+    "definitions": [
+      "A dwelling place, abode, or settled place of residence."
+    ],
+    "aliases": [
+      "habitations"
+    ],
+    "confidence": "high"
+  },
+  "hallow": {
+    "definitions": [
+      "To make holy, set apart, or treat as sacred."
+    ],
+    "aliases": [
+      "hallowed"
+    ],
+    "confidence": "high"
+  },
+  "halt": {
+    "definitions": [
+      "To limp; to walk lamely.",
+      "In some places, to hesitate or waver between two courses."
+    ],
+    "aliases": [
+      "halted",
+      "halteth"
+    ],
+    "confidence": "high"
+  },
+  "haply": {
+    "definitions": [
+      "Perhaps; by chance; it may be."
+    ],
+    "confidence": "high"
+  },
+  "harden": {
+    "definitions": [
+      "To make hard, stubborn, or insensitive."
+    ],
+    "aliases": [
+      "hardened",
+      "hardness"
+    ],
+    "confidence": "high"
+  },
+  "hardness": {
+    "definitions": [
+      "Harshness, severity, or stubborn insensibility.",
+      "Often the hardening of heart against truth."
+    ],
+    "confidence": "high"
+  },
+  "harvest": {
+    "definitions": [
+      "The reaping and gathering of ripe grain or other produce.",
+      "By figure, a season of ingathering, reward, or judgment."
+    ],
+    "aliases": [
+      "harvests"
+    ],
+    "confidence": "high"
+  },
+  "hast": {
+    "definitions": [
+      "An older second-person singular form meaning 'have.'"
+    ],
+    "confidence": "high"
+  },
+  "hasteth": {
+    "definitions": [
+      "Makes haste; moves or acts quickly."
+    ],
+    "aliases": [
+      "haste"
+    ],
+    "confidence": "high"
+  },
+  "hatest": {
+    "definitions": [
+      "Hatest; thou hatest; you hate or regard with settled aversion."
+    ],
+    "confidence": "high"
+  },
+  "hateth": {
+    "definitions": [
+      "Hates; regards with aversion or settled opposition."
+    ],
+    "aliases": [
+      "hate"
+    ],
+    "confidence": "high"
+  },
+  "hath": {
+    "definitions": [
+      "An older third-person singular form meaning 'has.'"
+    ],
+    "confidence": "high"
+  },
+  "haughtiness": {
+    "definitions": [
+      "Proud loftiness; arrogance of spirit."
+    ],
+    "confidence": "high"
+  },
+  "heardest": {
+    "definitions": [
+      "Heardest; thou heardest; you heard or gave ear to."
+    ],
+    "confidence": "high"
+  },
+  "hearest": {
+    "definitions": [
+      "Hearest; thou hearest; you hear.",
+      "Frequently implies that you listen with attention or heed what is spoken."
+    ],
+    "confidence": "high"
+  },
+  "heareth": {
+    "definitions": [
+      "Hears; receives by the ear; listens to.",
+      "Frequently implies heeding, attending, or obeying what is heard."
+    ],
+    "aliases": [
+      "hear"
+    ],
+    "confidence": "high"
+  },
+  "hearken": {
+    "definitions": [
+      "To listen attentively; to give ear with obedience or regard."
+    ],
+    "aliases": [
+      "hearkened",
+      "hearkeneth"
+    ],
+    "confidence": "high"
+  },
+  "heathen": {
+    "definitions": [
+      "The nations, especially those outside the covenant people and ignorant of the true God."
+    ],
+    "confidence": "high"
+  },
+  "heaviness": {
+    "definitions": [
+      "Sorrow, grief, or burden of spirit.",
+      "Sometimes literal weight, but often inward sadness."
+    ],
+    "confidence": "high"
+  },
+  "heed": {
+    "definitions": [
+      "Careful attention; watchful regard.",
+      "As a verb, to give careful attention to."
+    ],
+    "confidence": "high"
+  },
+  "heir": {
+    "definitions": [
+      "One who receives an inheritance or stands to receive it by right."
+    ],
+    "aliases": [
+      "heirs"
+    ],
+    "confidence": "high"
+  },
+  "hence": {
+    "definitions": [
+      "From this place; away; from this cause or time."
+    ],
+    "confidence": "high"
+  },
+  "henceforth": {
+    "definitions": [
+      "From this time forward; hereafter."
+    ],
+    "confidence": "high"
+  },
+  "heritage": {
+    "definitions": [
+      "An inheritance, possession, or allotted portion received as one's own."
+    ],
+    "confidence": "high"
+  },
+  "hide": {
+    "definitions": [
+      "To conceal, cover, or keep from sight.",
+      "Also to withdraw oneself from view or notice."
+    ],
+    "aliases": [
+      "hid",
+      "hidden"
+    ],
+    "confidence": "high"
+  },
+  "hidest": {
+    "definitions": [
+      "Hidest; thou hidest; you hide or conceal."
+    ],
+    "confidence": "high"
+  },
+  "hideth": {
+    "definitions": [
+      "Hides; conceals; keeps from view or notice."
+    ],
+    "aliases": [
+      "hide"
+    ],
+    "confidence": "high"
+  },
+  "highest": {
+    "definitions": [
+      "Highest; most high, lofty, or exalted among those compared."
+    ],
+    "confidence": "high"
+  },
+  "hinder": {
+    "definitions": [
+      "To obstruct, delay, or keep back from progress."
+    ],
+    "aliases": [
+      "hindered"
+    ],
+    "confidence": "high"
+  },
+  "hither": {
+    "definitions": [
+      "To this place; here."
+    ],
+    "confidence": "high"
+  },
+  "hitherto": {
+    "definitions": [
+      "Up to this time; until now; thus far."
+    ],
+    "confidence": "high"
+  },
+  "holdest": {
+    "definitions": [
+      "Holdest; thou holdest; you hold, keep fast, consider, or maintain.",
+      "The exact force depends on context."
+    ],
+    "confidence": "high"
+  },
+  "holdeth": {
+    "definitions": [
+      "Holds; keeps, grasps, contains, or maintains.",
+      "The exact force depends on context."
+    ],
+    "aliases": [
+      "hold"
+    ],
+    "confidence": "high"
+  },
+  "holiness": {
+    "definitions": [
+      "The state of being holy, set apart, and pure before God."
+    ],
+    "confidence": "high"
+  },
+  "holy": {
+    "definitions": [
+      "Set apart unto God; pure, sacred, and morally clean."
+    ],
+    "confidence": "high"
+  },
+  "honest": {
+    "definitions": [
+      "Honorable, decent, or worthy of respect.",
+      "Often carrying the sense of morally seemly as well as truthful."
+    ],
+    "confidence": "medium"
+  },
+  "honourable": {
+    "definitions": [
+      "Worthy of honor; held in esteem; dignified."
+    ],
+    "confidence": "high"
+  },
+  "honoureth": {
+    "definitions": [
+      "Honours; gives esteem, respect, or due value to."
+    ],
+    "aliases": [
+      "honour"
+    ],
+    "confidence": "high"
+  },
+  "hope": {
+    "definitions": [
+      "Confident expectation of good; a looking forward with trust."
+    ],
+    "confidence": "high"
+  },
+  "hopeth": {
+    "definitions": [
+      "Hopes; expects with desire and confidence."
+    ],
+    "aliases": [
+      "hope"
+    ],
+    "confidence": "high"
+  },
+  "household": {
+    "definitions": [
+      "All belonging to one house or family, including servants and dependents."
+    ],
+    "confidence": "high"
+  },
+  "householder": {
+    "definitions": [
+      "The master or head of a household."
+    ],
+    "aliases": [
+      "householders"
+    ],
+    "confidence": "high"
+  },
+  "howbeit": {
+    "definitions": [
+      "Nevertheless; yet; notwithstanding."
+    ],
+    "confidence": "high"
+  },
+  "humble": {
+    "definitions": [
+      "Lowly in mind; not proud or self-exalting.",
+      "As a verb, to bring low or cause to be lowly."
+    ],
+    "aliases": [
+      "humbled",
+      "humbleth"
+    ],
+    "confidence": "high"
+  },
+  "humility": {
+    "definitions": [
+      "Lowliness of mind; a modest and submissive temper."
+    ],
+    "confidence": "high"
+  },
+  "hypocrisy": {
+    "definitions": [
+      "Dissimulation in religion or morals; a false outward show concealing the inward reality."
+    ],
+    "confidence": "high"
+  },
+  "ignorance": {
+    "definitions": [
+      "Lack of knowledge; unawareness; uninstructed condition."
+    ],
+    "confidence": "high"
+  },
+  "ignorant": {
+    "definitions": [
+      "Lacking knowledge; uninstructed in the matter at hand.",
+      "Not necessarily stupid, but uninformed."
+    ],
+    "confidence": "high"
+  },
+  "image": {
+    "definitions": [
+      "A likeness, representation, or formed resemblance.",
+      "At times an idol or graven representation."
+    ],
+    "aliases": [
+      "images"
+    ],
+    "confidence": "high"
+  },
+  "immortality": {
+    "definitions": [
+      "Freedom from death; endless life and incorruption."
+    ],
+    "confidence": "high"
+  },
+  "impute": {
+    "definitions": [
+      "To reckon, attribute, or set to one's account."
+    ],
+    "aliases": [
+      "imputed",
+      "imputeth"
+    ],
+    "confidence": "high"
+  },
+  "inasmuch": {
+    "definitions": [
+      "In so far as; seeing that; because."
+    ],
+    "confidence": "high"
+  },
+  "increase": {
+    "definitions": [
+      "Growth, multiplication, or addition.",
+      "As a verb, to make or become greater."
+    ],
+    "aliases": [
+      "increased",
+      "increaseth"
+    ],
+    "confidence": "high"
+  },
+  "indeed": {
+    "definitions": [
+      "In truth; truly; really."
+    ],
+    "confidence": "high"
+  },
+  "indignation": {
+    "definitions": [
+      "Strong displeasure or anger stirred by what is wrong."
+    ],
+    "confidence": "high"
+  },
+  "infirmity": {
+    "definitions": [
+      "Weakness, frailty, or feebleness, whether bodily or moral."
+    ],
+    "aliases": [
+      "infirmities"
+    ],
+    "confidence": "high"
+  },
+  "inhabit": {
+    "definitions": [
+      "To dwell in, occupy, or live within."
+    ],
+    "aliases": [
+      "inhabited",
+      "inhabitants"
+    ],
+    "confidence": "high"
+  },
+  "inheritance": {
+    "definitions": [
+      "That which is received as a possession, lot, or heritage.",
+      "Often an allotted possession from God or by family right."
+    ],
+    "aliases": [
+      "inherit"
+    ],
+    "confidence": "high"
+  },
+  "iniquity": {
+    "definitions": [
+      "Moral crookedness, unrighteousness, or guilt.",
+      "Often wickedness considered in its perverse and blameworthy character."
+    ],
+    "aliases": [
+      "iniquities"
+    ],
+    "confidence": "high"
+  },
+  "instant": {
+    "definitions": [
+      "Urgent, earnest, or pressing in action or request.",
+      "Sometimes ready at hand or immediately present, but often carrying the sense of persistence and earnestness."
+    ],
+    "confidence": "medium"
+  },
+  "instantly": {
+    "definitions": [
+      "Earnestly; urgently; with pressing persistence.",
+      "Sometimes also without delay, but not limited to that."
+    ],
+    "confidence": "medium"
+  },
+  "instruction": {
+    "definitions": [
+      "Teaching, training, and discipline imparted for guidance."
+    ],
+    "confidence": "high"
+  },
+  "intercession": {
+    "definitions": [
+      "Pleading on behalf of another; mediation by prayer or request."
+    ],
+    "confidence": "high"
+  },
+  "interpretation": {
+    "definitions": [
+      "The declaring or unfolding of the meaning of a thing.",
+      "Often the explanation of a dream, vision, saying, or tongue."
+    ],
+    "aliases": [
+      "interpretations"
+    ],
+    "confidence": "high"
+  },
+  "inward": {
+    "definitions": [
+      "Within; on the inside; turned toward the inner part.",
+      "Also pertaining to the inner man, hidden thought, or secret affection."
+    ],
+    "confidence": "high"
+  },
+  "journeying": {
+    "definitions": [
+      "Traveling; going on a journey or course from place to place."
+    ],
+    "confidence": "high"
+  },
+  "joyful": {
+    "definitions": [
+      "Full of joy; glad and rejoicing."
+    ],
+    "confidence": "high"
+  },
+  "judge": {
+    "definitions": [
+      "To discern, decide, or pronounce sentence.",
+      "Also to govern or rule in some contexts."
+    ],
+    "aliases": [
+      "judged",
+      "judgeth"
+    ],
+    "confidence": "high"
+  },
+  "judges": {
+    "definitions": [
+      "Those who judge; rulers or officers appointed to decide causes.",
+      "Also the book title or governing deliverers of Israel, according to context."
+    ],
+    "confidence": "high"
+  },
+  "judgest": {
+    "definitions": [
+      "Judgest; thou judgest; you judge, decide, or pronounce upon."
+    ],
+    "confidence": "high"
+  },
+  "judgment": {
+    "definitions": [
+      "Sentence, decision, or act of judging.",
+      "Also justice, right order, wise discernment, or the punishment awarded by authority, according to context."
+    ],
+    "aliases": [
+      "judgments"
+    ],
+    "confidence": "high"
+  },
+  "just": {
+    "definitions": [
+      "Righteous, upright, and conformable to what is right.",
+      "Also fair or due in judgment and dealing."
+    ],
+    "confidence": "high"
+  },
+  "justice": {
+    "definitions": [
+      "Righteous judgment; that which is right and due in law or moral order."
+    ],
+    "confidence": "high"
+  },
+  "justification": {
+    "definitions": [
+      "The act of being accounted righteous; acquittal in judgment."
+    ],
+    "confidence": "high"
+  },
+  "justify": {
+    "definitions": [
+      "To account or declare righteous.",
+      "Sometimes to vindicate or show to be right."
+    ],
+    "aliases": [
+      "justified",
+      "justifieth"
+    ],
+    "confidence": "high"
+  },
+  "keep": {
+    "definitions": [
+      "To guard, preserve, observe, or retain."
+    ],
+    "aliases": [
+      "kept",
+      "keepeth"
+    ],
+    "confidence": "high"
+  },
+  "keepest": {
+    "definitions": [
+      "Keepest; thou keepest; you keep, guard, or observe.",
+      "Often used of observing commandments or preserving something with care."
+    ],
+    "confidence": "high"
+  },
+  "keepeth": {
+    "definitions": [
+      "Keeps; guards; observes; preserves.",
+      "Often means to hold fast or carefully observe a command, charge, or way."
+    ],
+    "aliases": [
+      "keep"
+    ],
+    "confidence": "high"
+  },
+  "killeth": {
+    "definitions": [
+      "Kills; puts to death.",
+      "In some figurative uses it means brings death, condemnation, or lifelessness."
+    ],
+    "aliases": [
+      "kill"
+    ],
+    "confidence": "high"
+  },
+  "kindness": {
+    "definitions": [
+      "Goodness of disposition shown in gentle and helpful dealing.",
+      "Sometimes covenant favor or loving-kindness."
+    ],
+    "confidence": "high"
+  },
+  "kindred": {
+    "definitions": [
+      "Relatives, family stock, or those of the same kin."
+    ],
+    "confidence": "high"
+  },
+  "kingdom": {
+    "definitions": [
+      "The realm, rule, or reign of a king.",
+      "Often the dominion or royal rule of God."
+    ],
+    "confidence": "high"
+  },
+  "knewest": {
+    "definitions": [
+      "Knewest; thou knewest; you knew or had knowledge of."
+    ],
+    "confidence": "high"
+  },
+  "knops": {
+    "definitions": [
+      "Knobs or rounded ornamental projections."
+    ],
+    "confidence": "high"
+  },
+  "knowest": {
+    "definitions": [
+      "Knowest; thou knowest; you know, perceive, or acknowledge."
+    ],
+    "confidence": "high"
+  },
+  "knoweth": {
+    "definitions": [
+      "Knows; has knowledge of; perceives or acknowledges."
+    ],
+    "aliases": [
+      "know"
+    ],
+    "confidence": "high"
+  },
+  "knowledge": {
+    "definitions": [
+      "Understanding, acquaintance, or true apprehension of a matter."
+    ],
+    "confidence": "high"
+  },
+  "lament": {
+    "definitions": [
+      "To mourn aloud or express sorrow deeply."
+    ],
+    "aliases": [
+      "lamented"
+    ],
+    "confidence": "high"
+  },
+  "lamentation": {
+    "definitions": [
+      "Mourning expressed in cries, words, or song."
+    ],
+    "aliases": [
+      "lamentations"
+    ],
+    "confidence": "high"
+  },
+  "languisheth": {
+    "definitions": [
+      "Languishes; grows faint, weak, or drooping."
+    ],
+    "aliases": [
+      "languish"
+    ],
+    "confidence": "high"
+  },
+  "lawful": {
+    "definitions": [
+      "Allowed by right, law, or just rule."
+    ],
+    "confidence": "high"
+  },
+  "layeth": {
+    "definitions": [
+      "Lays; places; sets down; imposes.",
+      "It may also mean to direct, apply, or prepare."
+    ],
+    "aliases": [
+      "lay"
+    ],
+    "confidence": "high"
+  },
+  "leadest": {
+    "definitions": [
+      "Leadest; thou leadest; you lead or guide."
+    ],
+    "confidence": "high"
+  },
+  "leadeth": {
+    "definitions": [
+      "Leads; guides; conducts in a way."
+    ],
+    "aliases": [
+      "lead"
+    ],
+    "confidence": "high"
+  },
+  "lean": {
+    "definitions": [
+      "To rest or depend upon.",
+      "Also thin or lacking fat in the literal sense."
+    ],
+    "aliases": [
+      "leaned",
+      "leaneth"
+    ],
+    "confidence": "medium"
+  },
+  "leasing": {
+    "definitions": [
+      "Falsehood; lies; vanity in speech."
+    ],
+    "confidence": "high"
+  },
+  "leaveth": {
+    "definitions": [
+      "Leaves; departs from; lets remain; abandons."
+    ],
+    "aliases": [
+      "leave"
+    ],
+    "confidence": "high"
+  },
+  "length": {
+    "definitions": [
+      "The measure from end to end; long extent."
+    ],
+    "confidence": "high"
+  },
+  "less": {
+    "definitions": [
+      "Smaller in amount, degree, or number; not so much."
+    ],
+    "confidence": "high"
+  },
+  "lest": {
+    "definitions": [
+      "For fear that; so that not; to avoid the danger that."
+    ],
+    "confidence": "high"
+  },
+  "let": {
+    "definitions": [
+      "To hinder; to restrain; to hold back.",
+      "In older use, the very opposite of the common modern sense 'to allow.'"
+    ],
+    "aliases": [
+      "letteth",
+      "letted"
+    ],
+    "confidence": "high"
+  },
+  "liberal": {
+    "definitions": [
+      "Bountiful; generous; free in giving."
+    ],
+    "aliases": [
+      "liberally"
+    ],
+    "confidence": "high"
+  },
+  "liberty": {
+    "definitions": [
+      "Freedom from restraint or bondage.",
+      "Often lawful freedom under right order, not lawless license."
+    ],
+    "confidence": "high"
+  },
+  "lieth": {
+    "definitions": [
+      "Lies; rests; is laid down.",
+      "It may also mean remains in a certain state, is situated, or lies concealed."
+    ],
+    "aliases": [
+      "lie"
+    ],
+    "confidence": "high"
+  },
+  "liftest": {
+    "definitions": [
+      "Liftest; thou liftest; you lift, raise up, or exalt."
+    ],
+    "confidence": "high"
+  },
+  "lifteth": {
+    "definitions": [
+      "Lifts; raises up; exalts."
+    ],
+    "aliases": [
+      "lift"
+    ],
+    "confidence": "high"
+  },
+  "likeminded": {
+    "definitions": [
+      "Of one mind; sharing the same inward disposition."
+    ],
+    "confidence": "high"
+  },
+  "likeness": {
+    "definitions": [
+      "Resemblance, similarity, or form answering to another thing.",
+      "Sometimes an image or representation."
+    ],
+    "aliases": [
+      "likenesses"
+    ],
+    "confidence": "high"
+  },
+  "likewise": {
+    "definitions": [
+      "In like manner; in the same way."
+    ],
+    "confidence": "high"
+  },
+  "lively": {
+    "definitions": [
+      "Living; full of life and active power.",
+      "Often simply 'living' in older usage."
+    ],
+    "confidence": "high"
+  },
+  "liveth": {
+    "definitions": [
+      "Lives; remains alive; continues in life.",
+      "In some places, lives in a certain manner or under a certain rule."
+    ],
+    "aliases": [
+      "live"
+    ],
+    "confidence": "high"
+  },
+  "living": {
+    "definitions": [
+      "Alive; having life.",
+      "Sometimes livelihood or means of support, according to context."
+    ],
+    "confidence": "medium"
+  },
+  "loins": {
+    "definitions": [
+      "The lower part of the body about the hips and reins.",
+      "Often used figuratively for strength, readiness, or posterity."
+    ],
+    "confidence": "high"
+  },
+  "longsuffering": {
+    "definitions": [
+      "Patient endurance under provocation; slowness to anger."
+    ],
+    "confidence": "high"
+  },
+  "lookest": {
+    "definitions": [
+      "Lookest; thou lookest; you look or behold.",
+      "At times it also means you regard or take notice of."
+    ],
+    "confidence": "high"
+  },
+  "looketh": {
+    "definitions": [
+      "Looks; beholds; directs the eyes toward.",
+      "At times it also means to regard, attend to, or expect."
+    ],
+    "aliases": [
+      "look"
+    ],
+    "confidence": "high"
+  },
+  "lovest": {
+    "definitions": [
+      "Lovest; thou lovest; you love, delight in, or bear affection toward."
+    ],
+    "confidence": "high"
+  },
+  "loveth": {
+    "definitions": [
+      "Loves; bears affection toward; delights in.",
+      "In Scripture often includes settled goodwill, covenant kindness, or holy delight rather than mere feeling."
+    ],
+    "aliases": [
+      "love"
+    ],
+    "confidence": "high"
+  },
+  "lovingkindness": {
+    "definitions": [
+      "Steadfast and tender covenant love expressed in mercy and favor."
+    ],
+    "confidence": "high"
+  },
+  "lowest": {
+    "definitions": [
+      "Lowest; least high, least exalted, or most humble among those compared."
+    ],
+    "confidence": "high"
+  },
+  "lowliness": {
+    "definitions": [
+      "Humility; a lowly mind free from proud self-exaltation."
+    ],
+    "confidence": "high"
+  },
+  "lust": {
+    "definitions": [
+      "Strong desire or craving.",
+      "Often a corrupt and unlawful desire, though the bare sense is broader."
+    ],
+    "aliases": [
+      "lusts"
+    ],
+    "confidence": "high"
+  },
+  "lusteth": {
+    "definitions": [
+      "Lusts; strongly desires, often in a corrupt or unlawful way."
+    ],
+    "aliases": [
+      "lust"
+    ],
+    "confidence": "high"
+  },
+  "madest": {
+    "definitions": [
+      "Madest; thou madest; you made, formed, or caused."
+    ],
+    "confidence": "high"
+  },
+  "magnify": {
+    "definitions": [
+      "To make great in esteem, praise, or apparent importance."
+    ],
+    "aliases": [
+      "magnified"
+    ],
+    "confidence": "high"
+  },
+  "majesty": {
+    "definitions": [
+      "Greatness, royal dignity, and exalted splendor."
+    ],
+    "confidence": "high"
+  },
+  "makest": {
+    "definitions": [
+      "Makest; thou makest; you make, form, or cause."
+    ],
+    "confidence": "high"
+  },
+  "maketh": {
+    "definitions": [
+      "Makes; forms; causes; brings about."
+    ],
+    "aliases": [
+      "make"
+    ],
+    "confidence": "high"
+  },
+  "malice": {
+    "definitions": [
+      "Ill will, spite, or settled desire to injure."
+    ],
+    "confidence": "high"
+  },
+  "manifest": {
+    "definitions": [
+      "Plainly shown; openly revealed; made evident."
+    ],
+    "aliases": [
+      "manifested",
+      "manifestly"
+    ],
+    "confidence": "high"
+  },
+  "manner": {
+    "definitions": [
+      "Way, kind, fashion, or custom of doing or being."
+    ],
+    "aliases": [
+      "manners"
+    ],
+    "confidence": "high"
+  },
+  "mark": {
+    "definitions": [
+      "To observe closely, note, or take heed of.",
+      "Also a sign, target, or token."
+    ],
+    "aliases": [
+      "marked"
+    ],
+    "confidence": "medium"
+  },
+  "matrix": {
+    "definitions": [
+      "The womb.",
+      "Often used in the phrase 'openeth the matrix' for the firstborn issuing from the womb."
+    ],
+    "confidence": "high"
+  },
+  "mayest": {
+    "definitions": [
+      "May; art permitted or enabled to.",
+      "Often expresses permission, possibility, or fitness rather than certainty."
+    ],
+    "confidence": "high"
+  },
+  "mean": {
+    "definitions": [
+      "Low in rank or outward state; humble or common.",
+      "Also to intend or signify, according to context."
+    ],
+    "confidence": "medium"
+  },
+  "meaneth": {
+    "definitions": [
+      "Means; intends; signifies."
+    ],
+    "aliases": [
+      "mean"
+    ],
+    "confidence": "high"
+  },
+  "meat": {
+    "definitions": [
+      "Food in general; nourishment.",
+      "Only sometimes flesh specifically."
+    ],
+    "aliases": [
+      "meats"
+    ],
+    "confidence": "high"
+  },
+  "mediator": {
+    "definitions": [
+      "One who stands between parties to reconcile or transact on behalf of both."
+    ],
+    "confidence": "high"
+  },
+  "meek": {
+    "definitions": [
+      "Gentle, lowly, and under restraint rather than self-asserting.",
+      "Strength governed, not weakness without courage."
+    ],
+    "confidence": "high"
+  },
+  "meet": {
+    "definitions": [
+      "Fit, suitable, or proper.",
+      "Not chiefly an encounter, though that sense exists in other forms."
+    ],
+    "confidence": "high"
+  },
+  "melteth": {
+    "definitions": [
+      "Melts; dissolves, softens, or loses firmness.",
+      "It may also speak of the heart failing with fear or sorrow."
+    ],
+    "aliases": [
+      "melt"
+    ],
+    "confidence": "high"
+  },
+  "merchandise": {
+    "definitions": [
+      "Goods bought and sold; traffic in wares."
+    ],
+    "confidence": "high"
+  },
+  "merciful": {
+    "definitions": [
+      "Disposed to show mercy; compassionate toward misery or guilt."
+    ],
+    "confidence": "high"
+  },
+  "mercy": {
+    "definitions": [
+      "Compassion shown to the miserable or guilty; pity joined with help or pardon.",
+      "When spoken of God, his gracious readiness to spare, forgive, and do good to the undeserving."
+    ],
+    "aliases": [
+      "mercies"
+    ],
+    "confidence": "high"
+  },
+  "midst": {
+    "definitions": [
+      "The middle, center, or inner part among surrounding things."
+    ],
+    "confidence": "high"
+  },
+  "mightest": {
+    "definitions": [
+      "Mightest; thou mightest; you might, could, or would be able to."
+    ],
+    "confidence": "high"
+  },
+  "mindful": {
+    "definitions": [
+      "Remembering; paying heed; taking thought for."
+    ],
+    "confidence": "high"
+  },
+  "minister": {
+    "definitions": [
+      "To serve, attend, or supply what is needed.",
+      "Whether in practical service or sacred office depends on context."
+    ],
+    "aliases": [
+      "ministered",
+      "ministereth",
+      "ministry"
+    ],
+    "confidence": "high"
+  },
+  "mirth": {
+    "definitions": [
+      "Gladness, merriment, or festive joy."
+    ],
+    "confidence": "medium"
+  },
+  "moderation": {
+    "definitions": [
+      "Gentleness, restraint, and a yielding spirit that avoids excess."
+    ],
+    "confidence": "medium"
+  },
+  "month": {
+    "definitions": [
+      "A stated division of time, commonly reckoned by the moon."
+    ],
+    "aliases": [
+      "months"
+    ],
+    "confidence": "high"
+  },
+  "moreover": {
+    "definitions": [
+      "Besides; further; in addition to this."
+    ],
+    "confidence": "high"
+  },
+  "mortify": {
+    "definitions": [
+      "To put to death; to subdue and crush the power of sinful practices."
+    ],
+    "aliases": [
+      "mortified"
+    ],
+    "confidence": "high"
+  },
+  "mourn": {
+    "definitions": [
+      "To grieve, lament, or sorrow deeply."
+    ],
+    "aliases": [
+      "mourned",
+      "mourning"
+    ],
+    "confidence": "high"
+  },
+  "mourneth": {
+    "definitions": [
+      "Mourns; grieves; laments."
+    ],
+    "aliases": [
+      "mourn"
+    ],
+    "confidence": "high"
+  },
+  "mouth": {
+    "definitions": [
+      "The bodily organ of speech and eating.",
+      "By extension, speech itself, command, opening, edge, or entrance, according to context."
+    ],
+    "aliases": [
+      "mouths"
+    ],
+    "confidence": "high"
+  },
+  "moveth": {
+    "definitions": [
+      "Moves; changes place; stirs or influences."
+    ],
+    "aliases": [
+      "move"
+    ],
+    "confidence": "high"
+  },
+  "mystery": {
+    "definitions": [
+      "A truth once hidden, now made known by divine revelation.",
+      "Not merely something puzzling, but something disclosed by God."
+    ],
+    "aliases": [
+      "mysteries"
+    ],
+    "confidence": "high"
+  },
+  "nakedness": {
+    "definitions": [
+      "The state of being uncovered or unclothed.",
+      "Often also shameful exposure, especially where modesty, kinship, or ceremonial defilement is involved."
+    ],
+    "confidence": "high"
+  },
+  "nation": {
+    "definitions": [
+      "A people joined in common descent, land, or civil order.",
+      "Often used of the Gentile peoples as distinguished from Israel."
+    ],
+    "aliases": [
+      "nations"
+    ],
+    "confidence": "high"
+  },
+  "naught": {
+    "definitions": [
+      "Worthless, evil, or of no account.",
+      "Sometimes simply nothing."
+    ],
+    "confidence": "medium"
+  },
+  "nay": {
+    "definitions": [
+      "No; and more than that; a strong denial or correction."
+    ],
+    "confidence": "high"
+  },
+  "needeth": {
+    "definitions": [
+      "Needs; requires; stands in need of."
+    ],
+    "aliases": [
+      "need"
+    ],
+    "confidence": "high"
+  },
+  "neesings": {
+    "definitions": [
+      "Sneezings."
+    ],
+    "confidence": "high"
+  },
+  "nest": {
+    "definitions": [
+      "A bird's dwelling or resting place.",
+      "By figure, a settled and often lofty place of security."
+    ],
+    "aliases": [
+      "nests"
+    ],
+    "confidence": "high"
+  },
+  "never": {
+    "definitions": [
+      "At no time; not ever."
+    ],
+    "confidence": "high"
+  },
+  "nevertheless": {
+    "definitions": [
+      "Notwithstanding that; for all that; yet despite what has just been said."
+    ],
+    "confidence": "high"
+  },
+  "nigh": {
+    "definitions": [
+      "Near; close at hand; drawing near."
+    ],
+    "confidence": "high"
+  },
+  "ninth": {
+    "definitions": [
+      "The one next after the eighth; occupying the ninth place."
+    ],
+    "confidence": "high"
+  },
+  "north": {
+    "definitions": [
+      "The northern quarter or region."
+    ],
+    "confidence": "high"
+  },
+  "oath": {
+    "definitions": [
+      "A solemn appeal to God in confirmation of a word, promise, or testimony."
+    ],
+    "aliases": [
+      "oaths"
+    ],
+    "confidence": "high"
+  },
+  "obedience": {
+    "definitions": [
+      "Submission to rightful authority; heedful compliance with command."
+    ],
+    "confidence": "high"
+  },
+  "oblation": {
+    "definitions": [
+      "An offering presented unto God, especially one solemnly brought before him."
+    ],
+    "aliases": [
+      "oblations"
+    ],
+    "confidence": "high"
+  },
+  "offence": {
+    "definitions": [
+      "A cause of stumbling, falling, or displeasure.",
+      "Sometimes an actual trespass or wrongdoing."
+    ],
+    "aliases": [
+      "offences"
+    ],
+    "confidence": "high"
+  },
+  "offend": {
+    "definitions": [
+      "To cause to stumble, sin, or take hurt.",
+      "Also to commit an offense against another."
+    ],
+    "aliases": [
+      "offended"
+    ],
+    "confidence": "high"
+  },
+  "offereth": {
+    "definitions": [
+      "Offers; presents; brings forward.",
+      "Often used of presenting sacrifice or setting something before God."
+    ],
+    "aliases": [
+      "offer"
+    ],
+    "confidence": "high"
+  },
+  "offering": {
+    "definitions": [
+      "That which is brought and presented before God or another.",
+      "Often a sacrificial gift."
+    ],
+    "aliases": [
+      "offerings"
+    ],
+    "confidence": "high"
+  },
+  "offscouring": {
+    "definitions": [
+      "That which is scraped off as vile refuse; something treated as filth or castaway matter."
+    ],
+    "confidence": "medium"
+  },
+  "oft": {
+    "definitions": [
+      "Often; frequently."
+    ],
+    "confidence": "high"
+  },
+  "openeth": {
+    "definitions": [
+      "Opens; makes open; reveals or begins access.",
+      "It may also mean to unfold understanding or to loose what was shut."
+    ],
+    "aliases": [
+      "open"
+    ],
+    "confidence": "high"
+  },
+  "oppress": {
+    "definitions": [
+      "To crush, burden, or treat harshly by misuse of power."
+    ],
+    "aliases": [
+      "oppressed",
+      "oppression"
+    ],
+    "confidence": "high"
+  },
+  "oracles": {
+    "definitions": [
+      "Divine utterances or inspired sayings entrusted from God."
+    ],
+    "confidence": "high"
+  },
+  "ordinance": {
+    "definitions": [
+      "An appointed order, statute, or prescribed observance."
+    ],
+    "aliases": [
+      "ordinances"
+    ],
+    "confidence": "high"
+  },
+  "ouches": {
+    "definitions": [
+      "Ornamental settings or sockets, especially for precious stones."
+    ],
+    "confidence": "high"
+  },
+  "overcome": {
+    "definitions": [
+      "To conquer, prevail over, or gain the victory against."
+    ],
+    "aliases": [
+      "overcame"
+    ],
+    "confidence": "high"
+  },
+  "overcometh": {
+    "definitions": [
+      "Overcomes; prevails against; gains victory over."
+    ],
+    "aliases": [
+      "overcome"
+    ],
+    "confidence": "high"
+  },
+  "partaker": {
+    "definitions": [
+      "One who shares in a thing; a participant or partner."
+    ],
+    "aliases": [
+      "partakers"
+    ],
+    "confidence": "high"
+  },
+  "partly": {
+    "definitions": [
+      "In part; to some extent; not wholly."
+    ],
+    "confidence": "high"
+  },
+  "passest": {
+    "definitions": [
+      "Passest; thou passest; you pass, go by, move onward, or surpass."
+    ],
+    "confidence": "high"
+  },
+  "passeth": {
+    "definitions": [
+      "Passes; goes by; moves onward.",
+      "It may also mean surpasses, comes to an end, or is transferred from one state to another."
+    ],
+    "aliases": [
+      "pass"
+    ],
+    "confidence": "high"
+  },
+  "patience": {
+    "definitions": [
+      "Steadfast endurance under trial; a calm continuing under burden without giving way."
+    ],
+    "confidence": "high"
+  },
+  "patient": {
+    "definitions": [
+      "Enduring calmly; able to bear delay, trial, or injury without murmuring."
+    ],
+    "confidence": "high"
+  },
+  "peculiar": {
+    "definitions": [
+      "Specially one's own; set apart as a treasured possession.",
+      "Not merely odd or strange."
+    ],
+    "confidence": "high"
+  },
+  "peradventure": {
+    "definitions": [
+      "Perhaps; it may be; possibly."
+    ],
+    "confidence": "high"
+  },
+  "perfect": {
+    "definitions": [
+      "Complete, whole, or mature.",
+      "Often full-grown or fully furnished rather than absolutely sinless."
+    ],
+    "confidence": "high"
+  },
+  "perfection": {
+    "definitions": [
+      "Completeness, maturity, or full accomplishment."
+    ],
+    "confidence": "high"
+  },
+  "perish": {
+    "definitions": [
+      "To be ruined, lost, or destroyed."
+    ],
+    "aliases": [
+      "perished",
+      "perisheth"
+    ],
+    "confidence": "high"
+  },
+  "perplexed": {
+    "definitions": [
+      "Distressed with uncertainty; puzzled and troubled."
+    ],
+    "confidence": "high"
+  },
+  "persecute": {
+    "definitions": [
+      "To pursue with hostility; to harass or oppress for hatred's sake."
+    ],
+    "aliases": [
+      "persecuted",
+      "persecution"
+    ],
+    "confidence": "high"
+  },
+  "persuaded": {
+    "definitions": [
+      "Convinced, assured, or won over in judgment."
+    ],
+    "confidence": "high"
+  },
+  "persuasion": {
+    "definitions": [
+      "A settled conviction or the act of winning over another's judgment."
+    ],
+    "confidence": "medium"
+  },
+  "pertaineth": {
+    "definitions": [
+      "Pertains; belongs properly to; relates to."
+    ],
+    "aliases": [
+      "pertain"
+    ],
+    "confidence": "high"
+  },
+  "pestilence": {
+    "definitions": [
+      "A grievous contagious disease; plague.",
+      "Often one sent as a severe public judgment."
+    ],
+    "aliases": [
+      "pestilences"
+    ],
+    "confidence": "high"
+  },
+  "petition": {
+    "definitions": [
+      "A formal request, earnest asking, or supplication."
+    ],
+    "aliases": [
+      "petitions"
+    ],
+    "confidence": "high"
+  },
+  "pisseth": {
+    "definitions": [
+      "Pisseth; urinates.",
+      "Used in the older literal expression 'him that pisseth against the wall.'"
+    ],
+    "confidence": "medium"
+  },
+  "pitiful": {
+    "definitions": [
+      "Full of pity; compassionate and tenderhearted.",
+      "Not chiefly miserable in the modern sense."
+    ],
+    "confidence": "high"
+  },
+  "pity": {
+    "definitions": [
+      "Tender compassion toward one in misery or weakness.",
+      "Also the act of sparing or having mercy."
+    ],
+    "confidence": "high"
+  },
+  "plain": {
+    "definitions": [
+      "Clear, open, and easy to understand.",
+      "Also level or straightforward."
+    ],
+    "confidence": "high"
+  },
+  "plainness": {
+    "definitions": [
+      "Openness, simplicity, and straightforward clearness."
+    ],
+    "confidence": "high"
+  },
+  "pleasant": {
+    "definitions": [
+      "Delightful, agreeable, or giving satisfaction."
+    ],
+    "confidence": "high"
+  },
+  "pleaseth": {
+    "definitions": [
+      "Pleases; gives satisfaction to; is agreeable to."
+    ],
+    "aliases": [
+      "please"
+    ],
+    "confidence": "high"
+  },
+  "plenteous": {
+    "definitions": [
+      "Abundant; full; richly supplied."
+    ],
+    "confidence": "high"
+  },
+  "pollute": {
+    "definitions": [
+      "To defile, profane, or make unclean."
+    ],
+    "aliases": [
+      "polluted"
+    ],
+    "confidence": "high"
+  },
+  "poor": {
+    "definitions": [
+      "Lacking worldly goods; needy; lowly in outward estate.",
+      "At times humble and dependent in spirit."
+    ],
+    "confidence": "high"
+  },
+  "portion": {
+    "definitions": [
+      "A part allotted, assigned, or belonging to one as a share."
+    ],
+    "aliases": [
+      "portions"
+    ],
+    "confidence": "high"
+  },
+  "possess": {
+    "definitions": [
+      "To hold as one's own; to occupy; to have mastery over."
+    ],
+    "aliases": [
+      "possessed",
+      "possesseth"
+    ],
+    "confidence": "high"
+  },
+  "possession": {
+    "definitions": [
+      "That which one owns or holds as property; an occupied holding."
+    ],
+    "aliases": [
+      "possessions"
+    ],
+    "confidence": "high"
+  },
+  "poureth": {
+    "definitions": [
+      "Pours; causes to flow out; sheds forth abundantly."
+    ],
+    "aliases": [
+      "pour"
+    ],
+    "confidence": "high"
+  },
+  "powerful": {
+    "definitions": [
+      "Mighty in effect, force, or ability."
+    ],
+    "confidence": "high"
+  },
+  "praise": {
+    "definitions": [
+      "Commendation, thanksgiving, and spoken honor given for worth or goodness.",
+      "As a verb, to extol or magnify."
+    ],
+    "aliases": [
+      "praised",
+      "praises"
+    ],
+    "confidence": "high"
+  },
+  "pray": {
+    "definitions": [
+      "To ask earnestly; to entreat; to make supplication.",
+      "Most often in Scripture, to call upon God with petition, confession, thanksgiving, or praise."
+    ],
+    "aliases": [
+      "prayed",
+      "prayeth",
+      "prayer",
+      "prayers",
+      "praying"
+    ],
+    "confidence": "high"
+  },
+  "prayest": {
+    "definitions": [
+      "Prayest; thou prayest; you pray, ask earnestly, or make supplication."
+    ],
+    "confidence": "high"
+  },
+  "preach": {
+    "definitions": [
+      "To proclaim publicly, especially as a herald or preacher."
+    ],
+    "aliases": [
+      "preached",
+      "preaching"
+    ],
+    "confidence": "high"
+  },
+  "precious": {
+    "definitions": [
+      "Costly, highly valued, and greatly esteemed."
+    ],
+    "confidence": "high"
+  },
+  "presence": {
+    "definitions": [
+      "The fact of being present; nearness before a person.",
+      "Often the face, favor, or immediate appearing of a king or of God."
+    ],
+    "confidence": "high"
+  },
+  "presently": {
+    "definitions": [
+      "Immediately; before long; soon."
+    ],
+    "confidence": "high"
+  },
+  "preserve": {
+    "definitions": [
+      "To keep safe, guard from harm, or maintain from ruin."
+    ],
+    "aliases": [
+      "preserved"
+    ],
+    "confidence": "high"
+  },
+  "preserveth": {
+    "definitions": [
+      "Preserves; keeps safe; guards from harm or decay."
+    ],
+    "aliases": [
+      "preserve"
+    ],
+    "confidence": "high"
+  },
+  "prevail": {
+    "definitions": [
+      "To prove stronger, gain the victory, or have effect."
+    ],
+    "aliases": [
+      "prevailed"
+    ],
+    "confidence": "high"
+  },
+  "prevent": {
+    "definitions": [
+      "To go before; to come before; to anticipate in time.",
+      "Not chiefly to stop from happening, as in modern usage."
+    ],
+    "aliases": [
+      "prevented",
+      "preventeth"
+    ],
+    "confidence": "high"
+  },
+  "priesthood": {
+    "definitions": [
+      "The office, order, or collective body of priests."
+    ],
+    "confidence": "high"
+  },
+  "priests": {
+    "definitions": [
+      "Those appointed to minister in sacred service and offer sacrifices."
+    ],
+    "aliases": [
+      "priest"
+    ],
+    "confidence": "high"
+  },
+  "principalities": {
+    "definitions": [
+      "Ruling powers or chief authorities.",
+      "Often spiritual ranks or governing powers."
+    ],
+    "confidence": "medium"
+  },
+  "proceedeth": {
+    "definitions": [
+      "Proceeds; goes forth; comes out from; continues onward."
+    ],
+    "aliases": [
+      "proceed"
+    ],
+    "confidence": "high"
+  },
+  "proclaim": {
+    "definitions": [
+      "To announce publicly; to publish aloud."
+    ],
+    "aliases": [
+      "proclaimed"
+    ],
+    "confidence": "high"
+  },
+  "profane": {
+    "definitions": [
+      "Common rather than holy; irreverent toward sacred things."
+    ],
+    "aliases": [
+      "profaned",
+      "profaneness"
+    ],
+    "confidence": "high"
+  },
+  "profit": {
+    "definitions": [
+      "Gain, advantage, or beneficial increase."
+    ],
+    "aliases": [
+      "profitable",
+      "profited"
+    ],
+    "confidence": "high"
+  },
+  "profiteth": {
+    "definitions": [
+      "Profits; is of gain, use, or advantage."
+    ],
+    "aliases": [
+      "profit"
+    ],
+    "confidence": "high"
+  },
+  "profiting": {
+    "definitions": [
+      "Progress, gain, or advancement."
+    ],
+    "confidence": "high"
+  },
+  "promise": {
+    "definitions": [
+      "A pledged word; an assured declaration of what shall be given or done."
+    ],
+    "aliases": [
+      "promises"
+    ],
+    "confidence": "high"
+  },
+  "prophesieth": {
+    "definitions": [
+      "Prophesies; speaks forth under divine impulse or declares what God reveals."
+    ],
+    "aliases": [
+      "prophesy"
+    ],
+    "confidence": "high"
+  },
+  "propitiation": {
+    "definitions": [
+      "That which turns away wrath and restores favor by a sacrificial satisfaction."
+    ],
+    "confidence": "high"
+  },
+  "prosper": {
+    "definitions": [
+      "To succeed, advance, or go forward with good issue."
+    ],
+    "aliases": [
+      "prospered",
+      "prosperity"
+    ],
+    "confidence": "high"
+  },
+  "prosperity": {
+    "definitions": [
+      "A state of flourishing, welfare, and successful condition."
+    ],
+    "confidence": "high"
+  },
+  "prove": {
+    "definitions": [
+      "To test, try, and find out by trial.",
+      "Also to demonstrate or show to be so."
+    ],
+    "aliases": [
+      "proved"
+    ],
+    "confidence": "high"
+  },
+  "provoke": {
+    "definitions": [
+      "To stir up, incite, or move strongly.",
+      "Often to anger, but sometimes to good works."
+    ],
+    "aliases": [
+      "provoked"
+    ],
+    "confidence": "high"
+  },
+  "prudence": {
+    "definitions": [
+      "Wise foresight and practical judgment in conduct."
+    ],
+    "confidence": "high"
+  },
+  "prudent": {
+    "definitions": [
+      "Wise in practical judgment; discreet and circumspect."
+    ],
+    "confidence": "high"
+  },
+  "publish": {
+    "definitions": [
+      "To proclaim openly; to make known abroad."
+    ],
+    "aliases": [
+      "published"
+    ],
+    "confidence": "high"
+  },
+  "pure": {
+    "definitions": [
+      "Clean, unmixed, and free from defilement."
+    ],
+    "aliases": [
+      "purely"
+    ],
+    "confidence": "high"
+  },
+  "pureness": {
+    "definitions": [
+      "Purity, cleanness, and freedom from defilement."
+    ],
+    "confidence": "high"
+  },
+  "purge": {
+    "definitions": [
+      "To cleanse thoroughly by removing what defiles."
+    ],
+    "aliases": [
+      "purged",
+      "purging"
+    ],
+    "confidence": "high"
+  },
+  "purify": {
+    "definitions": [
+      "To cleanse, refine, or make pure."
+    ],
+    "aliases": [
+      "purified"
+    ],
+    "confidence": "high"
+  },
+  "purpose": {
+    "definitions": [
+      "A set intention, design, or settled resolve."
+    ],
+    "aliases": [
+      "purposed"
+    ],
+    "confidence": "high"
+  },
+  "pursueth": {
+    "definitions": [
+      "Pursues; follows after eagerly; chases or seeks to overtake."
+    ],
+    "aliases": [
+      "pursue"
+    ],
+    "confidence": "high"
+  },
+  "puttest": {
+    "definitions": [
+      "Puttest; thou puttest; you put, place, set, or lay upon."
+    ],
+    "confidence": "high"
+  },
+  "putteth": {
+    "definitions": [
+      "Puts; places; sets.",
+      "Often also lays upon, appoints, or causes to be in a certain state."
+    ],
+    "aliases": [
+      "put"
+    ],
+    "confidence": "high"
+  },
+  "quick": {
+    "definitions": [
+      "Living; alive.",
+      "Sometimes lively, active, or piercing, according to context."
+    ],
+    "confidence": "high"
+  },
+  "quicken": {
+    "definitions": [
+      "To make alive; to give life or renewed vigor.",
+      "Also to revive spiritually."
+    ],
+    "aliases": [
+      "quickened",
+      "quickeneth"
+    ],
+    "confidence": "high"
+  },
+  "quickly": {
+    "definitions": [
+      "Swiftly, soon, or without delay."
+    ],
+    "confidence": "high"
+  },
+  "quit": {
+    "definitions": [
+      "To acquit or free from obligation.",
+      "In 'quit you like men,' to conduct yourselves bravely or manfully."
+    ],
+    "aliases": [
+      "quit you"
+    ],
+    "confidence": "high"
+  },
+  "raiment": {
+    "definitions": [
+      "Clothing; garments; apparel."
+    ],
+    "confidence": "high"
+  },
+  "rain": {
+    "definitions": [
+      "Water descending from the clouds.",
+      "As a verb, to pour down or cause to fall abundantly."
+    ],
+    "aliases": [
+      "rained"
+    ],
+    "confidence": "medium"
+  },
+  "raiseth": {
+    "definitions": [
+      "Raises; lifts up; causes to arise or stand.",
+      "It may also mean stirs up, appoints, or brings forth."
+    ],
+    "aliases": [
+      "raise"
+    ],
+    "confidence": "high"
+  },
+  "reacheth": {
+    "definitions": [
+      "Reaches; extends to; attains or comes as far as."
+    ],
+    "aliases": [
+      "reach"
+    ],
+    "confidence": "high"
+  },
+  "rebellion": {
+    "definitions": [
+      "Resistance against rightful rule; willful rising against authority."
+    ],
+    "confidence": "high"
+  },
+  "rebuke": {
+    "definitions": [
+      "To reprove sharply; to check by word of authority.",
+      "At times to restrain or suppress by command."
+    ],
+    "aliases": [
+      "rebuked",
+      "rebuketh"
+    ],
+    "confidence": "high"
+  },
+  "receive": {
+    "definitions": [
+      "To take, accept, or welcome what is given or brought."
+    ],
+    "aliases": [
+      "received",
+      "receiveth"
+    ],
+    "confidence": "high"
+  },
+  "recompence": {
+    "definitions": [
+      "Repayment, return, or reward rendered for good or evil."
+    ],
+    "aliases": [
+      "recompensed"
+    ],
+    "confidence": "high"
+  },
+  "reconcile": {
+    "definitions": [
+      "To restore to favor, peace, or agreement after estrangement."
+    ],
+    "aliases": [
+      "reconciled",
+      "reconciliation"
+    ],
+    "confidence": "high"
+  },
+  "redeem": {
+    "definitions": [
+      "To buy back, ransom, or deliver by payment or costly means."
+    ],
+    "aliases": [
+      "redeemed",
+      "redeemeth"
+    ],
+    "confidence": "high"
+  },
+  "redemption": {
+    "definitions": [
+      "Deliverance secured by ransom; release obtained at a price."
+    ],
+    "confidence": "high"
+  },
+  "refuge": {
+    "definitions": [
+      "A shelter, defense, or place of safety."
+    ],
+    "confidence": "high"
+  },
+  "refuseth": {
+    "definitions": [
+      "Refuses; declines; will not accept or obey."
+    ],
+    "aliases": [
+      "refuse"
+    ],
+    "confidence": "high"
+  },
+  "regard": {
+    "definitions": [
+      "To look upon with consideration; to heed or respect.",
+      "Also esteem or favorable notice."
+    ],
+    "aliases": [
+      "regarded"
+    ],
+    "confidence": "medium"
+  },
+  "regardeth": {
+    "definitions": [
+      "Regards; looks upon; esteems or takes notice of."
+    ],
+    "aliases": [
+      "regard"
+    ],
+    "confidence": "high"
+  },
+  "regeneration": {
+    "definitions": [
+      "New birth; renewal into new life.",
+      "At times also a great renewing or restoration."
+    ],
+    "confidence": "high"
+  },
+  "reigneth": {
+    "definitions": [
+      "Reigns; rules as king or sovereign; exercises prevailing dominion."
+    ],
+    "aliases": [
+      "reign"
+    ],
+    "confidence": "high"
+  },
+  "reins": {
+    "definitions": [
+      "The inward parts, especially the kidneys, figuratively the seat of feeling or hidden affections."
+    ],
+    "confidence": "high"
+  },
+  "rejoice": {
+    "definitions": [
+      "To be glad, exult, or take joy."
+    ],
+    "aliases": [
+      "rejoiced",
+      "rejoiceth"
+    ],
+    "confidence": "high"
+  },
+  "rejoicing": {
+    "definitions": [
+      "Joyful exultation; the act or state of rejoicing."
+    ],
+    "confidence": "high"
+  },
+  "remaineth": {
+    "definitions": [
+      "Remains; continues; is left over after other things are removed or finished."
+    ],
+    "aliases": [
+      "remain"
+    ],
+    "confidence": "high"
+  },
+  "remember": {
+    "definitions": [
+      "To call to mind, keep in mind, or act with mindful regard toward."
+    ],
+    "aliases": [
+      "remembered",
+      "remembereth"
+    ],
+    "confidence": "high"
+  },
+  "remembered": {
+    "definitions": [
+      "Called to mind; kept in remembrance; regarded with mindful attention."
+    ],
+    "confidence": "high"
+  },
+  "remembrance": {
+    "definitions": [
+      "Memory; mindful recollection; a keeping in mind.",
+      "Also a memorial or token that calls something to mind."
+    ],
+    "confidence": "high"
+  },
+  "remission": {
+    "definitions": [
+      "Release, cancellation, or forgiveness, especially of sins."
+    ],
+    "confidence": "high"
+  },
+  "render": {
+    "definitions": [
+      "To give back, pay, or return what is due."
+    ],
+    "aliases": [
+      "rendered"
+    ],
+    "confidence": "high"
+  },
+  "renew": {
+    "definitions": [
+      "To make fresh again; to restore or strengthen anew."
+    ],
+    "aliases": [
+      "renewed"
+    ],
+    "confidence": "high"
+  },
+  "repent": {
+    "definitions": [
+      "To turn in mind and purpose; to feel sorrow for sin and turn from it.",
+      "In some contexts it may speak more generally of relenting or changing course."
+    ],
+    "aliases": [
+      "repented",
+      "repenteth"
+    ],
+    "confidence": "high"
+  },
+  "repentance": {
+    "definitions": [
+      "A change of mind and heart leading to turning from sin unto God."
+    ],
+    "confidence": "high"
+  },
+  "repentest": {
+    "definitions": [
+      "Repentest; thou repentest; you repent, turn in mind, or feel sorrow for wrong and turn from it."
+    ],
+    "confidence": "high"
+  },
+  "reproacheth": {
+    "definitions": [
+      "Reproaches; brings shame upon; taunts or upbraids."
+    ],
+    "aliases": [
+      "reproach"
+    ],
+    "confidence": "high"
+  },
+  "reproof": {
+    "definitions": [
+      "Correction, rebuke, or blame given for fault."
+    ],
+    "aliases": [
+      "reprove",
+      "reproved"
+    ],
+    "confidence": "high"
+  },
+  "request": {
+    "definitions": [
+      "A petition, desire, or thing asked for.",
+      "Also the act of making such a petition."
+    ],
+    "aliases": [
+      "requests"
+    ],
+    "confidence": "high"
+  },
+  "require": {
+    "definitions": [
+      "To demand, ask for, or call for as due."
+    ],
+    "aliases": [
+      "required"
+    ],
+    "confidence": "high"
+  },
+  "rest": {
+    "definitions": [
+      "Relief from labor or disturbance; settled repose.",
+      "Also the remainder or what is left over, according to context."
+    ],
+    "confidence": "medium"
+  },
+  "resurrection": {
+    "definitions": [
+      "Rising again from the dead; restoration to life."
+    ],
+    "confidence": "high"
+  },
+  "returneth": {
+    "definitions": [
+      "Returns; comes back; turns again."
+    ],
+    "aliases": [
+      "return"
+    ],
+    "confidence": "high"
+  },
+  "revile": {
+    "definitions": [
+      "To rail at, speak abusively against, or heap insulting words upon."
+    ],
+    "aliases": [
+      "reviled",
+      "reviling"
+    ],
+    "confidence": "high"
+  },
+  "reward": {
+    "definitions": [
+      "Recompense, return, or what is given in response to service or conduct."
+    ],
+    "aliases": [
+      "rewarded"
+    ],
+    "confidence": "high"
+  },
+  "riches": {
+    "definitions": [
+      "Abundant wealth or valuable possession.",
+      "Also abundance of spiritual treasure, according to context."
+    ],
+    "confidence": "high"
+  },
+  "rideth": {
+    "definitions": [
+      "Rides; is carried along upon a beast or vehicle."
+    ],
+    "aliases": [
+      "ride"
+    ],
+    "confidence": "high"
+  },
+  "righteous": {
+    "definitions": [
+      "Just, upright, and in the right according to God's standard."
+    ],
+    "confidence": "high"
+  },
+  "righteousness": {
+    "definitions": [
+      "Justice, uprightness, and conformity to what is right before God."
+    ],
+    "confidence": "high"
+  },
+  "riot": {
+    "definitions": [
+      "Wasteful, disorderly excess; loose and lavish living."
+    ],
+    "aliases": [
+      "riotous"
+    ],
+    "confidence": "high"
+  },
+  "riseth": {
+    "definitions": [
+      "Rises; gets up; stands up; springs forth.",
+      "It may also mean arises in power, appears, or comes into action."
+    ],
+    "aliases": [
+      "rise"
+    ],
+    "confidence": "high"
+  },
+  "room": {
+    "definitions": [
+      "Place; space; opportunity.",
+      "Not necessarily an enclosed chamber."
+    ],
+    "confidence": "high"
+  },
+  "rude": {
+    "definitions": [
+      "Untrained, unskilled, or plain rather than polished.",
+      "Not necessarily insolent in the modern sense."
+    ],
+    "confidence": "high"
+  },
+  "ruleth": {
+    "definitions": [
+      "Rules; governs; exercises authority over."
+    ],
+    "aliases": [
+      "rule"
+    ],
+    "confidence": "high"
+  },
+  "runneth": {
+    "definitions": [
+      "Runs; moves swiftly; hastens.",
+      "It may also be said of water or of the course of a thing."
+    ],
+    "aliases": [
+      "run"
+    ],
+    "confidence": "high"
+  },
+  "sabbath": {
+    "definitions": [
+      "A day of sacred rest set apart unto God.",
+      "By use it may speak of the weekly holy day or of other solemn rest-days appointed under the law."
+    ],
+    "aliases": [
+      "sabbaths"
+    ],
+    "confidence": "high"
+  },
+  "sackcloth": {
+    "definitions": [
+      "A coarse cloth, often of hair, worn in mourning, humiliation, or penitence."
+    ],
+    "confidence": "high"
+  },
+  "saith": {
+    "definitions": [
+      "Says; speaks; declares."
+    ],
+    "aliases": [
+      "say"
+    ],
+    "confidence": "high"
+  },
+  "salutation": {
+    "definitions": [
+      "A greeting; words of welcome or respectful address."
+    ],
+    "aliases": [
+      "salutations"
+    ],
+    "confidence": "high"
+  },
+  "salvation": {
+    "definitions": [
+      "Deliverance, preservation, and rescue, especially from sin and judgment."
+    ],
+    "confidence": "high"
+  },
+  "sanctified": {
+    "definitions": [
+      "Made holy; set apart unto sacred use or cleansed for God."
+    ],
+    "confidence": "high"
+  },
+  "sanctifieth": {
+    "definitions": [
+      "Sanctifies; sets apart as holy; consecrates or makes holy."
+    ],
+    "aliases": [
+      "sanctify"
+    ],
+    "confidence": "high"
+  },
+  "sanctify": {
+    "definitions": [
+      "To set apart as holy; to consecrate.",
+      "Also to cleanse and make holy in life and use."
+    ],
+    "aliases": [
+      "sanctified",
+      "sanctification"
+    ],
+    "confidence": "high"
+  },
+  "sanctuary": {
+    "definitions": [
+      "A holy place set apart for God's worship or presence."
+    ],
+    "aliases": [
+      "sanctuaries"
+    ],
+    "confidence": "high"
+  },
+  "satisfy": {
+    "definitions": [
+      "To fill, content, or supply fully."
+    ],
+    "aliases": [
+      "satisfied"
+    ],
+    "confidence": "high"
+  },
+  "saveth": {
+    "definitions": [
+      "Saves; delivers, preserves, or rescues from danger or ruin."
+    ],
+    "aliases": [
+      "save"
+    ],
+    "confidence": "high"
+  },
+  "savour": {
+    "definitions": [
+      "Taste, smell, or perceived quality.",
+      "Figuratively, inward relish, bent, or judgment."
+    ],
+    "aliases": [
+      "savourest"
+    ],
+    "confidence": "medium"
+  },
+  "sawest": {
+    "definitions": [
+      "Sawest; thou sawest; you saw or beheld."
+    ],
+    "confidence": "high"
+  },
+  "sayest": {
+    "definitions": [
+      "Sayest; thou sayest; you say or speak."
+    ],
+    "confidence": "high"
+  },
+  "scarce": {
+    "definitions": [
+      "Hardly; barely; with difficulty.",
+      "Also rare or not plentiful in some contexts."
+    ],
+    "confidence": "high"
+  },
+  "scattereth": {
+    "definitions": [
+      "Scatters; disperses; causes to be spread abroad."
+    ],
+    "aliases": [
+      "scatter"
+    ],
+    "confidence": "high"
+  },
+  "scorn": {
+    "definitions": [
+      "To despise with mockery or proud contempt.",
+      "Also the expression of such contempt."
+    ],
+    "aliases": [
+      "scorned",
+      "scorning"
+    ],
+    "confidence": "high"
+  },
+  "scorner": {
+    "definitions": [
+      "A mocker; one who treats truth or correction with proud contempt."
+    ],
+    "aliases": [
+      "scorners"
+    ],
+    "confidence": "high"
+  },
+  "scrip": {
+    "definitions": [
+      "A small bag, wallet, or satchel for carrying provisions."
+    ],
+    "confidence": "high"
+  },
+  "search": {
+    "definitions": [
+      "To examine carefully, seek out, or inquire diligently."
+    ],
+    "aliases": [
+      "searched",
+      "searcheth"
+    ],
+    "confidence": "high"
+  },
+  "seekest": {
+    "definitions": [
+      "Seekest; thou seekest; you seek, look for, or pursue after."
+    ],
+    "confidence": "high"
+  },
+  "seeketh": {
+    "definitions": [
+      "Seeks; looks for; pursues after.",
+      "Often implies earnest desire, inquiry, or effort to obtain."
+    ],
+    "aliases": [
+      "seek"
+    ],
+    "confidence": "high"
+  },
+  "seemeth": {
+    "definitions": [
+      "Seems; appears; is judged or thought to be so."
+    ],
+    "aliases": [
+      "seem"
+    ],
+    "confidence": "high"
+  },
+  "seemly": {
+    "definitions": [
+      "Becoming, decent, fitting, or proper."
+    ],
+    "confidence": "high"
+  },
+  "seest": {
+    "definitions": [
+      "Seest; thou seest; you see or perceive.",
+      "Often carries the further sense of understanding or taking notice."
+    ],
+    "confidence": "high"
+  },
+  "seeth": {
+    "definitions": [
+      "Sees; beholds; perceives.",
+      "Often includes understanding, taking notice, or discerning."
+    ],
+    "aliases": [
+      "see"
+    ],
+    "confidence": "high"
+  },
+  "sendest": {
+    "definitions": [
+      "Sendest; thou sendest; you send or dispatch."
+    ],
+    "confidence": "high"
+  },
+  "sendeth": {
+    "definitions": [
+      "Sends; dispatches; causes to go forth."
+    ],
+    "aliases": [
+      "send"
+    ],
+    "confidence": "high"
+  },
+  "servant": {
+    "definitions": [
+      "One who serves another under authority.",
+      "The word may refer to a household servant, official minister, or bond-servant of God."
+    ],
+    "aliases": [
+      "servants"
+    ],
+    "confidence": "high"
+  },
+  "serveth": {
+    "definitions": [
+      "Serves; ministers to; is in bondage or obedience to."
+    ],
+    "aliases": [
+      "serve"
+    ],
+    "confidence": "high"
+  },
+  "settest": {
+    "definitions": [
+      "Settest; thou settest; you set, place, appoint, or fix."
+    ],
+    "confidence": "high"
+  },
+  "setteth": {
+    "definitions": [
+      "Sets; places; appoints; establishes."
+    ],
+    "aliases": [
+      "set"
+    ],
+    "confidence": "high"
+  },
+  "settle": {
+    "definitions": [
+      "To establish, fix firmly, or bring into a stable state."
+    ],
+    "aliases": [
+      "settled"
+    ],
+    "confidence": "high"
+  },
+  "seventh": {
+    "definitions": [
+      "The one next after the sixth; occupying the seventh place."
+    ],
+    "confidence": "high"
+  },
+  "several": {
+    "definitions": [
+      "Separate; distinct; set apart from one another."
+    ],
+    "confidence": "high"
+  },
+  "severity": {
+    "definitions": [
+      "Sharpness, strictness, or stern dealing."
+    ],
+    "confidence": "high"
+  },
+  "shadow": {
+    "definitions": [
+      "Shade or dark outline caused by interception of light.",
+      "Figuratively, a dim figure or foreshadowing of something greater."
+    ],
+    "aliases": [
+      "shadows"
+    ],
+    "confidence": "medium"
+  },
+  "shaketh": {
+    "definitions": [
+      "Shakes; causes to tremble, move, or be disturbed."
+    ],
+    "aliases": [
+      "shake"
+    ],
+    "confidence": "high"
+  },
+  "shall": {
+    "definitions": [
+      "Will; is to; must; is bound to, according to context.",
+      "Often expresses certainty, duty, or future determination."
+    ],
+    "confidence": "medium"
+  },
+  "shambles": {
+    "definitions": [
+      "A meat market; a place where butchered flesh is sold."
+    ],
+    "confidence": "high"
+  },
+  "shame": {
+    "definitions": [
+      "Dishonor, reproach, or the painful sense of disgrace."
+    ],
+    "confidence": "high"
+  },
+  "shamefacedness": {
+    "definitions": [
+      "Modesty joined with a wholesome sense of shame and reserve.",
+      "Not fear of faces, but modest self-restraint."
+    ],
+    "confidence": "high"
+  },
+  "shew": {
+    "definitions": [
+      "To show; to make plain or visible."
+    ],
+    "aliases": [
+      "shewed",
+      "shewbread"
+    ],
+    "confidence": "high"
+  },
+  "shewest": {
+    "definitions": [
+      "Shewest; thou shewest; you show, make known, or set before the sight."
+    ],
+    "confidence": "high"
+  },
+  "sheweth": {
+    "definitions": [
+      "Shows; makes known; sets before the sight or understanding.",
+      "An older spelling of 'showeth.'"
+    ],
+    "aliases": [
+      "shew"
+    ],
+    "confidence": "high"
+  },
+  "shineth": {
+    "definitions": [
+      "Shines; gives light; appears bright or glorious."
+    ],
+    "aliases": [
+      "shine"
+    ],
+    "confidence": "high"
+  },
+  "shortly": {
+    "definitions": [
+      "Soon; in a little time; quickly."
+    ],
+    "confidence": "high"
+  },
+  "shouldest": {
+    "definitions": [
+      "Shouldest; thou shouldest; you ought to, would be expected to, or would in fitting course."
+    ],
+    "confidence": "high"
+  },
+  "showeth": {
+    "definitions": [
+      "Shows; makes known; displays; causes to be seen."
+    ],
+    "aliases": [
+      "show"
+    ],
+    "confidence": "high"
+  },
+  "shutteth": {
+    "definitions": [
+      "Shuts; closes; keeps from entrance or exit."
+    ],
+    "aliases": [
+      "shut"
+    ],
+    "confidence": "high"
+  },
+  "silence": {
+    "definitions": [
+      "Stillness or absence of speech.",
+      "Also the act of refraining from speech or the bringing of speech to an end."
+    ],
+    "confidence": "high"
+  },
+  "silly": {
+    "definitions": [
+      "Weak, helpless, or pitiable.",
+      "Sometimes simple or easily deceived, not merely playful foolishness."
+    ],
+    "confidence": "medium"
+  },
+  "simple": {
+    "definitions": [
+      "Inexperienced; easily led; lacking sound judgment.",
+      "Not merely plain or uncomplicated."
+    ],
+    "confidence": "high"
+  },
+  "simplicity": {
+    "definitions": [
+      "Singleness, sincerity, or freedom from mixture and guile.",
+      "Not merely lack of complexity."
+    ],
+    "confidence": "high"
+  },
+  "sincerity": {
+    "definitions": [
+      "Purity, singleness, and freedom from hypocrisy or mixture."
+    ],
+    "confidence": "high"
+  },
+  "sinneth": {
+    "definitions": [
+      "Sins; commits sin; acts contrary to God's law."
+    ],
+    "aliases": [
+      "sin"
+    ],
+    "confidence": "high"
+  },
+  "sith": {
+    "definitions": [
+      "Since; seeing that."
+    ],
+    "confidence": "high"
+  },
+  "sittest": {
+    "definitions": [
+      "Sittest; thou sittest; you sit or are seated.",
+      "It may also mean you dwell or remain in a settled place."
+    ],
+    "confidence": "high"
+  },
+  "sitteth": {
+    "definitions": [
+      "Sits; is seated; remains in a sitting place.",
+      "Often also means dwells, abides in rule, or occupies a settled position."
+    ],
+    "aliases": [
+      "sit"
+    ],
+    "confidence": "high"
+  },
+  "sixth": {
+    "definitions": [
+      "The one next after the fifth; occupying the sixth place."
+    ],
+    "confidence": "high"
+  },
+  "slay": {
+    "definitions": [
+      "To kill, especially by violence."
+    ],
+    "aliases": [
+      "slew",
+      "slain"
+    ],
+    "confidence": "high"
+  },
+  "sleepeth": {
+    "definitions": [
+      "Sleeps; rests in sleep.",
+      "At times used more gently of death."
+    ],
+    "aliases": [
+      "sleep"
+    ],
+    "confidence": "high"
+  },
+  "smiteth": {
+    "definitions": [
+      "Smites; strikes, wounds, or afflicts."
+    ],
+    "aliases": [
+      "smite"
+    ],
+    "confidence": "high"
+  },
+  "snare": {
+    "definitions": [
+      "A trap or entangling device.",
+      "Figuratively, anything that draws one into danger or sin."
+    ],
+    "aliases": [
+      "snares"
+    ],
+    "confidence": "high"
+  },
+  "sober": {
+    "definitions": [
+      "Self-restrained; sound in mind; temperate and serious."
+    ],
+    "aliases": [
+      "soberness",
+      "soberly"
+    ],
+    "confidence": "high"
+  },
+  "sod": {
+    "definitions": [
+      "To boil or seethe."
+    ],
+    "aliases": [
+      "sodden"
+    ],
+    "confidence": "high"
+  },
+  "sojourneth": {
+    "definitions": [
+      "Sojourns; dwells as a stranger for a time; resides temporarily."
+    ],
+    "aliases": [
+      "sojourn"
+    ],
+    "confidence": "high"
+  },
+  "solemn": {
+    "definitions": [
+      "Serious, grave, and set apart for weighty use or worship."
+    ],
+    "confidence": "high"
+  },
+  "some": {
+    "definitions": [
+      "A certain portion or number not fully specified.",
+      "Sometimes certain persons or things distinguished from others."
+    ],
+    "confidence": "high"
+  },
+  "sore": {
+    "definitions": [
+      "Greatly; grievously; painfully severe.",
+      "Also painful or afflicted in the literal sense."
+    ],
+    "confidence": "high"
+  },
+  "sorrow": {
+    "definitions": [
+      "Grief, sadness, or inward pain."
+    ],
+    "aliases": [
+      "sorrows"
+    ],
+    "confidence": "high"
+  },
+  "soul": {
+    "definitions": [
+      "The living soul or self; the life, person, or inward being of a man.",
+      "According to context it may refer to the whole person, the seat of desire and feeling, or life itself."
+    ],
+    "aliases": [
+      "souls"
+    ],
+    "confidence": "high"
+  },
+  "south": {
+    "definitions": [
+      "The southern quarter or region."
+    ],
+    "confidence": "high"
+  },
+  "soweth": {
+    "definitions": [
+      "Sows; scatters seed; plants for increase.",
+      "Figuratively, it may mean to spread or produce something that will later bear fruit."
+    ],
+    "aliases": [
+      "sow"
+    ],
+    "confidence": "high"
+  },
+  "spake": {
+    "definitions": [
+      "An older past-tense form meaning 'spoke.'"
+    ],
+    "aliases": [
+      "speak"
+    ],
+    "confidence": "high"
+  },
+  "spakest": {
+    "definitions": [
+      "Spakest; thou spakest; you spoke or uttered words."
+    ],
+    "confidence": "high"
+  },
+  "speak": {
+    "definitions": [
+      "To utter words, say, or make known by speech."
+    ],
+    "aliases": [
+      "spake",
+      "spoken",
+      "speaketh"
+    ],
+    "confidence": "high"
+  },
+  "speakest": {
+    "definitions": [
+      "An older second-person singular form meaning 'speakest' or 'you speak.'"
+    ],
+    "confidence": "high"
+  },
+  "speaketh": {
+    "definitions": [
+      "Speaks; utters words; declares."
+    ],
+    "aliases": [
+      "speak"
+    ],
+    "confidence": "high"
+  },
+  "spirit": {
+    "definitions": [
+      "Breath, spirit, or the immaterial principle of life and inward disposition.",
+      "It may refer to the human spirit, an angelic spirit, an evil spirit, or the Spirit of God according to context."
+    ],
+    "aliases": [
+      "spirits",
+      "spiritual"
+    ],
+    "confidence": "high"
+  },
+  "spreadeth": {
+    "definitions": [
+      "Spreads; stretches out; extends or disperses abroad."
+    ],
+    "aliases": [
+      "spread"
+    ],
+    "confidence": "high"
+  },
+  "stablish": {
+    "definitions": [
+      "To establish; to make firm, settled, or stable."
+    ],
+    "aliases": [
+      "stablished"
+    ],
+    "confidence": "high"
+  },
+  "stablisheth": {
+    "definitions": [
+      "Stablishes; makes stable, firm, or fixed.",
+      "An older form of establish with much the same force."
+    ],
+    "aliases": [
+      "stablish"
+    ],
+    "confidence": "high"
+  },
+  "standest": {
+    "definitions": [
+      "Standest; thou standest; you stand or remain fixed.",
+      "Often means you remain present, firm, or established before another."
+    ],
+    "confidence": "high"
+  },
+  "standeth": {
+    "definitions": [
+      "Stands; remains upright or fixed.",
+      "Often means continues firm, remains established, or is present ready before another."
+    ],
+    "aliases": [
+      "stand"
+    ],
+    "confidence": "high"
+  },
+  "steward": {
+    "definitions": [
+      "One entrusted with the management of another's goods or household."
+    ],
+    "aliases": [
+      "stewards",
+      "stewardship"
+    ],
+    "confidence": "high"
+  },
+  "strait": {
+    "definitions": [
+      "Narrow, close, or difficult to pass through.",
+      "Also pressed or distressed by difficulty."
+    ],
+    "aliases": [
+      "straitened"
+    ],
+    "confidence": "high"
+  },
+  "straiteneth": {
+    "definitions": [
+      "Straitens; narrows, presses, or confines.",
+      "Often means to distress, hem in, or make difficult."
+    ],
+    "aliases": [
+      "straiten"
+    ],
+    "confidence": "high"
+  },
+  "straitest": {
+    "definitions": [
+      "Straitest; most narrow, close, or difficult among those compared.",
+      "It may also mean most pressed or most confined."
+    ],
+    "confidence": "high"
+  },
+  "straitly": {
+    "definitions": [
+      "Strictly; closely; with sharp charge or narrow constraint."
+    ],
+    "confidence": "high"
+  },
+  "straitness": {
+    "definitions": [
+      "Narrowness, confinement, or distress arising from being pressed in."
+    ],
+    "confidence": "high"
+  },
+  "strength": {
+    "definitions": [
+      "Power, force, or ability whether of body, mind, heart, or estate.",
+      "Often firmness and capacity to endure or prevail."
+    ],
+    "aliases": [
+      "strengthen",
+      "strengthened"
+    ],
+    "confidence": "high"
+  },
+  "strengtheneth": {
+    "definitions": [
+      "Strengthens; makes strong; confirms or supports."
+    ],
+    "aliases": [
+      "strengthen"
+    ],
+    "confidence": "high"
+  },
+  "stretcheth": {
+    "definitions": [
+      "Stretches; extends or spreads forth."
+    ],
+    "aliases": [
+      "stretch"
+    ],
+    "confidence": "high"
+  },
+  "strive": {
+    "definitions": [
+      "To contend, labor earnestly, or struggle toward a thing."
+    ],
+    "aliases": [
+      "strove",
+      "striven"
+    ],
+    "confidence": "high"
+  },
+  "study": {
+    "definitions": [
+      "To be diligent; to strive earnestly after a thing.",
+      "Not only to read books, but to give labor and care."
+    ],
+    "confidence": "high"
+  },
+  "submit": {
+    "definitions": [
+      "To yield, subject oneself, or place under authority."
+    ],
+    "aliases": [
+      "submitted"
+    ],
+    "confidence": "high"
+  },
+  "substance": {
+    "definitions": [
+      "Possession, wealth, or material goods.",
+      "Sometimes the real underlying reality or essence."
+    ],
+    "confidence": "medium"
+  },
+  "subtil": {
+    "definitions": [
+      "Subtle, crafty, or keenly discriminating.",
+      "The moral tone depends on context."
+    ],
+    "confidence": "medium"
+  },
+  "suffer": {
+    "definitions": [
+      "To allow; to permit.",
+      "Also to endure pain or wrong, according to context."
+    ],
+    "aliases": [
+      "suffered",
+      "suffereth"
+    ],
+    "confidence": "high"
+  },
+  "sundry": {
+    "definitions": [
+      "Several; diverse; of various sorts."
+    ],
+    "confidence": "high"
+  },
+  "superfluity": {
+    "definitions": [
+      "An overflowing excess; abundance beyond what is fitting.",
+      "In moral use, rank overgrowth of wickedness."
+    ],
+    "confidence": "high"
+  },
+  "supplication": {
+    "definitions": [
+      "Earnest pleading; humble entreaty in prayer."
+    ],
+    "aliases": [
+      "supplications"
+    ],
+    "confidence": "high"
+  },
+  "suppose": {
+    "definitions": [
+      "To think, assume, or reckon as likely."
+    ],
+    "aliases": [
+      "supposed"
+    ],
+    "confidence": "high"
+  },
+  "sure": {
+    "definitions": [
+      "Certain, firm, secure, or reliable."
+    ],
+    "confidence": "high"
+  },
+  "surely": {
+    "definitions": [
+      "Certainly; assuredly; without doubt."
+    ],
+    "confidence": "high"
+  },
+  "surety": {
+    "definitions": [
+      "Security or pledge given for another.",
+      "A person who becomes bound on behalf of another."
+    ],
+    "confidence": "high"
+  },
+  "swaddling": {
+    "definitions": [
+      "Wrapping closely with bands of cloth, especially an infant."
+    ],
+    "aliases": [
+      "swaddling clothes"
+    ],
+    "confidence": "high"
+  },
+  "swarest": {
+    "definitions": [
+      "Swarest; thou swarest; you swore, especially by oath."
+    ],
+    "confidence": "high"
+  },
+  "swear": {
+    "definitions": [
+      "To bind oneself with an oath or solemn declaration."
+    ],
+    "aliases": [
+      "sware",
+      "sworn"
+    ],
+    "confidence": "high"
+  },
+  "sweareth": {
+    "definitions": [
+      "Swears; takes an oath or speaks with solemn appeal."
+    ],
+    "aliases": [
+      "swear"
+    ],
+    "confidence": "high"
+  },
+  "takest": {
+    "definitions": [
+      "Takest; thou takest; you take, receive, or lay hold on."
+    ],
+    "confidence": "high"
+  },
+  "taketh": {
+    "definitions": [
+      "Takes; receives; lays hold on.",
+      "It may also mean removes, carries away, or accepts according to context."
+    ],
+    "aliases": [
+      "take"
+    ],
+    "confidence": "high"
+  },
+  "tarry": {
+    "definitions": [
+      "To remain, stay, or wait."
+    ],
+    "aliases": [
+      "tarried",
+      "tarrying"
+    ],
+    "confidence": "high"
+  },
+  "teachest": {
+    "definitions": [
+      "Teachest; thou teachest; you teach or instruct."
+    ],
+    "confidence": "high"
+  },
+  "teacheth": {
+    "definitions": [
+      "Teaches; instructs; imparts knowledge or doctrine."
+    ],
+    "aliases": [
+      "teach"
+    ],
+    "confidence": "high"
+  },
+  "teareth": {
+    "definitions": [
+      "Tears; rends or pulls apart violently."
+    ],
+    "aliases": [
+      "tear"
+    ],
+    "confidence": "high"
+  },
+  "teeth": {
+    "definitions": [
+      "The hard parts in the mouth used for biting and chewing.",
+      "Often used figuratively of devouring power, rage, or fierce injury."
+    ],
+    "confidence": "high"
+  },
+  "telleth": {
+    "definitions": [
+      "Tells; relates, declares, or counts."
+    ],
+    "aliases": [
+      "tell"
+    ],
+    "confidence": "high"
+  },
+  "temper": {
+    "definitions": [
+      "To mix, soften, or bring into a fitting condition.",
+      "Also inward disposition or frame of spirit in some uses."
+    ],
+    "confidence": "medium"
+  },
+  "temperance": {
+    "definitions": [
+      "Self-control; mastery over appetites and passions."
+    ],
+    "confidence": "high"
+  },
+  "tempest": {
+    "definitions": [
+      "A violent storm, especially with wind and disturbance."
+    ],
+    "aliases": [
+      "tempests"
+    ],
+    "confidence": "high"
+  },
+  "tempt": {
+    "definitions": [
+      "To try, test, or prove.",
+      "Often to entice toward evil, according to context."
+    ],
+    "aliases": [
+      "tempted",
+      "temptation"
+    ],
+    "confidence": "high"
+  },
+  "tender": {
+    "definitions": [
+      "Soft, delicate, or gentle.",
+      "Often compassionate and easily touched in feeling."
+    ],
+    "confidence": "medium"
+  },
+  "tenth": {
+    "definitions": [
+      "The one next after the ninth; occupying the tenth place."
+    ],
+    "confidence": "high"
+  },
+  "terror": {
+    "definitions": [
+      "Great dread, fear, or cause of fearful trembling."
+    ],
+    "aliases": [
+      "terrors"
+    ],
+    "confidence": "high"
+  },
+  "testimony": {
+    "definitions": [
+      "Witness borne; solemn declaration; evidence given.",
+      "Also God's revealed witness or covenantal charge."
+    ],
+    "aliases": [
+      "testimonies"
+    ],
+    "confidence": "high"
+  },
+  "thanksgiving": {
+    "definitions": [
+      "The giving of thanks; grateful acknowledgment offered to God."
+    ],
+    "aliases": [
+      "thanksgivings"
+    ],
+    "confidence": "high"
+  },
+  "thence": {
+    "definitions": [
+      "From that place; from that source; from there."
+    ],
+    "confidence": "high"
+  },
+  "there": {
+    "definitions": [
+      "In that place; at that point; in that matter, according to context."
+    ],
+    "confidence": "high"
+  },
+  "thereby": {
+    "definitions": [
+      "By that means; through that."
+    ],
+    "confidence": "high"
+  },
+  "therefore": {
+    "definitions": [
+      "For that reason; on that account; consequently."
+    ],
+    "confidence": "high"
+  },
+  "therein": {
+    "definitions": [
+      "In that; within that matter or place."
+    ],
+    "confidence": "high"
+  },
+  "thereof": {
+    "definitions": [
+      "Of that; belonging to that; concerning that."
+    ],
+    "confidence": "high"
+  },
+  "thereon": {
+    "definitions": [
+      "On that; upon that thing or place."
+    ],
+    "confidence": "high"
+  },
+  "thereto": {
+    "definitions": [
+      "To that; unto that; in addition to that."
+    ],
+    "confidence": "high"
+  },
+  "therewith": {
+    "definitions": [
+      "With that; together with it; by means of that."
+    ],
+    "confidence": "high"
+  },
+  "thinkest": {
+    "definitions": [
+      "Thinkest; thou thinkest; you think, suppose, or consider."
+    ],
+    "confidence": "high"
+  },
+  "thirtieth": {
+    "definitions": [
+      "The one next after the twenty-ninth; occupying the thirtieth place."
+    ],
+    "confidence": "high"
+  },
+  "thither": {
+    "definitions": [
+      "To that place; there."
+    ],
+    "confidence": "high"
+  },
+  "thitherward": {
+    "definitions": [
+      "Toward that place; in that direction."
+    ],
+    "confidence": "high"
+  },
+  "toucheth": {
+    "definitions": [
+      "Touches; comes into contact with.",
+      "It may also mean reaches, affects, or concerns."
+    ],
+    "aliases": [
+      "touch"
+    ],
+    "confidence": "high"
+  },
+  "toward": {
+    "definitions": [
+      "In the direction of; with respect to; near unto."
+    ],
+    "confidence": "high"
+  },
+  "transgressed": {
+    "definitions": [
+      "Went beyond the commanded boundary; broke the law or charge given."
+    ],
+    "aliases": [
+      "transgress",
+      "transgresseth"
+    ],
+    "confidence": "high"
+  },
+  "transgressest": {
+    "definitions": [
+      "Transgressest; thou transgressest; you go beyond the command and so offend."
+    ],
+    "confidence": "high"
+  },
+  "transgression": {
+    "definitions": [
+      "A going beyond the boundary of law; offense against command."
+    ],
+    "aliases": [
+      "transgressions"
+    ],
+    "confidence": "high"
+  },
+  "travail": {
+    "definitions": [
+      "Painful labor, especially labor in childbirth.",
+      "By extension, severe toil or inward anguish."
+    ],
+    "aliases": [
+      "travaileth"
+    ],
+    "confidence": "high"
+  },
+  "travailest": {
+    "definitions": [
+      "Travailest; thou travailest; you labor painfully, especially as in sore toil or birth-pain."
+    ],
+    "confidence": "high"
+  },
+  "treadeth": {
+    "definitions": [
+      "Treads; steps upon; walks over; tramples."
+    ],
+    "aliases": [
+      "tread"
+    ],
+    "confidence": "high"
+  },
+  "tremble": {
+    "definitions": [
+      "To shake with fear, weakness, or strong feeling."
+    ],
+    "aliases": [
+      "trembled",
+      "trembling"
+    ],
+    "confidence": "high"
+  },
+  "tribulation": {
+    "definitions": [
+      "Pressure, affliction, and distress under trial."
+    ],
+    "aliases": [
+      "tribulations"
+    ],
+    "confidence": "high"
+  },
+  "troubleth": {
+    "definitions": [
+      "Troubles; disturbs, afflicts, or throws into agitation."
+    ],
+    "aliases": [
+      "trouble"
+    ],
+    "confidence": "high"
+  },
+  "trow": {
+    "definitions": [
+      "To think, suppose, or believe."
+    ],
+    "confidence": "high"
+  },
+  "trust": {
+    "definitions": [
+      "To rely upon with confidence; to place dependence in."
+    ],
+    "aliases": [
+      "trusted",
+      "trusteth"
+    ],
+    "confidence": "high"
+  },
+  "trustest": {
+    "definitions": [
+      "Trustest; thou trustest; you trust, rely, or place confidence in."
+    ],
+    "confidence": "high"
+  },
+  "truth": {
+    "definitions": [
+      "That which is true, sure, and according to reality.",
+      "Also faithfulness, steadfastness, and sincerity, especially when spoken of God or of covenant dealing."
+    ],
+    "confidence": "high"
+  },
+  "turnest": {
+    "definitions": [
+      "Turnest; thou turnest; you turn, return, or change course."
+    ],
+    "confidence": "high"
+  },
+  "turneth": {
+    "definitions": [
+      "Turns; changes direction; returns.",
+      "Often used of turning the heart, changing course, or converting from one state or way to another."
+    ],
+    "aliases": [
+      "turn"
+    ],
+    "confidence": "high"
+  },
+  "twain": {
+    "definitions": [
+      "Two; a pair considered as two persons or things."
+    ],
+    "confidence": "high"
+  },
+  "twentieth": {
+    "definitions": [
+      "The one next after the nineteenth; occupying the twentieth place."
+    ],
+    "confidence": "high"
+  },
+  "unawares": {
+    "definitions": [
+      "Without being aware; unexpectedly; before one perceives it."
+    ],
+    "confidence": "high"
+  },
+  "uncircumcised": {
+    "definitions": [
+      "Not circumcised; outside the covenant sign.",
+      "Often used figuratively for what is unrenewed or unpurified."
+    ],
+    "confidence": "high"
+  },
+  "unclean": {
+    "definitions": [
+      "Defiled, impure, or ceremonially unfit.",
+      "At times morally impure as well."
+    ],
+    "confidence": "high"
+  },
+  "uncleanness": {
+    "definitions": [
+      "Impurity, whether ceremonial or moral.",
+      "It may refer to defilement under the law, or to filthy and sinful corruption in conduct and desire."
+    ],
+    "confidence": "high"
+  },
+  "understandeth": {
+    "definitions": [
+      "Understands; perceives the meaning of; discerns rightly."
+    ],
+    "aliases": [
+      "understand"
+    ],
+    "confidence": "high"
+  },
+  "understanding": {
+    "definitions": [
+      "Discernment, intelligence, and right apprehension of a matter."
+    ],
+    "confidence": "high"
+  },
+  "unfeigned": {
+    "definitions": [
+      "Without hypocrisy; sincere; genuine."
+    ],
+    "confidence": "high"
+  },
+  "ungodly": {
+    "definitions": [
+      "Without godliness; irreverent and wicked toward God."
+    ],
+    "confidence": "high"
+  },
+  "unrighteousness": {
+    "definitions": [
+      "Injustice, wrong, or want of conformity to what is right before God."
+    ],
+    "confidence": "high"
+  },
+  "unto": {
+    "definitions": [
+      "To; toward; until; in relation to, according to context."
+    ],
+    "confidence": "high"
+  },
+  "upright": {
+    "definitions": [
+      "Straight, just, and morally sound."
+    ],
+    "confidence": "high"
+  },
+  "uprightly": {
+    "definitions": [
+      "With straightness, integrity, and moral rightness."
+    ],
+    "confidence": "high"
+  },
+  "upward": {
+    "definitions": [
+      "Toward a higher place; above."
+    ],
+    "confidence": "high"
+  },
+  "use": {
+    "definitions": [
+      "Custom, practice, or habitual way of acting.",
+      "Also employment or application of a thing."
+    ],
+    "aliases": [
+      "used"
+    ],
+    "confidence": "medium"
+  },
+  "useth": {
+    "definitions": [
+      "Uses; employs; is accustomed to."
+    ],
+    "aliases": [
+      "use"
+    ],
+    "confidence": "high"
+  },
+  "usury": {
+    "definitions": [
+      "Interest exacted on a loan, especially when viewed as oppressive or unlawful."
+    ],
+    "confidence": "high"
+  },
+  "uttereth": {
+    "definitions": [
+      "Utters; speaks forth; gives out."
+    ],
+    "aliases": [
+      "utter"
+    ],
+    "confidence": "high"
+  },
+  "uttermost": {
+    "definitions": [
+      "Farthest, highest, or most extreme limit."
+    ],
+    "confidence": "high"
+  },
+  "vain": {
+    "definitions": [
+      "Empty, fruitless, or without true profit.",
+      "Also proud or lifted up, according to context."
+    ],
+    "confidence": "high"
+  },
+  "vainly": {
+    "definitions": [
+      "To no good purpose; fruitlessly; emptily."
+    ],
+    "confidence": "high"
+  },
+  "vanity": {
+    "definitions": [
+      "Emptiness, frailty, and what proves passing or profitless.",
+      "Sometimes pride or self-regard, according to context."
+    ],
+    "confidence": "high"
+  },
+  "vengeance": {
+    "definitions": [
+      "Avenging justice; the inflicting of due punishment for wrong."
+    ],
+    "confidence": "high"
+  },
+  "verily": {
+    "definitions": [
+      "Truly; assuredly; of a truth."
+    ],
+    "confidence": "high"
+  },
+  "vexation": {
+    "definitions": [
+      "Troubling, irritation, or grievous disquiet."
+    ],
+    "confidence": "high"
+  },
+  "vile": {
+    "definitions": [
+      "Low, base, or morally contemptible.",
+      "Sometimes humble or lowly in outward estate, depending on context."
+    ],
+    "confidence": "medium"
+  },
+  "violence": {
+    "definitions": [
+      "Force used wrongfully; oppression, cruelty, or violent injury."
+    ],
+    "confidence": "high"
+  },
+  "virtue": {
+    "definitions": [
+      "Moral excellence, goodness, or worthy power of character.",
+      "In some contexts, power proceeding from a person."
+    ],
+    "confidence": "medium"
+  },
+  "vision": {
+    "definitions": [
+      "A sight, appearance, or supernatural revelation seen.",
+      "Often a divinely granted scene or message perceived by prophetic sight."
+    ],
+    "aliases": [
+      "visions"
+    ],
+    "confidence": "high"
+  },
+  "visitation": {
+    "definitions": [
+      "A coming to inspect, help, or judge.",
+      "May be gracious visitation or punitive visitation depending on context."
+    ],
+    "aliases": [
+      "visitations"
+    ],
+    "confidence": "high"
+  },
+  "vocation": {
+    "definitions": [
+      "Calling; the state or duty to which one is called."
+    ],
+    "confidence": "high"
+  },
+  "waiteth": {
+    "definitions": [
+      "Waits; stays in expectation; tarries with hope or readiness."
+    ],
+    "aliases": [
+      "wait"
+    ],
+    "confidence": "high"
+  },
+  "walkest": {
+    "definitions": [
+      "Walkest; thou walkest; you walk.",
+      "Very often used of the way you live and conduct yourself."
+    ],
+    "confidence": "high"
+  },
+  "walketh": {
+    "definitions": [
+      "Walks; goes on foot.",
+      "Very often means lives, conducts oneself, or proceeds in a course of life."
+    ],
+    "aliases": [
+      "walk"
+    ],
+    "confidence": "high"
+  },
+  "wander": {
+    "definitions": [
+      "To go astray, roam, or move without a settled course."
+    ],
+    "aliases": [
+      "wandered",
+      "wandering"
+    ],
+    "confidence": "high"
+  },
+  "wanteth": {
+    "definitions": [
+      "Wants; lacks; is without what is needed."
+    ],
+    "aliases": [
+      "want"
+    ],
+    "confidence": "high"
+  },
+  "wanton": {
+    "definitions": [
+      "Unrestrained; luxuriant; self-indulgent.",
+      "Often carrying the sense of licentious or undisciplined behavior."
+    ],
+    "aliases": [
+      "wantonness"
+    ],
+    "confidence": "high"
+  },
+  "wast": {
+    "definitions": [
+      "An older second-person singular form meaning 'wert' or 'you were.'"
+    ],
+    "confidence": "high"
+  },
+  "watch": {
+    "definitions": [
+      "To stay awake, keep guard, or remain spiritually alert.",
+      "Also a division of the night under a guard system."
+    ],
+    "aliases": [
+      "watcheth",
+      "watching"
+    ],
+    "confidence": "high"
+  },
+  "watchful": {
+    "definitions": [
+      "Alert, vigilant, and careful to observe danger or duty."
+    ],
+    "confidence": "high"
+  },
+  "wax": {
+    "definitions": [
+      "To grow, become, or increase."
+    ],
+    "aliases": [
+      "waxed",
+      "waxeth"
+    ],
+    "confidence": "high"
+  },
+  "weakness": {
+    "definitions": [
+      "Lack of strength, whether bodily, mental, or spiritual."
+    ],
+    "aliases": [
+      "weaknesses"
+    ],
+    "confidence": "high"
+  },
+  "wentest": {
+    "definitions": [
+      "Wentest; thou wentest; you went, departed, or proceeded."
+    ],
+    "confidence": "high"
+  },
+  "west": {
+    "definitions": [
+      "The western quarter or region."
+    ],
+    "confidence": "high"
+  },
+  "westward": {
+    "definitions": [
+      "Toward the west."
+    ],
+    "confidence": "high"
+  },
+  "whatsoever": {
+    "definitions": [
+      "Whatever at all; anything whatever without exception."
+    ],
+    "confidence": "high"
+  },
+  "whence": {
+    "definitions": [
+      "From what place; from which source."
+    ],
+    "confidence": "high"
+  },
+  "whensoever": {
+    "definitions": [
+      "Whenever; at whatever time."
+    ],
+    "confidence": "high"
+  },
+  "where": {
+    "definitions": [
+      "In what place; in which place; at the place in view.",
+      "Sometimes used more broadly of the situation or matter in question."
+    ],
+    "confidence": "high"
+  },
+  "whereas": {
+    "definitions": [
+      "While on the other hand; considering that; where."
+    ],
+    "confidence": "medium"
+  },
+  "whereby": {
+    "definitions": [
+      "By which; through which means."
+    ],
+    "confidence": "high"
+  },
+  "wherefore": {
+    "definitions": [
+      "For which reason; why; on what account."
+    ],
+    "confidence": "high"
+  },
+  "wherein": {
+    "definitions": [
+      "In which; in what thing or matter."
+    ],
+    "confidence": "high"
+  },
+  "whereof": {
+    "definitions": [
+      "Of which; concerning which."
+    ],
+    "confidence": "high"
+  },
+  "whereon": {
+    "definitions": [
+      "On which; upon which thing or place."
+    ],
+    "confidence": "high"
+  },
+  "wheresoever": {
+    "definitions": [
+      "In whatever place; wherever."
+    ],
+    "confidence": "high"
+  },
+  "whereunto": {
+    "definitions": [
+      "To which; unto which thing or purpose."
+    ],
+    "confidence": "high"
+  },
+  "wherewith": {
+    "definitions": [
+      "With which; by means of which."
+    ],
+    "confidence": "high"
+  },
+  "while": {
+    "definitions": [
+      "During the time that; as long as; for a short time."
+    ],
+    "confidence": "high"
+  },
+  "whither": {
+    "definitions": [
+      "To what place; to which place."
+    ],
+    "confidence": "high"
+  },
+  "whithersoever": {
+    "definitions": [
+      "To whatever place; wherever one may go."
+    ],
+    "confidence": "high"
+  },
+  "wholly": {
+    "definitions": [
+      "Entirely; fully; altogether."
+    ],
+    "confidence": "high"
+  },
+  "whosoever": {
+    "definitions": [
+      "Whoever; any person whatsoever without naming which one in particular."
+    ],
+    "confidence": "high"
+  },
+  "wicked": {
+    "definitions": [
+      "Evil in character and conduct; guilty of moral wrong."
+    ],
+    "confidence": "high"
+  },
+  "wickedly": {
+    "definitions": [
+      "In a wicked manner; evilly; with moral wrong or impiety."
+    ],
+    "confidence": "high"
+  },
+  "wickedness": {
+    "definitions": [
+      "Evil conduct, moral wrong, or active ungodliness."
+    ],
+    "confidence": "high"
+  },
+  "wilderness": {
+    "definitions": [
+      "A desert place, waste, or uncultivated region fit for little settled habitation.",
+      "Often a solitary tract lying apart from cities and fields."
+    ],
+    "aliases": [
+      "wildernesses"
+    ],
+    "confidence": "high"
+  },
+  "wiles": {
+    "definitions": [
+      "Crafty methods, subtle schemes, or deceitful devices."
+    ],
+    "confidence": "high"
+  },
+  "wisdom": {
+    "definitions": [
+      "Right judgment joined with understanding and skill in godly living."
+    ],
+    "confidence": "high"
+  },
+  "wise": {
+    "definitions": [
+      "Endued with sound judgment, understanding, and skill in right conduct.",
+      "Sometimes prudent in earthly affairs, but often morally and spiritually discerning."
+    ],
+    "confidence": "high"
+  },
+  "wist": {
+    "definitions": [
+      "Knew.",
+      "An older past-tense form related to 'wit' in the sense of knowing."
+    ],
+    "confidence": "high"
+  },
+  "withal": {
+    "definitions": [
+      "With it; besides; moreover; by means of that."
+    ],
+    "confidence": "medium"
+  },
+  "withered": {
+    "definitions": [
+      "Dried up, shrunk, or wasted away for lack of life or moisture."
+    ],
+    "confidence": "high"
+  },
+  "withereth": {
+    "definitions": [
+      "Withers; dries up; wastes away for lack of life or moisture."
+    ],
+    "aliases": [
+      "wither"
+    ],
+    "confidence": "high"
+  },
+  "witness": {
+    "definitions": [
+      "One who bears testimony, or the testimony itself that is borne.",
+      "Also a token, evidence, or public sign that proves or confirms a matter."
+    ],
+    "aliases": [
+      "witnesses"
+    ],
+    "confidence": "high"
+  },
+  "worketh": {
+    "definitions": [
+      "Works; acts; performs or produces an effect.",
+      "Often means operates inwardly or brings something to pass."
+    ],
+    "aliases": [
+      "work"
+    ],
+    "confidence": "high"
+  },
+  "worship": {
+    "definitions": [
+      "Honor, reverence, and adoration offered to one deemed worthy.",
+      "In Scripture most often the reverent service and homage due unto God."
+    ],
+    "aliases": [
+      "worshipped",
+      "worshippeth"
+    ],
+    "confidence": "high"
+  },
+  "worthy": {
+    "definitions": [
+      "Fit, suitable, deserving, or of corresponding value."
+    ],
+    "confidence": "high"
+  },
+  "wot": {
+    "definitions": [
+      "Know; knoweth; knows."
+    ],
+    "aliases": [
+      "wotteth"
+    ],
+    "confidence": "high"
+  },
+  "wouldest": {
+    "definitions": [
+      "Wouldest; thou wouldest; you would, wish, or were inclined to.",
+      "Often expresses willingness, desire, or what one would do in a supposed case."
+    ],
+    "confidence": "high"
+  },
+  "wrath": {
+    "definitions": [
+      "Strong anger or indignation.",
+      "Often righteous judgment when spoken of God."
+    ],
+    "confidence": "high"
+  },
+  "wroth": {
+    "definitions": [
+      "Angry; filled with wrath."
+    ],
+    "confidence": "high"
+  },
+  "youngest": {
+    "definitions": [
+      "Least in age; the most young among those compared."
+    ],
+    "confidence": "high"
+  },
+  "youth": {
+    "definitions": [
+      "The early part of life; young age; the state of being young."
+    ],
+    "confidence": "high"
+  },
+  "zeal": {
+    "definitions": [
+      "Fervent eagerness and ardor of spirit for a cause or person."
+    ],
+    "confidence": "high"
+  }
+}

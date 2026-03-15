@@ -1,0 +1,907 @@
+{
+  "concordanceWords": 13787,
+  "aiDictionaryEntries": 567,
+  "coveredByKeyOrAlias": 1130,
+  "refinedCandidates": [
+    {
+      "word": "atonement",
+      "count": 70,
+      "score": 36,
+      "isProper": false
+    },
+    {
+      "word": "covenant",
+      "count": 272,
+      "score": 32,
+      "isProper": false
+    },
+    {
+      "word": "mercy",
+      "count": 258,
+      "score": 32,
+      "isProper": false
+    },
+    {
+      "word": "instant",
+      "count": 8,
+      "score": 22,
+      "isProper": false
+    },
+    {
+      "word": "there",
+      "count": 1901,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "forth",
+      "count": 832,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "ever",
+      "count": 416,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "where",
+      "count": 309,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "thereon",
+      "count": 61,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "remembrance",
+      "count": 50,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "believeth",
+      "count": 39,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "forest",
+      "count": 38,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "remaineth",
+      "count": 36,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "uncleanness",
+      "count": 35,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "beneath",
+      "count": 27,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "whereon",
+      "count": 25,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "withered",
+      "count": 24,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "beareth",
+      "count": 23,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "best",
+      "count": 23,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "beautiful",
+      "count": 20,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "thereto",
+      "count": 20,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "unrighteousness",
+      "count": 20,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "belongeth",
+      "count": 19,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "request",
+      "count": 19,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "recompence",
+      "count": 18,
+      "score": 21,
+      "isProper": false
+    },
+    {
+      "word": "saith",
+      "count": 1197,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "city",
+      "count": 777,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "mouth",
+      "count": 397,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "both",
+      "count": 342,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "death",
+      "count": 340,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "congregation",
+      "count": 331,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "wilderness",
+      "count": 293,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "toward",
+      "count": 285,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "judgment",
+      "count": 284,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "cometh",
+      "count": 267,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "gathered",
+      "count": 255,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "wise",
+      "count": 236,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "faith",
+      "count": 231,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "strength",
+      "count": 230,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "truth",
+      "count": 220,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "some",
+      "count": 195,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "month",
+      "count": 187,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "goeth",
+      "count": 131,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "nation",
+      "count": 127,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "south",
+      "count": 127,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "north",
+      "count": 125,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "whosoever",
+      "count": 121,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "giveth",
+      "count": 119,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "witness",
+      "count": 119,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "maketh",
+      "count": 117,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "wickedness",
+      "count": 117,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "sabbath",
+      "count": 115,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "seventh",
+      "count": 115,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "presence",
+      "count": 108,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "bless",
+      "count": 107,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "mayest",
+      "count": 107,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "knoweth",
+      "count": 100,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "generation",
+      "count": 92,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "doeth",
+      "count": 91,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "liveth",
+      "count": 86,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "garment",
+      "count": 82,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "never",
+      "count": 82,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "breadth",
+      "count": 80,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "fourth",
+      "count": 78,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "likewise",
+      "count": 78,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "taketh",
+      "count": 74,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "knowest",
+      "count": 73,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "vision",
+      "count": 73,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "length",
+      "count": 71,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "bringeth",
+      "count": 70,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "tenth",
+      "count": 68,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "youth",
+      "count": 66,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "west",
+      "count": 65,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "endureth",
+      "count": 59,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "fifth",
+      "count": 59,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "upward",
+      "count": 59,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "shouldest",
+      "count": 58,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "afterward",
+      "count": 57,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "habitation",
+      "count": 57,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "lieth",
+      "count": 57,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "loveth",
+      "count": 57,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "oath",
+      "count": 54,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "violence",
+      "count": 54,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "foundation",
+      "count": 53,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "seeth",
+      "count": 52,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "harvest",
+      "count": 51,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "heareth",
+      "count": 48,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "eateth",
+      "count": 46,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "goest",
+      "count": 46,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "pestilence",
+      "count": 46,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "sackcloth",
+      "count": 45,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "teeth",
+      "count": 45,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "sixth",
+      "count": 44,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "fatherless",
+      "count": 43,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "nakedness",
+      "count": 43,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "breath",
+      "count": 42,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "interpretation",
+      "count": 42,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "doest",
+      "count": 40,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "sitteth",
+      "count": 40,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "walketh",
+      "count": 40,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "eastward",
+      "count": 39,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "seeketh",
+      "count": 39,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "eighth",
+      "count": 38,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "passeth",
+      "count": 38,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "sayest",
+      "count": 38,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "toucheth",
+      "count": 38,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "confidence",
+      "count": 37,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "vengeance",
+      "count": 37,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "merciful",
+      "count": 36,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "worketh",
+      "count": 35,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "authority",
+      "count": 34,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "silence",
+      "count": 34,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "twentieth",
+      "count": 34,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "ninth",
+      "count": 33,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "patience",
+      "count": 33,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "wouldest",
+      "count": 33,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "fruitful",
+      "count": 32,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "greatness",
+      "count": 32,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "looketh",
+      "count": 32,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "turneth",
+      "count": 32,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "causeth",
+      "count": 31,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "calleth",
+      "count": 30,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "circumcision",
+      "count": 30,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "gavest",
+      "count": 30,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "hateth",
+      "count": 30,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "oblation",
+      "count": 30,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "putteth",
+      "count": 30,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "hence",
+      "count": 29,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "pity",
+      "count": 29,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "standeth",
+      "count": 29,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "business",
+      "count": 28,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "falleth",
+      "count": 28,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "likeness",
+      "count": 28,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "seest",
+      "count": 28,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "comest",
+      "count": 27,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "covereth",
+      "count": 27,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "less",
+      "count": 27,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "nevertheless",
+      "count": 27,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "whithersoever",
+      "count": 27,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "camest",
+      "count": 26,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "dieth",
+      "count": 26,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "makest",
+      "count": 26,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "westward",
+      "count": 26,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "appearance",
+      "count": 25,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "confusion",
+      "count": 25,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "findeth",
+      "count": 25,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "fourteenth",
+      "count": 25,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "fulness",
+      "count": 25,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "inward",
+      "count": 25,
+      "score": 20,
+      "isProper": false
+    },
+    {
+      "word": "joyful",
+      "count": 25,
+      "score": 20,
+      "isProper": false
+    }
+  ]
+}

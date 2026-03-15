@@ -1,0 +1,607 @@
+{
+  "concordanceWords": 12816,
+  "aiDictionaryEntries": 811,
+  "coveredByKeyOrAlias": 1241,
+  "highValueCandidates": [
+    {
+      "word": "entereth",
+      "count": 19,
+      "score": 19
+    },
+    {
+      "word": "faileth",
+      "count": 19,
+      "score": 19
+    },
+    {
+      "word": "sheweth",
+      "count": 19,
+      "score": 19
+    },
+    {
+      "word": "burneth",
+      "count": 18,
+      "score": 19
+    },
+    {
+      "word": "committeth",
+      "count": 17,
+      "score": 19
+    },
+    {
+      "word": "crieth",
+      "count": 17,
+      "score": 19
+    },
+    {
+      "word": "desireth",
+      "count": 17,
+      "score": 19
+    },
+    {
+      "word": "layeth",
+      "count": 17,
+      "score": 19
+    },
+    {
+      "word": "drinketh",
+      "count": 16,
+      "score": 19
+    },
+    {
+      "word": "gathereth",
+      "count": 16,
+      "score": 19
+    },
+    {
+      "word": "breaketh",
+      "count": 15,
+      "score": 19
+    },
+    {
+      "word": "casteth",
+      "count": 15,
+      "score": 19
+    },
+    {
+      "word": "despiseth",
+      "count": 15,
+      "score": 19
+    },
+    {
+      "word": "hideth",
+      "count": 15,
+      "score": 19
+    },
+    {
+      "word": "offereth",
+      "count": 15,
+      "score": 19
+    },
+    {
+      "word": "sojourneth",
+      "count": 15,
+      "score": 19
+    },
+    {
+      "word": "creepeth",
+      "count": 14,
+      "score": 19
+    },
+    {
+      "word": "followeth",
+      "count": 14,
+      "score": 19
+    },
+    {
+      "word": "groweth",
+      "count": 14,
+      "score": 19
+    },
+    {
+      "word": "riseth",
+      "count": 14,
+      "score": 19
+    },
+    {
+      "word": "ruleth",
+      "count": 14,
+      "score": 19
+    },
+    {
+      "word": "spreadeth",
+      "count": 14,
+      "score": 19
+    },
+    {
+      "word": "cleaveth",
+      "count": 13,
+      "score": 19
+    },
+    {
+      "word": "commandeth",
+      "count": 13,
+      "score": 19
+    },
+    {
+      "word": "delighteth",
+      "count": 13,
+      "score": 19
+    },
+    {
+      "word": "mephibosheth",
+      "count": 13,
+      "score": 19
+    },
+    {
+      "word": "reacheth",
+      "count": 13,
+      "score": 19
+    },
+    {
+      "word": "regardeth",
+      "count": 13,
+      "score": 19
+    },
+    {
+      "word": "reigneth",
+      "count": 13,
+      "score": 19
+    },
+    {
+      "word": "smiteth",
+      "count": 13,
+      "score": 19
+    },
+    {
+      "word": "soweth",
+      "count": 13,
+      "score": 19
+    },
+    {
+      "word": "draweth",
+      "count": 12,
+      "score": 19
+    },
+    {
+      "word": "floweth",
+      "count": 12,
+      "score": 19
+    },
+    {
+      "word": "heth",
+      "count": 12,
+      "score": 19
+    },
+    {
+      "word": "ariseth",
+      "count": 11,
+      "score": 19
+    },
+    {
+      "word": "japheth",
+      "count": 11,
+      "score": 19
+    },
+    {
+      "word": "mourneth",
+      "count": 11,
+      "score": 19
+    },
+    {
+      "word": "proceedeth",
+      "count": 11,
+      "score": 19
+    },
+    {
+      "word": "runneth",
+      "count": 11,
+      "score": 19
+    },
+    {
+      "word": "sweareth",
+      "count": 11,
+      "score": 19
+    },
+    {
+      "word": "understandeth",
+      "count": 11,
+      "score": 19
+    },
+    {
+      "word": "waiteth",
+      "count": 11,
+      "score": 19
+    },
+    {
+      "word": "appeareth",
+      "count": 10,
+      "score": 19
+    },
+    {
+      "word": "asketh",
+      "count": 10,
+      "score": 19
+    },
+    {
+      "word": "dealeth",
+      "count": 10,
+      "score": 19
+    },
+    {
+      "word": "devoureth",
+      "count": 10,
+      "score": 19
+    },
+    {
+      "word": "divideth",
+      "count": 10,
+      "score": 19
+    },
+    {
+      "word": "lifteth",
+      "count": 10,
+      "score": 19
+    },
+    {
+      "word": "overcometh",
+      "count": 10,
+      "score": 19
+    },
+    {
+      "word": "poureth",
+      "count": 10,
+      "score": 19
+    },
+    {
+      "word": "scattereth",
+      "count": 10,
+      "score": 19
+    },
+    {
+      "word": "treadeth",
+      "count": 10,
+      "score": 19
+    },
+    {
+      "word": "troubleth",
+      "count": 10,
+      "score": 19
+    },
+    {
+      "word": "bindeth",
+      "count": 9,
+      "score": 19
+    },
+    {
+      "word": "ceaseth",
+      "count": 9,
+      "score": 19
+    },
+    {
+      "word": "considereth",
+      "count": 9,
+      "score": 19
+    },
+    {
+      "word": "exalteth",
+      "count": 9,
+      "score": 19
+    },
+    {
+      "word": "hasteth",
+      "count": 9,
+      "score": 19
+    },
+    {
+      "word": "holdeth",
+      "count": 9,
+      "score": 19
+    },
+    {
+      "word": "refuseth",
+      "count": 9,
+      "score": 19
+    },
+    {
+      "word": "shineth",
+      "count": 9,
+      "score": 19
+    },
+    {
+      "word": "thirtieth",
+      "count": 9,
+      "score": 19
+    },
+    {
+      "word": "uttereth",
+      "count": 9,
+      "score": 19
+    },
+    {
+      "word": "azmaveth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "buildeth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "cheweth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "chiefest",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "defileth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "destroyeth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "deviseth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "feedeth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "fleeth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "getteth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "honoureth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "meaneth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "moveth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "preserveth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "raiseth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "seth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "stirreth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "withereth",
+      "count": 8,
+      "score": 19
+    },
+    {
+      "word": "aileth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "elisabeth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "languisheth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "melteth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "pertaineth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "prophesieth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "pursueth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "reproacheth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "rideth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "saveth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "selleth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "serveth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "shutteth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "sleepeth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "strengtheneth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "stretcheth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "telleth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "useth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "wanteth",
+      "count": 7,
+      "score": 19
+    },
+    {
+      "word": "careth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "cutteth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "executeth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "fadeth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "filleth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "flattereth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "forsaketh",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "hidest",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "leaveth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "lusteth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "needeth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "persecutest",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "pisseth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "pleaseth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "profiteth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "returneth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "revealeth",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "shaketh",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "teachest",
+      "count": 6,
+      "score": 19
+    },
+    {
+      "word": "teareth",
+      "count": 6,
+      "score": 19
+    }
+  ]
+}
