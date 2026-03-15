@@ -1,4 +1,4 @@
-import { BrainIcon, LoaderCircleIcon } from "lucide-react";
+import { BrainCircuitIcon, LoaderCircleIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { AIDictionaryEntry } from "@/types/reader";
@@ -43,7 +43,7 @@ export function AIDictionaryTool({
       <AccordionTrigger
         className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
       >
-        <BrainIcon />
+        <BrainCircuitIcon />
         AI Dictionary
       </AccordionTrigger>
       <AccordionContent className="space-y-2 overflow-visible">
@@ -84,6 +84,11 @@ export function AIDictionaryTool({
                     <AccordionContent className="space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="outline">AI-drafted</Badge>
+                        {entry.partOfSpeech ? (
+                          <Badge variant="outline" className="capitalize">
+                            {entry.partOfSpeech}
+                          </Badge>
+                        ) : null}
                         {entry.confidence ? (
                           <Badge variant="outline" className="capitalize">
                             {entry.confidence} confidence
