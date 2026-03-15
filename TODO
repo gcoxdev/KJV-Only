@@ -3,3 +3,5 @@
 - Map with english tiles
 
 - Maybe make infinite scrolling for chapters possible, always have loaded prev, current, next
+
+Let's plan on making a new tool called "AI Dictionary". This new tool will be a dictionary composed entirely by you given your current knowledge. Your goal is to provide clear and meaningful definitions of certain words and phrases as you understand it but only in the context of what the meaning would have been at the time the KJV was written. So, modern meanings of the words should not be considered, only original meanings. I want you to go through every word in our concordance and provide one or more definitions. Is this something you are able to do?
