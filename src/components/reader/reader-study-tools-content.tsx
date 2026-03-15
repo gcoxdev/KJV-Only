@@ -3,6 +3,7 @@ import type { ComponentProps } from "react";
 import { CrossRefsTool } from "@/components/reader/study-tools/cross-refs-tool";
 import { ConcordanceTool } from "@/components/reader/study-tools/concordance-tool";
 import { WebstersTool } from "@/components/reader/study-tools/websters-tool";
+import { AIDictionaryTool } from "@/components/reader/study-tools/ai-dictionary-tool";
 import { StrongsTool } from "@/components/reader/study-tools/strongs-tool";
 import { KJVWordsPhrasesTool } from "@/components/reader/study-tools/kjv-words-phrases-tool";
 import { BibleWordBookTool } from "@/components/reader/study-tools/bible-word-book-tool";
@@ -14,6 +15,7 @@ export type ReaderStudyToolsContentProps = {
   crossRefsProps: ComponentProps<typeof CrossRefsTool>;
   concordanceProps: ComponentProps<typeof ConcordanceTool>;
   webstersProps: ComponentProps<typeof WebstersTool>;
+  aiDictionaryProps: ComponentProps<typeof AIDictionaryTool>;
   strongsProps: ComponentProps<typeof StrongsTool>;
   kjvWordsPhrasesProps: ComponentProps<typeof KJVWordsPhrasesTool>;
   bibleWordBookProps: ComponentProps<typeof BibleWordBookTool>;
@@ -26,6 +28,7 @@ export function ReaderStudyToolsContent({
   crossRefsProps,
   concordanceProps,
   webstersProps,
+  aiDictionaryProps,
   strongsProps,
   kjvWordsPhrasesProps,
   bibleWordBookProps,
@@ -38,6 +41,7 @@ export function ReaderStudyToolsContent({
       <CrossRefsTool {...crossRefsProps} />
       <ConcordanceTool {...concordanceProps} />
       <WebstersTool {...webstersProps} />
+      <AIDictionaryTool {...aiDictionaryProps} />
       <StrongsTool {...strongsProps} />
       <KJVWordsPhrasesTool {...kjvWordsPhrasesProps} />
       <BibleWordBookTool {...bibleWordBookProps} />

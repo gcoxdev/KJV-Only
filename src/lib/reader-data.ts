@@ -4,6 +4,7 @@ import {
   type MapGeoJsonPayload,
 } from "@/lib/maps";
 import type {
+  AIDictionaryPayload,
   ConcordancePayload,
   CrossRefsPayload,
   GenealogyCompactPayload,
@@ -31,6 +32,7 @@ let phrasesPromise: Promise<PhrasesPayload> | null = null;
 let unitsPromise: Promise<UnitsPayload> | null = null;
 let genealogyPromise: Promise<GenealogyPayload> | null = null;
 let webstersPromise: Promise<WebstersPayload> | null = null;
+let aiDictionaryPromise: Promise<AIDictionaryPayload> | null = null;
 let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
 let ancientMapPromise: Promise<AncientMapPayload> | null = null;
@@ -139,6 +141,27 @@ export function loadWebsters() {
   }
 
   return webstersPromise;
+}
+
+export function loadAIDictionary() {
+  if (!aiDictionaryPromise) {
+    aiDictionaryPromise = fetch("/references/ai-dictionary.json", {
+      cache: "no-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /references/ai-dictionary.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as AIDictionaryPayload)
+      .catch((error) => {
+        aiDictionaryPromise = null;
+        throw error;
+      });
+  }
+
+  return aiDictionaryPromise;
 }
 
 export function loadHitchcocks() {

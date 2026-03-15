@@ -2,12 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import {
   decodeConcordanceReferences,
+  resolveAIDictionaryKey,
   resolveConcordanceKey,
   resolvePhraseKey,
   resolvePhraseKeyForToken,
   resolveUnitsKey,
 } from "@/lib/references";
 import type {
+  AIDictionaryPayload,
   ConcordancePayload,
   PhrasesPayload,
   UnitsPayload,
@@ -71,6 +73,22 @@ describe("concordance helpers", () => {
     expect(resolvePhraseKey(phrases, "By and by")).toBe("by and by");
     expect(resolvePhraseKey(phrases, "anon")).toBe("by and by");
     expect(resolvePhraseKey(phrases, "God forbid")).toBe("god forbid");
+  });
+
+  it("resolves AI dictionary entries by case, singular, and aliases", () => {
+    const aiDictionary: AIDictionaryPayload = {
+      prevent: {
+        definitions: ["To go before."],
+        aliases: ["prevented", "preventeth"],
+      },
+      quick: {
+        definitions: ["Living; alive."],
+      },
+    };
+
+    expect(resolveAIDictionaryKey(aiDictionary, "Prevent")).toBe("prevent");
+    expect(resolveAIDictionaryKey(aiDictionary, "preventeth")).toBe("prevent");
+    expect(resolveAIDictionaryKey(aiDictionary, "quick")).toBe("quick");
   });
 
   it("resolves phrase matches from a clicked token context", () => {

@@ -2,6 +2,7 @@ export const STUDY_ACCORDION_ITEMS = [
   "cross-refs",
   "concordance",
   "websters",
+  "ai-dictionary",
   "strongs",
   "bible-word-book",
   "kjv-words-phrases",
@@ -15,6 +16,7 @@ type UseStudySidebarStateArgs = {
   crossRefsCount: number;
   concordanceCount: number;
   webstersCount: number;
+  aiDictionaryCount: number;
   strongsCount: number;
   bibleWordBookCount: number;
   mapsCount: number;
@@ -28,6 +30,7 @@ export function useStudySidebarState({
   crossRefsCount,
   concordanceCount,
   webstersCount,
+  aiDictionaryCount,
   strongsCount,
   bibleWordBookCount,
   mapsCount,
@@ -50,6 +53,7 @@ export function useStudySidebarState({
     isCrossRefsSectionOpen: openStudySections.has("cross-refs"),
     isConcordanceSectionOpen: openStudySections.has("concordance"),
     isWebstersSectionOpen: openStudySections.has("websters"),
+    isAIDictionarySectionOpen: openStudySections.has("ai-dictionary"),
     isStrongsSectionOpen: openStudySections.has("strongs"),
     isBibleWordBookSectionOpen: openStudySections.has("bible-word-book"),
     isKjvWordsPhrasesSectionOpen: openStudySections.has("kjv-words-phrases"),
@@ -59,6 +63,7 @@ export function useStudySidebarState({
     hasCrossRefsInfo: crossRefsCount > 0,
     hasConcordanceInfo: concordanceCount > 0,
     hasWebstersInfo: webstersCount > 0,
+    hasAIDictionaryInfo: aiDictionaryCount > 0,
     hasStrongsInfo: strongsCount > 0,
     hasBibleWordBookInfo: bibleWordBookCount > 0,
     hasKjvWordsPhrasesInfo: kjvWordsPhrasesCount > 0,
