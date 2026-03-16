@@ -1,110 +1,13 @@
 {
-  "generatedAt": "2026-03-16T19:09:25.749Z",
+  "generatedAt": "2026-03-16T19:11:28.824Z",
   "summary": {
     "mediumConfidence": 5969,
     "withFormOf": 3284,
     "selfSufficientFormOf": 3284,
     "unresolvedFormOf": 0,
-    "genericWording": 24
+    "genericWording": 0
   },
   "samples": {
-    "genericWording": [
-      {
-        "word": "along",
-        "definition": "A preposition marking relation in place, time, manner, cause, or degree according to context."
-      },
-      {
-        "word": "ark",
-        "definition": "An ark; a chest or vessel, especially Noah's ark or the ark of the covenant according to context."
-      },
-      {
-        "word": "bed",
-        "definition": "A bed; a place of lying down, and by extension a channel or layer according to context."
-      },
-      {
-        "word": "besides",
-        "definition": "A preposition marking relation in place, time, manner, cause, or degree according to context."
-      },
-      {
-        "word": "betwixt",
-        "definition": "A preposition marking relation in place, time, manner, cause, or degree according to context."
-      },
-      {
-        "word": "beyond",
-        "definition": "A preposition marking relation in place, time, manner, cause, or degree according to context."
-      },
-      {
-        "word": "board",
-        "definition": "A board is a plank or flat piece of timber; to board is to cover or furnish with boards according to context."
-      },
-      {
-        "word": "bow",
-        "definition": "A bow; a weapon for shooting arrows, and also to bend or stoop according to context."
-      },
-      {
-        "word": "brother",
-        "definition": "A brother by birth, kinship, nation, or close covenant relation, according to context."
-      },
-      {
-        "word": "charge",
-        "definition": "A charge; command, duty, cost, or accusation, and also to command or entrust according to context."
-      },
-      {
-        "word": "except",
-        "definition": "A preposition marking relation in place, time, manner, cause, or degree according to context."
-      },
-      {
-        "word": "field",
-        "definition": "A field; open land, cultivated ground, or the scene of action according to context."
-      },
-      {
-        "word": "following",
-        "definition": "A following; those who go after or attend one; also the act of coming after, according to context."
-      },
-      {
-        "word": "host",
-        "definition": "A host; an army, a great company, or a heavenly company according to context."
-      },
-      {
-        "word": "house",
-        "definition": "A house, household, family line, or dwelling place, according to context."
-      },
-      {
-        "word": "inside",
-        "definition": "A preposition marking relation in place, time, manner, cause, or degree according to context."
-      },
-      {
-        "word": "man",
-        "definition": "A man; a human being, or a male person in particular, according to context."
-      },
-      {
-        "word": "measure",
-        "definition": "A measure; a standard or quantity, and also to measure according to context."
-      },
-      {
-        "word": "pan",
-        "definition": "A pan is a shallow vessel or utensil for cooking, carrying fire, or holding something according to context."
-      },
-      {
-        "word": "pit",
-        "definition": "A pit; a hole, cistern, snare, grave-like place, or place of destruction according to context."
-      },
-      {
-        "word": "rod",
-        "definition": "A rod; a staff, scepter, instrument of correction, or sign of authority according to context."
-      },
-      {
-        "word": "underneath",
-        "definition": "A preposition marking relation in place, time, manner, cause, or degree according to context."
-      },
-      {
-        "word": "woman",
-        "definition": "A woman; an adult female, whether wife or not according to context."
-      },
-      {
-        "word": "would",
-        "definition": "A verb expressing willingness, customary action, or consequence according to context."
-      }
-    ]
+    "genericWording": []
   }
 }
