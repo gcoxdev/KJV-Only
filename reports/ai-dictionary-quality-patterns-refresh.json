@@ -1,18 +1,20 @@
 {
-  "generatedAt": "2026-03-16T02:09:07.590Z",
+  "generatedAt": "2026-03-16T06:05:00.000Z",
   "counts": {
     "mediumConfidence": 5969,
-    "personWithSeveral": 131,
-    "thinPlaceTail": 504,
-    "peopleGroupThin": 0,
-    "titleThin": 0,
-    "deityThin": 0,
-    "variantHeavy": 160,
-    "genericWording": 0
+    "repeatedNameFormula": 91,
+    "variantHeavy": 91,
+    "malformedPlural": 1426,
+    "malformedVerbForm": 2147,
+    "genericAdj": 0,
+    "genericNoun": 0,
+    "thinPlaceCurated": 149
   },
   "notes": [
-    "This is a broad pattern scan, not a hand-curated queue.",
-    "The thinPlaceTail and variantHeavy counts are currently overinclusive and should be treated as heuristic buckets.",
-    "The low-noise structural buckets peopleGroupThin, titleThin, deityThin, and genericWording are effectively exhausted."
+    "The focused generic adjective seam is now exhausted.",
+    "Repeated-name and variant-led matches are noisy heuristic buckets again and should not be treated as the next clean queue without another manual narrowing pass.",
+    "The next practical low-noise seams are thinPlaceCurated and genericNoun.",
+    "Malformed plural and malformed verb-form buckets remain large broad cleanup queues.",
+    "genericNoun is now exhausted after the consolidated noun pass."
   ]
 }
