@@ -38,6 +38,7 @@ export type UnitsEntry = {
 export type UnitsPayload = Record<string, UnitsEntry>;
 export type AIDictionaryEntry = {
   partOfSpeech?: string;
+  classification?: string;
   definitions: string[];
   aliases?: string[];
   note?: string;
