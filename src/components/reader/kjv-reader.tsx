@@ -28,6 +28,7 @@ import {
   normalizeConcordanceWord,
   normalizeStrongsCode,
   resolveAIDictionaryKey,
+  resolveAIDictionaryPhraseKeyForToken,
   resolveConcordanceKey,
   resolveBibleWordBookKey,
   resolveHitchcocksKey,
@@ -2247,6 +2248,35 @@ export function KJVReader() {
     [books],
   );
 
+  const resolveAIDictionarySelectionAtLocation = useCallback(
+    (
+      aiDictionaryData: AIDictionaryPayload | null,
+      bookIndex: number,
+      chapterIndex: number,
+      verseNumber: number,
+      tokenIndex: number,
+    ) => {
+      if (!aiDictionaryData) {
+        return null;
+      }
+      const verse = books[bookIndex]?.chapters[chapterIndex]?.verses.find(
+        (item) => item.verse === verseNumber,
+      );
+      if (!verse) {
+        return null;
+      }
+      const matchedKey = resolveAIDictionaryPhraseKeyForToken(
+        aiDictionaryData,
+        verse.tokens,
+        tokenIndex,
+      );
+      return matchedKey
+        ? { key: matchedKey, entry: aiDictionaryData[matchedKey] }
+        : null;
+    },
+    [books],
+  );
+
   const syncTokenAccordionState = useCallback(
     (
       rawWord: string,
@@ -2258,6 +2288,7 @@ export function KJVReader() {
         concordanceData?: ConcordancePayload | null;
         webstersData?: WebstersPayload | null;
         aiDictionaryData?: AIDictionaryPayload | null;
+        aiDictionarySelection?: { key: string; entry: AIDictionaryEntry } | null;
         bibleWordBookData?: BibleWordBookPayload | null;
         hitchcocksData?: HitchcocksPayload | null;
         oldEnglishData?: OldEnglishPayload | null;
@@ -2292,7 +2323,11 @@ export function KJVReader() {
       }
 
       const aiDictionaryData = options?.aiDictionaryData ?? aiDictionary;
-      if (aiDictionaryData && resolveAIDictionaryKey(aiDictionaryData, rawWord)) {
+      if (
+        aiDictionaryData &&
+        (options?.aiDictionarySelection ||
+          resolveAIDictionaryKey(aiDictionaryData, rawWord))
+      ) {
         nextAccordion.push("ai-dictionary");
       }
 
@@ -2379,6 +2414,7 @@ export function KJVReader() {
       overrides?: {
         websters?: WebstersPayload | null;
         aiDictionary?: AIDictionaryPayload | null;
+        aiDictionarySelection?: { key: string; entry: AIDictionaryEntry } | null;
         bibleWordBook?: BibleWordBookPayload | null;
         hitchcocks?: HitchcocksPayload | null;
         oldEnglish?: OldEnglishPayload | null;
@@ -2417,9 +2453,10 @@ export function KJVReader() {
         const matchedKey = resolveAIDictionaryKey(nextAIDictionary, rawWord);
         setAIDictionaryWordAccordionValue([]);
         setSelectedAIDictionaryEntry(
-          matchedKey
-            ? { key: matchedKey, entry: nextAIDictionary[matchedKey] }
-            : null,
+          overrides?.aiDictionarySelection ??
+            (matchedKey
+              ? { key: matchedKey, entry: nextAIDictionary[matchedKey] }
+              : null),
         );
       } else {
         setSelectedAIDictionaryEntry(null);
@@ -2974,6 +3011,13 @@ export function KJVReader() {
           nextAncientMaps,
           nextStrongs,
         ]) => {
+          const aiDictionarySelection = resolveAIDictionarySelectionAtLocation(
+            nextAIDictionary,
+            bookIndex,
+            chapterIndex,
+            verseNumber,
+            tokenIndex,
+          );
           const phraseSelection = resolvePhraseSelectionAtLocation(
             nextPhrases,
             bookIndex,
@@ -2984,6 +3028,7 @@ export function KJVReader() {
           syncWordStudySelections(rawWord, normalizedCode, {
             websters: nextWebsters,
             aiDictionary: nextAIDictionary,
+            aiDictionarySelection,
             bibleWordBook: nextBibleWordBook,
             hitchcocks: nextHitchcocks,
             oldEnglish: nextOldEnglish,
@@ -3003,6 +3048,7 @@ export function KJVReader() {
             concordanceData: nextConcordance,
             webstersData: nextWebsters,
             aiDictionaryData: nextAIDictionary,
+            aiDictionarySelection,
             bibleWordBookData: nextBibleWordBook,
             hitchcocksData: nextHitchcocks,
             oldEnglishData: nextOldEnglish,
@@ -3025,6 +3071,7 @@ export function KJVReader() {
       concordance,
       bibleWordBook,
       ensureConcordanceLoaded,
+      ensureAIDictionaryLoaded,
       ensureAncientMapsLoaded,
       ensureBibleWordBookLoaded,
       ensureGenealogyLoaded,
@@ -3040,6 +3087,7 @@ export function KJVReader() {
       hitchcocks,
       oldEnglish,
       phrases,
+      resolveAIDictionarySelectionAtLocation,
       resolvePhraseSelectionAtLocation,
       setConcordanceError,
       setIsConcordanceLoading,
@@ -3047,6 +3095,7 @@ export function KJVReader() {
       setIsStrongsSearching,
       setNotesContext,
       setSelectedConcordanceWord,
+      setSelectedAIDictionaryEntry,
       setSelectedGenealogyIds,
       setSelectedHitchcocksEntry,
       setSelectedMapsEntries,

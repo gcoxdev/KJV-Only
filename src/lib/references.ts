@@ -193,6 +193,67 @@ export function resolveAIDictionaryKey(
   return null;
 }
 
+export function resolveAIDictionaryPhraseKey(
+  aiDictionary: AIDictionaryPayload,
+  rawValue: string,
+) {
+  const normalized = normalizePhraseText(rawValue);
+  if (!normalized || !normalized.includes(" ")) {
+    return null;
+  }
+
+  for (const [key, entry] of Object.entries(aiDictionary)) {
+    if (normalizePhraseText(key) === normalized) {
+      return key;
+    }
+    if (
+      entry.aliases?.some((alias) => normalizePhraseText(alias) === normalized)
+    ) {
+      return key;
+    }
+  }
+
+  return null;
+}
+
+export function resolveAIDictionaryPhraseKeyForToken(
+  aiDictionary: AIDictionaryPayload,
+  verseTokens: VerseToken[],
+  tokenIndex: number,
+) {
+  const normalizedWords = verseTokens
+    .map((token, index) => ({
+      sourceIndex: index,
+      word: normalizePhraseText(token.text),
+    }))
+    .filter((item) => item.word.length > 0);
+
+  const clickedWordIndex = normalizedWords.findIndex(
+    (item) => item.sourceIndex === tokenIndex,
+  );
+  if (clickedWordIndex < 0) {
+    return null;
+  }
+
+  const maxPhraseLength = Math.min(8, normalizedWords.length);
+  for (let length = maxPhraseLength; length >= 2; length -= 1) {
+    const startMin = Math.max(0, clickedWordIndex - length + 1);
+    const startMax = Math.min(clickedWordIndex, normalizedWords.length - length);
+    for (let start = startMin; start <= startMax; start += 1) {
+      const candidate = normalizedWords
+        .slice(start, start + length)
+        .map((item) => item.word)
+        .join(" ");
+      const matchedKey = resolveAIDictionaryPhraseKey(aiDictionary, candidate);
+      if (matchedKey) {
+        return matchedKey;
+      }
+    }
+  }
+
+  return null;
+}
+
 export function resolveHitchcocksKey(
   hitchcocks: HitchcocksPayload,
   rawWord: string,

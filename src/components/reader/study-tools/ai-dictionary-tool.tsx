@@ -26,6 +26,31 @@ type AIDictionaryToolProps = {
   onSearch: (term: string) => void;
 };
 
+const GENERIC_COMPLETION_PATTERNS = [
+  "A word used in Scripture whose exact force depends on context.",
+  "A proper name used in Scripture.",
+  "A Scripture term whose exact force depends on context.",
+  "A noun naming an act, state, office, quality, or thing according to context.",
+  "An adjective describing quality, condition, or relation according to context.",
+  "A conjunction joining words, clauses, or sentences according to the sense.",
+  "A preposition marking relation in place, time, manner, cause, or degree according to context.",
+  "An exclamation expressing feeling or calling attention.",
+  "A pronoun of reference, possession, or person according to its use.",
+];
+
+function isGenericCompletionEntry(entry: AIDictionaryEntry) {
+  return entry.definitions.some(
+    (definition) =>
+      GENERIC_COMPLETION_PATTERNS.includes(definition) ||
+      definition.startsWith("A plural form referring to more than one ") ||
+      definition.startsWith("A past form or participle of ") ||
+      definition.startsWith("The act, state, or present participial form of ") ||
+      definition.startsWith("An older second-person singular form of ") ||
+      definition.startsWith("An older third-person singular form meaning ") ||
+      definition.startsWith("In a ") && definition.endsWith(" manner or degree."),
+  );
+}
+
 export function AIDictionaryTool({
   hasInfo,
   isOpen,
@@ -83,7 +108,17 @@ export function AIDictionaryTool({
                     <AccordionTrigger>{key}</AccordionTrigger>
                     <AccordionContent className="space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="outline">AI-drafted</Badge>
+                        <Badge
+                          variant={isGenericCompletionEntry(entry) ? "secondary" : "outline"}
+                          className="capitalize"
+                        >
+                          {isGenericCompletionEntry(entry) ? "Completion" : "Curated"}
+                        </Badge>
+                        {entry.classification ? (
+                          <Badge variant="outline" className="capitalize">
+                            {entry.classification}
+                          </Badge>
+                        ) : null}
                         {entry.partOfSpeech ? (
                           <Badge variant="outline" className="capitalize">
                             {entry.partOfSpeech}
@@ -106,7 +141,15 @@ export function AIDictionaryTool({
                         </p>
                       ) : null}
                       {entry.note ? (
-                        <p className="text-xs text-muted-foreground">{entry.note}</p>
+                        <p
+                          className={cn(
+                            "text-xs text-muted-foreground",
+                            entry.note.startsWith("Location:") &&
+                              "rounded-sm border border-border/60 bg-muted/40 px-2 py-1",
+                          )}
+                        >
+                          {entry.note}
+                        </p>
                       ) : null}
                     </AccordionContent>
                   </AccordionItem>
