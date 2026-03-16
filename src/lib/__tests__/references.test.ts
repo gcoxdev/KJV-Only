@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   decodeConcordanceReferences,
   resolveAIDictionaryKey,
+  resolveAIDictionaryPhraseKey,
+  resolveAIDictionaryPhraseKeyForToken,
   resolveConcordanceKey,
   resolvePhraseKey,
   resolvePhraseKeyForToken,
@@ -89,6 +91,58 @@ describe("concordance helpers", () => {
     expect(resolveAIDictionaryKey(aiDictionary, "Prevent")).toBe("prevent");
     expect(resolveAIDictionaryKey(aiDictionary, "preventeth")).toBe("prevent");
     expect(resolveAIDictionaryKey(aiDictionary, "quick")).toBe("quick");
+  });
+
+  it("resolves AI dictionary phrases by exact text and aliases", () => {
+    const aiDictionary: AIDictionaryPayload = {
+      "take no thought": {
+        partOfSpeech: "phrase",
+        definitions: ["Do not be anxious."],
+        aliases: ["be not anxious"],
+      },
+      "god forbid": {
+        partOfSpeech: "phrase",
+        definitions: ["May it never be."],
+      },
+    };
+
+    expect(resolveAIDictionaryPhraseKey(aiDictionary, "Take no thought")).toBe(
+      "take no thought",
+    );
+    expect(resolveAIDictionaryPhraseKey(aiDictionary, "be not anxious")).toBe(
+      "take no thought",
+    );
+    expect(resolveAIDictionaryPhraseKey(aiDictionary, "God forbid")).toBe(
+      "god forbid",
+    );
+  });
+
+  it("resolves AI dictionary phrase matches from a clicked token context", () => {
+    const aiDictionary: AIDictionaryPayload = {
+      "quit you like men": {
+        partOfSpeech: "phrase",
+        definitions: ["Conduct yourselves bravely."],
+      },
+    };
+    const verseTokens = [
+      { text: "Watch" },
+      { text: "ye," },
+      { text: "stand" },
+      { text: "fast" },
+      { text: "in" },
+      { text: "the" },
+      { text: "faith," },
+      { text: "quit" },
+      { text: "you" },
+      { text: "like" },
+      { text: "men," },
+      { text: "be" },
+      { text: "strong." },
+    ];
+
+    expect(resolveAIDictionaryPhraseKeyForToken(aiDictionary, verseTokens, 9)).toBe(
+      "quit you like men",
+    );
   });
 
   it("resolves phrase matches from a clicked token context", () => {
