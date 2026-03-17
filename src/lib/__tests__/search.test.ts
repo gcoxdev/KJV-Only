@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildVerseSearchIndex,
   buildRegexMatcher,
   createSearchableVerseEntry,
   extractSearchWords,
@@ -8,6 +9,7 @@ import {
   scoreSmartSearch,
   suggestSmartCorrections,
 } from "@/lib/search";
+import type { Book } from "@/types/bible";
 
 describe("search helpers", () => {
   it("extracts normalized token words from verse text", () => {
@@ -20,6 +22,43 @@ describe("search helpers", () => {
       "LORD'S",
       "host",
     ]);
+  });
+
+  it("normalizes curly apostrophes for token search", () => {
+    const entry = createSearchableVerseEntry("the brethren’s tents");
+
+    expect(matchSelectedWords(entry, ["brethren's"], "contains-any", false)).toBe(
+      true,
+    );
+  });
+
+  it("builds verse search text from displayed divine-name casing", () => {
+    const books: Book[] = [
+      {
+        name: "Exodus",
+        chapters: [
+          {
+            chapter: 6,
+            verses: [
+              {
+                verse: 3,
+                tokens: [
+                  { text: "by", punctuation: false, divineName: false },
+                  { text: "my", punctuation: false, divineName: false },
+                  { text: "name", punctuation: false, divineName: false },
+                  { text: "Jehovah", punctuation: false, divineName: true },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    const [entry] = buildVerseSearchIndex(books);
+
+    expect(entry.text).toContain("JEHOVAH");
+    expect(entry.searchWords).toContain("JEHOVAH");
   });
 
   it("matches contains-any and contains-all by token instead of substring", () => {

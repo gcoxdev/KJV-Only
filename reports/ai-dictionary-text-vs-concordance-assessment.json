@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-03-17T08:00:00.000Z",
+  "sourceText": "public/data/kjv.json",
+  "sourceConcordance": "public/references/concordance.json",
+  "normalization": [
+    "normalize curly apostrophes to straight apostrophes",
+    "use displayed token text, including divineName capitalization",
+    "preserve internal apostrophes and hyphens",
+    "ignore punctuation-only tokens"
+  ],
+  "counts": {
+    "textDerivedWords": 13450,
+    "concordanceWords": 13450,
+    "onlyInConcordance": 0,
+    "onlyInText": 0,
+    "intersection": 13450
+  },
+  "samples": {
+    "onlyInConcordance": [],
+    "onlyInText": []
+  },
+  "checks": {
+    "brethren's": {
+      "inConcordance": true,
+      "inTextDerived": true,
+      "textRefs": [
+        "DEU.20.8"
+      ],
+      "concordanceRefs": [
+        "DEU.20.8"
+      ]
+    },
+    "divineNames": {
+      "LORD": [
+        "GEN.2.4",
+        "GEN.2.5",
+        "GEN.2.7",
+        "GEN.2.8",
+        "GEN.2.9",
+        "GEN.2.15",
+        "GEN.2.16",
+        "GEN.2.18",
+        "GEN.2.19",
+        "GEN.2.21"
+      ],
+      "GOD": [
+        "GEN.6.5",
+        "GEN.15.2",
+        "GEN.15.8",
+        "EXO.23.17",
+        "EXO.34.23",
+        "DEU.3.24",
+        "DEU.9.26",
+        "DEU.28.58",
+        "JOS.7.7",
+        "JDG.6.22"
+      ],
+      "JEHOVAH": [
+        "EXO.6.3",
+        "PSA.83.18",
+        "ISA.12.2",
+        "ISA.26.4"
+      ],
+      "LORD's": [
+        "EXO.9.29",
+        "EXO.12.11",
+        "EXO.12.27",
+        "EXO.13.9",
+        "EXO.13.12",
+        "EXO.32.26",
+        "EXO.35.21",
+        "EXO.35.24",
+        "LEV.3.16",
+        "LEV.16.9"
+      ]
+    }
+  }
+}
