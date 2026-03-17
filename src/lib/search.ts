@@ -21,13 +21,34 @@ function isPunctuationTokenText(text: string) {
   return /^[,.;:!?)]$/.test(text) || /^['"]$/.test(text) || /^--?$/.test(text);
 }
 
+function normalizeSearchDisplayText(text: string) {
+  return text.replace(/[’‘]/g, "'");
+}
+
+function formatSearchTokenText(verse: Verse, tokenIndex: number) {
+  const token = verse.tokens[tokenIndex];
+  const normalized = normalizeSearchDisplayText(token.text);
+  if (!token.divineName) {
+    return normalized;
+  }
+
+  const nextToken = verse.tokens[tokenIndex + 1];
+  const hasPossessiveSuffix =
+    nextToken &&
+    (normalizeSearchDisplayText(nextToken.text) === "'s" ||
+      normalizeSearchDisplayText(nextToken.text) === "'");
+
+  return hasPossessiveSuffix ? normalized.toUpperCase() : normalized.toUpperCase();
+}
+
 function formatVerseText(verse: Verse) {
   let value = "";
   verse.tokens.forEach((token, index) => {
-    if (index > 0 && !isPunctuationTokenText(token.text)) {
+    const tokenText = formatSearchTokenText(verse, index);
+    if (index > 0 && !isPunctuationTokenText(tokenText)) {
       value += " ";
     }
-    value += token.text;
+    value += tokenText;
   });
   return value;
 }
@@ -35,7 +56,7 @@ function formatVerseText(verse: Verse) {
 export function extractSearchWords(text: string) {
   return text
     .split(/\s+/)
-    .map((word) => normalizeConcordanceWord(word))
+    .map((word) => normalizeConcordanceWord(normalizeSearchDisplayText(word)))
     .filter(Boolean);
 }
 

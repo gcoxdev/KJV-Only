@@ -19,9 +19,6 @@
       "Aaron; the brother of Moses and first high priest of Israel."
     ],
     "confidence": "high",
-    "aliases": [
-      "aaron's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Aaron's"
@@ -319,9 +316,6 @@
       "Abiathar; a priest, son of Ahimelech, who fled to David and afterward served in the priesthood during his reign."
     ],
     "confidence": "high",
-    "aliases": [
-      "abiathar's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Abiathar's"
@@ -494,9 +488,6 @@
       "Abimelech; a royal title or throne-name borne by Philistine kings, and also the name of Gideon's son who usurped rule at Shechem."
     ],
     "confidence": "high",
-    "aliases": [
-      "abimelech's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Abimelech's"
@@ -610,9 +601,6 @@
       "Abner; son of Ner and captain of Saul's host, prominent in the struggle that followed Saul's death."
     ],
     "confidence": "high",
-    "aliases": [
-      "abner's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Abner's"
@@ -744,9 +732,6 @@
       "Abraham; the patriarch called by God and father of the covenant line."
     ],
     "confidence": "high",
-    "aliases": [
-      "abraham's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Abraham's"
@@ -758,9 +743,6 @@
       "Abram; the earlier name of Abraham, the patriarch called by God out of Ur and made heir of the covenant promise."
     ],
     "confidence": "high",
-    "aliases": [
-      "abram's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Abram's"
@@ -779,9 +761,6 @@
       "Absalom; the son of David who rebelled against his father."
     ],
     "confidence": "high",
-    "aliases": [
-      "absalom's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Absalom's"
@@ -1402,9 +1381,6 @@
       "His fall brought sin and death into the world, and he stands in Scripture as the first man in contrast with Christ."
     ],
     "confidence": "high",
-    "aliases": [
-      "adam's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Adam's"
@@ -2060,7 +2036,10 @@
       "Aeneas; the man at Lydda whom Peter healed after he had long been bedridden."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Eneas"
+    ]
   },
   "Aenon": {
     "partOfSpeech": "noun",
@@ -2505,9 +2484,6 @@
       "Ahab; especially the king of Israel, son of Omri."
     ],
     "confidence": "high",
-    "aliases": [
-      "ahab's"
-    ],
     "relatedEntries": [
       "Ahab's"
     ]
@@ -2550,9 +2526,6 @@
       "Ahasuerus; the royal name used of a Persian king, especially in the book of Esther."
     ],
     "confidence": "high",
-    "aliases": [
-      "ahasuerus'"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Ahasuerus'"
@@ -2693,9 +2666,6 @@
       "Ahimelech; the name of priests in Scripture, especially the priest of Nob who aided David and was slain by Saul."
     ],
     "confidence": "high",
-    "aliases": [
-      "ahimelech's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Ahimelech's"
@@ -2946,9 +2916,6 @@
   "aileth": {
     "definitions": [
       "Ails; troubles; is the matter with."
-    ],
-    "aliases": [
-      "ail"
     ],
     "confidence": "high",
     "partOfSpeech": "verb"
@@ -3380,7 +3347,10 @@
       "Alphaeus; the father of James the less, and also the name of Levi's father according to one Gospel listing."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Alpheus"
+    ]
   },
   "already": {
     "partOfSpeech": "noun",
@@ -3693,9 +3663,6 @@
     "definitions": [
       "To correct, reform, or make better."
     ],
-    "aliases": [
-      "amended"
-    ],
     "confidence": "high",
     "partOfSpeech": "verb"
   },
@@ -3862,9 +3829,6 @@
       "Amnon; the son of David who defiled Tamar and was afterward slain."
     ],
     "confidence": "high",
-    "aliases": [
-      "amnon's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Amnon's"
@@ -3961,9 +3925,6 @@
       "Amram; the father of Moses, Aaron, and Miriam, of the tribe of Levi."
     ],
     "confidence": "high",
-    "aliases": [
-      "amram's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Amram's"
@@ -5443,7 +5404,10 @@
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Sometimes identified with Rantis."
+    "note": "Location: Sometimes identified with Rantis.",
+    "relatedEntries": [
+      "Arimathea"
+    ]
   },
   "Arioch": {
     "partOfSpeech": "noun",
@@ -5492,9 +5456,6 @@
       "the personal name borne by a man or household mentioned in Romans 16."
     ],
     "confidence": "medium",
-    "aliases": [
-      "aristobulus'"
-    ],
     "relatedEntries": [
       "Aristobulus'"
     ]
@@ -5572,9 +5533,6 @@
     "partOfSpeech": "noun",
     "definitions": [
       "Defensive equipment worn for protection in battle."
-    ],
-    "aliases": [
-      "armor"
     ],
     "confidence": "high"
   },
@@ -5753,9 +5711,6 @@
       "Artaxerxes; the royal name of Persian kings mentioned in Ezra and Nehemiah."
     ],
     "confidence": "high",
-    "aliases": [
-      "artaxerxes'"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Artaxerxes'"
@@ -5853,9 +5808,6 @@
       "Asa; especially the king of Judah who sought the LORD, removed idols, and strengthened the kingdom."
     ],
     "confidence": "high",
-    "aliases": [
-      "asa's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Asa's"
@@ -5891,9 +5843,6 @@
       "Asaph; a biblical personal name, especially borne by the chief singer and psalmist connected with temple worship."
     ],
     "confidence": "high",
-    "aliases": [
-      "asaph's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Asaph's"
@@ -6718,10 +6667,7 @@
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Sometimes identified with Khirbet Atara.",
-    "relatedEntries": [
-      "Ataroth-Adar"
-    ]
+    "note": "Location: Sometimes identified with Khirbet Atara."
   },
   "ate": {
     "partOfSpeech": "noun",
@@ -6941,9 +6887,6 @@
       "Augustus; the Roman emperor Caesar Augustus, under whose decree the nativity account is dated."
     ],
     "confidence": "high",
-    "aliases": [
-      "augustus'"
-    ],
     "classification": "title",
     "relatedEntries": [
       "Augustus'"
@@ -7473,9 +7416,6 @@
       "Baal; the title of a false god or lord worshipped among the Canaanites and often opposed in Scripture to the worship of the LORD."
     ],
     "confidence": "high",
-    "aliases": [
-      "baal's"
-    ],
     "classification": "deity",
     "relatedEntries": [
       "Baal's"
@@ -7747,9 +7687,6 @@
       "In prophetic passages it may also stand for proud worldly power set against God."
     ],
     "confidence": "high",
-    "aliases": [
-      "babylon's"
-    ],
     "classification": "city",
     "note": "Location: Usually identified with Rome.",
     "relatedEntries": [
@@ -8039,9 +7976,6 @@
       "Balaam; son of Beor, the diviner hired by Balak to curse Israel but constrained by God to bless."
     ],
     "confidence": "high",
-    "aliases": [
-      "balaam's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Balaam's"
@@ -8078,9 +8012,6 @@
       "Balak; a man named in Scripture, son of Zippor."
     ],
     "confidence": "medium",
-    "aliases": [
-      "balak's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Balak's"
@@ -8261,8 +8192,7 @@
       "baptized",
       "baptizest",
       "baptizeth",
-      "baptizing",
-      "baptist"
+      "baptizing"
     ]
   },
   "baptisms": {
@@ -8284,9 +8214,6 @@
       "Baptist; a baptizer, especially John the Baptist."
     ],
     "confidence": "medium",
-    "aliases": [
-      "baptist's"
-    ],
     "relatedEntries": [
       "baptism",
       "baptize",
@@ -8307,8 +8234,7 @@
       "baptized",
       "baptizest",
       "baptizeth",
-      "baptizing",
-      "baptist"
+      "baptizing"
     ]
   },
   "baptized": {
@@ -8356,8 +8282,7 @@
     "relatedEntries": [
       "baptize",
       "baptized",
-      "baptism",
-      "baptist"
+      "baptism"
     ]
   },
   "bar": {
@@ -8617,7 +8542,10 @@
       "Bartimaeus; the blind beggar near Jericho whom Jesus healed."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Bartimeus"
+    ]
   },
   "Baruch": {
     "partOfSpeech": "noun",
@@ -10017,9 +9945,6 @@
       "Benjamin; the son of Jacob and the tribe descended from him."
     ],
     "confidence": "high",
-    "aliases": [
-      "benjamin's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Benjamin's"
@@ -10768,10 +10693,7 @@
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Commonly identified with Tel Bet Shean.",
-    "relatedEntries": [
-      "Beth-Shan"
-    ]
+    "note": "Location: Commonly identified with Tel Bet Shean."
   },
   "Beth-shemesh": {
     "partOfSpeech": "noun",
@@ -12394,9 +12316,6 @@
       "The breast or chest.",
       "Figuratively, the place of closeness, affection, or inward keeping."
     ],
-    "aliases": [
-      "bosoms"
-    ],
     "confidence": "high",
     "partOfSpeech": "noun"
   },
@@ -12879,9 +12798,6 @@
       "The breathing of life; the air drawn from the mouth or nostrils.",
       "Often used for life itself, or that which is frail and quickly vanishing."
     ],
-    "aliases": [
-      "breaths"
-    ],
     "confidence": "high",
     "partOfSpeech": "noun"
   },
@@ -13027,9 +12943,6 @@
     "definitions": [
       "To restrain, govern, or hold in check.",
       "Literally, the headgear used to control a horse."
-    ],
-    "aliases": [
-      "bridled"
     ],
     "confidence": "high",
     "partOfSpeech": "verb"
@@ -13341,9 +13254,6 @@
   "bruit": {
     "definitions": [
       "A report, rumor, or noise spread abroad."
-    ],
-    "aliases": [
-      "bruited"
     ],
     "confidence": "high",
     "partOfSpeech": "noun"
@@ -13923,9 +13833,6 @@
     "definitions": [
       "A proverb-like saying about someone; a name used in reproach or mockery."
     ],
-    "aliases": [
-      "bywords"
-    ],
     "confidence": "high",
     "partOfSpeech": "noun"
   },
@@ -13967,12 +13874,11 @@
       "Caesar; the imperial title of the Roman emperor."
     ],
     "confidence": "high",
-    "aliases": [
-      "caesar's"
-    ],
     "classification": "title",
     "relatedEntries": [
-      "Caesar's"
+      "Caesar's",
+      "Cesar",
+      "Cesar's"
     ]
   },
   "Caesarea": {
@@ -13983,7 +13889,10 @@
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: On the Mediterranean coast of Judaea, commonly identified with Caesarea Maritima."
+    "note": "Location: On the Mediterranean coast of Judaea, commonly identified with Caesarea Maritima.",
+    "relatedEntries": [
+      "Cesarea"
+    ]
   },
   "cage": {
     "partOfSpeech": "noun / verb",
@@ -14088,9 +13997,6 @@
       "Caleb; especially the faithful spy who wholly followed the LORD and received Hebron for an inheritance."
     ],
     "confidence": "high",
-    "aliases": [
-      "caleb's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Caleb's"
@@ -14899,9 +14805,6 @@
     "definitions": [
       "To throw, put, send forth, set down, or place."
     ],
-    "aliases": [
-      "casted"
-    ],
     "confidence": "medium",
     "partOfSpeech": "verb"
   },
@@ -15335,9 +15238,6 @@
       "Chaldeans; the people of Chaldea, and in some passages especially the Babylonian wise or learned class."
     ],
     "confidence": "high",
-    "aliases": [
-      "chaldeans'"
-    ],
     "classification": "people group",
     "relatedEntries": [
       "Chaldeans'"
@@ -15349,9 +15249,6 @@
       "Chaldees; the Chaldean people, or in some contexts the Chaldean language or learned class."
     ],
     "confidence": "medium",
-    "aliases": [
-      "chaldees'"
-    ],
     "classification": "people group",
     "note": "Location: Usually located in or identified with southern Babylonia.",
     "relatedEntries": [
@@ -16069,7 +15966,6 @@
       "Cherubim; the winged heavenly beings so named in Scripture."
     ],
     "aliases": [
-      "cherubim",
       "cherubims'"
     ],
     "confidence": "high",
@@ -16274,9 +16170,6 @@
     "definitions": [
       "Worthless, lawless, or vile persons."
     ],
-    "aliases": [
-      "sons of belial"
-    ],
     "confidence": "high",
     "classification": "people group"
   },
@@ -16294,9 +16187,6 @@
       "Chilion; the son of Elimelech and Naomi, husband of Orpah."
     ],
     "confidence": "high",
-    "aliases": [
-      "chilion's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Chilion's"
@@ -16524,9 +16414,6 @@
       "Christ; the Anointed One, the royal and saving title of the promised Messiah, fulfilled supremely in the Lord Jesus."
     ],
     "confidence": "high",
-    "aliases": [
-      "christ's"
-    ],
     "classification": "title",
     "relatedEntries": [
       "Christ's"
@@ -16966,9 +16853,6 @@
       "To cling fast, adhere, or hold closely to.",
       "In other contexts, to split or divide."
     ],
-    "aliases": [
-      "cleaving"
-    ],
     "confidence": "high",
     "partOfSpeech": "verb",
     "relatedEntries": [
@@ -17098,9 +16982,6 @@
     "definitions": [
       "A cloak or outer garment.",
       "Figuratively, a cover or pretense used to hide something."
-    ],
-    "aliases": [
-      "cloak"
     ],
     "confidence": "high",
     "partOfSpeech": "noun"
@@ -17779,9 +17660,6 @@
     "definitions": [
       "To share with another; to impart; to distribute to one in need.",
       "Not merely to speak, but often to give or have in common."
-    ],
-    "aliases": [
-      "communicateth"
     ],
     "confidence": "high",
     "partOfSpeech": "verb",
@@ -19096,9 +18974,6 @@
       "The whole manner of life; conduct; daily walk.",
       "Not merely spoken talk."
     ],
-    "aliases": [
-      "conversations"
-    ],
     "confidence": "high",
     "partOfSpeech": "noun"
   },
@@ -20318,9 +20193,6 @@
       "The instrument of crucifixion.",
       "Also the shame, suffering, or burden connected with following Christ."
     ],
-    "aliases": [
-      "crosses"
-    ],
     "confidence": "high",
     "partOfSpeech": "noun"
   },
@@ -20923,9 +20795,6 @@
       "Dagon; a Philistine false god whose worship appears in conflict with the worship of the LORD."
     ],
     "confidence": "high",
-    "aliases": [
-      "dagon's"
-    ],
     "classification": "deity",
     "relatedEntries": [
       "Dagon's"
@@ -21351,9 +21220,6 @@
       "David; the son of Jesse and king of Israel, and in some passages the royal line or kingdom connected with him."
     ],
     "confidence": "high",
-    "aliases": [
-      "david's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "David's"
@@ -23414,9 +23280,6 @@
       "Dinah; the daughter of Jacob and Leah."
     ],
     "confidence": "high",
-    "aliases": [
-      "dinah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Dinah's"
@@ -23973,9 +23836,6 @@
     "definitions": [
       "A stewardship, ordering, or administration committed to one.",
       "Sometimes the ordered arrangement of divine dealings in a given matter."
-    ],
-    "aliases": [
-      "dispensations"
     ],
     "confidence": "high",
     "partOfSpeech": "noun"
@@ -26030,9 +25890,6 @@
       "Egyptian; a person of Egypt or something belonging to that land and its people."
     ],
     "confidence": "high",
-    "aliases": [
-      "egyptian's"
-    ],
     "classification": "people group",
     "relatedEntries": [
       "Egyptian's"
@@ -26353,9 +26210,6 @@
       "Eli; a man named in Scripture, father of Hophni."
     ],
     "confidence": "medium",
-    "aliases": [
-      "eli's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Eli's"
@@ -26367,9 +26221,6 @@
       "Eliab; David's eldest brother, and also the name of other notable men of tribal and Levitical lines."
     ],
     "confidence": "high",
-    "aliases": [
-      "eliab's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Eliab's"
@@ -26541,9 +26392,6 @@
       "Elimelech; the husband of Naomi and father of Mahlon and Chilion in the book of Ruth."
     ],
     "confidence": "high",
-    "aliases": [
-      "elimelech's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Elimelech's"
@@ -26606,9 +26454,6 @@
       "Elisabeth; the wife of Zacharias and mother of John the Baptist."
     ],
     "confidence": "medium",
-    "aliases": [
-      "elisabeth's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Elisabeth's"
@@ -27823,9 +27668,6 @@
       "To beseech, plead with, or earnestly ask.",
       "In some contexts, to deal with or treat in a certain manner."
     ],
-    "aliases": [
-      "entreaty"
-    ],
     "confidence": "high",
     "partOfSpeech": "verb",
     "relatedEntries": [
@@ -27919,7 +27761,10 @@
       "Epaenetus; a beloved Christian greeted by Paul as an early convert unto Christ."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Epenetus"
+    ]
   },
   "Epaphras": {
     "partOfSpeech": "noun",
@@ -28023,9 +27868,6 @@
       "Ephraim; the son of Joseph, the tribe descended from him, or the northern kingdom represented by that tribe."
     ],
     "confidence": "high",
-    "aliases": [
-      "ephraim's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Ephraim's"
@@ -28274,7 +28116,10 @@
       "Esar-Haddon; king of Assyria, remembered in Scripture for conquest and resettlement."
     ],
     "confidence": "medium",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Esarhaddon"
+    ]
   },
   "Esau": {
     "partOfSpeech": "noun",
@@ -28282,9 +28127,6 @@
       "Esau; the elder son of Isaac and Rebekah, brother of Jacob, and ancestor of Edom."
     ],
     "confidence": "high",
-    "aliases": [
-      "esau's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Esau's"
@@ -28557,9 +28399,6 @@
       "Esther; the Jewish queen of Persia who interceded to save her people in the days of Ahasuerus."
     ],
     "confidence": "high",
-    "aliases": [
-      "esther's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Esther's"
@@ -29687,10 +29526,7 @@
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Often located in or identified with Jezirat Faraun, though the exact identification is debated.",
-    "relatedEntries": [
-      "Ezion-Gaber"
-    ]
+    "note": "Location: Often located in or identified with Jezirat Faraun, though the exact identification is debated."
   },
   "eznite": {
     "partOfSpeech": "noun",
@@ -30856,9 +30692,6 @@
       "Porcius Festus, the Roman governor who heard Paul's case."
     ],
     "confidence": "medium",
-    "aliases": [
-      "festus'"
-    ],
     "relatedEntries": [
       "Festus'"
     ]
@@ -33800,7 +33633,11 @@
     ],
     "confidence": "high",
     "classification": "region",
-    "note": "Location: In the north of the land of Israel, west of the upper Jordan and the Sea of Galilee."
+    "note": "Location: In the north of the land of Israel, west of the upper Jordan and the Sea of Galilee.",
+    "relatedEntries": [
+      "Galilean",
+      "Galileans"
+    ]
   },
   "gall": {
     "partOfSpeech": "noun",
@@ -34871,9 +34708,6 @@
       "Gilead; the hill country east of Jordan, known for balm, pasture, and many important historical events."
     ],
     "confidence": "high",
-    "aliases": [
-      "gilead's"
-    ],
     "classification": "region",
     "note": "Location: East of the Jordan River, in the hill country between Bashan to the north and Moab to the south.",
     "relatedEntries": [
@@ -35445,17 +35279,10 @@
   "god": {
     "partOfSpeech": "noun",
     "definitions": [
-      "God; the one true and living God, the Maker and Lord of all things.",
-      "A god; a false deity or object of worship when Scripture speaks of the gods of the nations.",
-      "God may also be used in a subordinate or figurative sense for one bearing divine title or authority in a few passages."
+      "A god; a false deity, idol, or object of worship.",
+      "The term may also be used in a subordinate or figurative sense for one bearing divine title or delegated authority in a few passages."
     ],
-    "confidence": "high",
-    "aliases": [
-      "god's"
-    ],
-    "relatedEntries": [
-      "God's"
-    ]
+    "confidence": "high"
   },
   "god forbid": {
     "partOfSpeech": "phrase",
@@ -35463,6 +35290,20 @@
       "May it never be; certainly not."
     ],
     "confidence": "high"
+  },
+  "GOD": {
+    "partOfSpeech": "noun / title",
+    "definitions": [
+      "GOD; the one true and living God, especially where the KJV writes the divine title in capitals."
+    ],
+    "aliases": [
+      "God"
+    ],
+    "confidence": "high",
+    "classification": "title",
+    "relatedEntries": [
+      "God's"
+    ]
   },
   "god-ward": {
     "partOfSpeech": "adverb",
@@ -37160,9 +37001,6 @@
       "Haman; the Agagite enemy of the Jews in the book of Esther, overthrown by the providence of God."
     ],
     "confidence": "high",
-    "aliases": [
-      "haman's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Haman's"
@@ -37283,9 +37121,6 @@
       "Hamor; a man named in Scripture, father of Shechem."
     ],
     "confidence": "medium",
-    "aliases": [
-      "hamor's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Hamor's"
@@ -38042,9 +37877,6 @@
     "definitions": [
       "The reaping and gathering of ripe grain or other produce.",
       "By figure, a season of ingathering, reward, or judgment."
-    ],
-    "aliases": [
-      "harvests"
     ],
     "confidence": "high",
     "partOfSpeech": "verb"
@@ -39034,9 +38866,6 @@
       "Heber; especially Heber the Kenite in the days of Deborah and Jael, and also the name of an ancestor in older genealogies and other biblical men."
     ],
     "confidence": "medium",
-    "aliases": [
-      "heber's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Heber's"
@@ -39071,9 +38900,6 @@
       "Hebrews; the people of Israel considered as Hebrews, especially in distinction from other nations or from Hellenists."
     ],
     "confidence": "high",
-    "aliases": [
-      "hebrews'"
-    ],
     "classification": "people group",
     "relatedEntries": [
       "Hebrews'"
@@ -39775,9 +39601,6 @@
       "Herod; the dynastic name of the rulers of the Herodian house in the New Testament."
     ],
     "confidence": "high",
-    "aliases": [
-      "herod's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Herod's"
@@ -39797,9 +39620,6 @@
       "Herodias; the wife of Herod Philip and later of Herod Antipas, whose resentment led to John the Baptist's death."
     ],
     "confidence": "high",
-    "aliases": [
-      "herodias'"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Herodias'"
@@ -39973,9 +39793,6 @@
       "Hezron; especially a grandson of Judah and the ancestor of an important family line in Israel, and also the name of other biblical men."
     ],
     "confidence": "medium",
-    "aliases": [
-      "hezron's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Hezron's"
@@ -40142,9 +39959,6 @@
       "Hilkiah; especially the high priest in Josiah's day who found the book of the law, and also the name of other biblical men."
     ],
     "confidence": "high",
-    "aliases": [
-      "hilkiah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Hilkiah's"
@@ -40287,9 +40101,6 @@
       "Hiram; the name of men in Scripture, especially the king of Tyre and also the craftsman who worked for Solomon."
     ],
     "confidence": "high",
-    "aliases": [
-      "hiram's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Hiram's"
@@ -41253,9 +41064,6 @@
     "definitions": [
       "The master or head of a household."
     ],
-    "aliases": [
-      "householders"
-    ],
     "confidence": "high",
     "partOfSpeech": "noun"
   },
@@ -41773,7 +41581,10 @@
       "Hymenaeus; a false teacher opposed by Paul in the Pastoral Epistles."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Hymeneus"
+    ]
   },
   "hymn": {
     "partOfSpeech": "noun",
@@ -41850,9 +41661,6 @@
       "I-Chabod; the name given at the fall of Eli's house, meaning the glory is departed."
     ],
     "confidence": "medium",
-    "aliases": [
-      "i-chabod's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "I-chabod's"
@@ -43073,7 +42881,10 @@
     "definitions": [
       "Instructor; one who teaches, directs, or gives knowledge."
     ],
-    "confidence": "high"
+    "confidence": "high",
+    "relatedEntries": [
+      "instructors"
+    ]
   },
   "instrument": {
     "partOfSpeech": "noun",
@@ -43482,9 +43293,6 @@
       "Isaac; the son of Abraham and father of Jacob."
     ],
     "confidence": "high",
-    "aliases": [
-      "isaac's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Isaac's"
@@ -43593,9 +43401,6 @@
       "Ishmael; the son of Abraham by Hagar, and also the name of other biblical men."
     ],
     "confidence": "high",
-    "aliases": [
-      "ishmael's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Ishmael's"
@@ -43749,9 +43554,6 @@
       "Israel; the patriarch Jacob, the covenant people descended from him, or the kingdom bearing that name."
     ],
     "confidence": "high",
-    "aliases": [
-      "israel's"
-    ],
     "classification": "country",
     "note": "Location: Usually located in or identified with Jerusalem.",
     "relatedEntries": [
@@ -44005,7 +43807,10 @@
     ],
     "confidence": "high",
     "classification": "region",
-    "note": "Location: Usually located in or identified with Mount Hermon."
+    "note": "Location: Usually located in or identified with Mount Hermon.",
+    "relatedEntries": [
+      "Iturea"
+    ]
   },
   "Ivah": {
     "partOfSpeech": "noun",
@@ -44235,9 +44040,6 @@
       "Jabin; the royal name of Canaanite kings, especially the king of Hazor in the days of Deborah and Barak."
     ],
     "confidence": "high",
-    "aliases": [
-      "jabin's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Jabin's"
@@ -44298,9 +44100,6 @@
       "Jacob; the patriarch afterward called Israel, and by extension the people descended from him."
     ],
     "confidence": "high",
-    "aliases": [
-      "jacob's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Jacob's"
@@ -45202,9 +45001,6 @@
       "Jehoiachin; king of Judah, son of Jehoiakim, carried away captive to Babylon."
     ],
     "confidence": "high",
-    "aliases": [
-      "jehoiachin's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Jehoiachin's"
@@ -45299,13 +45095,20 @@
     "confidence": "medium",
     "classification": "person"
   },
-  "jehovah": {
+  "JEHOVAH": {
     "partOfSpeech": "noun / title",
     "definitions": [
-      "Jehovah; an English form used for the covenant name of the LORD, the God of Israel."
+      "JEHOVAH; the English form used in the KJV for the covenant name of the LORD, the God of Israel."
+    ],
+    "aliases": [
+      "Jehovah",
+      "jehovah"
     ],
     "confidence": "high",
-    "classification": "title"
+    "classification": "title",
+    "relatedEntries": [
+      "LORD"
+    ]
   },
   "Jehovah-jireh": {
     "partOfSpeech": "noun / title",
@@ -45544,9 +45347,6 @@
       "Jeremiah; the prophet of Judah who warned of coming judgment and ministered in the final days before the Babylonian fall."
     ],
     "confidence": "high",
-    "aliases": [
-      "jeremiah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Jeremiah's"
@@ -45642,9 +45442,6 @@
       "Jeroboam; the name of the kings of Israel so called, especially Jeroboam the son of Nebat."
     ],
     "confidence": "high",
-    "aliases": [
-      "jeroboam's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Jeroboam's"
@@ -45689,9 +45486,6 @@
       "Jerusalem; the chief city of Judah and the place of the temple, sometimes standing for its people or worship."
     ],
     "confidence": "high",
-    "aliases": [
-      "jerusalem's"
-    ],
     "classification": "city",
     "note": "Location: In the hill country of Judah, commonly identified with the historic city of Jerusalem.",
     "relatedEntries": [
@@ -45874,9 +45668,6 @@
       "Jesus; the personal name of the Lord Jesus Christ, and in some passages the Greek name for Joshua."
     ],
     "confidence": "high",
-    "aliases": [
-      "jesus'"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Jesus'"
@@ -46000,9 +45791,6 @@
       "Jews; the people of Judah and later the covenant nation known by that name, especially in the post-exilic and New Testament period."
     ],
     "confidence": "high",
-    "aliases": [
-      "jews'"
-    ],
     "classification": "people group",
     "relatedEntries": [
       "Jews'"
@@ -46022,9 +45810,6 @@
       "Jezebel; a woman named in Scripture, daughter of Ethbaal, wife of Ahab, mother of Ahaziah."
     ],
     "confidence": "medium",
-    "aliases": [
-      "jezebel's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Jezebel's"
@@ -46176,9 +45961,6 @@
       "Joab; the captain of David's host."
     ],
     "confidence": "high",
-    "aliases": [
-      "joab's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Joab's"
@@ -46230,9 +46012,6 @@
       "Job; the righteous sufferer of the book of Job, famed for endurance under trial."
     ],
     "confidence": "high",
-    "aliases": [
-      "job's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Job's"
@@ -46325,9 +46104,6 @@
       "John; especially John the Baptist or John the apostle, though the name is borne by others."
     ],
     "confidence": "high",
-    "aliases": [
-      "john's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "John's"
@@ -46512,9 +46288,6 @@
       "Jonathan; especially the son of Saul, though the name is borne by others."
     ],
     "confidence": "high",
-    "aliases": [
-      "jonathan's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Jonathan's"
@@ -46621,9 +46394,6 @@
       "Joseph; especially the son of Jacob, though the name is borne by others."
     ],
     "confidence": "high",
-    "aliases": [
-      "joseph's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Joseph's"
@@ -46913,9 +46683,6 @@
       "In some passages the name may extend to the land, people, or royal line identified with that tribe."
     ],
     "confidence": "high",
-    "aliases": [
-      "judah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Judah's"
@@ -48377,9 +48144,6 @@
       "Laban; the Aramean brother of Rebekah, father of Leah and Rachel, with whom Jacob dwelt and served."
     ],
     "confidence": "high",
-    "aliases": [
-      "laban's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Laban's"
@@ -48664,9 +48428,6 @@
       "A lamb; a young sheep, often used sacrificially or figuratively."
     ],
     "confidence": "high",
-    "aliases": [
-      "lamb's"
-    ],
     "relatedEntries": [
       "Lamb's"
     ]
@@ -49247,9 +49008,6 @@
       "Leah; the elder daughter of Laban and first wife of Jacob."
     ],
     "confidence": "high",
-    "aliases": [
-      "leah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Leah's"
@@ -49728,9 +49486,6 @@
     "definitions": [
       "To hinder, restrain, or hold back.",
       "In older use, the very opposite of the common modern sense 'to allow.'"
-    ],
-    "aliases": [
-      "letted"
     ],
     "confidence": "high",
     "partOfSpeech": "verb",
@@ -50270,9 +50025,6 @@
     "definitions": [
       "Resemblance, similarity, or form answering to another thing.",
       "Sometimes an image or representation."
-    ],
-    "aliases": [
-      "likenesses"
     ],
     "confidence": "high",
     "partOfSpeech": "noun"
@@ -50956,8 +50708,8 @@
   "lord": {
     "partOfSpeech": "noun",
     "definitions": [
-      "One having authority, rule, or ownership.",
-      "In Scripture often a title of dignity for men, and supremely the divine title of the Lord himself."
+      "One having authority, rule, ownership, or mastery.",
+      "In Scripture often a title of dignity or respect for a human superior."
     ],
     "aliases": [
       "lord's"
@@ -50966,6 +50718,21 @@
     "relatedEntries": [
       "lords",
       "lord's"
+    ]
+  },
+  "LORD": {
+    "partOfSpeech": "noun / title",
+    "definitions": [
+      "LORD; the covenant name and divine title used in the KJV where the name of the God of Israel is written in capitals."
+    ],
+    "aliases": [
+      "Lord"
+    ],
+    "confidence": "high",
+    "classification": "title",
+    "relatedEntries": [
+      "LORD's",
+      "JEHOVAH"
     ]
   },
   "lordly": {
@@ -51019,9 +50786,6 @@
       "Lot; the son of Haran and nephew of Abraham, and also a lot cast or portion assigned."
     ],
     "confidence": "high",
-    "aliases": [
-      "lot's"
-    ],
     "relatedEntries": [
       "Lot's"
     ]
@@ -51032,9 +50796,6 @@
       "Lotan; a Horite chief in the genealogies of Seir."
     ],
     "confidence": "high",
-    "aliases": [
-      "lotan's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Lotan's"
@@ -52012,9 +51773,6 @@
       "Mahlon; the son of Elimelech and Naomi, husband of Ruth."
     ],
     "confidence": "high",
-    "aliases": [
-      "mahlon's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Mahlon's"
@@ -52447,9 +52205,6 @@
       "Manasseh; the son of Joseph, the tribe descended from him, or the king of Judah so named."
     ],
     "confidence": "high",
-    "aliases": [
-      "manasseh's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Manasseh's"
@@ -52878,9 +52633,6 @@
       "Plural form of 'mar'. See 'mar'."
     ],
     "confidence": "medium",
-    "aliases": [
-      "mars'"
-    ],
     "relatedEntries": [
       "Mars'"
     ]
@@ -53292,9 +53044,6 @@
     "partOfSpeech": "phrase",
     "definitions": [
       "It seems to me; in my judgment."
-    ],
-    "aliases": [
-      "methinketh"
     ],
     "confidence": "high"
   },
@@ -54210,10 +53959,7 @@
       "Merodach-Baladan; the king of Babylon who sent to Hezekiah."
     ],
     "confidence": "medium",
-    "classification": "person",
-    "relatedEntries": [
-      "Berodach-Baladan"
-    ]
+    "classification": "person"
   },
   "Merom": {
     "partOfSpeech": "noun / place",
@@ -54534,9 +54280,6 @@
       "Micah; especially the prophet who spoke in the days of Jotham, Ahaz, and Hezekiah, and also the name of other biblical men."
     ],
     "confidence": "high",
-    "aliases": [
-      "micah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Micah's"
@@ -55793,9 +55536,6 @@
       "Mordecai; the Jew who reared Esther and was advanced in Persia after the downfall of Haman."
     ],
     "confidence": "high",
-    "aliases": [
-      "mordecai's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Mordecai's"
@@ -55919,9 +55659,6 @@
     "definitions": [
       "To put to death; to subdue and crush the power of sinful practices."
     ],
-    "aliases": [
-      "mortified"
-    ],
     "confidence": "high",
     "partOfSpeech": "verb"
   },
@@ -55949,9 +55686,6 @@
       "Moses; the lawgiver and servant of God who led Israel out of Egypt."
     ],
     "confidence": "high",
-    "aliases": [
-      "moses'"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Moses'"
@@ -56598,9 +56332,6 @@
       "Naaman; especially the Syrian captain healed of leprosy by Elisha, and also the name of other biblical men."
     ],
     "confidence": "high",
-    "aliases": [
-      "naaman's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Naaman's"
@@ -56679,9 +56410,6 @@
       "Nabal; a man named in Scripture, husband of Abigail."
     ],
     "confidence": "medium",
-    "aliases": [
-      "nabal's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Nabal's"
@@ -56701,9 +56429,6 @@
       "Nachon; a threshingfloor or place-name associated with the transporting of the ark in David's time."
     ],
     "confidence": "high",
-    "aliases": [
-      "nachon's"
-    ],
     "classification": "place",
     "relatedEntries": [
       "Nachon's"
@@ -56826,9 +56551,6 @@
       "Nahor; the name of Abraham's grandfather and also of his brother, both appearing in the ancestral line before the patriarchal migration."
     ],
     "confidence": "high",
-    "aliases": [
-      "nahor's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Nahor's"
@@ -56955,9 +56677,6 @@
       "Naomi; a woman named in Scripture, wife of Elimelech, mother of Chilion."
     ],
     "confidence": "medium",
-    "aliases": [
-      "naomi's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Naomi's"
@@ -57198,9 +56917,6 @@
     ],
     "confidence": "high",
     "classification": "city",
-    "aliases": [
-      "nazareths"
-    ],
     "note": "Location: In lower Galilee, commonly identified with modern Nazareth in northern Israel."
   },
   "Nazarite": {
@@ -57557,7 +57273,6 @@
       "A neighbour; one dwelling near, or any other person regarded in relation and duty."
     ],
     "aliases": [
-      "neighbor",
       "neighbour's"
     ],
     "confidence": "high",
@@ -58188,9 +57903,6 @@
       "Noah; the righteous man preserved with his family through the flood in the ark."
     ],
     "confidence": "high",
-    "aliases": [
-      "noah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Noah's"
@@ -61491,9 +61203,6 @@
       "Paul; the apostle of that name, formerly called Saul of Tarsus."
     ],
     "confidence": "high",
-    "aliases": [
-      "paul's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Paul's"
@@ -61894,9 +61603,6 @@
       "Peor; the mountain height in Moab associated with Balaam and with Israel's sin at Baal-peor."
     ],
     "confidence": "high",
-    "aliases": [
-      "peor's"
-    ],
     "classification": "mountain",
     "note": "Location: In the Moabite highlands east of the Jordan opposite Jericho, near Beth-peor and the sanctuary of Baal-peor.",
     "relatedEntries": [
@@ -62520,9 +62226,6 @@
       "Peter; the apostle Simon Peter."
     ],
     "confidence": "high",
-    "aliases": [
-      "peter's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Peter's"
@@ -62617,9 +62320,6 @@
       "Pharaoh; the royal title of the kings of Egypt."
     ],
     "confidence": "high",
-    "aliases": [
-      "pharaoh's"
-    ],
     "classification": "title",
     "relatedEntries": [
       "Pharaoh's"
@@ -62671,9 +62371,6 @@
       "Pharisee; one of the Pharisees, the strict Jewish sect prominent in the New Testament, noted for zeal toward the law, tradition, and ceremonial exactness."
     ],
     "confidence": "high",
-    "aliases": [
-      "pharisee's"
-    ],
     "classification": "people group",
     "relatedEntries": [
       "Pharisee's"
@@ -62685,9 +62382,6 @@
       "Pharisees; the strict Jewish sect prominent in the New Testament, often in controversy with Jesus."
     ],
     "confidence": "high",
-    "aliases": [
-      "pharisees'"
-    ],
     "classification": "people group",
     "relatedEntries": [
       "Pharisees'"
@@ -62792,9 +62486,6 @@
       "Philip; chiefly Philip the apostle and Philip the evangelist, though the name belongs to more than one New Testament man."
     ],
     "confidence": "high",
-    "aliases": [
-      "philip's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Philip's"
@@ -62850,9 +62541,6 @@
       "Philistines; the powerful coastal people who frequently opposed Israel in the days of the judges and kings."
     ],
     "confidence": "high",
-    "aliases": [
-      "philistines'"
-    ],
     "classification": "people group",
     "relatedEntries": [
       "Philistines'"
@@ -62886,9 +62574,6 @@
       "Phinehas; especially Aaron's grandson whose zeal stopped a plague in Israel, and also the name of other biblical men."
     ],
     "confidence": "medium",
-    "aliases": [
-      "phinehas'"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Phinehas'"
@@ -65004,9 +64689,6 @@
       "To go before, come before, or anticipate in time.",
       "Not chiefly to stop from happening, as in modern usage."
     ],
-    "aliases": [
-      "preventeth"
-    ],
     "confidence": "high",
     "partOfSpeech": "verb",
     "relatedEntries": [
@@ -66807,9 +66489,6 @@
       "Quit; to acquit, release, or free from obligation.",
       "In the phrase \"quit you like men,\" it means to conduct yourselves bravely or manfully."
     ],
-    "aliases": [
-      "quit you"
-    ],
     "confidence": "high",
     "partOfSpeech": "verb"
   },
@@ -66986,9 +66665,6 @@
       "Rachel; the younger daughter of Laban and beloved wife of Jacob, mother of Joseph and Benjamin."
     ],
     "confidence": "high",
-    "aliases": [
-      "rachel's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Rachel's"
@@ -67763,9 +67439,6 @@
       "Rebekah; a woman named in Scripture, daughter of Bethuel, wife of Isaac, mother of Esau."
     ],
     "confidence": "medium",
-    "aliases": [
-      "rebekah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Rebekah's"
@@ -68641,9 +68314,6 @@
       "Remaliah; the father of Pekah king of Israel, often named in prophetic history to identify his son."
     ],
     "confidence": "high",
-    "aliases": [
-      "remaliah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Remaliah's"
@@ -69806,9 +69476,6 @@
   "revile": {
     "definitions": [
       "To rail at, speak abusively against, or heap insulting words upon."
-    ],
-    "aliases": [
-      "reviling"
     ],
     "confidence": "high",
     "partOfSpeech": "verb",
@@ -71199,10 +70866,7 @@
       "Sabtecha; a son of Cush in the table of nations."
     ],
     "confidence": "high",
-    "classification": "person",
-    "relatedEntries": [
-      "Sabtechah"
-    ]
+    "classification": "person"
   },
   "Sacar": {
     "partOfSpeech": "noun",
@@ -71768,9 +71432,6 @@
       "Samson; the Nazarite judge of Israel famed for extraordinary strength and for his conflict with the Philistines."
     ],
     "confidence": "high",
-    "aliases": [
-      "samson's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Samson's"
@@ -71923,9 +71584,6 @@
       "Sara; the Greek name for Sarah."
     ],
     "confidence": "high",
-    "aliases": [
-      "sara's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Sara's"
@@ -71937,9 +71595,6 @@
       "Sarah; the wife of Abraham and mother of Isaac, first called Sarai."
     ],
     "confidence": "high",
-    "aliases": [
-      "sarah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Sarah's"
@@ -71951,9 +71606,6 @@
       "Sarai; the earlier name of Sarah, wife of Abram before the covenant name-change."
     ],
     "confidence": "high",
-    "aliases": [
-      "sarai's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Sarai's"
@@ -72070,9 +71722,6 @@
       "Satan; the adversary, the chief evil spirit who opposes God and tempts or accuses men."
     ],
     "confidence": "high",
-    "aliases": [
-      "satan's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Satan's"
@@ -72157,9 +71806,6 @@
       "Saul; especially the first king of Israel, though the name is also borne by others."
     ],
     "confidence": "high",
-    "aliases": [
-      "saul's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Saul's"
@@ -72525,9 +72171,6 @@
     "definitions": [
       "To despise with mockery or proud contempt.",
       "The expression or object of such contempt."
-    ],
-    "aliases": [
-      "scorned"
     ],
     "confidence": "high",
     "partOfSpeech": "verb / noun",
@@ -74811,9 +74454,6 @@
       "Shechem; the central city between Gerizim and Ebal, important in patriarchal, covenant, and royal history."
     ],
     "confidence": "high",
-    "aliases": [
-      "shechem's"
-    ],
     "classification": "city",
     "relatedEntries": [
       "Shechem's"
@@ -76249,9 +75889,6 @@
     "definitions": [
       "Shows; makes known; displays; causes to be seen."
     ],
-    "aliases": [
-      "show"
-    ],
     "confidence": "high",
     "partOfSpeech": "verb"
   },
@@ -76634,9 +76271,6 @@
     ],
     "confidence": "high",
     "classification": "city",
-    "aliases": [
-      "zidon"
-    ],
     "note": "Location: On the Phoenician coast, commonly identified with modern Sidon in Lebanon."
   },
   "Sidonians": {
@@ -76950,9 +76584,6 @@
       "Simon; the name of Peter before he was called Peter, and of several others in the New Testament."
     ],
     "confidence": "high",
-    "aliases": [
-      "simon's"
-    ],
     "relatedEntries": [
       "Simon's"
     ]
@@ -78462,9 +78093,6 @@
       "Solomon; the son of David and king of Israel famed for wisdom and wealth."
     ],
     "confidence": "high",
-    "aliases": [
-      "solomon's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Solomon's"
@@ -79318,10 +78946,7 @@
     "definitions": [
       "Spilt; an older past tense and past participial spelling of spill, meaning spilled or poured out."
     ],
-    "confidence": "high",
-    "relatedEntries": [
-      "spill"
-    ]
+    "confidence": "high"
   },
   "spin": {
     "partOfSpeech": "verb",
@@ -81990,9 +81615,6 @@
     "definitions": [
       "Wrapping closely with bands of cloth, especially an infant."
     ],
-    "aliases": [
-      "swaddling clothes"
-    ],
     "confidence": "high",
     "partOfSpeech": "noun"
   },
@@ -83532,9 +83154,6 @@
     "definitions": [
       "A violent storm, especially with wind and disturbance."
     ],
-    "aliases": [
-      "tempests"
-    ],
     "confidence": "high",
     "partOfSpeech": "noun"
   },
@@ -83905,7 +83524,11 @@
       "Thaddaeus; the apostle also associated with the names Judas and Lebbaeus."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Thaddeus",
+      "Lebbeus"
+    ]
   },
   "Thahash": {
     "partOfSpeech": "noun",
@@ -85154,7 +84777,10 @@
       "Timaeus; the father of blind Bartimaeus."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Timeus"
+    ]
   },
   "timber": {
     "partOfSpeech": "noun",
@@ -88139,9 +87765,6 @@
       "Uriah; especially Uriah the Hittite, husband of Bathsheba, and also the name of other biblical men."
     ],
     "confidence": "high",
-    "aliases": [
-      "uriah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Uriah's"
@@ -89133,9 +88756,6 @@
   "visitation": {
     "definitions": [
       "Visitation; a coming to inspect, help, punish, or judge."
-    ],
-    "aliases": [
-      "visitations"
     ],
     "confidence": "high",
     "partOfSpeech": "noun"
@@ -90209,9 +89829,6 @@
     "definitions": [
       "Lack of strength, whether bodily, mental, or spiritual."
     ],
-    "aliases": [
-      "weaknesses"
-    ],
     "confidence": "high",
     "partOfSpeech": "noun"
   },
@@ -90511,9 +90128,6 @@
     "partOfSpeech": "phrase",
     "definitions": [
       "Fair in appearance; handsome; pleasing to look upon."
-    ],
-    "aliases": [
-      "well favored"
     ],
     "confidence": "high"
   },
@@ -91268,9 +90882,6 @@
     "definitions": [
       "A wilderness; a desert, waste, or uncultivated region with little settled habitation.",
       "It often denotes a solitary tract apart from cities and fruitful fields."
-    ],
-    "aliases": [
-      "wildernesses"
     ],
     "confidence": "high",
     "partOfSpeech": "noun"
@@ -93065,7 +92676,10 @@
       "Zacchaeus; the chief publican of Jericho whom Jesus called and saved."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Zaccheus"
+    ]
   },
   "Zacchur": {
     "partOfSpeech": "noun",
@@ -93119,9 +92733,6 @@
       "Zadok; the priest who remained faithful to David and whose house held the high-priestly line."
     ],
     "confidence": "high",
-    "aliases": [
-      "zadok's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Zadok's"
@@ -93397,9 +93008,6 @@
       "Zebedee; the father of James and John, the sons of Zebedee."
     ],
     "confidence": "high",
-    "aliases": [
-      "zebedee's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Zebedee's"
@@ -93493,9 +93101,6 @@
       "Zedekiah; especially the last king of Judah before the fall of Jerusalem, and also the name of other biblical men."
     ],
     "confidence": "high",
-    "aliases": [
-      "zedekiah's"
-    ],
     "classification": "person",
     "relatedEntries": [
       "Zedekiah's"
@@ -93971,9 +93576,6 @@
       "Zion; the hill and city of Jerusalem in its sacred and royal aspect, often standing for God's dwelling and kingdom."
     ],
     "confidence": "high",
-    "aliases": [
-      "zion's"
-    ],
     "classification": "city",
     "note": "Location: Originally the stronghold hill in Jerusalem, then by extension the city and sanctuary centered there.",
     "relatedEntries": [
@@ -98882,10 +98484,7 @@
       "Possessive form of 'adders'. See 'adders'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "adders"
-    ]
+    "partOfSpeech": "possessive"
   },
   "angel's": {
     "definitions": [
@@ -98952,10 +98551,7 @@
       "Possessive form of 'badgers'. See 'badgers'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "badgers"
-    ]
+    "partOfSpeech": "possessive"
   },
   "bakers'": {
     "definitions": [
@@ -98972,10 +98568,7 @@
       "Possessive form of 'barber'. See 'barber'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "barber"
-    ]
+    "partOfSpeech": "possessive"
   },
   "beast's": {
     "definitions": [
@@ -99072,10 +98665,7 @@
       "Possessive form of 'brothers'. See 'brothers'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "brothers"
-    ]
+    "partOfSpeech": "possessive"
   },
   "bullock's": {
     "definitions": [
@@ -99392,10 +98982,7 @@
       "Possessive form of 'fisher'. See 'fisher'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "fisher"
-    ]
+    "partOfSpeech": "possessive"
   },
   "fool's": {
     "definitions": [
@@ -99432,10 +99019,7 @@
       "Possessive form of 'fullers'. See 'fullers'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "fullers"
-    ]
+    "partOfSpeech": "possessive"
   },
   "goats'": {
     "definitions": [
@@ -99725,6 +99309,19 @@
     "partOfSpeech": "possessive",
     "relatedEntries": [
       "lord"
+    ]
+  },
+  "LORD's": {
+    "definitions": [
+      "Possessive form of 'LORD'. See 'LORD'."
+    ],
+    "aliases": [
+      "Lord's"
+    ],
+    "confidence": "high",
+    "partOfSpeech": "possessive",
+    "relatedEntries": [
+      "LORD"
     ]
   },
   "love's": {
@@ -100272,10 +99869,7 @@
       "Possessive form of 'stomach'. See 'stomach'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "stomach"
-    ]
+    "partOfSpeech": "possessive"
   },
   "stone's": {
     "definitions": [
@@ -100502,10 +100096,7 @@
       "Possessive form of 'wits'. See 'wits'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "wits"
-    ]
+    "partOfSpeech": "possessive"
   },
   "wives'": {
     "definitions": [
@@ -100702,10 +100293,7 @@
       "Possessive form of 'ahab'. See 'ahab'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "ahab"
-    ]
+    "partOfSpeech": "possessive"
   },
   "Ahasuerus'": {
     "definitions": [
@@ -100752,10 +100340,7 @@
       "Possessive form of 'aristobulus'. See 'aristobulus'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "aristobulus"
-    ]
+    "partOfSpeech": "possessive"
   },
   "Artaxerxes'": {
     "definitions": [
@@ -100812,10 +100397,7 @@
       "Possessive form of 'babylon'. See 'babylon'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "babylon"
-    ]
+    "partOfSpeech": "possessive"
   },
   "Balaam's": {
     "definitions": [
@@ -100842,10 +100424,7 @@
       "Possessive form of 'baptist'. See 'baptist'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "baptist"
-    ]
+    "partOfSpeech": "possessive"
   },
   "Benjamin's": {
     "definitions": [
@@ -101032,10 +100611,7 @@
       "Possessive form of 'festus'. See 'festus'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "festus"
-    ]
+    "partOfSpeech": "possessive"
   },
   "Gilead's": {
     "definitions": [
@@ -101049,12 +100625,12 @@
   },
   "God's": {
     "definitions": [
-      "Possessive form of 'god'. See 'god'."
+      "Possessive form of 'GOD'. See 'GOD'."
     ],
     "confidence": "high",
     "partOfSpeech": "possessive",
     "relatedEntries": [
-      "god"
+      "GOD"
     ]
   },
   "Haman's": {
@@ -101252,20 +100828,14 @@
       "Possessive form of 'jesus'. See 'jesus'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "jesus"
-    ]
+    "partOfSpeech": "possessive"
   },
   "Jews'": {
     "definitions": [
       "Possessive form of 'jews'. See 'jews'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "jews"
-    ]
+    "partOfSpeech": "possessive"
   },
   "Jezebel's": {
     "definitions": [
@@ -101412,10 +100982,7 @@
       "Possessive form of 'mars'. See 'mars'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "mars"
-    ]
+    "partOfSpeech": "possessive"
   },
   "Micah's": {
     "definitions": [
@@ -101472,10 +101039,7 @@
       "Possessive form of 'nachon'. See 'nachon'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "nachon"
-    ]
+    "partOfSpeech": "possessive"
   },
   "Nahor's": {
     "definitions": [
@@ -101702,10 +101266,7 @@
       "Possessive form of 'simon'. See 'simon'."
     ],
     "confidence": "high",
-    "partOfSpeech": "possessive",
-    "relatedEntries": [
-      "simon"
-    ]
+    "partOfSpeech": "possessive"
   },
   "Solomon's": {
     "definitions": [
@@ -101843,5 +101404,221 @@
       "strengthened"
     ],
     "confidence": "high"
+  },
+  "Alpheus": {
+    "partOfSpeech": "noun",
+    "classification": "person",
+    "confidence": "high",
+    "definitions": [
+      "Alpheus; the father of James the less, and also the name of Levi's father according to one Gospel listing."
+    ],
+    "relatedEntries": [
+      "Alphaeus"
+    ]
+  },
+  "Arimathea": {
+    "partOfSpeech": "noun",
+    "classification": "city",
+    "confidence": "high",
+    "definitions": [
+      "Arimathea; the home town of Joseph of Arimathea, who asked Pilate for the body of Jesus."
+    ],
+    "relatedEntries": [
+      "Arimathaea"
+    ]
+  },
+  "Bartimeus": {
+    "partOfSpeech": "noun",
+    "classification": "person",
+    "confidence": "high",
+    "definitions": [
+      "Bartimeus; the blind beggar near Jericho whom Jesus healed."
+    ],
+    "relatedEntries": [
+      "Bartimaeus",
+      "Timeus"
+    ]
+  },
+  "Cesar": {
+    "partOfSpeech": "noun",
+    "classification": "title",
+    "confidence": "high",
+    "definitions": [
+      "Cesar; the imperial title of the Roman emperor."
+    ],
+    "relatedEntries": [
+      "Caesar",
+      "Cesar's"
+    ]
+  },
+  "Cesar's": {
+    "partOfSpeech": "possessive",
+    "confidence": "high",
+    "definitions": [
+      "Possessive form of 'Cesar'. See 'Cesar'."
+    ],
+    "relatedEntries": [
+      "Cesar"
+    ]
+  },
+  "Cesarea": {
+    "partOfSpeech": "noun",
+    "classification": "city",
+    "confidence": "high",
+    "definitions": [
+      "Cesarea; the major Roman port and administrative city of Judaea, important in Acts and Paul's imprisonment."
+    ],
+    "relatedEntries": [
+      "Caesarea"
+    ]
+  },
+  "Eneas": {
+    "partOfSpeech": "noun",
+    "classification": "person",
+    "confidence": "high",
+    "definitions": [
+      "Eneas; the man at Lydda whom Peter healed after he had long been bedridden."
+    ],
+    "relatedEntries": [
+      "Aeneas"
+    ]
+  },
+  "Epenetus": {
+    "partOfSpeech": "noun",
+    "classification": "person",
+    "confidence": "high",
+    "definitions": [
+      "Epenetus; a beloved Christian greeted by Paul as an early convert unto Christ."
+    ],
+    "relatedEntries": [
+      "Epaenetus"
+    ]
+  },
+  "Esarhaddon": {
+    "partOfSpeech": "noun",
+    "classification": "person",
+    "confidence": "high",
+    "definitions": [
+      "Esarhaddon; king of Assyria, remembered in Scripture for conquest and resettlement."
+    ],
+    "relatedEntries": [
+      "Esar-haddon"
+    ]
+  },
+  "Galilean": {
+    "partOfSpeech": "noun / adjective",
+    "classification": "person",
+    "confidence": "high",
+    "definitions": [
+      "Galilean; a person from Galilee, or something belonging to Galilee."
+    ],
+    "relatedEntries": [
+      "Galilee",
+      "Galileans"
+    ]
+  },
+  "Galileans": {
+    "partOfSpeech": "noun",
+    "classification": "people group",
+    "confidence": "high",
+    "definitions": [
+      "Galileans; people from Galilee."
+    ],
+    "relatedEntries": [
+      "Galilean",
+      "Galilee"
+    ]
+  },
+  "Hymeneus": {
+    "partOfSpeech": "noun",
+    "classification": "person",
+    "confidence": "high",
+    "definitions": [
+      "Hymeneus; a false teacher opposed by Paul in the Pastoral Epistles."
+    ],
+    "relatedEntries": [
+      "Hymenaeus"
+    ]
+  },
+  "Iturea": {
+    "partOfSpeech": "noun",
+    "classification": "region",
+    "confidence": "high",
+    "definitions": [
+      "Iturea; a district northeast of Galilee, ruled with neighboring lands in the time mentioned by Luke."
+    ],
+    "relatedEntries": [
+      "Ituraea"
+    ]
+  },
+  "Lebbeus": {
+    "partOfSpeech": "noun",
+    "classification": "person",
+    "confidence": "high",
+    "definitions": [
+      "Lebbeus; a surname linked with the apostle Thaddaeus or Judas."
+    ],
+    "relatedEntries": [
+      "Thaddaeus"
+    ]
+  },
+  "Maran-atha": {
+    "partOfSpeech": "phrase",
+    "confidence": "high",
+    "definitions": [
+      "Maran-atha; an Aramaic expression meaning, The Lord cometh, or, Our Lord, come."
+    ]
+  },
+  "Pretorium": {
+    "partOfSpeech": "noun",
+    "classification": "place",
+    "confidence": "high",
+    "definitions": [
+      "Pretorium; the governor's official residence or judgment hall."
+    ]
+  },
+  "Thaddeus": {
+    "partOfSpeech": "noun",
+    "classification": "person",
+    "confidence": "high",
+    "definitions": [
+      "Thaddeus; the apostle also associated with the names Judas and Lebbeus."
+    ],
+    "relatedEntries": [
+      "Lebbeus"
+    ]
+  },
+  "Timeus": {
+    "partOfSpeech": "noun",
+    "classification": "person",
+    "confidence": "high",
+    "definitions": [
+      "Timeus; the father of blind Bartimeus."
+    ],
+    "relatedEntries": [
+      "Bartimeus",
+      "Timaeus"
+    ]
+  },
+  "Zaccheus": {
+    "partOfSpeech": "noun",
+    "classification": "person",
+    "confidence": "high",
+    "definitions": [
+      "Zaccheus; the chief publican of Jericho whom Jesus called and saved."
+    ],
+    "relatedEntries": [
+      "Zacchaeus"
+    ]
+  },
+  "instructors": {
+    "partOfSpeech": "noun",
+    "confidence": "high",
+    "definitions": [
+      "Plural form of 'instructor'. See 'instructor'."
+    ],
+    "relatedEntries": [
+      "instructor"
+    ]
   }
 }

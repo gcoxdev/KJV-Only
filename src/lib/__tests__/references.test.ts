@@ -106,6 +106,30 @@ describe("concordance helpers", () => {
     expect(resolveAIDictionaryKey(aiDictionary, "baptisms")).toBe("baptisms");
   });
 
+  it("prefers divine-name alias matches before lowercase common nouns", () => {
+    const aiDictionary: AIDictionaryPayload = {
+      god: {
+        definitions: ["A false deity or figurative god."],
+      },
+      GOD: {
+        definitions: ["The one true God."],
+        aliases: ["God"],
+      },
+      lord: {
+        definitions: ["A human lord or master."],
+      },
+      LORD: {
+        definitions: ["The covenant name of God in caps."],
+        aliases: ["Lord"],
+      },
+    };
+
+    expect(resolveAIDictionaryKey(aiDictionary, "God")).toBe("GOD");
+    expect(resolveAIDictionaryKey(aiDictionary, "god")).toBe("god");
+    expect(resolveAIDictionaryKey(aiDictionary, "Lord")).toBe("LORD");
+    expect(resolveAIDictionaryKey(aiDictionary, "lord")).toBe("lord");
+  });
+
   it("resolves AI dictionary phrases by exact text and aliases", () => {
     const aiDictionary: AIDictionaryPayload = {
       "take no thought": {
