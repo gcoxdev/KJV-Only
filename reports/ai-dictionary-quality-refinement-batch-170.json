@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-03-17T08:20:00.000Z",
+  "batch": "ai-dictionary-quality-refinement-batch-170",
+  "focus": [
+    "textSurfaceConcordance",
+    "divineNameCanonicalization",
+    "missingTextSurfaceAIDictionaryEntries"
+  ],
+  "changes": [
+    "Rebuilt public/references/concordance.json from displayed KJV token text, including divineName capitalization and apostrophe normalization.",
+    "Rebuilt concordance compact/nested runtime variants from the new primary concordance.",
+    "Confirmed text-vs-concordance alignment is now exact at the displayed surface-word level.",
+    "Added text-surface AI Dictionary primary entries exposed by the new concordance, including Alpheus, Arimathea, Bartimeus, Cesar, Cesar's, Cesarea, Eneas, Epenetus, Esarhaddon, Galilean, Galileans, Hymeneus, Iturea, Lebbeus, Maran-atha, Pretorium, Thaddeus, Timeus, Zaccheus, and instructors.",
+    "Added canonical divine-name AI Dictionary entries for GOD, LORD, JEHOVAH, and LORD's, and updated resolver precedence so proper-case divine-name clicks resolve to those entries."
+  ],
+  "files": [
+    "public/references/concordance.json",
+    "public/references/concordance.compact.json",
+    "public/references/concordance.compact.min.json",
+    "public/references/concordance.compact.delta.min.json",
+    "public/references/concordance.nested.json",
+    "public/references/concordance.nested.min.json",
+    "public/references/concordance.build-report.json",
+    "public/references/ai-dictionary.json",
+    "src/lib/references.ts",
+    "src/lib/__tests__/references.test.ts",
+    "reports/ai-dictionary-text-vs-concordance-assessment.json",
+    "reports/ai-dictionary-concordance-primary-assessment.json"
+  ],
+  "reassessment": {
+    "textDerivedWords": 13450,
+    "concordanceWords": 13450,
+    "onlyInConcordance": 0,
+    "onlyInText": 0,
+    "aiDictionaryExactPrimaryMatches": 12343,
+    "aiDictionaryPrimaryCaseVariantMatches": 1107,
+    "aiDictionaryAliasOnlyMatches": 0,
+    "aiDictionaryMissingWithoutAliasResolution": 0
+  }
+}

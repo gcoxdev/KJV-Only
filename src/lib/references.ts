@@ -169,16 +169,33 @@ export function resolveAIDictionaryKey(
   const singular = lowered.endsWith("s") ? lowered.slice(0, -1) : lowered;
   const exactCandidates = new Set([
     cleaned,
-    lowered,
     cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase(),
     cleaned.toUpperCase(),
+    lowered,
   ]);
   const normalizedCandidate = normalizePhraseText(rawWord);
+
+  for (const candidate of exactCandidates) {
+    if (aiDictionary[candidate]) {
+      return candidate;
+    }
+  }
+
+  for (const [key, entry] of Object.entries(aiDictionary)) {
+    if (
+      entry.aliases?.some(
+        (alias) =>
+          exactCandidates.has(alias) ||
+          (normalizedCandidate && normalizePhraseText(alias) === normalizedCandidate),
+      )
+    ) {
+      return key;
+    }
+  }
 
   for (const [key, entry] of Object.entries(aiDictionary)) {
     const keyLower = key.toLowerCase();
     if (
-      exactCandidates.has(key) ||
       exactCandidates.has(keyLower) ||
       (normalizedCandidate && normalizePhraseText(key) === normalizedCandidate)
     ) {

@@ -1,15 +1,15 @@
 {
   "input": {
     "path": "public/references/concordance.json",
-    "bytes": 10447858,
-    "wordCount": 13787
+    "bytes": 12856844,
+    "wordCount": 13450
   },
   "compact": {
     "path": "public/references/concordance.compact.json",
-    "bytes": 8788502,
-    "bytesSaved": 1659356,
+    "bytes": 10567533,
+    "bytesSaved": 2289311,
     "versesCount": 31102,
-    "wordsCount": 13787,
+    "wordsCount": 13450,
     "sample": {
       "word": "Abana",
       "value": [
@@ -19,13 +19,13 @@
   },
   "compactMin": {
     "path": "public/references/concordance.compact.min.json",
-    "bytes": 4066993,
-    "bytesSaved": 6380865
+    "bytes": 4856298,
+    "bytesSaved": 8000546
   },
   "compactDeltaMin": {
     "path": "public/references/concordance.compact.delta.min.json",
-    "bytes": 2232652,
-    "bytesSaved": 8215206,
+    "bytes": 2506133,
+    "bytesSaved": 10350711,
     "sample": {
       "word": "Abana",
       "value": [
@@ -35,12 +35,12 @@
   },
   "nested": {
     "path": "public/references/concordance.nested.json",
-    "bytes": 15083129,
-    "bytesSaved": -4635271,
-    "wordsCount": 13787,
-    "bookBuckets": 83730,
-    "chapterBuckets": 271419,
-    "verseEntries": 630618,
+    "bytes": 16635729,
+    "bytesSaved": -3778885,
+    "wordsCount": 13450,
+    "bookBuckets": 82901,
+    "chapterBuckets": 267787,
+    "verseEntries": 772537,
     "sample": {
       "word": "Abana",
       "value": {
@@ -54,7 +54,7 @@
   },
   "nestedMin": {
     "path": "public/references/concordance.nested.min.json",
-    "bytes": 4318741,
-    "bytesSaved": 6129117
+    "bytes": 4660028,
+    "bytesSaved": 8196816
   }
 }
