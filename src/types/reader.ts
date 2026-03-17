@@ -41,6 +41,7 @@ export type AIDictionaryEntry = {
   classification?: string;
   definitions: string[];
   aliases?: string[];
+  relatedEntries?: string[];
   note?: string;
   confidence?: "high" | "medium" | "low";
 };

@@ -167,24 +167,46 @@ export function resolveAIDictionaryKey(
 
   const lowered = cleaned.toLowerCase();
   const singular = lowered.endsWith("s") ? lowered.slice(0, -1) : lowered;
-  const candidates = new Set([
+  const exactCandidates = new Set([
     cleaned,
     lowered,
-    singular,
     cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase(),
     cleaned.toUpperCase(),
   ]);
+  const normalizedCandidate = normalizePhraseText(rawWord);
 
   for (const [key, entry] of Object.entries(aiDictionary)) {
     const keyLower = key.toLowerCase();
-    if (candidates.has(key) || candidates.has(keyLower)) {
+    if (
+      exactCandidates.has(key) ||
+      exactCandidates.has(keyLower) ||
+      (normalizedCandidate && normalizePhraseText(key) === normalizedCandidate)
+    ) {
       return key;
     }
     if (
       entry.aliases?.some((alias) => {
         const aliasLower = alias.toLowerCase();
-        return candidates.has(alias) || candidates.has(aliasLower);
+        return (
+          exactCandidates.has(alias) ||
+          exactCandidates.has(aliasLower) ||
+          (normalizedCandidate && normalizePhraseText(alias) === normalizedCandidate)
+        );
       })
+    ) {
+      return key;
+    }
+  }
+
+  const singularCandidates = new Set([singular]);
+
+  for (const [key, entry] of Object.entries(aiDictionary)) {
+    const keyLower = key.toLowerCase();
+    if (singularCandidates.has(key) || singularCandidates.has(keyLower)) {
+      return key;
+    }
+    if (
+      entry.aliases?.some((alias) => singularCandidates.has(alias.toLowerCase()))
     ) {
       return key;
     }

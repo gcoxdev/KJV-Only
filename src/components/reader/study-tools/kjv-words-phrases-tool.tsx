@@ -99,6 +99,7 @@ export function KJVWordsPhrasesTool({
               placeholder="Search words, phrases, or units..."
               ariaLabel="Search KJV words and phrases"
               loading={isLoading || isSearching}
+              value={searchTerm}
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

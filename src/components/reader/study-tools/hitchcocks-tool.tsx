@@ -47,6 +47,7 @@ export function HitchcocksTool({
               placeholder="Search Hitchcock's..."
               ariaLabel="Search Hitchcock's Bible Names"
               loading={isLoading || isSearching}
+              value={searchTerm}
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

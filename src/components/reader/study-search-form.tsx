@@ -1,5 +1,5 @@
 import { LoaderCircleIcon, SearchIcon } from "lucide-react";
-import { type Ref } from "react";
+import { type Ref, useEffect, useState } from "react";
 
 import {
   InputGroup,
@@ -13,6 +13,7 @@ type StudySearchFormProps = {
   placeholder: string;
   ariaLabel: string;
   loading: boolean;
+  value: string;
   inputRef?: Ref<HTMLInputElement>;
   onSearch: (value: string) => void;
 };
@@ -22,17 +23,22 @@ export function StudySearchForm({
   placeholder,
   ariaLabel,
   loading,
+  value,
   inputRef,
   onSearch,
 }: StudySearchFormProps) {
+  const [draftValue, setDraftValue] = useState(value);
+
+  useEffect(() => {
+    setDraftValue(value);
+  }, [value]);
+
   return (
     <form
       className="w-full"
       onSubmit={(event) => {
         event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const value = formData.get(name);
-        onSearch(typeof value === "string" ? value : "");
+        onSearch(draftValue);
       }}
     >
       <InputGroup className="bg-workspace-panel-elevated">
@@ -41,6 +47,8 @@ export function StudySearchForm({
           name={name}
           placeholder={placeholder}
           className="bg-transparent"
+          value={draftValue}
+          onChange={(event) => setDraftValue(event.target.value)}
         />
         <InputGroupAddon align="inline-end">
           <InputGroupButton
