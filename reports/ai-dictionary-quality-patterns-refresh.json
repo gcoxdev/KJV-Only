@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-17T06:13:32.421Z",
+  "generatedAt": "2026-03-17T07:10:00.000Z",
   "schema": {
     "definitions": "array<string>",
     "partOfSpeech": "string",
@@ -11,78 +11,29 @@
     "emptyDefinitions": 0,
     "nonStringDefinitions": 0,
     "mediumConfidence": 5751,
-    "withFormOf": 4007,
-    "selfSufficientFormOf": 3967,
-    "unresolvedFormOf": 40,
-    "variantLanguage": 6,
+    "withFormOf": 3972,
+    "selfSufficientFormOf": 3971,
+    "unresolvedFormOf": 0,
+    "variantLanguage": 0,
     "repeatedNameFormula": 0,
     "genericWording": 0,
-    "thinPlace": 122,
-    "pronounEntries": 49,
-    "multiDefinitionEntries": 787
+    "thinPlace": 0,
+    "pronounEntries": 64,
+    "multiDefinitionEntries": 785
   },
   "samples": {
     "missingDefinitionsArray": [],
     "emptyDefinitions": [],
     "nonStringDefinitions": [],
-    "unresolvedFormOf": [
-      "Enosh",
-      "Jeremy",
-      "Jose",
-      "Joshaphat",
-      "Jude",
-      "Korhites",
-      "Madian",
-      "Mahali",
-      "Maleleel",
-      "Melchiah",
-      "Mesech",
-      "Michah",
-      "Michmas",
-      "Nachor",
-      "Nepthalim",
-      "Sadoc",
-      "Salma",
-      "Semei",
-      "Shamer",
-      "Shemuel"
-    ],
-    "variantLanguage": [
-      "Ararat",
-      "Baalath-beer",
-      "Hodevah",
-      "Pas-dammim",
-      "pomegranate",
-      "Thomas"
-    ],
+    "unresolvedFormOf": [],
+    "variantLanguage": [],
     "repeatedNameFormula": [],
     "genericWording": [],
-    "thinPlace": [
-      "Abez",
-      "Adamah",
-      "Adithaim",
-      "Ahlab",
-      "Alammelech",
-      "Amad",
-      "Amam",
-      "Anem",
-      "Aphekah",
-      "Arab",
-      "Balah",
-      "Bene-berak",
-      "Beten",
-      "Beth-birei",
-      "Beth-el",
-      "Beth-emek",
-      "Beth-palet",
-      "Beth-pazzez",
-      "Beth-peor",
-      "Beth-phelet"
-    ]
+    "thinPlace": []
   },
   "notes": [
     "Assessment is heuristic and tuned to the cleanup seams used in this project.",
-    "unresolvedFormOf is the main remaining long-tail signal if nonzero.",
+    "unresolvedFormOf tracks inflected-form wording that still lacks an explicit See-link to the root entry.",
     "mediumConfidence is not itself an error bucket; it marks entries that may still have room for nuance improvement."
   ]
 }
