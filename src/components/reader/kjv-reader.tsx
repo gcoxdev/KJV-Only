@@ -2394,6 +2394,7 @@ export function KJVReader() {
     },
     [
       ancientMaps,
+      aiDictionary,
       bibleWordBook,
       concordance,
       genealogy,
@@ -2560,6 +2561,7 @@ export function KJVReader() {
     },
     [
       ancientMaps,
+      aiDictionary,
       bibleWordBook,
       genealogy,
       hitchcocks,
@@ -2573,6 +2575,7 @@ export function KJVReader() {
       setSelectedOldEnglishEntry,
       setSelectedPhrasesEntry,
       setSelectedUnitsEntry,
+      setSelectedAIDictionaryEntry,
       setSelectedStrongsEntry,
       setSelectedWebstersEntry,
       strongsGreek,
@@ -3068,6 +3071,7 @@ export function KJVReader() {
     },
     [
       ancientMaps,
+      aiDictionary,
       concordance,
       bibleWordBook,
       ensureConcordanceLoaded,
@@ -3095,7 +3099,6 @@ export function KJVReader() {
       setIsStrongsSearching,
       setNotesContext,
       setSelectedConcordanceWord,
-      setSelectedAIDictionaryEntry,
       setSelectedGenealogyIds,
       setSelectedHitchcocksEntry,
       setSelectedMapsEntries,

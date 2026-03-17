@@ -742,44 +742,49 @@ export function SearchPage({
     });
   };
 
-  const renderResultText = (match: SearchMatch) => {
-    if (lastSearchMode === "smart") {
-      const smartTerms = getSmartHighlightWords(
-        {
-          searchWords: match.text.split(/\s+/),
-          searchWordsLower: match.text
-            .split(/\s+/)
-            .map((word) => word.toLowerCase().replace(/^[^a-z0-9']+|[^a-z0-9']+$/gi, ""))
-            .filter(Boolean),
-        },
-        lastSearchPhraseInput.trim(),
-        false,
-      );
-      return renderHighlightedTerms(
-        match.text,
-        smartTerms,
-        `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
-      );
-    }
+  const renderResultText = useCallback(
+    (match: SearchMatch) => {
+      if (lastSearchMode === "smart") {
+        const smartTerms = getSmartHighlightWords(
+          {
+            searchWords: match.text.split(/\s+/),
+            searchWordsLower: match.text
+              .split(/\s+/)
+              .map((word) =>
+                word.toLowerCase().replace(/^[^a-z0-9']+|[^a-z0-9']+$/gi, ""),
+              )
+              .filter(Boolean),
+          },
+          lastSearchPhraseInput.trim(),
+          false,
+        );
+        return renderHighlightedTerms(
+          match.text,
+          smartTerms,
+          `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
+        );
+      }
 
-    if (lastSearchMode === "contains-any" || lastSearchMode === "contains-all") {
-      return renderHighlightedTerms(
-        match.text,
-        lastSearchSelectedWords,
-        `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
-      );
-    }
+      if (lastSearchMode === "contains-any" || lastSearchMode === "contains-all") {
+        return renderHighlightedTerms(
+          match.text,
+          lastSearchSelectedWords,
+          `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
+        );
+      }
 
-    if (lastSearchMode === "regex") {
-      return renderHighlightedText(
-        match.text,
-        lastSearchPhraseInput.trim(),
-        `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
-      );
-    }
+      if (lastSearchMode === "regex") {
+        return renderHighlightedText(
+          match.text,
+          lastSearchPhraseInput.trim(),
+          `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
+        );
+      }
 
-    return match.text;
-  };
+      return match.text;
+    },
+    [lastSearchMode, lastSearchPhraseInput, lastSearchSelectedWords],
+  );
 
   const searchSummary = useMemo(() => {
     const summaryMode = lastSearchMode ?? searchMode;
@@ -842,7 +847,7 @@ export function SearchPage({
           </p>
         </button>
       )),
-    [lastSearchMode, lastSearchPhraseInput, lastSearchSelectedWords, onOpenResult, results],
+    [onOpenResult, renderResultText, results],
   );
   const totalPages = Math.max(
     1,
