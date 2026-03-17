@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-03-17T05:18:51.118Z",
+  "scope": "concordance words vs ai-dictionary primary keys with case-normalized primary matching",
+  "concordanceWords": 13787,
+  "exactPrimaryMatches": 12016,
+  "primaryCaseVariantMatches": 1028,
+  "aliasOnlyMatches": 743,
+  "missingWithoutAliasResolution": 0,
+  "lowercaseAliasOnlyCount": 523,
+  "notes": [
+    "This report compares concordance surface forms against AI Dictionary primary keys, while also recognizing lowercase/case-normalized primary matches.",
+    "Primary case-variant matches are concordance words already covered by an existing primary AI Dictionary entry that differs only by case.",
+    "Alias-only matches are words that resolve through AI Dictionary aliases but do not yet exist as primary entries.",
+    "The lowercase alias-only subset is the cleanest candidate pool for future primary-word promotion."
+  ]
+}

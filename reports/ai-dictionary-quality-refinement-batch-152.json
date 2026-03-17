@@ -1,0 +1,36 @@
+{
+  "batch": 152,
+  "scope": "concordance lowercase alias-only surface forms promoted to primary entries",
+  "changedCount": 25,
+  "entries": [
+    "account",
+    "accounted",
+    "appear",
+    "appeareth",
+    "arise",
+    "ariseth",
+    "ask",
+    "asketh",
+    "bear",
+    "beareth",
+    "become",
+    "becometh",
+    "beget",
+    "begat",
+    "begotten",
+    "beguile",
+    "beguiled",
+    "believe",
+    "believeth",
+    "belly",
+    "bellies",
+    "benefit",
+    "benefits",
+    "beseech",
+    "besought"
+  ],
+  "notes": [
+    "Promoted the next clean block of concordance surface forms that previously resolved only through aliases.",
+    "Replaced root alias-only coverage with explicit primary entries and Related links."
+  ]
+}
