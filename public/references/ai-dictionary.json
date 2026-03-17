@@ -4657,9 +4657,9 @@
     "confidence": "medium"
   },
   "apply": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "verb",
     "definitions": [
-      "In a app manner or degree."
+      "Apply; to put to use, direct to a purpose, lay to, or bring into action."
     ],
     "confidence": "medium"
   },
@@ -9278,7 +9278,7 @@
       "bellies"
     ],
     "confidence": "high",
-    "partOfSpeech": "adverb"
+    "partOfSpeech": "noun"
   },
   "belong": {
     "partOfSpeech": "verb",
@@ -11506,9 +11506,9 @@
     "confidence": "medium"
   },
   "bodily": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "adjective",
     "definitions": [
-      "In a bodi manner or degree."
+      "Bodily; belonging to the body, physical, or corporeal."
     ],
     "confidence": "medium"
   },
@@ -12711,10 +12711,10 @@
   },
   "brotherly": {
     "definitions": [
-      "Like that which becomes brethren: affectionate, kind, and united."
+      "Brotherly; like that which becomes brethren, affectionate, kind, and united."
     ],
     "confidence": "high",
-    "partOfSpeech": "adverb"
+    "partOfSpeech": "adjective"
   },
   "brothers": {
     "partOfSpeech": "noun",
@@ -16848,10 +16848,10 @@
   },
   "comely": {
     "definitions": [
-      "Becoming, seemly, or pleasant to behold."
+      "Comely; becoming, seemly, or pleasant to behold."
     ],
     "confidence": "high",
-    "partOfSpeech": "adverb"
+    "partOfSpeech": "adjective"
   },
   "comers": {
     "partOfSpeech": "noun",
@@ -18845,9 +18845,9 @@
     "confidence": "medium"
   },
   "costly": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "adjective",
     "definitions": [
-      "In a cost manner or degree."
+      "Costly; expensive, precious, or of great value."
     ],
     "confidence": "medium"
   },
@@ -24819,9 +24819,9 @@
     "confidence": "medium"
   },
   "early": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "adverb / adjective",
     "definitions": [
-      "Early; at an early time, soon in the day, or beforehand."
+      "Early; at an early time, soon in the day, beforehand, or belonging to an early time."
     ],
     "confidence": "high"
   },
@@ -24883,9 +24883,9 @@
     "confidence": "high"
   },
   "earthly": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "adjective",
     "definitions": [
-      "In a earth manner or degree."
+      "Earthly; belonging to the earth, worldly, or of this present life."
     ],
     "confidence": "medium"
   },
@@ -30860,10 +30860,10 @@
   },
   "fleshly": {
     "definitions": [
-      "Belonging to the flesh; governed by bodily or natural desires."
+      "Fleshly; belonging to the flesh, bodily, or governed by natural desires."
     ],
     "confidence": "high",
-    "partOfSpeech": "adverb"
+    "partOfSpeech": "adjective"
   },
   "fleshy": {
     "partOfSpeech": "adjective",
@@ -31059,9 +31059,10 @@
     "confidence": "medium"
   },
   "fly": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "verb / noun",
     "definitions": [
-      "In a f manner or degree."
+      "Fly; to move through the air with wings or swift motion.",
+      "A fly is a winged insect of that name."
     ],
     "confidence": "medium"
   },
@@ -31210,9 +31211,9 @@
     "confidence": "medium"
   },
   "folly": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "noun",
     "definitions": [
-      "In a fol manner or degree."
+      "Folly; foolishness, lack of wisdom, or sinful madness."
     ],
     "confidence": "medium"
   },
@@ -32313,9 +32314,9 @@
     "confidence": "medium"
   },
   "friendly": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "adjective",
     "definitions": [
-      "In a friend manner or degree."
+      "Friendly; kind, favorable, or disposed as a friend."
     ],
     "confidence": "medium"
   },
@@ -32401,7 +32402,7 @@
       "Perverse; willfully contrary; hard to govern or persuade."
     ],
     "confidence": "high",
-    "partOfSpeech": "adverb"
+    "partOfSpeech": "adjective"
   },
   "frowardly": {
     "partOfSpeech": "adverb",
@@ -34581,9 +34582,9 @@
     "partOfSpeech": "noun"
   },
   "godly": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "adjective",
     "definitions": [
-      "In a god manner or degree."
+      "Godly; devout, pious, and conformed to the will of God."
     ],
     "confidence": "medium"
   },
@@ -34754,10 +34755,10 @@
   },
   "goodly": {
     "definitions": [
-      "Fair, handsome, stately, or of pleasing appearance."
+      "Goodly; fair, handsome, stately, or of pleasing appearance."
     ],
     "confidence": "high",
-    "partOfSpeech": "adverb"
+    "partOfSpeech": "adjective"
   },
   "goodman": {
     "partOfSpeech": "noun",
@@ -38006,9 +38007,9 @@
     "confidence": "high"
   },
   "heavenly": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "adjective",
     "definitions": [
-      "In a heaven manner or degree."
+      "Heavenly; belonging to heaven, divine, or spiritually exalted."
     ],
     "confidence": "medium"
   },
@@ -39632,10 +39633,10 @@
   },
   "holy": {
     "definitions": [
-      "Set apart unto God; pure, sacred, and morally clean."
+      "Holy; set apart unto God, pure, sacred, and morally clean."
     ],
     "confidence": "high",
-    "partOfSpeech": "adverb"
+    "partOfSpeech": "adjective"
   },
   "holyday": {
     "partOfSpeech": "noun",
@@ -42783,7 +42784,7 @@
     "classification": "people group"
   },
   "italy": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "noun / region",
     "definitions": [
       "Italy; the land of the Romans in the New Testament setting, especially associated with Rome and those from there."
     ],
@@ -46596,9 +46597,9 @@
     "confidence": "medium"
   },
   "kingly": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "adjective",
     "definitions": [
-      "In a king manner or degree."
+      "Kingly; royal, princely, or becoming a king."
     ],
     "confidence": "medium"
   },
@@ -49095,9 +49096,9 @@
     "confidence": "medium"
   },
   "lily": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "noun",
     "definitions": [
-      "In a li manner or degree."
+      "Lily; the flower so called, often used in Scripture as an image of beauty or grace."
     ],
     "confidence": "medium"
   },
@@ -49304,11 +49305,11 @@
   },
   "lively": {
     "definitions": [
-      "Living; full of life and active power.",
-      "Often simply 'living' in older usage."
+      "Lively; living, full of life, or active in power.",
+      "In older usage often simply means living."
     ],
     "confidence": "high",
-    "partOfSpeech": "adverb"
+    "partOfSpeech": "adjective"
   },
   "liver": {
     "partOfSpeech": "noun",
@@ -49876,9 +49877,9 @@
     "confidence": "medium"
   },
   "lovely": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "adjective",
     "definitions": [
-      "In a love manner or degree."
+      "Lovely; worthy of love, beautiful, or delightful."
     ],
     "confidence": "medium"
   },
@@ -49986,9 +49987,9 @@
     "partOfSpeech": "noun"
   },
   "lowly": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "adjective",
     "definitions": [
-      "In a low manner or degree."
+      "Lowly; humble, meek, or low in condition."
     ],
     "confidence": "medium"
   },
@@ -90705,9 +90706,9 @@
     ]
   },
   "yearly": {
-    "partOfSpeech": "adverb",
+    "partOfSpeech": "adverb / adjective",
     "definitions": [
-      "In a year manner or degree."
+      "Yearly; every year, or belonging to each year."
     ],
     "confidence": "medium"
   },
