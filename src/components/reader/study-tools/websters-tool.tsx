@@ -53,6 +53,7 @@ export function WebstersTool({
               placeholder="Search Webster's..."
               ariaLabel="Search Webster's dictionary"
               loading={isLoading || isSearching}
+              value={searchTerm}
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

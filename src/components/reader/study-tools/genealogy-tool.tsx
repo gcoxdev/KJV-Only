@@ -57,6 +57,7 @@ export function GenealogyTool({
               placeholder="Search genealogy..."
               ariaLabel="Search genealogy"
               loading={isLoading || isSearching}
+              value={searchTerm}
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

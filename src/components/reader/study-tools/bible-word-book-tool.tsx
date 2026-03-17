@@ -59,6 +59,7 @@ export function BibleWordBookTool({
               placeholder="Search Bible Word-Book..."
               ariaLabel="Search Bible Word-Book"
               loading={isLoading || isSearching}
+              value={searchTerm}
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

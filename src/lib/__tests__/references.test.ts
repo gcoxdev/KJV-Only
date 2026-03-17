@@ -93,6 +93,19 @@ describe("concordance helpers", () => {
     expect(resolveAIDictionaryKey(aiDictionary, "quick")).toBe("quick");
   });
 
+  it("prefers exact AI dictionary entry matches over singular fallback", () => {
+    const aiDictionary: AIDictionaryPayload = {
+      baptism: {
+        definitions: ["Singular entry."],
+      },
+      baptisms: {
+        definitions: ["Plural entry."],
+      },
+    };
+
+    expect(resolveAIDictionaryKey(aiDictionary, "baptisms")).toBe("baptisms");
+  });
+
   it("resolves AI dictionary phrases by exact text and aliases", () => {
     const aiDictionary: AIDictionaryPayload = {
       "take no thought": {

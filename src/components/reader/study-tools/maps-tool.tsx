@@ -122,6 +122,7 @@ export function MapsTool({
               placeholder="Search maps..."
               ariaLabel="Search maps"
               loading={isLoading || isSearching}
+              value={searchTerm}
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

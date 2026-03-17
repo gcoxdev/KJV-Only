@@ -47,6 +47,7 @@ export function OldEnglishTool({
               placeholder="Search Old English..."
               ariaLabel="Search Old English dictionary"
               loading={isLoading || isSearching}
+              value={searchTerm}
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

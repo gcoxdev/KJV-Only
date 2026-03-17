@@ -9,6 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { StudySearchForm } from "@/components/reader/study-search-form";
 
 type AIDictionaryResult = { key: string; entry: AIDictionaryEntry };
@@ -23,8 +24,49 @@ type AIDictionaryToolProps = {
   results: AIDictionaryResult[];
   wordAccordionValue: string[];
   onWordAccordionValueChange: (value: string[]) => void;
+  resolveEntryTarget: (term: string) => string | null;
+  onOpenEntry: (term: string) => void;
   onSearch: (term: string) => void;
 };
+
+function renderAIDictionaryDefinition(
+  entryKey: string,
+  definition: string,
+  index: number,
+  resolveEntryTarget: (term: string) => string | null,
+  onOpenEntry: (term: string) => void,
+) {
+  const match = definition.match(/^(.*)\. See '([^']+)'\.$/);
+  if (!match) {
+    return <p key={`${entryKey}-definition-${index}`}>{definition}</p>;
+  }
+
+  const [, prefix, targetLabel] = match;
+  const targetKey = resolveEntryTarget(targetLabel);
+  if (!targetKey || targetKey === entryKey) {
+    return <p key={`${entryKey}-definition-${index}`}>{definition}</p>;
+  }
+
+  return (
+    <p key={`${entryKey}-definition-${index}`}>
+      {prefix}.{" "}
+      <Button
+        type="button"
+        variant="link"
+        size="xs"
+        className="h-auto px-0 py-0 text-sm align-baseline"
+        onClick={() => onOpenEntry(targetLabel)}
+      >
+        See "{targetLabel}".
+      </Button>
+    </p>
+  );
+}
+
+function extractSeeReference(definition: string) {
+  const match = definition.match(/(?:^| )See '([^']+)'\.$/);
+  return match?.[1] ?? null;
+}
 
 export function AIDictionaryTool({
   hasInfo,
@@ -36,6 +78,8 @@ export function AIDictionaryTool({
   results,
   wordAccordionValue,
   onWordAccordionValueChange,
+  resolveEntryTarget,
+  onOpenEntry,
   onSearch,
 }: AIDictionaryToolProps) {
   return (
@@ -54,6 +98,7 @@ export function AIDictionaryTool({
               placeholder="Search AI Dictionary..."
               ariaLabel="Search AI Dictionary"
               loading={isLoading || isSearching}
+              value={searchTerm}
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (
@@ -82,6 +127,47 @@ export function AIDictionaryTool({
                   <AccordionItem key={key} value={key}>
                     <AccordionTrigger>{key}</AccordionTrigger>
                     <AccordionContent className="space-y-2">
+                      {(() => {
+                        const aliasTargets =
+                          entry.aliases?.map((alias) => ({
+                            label: alias,
+                            target: resolveEntryTarget(alias),
+                          })) ?? [];
+                        const clickableAliases = aliasTargets.filter(
+                          ({ target }) => Boolean(target) && target !== key,
+                        );
+                        const plainAliases = aliasTargets.filter(
+                          ({ target }) => !target || target === key,
+                        );
+                        const explicitRelatedTargets =
+                          entry.relatedEntries?.map((related) => ({
+                            label: related,
+                            target: resolveEntryTarget(related),
+                          })) ?? [];
+                        const derivedRelatedTargets = entry.definitions
+                          .map((definition) => extractSeeReference(definition))
+                          .filter((value): value is string => Boolean(value))
+                          .map((related) => ({
+                            label: related,
+                            target: resolveEntryTarget(related),
+                          }));
+                        const relatedTargets = [
+                          ...explicitRelatedTargets,
+                          ...derivedRelatedTargets,
+                        ].filter(
+                          (item, index, items) =>
+                            items.findIndex(
+                              (candidate) =>
+                                candidate.label === item.label &&
+                                candidate.target === item.target,
+                            ) === index,
+                        );
+                        const clickableRelated = relatedTargets.filter(
+                          ({ target }) => Boolean(target) && target !== key,
+                        );
+
+                        return (
+                          <>
                       <div className="flex flex-wrap items-center gap-2">
                         {entry.classification ? (
                           <Badge variant="outline" className="capitalize">
@@ -100,14 +186,60 @@ export function AIDictionaryTool({
                         ) : null}
                       </div>
                       <div className="space-y-2 text-sm leading-relaxed">
-                        {entry.definitions.map((definition, index) => (
-                          <p key={`${key}-definition-${index}`}>{definition}</p>
-                        ))}
+                        {entry.definitions.map((definition, index) =>
+                          renderAIDictionaryDefinition(
+                            key,
+                            definition,
+                            index,
+                            resolveEntryTarget,
+                            onOpenEntry,
+                          ),
+                        )}
                       </div>
-                      {entry.aliases?.length ? (
-                        <p className="text-xs text-muted-foreground">
-                          Also: {entry.aliases.join(", ")}
-                        </p>
+                      {clickableAliases.length > 0 || plainAliases.length > 0 ? (
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground">Also:</p>
+                          {clickableAliases.length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {clickableAliases.map(({ label }) => (
+                                <Button
+                                  key={`${key}-alias-${label}`}
+                                  type="button"
+                                  variant="outline"
+                                  size="xs"
+                                  className="h-auto px-2 py-1 text-xs"
+                                  onClick={() => onOpenEntry(label)}
+                                >
+                                  {label}
+                                </Button>
+                              ))}
+                            </div>
+                          ) : null}
+                          {plainAliases.length > 0 ? (
+                            <p className="text-xs text-muted-foreground">
+                              {plainAliases.map(({ label }) => label).join(", ")}
+                            </p>
+                          ) : null}
+                        </div>
+                      ) : null}
+                      {clickableRelated.length > 0 ? (
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground">Related:</p>
+                          <div className="flex flex-wrap gap-1">
+                            {clickableRelated.map(({ label }) => (
+                              <Button
+                                key={`${key}-related-${label}`}
+                                type="button"
+                                variant="outline"
+                                size="xs"
+                                className="h-auto px-2 py-1 text-xs"
+                                onClick={() => onOpenEntry(label)}
+                              >
+                                {label}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
                       ) : null}
                       {entry.note ? (
                         <p
@@ -120,6 +252,9 @@ export function AIDictionaryTool({
                           {entry.note}
                         </p>
                       ) : null}
+                          </>
+                        );
+                      })()}
                     </AccordionContent>
                   </AccordionItem>
                 ))}
