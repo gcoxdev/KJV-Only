@@ -208,7 +208,7 @@
   "Abez": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Abez; a town in the territory of Issachar listed among that tribe's inheritances."
+      "Abez; a settlement named in the tribal allotment of Issachar."
     ],
     "confidence": "high",
     "classification": "city",
@@ -1413,7 +1413,7 @@
   "Adamah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Adamah; a town in Naphtali listed among the northern tribal inheritances."
+      "Adamah; a northern settlement named in the tribal allotment of Naphtali."
     ],
     "confidence": "high",
     "classification": "city",
@@ -1591,7 +1591,7 @@
   "Adithaim": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Adithaim; a town in the lowland of Judah named among the Shephelah settlements."
+      "Adithaim; a settlement in the Shephelah of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -2800,7 +2800,7 @@
   "Ahlab": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ahlab; a town in Asher from which the Canaanite inhabitants were not driven out."
+      "Ahlab; an Asherite settlement from which the Canaanite inhabitants were not driven out."
     ],
     "confidence": "high",
     "classification": "city",
@@ -3029,7 +3029,7 @@
   "Alammelech": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Alammelech; a town in the inheritance of Asher on the northern coastland side of the land."
+      "Alammelech; a coastal settlement in the inheritance of Asher."
     ],
     "confidence": "high",
     "classification": "city",
@@ -3501,7 +3501,7 @@
   "Amad": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Amad; a town in the inheritance of Asher."
+      "Amad; a settlement named in the inheritance of Asher."
     ],
     "confidence": "high",
     "classification": "city",
@@ -3543,7 +3543,7 @@
   "Amam": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Amam; a town in the southern territory of Judah near the Negev settlements."
+      "Amam; a settlement in the Negev of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -4182,7 +4182,7 @@
   "Anem": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Anem; a Levitical town in Issachar given to the Gershonites."
+      "Anem; a Levitical settlement in Issachar assigned to the Gershonites."
     ],
     "confidence": "high",
     "classification": "city",
@@ -4636,7 +4636,7 @@
   "Aphekah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Aphekah; a town in the hill country of Judah named among that tribe's settlements."
+      "Aphekah; a Judahite settlement in the hill country, listed among the towns of that region."
     ],
     "confidence": "high",
     "classification": "city",
@@ -5102,7 +5102,7 @@
   "Arab": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Arab; a town in the hill country of Judah named among its settlements."
+      "Arab; a settlement in the hill country of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -5185,8 +5185,7 @@
   "Ararat": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ararat; the land or mountainous region where the ark rested after the flood.",
-      "It also appears as a kingdom or territorial name in later history."
+      "Ararat; the mountainous region where Noah's ark came to rest after the flood, later also known as a kingdom in the north."
     ],
     "confidence": "high",
     "classification": "region",
@@ -5911,10 +5910,13 @@
   "Asarelah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Asarelah; one of the sons of Asaph appointed in the courses of temple musicians, also written Jesharelah."
+      "Asarelah; one of the sons of Asaph appointed in the courses of temple musicians."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Jesharelah"
+    ]
   },
   "ascend": {
     "partOfSpeech": "verb",
@@ -6712,11 +6714,14 @@
   "Ataroth-addar": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ataroth-Addar; the border town between Ephraim and Benjamin, also written Ataroth-Adar."
+      "Ataroth-Addar; a border town between Ephraim and Benjamin."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Sometimes identified with Khirbet Atara."
+    "note": "Location: Sometimes identified with Khirbet Atara.",
+    "relatedEntries": [
+      "Ataroth-Adar"
+    ]
   },
   "ate": {
     "partOfSpeech": "noun",
@@ -7611,11 +7616,14 @@
   "Baalath-beer": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Baalath-Beer; a southern town of Simeon, also called Ramath of the south."
+      "Baalath-Beer; a Simeonite settlement in the south, identified with Ramath of the south."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Sometimes identified with Tel Malhata."
+    "note": "Location: Sometimes identified with Tel Malhata.",
+    "relatedEntries": [
+      "Ramath"
+    ]
   },
   "Baale": {
     "partOfSpeech": "noun",
@@ -8058,7 +8066,7 @@
   "Balah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Balah; a southern town in the Simeonite or Judean lists, likely related to Bilhah or Baalah in parallel records."
+      "Balah; a southern town named in the Simeonite and Judean lists, likely related to Bilhah or Baalah in parallel records."
     ],
     "confidence": "high",
     "classification": "city",
@@ -9207,10 +9215,13 @@
   "Beeliada": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beeliada; one of David's sons born at Jerusalem, also written Eliada."
+      "Beeliada; one of David's sons born at Jerusalem."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Eliada"
+    ]
   },
   "Beelzebub": {
     "partOfSpeech": "noun",
@@ -9946,7 +9957,7 @@
   "Bene-berak": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Bene-Berak; a town in Dan's inheritance on the western lowland side of the territory."
+      "Bene-Berak; a western settlement in the inheritance of Dan."
     ],
     "confidence": "high",
     "classification": "city",
@@ -10368,7 +10379,7 @@
   "Beten": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beten; a town in the inheritance of Asher on the northern side of the land."
+      "Beten; a northern settlement in the inheritance of Asher."
     ],
     "confidence": "high",
     "classification": "city",
@@ -10457,7 +10468,7 @@
   "Beth-birei": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beth-Birei; a southern Simeonite town in the Negev, probably the same place elsewhere called Beth-Lebaoth."
+      "Beth-Birei; a Simeonite settlement in the Negev, probably the same place elsewhere called Beth-lebaoth."
     ],
     "confidence": "high",
     "classification": "city",
@@ -10512,7 +10523,7 @@
   "Beth-emek": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beth-Emek; a town in Asher's inheritance among the northern settlements."
+      "Beth-Emek; a northern settlement in the inheritance of Asher."
     ],
     "confidence": "high",
     "classification": "city",
@@ -10575,11 +10586,14 @@
   "Beth-hoglah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beth-Hoglah; the border town near the Jordan valley, also written Beth-hogla."
+      "Beth-Hoglah; a border town near the Jordan valley."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Often identified with Deir Hajla."
+    "note": "Location: Often identified with Deir Hajla.",
+    "relatedEntries": [
+      "Beth-hogla"
+    ]
   },
   "Beth-horon": {
     "partOfSpeech": "noun",
@@ -10602,16 +10616,19 @@
   "Beth-jesimoth": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beth-Jesimoth; the eastern border town near the Dead Sea, also written Beth-jeshimoth."
+      "Beth-Jesimoth; an eastern border town near the Dead Sea."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Commonly identified with Tell Azeimeh."
+    "note": "Location: Commonly identified with Tell Azeimeh.",
+    "relatedEntries": [
+      "Beth-jeshimoth"
+    ]
   },
   "Beth-lebaoth": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beth-Lebaoth; a southern Simeonite town, probably identical with Beth-Birei in a parallel list."
+      "Beth-Lebaoth; a Simeonite settlement, probably identical with Beth-Birei in a parallel list."
     ],
     "confidence": "high",
     "classification": "city",
@@ -10655,7 +10672,7 @@
   "Beth-marcaboth": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beth-Marcaboth; a southern Simeonite town whose name suggests association with chariots or riding."
+      "Beth-Marcaboth; a Simeonite settlement whose name suggests association with chariots or riding."
     ],
     "confidence": "high",
     "classification": "city",
@@ -10691,7 +10708,7 @@
   "Beth-pazzez": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beth-Pazzez; a town in Issachar named among that tribe's inheritances."
+      "Beth-Pazzez; a settlement named in the inheritance of Issachar."
     ],
     "confidence": "high",
     "classification": "city",
@@ -10700,7 +10717,7 @@
   "Beth-peor": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beth-Peor; a place in the Moabite region east of Jordan associated with Peor."
+      "Beth-Peor; a Moabite site east of Jordan associated with Baal-peor and Peor."
     ],
     "confidence": "medium",
     "classification": "city",
@@ -10709,11 +10726,14 @@
   "Beth-phelet": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beth-Phelet; the southern town in Judah's territory, also written Beth-palet."
+      "Beth-Phelet; a southern town in Judah's territory."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Often identified with Tell es Saqati."
+    "note": "Location: Often identified with Tell es Saqati.",
+    "relatedEntries": [
+      "Beth-palet"
+    ]
   },
   "Beth-rapha": {
     "partOfSpeech": "noun",
@@ -10744,11 +10764,14 @@
   "Beth-shean": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Beth-Shean; the city remembered especially in the account of Saul's death, also written Beth-Shan."
+      "Beth-Shean; the city remembered especially in the account of Saul's death."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Commonly identified with Tel Bet Shean."
+    "note": "Location: Commonly identified with Tel Bet Shean.",
+    "relatedEntries": [
+      "Beth-Shan"
+    ]
   },
   "Beth-shemesh": {
     "partOfSpeech": "noun",
@@ -10877,11 +10900,14 @@
   "Bethul": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Bethul; a southern town in the Simeonite and Judean Negev lists, perhaps related to Bethuel in a parallel form."
+      "Bethul; a southern town named in the Simeonite and Judean Negev lists, perhaps related to Bethuel in a parallel form."
     ],
     "confidence": "medium",
     "classification": "city",
-    "note": "Location: Commonly identified with Khirbet ar Ras."
+    "note": "Location: Commonly identified with Khirbet ar Ras.",
+    "relatedEntries": [
+      "Bethuel"
+    ]
   },
   "betimes": {
     "definitions": [
@@ -11146,10 +11172,13 @@
   "Bigthana": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Bigthana; one of the chamberlains of Ahasuerus who conspired against the king, also written Bigthan."
+      "Bigthana; one of the chamberlains of Ahasuerus who conspired against the king."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Bigthan"
+    ]
   },
   "Bigvai": {
     "partOfSpeech": "noun",
@@ -11170,11 +11199,14 @@
   "Bileam": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Bileam; a town in Manasseh's northern territory, known in related form as Ibleam in other passages."
+      "Bileam; a Manassite settlement also known in related form as Ibleam."
     ],
     "confidence": "medium",
     "classification": "city",
-    "note": "Location: Commonly identified with Khirbet Belameh."
+    "note": "Location: Commonly identified with Khirbet Belameh.",
+    "relatedEntries": [
+      "Ibleam"
+    ]
   },
   "Bilgah": {
     "partOfSpeech": "noun",
@@ -13907,7 +13939,7 @@
   "Cabbon": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Cabbon; a town in the lowland of Judah named among the Shephelah settlements."
+      "Cabbon; a settlement in the Shephelah of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -13923,7 +13955,7 @@
   "Cabul": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Cabul; a town in Asher and also the district-name used by Hiram for the towns Solomon gave him in Galilee."
+      "Cabul; a place-name used both for a town in Asher and for the district-name Hiram applied to towns Solomon gave him in Galilee."
     ],
     "confidence": "high",
     "classification": "city",
@@ -15954,7 +15986,7 @@
   "Chephar-haammonai": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Chephar-Haammonai; a town in the inheritance of Benjamin near the hill-country settlements."
+      "Chephar-Haammonai; a settlement near the hill-country towns of Benjamin."
     ],
     "confidence": "high",
     "classification": "city",
@@ -20851,11 +20883,14 @@
   "Dabareh": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Dabareh; a Levitical town in Issachar, better known in a related form as Daberath."
+      "Dabareh; a Levitical settlement in Issachar, better known in a related form as Daberath."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Often identified with Horvat Devora."
+    "note": "Location: Often identified with Horvat Devora.",
+    "relatedEntries": [
+      "Daberath"
+    ]
   },
   "Dabbasheth": {
     "partOfSpeech": "noun",
@@ -20869,7 +20904,7 @@
   "Daberath": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Daberath; a Levitical town on the border of Issachar near Mount Tabor."
+      "Daberath; a Levitical settlement on the border of Issachar near Mount Tabor."
     ],
     "confidence": "high",
     "classification": "city",
@@ -23281,7 +23316,7 @@
   "Dilean": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Dilean; a town in the lowland of Judah named among the Shephelah settlements."
+      "Dilean; a settlement in the Shephelah of Judah."
     ],
     "confidence": "medium",
     "classification": "city",
@@ -23367,7 +23402,7 @@
   "Dimonah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Dimonah; a town in the south of Judah named among the Negev settlements."
+      "Dimonah; a settlement in the Negev of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -25804,11 +25839,14 @@
   "Edar": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Edar; a place-name associated with the tower of Eder near Bethlehem and also with a town in Judah's southern lists."
+      "Edar; a name associated with the tower of Eder near Bethlehem and also with a southern Judahite settlement."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Often identified with Khirbet es Siyar el Ghanam."
+    "note": "Location: Often identified with Khirbet es Siyar el Ghanam.",
+    "relatedEntries": [
+      "Bethlehem"
+    ]
   },
   "Eden": {
     "partOfSpeech": "noun",
@@ -26530,10 +26568,13 @@
   "Eliphalet": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Eliphalet; the name of Davidic sons and other men in Scripture, elsewhere also written Eliphelet."
+      "Eliphalet; the name of Davidic sons and other men in Scripture."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Eliphelet"
+    ]
   },
   "Eliphaz": {
     "partOfSpeech": "noun",
@@ -26752,11 +26793,14 @@
   "Eloth": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Eloth; the Red Sea port in the far south, also written Elath."
+      "Eloth; the Red Sea port in the far south."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Often located in or identified with Aqaba, though the exact identification is debated."
+    "note": "Location: Often located in or identified with Aqaba, though the exact identification is debated.",
+    "relatedEntries": [
+      "Elath"
+    ]
   },
   "Elpaal": {
     "partOfSpeech": "noun",
@@ -26784,7 +26828,7 @@
   "Eltekeh": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Eltekeh; a Levitical town in Dan's territory, later involved in Assyrian-era conflict."
+      "Eltekeh; a Levitical settlement in Dan's territory, later mentioned in Assyrian-era conflict."
     ],
     "confidence": "high",
     "classification": "city",
@@ -26842,10 +26886,13 @@
   "Elzaphan": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Elzaphan; the son of Uzziel set over the Kohathites, also written Elizaphan."
+      "Elzaphan; the son of Uzziel set over the Kohathites."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Elizaphan"
+    ]
   },
   "embalm": {
     "partOfSpeech": "verb",
@@ -27053,11 +27100,14 @@
   "En-gannim": {
     "partOfSpeech": "noun",
     "definitions": [
-      "En-Gannim; a Levitical town in Issachar and also a place-name in Judah under related usage."
+      "En-Gannim; a Levitical settlement in Issachar; the name is also used for a place in Judah in a related form."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Often identified with Khirbet Umm Jina."
+    "note": "Location: Often identified with Khirbet Umm Jina.",
+    "relatedEntries": [
+      "Issachar"
+    ]
   },
   "En-gedi": {
     "partOfSpeech": "noun",
@@ -27564,10 +27614,13 @@
   "Enosh": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Enosh; a name-form of Enos, the son of Seth, in whose days men began to call upon the name of the LORD."
+      "Enosh; the son of Seth, in whose days men began to call upon the name of the LORD."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Enos"
+    ]
   },
   "enough": {
     "partOfSpeech": "adjective",
@@ -28688,7 +28741,7 @@
   "Euphrates": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Euphrates; the great river of Mesopotamia, one of the boundary markers of the promised land and a major river in biblical history."
+      "Euphrates; the major river of Mesopotamia, serving as a boundary marker of the promised land and a recurring landmark in biblical history."
     ],
     "confidence": "medium",
     "classification": "river",
@@ -29568,10 +29621,13 @@
   "Ezbon": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ezbon; a son of Gad whose line appears in the tribal genealogies, also written Ozni."
+      "Ezbon; a son of Gad whose line appears in the tribal genealogies."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Ozni"
+    ]
   },
   "Ezekias": {
     "partOfSpeech": "noun",
@@ -29627,11 +29683,14 @@
   "Ezion-geber": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ezion-Geber; the southern port used for sea trade on the Gulf of Aqaba, also written Ezion-Gaber."
+      "Ezion-Geber; the southern port used for sea trade on the Gulf of Aqaba."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Often located in or identified with Jezirat Faraun, though the exact identification is debated."
+    "note": "Location: Often located in or identified with Jezirat Faraun, though the exact identification is debated.",
+    "relatedEntries": [
+      "Ezion-Gaber"
+    ]
   },
   "eznite": {
     "partOfSpeech": "noun",
@@ -34006,7 +34065,7 @@
   "Gath-rimmon": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Gath-Rimmon; a Levitical town named in both Danite and Manassite contexts in the allotment lists."
+      "Gath-Rimmon; a Levitical settlement named in both Danite and Manassite contexts in the allotment lists."
     ],
     "confidence": "high",
     "classification": "city",
@@ -34222,7 +34281,7 @@
   "Gederah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Gederah; a town in the Shephelah of Judah named among the lowland settlements."
+      "Gederah; a Judahite settlement in the Shephelah, among the lowland communities."
     ],
     "confidence": "high",
     "classification": "city",
@@ -34647,7 +34706,7 @@
   "Gibea": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Gibea; a town in the hill country of Judah, distinct from the better-known Gibeah of Benjamin."
+      "Gibea; a Judahite settlement in the hill country, distinct from the better-known Gibeah of Benjamin."
     ],
     "confidence": "high",
     "classification": "city",
@@ -34783,7 +34842,10 @@
     ],
     "confidence": "high",
     "classification": "river",
-    "note": "Location: In Genesis it is one of Eden's rivers, often linked broadly with Cush; in Jerusalem it refers to the spring on the city's eastern side."
+    "note": "Location: In Genesis it is one of Eden's rivers, often linked broadly with Cush; in Jerusalem it refers to the spring on the city's eastern side.",
+    "relatedEntries": [
+      "Jerusalem"
+    ]
   },
   "Gilalai": {
     "partOfSpeech": "noun",
@@ -34890,10 +34952,13 @@
   "Ginnetho": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ginnetho; the name of a priestly house in the post-exilic records, also written Ginnethon."
+      "Ginnetho; the name of a priestly house in the post-exilic records."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Ginnethon"
+    ]
   },
   "Ginnethon": {
     "partOfSpeech": "noun",
@@ -36730,7 +36795,7 @@
   "Hadashah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Hadashah; a town in the lowland of Judah listed among the Shephelah settlements."
+      "Hadashah; a Judahite settlement in the lowland Shephelah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -37016,7 +37081,7 @@
   "Hali": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Hali; a town in the inheritance of Asher named among the northern settlements."
+      "Hali; an Asherite settlement named among the northern communities of that tribe."
     ],
     "confidence": "high",
     "classification": "city",
@@ -37188,7 +37253,7 @@
   "Hammoth-dor": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Hammoth-Dor; a Levitical town in Naphtali, probably the same place otherwise called Hammath."
+      "Hammoth-Dor; a Levitical settlement in Naphtali, probably the same place otherwise called Hammath."
     ],
     "confidence": "high",
     "classification": "city",
@@ -37543,7 +37608,7 @@
   "Hapharaim": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Hapharaim; a town in the inheritance of Issachar."
+      "Hapharaim; a settlement named in the inheritance of Issachar."
     ],
     "confidence": "high",
     "classification": "city",
@@ -37734,10 +37799,13 @@
   "Harhas": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Harhas; father of Shallum, the husband of Huldah the prophetess, also written Hasrah."
+      "Harhas; father of Shallum, the husband of Huldah the prophetess."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Hasrah"
+    ]
   },
   "Harhur": {
     "partOfSpeech": "noun",
@@ -38448,7 +38516,7 @@
   "Hazar-addar": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Hazar-Addar; a southern border place in the territorial description of Judah."
+      "Hazar-Addar; a landmark on the southern border of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -38493,7 +38561,7 @@
   "Hazar-susah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Hazar-Susah; a southern Simeonite town in the Negev, probably related to Hazar-Susim in a parallel list."
+      "Hazar-Susah; a Simeonite settlement in the Negev, probably related to Hazar-Susim in a parallel list."
     ],
     "confidence": "high",
     "classification": "city",
@@ -38502,7 +38570,7 @@
   "Hazar-susim": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Hazar-Susim; a southern Simeonite town in the Negev, probably parallel to Hazar-Susah in another list."
+      "Hazar-Susim; a Simeonite settlement in the Negev, probably parallel to Hazar-Susah in another list."
     ],
     "confidence": "high",
     "classification": "city",
@@ -39151,7 +39219,7 @@
   "Helbah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Helbah; a town in the territory of Asher named among the places from which the Canaanites were not expelled."
+      "Helbah; an Asherite settlement named among the places from which the Canaanites were not expelled."
     ],
     "confidence": "high",
     "classification": "city",
@@ -39786,7 +39854,7 @@
   "Heshmon": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Heshmon; a town in the southern inheritance of Judah."
+      "Heshmon; a settlement in the Negev of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -39803,7 +39871,7 @@
   "Hethlon": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Hethlon; a place marking the entrance route named in Ezekiel's northern boundary description."
+      "Hethlon; a landmark marking the entrance route in Ezekiel's northern boundary description."
     ],
     "confidence": "high",
     "classification": "city",
@@ -40059,11 +40127,14 @@
   "Hilen": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Hilen; a town in the hill country of Judah assigned to the priests, probably the same place elsewhere called Holon."
+      "Hilen; a priestly settlement in the hill country of Judah, probably the same place elsewhere called Holon."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Sometimes identified with Khirbet Alin."
+    "note": "Location: Sometimes identified with Khirbet Alin.",
+    "relatedEntries": [
+      "Holon"
+    ]
   },
   "Hilkiah": {
     "partOfSpeech": "noun",
@@ -40430,10 +40501,13 @@
   "Hodevah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Hodevah; a variant form linked with Hodaviah, especially in the post-exilic family and Levitical records."
+      "Hodevah; a post-exilic family name, likely the same name elsewhere written Hodaviah."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Hodaviah"
+    ]
   },
   "Hodiah": {
     "partOfSpeech": "noun",
@@ -40574,7 +40648,7 @@
   "Holon": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Holon; a priestly town in the hill country of Judah."
+      "Holon; a priestly settlement in the hill country of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -40833,7 +40907,7 @@
   "Horem": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Horem; a town in the inheritance of Naphtali."
+      "Horem; a settlement named in the inheritance of Naphtali."
     ],
     "confidence": "high",
     "classification": "city",
@@ -41353,7 +41427,7 @@
   "Humtah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Humtah; a town in the hill country of Judah near Hebron."
+      "Humtah; a settlement in the hill country of Judah near Hebron."
     ],
     "confidence": "high",
     "classification": "city",
@@ -41795,7 +41869,7 @@
   "Ibleam": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ibleam; a town in Manasseh's territory, later connected with royal flight and conflict in the days of Jehu."
+      "Ibleam; a settlement in Manasseh's territory, later connected with royal flight and conflict in the days of Jehu."
     ],
     "confidence": "high",
     "classification": "city",
@@ -41853,7 +41927,7 @@
   "Idalah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Idalah; a town in the inheritance of Zebulun named among its settlements."
+      "Idalah; a settlement named in the inheritance of Zebulun."
     ],
     "confidence": "high",
     "classification": "city",
@@ -43381,7 +43455,7 @@
   "Irpeel": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Irpeel; a town in Benjamin's inheritance named in the tribal border list."
+      "Irpeel; a Benjaminite settlement named in the tribal border list."
     ],
     "confidence": "high",
     "classification": "city",
@@ -43756,10 +43830,13 @@
   "Isuah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Isuah; the spelling used for Ishuah, a son of Asher named among the tribal ancestors."
+      "Isuah; a son of Asher named among the tribal ancestors."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Ishuah"
+    ]
   },
   "Isui": {
     "partOfSpeech": "noun",
@@ -43907,7 +43984,7 @@
   "Ittah-kazin": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ittah-Kazin; a border place in Zebulun's inheritance near the Galilean uplands."
+      "Ittah-Kazin; a border landmark in Zebulun's inheritance near the Galilean uplands."
     ],
     "confidence": "high",
     "classification": "city",
@@ -43950,10 +44027,13 @@
   "Izehar": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Izehar; the spelling used for Izhar, a son of Kohath in the Levitical line."
+      "Izehar; a son of Kohath in the Levitical line."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Izhar"
+    ]
   },
   "Izeharites": {
     "partOfSpeech": "noun",
@@ -44166,7 +44246,7 @@
   "Jabneel": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jabneel; the name of a border town in Judah and also a northern town in Naphtali in the allotment lists."
+      "Jabneel; the name of both a border town in Judah and a northern town in Naphtali."
     ],
     "confidence": "high",
     "classification": "city",
@@ -44385,10 +44465,13 @@
   "Jahzeel": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jahzeel; a son of Naphtali whose descendants formed a clan in Israel, also written Jahziel."
+      "Jahzeel; a son of Naphtali whose descendants formed a clan in Israel."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Jahziel"
+    ]
   },
   "Jahzeelites": {
     "partOfSpeech": "noun",
@@ -44409,10 +44492,13 @@
   "Jahziel": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jahziel; the spelling used for Jahzeel, a son of Naphtali and ancestor of a clan."
+      "Jahziel; a son of Naphtali and ancestor of a clan."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Jahzeel"
+    ]
   },
   "jailor": {
     "partOfSpeech": "noun",
@@ -44658,7 +44744,7 @@
   "Jarmuth": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jarmuth; the royal city of a Canaanite king defeated by Joshua, also the name of a Judahite town in later lists."
+      "Jarmuth; the royal city of a Canaanite king defeated by Joshua, and also the name of a Judahite town in later lists."
     ],
     "confidence": "high",
     "classification": "city",
@@ -44755,7 +44841,7 @@
   "Jattir": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jattir; a priestly town in the hill country of Judah to which David sent spoil after defeating Amalek."
+      "Jattir; a priestly settlement in the hill country of Judah to which David sent spoil after defeating Amalek."
     ],
     "confidence": "high",
     "classification": "city",
@@ -44922,10 +45008,13 @@
   "Jecoliah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jecoliah; the mother of king Uzziah, also written Jecholiah."
+      "Jecoliah; the mother of king Uzziah."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Jecholiah"
+    ]
   },
   "Jeconiah": {
     "partOfSpeech": "noun",
@@ -44978,10 +45067,13 @@
   "Jeezer": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jeezer; the spelling used for Abiezer, the Manassite clan especially associated with Gideon."
+      "Jeezer; the Manassite clan especially associated with Gideon."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Abiezer"
+    ]
   },
   "Jeezerites": {
     "partOfSpeech": "noun",
@@ -45145,10 +45237,13 @@
   "Jehonadab": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jehonadab; the son of Rechab who joined Jehu and became the forefather of the Rechabites, also written Jonadab."
+      "Jehonadab; the son of Rechab who joined Jehu and became the forefather of the Rechabites."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Jonadab"
+    ]
   },
   "Jehonathan": {
     "partOfSpeech": "noun",
@@ -45169,10 +45264,13 @@
   "Jehoshabeath": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jehoshabeath; the daughter of king Jehoram who hid the young Joash from Athaliah, also written Jehosheba."
+      "Jehoshabeath; the daughter of king Jehoram who hid the young Joash from Athaliah."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Jehosheba"
+    ]
   },
   "Jehoshaphat": {
     "partOfSpeech": "noun",
@@ -45185,10 +45283,13 @@
   "Jehosheba": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jehosheba; the daughter of king Jehoram who rescued and hid Joash, also written Jehoshabeath."
+      "Jehosheba; the daughter of king Jehoram who rescued and hid Joash."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Jehoshabeath"
+    ]
   },
   "Jehoshua": {
     "partOfSpeech": "noun",
@@ -45272,7 +45373,7 @@
   "Jehud": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jehud; a town in the territory of Dan on the western side of the central hill country."
+      "Jehud; one of the towns of Dan on the western side of the central hill country."
     ],
     "confidence": "high",
     "classification": "city",
@@ -45470,10 +45571,13 @@
   "Jeremy": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jeremy; an English name-form of Jeremiah, used in the Apocryphal title of the prophet."
+      "Jeremy; the name used in the Apocryphal title of the book of Jeremiah."
     ],
     "confidence": "medium",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Jeremiah"
+    ]
   },
   "Jeriah": {
     "partOfSpeech": "noun",
@@ -45597,18 +45701,24 @@
   "Jerusha": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jerusha; the wife of king Uzziah and mother of Jotham, also written Jerushah."
+      "Jerusha; the wife of king Uzziah and mother of Jotham."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Jerushah"
+    ]
   },
   "Jerushah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jerushah; the wife of king Uzziah and mother of Jotham, also written Jerusha."
+      "Jerushah; the wife of king Uzziah and mother of Jotham."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Jerusha"
+    ]
   },
   "Jesaiah": {
     "partOfSpeech": "noun",
@@ -45638,10 +45748,13 @@
   "Jesharelah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jesharelah; a son of Asaph appointed in the courses of temple musicians, also written Asarelah."
+      "Jesharelah; a son of Asaph appointed in the courses of temple musicians."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Asarelah"
+    ]
   },
   "Jeshebeab": {
     "partOfSpeech": "noun",
@@ -46042,7 +46155,7 @@
   "Jiphtah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jiphtah; a town in the hill country of Judah named among its settlements."
+      "Jiphtah; a settlement in the hill country of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -46296,7 +46409,7 @@
   "Jokdeam": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jokdeam; a town in the hill country of Judah named among its settlements."
+      "Jokdeam; a settlement in the hill country of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -46313,7 +46426,7 @@
   "Jokmeam": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jokmeam; a Levitical town, probably the same place elsewhere written Jokneam in the Carmel region."
+      "Jokmeam; a Levitical settlement, probably the same place elsewhere written Jokneam in the Carmel region."
     ],
     "confidence": "high",
     "classification": "city",
@@ -46443,7 +46556,7 @@
   "Jordan": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jordan; the chief river of the land, flowing through the great valley from the north toward the Dead Sea.",
+      "Jordan; the principal river of the land, flowing through the Jordan valley from the north to the Dead Sea.",
       "The name often marks a boundary or crossing-place in Israelite history."
     ],
     "confidence": "high",
@@ -46461,7 +46574,7 @@
   "Jorkoam": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jorkoam; a town in the hill country of Judah named among its settlements."
+      "Jorkoam; a settlement in the hill country of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -46486,10 +46599,13 @@
   "Jose": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jose; a name-form of Joseph borne by men in the New Testament family records."
+      "Jose; a shortened New Testament name used of men in the family records around Jesus."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Joseph"
+    ]
   },
   "Josedech": {
     "partOfSpeech": "noun",
@@ -46532,10 +46648,13 @@
   "Joshaphat": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Joshaphat; a name-form of Jehoshaphat used for men in genealogical or administrative records."
+      "Joshaphat; the name Jehoshaphat as written in genealogical or administrative records."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Jehoshaphat"
+    ]
   },
   "Joshaviah": {
     "partOfSpeech": "noun",
@@ -46813,10 +46932,13 @@
   "Jude": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Jude; the New Testament name-form of Judas, especially used of the servant of Jesus Christ and brother of James who wrote the Epistle of Jude."
+      "Jude; the New Testament form used especially of the servant of Jesus Christ and brother of James who wrote the Epistle of Jude."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Judas"
+    ]
   },
   "Judea": {
     "partOfSpeech": "noun",
@@ -47024,7 +47146,7 @@
   "Juttah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Juttah; a priestly town in the hill country of Judah, traditionally associated with the family setting of John the Baptist."
+      "Juttah; a priestly settlement in the hill country of Judah, traditionally associated with the family setting of John the Baptist."
     ],
     "confidence": "high",
     "classification": "city",
@@ -47101,7 +47223,7 @@
   "Karkaa": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Karkaa; a southern border place in the territorial description of Judah."
+      "Karkaa; a landmark on the southern border of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -47137,7 +47259,7 @@
   "Kartan": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Kartan; a Levitical town in Naphtali, sometimes treated as related to Kirjathaim in parallel lists."
+      "Kartan; a Levitical settlement in Naphtali, sometimes treated as related to Kirjathaim in parallel lists."
     ],
     "confidence": "high",
     "classification": "city",
@@ -47146,7 +47268,7 @@
   "Kattath": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Kattath; a town in the inheritance of Zebulun named among its settlements."
+      "Kattath; a settlement named in the inheritance of Zebulun."
     ],
     "confidence": "high",
     "classification": "city",
@@ -47171,7 +47293,7 @@
   "Kedemoth": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Kedemoth; a Levitical town in the territory of Reuben from which Moses sent messengers to Sihon."
+      "Kedemoth; a Levitical settlement in the territory of Reuben from which Moses sent messengers to Sihon."
     ],
     "confidence": "high",
     "classification": "city",
@@ -47428,7 +47550,7 @@
   "Keziz": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Keziz; a town in the inheritance of Benjamin."
+      "Keziz; a settlement named in the inheritance of Benjamin."
     ],
     "confidence": "high",
     "classification": "city",
@@ -47545,7 +47667,7 @@
   "Kinah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Kinah; a town in the southern inheritance of Judah."
+      "Kinah; a settlement in the Negev of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -47897,11 +48019,14 @@
   "Kison": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Kison; the brook associated with Deborah and Barak's victory, also written Kishon."
+      "Kison; the brook associated with Deborah and Barak's victory."
     ],
     "confidence": "high",
     "classification": "river",
-    "note": "Location: Commonly identified with Kishon River."
+    "note": "Location: Commonly identified with Kishon River.",
+    "relatedEntries": [
+      "Kishon"
+    ]
   },
   "kiss": {
     "partOfSpeech": "noun / verb",
@@ -47934,7 +48059,7 @@
   "Kithlish": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Kithlish; a town in the Shephelah of Judah."
+      "Kithlish; a settlement in the Shephelah of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -47943,7 +48068,7 @@
   "Kitron": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Kitron; a town in Zebulun from which the Canaanites were not expelled."
+      "Kitron; one of the towns in Zebulun from which the Canaanites were not expelled."
     ],
     "confidence": "high",
     "classification": "city",
@@ -48206,10 +48331,13 @@
   "Korhites": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Korhites; a name-form of Korahites, the descendants of Korah among the Levites."
+      "Korhites; the descendants of Korah among the Levites."
     ],
     "confidence": "high",
-    "classification": "people group"
+    "classification": "people group",
+    "relatedEntries": [
+      "Korahites"
+    ]
   },
   "Koz": {
     "partOfSpeech": "noun",
@@ -48464,7 +48592,7 @@
   "Lahmam": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Lahmam; a town in the Shephelah of Judah named among the lowland settlements."
+      "Lahmam; a Judahite settlement in the Shephelah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -48805,7 +48933,7 @@
   "Lasha": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Lasha; a place marking an extent in the table of nations."
+      "Lasha; a place-name marking an extent in the table of nations."
     ],
     "confidence": "medium",
     "classification": "region",
@@ -48814,7 +48942,7 @@
   "Lasharon": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Lasharon; a locality likely associated with the Sharon region in Joshua's conquest list."
+      "Lasharon; a place-name probably connected with the Sharon region in Joshua's conquest list."
     ],
     "confidence": "medium",
     "classification": "region",
@@ -49339,7 +49467,7 @@
   "Lecah": {
     "partOfSpeech": "noun / place",
     "definitions": [
-      "Lecah; a place in Judah mentioned in genealogical records."
+      "Lecah; a Judahite place mentioned in genealogical records."
     ],
     "confidence": "high",
     "classification": "place"
@@ -51439,7 +51567,7 @@
   "Maarath": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Maarath; a town in the hill country of Judah named among its settlements."
+      "Maarath; a settlement in the hill country of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -51600,11 +51728,14 @@
   "Madian": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Madian; a Greek or alternate name-form of Midian, the desert land associated with Midianite tribes."
+      "Madian; the Greek name used in some contexts for Midian, the land associated with Midianite tribes."
     ],
     "confidence": "high",
     "classification": "country",
-    "note": "Location: Usually located in or identified with Al Bad."
+    "note": "Location: Usually located in or identified with Al Bad.",
+    "relatedEntries": [
+      "Midian"
+    ]
   },
   "Madmannah": {
     "partOfSpeech": "noun",
@@ -51786,10 +51917,13 @@
   "Mahali": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Mahali; a Greek or alternate name-form of Mahli in the Levitical genealogies."
+      "Mahali; the Levitical name appearing in the genealogies."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Mahli"
+    ]
   },
   "Mahanaim": {
     "partOfSpeech": "noun",
@@ -52182,10 +52316,13 @@
   "Maleleel": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Maleleel; a Greek or alternate name-form of Mahalaleel, the patriarch in the line from Seth before the flood."
+      "Maleleel; the patriarch in the line from Seth before the flood."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Mahalaleel"
+    ]
   },
   "males": {
     "partOfSpeech": "noun",
@@ -53605,10 +53742,13 @@
   "Melchiah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Melchiah; a name-form of Malchiah borne by priests and postexilic figures connected with temple or rebuilding contexts."
+      "Melchiah; the name Malchiah as written of priests and other post-exilic figures."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Malchiah"
+    ]
   },
   "Melchisedec": {
     "partOfSpeech": "noun",
@@ -53645,10 +53785,13 @@
   "Melicu": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Melicu; a post-exilic priestly name, also written Malluch."
+      "Melicu; a post-exilic priestly name."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Malluch"
+    ]
   },
   "Melita": {
     "partOfSpeech": "noun",
@@ -54064,10 +54207,13 @@
   "Merodach-baladan": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Merodach-Baladan; king of Babylon who sent to Hezekiah, also written Berodach-Baladan."
+      "Merodach-Baladan; the king of Babylon who sent to Hezekiah."
     ],
     "confidence": "medium",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Berodach-Baladan"
+    ]
   },
   "Merom": {
     "partOfSpeech": "noun / place",
@@ -54122,10 +54268,13 @@
   "Mesech": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Mesech; a Greek or alternate name-form of Meshech, a son of Japheth named in the table of nations."
+      "Mesech; the Japhethite name appearing in the table of nations."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Meshech"
+    ]
   },
   "Mesha": {
     "partOfSpeech": "noun",
@@ -54427,10 +54576,13 @@
   "Michah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Michah; a name-form of Micah borne by men named in genealogical and historical records, especially in tribal and Levitical lists."
+      "Michah; the name Micah as written of men in genealogical and historical records."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Micah"
+    ]
   },
   "Michaiah": {
     "partOfSpeech": "noun",
@@ -54451,11 +54603,14 @@
   "Michmas": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Michmas; a name-form of Michmash, the Benjamite town."
+      "Michmas; the name Michmash as written for the Benjamite town east of Bethel."
     ],
     "confidence": "medium",
     "classification": "city",
-    "note": "Location: Often identified with Mukhmas, though the exact identification is debated."
+    "note": "Location: Often identified with Mukhmas, though the exact identification is debated.",
+    "relatedEntries": [
+      "Michmash"
+    ]
   },
   "Michmash": {
     "partOfSpeech": "noun",
@@ -54586,7 +54741,7 @@
   "Migdal-gad": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Migdal-Gad; a town in the Shephelah of Judah."
+      "Migdal-Gad; a settlement in the Shephelah of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -56051,7 +56206,7 @@
   "Mozah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Mozah; a town in the inheritance of Benjamin."
+      "Mozah; a settlement named in the inheritance of Benjamin."
     ],
     "confidence": "high",
     "classification": "city",
@@ -56557,10 +56712,13 @@
   "Nachor": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Nachor; a Greek or alternate name-form of Nahor, the name of Abraham's father and also of his brother."
+      "Nachor; the name of Abraham's father and of his brother."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Nahor"
+    ]
   },
   "Nadab": {
     "partOfSpeech": "noun",
@@ -56581,7 +56739,7 @@
   "Nahalal": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Nahalal; a town in Zebulun later assigned to the Levites."
+      "Nahalal; a Zebulunite settlement later assigned to the Levites."
     ],
     "confidence": "high",
     "classification": "city",
@@ -57112,10 +57270,13 @@
   "Nebaioth": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Nebaioth; the spelling used for Nebajoth, the firstborn son of Ishmael and ancestor of an Arabian people."
+      "Nebaioth; the firstborn son of Ishmael and ancestor of an Arabian people."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Nebajoth"
+    ]
   },
   "Nebajoth": {
     "partOfSpeech": "noun",
@@ -57544,10 +57705,13 @@
   "Nepthalim": {
     "partOfSpeech": "noun / people group",
     "definitions": [
-      "Nepthalim; an alternate name-form of Naphtali and of the people descended from him."
+      "Nepthalim; the patriarchal and tribal name used of Naphtali."
     ],
     "confidence": "medium",
-    "classification": "people group"
+    "classification": "people group",
+    "relatedEntries": [
+      "Naphtali"
+    ]
   },
   "Ner": {
     "partOfSpeech": "noun",
@@ -57787,7 +57951,7 @@
   "Nezib": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Nezib; a town in the Shephelah of Judah."
+      "Nezib; a settlement in the Shephelah of Judah."
     ],
     "confidence": "high",
     "classification": "city",
@@ -59235,7 +59399,7 @@
   "Ono": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ono; a town in the plain of Benjamin and Dan, known in the post-exilic period."
+      "Ono; a settlement in the plain of Benjamin and Dan, especially known in the post-exilic period."
     ],
     "confidence": "high",
     "classification": "city",
@@ -59344,7 +59508,7 @@
   "Ophni": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ophni; a town in Benjamin's inheritance."
+      "Ophni; a settlement in Benjamin's inheritance."
     ],
     "confidence": "high",
     "classification": "city",
@@ -60729,7 +60893,7 @@
   "Parah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Parah; a town in Benjamin's inheritance east of the central ridge."
+      "Parah; a settlement in Benjamin's inheritance east of the central ridge."
     ],
     "confidence": "high",
     "classification": "city",
@@ -61025,11 +61189,16 @@
   "Pas-dammim": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Pas-Dammim; the battlefield area between Socoh and Azekah where David fought Goliath, also called Ephes-Dammim."
+      "Pas-Dammim; the battlefield between Socoh and Azekah."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Often identified with Khirbet Damun."
+    "note": "Location: Often identified with Khirbet Damun.",
+    "relatedEntries": [
+      "Ephes-dammim",
+      "Socoh",
+      "Azekah"
+    ]
   },
   "Pasach": {
     "partOfSpeech": "noun",
@@ -63922,10 +64091,12 @@
   "pomegranate": {
     "partOfSpeech": "noun",
     "definitions": [
-      "A pomegranate is the fruit so called, notable for abundance of seed and rich appearance.",
-      "It also appears as an ornamental form in temple and priestly work."
+      "Pomegranate; the seeded fruit often used in Scripture as a sign of abundance and as an ornamental temple design."
     ],
-    "confidence": "high"
+    "confidence": "high",
+    "relatedEntries": [
+      "pomegranates"
+    ]
   },
   "pomegranates": {
     "partOfSpeech": "noun",
@@ -66748,7 +66919,7 @@
   "Rabbith": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Rabbith; a town in the inheritance of Issachar."
+      "Rabbith; a settlement named in the inheritance of Issachar."
     ],
     "confidence": "high",
     "classification": "city",
@@ -68537,7 +68708,7 @@
   "Remeth": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Remeth; a town in the inheritance of Issachar, commonly identified with the Jarmuth listed in another tribal boundary text."
+      "Remeth; an Issacharite settlement commonly identified with the Jarmuth listed in another tribal boundary text."
     ],
     "confidence": "medium",
     "classification": "city",
@@ -71003,26 +71174,35 @@
   "Sabta": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Sabta; a son of Cush in the table of nations, also written Sabtah."
+      "Sabta; a son of Cush in the table of nations."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Sabtah"
+    ]
   },
   "Sabtah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Sabtah; a son of Cush in the table of nations, also written Sabta."
+      "Sabtah; a son of Cush in the table of nations."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Sabta"
+    ]
   },
   "Sabtecha": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Sabtecha; a son of Cush in the table of nations, also written Sabtechah."
+      "Sabtecha; a son of Cush in the table of nations."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Sabtechah"
+    ]
   },
   "Sacar": {
     "partOfSpeech": "noun",
@@ -71180,10 +71360,13 @@
   "Sadoc": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Sadoc; a Greek name-form of Zadok appearing in the genealogy of Jesus in Matthew."
+      "Sadoc; the name appearing in the genealogy of Jesus in Matthew."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Zadok"
+    ]
   },
   "safe": {
     "partOfSpeech": "adjective",
@@ -71406,10 +71589,13 @@
   "Salma": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Salma; a genealogical name-form of Salmon in the line of Judah."
+      "Salma; the genealogical spelling used for Salmon in the line of Judah and of David."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Salmon"
+    ]
   },
   "Salmon": {
     "partOfSpeech": "noun",
@@ -72730,7 +72916,7 @@
   "Secacah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Secacah; a town in the wilderness of Judah near the Dead Sea district."
+      "Secacah; a settlement in the wilderness of Judah near the Dead Sea district."
     ],
     "confidence": "high",
     "classification": "city",
@@ -73192,10 +73378,13 @@
   "Semei": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Semei; a name-form of Shimei or Simeon appearing in genealogical and New Testament lists."
+      "Semei; a Greek form used for men otherwise called Shimei in biblical genealogies."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Shimei"
+    ]
   },
   "Senaah": {
     "partOfSpeech": "noun",
@@ -73374,7 +73563,7 @@
   "Sephar": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Sephar; a place marking the eastern extent of Joktanite settlement in the table of nations."
+      "Sephar; a landmark marking the eastern extent of Joktanite settlement in the table of nations."
     ],
     "confidence": "high",
     "classification": "city",
@@ -73783,7 +73972,7 @@
   "Shaalabbin": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Shaalabbin; a town in the territory of Dan, also known in related form as Shaalbim."
+      "Shaalabbin; a Danite settlement also known in related form as Shaalbim."
     ],
     "confidence": "high",
     "classification": "city",
@@ -73915,7 +74104,7 @@
   "Shahazimah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Shahazimah; a town in the inheritance of Naphtali."
+      "Shahazimah; a settlement named in the inheritance of Naphtali."
     ],
     "confidence": "high",
     "classification": "city",
@@ -74115,10 +74304,13 @@
   "Shamer": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Shamer; the name-form of Shomer used for the father of one of the servants who conspired against king Joash."
+      "Shamer; the father of one of the servants who conspired against king Joash."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Shomer"
+    ]
   },
   "shameth": {
     "partOfSpeech": "verb",
@@ -74940,10 +75132,13 @@
   "Shemuel": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Shemuel; a Hebrew name-form of Samuel, used of Samuel the prophet and of others bearing the same name."
+      "Shemuel; the name borne by Samuel and by others bearing that same name."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Samuel"
+    ]
   },
   "Shen": {
     "partOfSpeech": "noun",
@@ -75229,7 +75424,7 @@
   "Shicron": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Shicron; a border place of Judah in the Shephelah toward Ekron."
+      "Shicron; a border landmark of Judah in the Shephelah toward Ekron."
     ],
     "confidence": "high",
     "classification": "city",
@@ -75410,10 +75605,13 @@
   "Shimeon": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Shimeon; a name-form of Simeon occurring in genealogical and New Testament records."
+      "Shimeon; the name used of Simeon in genealogical and New Testament records."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Simeon"
+    ]
   },
   "Shimhi": {
     "partOfSpeech": "noun",
@@ -75556,7 +75754,7 @@
   "Shion": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Shion; a town in the inheritance of Issachar."
+      "Shion; a settlement named in the inheritance of Issachar."
     ],
     "confidence": "high",
     "classification": "city",
@@ -77023,7 +77221,7 @@
   "sir": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Sir; a respectful form of address used to a man, master, or superior."
+      "Sir; a respectful title or form of address for a man, master, or social superior."
     ],
     "confidence": "high"
   },
@@ -79118,9 +79316,12 @@
   "spilt": {
     "partOfSpeech": "verb / adjective",
     "definitions": [
-      "Spilt; spilled or poured out, an older past form of spill."
+      "Spilt; an older past tense and past participial spelling of spill, meaning spilled or poured out."
     ],
-    "confidence": "high"
+    "confidence": "high",
+    "relatedEntries": [
+      "spill"
+    ]
   },
   "spin": {
     "partOfSpeech": "verb",
@@ -79785,7 +79986,7 @@
   "state": {
     "partOfSpeech": "noun",
     "definitions": [
-      "State; condition, standing, dignity, or settled form of being."
+      "State; condition, standing, dignity, or settled mode of being."
     ],
     "confidence": "high"
   },
@@ -82250,7 +82451,7 @@
   "Taanath-shiloh": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Taanath-Shiloh; a border place of Ephraim eastward toward the Jordan descent."
+      "Taanath-Shiloh; a border landmark of Ephraim toward the Jordan descent."
     ],
     "confidence": "high",
     "classification": "city",
@@ -82763,7 +82964,7 @@
   "Taralah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Taralah; a town in Benjamin's inheritance."
+      "Taralah; a settlement in Benjamin's inheritance."
     ],
     "confidence": "high",
     "classification": "city",
@@ -83691,9 +83892,12 @@
   "tha": {
     "partOfSpeech": "pronoun / dialect form",
     "definitions": [
-      "Tha; a dialectal form of thou."
+      "Tha; a dialectal spelling of thou."
     ],
-    "confidence": "medium"
+    "confidence": "medium",
+    "relatedEntries": [
+      "thou"
+    ]
   },
   "Thaddaeus": {
     "partOfSpeech": "noun",
@@ -84146,11 +84350,14 @@
   "Thimnathah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Thimnathah; a name-form of Timnath or Timnah used of a town in hill-country and border traditions."
+      "Thimnathah; the town-name used in hill-country and border traditions for Timnah."
     ],
     "confidence": "high",
     "classification": "city",
-    "note": "Location: Commonly identified with Tel Batash."
+    "note": "Location: Commonly identified with Tel Batash.",
+    "relatedEntries": [
+      "Timnah"
+    ]
   },
   "thin": {
     "partOfSpeech": "adjective",
@@ -84333,10 +84540,13 @@
   "Thomas": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Thomas; one of the twelve apostles, also called Didymus, remembered for his confession of the risen Christ."
+      "Thomas; one of the twelve apostles, whose name is interpreted Didymus, meaning twin."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Didymus"
+    ]
   },
   "thongs": {
     "partOfSpeech": "noun",
@@ -84858,10 +85068,13 @@
   "Tikvath": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Tikvath; the name-form of Tikvah used especially in the record concerning Huldah's husband."
+      "Tikvath; the name appearing in the record concerning Huldah's husband."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Tikvah"
+    ]
   },
   "tile": {
     "partOfSpeech": "noun",
@@ -85339,10 +85552,13 @@
   "Toi": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Toi; king of Hamath who sent greeting and gifts to David after Hadarezer was smitten, also written Tou."
+      "Toi; king of Hamath who sent greeting and gifts to David after Hadarezer was defeated."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Tou"
+    ]
   },
   "toil": {
     "partOfSpeech": "noun / verb",
@@ -85645,10 +85861,13 @@
   "Tou": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Tou; the name-form of Toi used for the king of Hamath who honoured David after his victory."
+      "Tou; the king of Hamath who honoured David after his victory."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Toi"
+    ]
   },
   "touched": {
     "partOfSpeech": "verb",
@@ -86914,7 +87133,7 @@
   "Ummah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ummah; a town in the inheritance of Asher near the coast."
+      "Ummah; an Asherite settlement near the coast."
     ],
     "confidence": "high",
     "classification": "city",
@@ -87757,9 +87976,12 @@
   "upheld": {
     "partOfSpeech": "verb / adjective",
     "definitions": [
-      "Upheld; supported, sustained, or maintained, the past form of uphold."
+      "Upheld; the past tense and past participial form of uphold. See 'uphold'."
     ],
-    "confidence": "high"
+    "confidence": "high",
+    "relatedEntries": [
+      "uphold"
+    ]
   },
   "uphold": {
     "partOfSpeech": "verb",
@@ -90845,9 +91067,12 @@
   "whom": {
     "partOfSpeech": "pronoun",
     "definitions": [
-      "Whom; the objective form of who."
+      "Whom; the objective pronoun corresponding to who."
     ],
-    "confidence": "high"
+    "confidence": "high",
+    "relatedEntries": [
+      "who"
+    ]
   },
   "whomsoever": {
     "partOfSpeech": "pronoun",
@@ -90922,9 +91147,12 @@
   "whose": {
     "partOfSpeech": "pronoun / determiner",
     "definitions": [
-      "Whose; the possessive form of who."
+      "Whose; the possessive pronoun or determiner corresponding to who."
     ],
-    "confidence": "high"
+    "confidence": "high",
+    "relatedEntries": [
+      "who"
+    ]
   },
   "whoso": {
     "partOfSpeech": "pronoun",
@@ -91515,9 +91743,12 @@
   "withheld": {
     "partOfSpeech": "verb",
     "definitions": [
-      "Withheld; held back or refused, the past form of withhold."
+      "Withheld; the past tense and past participial form of withhold. See 'withhold'."
     ],
-    "confidence": "high"
+    "confidence": "high",
+    "relatedEntries": [
+      "withhold"
+    ]
   },
   "withheldest": {
     "partOfSpeech": "verb",
@@ -91761,9 +91992,12 @@
   "won": {
     "partOfSpeech": "verb",
     "definitions": [
-      "Won; gained, obtained, or conquered, the past form of win."
+      "Won; the past tense and past participial form of win. See 'win'."
     ],
-    "confidence": "high"
+    "confidence": "high",
+    "relatedEntries": [
+      "win"
+    ]
   },
   "wonder": {
     "partOfSpeech": "noun / verb",
@@ -92463,9 +92697,12 @@
   "wrung": {
     "partOfSpeech": "verb",
     "definitions": [
-      "Wrung; twisted, squeezed, or extorted, the past form of wring."
+      "Wrung; the past tense and past participial form of wring. See 'wring'."
     ],
-    "confidence": "high"
+    "confidence": "high",
+    "relatedEntries": [
+      "wring"
+    ]
   },
   "yarn": {
     "partOfSpeech": "noun",
@@ -92849,18 +93086,24 @@
   "Zachariah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Zachariah; a name-form of Zechariah used of many men in Scripture, including prophet, priest, counsellor, and father of John the Baptist."
+      "Zachariah; the name borne by many men in Scripture, including prophet, priest, counsellor, and father of John the Baptist."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Zechariah"
+    ]
   },
   "Zacharias": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Zacharias; the Greek name-form of Zechariah, especially the priest and father of John the Baptist."
+      "Zacharias; the Greek spelling used especially of the priest and father of John the Baptist."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Zechariah"
+    ]
   },
   "Zacher": {
     "partOfSpeech": "noun",
@@ -92961,7 +93204,7 @@
   "Zaphon": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Zaphon; a town in the territory of Gad in the Jordan valley."
+      "Zaphon; a settlement in the territory of Gad in the Jordan valley."
     ],
     "confidence": "high",
     "classification": "city",
@@ -92970,18 +93213,24 @@
   "Zara": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Zara; the Greek name-form of Zerah, especially the son of Judah by Tamar."
+      "Zara; the name used especially of the son of Judah by Tamar."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Zerah"
+    ]
   },
   "Zarah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Zarah; a name-form of Zerah used especially for the son of Judah by Tamar."
+      "Zarah; the name used especially of the son of Judah by Tamar."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Zerah"
+    ]
   },
   "Zareah": {
     "partOfSpeech": "noun",
@@ -93030,7 +93279,7 @@
   "Zareth-shahar": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Zareth-Shahar; a town in the uplands east of the Dead Sea within Reuben's territory."
+      "Zareth-Shahar; a settlement in Reuben's uplands east of the Dead Sea."
     ],
     "confidence": "high",
     "classification": "city",
@@ -93263,7 +93512,7 @@
   "Zelah": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Zelah; a town in Benjamin where Saul and Jonathan were buried."
+      "Zelah; a Benjaminite settlement where Saul and Jonathan were buried."
     ],
     "confidence": "high",
     "classification": "city",
@@ -93388,10 +93637,13 @@
   "Zephon": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Zephon; a son of Gad whose descendants formed a clan, also written Ziphion."
+      "Zephon; a son of Gad whose descendants formed a clan."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Ziphion"
+    ]
   },
   "Zephonites": {
     "partOfSpeech": "noun",
@@ -93404,7 +93656,7 @@
   "Zer": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Zer; a town in the inheritance of Naphtali."
+      "Zer; a settlement named in the inheritance of Naphtali."
     ],
     "confidence": "high",
     "classification": "city",
@@ -93593,7 +93845,7 @@
   "Ziddim": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Ziddim; a town in the territory of Naphtali."
+      "Ziddim; a settlement in the territory of Naphtali."
     ],
     "confidence": "high",
     "classification": "city",
@@ -93848,11 +94100,14 @@
   "Zoba": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Zoba; the name-form of Zobah used for the northern Aramean kingdom opposed by David."
+      "Zoba; the northern Aramean kingdom opposed by David."
     ],
     "confidence": "high",
     "classification": "region",
-    "note": "Location: Usually located in or identified with Brital."
+    "note": "Location: Usually located in or identified with Brital.",
+    "relatedEntries": [
+      "Zobah"
+    ]
   },
   "Zobah": {
     "partOfSpeech": "noun",
@@ -93967,10 +94222,13 @@
   "Zorobabel": {
     "partOfSpeech": "noun",
     "definitions": [
-      "Zorobabel; the Greek name-form of Zerubbabel, leader of the returned exiles."
+      "Zorobabel; the leader of the returned exiles who helped restore the temple community."
     ],
     "confidence": "high",
-    "classification": "person"
+    "classification": "person",
+    "relatedEntries": [
+      "Zerubbabel"
+    ]
   },
   "Zuar": {
     "partOfSpeech": "noun",
