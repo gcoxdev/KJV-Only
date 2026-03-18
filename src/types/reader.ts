@@ -172,6 +172,8 @@ export type SearchPageState = {
 };
 
 export type StaticPageId =
+  | "settings"
+  | "progress"
   | "saved"
   | "kjv-only"
   | "resources"

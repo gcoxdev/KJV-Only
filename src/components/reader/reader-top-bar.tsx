@@ -67,7 +67,9 @@ export function ReaderTopBar({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuLabel>Pages</DropdownMenuLabel>
-              {STATIC_PAGES.map((page) => (
+              {STATIC_PAGES.filter(
+                (page) => page.id !== "settings" && page.id !== "progress",
+              ).map((page) => (
                 <DropdownMenuItem
                   key={page.id}
                   onClick={() => onOpenPage(page.id)}
