@@ -17,6 +17,8 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpIcon,
+  ChevronLeftCircleIcon,
+  ChevronRightCircleIcon,
   BookmarkIcon,
   BookMarkedIcon,
   BookOpenCheckIcon,
@@ -234,6 +236,10 @@ type ReaderPanelTreeProps = {
   showTargetedPanelToggle: boolean;
   targetedPanelLeafId: string | null;
   onToggleTargetedPanel: (leafId: string) => void;
+  canGoLeafHistoryBack: (leafId: string) => boolean;
+  canGoLeafHistoryForward: (leafId: string) => boolean;
+  onGoLeafHistoryBack: (leafId: string) => void;
+  onGoLeafHistoryForward: (leafId: string) => void;
   moveLeafChapter: (leafId: string, step: -1 | 1) => void;
   toggleChapterRead: (bookIndex: number, chapterIndex: number) => void;
   updateSplitSize: (splitId: string, ratio: number) => void;
@@ -335,6 +341,10 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   showTargetedPanelToggle,
   targetedPanelLeafId,
   onToggleTargetedPanel,
+  canGoLeafHistoryBack,
+  canGoLeafHistoryForward,
+  onGoLeafHistoryBack,
+  onGoLeafHistoryForward,
   moveLeafChapter,
   toggleChapterRead,
   highlightModeEnabledByLeafId,
@@ -667,6 +677,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
       })()
     ) : null;
   const isTargetedPanel = targetedPanelLeafId === leaf.id;
+  const canHistoryBack = canGoLeafHistoryBack(leaf.id);
+  const canHistoryForward = canGoLeafHistoryForward(leaf.id);
 
   return (
     <div
@@ -784,9 +796,47 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   {isFullscreenLeaf ? <MinimizeIcon /> : <ExpandIcon />}
                   {isFullscreenLeaf ? "Exit Full Screen" : "Full Screen"}
                 </DropdownMenuItem>
-                {leaf.view === "reader" && !isFullscreenLeaf ? (
+                {leaf.view !== "picker" ? (
                   <>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => {
+                        updateLeafLocation(leaf.id, {
+                          view: "picker",
+                          pickerTestament: null,
+                          pickerBookIndex: null,
+                        });
+                        closePanelMenu();
+                      }}
+                    >
+                      <HouseIcon />
+                      Home
+                    </DropdownMenuItem>
+                  </>
+                ) : null}
+                <DropdownMenuItem
+                  disabled={!canHistoryBack}
+                  onClick={() => {
+                    onGoLeafHistoryBack(leaf.id);
+                    closePanelMenu();
+                  }}
+                >
+                  <ChevronLeftCircleIcon />
+                  Back
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={!canHistoryForward}
+                  onClick={() => {
+                    onGoLeafHistoryForward(leaf.id);
+                    closePanelMenu();
+                  }}
+                >
+                  <ChevronRightCircleIcon />
+                  Forward
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {leaf.view === "reader" && !isFullscreenLeaf ? (
+                  <>
                     <DropdownMenuGroup>
                       <DropdownMenuItem
                         onClick={() => {
@@ -831,24 +881,6 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                         Bookmark Chapter
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
-                  </>
-                ) : null}
-                {leaf.view !== "picker" ? (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => {
-                        updateLeafLocation(leaf.id, {
-                          view: "picker",
-                          pickerTestament: null,
-                          pickerBookIndex: null,
-                        });
-                        closePanelMenu();
-                      }}
-                    >
-                      <HouseIcon />
-                      Home
-                    </DropdownMenuItem>
                   </>
                 ) : null}
                 {!isFullscreenLeaf ? (
@@ -1670,6 +1702,10 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   showTargetedPanelToggle,
   targetedPanelLeafId,
   onToggleTargetedPanel,
+  canGoLeafHistoryBack,
+  canGoLeafHistoryForward,
+  onGoLeafHistoryBack,
+  onGoLeafHistoryForward,
   moveLeafChapter,
   toggleChapterRead,
   updateSplitSize,
@@ -1747,6 +1783,10 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       showTargetedPanelToggle={showTargetedPanelToggle}
       targetedPanelLeafId={targetedPanelLeafId}
       onToggleTargetedPanel={onToggleTargetedPanel}
+      canGoLeafHistoryBack={canGoLeafHistoryBack}
+      canGoLeafHistoryForward={canGoLeafHistoryForward}
+      onGoLeafHistoryBack={onGoLeafHistoryBack}
+      onGoLeafHistoryForward={onGoLeafHistoryForward}
       moveLeafChapter={moveLeafChapter}
       toggleChapterRead={toggleChapterRead}
       updateSplitSize={updateSplitSize}
