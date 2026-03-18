@@ -6,5 +6,3 @@
 
 * make sidebar override on mobile setting option
 * make selections targeted / not shared
-* keep tab states persisted, changing tabs resets
-* panels need history with back/forward buttons
