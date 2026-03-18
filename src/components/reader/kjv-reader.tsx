@@ -4174,6 +4174,120 @@ export function KJVReader() {
   const isBookPickerDialogOpen = Boolean(
     bookPickerDialogLeafId && bookPickerDialogLeaf,
   );
+
+  const mountedTabPanels = tabs.map((tab) => {
+    const isActive = tab.id === activeTabId;
+    return (
+      <div
+        key={tab.id}
+        className={isActive ? "absolute inset-0 min-h-0 min-w-0" : "hidden"}
+        aria-hidden={!isActive}
+      >
+        <ReaderPanelTree
+          root={tab.root}
+          books={books}
+          activeRoot={tab.root}
+          chapterRefIndex={chapterRefIndex}
+          chapterRefCount={chapterRefs.length}
+          readChapters={readChapters}
+          readChapterCountByBook={readChapterCountByBook}
+          hideReadModeVerseNumbers={hideReadModeVerseNumbers}
+          panelMenuOpenLeafId={panelMenuOpenLeafId}
+          setPanelMenuOpenLeafId={setPanelMenuOpenLeafId}
+          modelLeafNeighbors={isActive ? modelLeafNeighbors : new Map()}
+          neighborsForLeaf={neighborsForLeaf}
+          fullscreenLeafId={fullscreenLeafId}
+          panelElementRefs={panelElementRefs}
+          clearAllPanelPreviews={clearAllPanelPreviews}
+          updateLeafLocation={updateLeafLocation}
+          setBookPickerDialogLeafId={setBookPickerDialogLeafId}
+          toggleFullscreenLeaf={toggleFullscreenLeaf}
+          toggleParentGroupOrientation={toggleParentGroupOrientation}
+          setOrientationPreviewTarget={setOrientationPreviewTarget}
+          clearOrientationPreview={clearOrientationPreview}
+          moveLeaf={moveLeaf}
+          setMovePreviewTarget={setMovePreviewTarget}
+          clearMovePreview={clearMovePreview}
+          splitLeaf={splitLeaf}
+          setAddPreviewTarget={setAddPreviewTarget}
+          clearAddPreview={clearAddPreview}
+          insertPanelInGroup={insertPanelInGroup}
+          setGroupInsertPreviewTarget={setGroupInsertPreviewTarget}
+          addAroundGroup={addAroundGroup}
+          setAroundGroupPreviewTarget={setAroundGroupPreviewTarget}
+          existingTabTargets={existingTabTargets}
+          moveLeafToExistingTab={moveLeafToExistingTab}
+          moveLeafToNewTab={moveLeafToNewTab}
+          closeLeaf={closeLeaf}
+          flowVersesByParagraph={flowVersesByParagraph}
+          readModeParagraphIndent={readModeParagraphIndent}
+          isStudyMode={isStudyMode}
+          fontSize={fontSize}
+          verseSpacing={verseSpacing}
+          onOpenTokenDetails={openTokenDetailsFromElement}
+          onSelectVerse={handleVerseSelection}
+          concordanceWords={concordanceWords}
+          verseSearchIndex={verseSearchIndex}
+          ensureConcordanceWordsLoaded={ensureConcordanceLoaded}
+          onOpenSearchResult={openChapterReferenceInNewTab}
+          notes={readerNotes}
+          notesContext={notesContext}
+          activeReaderWordHighlight={activeReaderWordHighlight}
+          notesTabStateByLeafId={notesTabStateByLeafId}
+          onChangeNotesTabState={changeNotesTabState}
+          searchPageStateByLeafId={searchPageStateByLeafId}
+          onChangeSearchPageState={changeSearchPageState}
+          onCreateGeneralNote={createGeneralNote}
+          onCreateContextNote={createContextNote}
+          onUpdateNote={updateNote}
+          onDeleteNote={deleteNote}
+          onOpenNoteLink={openNoteLinkTarget}
+          selectedHighlightScope={notesHighlightScope}
+          showTargetedPanelToggle={showTargetedPanelToggle}
+          targetedPanelLeafId={targetedPanelLeafId}
+          onToggleTargetedPanel={(leafId) =>
+            setTargetedPanelLeafId((current) => {
+              const nextValue = current === leafId ? null : leafId;
+              targetedPanelLeafIdRef.current = nextValue;
+              return nextValue;
+            })
+          }
+          canGoLeafHistoryBack={(leafId) =>
+            (leafHistoryByLeafId[leafId]?.index ?? 0) > 0
+          }
+          canGoLeafHistoryForward={(leafId) => {
+            const history = leafHistoryByLeafId[leafId];
+            if (!history) {
+              return false;
+            }
+            return history.index < history.entries.length - 1;
+          }}
+          onGoLeafHistoryBack={(leafId) => navigateLeafHistory(leafId, -1)}
+          onGoLeafHistoryForward={(leafId) => navigateLeafHistory(leafId, 1)}
+          moveLeafChapter={moveLeafChapter}
+          toggleChapterRead={toggleChapterRead}
+          updateSplitSize={updateSplitSize}
+          updateSplitGroupLayout={updateSplitGroupLayout}
+          highlightModeEnabledByLeafId={highlightModeEnabledByLeafId}
+          highlightedVerseRangesByLeafId={highlightedVerseRangesByLeafId}
+          onClearLeafHighlights={handleClearLeafHighlights}
+          onToggleHighlightMode={toggleHighlightModeForLeaf}
+          onBookmarkLeafSelection={bookmarkLeafSelection}
+          studyToolsPanelProps={{
+            accordionValue: concordanceAccordionValue,
+            onAccordionValueChange: setConcordanceAccordionValue,
+            onExpandAll: () =>
+              setConcordanceAccordionValue([...STUDY_ACCORDION_ITEMS]),
+            onCollapseAll: () => setConcordanceAccordionValue([]),
+            canExpand: !allStudyAccordionsOpen,
+            canCollapse: concordanceAccordionValue.length > 0,
+            ...sharedStudyToolsProps,
+          }}
+          bookmarksPanelProps={sharedBookmarksProps}
+        />
+      </div>
+    );
+  });
   return (
     <main
       className="reader-shell h-screen w-full overflow-hidden bg-background"
@@ -4219,110 +4333,9 @@ export function KJVReader() {
             tabsOrientation={tabsOrientation}
             tabsStrip={tabsStrip}
             readerContent={
-              <ReaderPanelTree
-                root={activeTab.root}
-                books={books}
-                activeRoot={activeTab.root}
-                chapterRefIndex={chapterRefIndex}
-                chapterRefCount={chapterRefs.length}
-                readChapters={readChapters}
-                readChapterCountByBook={readChapterCountByBook}
-                hideReadModeVerseNumbers={hideReadModeVerseNumbers}
-                panelMenuOpenLeafId={panelMenuOpenLeafId}
-                setPanelMenuOpenLeafId={setPanelMenuOpenLeafId}
-                modelLeafNeighbors={modelLeafNeighbors}
-                neighborsForLeaf={neighborsForLeaf}
-                fullscreenLeafId={fullscreenLeafId}
-                panelElementRefs={panelElementRefs}
-                clearAllPanelPreviews={clearAllPanelPreviews}
-                updateLeafLocation={updateLeafLocation}
-                setBookPickerDialogLeafId={setBookPickerDialogLeafId}
-                toggleFullscreenLeaf={toggleFullscreenLeaf}
-                toggleParentGroupOrientation={toggleParentGroupOrientation}
-                setOrientationPreviewTarget={setOrientationPreviewTarget}
-                clearOrientationPreview={clearOrientationPreview}
-                moveLeaf={moveLeaf}
-                setMovePreviewTarget={setMovePreviewTarget}
-                clearMovePreview={clearMovePreview}
-                splitLeaf={splitLeaf}
-                setAddPreviewTarget={setAddPreviewTarget}
-                clearAddPreview={clearAddPreview}
-                insertPanelInGroup={insertPanelInGroup}
-                setGroupInsertPreviewTarget={setGroupInsertPreviewTarget}
-                addAroundGroup={addAroundGroup}
-                setAroundGroupPreviewTarget={setAroundGroupPreviewTarget}
-                existingTabTargets={existingTabTargets}
-                moveLeafToExistingTab={moveLeafToExistingTab}
-                moveLeafToNewTab={moveLeafToNewTab}
-                closeLeaf={closeLeaf}
-                flowVersesByParagraph={flowVersesByParagraph}
-                readModeParagraphIndent={readModeParagraphIndent}
-                isStudyMode={isStudyMode}
-                fontSize={fontSize}
-                verseSpacing={verseSpacing}
-                onOpenTokenDetails={openTokenDetailsFromElement}
-                onSelectVerse={handleVerseSelection}
-                concordanceWords={concordanceWords}
-                verseSearchIndex={verseSearchIndex}
-                ensureConcordanceWordsLoaded={ensureConcordanceLoaded}
-                onOpenSearchResult={openChapterReferenceInNewTab}
-                notes={readerNotes}
-                notesContext={notesContext}
-                activeReaderWordHighlight={activeReaderWordHighlight}
-                notesTabStateByLeafId={notesTabStateByLeafId}
-                onChangeNotesTabState={changeNotesTabState}
-                searchPageStateByLeafId={searchPageStateByLeafId}
-                onChangeSearchPageState={changeSearchPageState}
-                onCreateGeneralNote={createGeneralNote}
-                onCreateContextNote={createContextNote}
-                onUpdateNote={updateNote}
-                onDeleteNote={deleteNote}
-                onOpenNoteLink={openNoteLinkTarget}
-                selectedHighlightScope={notesHighlightScope}
-                showTargetedPanelToggle={showTargetedPanelToggle}
-                targetedPanelLeafId={targetedPanelLeafId}
-                onToggleTargetedPanel={(leafId) =>
-                  setTargetedPanelLeafId((current) => {
-                    const nextValue = current === leafId ? null : leafId;
-                    targetedPanelLeafIdRef.current = nextValue;
-                    return nextValue;
-                  })
-                }
-                canGoLeafHistoryBack={(leafId) =>
-                  (leafHistoryByLeafId[leafId]?.index ?? 0) > 0
-                }
-                canGoLeafHistoryForward={(leafId) => {
-                  const history = leafHistoryByLeafId[leafId];
-                  if (!history) {
-                    return false;
-                  }
-                  return history.index < history.entries.length - 1;
-                }}
-                onGoLeafHistoryBack={(leafId) => navigateLeafHistory(leafId, -1)}
-                onGoLeafHistoryForward={(leafId) =>
-                  navigateLeafHistory(leafId, 1)
-                }
-                moveLeafChapter={moveLeafChapter}
-                toggleChapterRead={toggleChapterRead}
-                updateSplitSize={updateSplitSize}
-                updateSplitGroupLayout={updateSplitGroupLayout}
-                highlightModeEnabledByLeafId={highlightModeEnabledByLeafId}
-                highlightedVerseRangesByLeafId={highlightedVerseRangesByLeafId}
-                onClearLeafHighlights={handleClearLeafHighlights}
-                onToggleHighlightMode={toggleHighlightModeForLeaf}
-                onBookmarkLeafSelection={bookmarkLeafSelection}
-                studyToolsPanelProps={{
-                  accordionValue: concordanceAccordionValue,
-                  onAccordionValueChange: setConcordanceAccordionValue,
-                  onExpandAll: () =>
-                    setConcordanceAccordionValue([...STUDY_ACCORDION_ITEMS]),
-                  onCollapseAll: () => setConcordanceAccordionValue([]),
-                  canExpand: !allStudyAccordionsOpen,
-                  canCollapse: concordanceAccordionValue.length > 0,
-                  ...sharedStudyToolsProps,
-                }}
-                bookmarksPanelProps={sharedBookmarksProps}
-              />
+              <div className="relative flex h-full min-h-0 min-w-0 flex-1 overflow-hidden">
+                {mountedTabPanels}
+              </div>
             }
           />
         </SidebarInset>
