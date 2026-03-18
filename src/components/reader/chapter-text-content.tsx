@@ -143,7 +143,8 @@ export const ChapterTextContent = memo(
     onOpenTokenDetails,
     onSelectVerse,
   }: ChapterTextContentProps) {
-    const lineHeight = Math.max(24, Math.round(fontSize * 1.75));
+    const baseLineHeight = Math.max(24, Math.round(fontSize * 1.75));
+    const lineHeight = baseLineHeight + verseSpacing;
     const verseNumberSize = Math.max(11, Math.round(fontSize * 0.75));
 
     const paragraphGroups = useMemo(() => {

@@ -71,6 +71,8 @@ import type { VerseSearchIndexEntry } from "@/lib/search";
 import type { BookmarkScope } from "@/types/bookmarks";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 import { StaticPage } from "@/components/reader/static-page";
+import { SettingsPanelContent } from "@/components/reader/settings-dialog";
+import { ProgressPanelContent } from "@/components/reader/progress-dialog";
 import { StudyToolsPanel } from "@/components/reader/study-tools-panel";
 import { getStaticPage } from "@/lib/static-pages";
 import {
@@ -263,6 +265,8 @@ type ReaderPanelTreeProps = {
   onBookmarkLeafSelection: (leafId: string) => void;
   studyToolsPanelProps: ComponentProps<typeof StudyToolsPanel>;
   bookmarksPanelProps: ComponentProps<typeof BookmarksTool>;
+  settingsPanelProps: ComponentProps<typeof SettingsPanelContent>;
+  progressPanelProps: ComponentProps<typeof ProgressPanelContent>;
 };
 
 type ReaderLeafPanelProps = Omit<ReaderPanelTreeProps, "root"> & {
@@ -354,6 +358,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   onBookmarkLeafSelection,
   studyToolsPanelProps,
   bookmarksPanelProps,
+  settingsPanelProps,
+  progressPanelProps,
 }: ReaderLeafPanelProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -1540,7 +1546,17 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
           </CardContent>
         ) : leaf.view === "page" ? (
           <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
-            <StaticPage pageId={leaf.pageId} />
+            {leaf.pageId === "settings" ? (
+              <div className="h-full overflow-y-auto p-4">
+                <SettingsPanelContent {...settingsPanelProps} />
+              </div>
+            ) : leaf.pageId === "progress" ? (
+              <div className="h-full overflow-y-auto p-4">
+                <ProgressPanelContent {...progressPanelProps} />
+              </div>
+            ) : (
+              <StaticPage pageId={leaf.pageId} />
+            )}
           </CardContent>
         ) : (
           <CardContent className="min-h-0 flex-1 overflow-auto p-2">
@@ -1723,6 +1739,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   onBookmarkLeafSelection,
   studyToolsPanelProps,
   bookmarksPanelProps,
+  settingsPanelProps,
+  progressPanelProps,
 }: ReaderPanelTreeProps) {
   const renderLeaf = (leaf: LeafNode) => (
     <ReaderLeafPanel
@@ -1804,6 +1822,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       onBookmarkLeafSelection={onBookmarkLeafSelection}
       studyToolsPanelProps={studyToolsPanelProps}
       bookmarksPanelProps={bookmarksPanelProps}
+      settingsPanelProps={settingsPanelProps}
+      progressPanelProps={progressPanelProps}
     />
   );
 
