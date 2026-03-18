@@ -310,6 +310,14 @@ type PendingReaderScrollTarget = {
   verseEnd: number;
 };
 
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{
+    outcome: "accepted" | "dismissed";
+    platform: string;
+  }>;
+};
+
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -368,6 +376,9 @@ export function KJVReader() {
   const [completionCelebrationVerse, setCompletionCelebrationVerse] = useState(
     COMPLETION_CELEBRATION_VERSES[0],
   );
+  const [deferredInstallPrompt, setDeferredInstallPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
+  const [isPwaInstalled, setIsPwaInstalled] = useState(false);
   const previousBibleCompletionRef = useRef(false);
   const pendingActiveTabIdRef = useRef<string | null>(null);
   const pendingToolsTabScrollRef = useRef(false);
@@ -428,6 +439,70 @@ export function KJVReader() {
   const addPreviewIsGroupRef = useRef(false);
   const orientationPreviewLeafIdsRef = useRef<string[]>([]);
   const fullscreenRequestedLeafIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQuery =
+      typeof window.matchMedia === "function"
+        ? window.matchMedia("(display-mode: standalone)")
+        : null;
+
+    const computeInstalled = () =>
+      mediaQuery?.matches === true ||
+      (
+        window.navigator as Navigator & {
+          standalone?: boolean;
+        }
+      ).standalone === true;
+
+    const handleInstalledStateChange = () => {
+      setIsPwaInstalled(computeInstalled());
+    };
+
+    const handleBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setDeferredInstallPrompt(event as BeforeInstallPromptEvent);
+    };
+
+    const handleAppInstalled = () => {
+      setDeferredInstallPrompt(null);
+      setIsPwaInstalled(true);
+    };
+
+    handleInstalledStateChange();
+    window.addEventListener(
+      "beforeinstallprompt",
+      handleBeforeInstallPrompt as EventListener,
+    );
+    window.addEventListener("appinstalled", handleAppInstalled);
+    mediaQuery?.addEventListener?.("change", handleInstalledStateChange);
+
+    return () => {
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt as EventListener,
+      );
+      window.removeEventListener("appinstalled", handleAppInstalled);
+      mediaQuery?.removeEventListener?.("change", handleInstalledStateChange);
+    };
+  }, []);
+
+  const installPwa = useCallback(async () => {
+    if (!deferredInstallPrompt) {
+      return;
+    }
+
+    const promptEvent = deferredInstallPrompt;
+    setDeferredInstallPrompt(null);
+    await promptEvent.prompt();
+    const userChoice = await promptEvent.userChoice;
+    if (userChoice.outcome === "accepted") {
+      setIsPwaInstalled(true);
+    }
+  }, [deferredInstallPrompt]);
   const syncedLayoutHashRef = useRef("");
   const domNeighborCacheRef = useRef<{
     root: PanelNode | null;
@@ -4601,6 +4676,9 @@ export function KJVReader() {
           bookmarksPanelProps={sharedBookmarksProps}
           settingsPanelProps={settingsPanelProps}
           progressPanelProps={progressPanelProps}
+          canInstallPwa={deferredInstallPrompt !== null}
+          isPwaInstalled={isPwaInstalled}
+          onInstallPwa={installPwa}
         />
       </div>
     );
