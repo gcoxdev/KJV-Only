@@ -1,6 +1,7 @@
 const SUPPORTED_URL_PROTOCOLS = new Set([
   "http:",
   "https:",
+  "kjv:",
   "mailto:",
   "sms:",
   "tel:",

@@ -90,7 +90,6 @@ import type {
   SearchPageState,
   SplitOrientation,
   StrongsPayload,
-  StudyToolOpenTarget,
   StudyWorkspaceTool,
   TabsOrientation,
   TokenPopupState,
@@ -98,8 +97,11 @@ import type {
   UnitsPayload,
   WebstersEntry,
   WebstersPayload,
+  WordVerseSelectionTarget,
+  NotesLinkOpenTarget,
 } from "@/types/reader";
-import type { ReaderBookmark } from "@/types/bookmarks";
+import type { BookmarkScope, ReaderBookmark } from "@/types/bookmarks";
+import type { NoteLinkTarget } from "@/types/notes";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { SidebarOpenRequestSync } from "@/components/reader/sidebar-open-request-sync";
 import { SidebarCloseRequestSync } from "@/components/reader/sidebar-close-request-sync";
@@ -299,9 +301,16 @@ export function KJVReader() {
     useState(false);
   const [readModeParagraphIndent, setReadModeParagraphIndent] = useState(false);
   const [flowVersesByParagraph, setFlowVersesByParagraph] = useState(false);
-  const [studyToolOpenTarget, setStudyToolOpenTarget] =
-    useState<StudyToolOpenTarget>("sidebar");
-  const studyToolOpenTargetRef = useRef<StudyToolOpenTarget>("sidebar");
+  const [wordVerseSelectionTarget, setWordVerseSelectionTarget] =
+    useState<WordVerseSelectionTarget>("sidebar");
+  const wordVerseSelectionTargetRef =
+    useRef<WordVerseSelectionTarget>("sidebar");
+  const [notesLinkOpenTarget, setNotesLinkOpenTarget] =
+    useState<NotesLinkOpenTarget>("new-panel");
+  const [targetedPanelLeafId, setTargetedPanelLeafId] = useState<string | null>(
+    null,
+  );
+  const targetedPanelLeafIdRef = useRef<string | null>(null);
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [sidebarCloseRequestKey, setSidebarCloseRequestKey] = useState(0);
   const [isCompletionCelebrationOpen, setIsCompletionCelebrationOpen] =
@@ -440,7 +449,9 @@ export function KJVReader() {
         readModeParagraphIndent?: boolean;
         flowVersesByParagraph?: boolean;
         tabsOrientation?: TabsOrientation;
-        studyToolOpenTarget?: StudyToolOpenTarget;
+        studyToolOpenTarget?: "sidebar" | "panel" | "tab";
+        wordVerseSelectionTarget?: WordVerseSelectionTarget;
+        notesLinkOpenTarget?: NotesLinkOpenTarget;
       };
       if (typeof parsed.fontSize === "number") {
         setFontSize(Math.max(8, Math.round(parsed.fontSize)));
@@ -469,11 +480,31 @@ export function KJVReader() {
         setTabsOrientation(parsed.tabsOrientation);
       }
       if (
+        parsed.wordVerseSelectionTarget === "sidebar" ||
+        parsed.wordVerseSelectionTarget === "new-tab" ||
+        parsed.wordVerseSelectionTarget === "new-panel" ||
+        parsed.wordVerseSelectionTarget === "targeted-panel"
+      ) {
+        setWordVerseSelectionTarget(parsed.wordVerseSelectionTarget);
+      } else if (
         parsed.studyToolOpenTarget === "sidebar" ||
         parsed.studyToolOpenTarget === "panel" ||
         parsed.studyToolOpenTarget === "tab"
       ) {
-        setStudyToolOpenTarget(parsed.studyToolOpenTarget);
+        setWordVerseSelectionTarget(
+          parsed.studyToolOpenTarget === "sidebar"
+            ? "sidebar"
+            : parsed.studyToolOpenTarget === "panel"
+              ? "new-panel"
+              : "new-tab",
+        );
+      }
+      if (
+        parsed.notesLinkOpenTarget === "new-tab" ||
+        parsed.notesLinkOpenTarget === "new-panel" ||
+        parsed.notesLinkOpenTarget === "targeted-panel"
+      ) {
+        setNotesLinkOpenTarget(parsed.notesLinkOpenTarget);
       }
     } catch {
       // Ignore malformed persisted display settings.
@@ -491,7 +522,8 @@ export function KJVReader() {
         readModeParagraphIndent,
         flowVersesByParagraph,
         tabsOrientation,
-        studyToolOpenTarget,
+        wordVerseSelectionTarget,
+        notesLinkOpenTarget,
       }),
     );
   }, [
@@ -502,12 +534,17 @@ export function KJVReader() {
     readModeParagraphIndent,
     flowVersesByParagraph,
     tabsOrientation,
-    studyToolOpenTarget,
+    wordVerseSelectionTarget,
+    notesLinkOpenTarget,
   ]);
 
   useEffect(() => {
-    studyToolOpenTargetRef.current = studyToolOpenTarget;
-  }, [studyToolOpenTarget]);
+    wordVerseSelectionTargetRef.current = wordVerseSelectionTarget;
+  }, [wordVerseSelectionTarget]);
+
+  useEffect(() => {
+    targetedPanelLeafIdRef.current = targetedPanelLeafId;
+  }, [targetedPanelLeafId]);
 
   useEffect(() => {
     if (!tokenPopup) {
@@ -614,6 +651,19 @@ export function KJVReader() {
   useEffect(() => {
     tabsRef.current = tabs;
   }, [tabs]);
+
+  useEffect(() => {
+    if (!targetedPanelLeafId) {
+      return;
+    }
+    const targetStillExists = tabs.some((tab) =>
+      Boolean(findLeafNode(tab.root, targetedPanelLeafId)),
+    );
+    if (!targetStillExists) {
+      targetedPanelLeafIdRef.current = null;
+      setTargetedPanelLeafId(null);
+    }
+  }, [tabs, targetedPanelLeafId]);
 
   useEffect(() => {
     if (!isLoaded || tabs.length === 0) {
@@ -771,6 +821,7 @@ export function KJVReader() {
   const {
     readerBookmarks,
     highlightModeEnabledByLeafId,
+    selectedHighlightScope,
     setSelectedHighlightScope,
     upsertBookmark,
     updateBookmark,
@@ -784,6 +835,72 @@ export function KJVReader() {
   const [searchPageStateByLeafId, setSearchPageStateByLeafId] = useState<
     Record<string, SearchPageState>
   >({});
+
+  const notesHighlightScope = useMemo<BookmarkScope | null>(() => {
+    if (selectedHighlightScope) {
+      return selectedHighlightScope;
+    }
+    if (!activeTab) {
+      return null;
+    }
+
+    for (const leafId of collectLeafIds(activeTab.root)) {
+      const leaf = findLeafNode(activeTab.root, leafId);
+      if (!leaf || leaf.view !== "reader") {
+        continue;
+      }
+      const ranges = highlightedVerseRangesByLeafId[leafId] ?? [];
+      if (ranges.length === 0) {
+        continue;
+      }
+      if (ranges.length === 1) {
+        const onlyRange = ranges[0];
+        if (onlyRange.start === onlyRange.end) {
+          return {
+            type: "verse",
+            bookIndex: leaf.bookIndex,
+            chapterIndex: leaf.chapterIndex,
+            verseNumber: onlyRange.start,
+          };
+        }
+        return {
+          type: "range",
+          start: {
+            bookIndex: leaf.bookIndex,
+            chapterIndex: leaf.chapterIndex,
+            verseNumber: onlyRange.start,
+          },
+          end: {
+            bookIndex: leaf.bookIndex,
+            chapterIndex: leaf.chapterIndex,
+            verseNumber: onlyRange.end,
+          },
+        };
+      }
+      return {
+        type: "selection",
+        bookIndex: leaf.bookIndex,
+        chapterIndex: leaf.chapterIndex,
+        ranges,
+      };
+    }
+
+    return null;
+  }, [activeTab, highlightedVerseRangesByLeafId, selectedHighlightScope]);
+
+  const showTargetedPanelToggle = useMemo(
+    () =>
+      wordVerseSelectionTarget === "targeted-panel" ||
+      notesLinkOpenTarget === "targeted-panel",
+    [notesLinkOpenTarget, wordVerseSelectionTarget],
+  );
+  const sidebarAvailable = isStudyMode && wordVerseSelectionTarget === "sidebar";
+
+  useEffect(() => {
+    if (wordVerseSelectionTarget !== "sidebar" && isRightSidebarOpen) {
+      setIsRightSidebarOpen(false);
+    }
+  }, [isRightSidebarOpen, setIsRightSidebarOpen, wordVerseSelectionTarget]);
 
   const createDefaultSearchPageState = useCallback(
     (): SearchPageState => ({
@@ -1289,7 +1406,7 @@ export function KJVReader() {
   useEffect(() => {
     domNeighborCacheRef.current = { root: null, neighbors: new Map() };
   }, [activeTab]);
-  function updateActiveTab(updater: (tab: ReaderTab) => ReaderTab) {
+  const updateActiveTab = useCallback((updater: (tab: ReaderTab) => ReaderTab) => {
     if (!activeTabId) {
       return;
     }
@@ -1297,7 +1414,7 @@ export function KJVReader() {
     setTabs((currentTabs) =>
       currentTabs.map((tab) => (tab.id === activeTabId ? updater(tab) : tab)),
     );
-  }
+  }, [activeTabId, setTabs]);
 
   function splitLeaf(leafId: string, direction: PanelDirection) {
     updateActiveTab((tab) => {
@@ -1702,7 +1819,7 @@ export function KJVReader() {
     }
   }
 
-  function updateLeafLocation(
+  const updateLeafLocation = useCallback((
     leafId: string,
     patch: Partial<
       Pick<
@@ -1714,7 +1831,7 @@ export function KJVReader() {
         | "pickerBookIndex"
       >
     >,
-  ) {
+  ) => {
     const shouldResetScroll =
       patch.bookIndex !== undefined || patch.chapterIndex !== undefined;
 
@@ -1740,7 +1857,7 @@ export function KJVReader() {
         viewport.scrollTo({ top: 0, behavior: "auto" });
       }
     });
-  }
+  }, [clearLeafHighlights, setSelectedHighlightScope, updateActiveTab]);
 
   function moveLeafChapter(leafId: string, direction: -1 | 1) {
     if (!activeTab) {
@@ -1907,6 +2024,41 @@ export function KJVReader() {
     [initializeNotesTabState, notesContext, readerNotes, tabsOrientation],
   );
 
+  const findTabContainingLeafId = useCallback(
+    (leafId: string, sourceTabs: ReaderTab[] = tabsRef.current) =>
+      sourceTabs.find((tab) => Boolean(findLeafNode(tab.root, leafId))) ?? null,
+    [],
+  );
+
+  const showTabById = useCallback((tabId: string) => {
+    pendingActiveTabIdRef.current = null;
+    setActiveTabId(tabId);
+  }, []);
+
+  const scrollVerseIntoView = useCallback(
+    (leafId: string, verseNumber: number) => {
+      requestAnimationFrame(() => {
+        const panelElement = panelElementRefs.current[leafId];
+        const viewport = panelViewportElement(panelElement);
+        const verseElement = panelElement?.querySelector<HTMLElement>(
+          `[data-verse-number="${verseNumber}"]`,
+        );
+        if (verseElement) {
+          verseElement.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "nearest",
+          });
+          return;
+        }
+        if (viewport) {
+          viewport.scrollTo({ top: 0, behavior: "auto" });
+        }
+      });
+    },
+    [panelElementRefs],
+  );
+
   const ensureToolsPanelInActiveTab = useCallback(() => {
     if (!activeTabId) {
       return;
@@ -1938,6 +2090,69 @@ export function KJVReader() {
       return nextTabs;
     });
   }, [activeTabId, setTabs]);
+
+  const createTargetedToolsPanelInActiveTab = useCallback(() => {
+    if (!activeTabId) {
+      return false;
+    }
+
+    const currentTabs = tabsRef.current;
+    const activeIndex = currentTabs.findIndex((tab) => tab.id === activeTabId);
+    if (activeIndex < 0) {
+      return false;
+    }
+
+    const active = currentTabs[activeIndex];
+    const nextLeaf = createLeaf(0, 0, "tools");
+    const nextRoot: PanelNode = {
+      id: createId(),
+      type: "split",
+      orientation: "horizontal",
+      ratio: 68,
+      first: active.root,
+      second: nextLeaf,
+    };
+
+    const nextTabs = [...currentTabs];
+    nextTabs[activeIndex] = { ...active, root: nextRoot };
+    tabsRef.current = nextTabs;
+    setTabs(nextTabs);
+
+    const nextLeafId = nextLeaf.id;
+    targetedPanelLeafIdRef.current = nextLeafId;
+    setTargetedPanelLeafId(nextLeafId);
+    showTabById(activeTabId);
+    return true;
+  }, [activeTabId, setTabs, showTabById]);
+
+  const openToolsInTargetedPanel = useCallback(() => {
+    const currentTargetedPanelLeafId = targetedPanelLeafIdRef.current;
+    if (!currentTargetedPanelLeafId) {
+      return false;
+    }
+
+    const targetTab = findTabContainingLeafId(currentTargetedPanelLeafId);
+    if (!targetTab) {
+      return true;
+    }
+
+    setTabs((currentTabs) =>
+      currentTabs.map((tab) =>
+        tab.id === targetTab.id
+          ? {
+              ...tab,
+              root: updateLeafNode(tab.root, currentTargetedPanelLeafId, {
+                view: "tools",
+                pickerTestament: null,
+                pickerBookIndex: null,
+              }),
+            }
+          : tab,
+      ),
+    );
+    showTabById(targetTab.id);
+    return true;
+  }, [findTabContainingLeafId, setTabs, showTabById]);
 
   const openToolsTab = useCallback(() => {
     const pendingToolsTabId = pendingToolsTabIdRef.current;
@@ -1975,6 +2190,71 @@ export function KJVReader() {
       ];
     });
   }, [setActiveTabId, setTabs]);
+
+  const navigateReaderLeafToNoteTarget = useCallback(
+    (tabId: string, leafId: string, target: NoteLinkTarget) => {
+      clearLeafHighlights(leafId);
+      setSelectedHighlightScope(null);
+      setTabs((currentTabs) =>
+        currentTabs.map((tab) =>
+          tab.id === tabId
+            ? {
+                ...tab,
+                root: updateLeafNode(tab.root, leafId, {
+                  bookIndex: target.bookIndex,
+                  chapterIndex: target.chapterIndex,
+                  view: "reader",
+                  pickerTestament: null,
+                  pickerBookIndex: null,
+                }),
+              }
+            : tab,
+        ),
+      );
+    },
+    [clearLeafHighlights, setSelectedHighlightScope, setTabs],
+  );
+
+  const createTargetedReaderPanelInActiveTab = useCallback(
+    (target: NoteLinkTarget) => {
+      if (!activeTabId) {
+        return null;
+      }
+
+      const currentTabs = tabsRef.current;
+      const activeIndex = currentTabs.findIndex((tab) => tab.id === activeTabId);
+      if (activeIndex < 0) {
+        return null;
+      }
+
+      const active = currentTabs[activeIndex];
+      const nextLeaf = createLeaf(
+        target.bookIndex,
+        target.chapterIndex,
+        "reader",
+      );
+      const nextRoot: PanelNode = {
+        id: createId(),
+        type: "split",
+        orientation: "horizontal",
+        ratio: 42,
+        first: active.root,
+        second: nextLeaf,
+      };
+
+      const nextTabs = [...currentTabs];
+      nextTabs[activeIndex] = { ...active, root: nextRoot };
+      tabsRef.current = nextTabs;
+      setTabs(nextTabs);
+
+      const nextLeafId = nextLeaf.id;
+      targetedPanelLeafIdRef.current = nextLeafId;
+      setTargetedPanelLeafId(nextLeafId);
+      showTabById(activeTabId);
+      return nextLeafId;
+    },
+    [activeTabId, setTabs, showTabById],
+  );
 
   function openBookmarkInNewTab(bookmark: ReaderBookmark) {
     if (bookmark.scope.type === "chapter") {
@@ -2238,13 +2518,17 @@ export function KJVReader() {
     (tool: StudyWorkspaceTool, options?: { openSidebar?: boolean }) => {
       const destination =
         options?.openSidebar === false
-          ? "panel"
-          : studyToolOpenTargetRef.current;
+          ? "new-panel"
+          : wordVerseSelectionTargetRef.current;
 
       if (destination === "sidebar") {
         setIsRightSidebarOpen(true);
         setSidebarOpenRequestKey((current) => current + 1);
-      } else if (destination === "panel") {
+      } else if (destination === "targeted-panel") {
+        if (!openToolsInTargetedPanel()) {
+          createTargetedToolsPanelInActiveTab();
+        }
+      } else if (destination === "new-panel") {
         ensureToolsPanelInActiveTab();
       } else {
         openToolsTab();
@@ -2252,7 +2536,9 @@ export function KJVReader() {
       showStudyTool(tool);
     },
     [
+      createTargetedToolsPanelInActiveTab,
       ensureToolsPanelInActiveTab,
+      openToolsInTargetedPanel,
       openToolsTab,
       setIsRightSidebarOpen,
       showStudyTool,
@@ -2760,6 +3046,181 @@ export function KJVReader() {
     ],
   );
 
+  const openNoteLinkTarget = useCallback(
+    (target: NoteLinkTarget) => {
+      setNotesContext(
+        target.type === "chapter"
+          ? {
+              bookIndex: target.bookIndex,
+              chapterIndex: target.chapterIndex,
+            }
+          : target.type === "verse"
+            ? {
+                bookIndex: target.bookIndex,
+                chapterIndex: target.chapterIndex,
+                verseNumber: target.verseNumber,
+              }
+            : target.type === "selection"
+              ? {
+                  bookIndex: target.bookIndex,
+                  chapterIndex: target.chapterIndex,
+                }
+            : {
+                bookIndex: target.bookIndex,
+                chapterIndex: target.chapterIndex,
+                verseNumber: target.verseNumber,
+                word: target.word,
+              },
+      );
+
+      const syncWordTarget = () => {
+        if (target.type !== "word") {
+          return;
+        }
+        const rawWord = normalizeConcordanceWord(target.word) || target.word;
+        syncWordStudySelections(rawWord, null);
+        syncTokenAccordionState(rawWord, {
+          bookIndex: target.bookIndex,
+          chapterIndex: target.chapterIndex,
+          verseNumber: target.verseNumber,
+          strongCode: null,
+        });
+      };
+
+      const applyReaderTargetEffects = (leafId: string) => {
+        if (target.type === "selection") {
+          queueVerseHighlights(leafId, target.ranges);
+          setSelectedHighlightScope({
+            type: "selection",
+            bookIndex: target.bookIndex,
+            chapterIndex: target.chapterIndex,
+            ranges: target.ranges,
+          });
+          scrollVerseIntoView(leafId, target.ranges[0]?.start ?? 1);
+        } else if (target.type !== "chapter") {
+          queueVerseHighlight(leafId, {
+            start: target.verseNumber,
+            end: target.verseNumber,
+          });
+          setSelectedHighlightScope({
+            type: "verse",
+            bookIndex: target.bookIndex,
+            chapterIndex: target.chapterIndex,
+            verseNumber: target.verseNumber,
+          });
+          scrollVerseIntoView(leafId, target.verseNumber);
+        }
+        syncWordTarget();
+      };
+
+      const openReaderTargetInNewTab = () => {
+        clearAllVerseHighlights();
+        setSelectedHighlightScope(null);
+        const nextTabId = createId();
+        const nextLeaf = createLeaf(target.bookIndex, target.chapterIndex, "reader");
+        setTabs((currentTabs) => [
+          ...currentTabs,
+          {
+            id: nextTabId,
+            title: `Tab ${currentTabs.length + 1}`,
+            root: nextLeaf,
+          },
+        ]);
+        showTabById(nextTabId);
+        applyReaderTargetEffects(nextLeaf.id);
+      };
+
+      const openReaderTargetInNewPanel = () => {
+        if (!activeTabId) {
+          openReaderTargetInNewTab();
+          return;
+        }
+
+        const nextReaderLeaf = createLeaf(
+          target.bookIndex,
+          target.chapterIndex,
+          "reader",
+        );
+
+        setTabs((currentTabs) => {
+          const activeIndex = currentTabs.findIndex(
+            (tab) => tab.id === activeTabId,
+          );
+          if (activeIndex < 0) {
+            return currentTabs;
+          }
+          const active = currentTabs[activeIndex];
+          const nextRoot: PanelNode = {
+            id: createId(),
+            type: "split",
+            orientation: "horizontal",
+            ratio: 42,
+            first: active.root,
+            second: nextReaderLeaf,
+          };
+          const nextTabs = [...currentTabs];
+          nextTabs[activeIndex] = { ...active, root: nextRoot };
+          return nextTabs;
+        });
+
+        applyReaderTargetEffects(nextReaderLeaf.id);
+      };
+
+      const openReaderTargetInTargetedPanel = () => {
+        const currentTargetedPanelLeafId = targetedPanelLeafIdRef.current;
+        if (!currentTargetedPanelLeafId) {
+          const nextLeafId = createTargetedReaderPanelInActiveTab(target);
+          if (nextLeafId) {
+            applyReaderTargetEffects(nextLeafId);
+            return;
+          }
+          openReaderTargetInNewPanel();
+          return;
+        }
+
+        const targetTab = findTabContainingLeafId(currentTargetedPanelLeafId);
+        if (!targetTab) {
+          return;
+        }
+
+        navigateReaderLeafToNoteTarget(
+          targetTab.id,
+          currentTargetedPanelLeafId,
+          target,
+        );
+        showTabById(targetTab.id);
+        applyReaderTargetEffects(currentTargetedPanelLeafId);
+      };
+
+      if (notesLinkOpenTarget === "targeted-panel") {
+        openReaderTargetInTargetedPanel();
+        return;
+      }
+      if (notesLinkOpenTarget === "new-tab") {
+        openReaderTargetInNewTab();
+        return;
+      }
+      openReaderTargetInNewPanel();
+    },
+    [
+      activeTabId,
+      clearAllVerseHighlights,
+      createTargetedReaderPanelInActiveTab,
+      findTabContainingLeafId,
+      navigateReaderLeafToNoteTarget,
+      notesLinkOpenTarget,
+      queueVerseHighlight,
+      queueVerseHighlights,
+      scrollVerseIntoView,
+      setSelectedHighlightScope,
+      setNotesContext,
+      setTabs,
+      showTabById,
+      syncTokenAccordionState,
+      syncWordStudySelections,
+    ],
+  );
+
   const handleVerseSelection = useCallback(
     (
       leafId: string,
@@ -2830,7 +3291,12 @@ export function KJVReader() {
           });
         }
       } else {
-        setSelectedHighlightScope(null);
+        setSelectedHighlightScope({
+          type: "selection",
+          bookIndex,
+          chapterIndex,
+          ranges: nextRanges,
+        });
       }
     },
     [
@@ -3549,9 +4015,9 @@ export function KJVReader() {
       }
     >
       <SidebarProvider
-        open={isStudyMode ? isRightSidebarOpen : false}
+        open={sidebarAvailable ? isRightSidebarOpen : false}
         onOpenChange={(open) => {
-          if (!isStudyMode) {
+          if (!sidebarAvailable) {
             return;
           }
           setIsRightSidebarOpen(open);
@@ -3560,16 +4026,17 @@ export function KJVReader() {
       >
         <SidebarOpenRequestSync
           requestKey={sidebarOpenRequestKey}
-          enabled={isStudyMode}
+          enabled={sidebarAvailable}
         />
         <SidebarCloseRequestSync
           requestKey={sidebarCloseRequestKey}
-          enabled={isStudyMode}
+          enabled={sidebarAvailable}
         />
         <SidebarInset className="flex h-screen min-h-0 flex-col overflow-hidden">
           <ReaderTopBar
             isStudyMode={isStudyMode}
             isShareCopied={isShareCopied}
+            showSidebarToggle={sidebarAvailable}
             onStudyModeChange={setIsStudyMode}
             onOpenSearch={openSearchTab}
             onShareLayout={shareLayout}
@@ -3639,6 +4106,17 @@ export function KJVReader() {
                 onCreateContextNote={createContextNote}
                 onUpdateNote={updateNote}
                 onDeleteNote={deleteNote}
+                onOpenNoteLink={openNoteLinkTarget}
+                selectedHighlightScope={notesHighlightScope}
+                showTargetedPanelToggle={showTargetedPanelToggle}
+                targetedPanelLeafId={targetedPanelLeafId}
+                onToggleTargetedPanel={(leafId) =>
+                  setTargetedPanelLeafId((current) => {
+                    const nextValue = current === leafId ? null : leafId;
+                    targetedPanelLeafIdRef.current = nextValue;
+                    return nextValue;
+                  })
+                }
                 moveLeafChapter={moveLeafChapter}
                 toggleChapterRead={toggleChapterRead}
                 updateSplitSize={updateSplitSize}
@@ -3664,10 +4142,10 @@ export function KJVReader() {
           />
         </SidebarInset>
 
-        {isStudyMode ? (
+        {sidebarAvailable ? (
           <Suspense fallback={null}>
             <LazyReaderStudySidebar
-              visible={isStudyMode}
+              visible={sidebarAvailable}
               activeTab={studyWorkspaceTab}
               accordionValue={concordanceAccordionValue}
               onAccordionValueChange={setConcordanceAccordionValue}
@@ -3844,8 +4322,10 @@ export function KJVReader() {
             onFlowVersesByParagraphChange={setFlowVersesByParagraph}
             tabsOrientation={tabsOrientation}
             onTabsOrientationChange={setTabsOrientation}
-            studyToolOpenTarget={studyToolOpenTarget}
-            onStudyToolOpenTargetChange={setStudyToolOpenTarget}
+            wordVerseSelectionTarget={wordVerseSelectionTarget}
+            onWordVerseSelectionTargetChange={setWordVerseSelectionTarget}
+            notesLinkOpenTarget={notesLinkOpenTarget}
+            onNotesLinkOpenTargetChange={setNotesLinkOpenTarget}
           />
         </Suspense>
       ) : null}

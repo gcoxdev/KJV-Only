@@ -25,6 +25,7 @@ import { Switch } from "@/components/ui/switch";
 type ReaderTopBarProps = {
   isStudyMode: boolean;
   isShareCopied: boolean;
+  showSidebarToggle: boolean;
   onStudyModeChange: (checked: boolean) => void;
   onOpenSearch: () => void;
   onShareLayout: () => void;
@@ -36,6 +37,7 @@ type ReaderTopBarProps = {
 export function ReaderTopBar({
   isStudyMode,
   isShareCopied,
+  showSidebarToggle,
   onStudyModeChange,
   onOpenSearch,
   onShareLayout,
@@ -122,7 +124,7 @@ export function ReaderTopBar({
             aria-label={isStudyMode ? "Switch to read mode" : "Switch to study mode"}
           />
         </div>
-        {isStudyMode ? (
+        {isStudyMode && showSidebarToggle ? (
           <SidebarTrigger className="border border-subtle-divider/70 bg-workspace-panel" />
         ) : null}
       </div>

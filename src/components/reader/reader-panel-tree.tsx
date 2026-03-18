@@ -24,11 +24,13 @@ import {
   HouseIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  CrosshairIcon,
   EraserIcon,
   EllipsisVerticalIcon,
   ExpandIcon,
   ExternalLinkIcon,
   HighlighterIcon,
+  LocateFixedIcon,
   MinimizeIcon,
   PauseIcon,
   PlayIcon,
@@ -64,6 +66,7 @@ import {
   panelViewportElement,
 } from "@/lib/reader-view";
 import type { VerseSearchIndexEntry } from "@/lib/search";
+import type { BookmarkScope } from "@/types/bookmarks";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 import { StaticPage } from "@/components/reader/static-page";
 import { StudyToolsPanel } from "@/components/reader/study-tools-panel";
@@ -98,7 +101,12 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import type { LeafNeighbors } from "@/lib/reader-neighbors";
-import type { NotesContext, NotesTabState, ReaderNote } from "@/types/notes";
+import type {
+  NoteLinkTarget,
+  NotesContext,
+  NotesTabState,
+  ReaderNote,
+} from "@/types/notes";
 
 type ExistingTabTarget = {
   id: string;
@@ -215,6 +223,11 @@ type ReaderPanelTreeProps = {
     patch: Partial<Pick<ReaderNote, "title" | "body" | "scope">>,
   ) => void;
   onDeleteNote: (noteId: string) => void;
+  onOpenNoteLink: (target: NoteLinkTarget) => void;
+  selectedHighlightScope: BookmarkScope | null;
+  showTargetedPanelToggle: boolean;
+  targetedPanelLeafId: string | null;
+  onToggleTargetedPanel: (leafId: string) => void;
   moveLeafChapter: (leafId: string, step: -1 | 1) => void;
   toggleChapterRead: (bookIndex: number, chapterIndex: number) => void;
   updateSplitSize: (splitId: string, ratio: number) => void;
@@ -310,6 +323,11 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   onCreateContextNote,
   onUpdateNote,
   onDeleteNote,
+  onOpenNoteLink,
+  selectedHighlightScope,
+  showTargetedPanelToggle,
+  targetedPanelLeafId,
+  onToggleTargetedPanel,
   moveLeafChapter,
   toggleChapterRead,
   highlightModeEnabledByLeafId,
@@ -641,6 +659,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
         );
       })()
     ) : null;
+  const isTargetedPanel = targetedPanelLeafId === leaf.id;
 
   return (
     <div
@@ -657,6 +676,23 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
       <Card className="flex h-full min-h-0 w-full min-w-0 flex-col rounded-none py-0">
         <CardHeader className="border-b p-2!">
           <div className="flex flex-wrap items-center gap-2">
+            {showTargetedPanelToggle ? (
+              <Button
+                type="button"
+                variant={isTargetedPanel ? "default" : "outline"}
+                size="icon-sm"
+                className={cn(
+                  "shrink-0",
+                  !isTargetedPanel && "text-muted-foreground",
+                )}
+                onClick={() => onToggleTargetedPanel(leaf.id)}
+                aria-label={
+                  isTargetedPanel ? "Clear targeted panel" : "Target this panel"
+                }
+              >
+                {isTargetedPanel ? <LocateFixedIcon /> : <CrosshairIcon />}
+              </Button>
+            ) : null}
             {leaf.view === "reader" && chapter ? (
               <>
                 <img
@@ -1086,6 +1122,17 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                     highlightedVerseRanges={
                       highlightedVerseRangesByLeafId[leaf.id] ?? null
                     }
+                    noteWordHighlight={
+                      notesContext?.word &&
+                      notesContext.bookIndex === leaf.bookIndex &&
+                      notesContext.chapterIndex === leaf.chapterIndex &&
+                      notesContext.verseNumber
+                        ? {
+                            verseNumber: notesContext.verseNumber,
+                            word: notesContext.word,
+                          }
+                        : null
+                    }
                     fontSize={fontSize}
                     verseSpacing={verseSpacing}
                     onOpenTokenDetails={(element, token, verseNumber, tokenIndex) =>
@@ -1429,12 +1476,14 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 books={books}
                 notes={notes}
                 context={notesContext}
+                selectedHighlightScope={selectedHighlightScope}
                 tabState={notesTabStateByLeafId[leaf.id] ?? null}
                 onTabStateChange={(patch) => onChangeNotesTabState(leaf.id, patch)}
                 onCreateGeneralNote={onCreateGeneralNote}
                 onCreateContextNote={onCreateContextNote}
                 onUpdateNote={onUpdateNote}
                 onDeleteNote={onDeleteNote}
+                onOpenNoteLink={onOpenNoteLink}
               />
             </Suspense>
           </CardContent>
@@ -1610,6 +1659,11 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   onCreateContextNote,
   onUpdateNote,
   onDeleteNote,
+  onOpenNoteLink,
+  selectedHighlightScope,
+  showTargetedPanelToggle,
+  targetedPanelLeafId,
+  onToggleTargetedPanel,
   moveLeafChapter,
   toggleChapterRead,
   updateSplitSize,
@@ -1681,6 +1735,11 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       onCreateContextNote={onCreateContextNote}
       onUpdateNote={onUpdateNote}
       onDeleteNote={onDeleteNote}
+      onOpenNoteLink={onOpenNoteLink}
+      selectedHighlightScope={selectedHighlightScope}
+      showTargetedPanelToggle={showTargetedPanelToggle}
+      targetedPanelLeafId={targetedPanelLeafId}
+      onToggleTargetedPanel={onToggleTargetedPanel}
       moveLeafChapter={moveLeafChapter}
       toggleChapterRead={toggleChapterRead}
       updateSplitSize={updateSplitSize}

@@ -1,6 +1,7 @@
 import { Fragment, memo, useMemo } from "react";
 
 import type { Verse, VerseToken } from "@/types/bible";
+import { normalizeConcordanceWord } from "@/lib/references";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -26,13 +27,18 @@ function renderToken(
   token: VerseToken,
   tokenIndex: number,
   isStudyMode: boolean,
+  isNoteWordHighlighted: boolean,
   onOpenDetails: (
     element: HTMLElement,
     token: VerseToken,
     tokenIndex: number,
   ) => void,
 ) {
-  const tokenClassName = cn(token.added && "italic");
+  const tokenClassName = cn(
+    token.added && "italic",
+    isNoteWordHighlighted &&
+      "rounded-sm bg-amber-200/80 px-0.5 py-0.5 text-amber-950 ring-1 ring-amber-500/60 dark:bg-amber-300/85 dark:text-amber-950 dark:ring-amber-200/70",
+  );
   const displayText = formatDisplayTokenText(token);
 
   if (!isStudyMode) {
@@ -65,6 +71,7 @@ function renderToken(
 function renderVerseTokens(
   tokens: VerseToken[],
   isStudyMode: boolean,
+  highlightedWord: string | null,
   onOpenDetails: (
     element: HTMLElement,
     token: VerseToken,
@@ -73,11 +80,23 @@ function renderVerseTokens(
 ) {
   return tokens.map((token, tokenIndex) => {
     const leadingSpace = tokenIndex > 0 && !isPunctuationToken(token.text);
+    const normalizedHighlightedWord = highlightedWord
+      ? normalizeConcordanceWord(highlightedWord).toLowerCase()
+      : "";
+    const isNoteWordHighlighted =
+      normalizedHighlightedWord.length > 0 &&
+      normalizeConcordanceWord(token.text).toLowerCase() === normalizedHighlightedWord;
 
     return (
       <Fragment key={`${token.text}-${tokenIndex}`}>
         {leadingSpace ? " " : null}
-        {renderToken(token, tokenIndex, isStudyMode, onOpenDetails)}
+        {renderToken(
+          token,
+          tokenIndex,
+          isStudyMode,
+          isNoteWordHighlighted,
+          onOpenDetails,
+        )}
       </Fragment>
     );
   });
@@ -94,6 +113,7 @@ type ChapterTextContentProps = {
   enableVerseSelection: boolean;
   highlightModeEnabled: boolean;
   highlightedVerseRanges?: Array<{ start: number; end: number }> | null;
+  noteWordHighlight?: { verseNumber: number; word: string } | null;
   fontSize: number;
   verseSpacing: number;
   onOpenTokenDetails: (
@@ -117,6 +137,7 @@ export const ChapterTextContent = memo(
     enableVerseSelection,
     highlightModeEnabled,
     highlightedVerseRanges,
+    noteWordHighlight,
     fontSize,
     verseSpacing,
     onOpenTokenDetails,
@@ -265,6 +286,9 @@ export const ChapterTextContent = memo(
                             {renderVerseTokens(
                               verse.tokens,
                               isStudyMode,
+                              noteWordHighlight?.verseNumber === verse.verse
+                                ? noteWordHighlight.word
+                                : null,
                               (element, token, tokenIndex) =>
                                 onOpenTokenDetails(
                                   element,
@@ -361,6 +385,9 @@ export const ChapterTextContent = memo(
                         {renderVerseTokens(
                           verse.tokens,
                           isStudyMode,
+                          noteWordHighlight?.verseNumber === verse.verse
+                            ? noteWordHighlight.word
+                            : null,
                           (element, token, tokenIndex) =>
                             onOpenTokenDetails(
                               element,
@@ -394,6 +421,8 @@ export const ChapterTextContent = memo(
       const other = next.highlightedVerseRanges?.[index];
       return other?.start === range.start && other.end === range.end;
     }) &&
+    prev.noteWordHighlight?.verseNumber === next.noteWordHighlight?.verseNumber &&
+    prev.noteWordHighlight?.word === next.noteWordHighlight?.word &&
     prev.fontSize === next.fontSize &&
     prev.verseSpacing === next.verseSpacing,
 );
