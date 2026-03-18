@@ -4679,6 +4679,9 @@ export function KJVReader() {
           canInstallPwa={deferredInstallPrompt !== null}
           isPwaInstalled={isPwaInstalled}
           onInstallPwa={installPwa}
+          renderReferencePreview={referencePreviewContent}
+          onOpenReference={openConcordanceReference}
+          onCloseSidebar={closeRightSidebarForMobile}
         />
       </div>
     );

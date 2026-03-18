@@ -269,6 +269,9 @@ type ReaderPanelTreeProps = {
   canInstallPwa: boolean;
   isPwaInstalled: boolean;
   onInstallPwa: () => void | Promise<void>;
+  renderReferencePreview: (reference: string, highlightWord: string) => ReactNode;
+  onOpenReference: (reference: string) => void;
+  onCloseSidebar: () => void;
 };
 
 type ReaderLeafPanelProps = Omit<ReaderPanelTreeProps, "root"> & {
@@ -364,6 +367,9 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   canInstallPwa,
   isPwaInstalled,
   onInstallPwa,
+  renderReferencePreview,
+  onOpenReference,
+  onCloseSidebar,
 }: ReaderLeafPanelProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -1565,6 +1571,9 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 canInstallPwa={canInstallPwa}
                 isPwaInstalled={isPwaInstalled}
                 onInstallPwa={onInstallPwa}
+                renderPreview={renderReferencePreview}
+                onOpenReference={onOpenReference}
+                onCloseSidebar={onCloseSidebar}
               />
             )}
           </CardContent>
@@ -1761,6 +1770,9 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   canInstallPwa,
   isPwaInstalled,
   onInstallPwa,
+  renderReferencePreview,
+  onOpenReference,
+  onCloseSidebar,
 }: ReaderPanelTreeProps) {
   const renderLeaf = (leaf: LeafNode) => (
     <ReaderLeafPanel
@@ -1846,6 +1858,9 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       canInstallPwa={canInstallPwa}
       isPwaInstalled={isPwaInstalled}
       onInstallPwa={onInstallPwa}
+      renderReferencePreview={renderReferencePreview}
+      onOpenReference={onOpenReference}
+      onCloseSidebar={onCloseSidebar}
     />
   );
 
