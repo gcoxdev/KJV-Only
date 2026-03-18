@@ -188,6 +188,7 @@ type ReaderPanelTreeProps = {
   verseSpacing: number;
   onOpenTokenDetails: (
     element: HTMLElement,
+    leafId: string,
     token: VerseToken,
     bookIndex: number,
     chapterIndex: number,
@@ -211,6 +212,11 @@ type ReaderPanelTreeProps = {
   ) => void;
   notes: ReaderNote[];
   notesContext: NotesContext | null;
+  activeReaderWordHighlight: {
+    leafId: string;
+    verseNumber: number;
+    word: string;
+  } | null;
   notesTabStateByLeafId: Record<string, NotesTabState>;
   onChangeNotesTabState: (
     leafId: string,
@@ -315,6 +321,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   onOpenSearchResult,
   notes,
   notesContext,
+  activeReaderWordHighlight,
   notesTabStateByLeafId,
   onChangeNotesTabState,
   searchPageStateByLeafId,
@@ -1123,13 +1130,10 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                       highlightedVerseRangesByLeafId[leaf.id] ?? null
                     }
                     noteWordHighlight={
-                      notesContext?.word &&
-                      notesContext.bookIndex === leaf.bookIndex &&
-                      notesContext.chapterIndex === leaf.chapterIndex &&
-                      notesContext.verseNumber
+                      activeReaderWordHighlight?.leafId === leaf.id
                         ? {
-                            verseNumber: notesContext.verseNumber,
-                            word: notesContext.word,
+                            verseNumber: activeReaderWordHighlight.verseNumber,
+                            word: activeReaderWordHighlight.word,
                           }
                         : null
                     }
@@ -1138,6 +1142,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                     onOpenTokenDetails={(element, token, verseNumber, tokenIndex) =>
                       onOpenTokenDetails(
                         element,
+                        leaf.id,
                         token,
                         leaf.bookIndex,
                         leaf.chapterIndex,
@@ -1651,6 +1656,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   onOpenSearchResult,
   notes,
   notesContext,
+  activeReaderWordHighlight,
   notesTabStateByLeafId,
   onChangeNotesTabState,
   searchPageStateByLeafId,
@@ -1727,6 +1733,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       onOpenSearchResult={onOpenSearchResult}
       notes={notes}
       notesContext={notesContext}
+      activeReaderWordHighlight={activeReaderWordHighlight}
       notesTabStateByLeafId={notesTabStateByLeafId}
       onChangeNotesTabState={onChangeNotesTabState}
       searchPageStateByLeafId={searchPageStateByLeafId}
