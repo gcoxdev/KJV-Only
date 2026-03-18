@@ -289,6 +289,31 @@ function isDedicatedLeafViewTab(
   return tab.root.type === "leaf" && tab.root.view === view;
 }
 
+function buildLeafHistoryEntry(leaf: LeafNode) {
+  return {
+    view: leaf.view,
+    bookIndex: leaf.bookIndex,
+    chapterIndex: leaf.chapterIndex,
+    pickerTestament: leaf.pickerTestament,
+    pickerBookIndex: leaf.pickerBookIndex,
+    pageId: leaf.pageId,
+  };
+}
+
+function leafHistoryEntryEquals(
+  left: ReturnType<typeof buildLeafHistoryEntry>,
+  right: ReturnType<typeof buildLeafHistoryEntry>,
+) {
+  return (
+    left.view === right.view &&
+    left.bookIndex === right.bookIndex &&
+    left.chapterIndex === right.chapterIndex &&
+    left.pickerTestament === right.pickerTestament &&
+    left.pickerBookIndex === right.pickerBookIndex &&
+    left.pageId === right.pageId
+  );
+}
+
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -315,7 +340,24 @@ export function KJVReader() {
     verseNumber: number;
     word: string;
   } | null>(null);
+  const [leafHistoryByLeafId, setLeafHistoryByLeafId] = useState<
+    Record<
+      string,
+      {
+        entries: Array<{
+          view: LeafNode["view"];
+          bookIndex: number;
+          chapterIndex: number;
+          pickerTestament: LeafNode["pickerTestament"];
+          pickerBookIndex: number | null;
+          pageId: LeafNode["pageId"];
+        }>;
+        index: number;
+      }
+    >
+  >({});
   const targetedPanelLeafIdRef = useRef<string | null>(null);
+  const pendingLeafHistoryNavigationRef = useRef<Set<string>>(new Set());
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [sidebarCloseRequestKey, setSidebarCloseRequestKey] = useState(0);
   const [isCompletionCelebrationOpen, setIsCompletionCelebrationOpen] =
@@ -655,6 +697,63 @@ export function KJVReader() {
 
   useEffect(() => {
     tabsRef.current = tabs;
+  }, [tabs]);
+
+  useEffect(() => {
+    const leafEntries = new Map<
+      string,
+      ReturnType<typeof buildLeafHistoryEntry>
+    >();
+
+    for (const tab of tabs) {
+      for (const leafId of collectLeafIds(tab.root)) {
+        const leaf = findLeafNode(tab.root, leafId);
+        if (!leaf) {
+          continue;
+        }
+        leafEntries.set(leafId, buildLeafHistoryEntry(leaf));
+      }
+    }
+
+    setLeafHistoryByLeafId((current) => {
+      let changed = false;
+      const next: typeof current = {};
+
+      for (const [leafId, entry] of leafEntries) {
+        const existing = current[leafId];
+        if (!existing) {
+          next[leafId] = { entries: [entry], index: 0 };
+          changed = true;
+          continue;
+        }
+
+        const currentEntry = existing.entries[existing.index];
+        if (currentEntry && leafHistoryEntryEquals(currentEntry, entry)) {
+          next[leafId] = existing;
+          continue;
+        }
+
+        if (pendingLeafHistoryNavigationRef.current.has(leafId)) {
+          pendingLeafHistoryNavigationRef.current.delete(leafId);
+          next[leafId] = { ...existing };
+          continue;
+        }
+
+        next[leafId] = {
+          entries: [...existing.entries.slice(0, existing.index + 1), entry],
+          index: existing.index + 1,
+        };
+        changed = true;
+      }
+
+      for (const leafId of Object.keys(current)) {
+        if (!leafEntries.has(leafId)) {
+          changed = true;
+        }
+      }
+
+      return changed ? next : current;
+    });
   }, [tabs]);
 
   useEffect(() => {
@@ -1863,6 +1962,44 @@ export function KJVReader() {
       }
     });
   }, [clearLeafHighlights, setSelectedHighlightScope, updateActiveTab]);
+
+  const navigateLeafHistory = useCallback(
+    (leafId: string, direction: -1 | 1) => {
+      const history = leafHistoryByLeafId[leafId];
+      if (!history) {
+        return;
+      }
+
+      const nextIndex = history.index + direction;
+      if (nextIndex < 0 || nextIndex >= history.entries.length) {
+        return;
+      }
+
+      const entry = history.entries[nextIndex];
+      pendingLeafHistoryNavigationRef.current.add(leafId);
+      setLeafHistoryByLeafId((current) => ({
+        ...current,
+        [leafId]: {
+          ...history,
+          index: nextIndex,
+        },
+      }));
+      updateLeafLocation(leafId, {
+        view: entry.view,
+        bookIndex: entry.bookIndex,
+        chapterIndex: entry.chapterIndex,
+        pickerTestament: entry.pickerTestament,
+        pickerBookIndex: entry.pickerBookIndex,
+      });
+      updateActiveTab((tab) => ({
+        ...tab,
+        root: updateLeafNode(tab.root, leafId, {
+          pageId: entry.pageId,
+        }),
+      }));
+    },
+    [leafHistoryByLeafId, updateActiveTab, updateLeafLocation],
+  );
 
   function moveLeafChapter(leafId: string, direction: -1 | 1) {
     if (!activeTab) {
@@ -4150,6 +4287,20 @@ export function KJVReader() {
                     targetedPanelLeafIdRef.current = nextValue;
                     return nextValue;
                   })
+                }
+                canGoLeafHistoryBack={(leafId) =>
+                  (leafHistoryByLeafId[leafId]?.index ?? 0) > 0
+                }
+                canGoLeafHistoryForward={(leafId) => {
+                  const history = leafHistoryByLeafId[leafId];
+                  if (!history) {
+                    return false;
+                  }
+                  return history.index < history.entries.length - 1;
+                }}
+                onGoLeafHistoryBack={(leafId) => navigateLeafHistory(leafId, -1)}
+                onGoLeafHistoryForward={(leafId) =>
+                  navigateLeafHistory(leafId, 1)
                 }
                 moveLeafChapter={moveLeafChapter}
                 toggleChapterRead={toggleChapterRead}
