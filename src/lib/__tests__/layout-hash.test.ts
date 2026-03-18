@@ -56,6 +56,7 @@ describe("layout hash", () => {
       tabs,
       activeTabId: "tab-2",
       tabsOrientation: "vertical",
+      targetedPanelLeafId: "leaf-1",
       highlightedVerseRangesByLeafId: {
         "leaf-1": [
           { start: 3, end: 5 },
@@ -68,7 +69,7 @@ describe("layout hash", () => {
     expect(hash).toContain("#tab=1");
     expect(hash).toContain("tabs=v");
     expect(hash).toContain("Main%20Study");
-    expect(hash).toContain("GEN.1.3-5,9,11-12");
+    expect(hash).toContain("GEN.1.3-5,9,11-12*");
 
     const parsed = parseLayoutHash(hash);
     expect(parsed).not.toBeNull();
@@ -76,6 +77,12 @@ describe("layout hash", () => {
     expect(parsed?.tabsOrientation).toBe("vertical");
     expect(parsed?.tabs.map((tab) => tab.title)).toEqual(["Main Study", "Notes"]);
     expect(parsed?.tabs[0]?.root.type).toBe("split");
+    expect(parsed?.targetedPanelLeafId).toBe(
+      parsed?.tabs[0]?.root.type === "split" &&
+        parsed.tabs[0].root.first.type === "leaf"
+        ? parsed.tabs[0].root.first.id
+        : null,
+    );
     expect(Object.values(parsed?.highlightedVerseRangesByLeafId ?? {})).toContainEqual([
       { start: 3, end: 5 },
       { start: 9, end: 9 },
@@ -152,5 +159,38 @@ describe("layout hash", () => {
         ? parsed.tabs[0].root.second.view
         : null,
     ).toBe("tools");
+  });
+
+  it("preserves a targeted non-reader leaf via * marker", () => {
+    const tabs: ReaderTab[] = [
+      {
+        id: "tab-tools",
+        title: "Workspace",
+        root: {
+          id: "leaf-tools",
+          type: "leaf",
+          view: "tools",
+          bookIndex: 0,
+          chapterIndex: 0,
+          pickerTestament: null,
+          pickerBookIndex: null,
+          pageId: null,
+        },
+      },
+    ];
+
+    const hash = serializeLayoutHash({
+      tabs,
+      activeTabId: "tab-tools",
+      tabsOrientation: "horizontal",
+      targetedPanelLeafId: "leaf-tools",
+    });
+
+    expect(hash).toContain("Workspace:tools*");
+
+    const parsed = parseLayoutHash(hash);
+    expect(parsed?.targetedPanelLeafId).toBe(
+      parsed?.tabs[0]?.root.type === "leaf" ? parsed.tabs[0].root.id : null,
+    );
   });
 });

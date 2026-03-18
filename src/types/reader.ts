@@ -202,6 +202,11 @@ export type WordVerseSelectionTarget =
   | "new-panel"
   | "targeted-panel";
 export type NotesLinkOpenTarget = "new-tab" | "new-panel" | "targeted-panel";
+export type SearchResultOpenTarget =
+  | "new-tab"
+  | "new-panel"
+  | "targeted-panel";
+export type BookmarkOpenTarget = "new-tab" | "new-panel" | "targeted-panel";
 
 export type PanelDirection = "left" | "right" | "up" | "down";
 export type SplitOrientation = "horizontal" | "vertical";

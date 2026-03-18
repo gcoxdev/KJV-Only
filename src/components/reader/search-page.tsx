@@ -867,7 +867,7 @@ export function SearchPage({
       "[data-slot='scroll-area-viewport']",
     );
     viewport?.scrollTo({ top: 0, behavior: "auto" });
-  }, [activePage]);
+  }, [activePage, results]);
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-1.5 p-2">
