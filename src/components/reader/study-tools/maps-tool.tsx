@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode, useMemo } from "react";
-import { EarthIcon, LoaderCircleIcon } from "lucide-react";
+import { LoaderCircleIcon, MapIcon } from "lucide-react";
 
 import { type AncientMapEntry } from "@/lib/maps";
 import { cn } from "@/lib/utils";
@@ -111,7 +111,7 @@ export function MapsTool({
       <AccordionTrigger
         className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
       >
-        <EarthIcon />
+        <MapIcon />
         Maps
       </AccordionTrigger>
       <AccordionContent className="space-y-2 overflow-visible">

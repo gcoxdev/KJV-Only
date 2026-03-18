@@ -37,8 +37,8 @@ let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
 let ancientMapPromise: Promise<AncientMapPayload> | null = null;
 const mapGeoJsonPromiseCache = new Map<string, Promise<MapGeoJsonPayload>>();
-const GENEALOGY_ASSET_VERSION = "20260312-philip-fix-1";
-const STRONGS_ASSET_VERSION = "20260313-derivation-links-2";
+export const GENEALOGY_ASSET_VERSION = "20260312-philip-fix-1";
+export const STRONGS_ASSET_VERSION = "20260313-derivation-links-2";
 
 function parseBooks(input: unknown): Book[] | null {
   if (Array.isArray(input)) {
