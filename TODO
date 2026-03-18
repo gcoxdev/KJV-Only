@@ -4,8 +4,7 @@
 
 - Maybe make infinite scrolling for chapters possible, always have loaded prev, current, next
 
-* If the "Selected Word" option is used then highlight the selected word in the reader. It should be a different highlight than the standard highlight or it won't be seen.
-
-
 * make sidebar override on mobile setting option
 * make selections targeted / not shared
+* keep tab states persisted, changing tabs resets
+* panels need history with back/forward buttons
