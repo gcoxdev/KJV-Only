@@ -255,16 +255,6 @@ const COMPLETION_CELEBRATION_VERSES = [
   },
 ] satisfies ReadonlyArray<{ reference: string; text: string }>;
 
-const LazySettingsDialog = lazy(async () => {
-  const module = await import("@/components/reader/settings-dialog");
-  return { default: module.SettingsDialog };
-});
-
-const LazyProgressDialog = lazy(async () => {
-  const module = await import("@/components/reader/progress-dialog");
-  return { default: module.ProgressDialog };
-});
-
 const LazyGenealogyTreeDialog = lazy(async () => {
   const module = await import("@/components/reader/genealogy-tree-dialog");
   return { default: module.GenealogyTreeDialog };
@@ -391,15 +381,11 @@ export function KJVReader() {
     isStudyMode,
     tabsOrientation,
     isRightSidebarOpen,
-    isSettingsOpen,
-    isProgressOpen,
     isGenealogyTreeOpen,
     genealogyTreePersonId,
     setIsStudyMode,
     setTabsOrientation,
     setIsRightSidebarOpen,
-    setIsSettingsOpen,
-    setIsProgressOpen,
     setIsGenealogyTreeOpen,
     setGenealogyTreePersonId,
   } = useReaderShellState();
@@ -2098,7 +2084,6 @@ export function KJVReader() {
       },
     ]);
     setActiveTabId(nextTabId);
-    setIsProgressOpen(false);
     requestAnimationFrame(() => {
       tabEndRef.current?.scrollIntoView({
         behavior: "smooth",
@@ -2932,7 +2917,6 @@ export function KJVReader() {
       ]);
       queueVerseHighlight(nextLeaf.id, { start: verseStart, end: verseEnd });
       setActiveTabId(nextTabId);
-      setIsProgressOpen(false);
       requestAnimationFrame(() => {
         tabEndRef.current?.scrollIntoView({
           behavior: "smooth",
@@ -2944,7 +2928,6 @@ export function KJVReader() {
     [
       clearAllVerseHighlights,
       queueVerseHighlight,
-      setIsProgressOpen,
       setSelectedHighlightScope,
       tabsOrientation,
     ],
@@ -4476,6 +4459,45 @@ export function KJVReader() {
     onUpdateBookmark: updateBookmark,
     onDeleteBookmark: deleteBookmark,
   };
+  const settingsPanelProps = {
+    theme,
+    onThemeChange: setTheme,
+    fontSize,
+    onIncreaseFontSize: () => setFontSize((current) => current + 4),
+    onDecreaseFontSize: () => setFontSize((current) => Math.max(8, current - 4)),
+    onResetFontSize: () => setFontSize(16),
+    highlightColor,
+    onHighlightColorChange: (value: string) =>
+      setHighlightColor(normalizeHighlightColor(value)),
+    onResetHighlightColor: () => setHighlightColor(defaultHighlightColor()),
+    verseSpacing,
+    onVerseSpacingChange: setVerseSpacing,
+    hideReadModeVerseNumbers,
+    onHideReadModeVerseNumbersChange: setHideReadModeVerseNumbers,
+    readModeParagraphIndent,
+    onReadModeParagraphIndentChange: setReadModeParagraphIndent,
+    flowVersesByParagraph,
+    onFlowVersesByParagraphChange: setFlowVersesByParagraph,
+    tabsOrientation,
+    onTabsOrientationChange: setTabsOrientation,
+    wordVerseSelectionTarget,
+    onWordVerseSelectionTargetChange: setWordVerseSelectionTarget,
+    notesLinkOpenTarget,
+    onNotesLinkOpenTargetChange: setNotesLinkOpenTarget,
+    searchResultOpenTarget,
+    onSearchResultOpenTargetChange: setSearchResultOpenTarget,
+    bookmarkOpenTarget,
+    onBookmarkOpenTargetChange: setBookmarkOpenTarget,
+  };
+  const progressPanelProps = {
+    totalProgressPercent,
+    progressByTestament,
+    onSetAllTestamentChaptersRead: setAllTestamentChaptersRead,
+    onSetAllBookChaptersRead: setAllBookChaptersRead,
+    onOpenChapterInNewTab: openChapterInNewTab,
+    onToggleChapterRead: toggleChapterRead,
+    onResetAllProgress: resetAllProgress,
+  };
 
   const bookPickerDialogLeaf =
     bookPickerDialogLeafId && activeTab
@@ -4594,6 +4616,8 @@ export function KJVReader() {
             ...sharedStudyToolsProps,
           }}
           bookmarksPanelProps={sharedBookmarksProps}
+          settingsPanelProps={settingsPanelProps}
+          progressPanelProps={progressPanelProps}
         />
       </div>
     );
@@ -4634,8 +4658,8 @@ export function KJVReader() {
             onStudyModeChange={setIsStudyMode}
             onOpenSearch={openSearchTab}
             onShareLayout={shareLayout}
-            onOpenProgress={() => setIsProgressOpen(true)}
-            onOpenSettings={() => setIsSettingsOpen(true)}
+            onOpenProgress={() => openStaticPageTab("progress")}
+            onOpenSettings={() => openStaticPageTab("settings")}
             onOpenPage={openStaticPageTab}
           />
 
@@ -4796,64 +4820,6 @@ export function KJVReader() {
             onValueChange={onRenameValueChange}
             onCancel={onRenameCancel}
             onConfirm={confirmRenameTab}
-          />
-        </Suspense>
-      ) : null}
-
-      {isSettingsOpen ? (
-        <Suspense fallback={null}>
-          <LazySettingsDialog
-            open={isSettingsOpen}
-            onOpenChange={setIsSettingsOpen}
-            theme={theme}
-            onThemeChange={setTheme}
-            fontSize={fontSize}
-            onIncreaseFontSize={() => setFontSize((current) => current + 4)}
-            onDecreaseFontSize={() =>
-              setFontSize((current) => Math.max(8, current - 4))
-            }
-            onResetFontSize={() => setFontSize(16)}
-            highlightColor={highlightColor}
-            onHighlightColorChange={(value) =>
-              setHighlightColor(normalizeHighlightColor(value))
-            }
-            onResetHighlightColor={() =>
-              setHighlightColor(defaultHighlightColor())
-            }
-            verseSpacing={verseSpacing}
-            onVerseSpacingChange={setVerseSpacing}
-            hideReadModeVerseNumbers={hideReadModeVerseNumbers}
-            onHideReadModeVerseNumbersChange={setHideReadModeVerseNumbers}
-            readModeParagraphIndent={readModeParagraphIndent}
-            onReadModeParagraphIndentChange={setReadModeParagraphIndent}
-            flowVersesByParagraph={flowVersesByParagraph}
-            onFlowVersesByParagraphChange={setFlowVersesByParagraph}
-            tabsOrientation={tabsOrientation}
-            onTabsOrientationChange={setTabsOrientation}
-            wordVerseSelectionTarget={wordVerseSelectionTarget}
-            onWordVerseSelectionTargetChange={setWordVerseSelectionTarget}
-            notesLinkOpenTarget={notesLinkOpenTarget}
-            onNotesLinkOpenTargetChange={setNotesLinkOpenTarget}
-            searchResultOpenTarget={searchResultOpenTarget}
-            onSearchResultOpenTargetChange={setSearchResultOpenTarget}
-            bookmarkOpenTarget={bookmarkOpenTarget}
-            onBookmarkOpenTargetChange={setBookmarkOpenTarget}
-          />
-        </Suspense>
-      ) : null}
-
-      {isProgressOpen ? (
-        <Suspense fallback={null}>
-          <LazyProgressDialog
-            open={isProgressOpen}
-            onOpenChange={setIsProgressOpen}
-            totalProgressPercent={totalProgressPercent}
-            progressByTestament={progressByTestament}
-            onSetAllTestamentChaptersRead={setAllTestamentChaptersRead}
-            onSetAllBookChaptersRead={setAllBookChaptersRead}
-            onOpenChapterInNewTab={openChapterInNewTab}
-            onToggleChapterRead={toggleChapterRead}
-            onResetAllProgress={resetAllProgress}
           />
         </Suspense>
       ) : null}

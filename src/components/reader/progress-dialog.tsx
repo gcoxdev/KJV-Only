@@ -49,9 +49,7 @@ type ProgressByTestament = {
   total: { read: number; total: number };
 };
 
-type ProgressDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+export type ProgressPanelContentProps = {
   totalProgressPercent: number;
   progressByTestament: ProgressByTestament;
   onSetAllTestamentChaptersRead: (testament: "old" | "new", read: boolean) => void;
@@ -61,9 +59,12 @@ type ProgressDialogProps = {
   onResetAllProgress: () => void;
 };
 
-export function ProgressDialog({
-  open,
-  onOpenChange,
+type ProgressDialogProps = ProgressPanelContentProps & {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
+
+export function ProgressPanelContent({
   totalProgressPercent,
   progressByTestament,
   onSetAllTestamentChaptersRead,
@@ -71,6 +72,182 @@ export function ProgressDialog({
   onOpenChapterInNewTab,
   onToggleChapterRead,
   onResetAllProgress,
+}: ProgressPanelContentProps) {
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="min-h-0 flex-1 space-y-3 overflow-auto pr-1 text-sm">
+        <Progress value={totalProgressPercent} className="w-full">
+          <ProgressLabel className="font-semibold">Whole Bible</ProgressLabel>
+          <ProgressValue>
+            {() =>
+              `${progressByTestament.total.read}/${progressByTestament.total.total} (${totalProgressPercent}%)`
+            }
+          </ProgressValue>
+        </Progress>
+
+        <Accordion className="w-full rounded-md border px-3" multiple defaultValue={[]}>
+          {[progressByTestament.old, progressByTestament.new].map((testament) => {
+            const testamentPercent =
+              testament.total > 0
+                ? Math.round((testament.read / testament.total) * 100)
+                : 0;
+            const testamentCode = testament.label.startsWith("Old") ? "OT" : "NT";
+            const testamentIconSrc = iconPath(
+              testamentPercent === 100 ? "color" : "bw",
+              testamentCode,
+            );
+
+            return (
+              <AccordionItem key={testament.label} value={testament.label} className="w-full">
+                <AccordionTrigger className="w-full">
+                  <div className="flex w-full items-center gap-3">
+                    <img
+                      src={testamentIconSrc}
+                      alt={`${testament.label} icon`}
+                      className="size-10 shrink-0"
+                    />
+                    <Progress value={testamentPercent} className="w-full">
+                      <ProgressLabel>{testament.label}</ProgressLabel>
+                      <ProgressValue>
+                        {() =>
+                          `${testament.read}/${testament.total} (${testamentPercent}%)`
+                        }
+                      </ProgressValue>
+                    </Progress>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3">
+                  <Accordion className="w-full rounded-md border px-2" multiple defaultValue={[]}>
+                    {testament.books.map((book) => {
+                      const bookPercent =
+                        book.total > 0
+                          ? Math.round((book.read / book.total) * 100)
+                          : 0;
+                      const bookIconSrc = iconPath(
+                        bookPercent === 100 ? "color" : "bw",
+                        bookCodeForIndex(book.bookIndex),
+                      );
+
+                      return (
+                        <AccordionItem
+                          key={book.name}
+                          value={`${testament.label}-${book.name}`}
+                          className="w-full"
+                        >
+                          <AccordionTrigger className="w-full px-1">
+                            <div className="flex w-full items-center gap-3">
+                              <img
+                                src={bookIconSrc}
+                                alt={`${book.name} icon`}
+                                className="size-10 shrink-0"
+                              />
+                              <Progress value={bookPercent} className="w-full">
+                                <ProgressLabel className="text-xs">{book.name}</ProgressLabel>
+                                <ProgressValue className="text-xs">
+                                  {() => `${book.read}/${book.total} (${bookPercent}%)`}
+                                </ProgressValue>
+                              </Progress>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="space-y-2 px-1">
+                            <div className="space-y-1">
+                              {book.chapters.map((chapter) => (
+                                <div
+                                  key={`${book.name}-${chapter.chapterNumber}`}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="flex-1 justify-start"
+                                    onClick={() =>
+                                      onOpenChapterInNewTab(
+                                        book.bookIndex,
+                                        chapter.chapterIndex,
+                                      )
+                                    }
+                                  >
+                                    {`Chapter ${chapter.chapterNumber}`}
+                                  </Button>
+                                  <Button
+                                    variant={chapter.read ? "secondary" : "outline"}
+                                    size="sm"
+                                    onClick={() =>
+                                      onToggleChapterRead(
+                                        book.bookIndex,
+                                        chapter.chapterIndex,
+                                      )
+                                    }
+                                  >
+                                    {chapter.read ? <BookOpenIcon /> : <BookOpenCheckIcon />}
+                                    {chapter.read ? "Read" : "Mark Read"}
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="flex justify-end">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  onSetAllBookChaptersRead(
+                                    book.bookIndex,
+                                    book.read !== book.total,
+                                  )
+                                }
+                              >
+                                {book.read === book.total
+                                  ? "Mark all incomplete"
+                                  : "Mark all complete"}
+                              </Button>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      );
+                    })}
+                  </Accordion>
+                  <div className="flex justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        onSetAllTestamentChaptersRead(
+                          testamentCode === "OT" ? "old" : "new",
+                          testament.read !== testament.total,
+                        )
+                      }
+                    >
+                      {testament.read === testament.total
+                        ? "Mark testament incomplete"
+                        : "Mark testament complete"}
+                    </Button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
+      </div>
+      <div className="flex justify-end pt-3">
+        <Button
+          variant="outline"
+          onClick={() => {
+            if (window.confirm("Reset all reading progress?")) {
+              onResetAllProgress();
+            }
+          }}
+        >
+          Reset Progress
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export function ProgressDialog({
+  open,
+  onOpenChange,
+  ...props
 }: ProgressDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -81,170 +258,8 @@ export function ProgressDialog({
             Track chapter completion across the whole Bible.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="max-h-[65vh] space-y-3 overflow-auto pr-1 text-sm">
-          <Progress value={totalProgressPercent} className="w-full">
-            <ProgressLabel className="font-semibold">Whole Bible</ProgressLabel>
-            <ProgressValue>
-              {() =>
-                `${progressByTestament.total.read}/${progressByTestament.total.total} (${totalProgressPercent}%)`
-              }
-            </ProgressValue>
-          </Progress>
-
-          <Accordion className="w-full rounded-md border px-3" multiple defaultValue={[]}>
-            {[progressByTestament.old, progressByTestament.new].map((testament) => {
-              const testamentPercent =
-                testament.total > 0
-                  ? Math.round((testament.read / testament.total) * 100)
-                  : 0;
-              const testamentCode = testament.label.startsWith("Old") ? "OT" : "NT";
-              const testamentIconSrc = iconPath(
-                testamentPercent === 100 ? "color" : "bw",
-                testamentCode,
-              );
-
-              return (
-                <AccordionItem key={testament.label} value={testament.label} className="w-full">
-                  <AccordionTrigger className="w-full">
-                    <div className="flex w-full items-center gap-3">
-                      <img
-                        src={testamentIconSrc}
-                        alt={`${testament.label} icon`}
-                        className="size-10 shrink-0"
-                      />
-                      <Progress value={testamentPercent} className="w-full">
-                        <ProgressLabel>{testament.label}</ProgressLabel>
-                        <ProgressValue>
-                          {() =>
-                            `${testament.read}/${testament.total} (${testamentPercent}%)`
-                          }
-                        </ProgressValue>
-                      </Progress>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-3">
-                    <Accordion className="w-full rounded-md border px-2" multiple defaultValue={[]}>
-                      {testament.books.map((book) => {
-                        const bookPercent =
-                          book.total > 0
-                            ? Math.round((book.read / book.total) * 100)
-                            : 0;
-                        const bookIconSrc = iconPath(
-                          bookPercent === 100 ? "color" : "bw",
-                          bookCodeForIndex(book.bookIndex),
-                        );
-
-                        return (
-                          <AccordionItem
-                            key={book.name}
-                            value={`${testament.label}-${book.name}`}
-                            className="w-full"
-                          >
-                            <AccordionTrigger className="w-full px-1">
-                              <div className="flex w-full items-center gap-3">
-                                <img
-                                  src={bookIconSrc}
-                                  alt={`${book.name} icon`}
-                                  className="size-10 shrink-0"
-                                />
-                                <Progress value={bookPercent} className="w-full">
-                                  <ProgressLabel className="text-xs">{book.name}</ProgressLabel>
-                                  <ProgressValue className="text-xs">
-                                    {() => `${book.read}/${book.total} (${bookPercent}%)`}
-                                  </ProgressValue>
-                                </Progress>
-                              </div>
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-2 px-1">
-                              <div className="space-y-1">
-                                {book.chapters.map((chapter) => (
-                                  <div
-                                    key={`${book.name}-${chapter.chapterNumber}`}
-                                    className="flex items-center gap-2"
-                                  >
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="flex-1 justify-start"
-                                      onClick={() =>
-                                        onOpenChapterInNewTab(
-                                          book.bookIndex,
-                                          chapter.chapterIndex,
-                                        )
-                                      }
-                                    >
-                                      {`Chapter ${chapter.chapterNumber}`}
-                                    </Button>
-                                    <Button
-                                      variant={chapter.read ? "secondary" : "outline"}
-                                      size="sm"
-                                      onClick={() =>
-                                        onToggleChapterRead(
-                                          book.bookIndex,
-                                          chapter.chapterIndex,
-                                        )
-                                      }
-                                    >
-                                      {chapter.read ? <BookOpenIcon /> : <BookOpenCheckIcon />}
-                                      {chapter.read ? "Read" : "Mark Read"}
-                                    </Button>
-                                  </div>
-                                ))}
-                              </div>
-                              <div className="flex justify-end">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    onSetAllBookChaptersRead(
-                                      book.bookIndex,
-                                      book.read !== book.total,
-                                    )
-                                  }
-                                >
-                                  {book.read === book.total
-                                    ? "Mark all incomplete"
-                                    : "Mark all complete"}
-                                </Button>
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        );
-                      })}
-                    </Accordion>
-                    <div className="flex justify-end">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          onSetAllTestamentChaptersRead(
-                            testamentCode === "OT" ? "old" : "new",
-                            testament.read !== testament.total,
-                          )
-                        }
-                      >
-                        {testament.read === testament.total
-                          ? "Mark testament incomplete"
-                          : "Mark testament complete"}
-                      </Button>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            })}
-          </Accordion>
-        </div>
+        <ProgressPanelContent {...props} />
         <AlertDialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => {
-              if (window.confirm("Reset all reading progress?")) {
-                onResetAllProgress();
-              }
-            }}
-          >
-            Reset Progress
-          </Button>
           <AlertDialogAction onClick={() => onOpenChange(false)}>
             Close
           </AlertDialogAction>

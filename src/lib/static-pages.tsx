@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  ChartBarIcon,
   BadgeHelpIcon,
   ChurchIcon,
   CoinsIcon,
@@ -10,6 +11,7 @@ import {
   InfoIcon,
   LibraryBigIcon,
   ScrollTextIcon,
+  SettingsIcon,
   SparklesIcon,
 } from "lucide-react";
 
@@ -33,6 +35,32 @@ export type StaticPageDefinition = {
 };
 
 export const STATIC_PAGES: StaticPageDefinition[] = [
+  {
+    id: "settings",
+    title: "Settings",
+    menuLabel: "Settings",
+    icon: SettingsIcon,
+    content: {
+      eyebrow: "Preferences",
+      heading: "Settings",
+      paragraphs: [
+        "Reader preferences for this device.",
+      ],
+    },
+  },
+  {
+    id: "progress",
+    title: "Reading Progress",
+    menuLabel: "Reading Progress",
+    icon: ChartBarIcon,
+    content: {
+      eyebrow: "Reading",
+      heading: "Reading Progress",
+      paragraphs: [
+        "Track chapter completion across the whole Bible.",
+      ],
+    },
+  },
   {
     id: "saved",
     title: "How to Get Saved",

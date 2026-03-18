@@ -40,9 +40,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 
-type SettingsDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+export type SettingsPanelContentProps = {
   theme: "light" | "dark";
   onThemeChange: (theme: "light" | "dark") => void;
   fontSize: number;
@@ -72,9 +70,12 @@ type SettingsDialogProps = {
   onBookmarkOpenTargetChange: (target: BookmarkOpenTarget) => void;
 };
 
-export function SettingsDialog({
-  open,
-  onOpenChange,
+type SettingsDialogProps = SettingsPanelContentProps & {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
+
+export function SettingsPanelContent({
   theme,
   onThemeChange,
   fontSize,
@@ -102,7 +103,7 @@ export function SettingsDialog({
   onSearchResultOpenTargetChange,
   bookmarkOpenTarget,
   onBookmarkOpenTargetChange,
-}: SettingsDialogProps) {
+}: SettingsPanelContentProps) {
   const [draftHighlightColor, setDraftHighlightColor] = useState(highlightColor);
   const wordVerseSelectionTargetLabel =
     wordVerseSelectionTarget === "sidebar"
@@ -150,26 +151,15 @@ export function SettingsDialog({
   }, [draftHighlightColor, highlightColor, onHighlightColorChange]);
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent
-        size="sm"
-        className="flex max-h-[calc(100vh-1.5rem)] flex-col gap-2 overflow-hidden"
+    <Tabs defaultValue="visual" className="flex h-full min-h-0 flex-col overflow-hidden">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="visual">Visual</TabsTrigger>
+        <TabsTrigger value="targeting">Targeting</TabsTrigger>
+      </TabsList>
+      <TabsContent
+        value="visual"
+        className="mt-3 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-2"
       >
-        <AlertDialogHeader>
-          <AlertDialogTitle>Settings</AlertDialogTitle>
-          <AlertDialogDescription>
-            Reader preferences for this device.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <Tabs defaultValue="visual" className="min-h-0 flex-1 overflow-hidden">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="visual">Visual</TabsTrigger>
-            <TabsTrigger value="targeting">Targeting</TabsTrigger>
-          </TabsList>
-          <TabsContent
-            value="visual"
-            className="mt-3 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-2"
-          >
             <div className="space-y-3">
               <div className="flex min-w-0 items-center justify-between gap-3">
                 <Label htmlFor="theme-mode">Dark Mode</Label>
@@ -246,7 +236,7 @@ export function SettingsDialog({
               </div>
               <div className="space-y-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">
-                  <Label htmlFor="verse-spacing">Verse Spacing</Label>
+                  <Label htmlFor="verse-spacing">Line Spacing</Label>
                   <span className="text-xs text-muted-foreground">{verseSpacing}px</span>
                 </div>
                 <Slider
@@ -298,11 +288,11 @@ export function SettingsDialog({
                 />
               </div>
             </div>
-          </TabsContent>
-          <TabsContent
-            value="targeting"
-            className="mt-3 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-2"
-          >
+      </TabsContent>
+      <TabsContent
+        value="targeting"
+        className="mt-3 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-2"
+      >
             <div className="space-y-3">
               <div className="space-y-2">
                 <div className="flex min-w-0 items-center justify-between gap-3">
@@ -419,8 +409,29 @@ export function SettingsDialog({
                 </Select>
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
+      </TabsContent>
+    </Tabs>
+  );
+}
+
+export function SettingsDialog({
+  open,
+  onOpenChange,
+  ...props
+}: SettingsDialogProps) {
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent
+        size="sm"
+        className="flex max-h-[calc(100vh-1.5rem)] flex-col gap-2 overflow-hidden"
+      >
+        <AlertDialogHeader>
+          <AlertDialogTitle>Settings</AlertDialogTitle>
+          <AlertDialogDescription>
+            Reader preferences for this device.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <SettingsPanelContent {...props} />
         <AlertDialogFooter className="group-data-[size=sm]/alert-dialog-content:flex group-data-[size=sm]/alert-dialog-content:flex-row group-data-[size=sm]/alert-dialog-content:justify-end justify-end sm:flex sm:justify-end">
           <AlertDialogAction onClick={() => onOpenChange(false)} className="w-auto">
             Close
