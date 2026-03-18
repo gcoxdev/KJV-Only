@@ -1560,6 +1560,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
               </div>
             ) : (
               <StaticPage
+                books={books}
                 pageId={leaf.pageId}
                 canInstallPwa={canInstallPwa}
                 isPwaInstalled={isPwaInstalled}
