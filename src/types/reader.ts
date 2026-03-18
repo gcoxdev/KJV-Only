@@ -196,7 +196,12 @@ export type StudyWorkspaceTool =
   | "maps"
   | "genealogy"
   | "hitchcocks";
-export type StudyToolOpenTarget = "sidebar" | "panel" | "tab";
+export type WordVerseSelectionTarget =
+  | "sidebar"
+  | "new-tab"
+  | "new-panel"
+  | "targeted-panel";
+export type NotesLinkOpenTarget = "new-tab" | "new-panel" | "targeted-panel";
 
 export type PanelDirection = "left" | "right" | "up" | "down";
 export type SplitOrientation = "horizontal" | "vertical";

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { migrateNoteBodyInternalLinks } from "@/lib/note-links";
 import { noteMatchesContext } from "@/lib/notes";
 import { createId, findLeafNode, collectLeafIds } from "@/lib/reader-layout";
 import type { NotesContext, NotesTabState, ReaderNote } from "@/types/notes";
@@ -26,7 +27,12 @@ export function useReaderNotes({ activeTab }: UseReaderNotesArgs) {
       if (!Array.isArray(parsed)) {
         return;
       }
-      setReaderNotes(parsed);
+      setReaderNotes(
+        parsed.map((note) => ({
+          ...note,
+          body: migrateNoteBodyInternalLinks(note.body),
+        })),
+      );
     } catch {
       // Ignore invalid stored notes payloads.
     }
