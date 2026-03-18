@@ -1,8 +1,10 @@
+import { DownloadPage } from "@/components/reader/download-page";
 import { getStaticPage } from "@/lib/static-pages";
-import { Button } from "@/components/ui/button";
+import type { Book } from "@/types/bible";
 import type { StaticPageId } from "@/types/reader";
 
 type StaticPageProps = {
+  books: Book[];
   pageId: StaticPageId | null;
   canInstallPwa?: boolean;
   isPwaInstalled?: boolean;
@@ -10,6 +12,7 @@ type StaticPageProps = {
 };
 
 export function StaticPage({
+  books,
   pageId,
   canInstallPwa = false,
   isPwaInstalled = false,
@@ -42,35 +45,12 @@ export function StaticPage({
             <p key={`${page.id}-paragraph-${index}`}>{paragraph}</p>
           ))}
           {page.id === "download" ? (
-            <div className="rounded-xl border border-border/70 bg-card/70 p-4">
-              <div className="flex flex-col gap-2">
-                <p className="text-sm font-medium leading-6 text-foreground">
-                  Install the app on this device
-                </p>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  Use the browser install prompt to add the app for quicker
-                  offline access and a more native experience.
-                </p>
-                <div className="flex flex-wrap items-center gap-3 pt-1">
-                  <Button
-                    type="button"
-                    disabled={!canInstallPwa || isPwaInstalled}
-                    onClick={() => {
-                      void onInstallPwa?.();
-                    }}
-                  >
-                    Install App
-                  </Button>
-                  <p className="text-xs leading-5 text-muted-foreground">
-                    {isPwaInstalled
-                      ? "Already installed on this device."
-                      : canInstallPwa
-                        ? "Install is available in this browser."
-                        : "This browser has not exposed an install prompt for this session. On Android or Brave, use the browser menu and choose Install app or Add to Home screen."}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <DownloadPage
+              books={books}
+              canInstallPwa={canInstallPwa}
+              isPwaInstalled={isPwaInstalled}
+              onInstallPwa={onInstallPwa}
+            />
           ) : null}
           {page.content.links ? (
             <div className="flex flex-col gap-3 pt-2">
