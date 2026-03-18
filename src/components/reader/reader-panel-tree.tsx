@@ -160,7 +160,6 @@ type ReaderPanelTreeProps = {
   panelElementRefs: RefObject<Record<string, HTMLDivElement | null>>;
   clearAllPanelPreviews: () => void;
   updateLeafLocation: (leafId: string, patch: LeafLocationPatch) => void;
-  setBookPickerDialogLeafId: (leafId: string | null) => void;
   toggleFullscreenLeaf: (leafId: string) => Promise<void>;
   toggleParentGroupOrientation: (leafId: string) => void;
   setOrientationPreviewTarget: (leafId: string) => void;
@@ -299,7 +298,6 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   panelElementRefs,
   clearAllPanelPreviews,
   updateLeafLocation,
-  setBookPickerDialogLeafId,
   toggleFullscreenLeaf,
   toggleParentGroupOrientation,
   setOrientationPreviewTarget,
@@ -652,13 +650,17 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
     clearAllPanelPreviews();
   };
 
-  const openBookPickerDialog = () => {
+  const openBookPickerPanelHome = () => {
+    const isReaderContext = leaf.view === "reader";
     const isOldTestament = leaf.bookIndex < 39;
     updateLeafLocation(leaf.id, {
-      pickerTestament: isOldTestament ? "old" : "new",
-      pickerBookIndex: leaf.bookIndex,
+      view: "picker",
+      pickerTestament:
+        leaf.pickerTestament ??
+        (isReaderContext ? (isOldTestament ? "old" : "new") : null),
+      pickerBookIndex:
+        leaf.pickerBookIndex ?? (isReaderContext ? leaf.bookIndex : null),
     });
-    setBookPickerDialogLeafId(leaf.id);
   };
 
   const panelHeaderIcon =
@@ -730,7 +732,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   variant="outline"
                   size="sm"
                   className="w-auto max-w-full justify-start px-2"
-                  onClick={openBookPickerDialog}
+                  onClick={openBookPickerPanelHome}
                 >
                   {`${book?.name ?? "Book"} ${chapter.chapter}`}
                 </Button>
@@ -807,11 +809,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => {
-                        updateLeafLocation(leaf.id, {
-                          view: "picker",
-                          pickerTestament: null,
-                          pickerBookIndex: null,
-                        });
+                        openBookPickerPanelHome();
                         closePanelMenu();
                       }}
                     >
@@ -1612,8 +1610,16 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 books={books}
                 selectedTestament={leaf.pickerTestament}
                 selectedBookIndex={leaf.pickerBookIndex}
-                currentBookIndex={leaf.view === "picker" ? null : leaf.bookIndex}
-                currentChapterIndex={leaf.view === "picker" ? null : leaf.chapterIndex}
+                currentBookIndex={
+                  leaf.pickerTestament !== null || leaf.pickerBookIndex !== null
+                    ? leaf.bookIndex
+                    : null
+                }
+                currentChapterIndex={
+                  leaf.pickerTestament !== null || leaf.pickerBookIndex !== null
+                    ? leaf.chapterIndex
+                    : null
+                }
                 onSelectTestament={(testament) =>
                   updateLeafLocation(leaf.id, {
                     pickerTestament: testament,
@@ -1678,7 +1684,6 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   panelElementRefs,
   clearAllPanelPreviews,
   updateLeafLocation,
-  setBookPickerDialogLeafId,
   toggleFullscreenLeaf,
   toggleParentGroupOrientation,
   setOrientationPreviewTarget,
@@ -1761,7 +1766,6 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       panelElementRefs={panelElementRefs}
       clearAllPanelPreviews={clearAllPanelPreviews}
       updateLeafLocation={updateLeafLocation}
-      setBookPickerDialogLeafId={setBookPickerDialogLeafId}
       toggleFullscreenLeaf={toggleFullscreenLeaf}
       toggleParentGroupOrientation={toggleParentGroupOrientation}
       setOrientationPreviewTarget={setOrientationPreviewTarget}
