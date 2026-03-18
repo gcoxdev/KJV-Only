@@ -146,11 +146,6 @@ const LazyMapAndPhotoDialogs = lazy(async () => {
   return { default: module.MapAndPhotoDialogs };
 });
 
-const LazyBookPickerDialog = lazy(async () => {
-  const module = await import("@/components/reader/book-picker-dialog");
-  return { default: module.BookPickerDialog };
-});
-
 const LazyRenameTabDialog = lazy(async () => {
   const module = await import("@/components/reader/rename-tab-dialog");
   return { default: module.RenameTabDialog };
@@ -397,9 +392,6 @@ export function KJVReader() {
   const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(
     null,
   );
-  const [bookPickerDialogLeafId, setBookPickerDialogLeafId] = useState<
-    string | null
-  >(null);
   const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
   const [concordanceWordAccordionValue, setConcordanceWordAccordionValue] =
     useState<string[]>([]);
@@ -4499,14 +4491,6 @@ export function KJVReader() {
     onResetAllProgress: resetAllProgress,
   };
 
-  const bookPickerDialogLeaf =
-    bookPickerDialogLeafId && activeTab
-      ? findLeafNode(activeTab.root, bookPickerDialogLeafId)
-      : null;
-  const isBookPickerDialogOpen = Boolean(
-    bookPickerDialogLeafId && bookPickerDialogLeaf,
-  );
-
   const mountedTabPanels = tabs.map((tab) => {
     const isActive = tab.id === activeTabId;
     return (
@@ -4532,7 +4516,6 @@ export function KJVReader() {
           panelElementRefs={panelElementRefs}
           clearAllPanelPreviews={clearAllPanelPreviews}
           updateLeafLocation={updateLeafLocation}
-          setBookPickerDialogLeafId={setBookPickerDialogLeafId}
           toggleFullscreenLeaf={toggleFullscreenLeaf}
           toggleParentGroupOrientation={toggleParentGroupOrientation}
           setOrientationPreviewTarget={setOrientationPreviewTarget}
@@ -4738,74 +4721,6 @@ export function KJVReader() {
             mapDialogGeoJson={mapDialogGeoJson}
             onMapDialogOpenChange={onMapDialogOpenChange}
             onCloseMapDialog={onCloseMapDialog}
-          />
-        </Suspense>
-      ) : null}
-
-      {isBookPickerDialogOpen ? (
-        <Suspense fallback={null}>
-          <LazyBookPickerDialog
-            open={isBookPickerDialogOpen}
-            books={books}
-            leaf={bookPickerDialogLeaf}
-            onClose={() => {
-              setBookPickerDialogLeafId(null);
-            }}
-            onSelectTestament={(testament) => {
-              if (!bookPickerDialogLeaf) {
-                return;
-              }
-              updateLeafLocation(bookPickerDialogLeaf.id, {
-                pickerTestament: testament,
-                pickerBookIndex: null,
-              });
-            }}
-            onBackToTestaments={() => {
-              if (!bookPickerDialogLeaf) {
-                return;
-              }
-              updateLeafLocation(bookPickerDialogLeaf.id, {
-                pickerTestament: null,
-                pickerBookIndex: null,
-              });
-            }}
-            onSelectBook={(bookIndex) => {
-              if (!bookPickerDialogLeaf) {
-                return;
-              }
-              updateLeafLocation(bookPickerDialogLeaf.id, {
-                pickerBookIndex: bookIndex,
-              });
-            }}
-            onGoToBookSelection={(testament) => {
-              if (!bookPickerDialogLeaf) {
-                return;
-              }
-              updateLeafLocation(bookPickerDialogLeaf.id, {
-                pickerTestament: testament,
-                pickerBookIndex: null,
-              });
-            }}
-            onGoToChapterSelection={(testament, bookIndex) => {
-              if (!bookPickerDialogLeaf) {
-                return;
-              }
-              updateLeafLocation(bookPickerDialogLeaf.id, {
-                pickerTestament: testament,
-                pickerBookIndex: bookIndex,
-              });
-            }}
-            onSelectChapter={(bookIndex, chapterIndex) => {
-              if (!bookPickerDialogLeaf) {
-                return;
-              }
-              updateLeafLocation(bookPickerDialogLeaf.id, {
-                bookIndex,
-                chapterIndex,
-                view: "reader",
-              });
-              setBookPickerDialogLeafId(null);
-            }}
           />
         </Suspense>
       ) : null}
