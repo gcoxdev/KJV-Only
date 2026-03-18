@@ -17,7 +17,11 @@ import {
   AArrowUpIcon,
   RotateCcwIcon,
 } from "lucide-react";
-import type { StudyToolOpenTarget, TabsOrientation } from "@/types/reader";
+import type {
+  NotesLinkOpenTarget,
+  TabsOrientation,
+  WordVerseSelectionTarget,
+} from "@/types/reader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,8 +54,10 @@ type SettingsDialogProps = {
   onFlowVersesByParagraphChange: (checked: boolean) => void;
   tabsOrientation: TabsOrientation;
   onTabsOrientationChange: (orientation: TabsOrientation) => void;
-  studyToolOpenTarget: StudyToolOpenTarget;
-  onStudyToolOpenTargetChange: (target: StudyToolOpenTarget) => void;
+  wordVerseSelectionTarget: WordVerseSelectionTarget;
+  onWordVerseSelectionTargetChange: (target: WordVerseSelectionTarget) => void;
+  notesLinkOpenTarget: NotesLinkOpenTarget;
+  onNotesLinkOpenTargetChange: (target: NotesLinkOpenTarget) => void;
 };
 
 export function SettingsDialog({
@@ -76,16 +82,26 @@ export function SettingsDialog({
   onFlowVersesByParagraphChange,
   tabsOrientation,
   onTabsOrientationChange,
-  studyToolOpenTarget,
-  onStudyToolOpenTargetChange,
+  wordVerseSelectionTarget,
+  onWordVerseSelectionTargetChange,
+  notesLinkOpenTarget,
+  onNotesLinkOpenTargetChange,
 }: SettingsDialogProps) {
   const [draftHighlightColor, setDraftHighlightColor] = useState(highlightColor);
-  const studyToolTargetLabel =
-    studyToolOpenTarget === "sidebar"
+  const wordVerseSelectionTargetLabel =
+    wordVerseSelectionTarget === "sidebar"
       ? "Sidebar"
-      : studyToolOpenTarget === "panel"
-        ? "Panel"
-        : "Tab";
+      : wordVerseSelectionTarget === "new-tab"
+        ? "New Tab"
+        : wordVerseSelectionTarget === "new-panel"
+          ? "New Panel"
+          : "Targeted Panel";
+  const notesLinkTargetLabel =
+    notesLinkOpenTarget === "new-tab"
+      ? "New Tab"
+      : notesLinkOpenTarget === "new-panel"
+        ? "New Panel"
+        : "Targeted Panel";
 
   useEffect(() => {
     setDraftHighlightColor(highlightColor);
@@ -246,25 +262,59 @@ export function SettingsDialog({
           </div>
           <div className="space-y-2 border-t pt-3">
             <div className="flex min-w-0 items-center justify-between gap-3">
-              <Label htmlFor="tool-open-target">Word / Verse Tool Open Target</Label>
+              <Label htmlFor="word-verse-selection-target">Word / Verse Selection Target</Label>
             </div>
             <Select
-              value={studyToolOpenTarget}
+              value={wordVerseSelectionTarget}
               onValueChange={(value) => {
-                if (value === "sidebar" || value === "panel" || value === "tab") {
-                  onStudyToolOpenTargetChange(value);
+                if (
+                  value === "sidebar" ||
+                  value === "new-tab" ||
+                  value === "new-panel" ||
+                  value === "targeted-panel"
+                ) {
+                  onWordVerseSelectionTargetChange(value);
                 }
               }}
             >
-              <SelectTrigger id="tool-open-target" className="w-full">
+              <SelectTrigger id="word-verse-selection-target" className="w-full">
                 <SelectValue placeholder="Sidebar">
-                  {studyToolTargetLabel}
+                  {wordVerseSelectionTargetLabel}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="sidebar">Sidebar</SelectItem>
-                <SelectItem value="panel">Panel</SelectItem>
-                <SelectItem value="tab">Tab</SelectItem>
+                <SelectItem value="new-tab">New Tab</SelectItem>
+                <SelectItem value="new-panel">New Panel</SelectItem>
+                <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2 border-t pt-3">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <Label htmlFor="notes-link-target">Notes Link Target</Label>
+            </div>
+            <Select
+              value={notesLinkOpenTarget}
+              onValueChange={(value) => {
+                if (
+                  value === "new-tab" ||
+                  value === "new-panel" ||
+                  value === "targeted-panel"
+                ) {
+                  onNotesLinkOpenTargetChange(value);
+                }
+              }}
+            >
+              <SelectTrigger id="notes-link-target" className="w-full">
+                <SelectValue placeholder="New Panel">
+                  {notesLinkTargetLabel}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="new-tab">New Tab</SelectItem>
+                <SelectItem value="new-panel">New Panel</SelectItem>
+                <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
               </SelectContent>
             </Select>
           </div>

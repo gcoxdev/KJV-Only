@@ -5,6 +5,37 @@ export type NotesContext = {
   word?: string;
 };
 
+export type NoteLinkTarget =
+  | { type: "chapter"; bookIndex: number; chapterIndex: number }
+  | {
+      type: "verse";
+      bookIndex: number;
+      chapterIndex: number;
+      verseNumber: number;
+    }
+  | {
+      type: "selection";
+      bookIndex: number;
+      chapterIndex: number;
+      ranges: Array<{ start: number; end: number }>;
+    }
+  | {
+      type: "word";
+      bookIndex: number;
+      chapterIndex: number;
+      verseNumber: number;
+      word: string;
+    };
+
+export type ParsedBibleReference =
+  | { type: "chapter"; bookIndex: number; chapterIndex: number }
+  | {
+      type: "verse";
+      bookIndex: number;
+      chapterIndex: number;
+      verseNumber: number;
+    };
+
 export type NoteScope =
   | { type: "general" }
   | { type: "book"; bookIndex: number }

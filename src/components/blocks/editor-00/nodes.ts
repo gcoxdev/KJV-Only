@@ -6,6 +6,7 @@ import {
   TextNode,
 } from "lexical"
 import type { Klass, LexicalNode, LexicalNodeReplacement } from "lexical"
+import { KjvInternalLinkNode } from "@/components/editor/nodes/kjv-internal-link-node"
 
 export const nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> =
   [
@@ -17,4 +18,5 @@ export const nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> =
     ListItemNode,
     LinkNode,
     AutoLinkNode,
+    KjvInternalLinkNode,
   ]

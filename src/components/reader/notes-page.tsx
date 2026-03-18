@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
+  Code2Icon,
   ExpandIcon,
   MinimizeIcon,
   PanelTopIcon,
@@ -13,15 +14,6 @@ import {
 } from "lucide-react";
 import type { SerializedEditorState } from "lexical";
 
-import type { Book } from "@/types/bible";
-import type {
-  NotesContext,
-  NotesTabFilter,
-  NotesTabState,
-  NoteScope,
-  ReaderNote,
-} from "@/types/notes";
-import { contextLabel, noteMatchesContext, noteScopeLabel } from "@/lib/notes";
 import { Editor } from "@/components/blocks/editor-00/editor";
 import {
   AlertDialog,
@@ -37,12 +29,26 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import type { Book } from "@/types/bible";
+import type { BookmarkScope } from "@/types/bookmarks";
+import { contextLabel, noteMatchesContext, noteScopeLabel } from "@/lib/notes";
+import { parseNoteLinkHref } from "@/lib/note-links";
+import type {
+  NoteLinkTarget,
+  NotesContext,
+  NotesTabFilter,
+  NotesTabState,
+  NoteScope,
+  ReaderNote,
+} from "@/types/notes";
 
 type NotesPageProps = {
   books: Book[];
   notes: ReaderNote[];
   context: NotesContext | null;
+  selectedHighlightScope: BookmarkScope | null;
   tabState: NotesTabState | null;
   onTabStateChange: (patch: Partial<NotesTabState>) => void;
   onCreateGeneralNote: () => string;
@@ -52,6 +58,7 @@ type NotesPageProps = {
     patch: Partial<Pick<ReaderNote, "title" | "body" | "scope">>,
   ) => void;
   onDeleteNote: (noteId: string) => void;
+  onOpenNoteLink: (target: NoteLinkTarget) => void;
 };
 
 function createPlainTextSerializedState(text: string): SerializedEditorState {
@@ -111,7 +118,9 @@ function formatNoteDateTime(timestamp: number) {
 
 function toChapterScope(note: ReaderNote, context: NotesContext | null): NoteScope | null {
   if (note.scope.type === "general") {
-    if (!context) return null;
+    if (!context) {
+      return null;
+    }
     return {
       type: "chapter",
       bookIndex: context.bookIndex,
@@ -139,7 +148,9 @@ function scopeSummary(scope: NoteScope, books: Book[]) {
 }
 
 function scopeFromContext(context: NotesContext | null): NoteScope | null {
-  if (!context) return null;
+  if (!context) {
+    return null;
+  }
   if (context.word) {
     return {
       type: "word",
@@ -164,20 +175,26 @@ function scopeFromContext(context: NotesContext | null): NoteScope | null {
   };
 }
 
+function serializedStateToBody(editorSerializedState: SerializedEditorState | undefined) {
+  return JSON.stringify(editorSerializedState ?? createPlainTextSerializedState(""));
+}
+
 export function NotesPage({
   books,
   notes,
   context,
+  selectedHighlightScope,
   tabState,
   onTabStateChange,
   onCreateGeneralNote,
   onCreateContextNote,
   onUpdateNote,
   onDeleteNote,
+  onOpenNoteLink,
 }: NotesPageProps) {
   const filter: NotesTabFilter = tabState?.filter ?? "all";
   const selectedNoteId = tabState?.selectedNoteId ?? null;
-  const pageContext = tabState?.context ?? context;
+  const pageContext = context ?? tabState?.context ?? null;
 
   const filteredNotes = useMemo(() => {
     if (filter === "general") {
@@ -199,26 +216,34 @@ export function NotesPage({
   const [isEditing, setIsEditing] = useState(false);
   const [draftTitle, setDraftTitle] = useState("");
   const [draftBody, setDraftBody] = useState<SerializedEditorState | undefined>(undefined);
+  const [draftSourceBody, setDraftSourceBody] = useState("");
+  const [isSourceMode, setIsSourceMode] = useState(false);
   const [isNotesListCollapsed, setIsNotesListCollapsed] = useState(false);
   const [isEditorFullscreen, setIsEditorFullscreen] = useState(false);
   const [showEditorTools, setShowEditorTools] = useState(true);
-  const pageRef = useRef<HTMLDivElement | null>(null);
   const [isCompactLayout, setIsCompactLayout] = useState(false);
+  const [pageElement, setPageElement] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!selectedNote) {
       setIsEditing(false);
       setDraftTitle("");
       setDraftBody(undefined);
+      setDraftSourceBody("");
+      setIsSourceMode(false);
       return;
     }
+
+    const nextDraftBody = parseSerializedState(selectedNote.body);
     setDraftTitle(selectedNote.title);
-    setDraftBody(parseSerializedState(selectedNote.body));
+    setDraftBody(nextDraftBody);
+    setDraftSourceBody(selectedNote.body);
     setIsEditing(isNewNote(selectedNote));
+    setIsSourceMode(false);
   }, [selectedNote?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const element = pageRef.current;
+    const element = pageElement;
     if (!element || typeof ResizeObserver === "undefined") {
       return;
     }
@@ -232,7 +257,7 @@ export function NotesPage({
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [pageElement]);
 
   useEffect(() => {
     if (isCompactLayout) {
@@ -243,15 +268,60 @@ export function NotesPage({
     setIsNotesListCollapsed(false);
   }, [isCompactLayout, selectedNote]);
 
+  const serializedDraftBody = useMemo(
+    () => serializedStateToBody(draftBody),
+    [draftBody],
+  );
+
   const hasDraftChanges =
     selectedNote !== null &&
     (draftTitle !== selectedNote.title ||
-      JSON.stringify(draftBody ?? null) !==
-        JSON.stringify(parseSerializedState(selectedNote.body) ?? null));
+      (isSourceMode ? draftSourceBody : serializedDraftBody) !== selectedNote.body);
+
+  const sourceModeButtonLabel = isSourceMode ? "Show rich text editor" : "Show note source";
+
+  const saveCurrentNote = () => {
+    if (!selectedNote) {
+      return;
+    }
+
+    const nextBody = isSourceMode ? draftSourceBody : serializedDraftBody;
+    onUpdateNote(selectedNote.id, {
+      title: draftTitle,
+      body: nextBody,
+    });
+    setIsEditing(false);
+    setIsSourceMode(false);
+  };
+
+  const cancelEditing = () => {
+    if (!selectedNote) {
+      return;
+    }
+    const nextDraftBody = parseSerializedState(selectedNote.body);
+    setDraftTitle(selectedNote.title);
+    setDraftBody(nextDraftBody);
+    setDraftSourceBody(selectedNote.body);
+    setIsEditing(false);
+    setIsSourceMode(false);
+    setShowEditorTools(true);
+  };
+
+  const toggleSourceMode = () => {
+    setIsSourceMode((current) => {
+      const next = !current;
+      if (next) {
+        setDraftSourceBody(isEditing ? serializedDraftBody : selectedNote?.body ?? "");
+      } else if (isEditing) {
+        setDraftBody(parseSerializedState(draftSourceBody));
+      }
+      return next;
+    });
+  };
 
   return (
     <div
-      ref={pageRef}
+      ref={setPageElement}
       className={cn(
         "grid h-full min-h-0 gap-3 p-2",
         isCompactLayout ? "grid-cols-1" : "grid-cols-[22rem_minmax(0,1fr)]",
@@ -401,6 +471,16 @@ export function NotesPage({
                     {selectedNote.title || "Untitled note"}
                   </div>
                 )}
+                <Button
+                  type="button"
+                  variant={isSourceMode ? "default" : "outline"}
+                  size="icon-sm"
+                  onClick={toggleSourceMode}
+                  aria-label={sourceModeButtonLabel}
+                  title={sourceModeButtonLabel}
+                >
+                  <Code2Icon />
+                </Button>
                 {isEditing ? (
                   <>
                     <Button
@@ -425,14 +505,7 @@ export function NotesPage({
                       type="button"
                       variant="outline"
                       size="icon-sm"
-                      onClick={() => {
-                        if (!selectedNote) return;
-                        onUpdateNote(selectedNote.id, {
-                          title: draftTitle,
-                          body: JSON.stringify(draftBody ?? createPlainTextSerializedState("")),
-                        });
-                        setIsEditing(false);
-                      }}
+                      onClick={saveCurrentNote}
                       disabled={!hasDraftChanges}
                       aria-label="Save note"
                     >
@@ -442,13 +515,7 @@ export function NotesPage({
                       type="button"
                       variant="outline"
                       size="icon-sm"
-                      onClick={() => {
-                        if (!selectedNote) return;
-                        setDraftTitle(selectedNote.title);
-                        setDraftBody(parseSerializedState(selectedNote.body));
-                        setIsEditing(false);
-                        setShowEditorTools(true);
-                      }}
+                      onClick={cancelEditing}
                       aria-label="Cancel editing"
                     >
                       <XIcon />
@@ -471,6 +538,7 @@ export function NotesPage({
                       size="icon-sm"
                       onClick={() => {
                         setIsEditing(true);
+                        setDraftSourceBody(selectedNote.body);
                         setShowEditorTools(true);
                       }}
                       aria-label="Edit note"
@@ -522,7 +590,9 @@ export function NotesPage({
                         className="h-6 px-1.5 text-[11px]"
                         onClick={() => {
                           const nextScope = toChapterScope(selectedNote, pageContext);
-                          if (!nextScope) return;
+                          if (!nextScope) {
+                            return;
+                          }
                           onUpdateNote(selectedNote.id, { scope: nextScope });
                         }}
                         disabled={!toChapterScope(selectedNote, pageContext)}
@@ -537,7 +607,9 @@ export function NotesPage({
                         className="h-6 px-1.5 text-[11px]"
                         onClick={() => {
                           const nextScope = scopeFromContext(pageContext);
-                          if (!nextScope) return;
+                          if (!nextScope) {
+                            return;
+                          }
                           onUpdateNote(selectedNote.id, { scope: nextScope });
                         }}
                         disabled={!scopeFromContext(pageContext)}
@@ -569,18 +641,42 @@ export function NotesPage({
               </div>
             </div>
             <div className="min-h-0 flex-1 p-2">
-              <Editor
-                key={`${selectedNote.id}-${isEditing ? "edit" : "view"}`}
-                editorSerializedState={isEditing ? draftBody : parseSerializedState(selectedNote.body)}
-                readOnly={!isEditing}
-                showToolbar={isEditing && showEditorTools}
-                autoFocus={isEditing}
-                onSerializedChange={(editorSerializedState) => {
-                  if (isEditing) {
-                    setDraftBody(editorSerializedState);
+              {isSourceMode ? (
+                <Textarea
+                  className="h-full min-h-full resize-none font-mono text-xs"
+                  readOnly={!isEditing}
+                  value={isEditing ? draftSourceBody : selectedNote.body}
+                  onChange={(event) => setDraftSourceBody(event.currentTarget.value)}
+                />
+              ) : (
+                <Editor
+                  key={`${selectedNote.id}-${isEditing ? "edit" : "view"}`}
+                  editorSerializedState={
+                    isEditing ? draftBody : parseSerializedState(selectedNote.body)
                   }
-                }}
-              />
+                  readOnly={!isEditing}
+                  showToolbar={isEditing && showEditorTools}
+                  autoFocus={isEditing}
+                  internalLinking={{
+                    books,
+                    mode: "notes",
+                    context: pageContext,
+                    highlightScope: selectedHighlightScope,
+                  }}
+                  onInternalLinkClick={(href) => {
+                    const target = parseNoteLinkHref(href);
+                    if (target) {
+                      onOpenNoteLink(target);
+                    }
+                  }}
+                  onSerializedChange={(editorSerializedState) => {
+                    if (isEditing) {
+                      setDraftBody(editorSerializedState);
+                      setDraftSourceBody(JSON.stringify(editorSerializedState));
+                    }
+                  }}
+                />
+              )}
             </div>
           </>
         ) : (
