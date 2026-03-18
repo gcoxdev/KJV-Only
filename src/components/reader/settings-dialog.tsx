@@ -18,7 +18,9 @@ import {
   RotateCcwIcon,
 } from "lucide-react";
 import type {
+  BookmarkOpenTarget,
   NotesLinkOpenTarget,
+  SearchResultOpenTarget,
   TabsOrientation,
   WordVerseSelectionTarget,
 } from "@/types/reader";
@@ -58,6 +60,10 @@ type SettingsDialogProps = {
   onWordVerseSelectionTargetChange: (target: WordVerseSelectionTarget) => void;
   notesLinkOpenTarget: NotesLinkOpenTarget;
   onNotesLinkOpenTargetChange: (target: NotesLinkOpenTarget) => void;
+  searchResultOpenTarget: SearchResultOpenTarget;
+  onSearchResultOpenTargetChange: (target: SearchResultOpenTarget) => void;
+  bookmarkOpenTarget: BookmarkOpenTarget;
+  onBookmarkOpenTargetChange: (target: BookmarkOpenTarget) => void;
 };
 
 export function SettingsDialog({
@@ -86,6 +92,10 @@ export function SettingsDialog({
   onWordVerseSelectionTargetChange,
   notesLinkOpenTarget,
   onNotesLinkOpenTargetChange,
+  searchResultOpenTarget,
+  onSearchResultOpenTargetChange,
+  bookmarkOpenTarget,
+  onBookmarkOpenTargetChange,
 }: SettingsDialogProps) {
   const [draftHighlightColor, setDraftHighlightColor] = useState(highlightColor);
   const wordVerseSelectionTargetLabel =
@@ -100,6 +110,18 @@ export function SettingsDialog({
     notesLinkOpenTarget === "new-tab"
       ? "New Tab"
       : notesLinkOpenTarget === "new-panel"
+        ? "New Panel"
+        : "Targeted Panel";
+  const searchResultTargetLabel =
+    searchResultOpenTarget === "new-tab"
+      ? "New Tab"
+      : searchResultOpenTarget === "new-panel"
+        ? "New Panel"
+        : "Targeted Panel";
+  const bookmarkTargetLabel =
+    bookmarkOpenTarget === "new-tab"
+      ? "New Tab"
+      : bookmarkOpenTarget === "new-panel"
         ? "New Panel"
         : "Targeted Panel";
 
@@ -309,6 +331,62 @@ export function SettingsDialog({
               <SelectTrigger id="notes-link-target" className="w-full">
                 <SelectValue placeholder="New Panel">
                   {notesLinkTargetLabel}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="new-tab">New Tab</SelectItem>
+                <SelectItem value="new-panel">New Panel</SelectItem>
+                <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2 border-t pt-3">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <Label htmlFor="search-result-target">Search Result Target</Label>
+            </div>
+            <Select
+              value={searchResultOpenTarget}
+              onValueChange={(value) => {
+                if (
+                  value === "new-tab" ||
+                  value === "new-panel" ||
+                  value === "targeted-panel"
+                ) {
+                  onSearchResultOpenTargetChange(value);
+                }
+              }}
+            >
+              <SelectTrigger id="search-result-target" className="w-full">
+                <SelectValue placeholder="New Panel">
+                  {searchResultTargetLabel}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="new-tab">New Tab</SelectItem>
+                <SelectItem value="new-panel">New Panel</SelectItem>
+                <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2 border-t pt-3">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <Label htmlFor="bookmark-target">Bookmark Target</Label>
+            </div>
+            <Select
+              value={bookmarkOpenTarget}
+              onValueChange={(value) => {
+                if (
+                  value === "new-tab" ||
+                  value === "new-panel" ||
+                  value === "targeted-panel"
+                ) {
+                  onBookmarkOpenTargetChange(value);
+                }
+              }}
+            >
+              <SelectTrigger id="bookmark-target" className="w-full">
+                <SelectValue placeholder="New Panel">
+                  {bookmarkTargetLabel}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>

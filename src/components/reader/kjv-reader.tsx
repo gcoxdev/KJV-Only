@@ -88,6 +88,7 @@ import type {
   PanelNode,
   ReaderTab,
   SearchPageState,
+  SearchResultOpenTarget,
   SplitOrientation,
   StrongsPayload,
   StudyWorkspaceTool,
@@ -99,6 +100,7 @@ import type {
   WebstersPayload,
   WordVerseSelectionTarget,
   NotesLinkOpenTarget,
+  BookmarkOpenTarget,
 } from "@/types/reader";
 import type { BookmarkScope, ReaderBookmark } from "@/types/bookmarks";
 import type { NoteLinkTarget } from "@/types/notes";
@@ -314,6 +316,15 @@ function leafHistoryEntryEquals(
   );
 }
 
+type PendingReaderScrollTarget = {
+  leafId: string;
+  bookIndex: number;
+  chapterIndex: number;
+  mode: "chapter-top" | "verse-range";
+  verseStart: number;
+  verseEnd: number;
+};
+
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -332,6 +343,10 @@ export function KJVReader() {
     useRef<WordVerseSelectionTarget>("sidebar");
   const [notesLinkOpenTarget, setNotesLinkOpenTarget] =
     useState<NotesLinkOpenTarget>("new-panel");
+  const [searchResultOpenTarget, setSearchResultOpenTarget] =
+    useState<SearchResultOpenTarget>("new-panel");
+  const [bookmarkOpenTarget, setBookmarkOpenTarget] =
+    useState<BookmarkOpenTarget>("new-panel");
   const [targetedPanelLeafId, setTargetedPanelLeafId] = useState<string | null>(
     null,
   );
@@ -340,6 +355,8 @@ export function KJVReader() {
     verseNumber: number;
     word: string;
   } | null>(null);
+  const [pendingReaderScrollTarget, setPendingReaderScrollTarget] =
+    useState<PendingReaderScrollTarget | null>(null);
   const [leafHistoryByLeafId, setLeafHistoryByLeafId] = useState<
     Record<
       string,
@@ -499,6 +516,8 @@ export function KJVReader() {
         studyToolOpenTarget?: "sidebar" | "panel" | "tab";
         wordVerseSelectionTarget?: WordVerseSelectionTarget;
         notesLinkOpenTarget?: NotesLinkOpenTarget;
+        searchResultOpenTarget?: SearchResultOpenTarget;
+        bookmarkOpenTarget?: BookmarkOpenTarget;
       };
       if (typeof parsed.fontSize === "number") {
         setFontSize(Math.max(8, Math.round(parsed.fontSize)));
@@ -553,6 +572,20 @@ export function KJVReader() {
       ) {
         setNotesLinkOpenTarget(parsed.notesLinkOpenTarget);
       }
+      if (
+        parsed.searchResultOpenTarget === "new-tab" ||
+        parsed.searchResultOpenTarget === "new-panel" ||
+        parsed.searchResultOpenTarget === "targeted-panel"
+      ) {
+        setSearchResultOpenTarget(parsed.searchResultOpenTarget);
+      }
+      if (
+        parsed.bookmarkOpenTarget === "new-tab" ||
+        parsed.bookmarkOpenTarget === "new-panel" ||
+        parsed.bookmarkOpenTarget === "targeted-panel"
+      ) {
+        setBookmarkOpenTarget(parsed.bookmarkOpenTarget);
+      }
     } catch {
       // Ignore malformed persisted display settings.
     }
@@ -571,6 +604,8 @@ export function KJVReader() {
         tabsOrientation,
         wordVerseSelectionTarget,
         notesLinkOpenTarget,
+        searchResultOpenTarget,
+        bookmarkOpenTarget,
       }),
     );
   }, [
@@ -583,6 +618,8 @@ export function KJVReader() {
     tabsOrientation,
     wordVerseSelectionTarget,
     notesLinkOpenTarget,
+    searchResultOpenTarget,
+    bookmarkOpenTarget,
   ]);
 
   useEffect(() => {
@@ -662,6 +699,8 @@ export function KJVReader() {
               parsedLayout.tabs[0]?.id ??
               null,
           );
+          targetedPanelLeafIdRef.current = parsedLayout.targetedPanelLeafId;
+          setTargetedPanelLeafId(parsedLayout.targetedPanelLeafId);
           setTabsOrientation(parsedLayout.tabsOrientation);
           setVerseHighlights(parsedLayout.highlightedVerseRangesByLeafId);
           for (const [leafId, ranges] of Object.entries(
@@ -769,6 +808,20 @@ export function KJVReader() {
     }
   }, [tabs, targetedPanelLeafId]);
 
+  const showTargetedPanelToggle = useMemo(
+    () =>
+      wordVerseSelectionTarget === "targeted-panel" ||
+      notesLinkOpenTarget === "targeted-panel" ||
+      searchResultOpenTarget === "targeted-panel" ||
+      bookmarkOpenTarget === "targeted-panel",
+    [
+      bookmarkOpenTarget,
+      notesLinkOpenTarget,
+      searchResultOpenTarget,
+      wordVerseSelectionTarget,
+    ],
+  );
+
   useEffect(() => {
     if (!isLoaded || tabs.length === 0) {
       return;
@@ -778,6 +831,7 @@ export function KJVReader() {
       activeTabId,
       tabsOrientation,
       highlightedVerseRangesByLeafId,
+      targetedPanelLeafId: showTargetedPanelToggle ? targetedPanelLeafId : null,
     });
     if (
       syncedLayoutHashRef.current === nextHash &&
@@ -792,8 +846,10 @@ export function KJVReader() {
     activeTabId,
     highlightedVerseRangesByLeafId,
     isLoaded,
+    showTargetedPanelToggle,
     tabs,
     tabsOrientation,
+    targetedPanelLeafId,
   ]);
 
   useEffect(() => {
@@ -840,12 +896,15 @@ export function KJVReader() {
           parsed.tabs[parsed.activeTabIndex]?.id ?? parsed.tabs[0]?.id ?? null,
         tabsOrientation: parsed.tabsOrientation,
         highlightedVerseRangesByLeafId: parsed.highlightedVerseRangesByLeafId,
+        targetedPanelLeafId: parsed.targetedPanelLeafId,
       });
       syncedLayoutHashRef.current = nextHash;
       setTabs(parsed.tabs);
       setActiveTabId(
         parsed.tabs[parsed.activeTabIndex]?.id ?? parsed.tabs[0]?.id ?? null,
       );
+      targetedPanelLeafIdRef.current = parsed.targetedPanelLeafId;
+      setTargetedPanelLeafId(parsed.targetedPanelLeafId);
       setTabsOrientation(parsed.tabsOrientation);
       setVerseHighlights(parsed.highlightedVerseRangesByLeafId);
       for (const [leafId, ranges] of Object.entries(
@@ -992,12 +1051,6 @@ export function KJVReader() {
     return null;
   }, [activeTab, highlightedVerseRangesByLeafId, selectedHighlightScope]);
 
-  const showTargetedPanelToggle = useMemo(
-    () =>
-      wordVerseSelectionTarget === "targeted-panel" ||
-      notesLinkOpenTarget === "targeted-panel",
-    [notesLinkOpenTarget, wordVerseSelectionTarget],
-  );
   const sidebarAvailable = isStudyMode && wordVerseSelectionTarget === "sidebar";
 
   useEffect(() => {
@@ -2174,32 +2227,191 @@ export function KJVReader() {
 
   const showTabById = useCallback((tabId: string) => {
     pendingActiveTabIdRef.current = null;
+    if (typeof document !== "undefined") {
+      const activeElement = document.activeElement;
+      if (activeElement instanceof HTMLElement && activeElement !== document.body) {
+        activeElement.blur();
+      }
+    }
     setActiveTabId(tabId);
   }, []);
 
   const scrollVerseIntoView = useCallback(
-    (leafId: string, verseNumber: number) => {
-      requestAnimationFrame(() => {
+    (
+      leafId: string,
+      bookIndex: number,
+      chapterIndex: number,
+      verseStart: number,
+      verseEnd = verseStart,
+    ) => {
+      let attempts = 0;
+
+      const elementOffsetWithin = (
+        element: HTMLElement,
+        ancestor: HTMLElement,
+      ) => {
+        let offset = 0;
+        let current: HTMLElement | null = element;
+
+        while (current && current !== ancestor) {
+          offset += current.offsetTop;
+          current = current.offsetParent as HTMLElement | null;
+        }
+
+        return offset;
+      };
+
+      const attemptScroll = () => {
         const panelElement = panelElementRefs.current[leafId];
         const viewport = panelViewportElement(panelElement);
-        const verseElement = panelElement?.querySelector<HTMLElement>(
-          `[data-verse-number="${verseNumber}"]`,
+        const chapterRoot = panelElement?.querySelector<HTMLElement>(
+          "[data-reader-chapter-root]",
         );
-        if (verseElement) {
-          verseElement.scrollIntoView({
+        const chapterMatches =
+          chapterRoot?.dataset.bookIndex === `${bookIndex}` &&
+          chapterRoot?.dataset.chapterIndex === `${chapterIndex}`;
+        const startVerseElement =
+          chapterMatches
+            ? panelElement?.querySelector<HTMLElement>(
+                `[data-verse-number="${verseStart}"]`,
+              )
+            : null;
+        const endVerseElement =
+          chapterMatches
+            ? panelElement?.querySelector<HTMLElement>(
+                `[data-verse-number="${verseEnd}"]`,
+              )
+            : null;
+        const panelIsVisible = Boolean(panelElement && panelElement.offsetParent);
+
+        if (startVerseElement && endVerseElement && viewport && panelIsVisible) {
+          const startTop = elementOffsetWithin(startVerseElement, viewport);
+          const endTop = elementOffsetWithin(endVerseElement, viewport);
+          const blockTop = Math.min(startTop, endTop);
+          const blockBottom = Math.max(
+            startTop + startVerseElement.offsetHeight,
+            endTop + endVerseElement.offsetHeight,
+          );
+          const blockHeight = Math.max(
+            startVerseElement.offsetHeight,
+            blockBottom - blockTop,
+          );
+          const nextTop =
+            blockTop -
+            viewport.clientHeight / 2 +
+            blockHeight / 2;
+          const maxTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight);
+
+          viewport.scrollTo({
+            top: Math.min(Math.max(0, nextTop), maxTop),
             behavior: "smooth",
-            block: "center",
-            inline: "nearest",
           });
           return;
         }
-        if (viewport) {
-          viewport.scrollTo({ top: 0, behavior: "auto" });
+
+        if (attempts < 60) {
+          attempts += 1;
+          requestAnimationFrame(attemptScroll);
+          return;
         }
-      });
+      };
+
+      requestAnimationFrame(attemptScroll);
     },
     [panelElementRefs],
   );
+
+  const scrollChapterToTop = useCallback(
+    (leafId: string, bookIndex: number, chapterIndex: number) => {
+      let attempts = 0;
+
+      const attemptScroll = () => {
+        const panelElement = panelElementRefs.current[leafId];
+        const viewport = panelViewportElement(panelElement);
+        const chapterRoot = panelElement?.querySelector<HTMLElement>(
+          "[data-reader-chapter-root]",
+        );
+        const chapterMatches =
+          chapterRoot?.dataset.bookIndex === `${bookIndex}` &&
+          chapterRoot?.dataset.chapterIndex === `${chapterIndex}`;
+        const panelIsVisible = Boolean(panelElement && panelElement.offsetParent);
+
+        if (chapterMatches && viewport && panelIsVisible) {
+          viewport.scrollTo({ top: 0, behavior: "smooth" });
+          return;
+        }
+
+        if (attempts < 60) {
+          attempts += 1;
+          requestAnimationFrame(attemptScroll);
+        }
+      };
+
+      requestAnimationFrame(attemptScroll);
+    },
+    [panelElementRefs],
+  );
+
+  useEffect(() => {
+    if (!pendingReaderScrollTarget) {
+      return;
+    }
+
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) {
+        return;
+      }
+      requestAnimationFrame(() => {
+        if (cancelled) {
+          return;
+        }
+        requestAnimationFrame(() => {
+          if (cancelled) {
+            return;
+          }
+          if (pendingReaderScrollTarget.mode === "chapter-top") {
+            scrollChapterToTop(
+              pendingReaderScrollTarget.leafId,
+              pendingReaderScrollTarget.bookIndex,
+              pendingReaderScrollTarget.chapterIndex,
+            );
+          } else {
+            scrollVerseIntoView(
+              pendingReaderScrollTarget.leafId,
+              pendingReaderScrollTarget.bookIndex,
+              pendingReaderScrollTarget.chapterIndex,
+              pendingReaderScrollTarget.verseStart,
+              pendingReaderScrollTarget.verseEnd,
+            );
+          }
+          setPendingReaderScrollTarget((current) =>
+            current?.leafId === pendingReaderScrollTarget.leafId &&
+            current.mode === pendingReaderScrollTarget.mode &&
+            current.bookIndex === pendingReaderScrollTarget.bookIndex &&
+            current.chapterIndex === pendingReaderScrollTarget.chapterIndex &&
+            current.verseStart === pendingReaderScrollTarget.verseStart &&
+            current.verseEnd === pendingReaderScrollTarget.verseEnd
+              ? null
+              : current,
+          );
+        });
+      });
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    activeTabId,
+    highlightedVerseRangesByLeafId,
+    pendingReaderScrollTarget,
+    scrollChapterToTop,
+    scrollVerseIntoView,
+    tabs,
+  ]);
 
   const ensureToolsPanelInActiveTab = useCallback(() => {
     if (!activeTabId) {
@@ -2398,48 +2610,302 @@ export function KJVReader() {
     [activeTabId, setTabs, showTabById],
   );
 
-  function openBookmarkInNewTab(bookmark: ReaderBookmark) {
-    if (bookmark.scope.type === "chapter") {
-      openChapterInNewTab(
-        bookmark.scope.bookIndex,
-        bookmark.scope.chapterIndex,
-      );
-      return;
-    }
+  const openReaderTarget = useCallback(
+    (
+      target:
+        | { type: "chapter"; bookIndex: number; chapterIndex: number }
+        | {
+            type: "verse";
+            bookIndex: number;
+            chapterIndex: number;
+            verseNumber: number;
+          }
+        | {
+            type: "selection";
+            bookIndex: number;
+            chapterIndex: number;
+            ranges: Array<{ start: number; end: number }>;
+          },
+      destination: NotesLinkOpenTarget | SearchResultOpenTarget | BookmarkOpenTarget,
+    ) => {
+      const applyReaderTargetEffects = (leafId: string) => {
+        if (target.type === "selection") {
+          setActiveReaderWordHighlight(null);
+          setLeafHighlights(leafId, target.ranges);
+          setSelectedHighlightScope({
+            type: "selection",
+            bookIndex: target.bookIndex,
+            chapterIndex: target.chapterIndex,
+            ranges: target.ranges,
+          });
+          const firstRange = target.ranges[0];
+          const lastRange = target.ranges[target.ranges.length - 1];
+          setPendingReaderScrollTarget({
+            leafId,
+            bookIndex: target.bookIndex,
+            chapterIndex: target.chapterIndex,
+            mode: "verse-range",
+            verseStart: firstRange?.start ?? 1,
+            verseEnd: lastRange?.end ?? firstRange?.end ?? firstRange?.start ?? 1,
+          });
+        } else if (target.type === "verse") {
+          setActiveReaderWordHighlight(null);
+          setLeafHighlights(leafId, [
+            {
+              start: target.verseNumber,
+              end: target.verseNumber,
+            },
+          ]);
+          setSelectedHighlightScope({
+            type: "verse",
+            bookIndex: target.bookIndex,
+            chapterIndex: target.chapterIndex,
+            verseNumber: target.verseNumber,
+          });
+          setPendingReaderScrollTarget({
+            leafId,
+            bookIndex: target.bookIndex,
+            chapterIndex: target.chapterIndex,
+            mode: "verse-range",
+            verseStart: target.verseNumber,
+            verseEnd: target.verseNumber,
+          });
+        } else {
+          setActiveReaderWordHighlight(null);
+          clearLeafHighlights(leafId);
+          setSelectedHighlightScope(null);
+          setPendingReaderScrollTarget({
+            leafId,
+            bookIndex: target.bookIndex,
+            chapterIndex: target.chapterIndex,
+            mode: "chapter-top",
+            verseStart: 1,
+            verseEnd: 1,
+          });
+        }
+      };
 
-    if (bookmark.scope.type === "verse") {
-      openChapterReferenceInNewTab(
-        bookmark.scope.bookIndex,
-        bookmark.scope.chapterIndex,
-        bookmark.scope.verseNumber,
-        bookmark.scope.verseNumber,
-      );
-      return;
-    }
+      const openInNewTab = () => {
+        const nextTabId = createId();
+        const nextLeaf = createLeaf(target.bookIndex, target.chapterIndex, "reader");
+        setTabs((currentTabs) => [
+          ...currentTabs,
+          {
+            id: nextTabId,
+            title: `Tab ${currentTabs.length + 1}`,
+            root: nextLeaf,
+          },
+        ]);
+        showTabById(nextTabId);
+        applyReaderTargetEffects(nextLeaf.id);
+        return nextLeaf.id;
+      };
 
-    if (bookmark.scope.type === "selection") {
-      openChapterHighlightsInNewTab(
-        bookmark.scope.bookIndex,
-        bookmark.scope.chapterIndex,
-        bookmark.scope.ranges,
-      );
-      return;
-    }
+      const openInNewPanel = () => {
+        if (!activeTabId) {
+          return openInNewTab();
+        }
 
-    const normalized = normalizeRangePoints(
-      bookmark.scope.start,
-      bookmark.scope.end,
-    );
-    const isSameChapter =
-      normalized.start.bookIndex === normalized.end.bookIndex &&
-      normalized.start.chapterIndex === normalized.end.chapterIndex;
-    openChapterReferenceInNewTab(
-      normalized.start.bookIndex,
-      normalized.start.chapterIndex,
-      normalized.start.verseNumber,
-      isSameChapter ? normalized.end.verseNumber : normalized.start.verseNumber,
-    );
-  }
+        const nextReaderLeaf = createLeaf(
+          target.bookIndex,
+          target.chapterIndex,
+          "reader",
+        );
+
+        setTabs((currentTabs) => {
+          const activeIndex = currentTabs.findIndex(
+            (tab) => tab.id === activeTabId,
+          );
+          if (activeIndex < 0) {
+            return currentTabs;
+          }
+          const active = currentTabs[activeIndex];
+          const nextRoot: PanelNode = {
+            id: createId(),
+            type: "split",
+            orientation: "horizontal",
+            ratio: 42,
+            first: active.root,
+            second: nextReaderLeaf,
+          };
+          const nextTabs = [...currentTabs];
+          nextTabs[activeIndex] = { ...active, root: nextRoot };
+          return nextTabs;
+        });
+
+        applyReaderTargetEffects(nextReaderLeaf.id);
+        return nextReaderLeaf.id;
+      };
+
+      const openInTargetedPanel = () => {
+        const currentTargetedPanelLeafId = targetedPanelLeafIdRef.current;
+        if (!currentTargetedPanelLeafId) {
+          const nextLeafId = createTargetedReaderPanelInActiveTab(target);
+          if (nextLeafId) {
+            applyReaderTargetEffects(nextLeafId);
+            return nextLeafId;
+          }
+          return openInNewPanel();
+        }
+
+        const targetTab = findTabContainingLeafId(currentTargetedPanelLeafId);
+        if (!targetTab) {
+          return null;
+        }
+
+        navigateReaderLeafToNoteTarget(
+          targetTab.id,
+          currentTargetedPanelLeafId,
+          target,
+        );
+        showTabById(targetTab.id);
+        applyReaderTargetEffects(currentTargetedPanelLeafId);
+        return currentTargetedPanelLeafId;
+      };
+
+      if (destination === "targeted-panel") {
+        return openInTargetedPanel();
+      }
+      if (destination === "new-tab") {
+        return openInNewTab();
+      }
+      return openInNewPanel();
+    },
+    [
+      activeTabId,
+      clearLeafHighlights,
+      createTargetedReaderPanelInActiveTab,
+      findTabContainingLeafId,
+      navigateReaderLeafToNoteTarget,
+      setPendingReaderScrollTarget,
+      setLeafHighlights,
+      setSelectedHighlightScope,
+      setTabs,
+      showTabById,
+    ],
+  );
+
+  const openBookmarkTarget = useCallback(
+    (bookmark: ReaderBookmark) => {
+      if (bookmark.scope.type === "chapter") {
+        openReaderTarget(
+          {
+            type: "chapter",
+            bookIndex: bookmark.scope.bookIndex,
+            chapterIndex: bookmark.scope.chapterIndex,
+          },
+          bookmarkOpenTarget,
+        );
+        return;
+      }
+
+      if (bookmark.scope.type === "verse") {
+        openReaderTarget(
+          {
+            type: "verse",
+            bookIndex: bookmark.scope.bookIndex,
+            chapterIndex: bookmark.scope.chapterIndex,
+            verseNumber: bookmark.scope.verseNumber,
+          },
+          bookmarkOpenTarget,
+        );
+        return;
+      }
+
+      if (bookmark.scope.type === "selection") {
+        openReaderTarget(
+          {
+            type: "selection",
+            bookIndex: bookmark.scope.bookIndex,
+            chapterIndex: bookmark.scope.chapterIndex,
+            ranges: bookmark.scope.ranges,
+          },
+          bookmarkOpenTarget,
+        );
+        return;
+      }
+
+      const normalized = normalizeRangePoints(
+        bookmark.scope.start,
+        bookmark.scope.end,
+      );
+      const isSameChapter =
+        normalized.start.bookIndex === normalized.end.bookIndex &&
+        normalized.start.chapterIndex === normalized.end.chapterIndex;
+      if (isSameChapter) {
+        openReaderTarget(
+          {
+            type:
+              normalized.start.verseNumber === normalized.end.verseNumber
+                ? "verse"
+                : "selection",
+            bookIndex: normalized.start.bookIndex,
+            chapterIndex: normalized.start.chapterIndex,
+            ...(normalized.start.verseNumber === normalized.end.verseNumber
+              ? { verseNumber: normalized.start.verseNumber }
+              : {
+                  ranges: [
+                    {
+                      start: normalized.start.verseNumber,
+                      end: normalized.end.verseNumber,
+                    },
+                  ],
+                }),
+          },
+          bookmarkOpenTarget,
+        );
+        return;
+      }
+
+      openReaderTarget(
+        {
+          type: "verse",
+          bookIndex: normalized.start.bookIndex,
+          chapterIndex: normalized.start.chapterIndex,
+          verseNumber: normalized.start.verseNumber,
+        },
+        bookmarkOpenTarget,
+      );
+    },
+    [bookmarkOpenTarget, openReaderTarget],
+  );
+
+  const openSearchResultTarget = useCallback(
+    (
+      bookIndex: number,
+      chapterIndex: number,
+      verseStart: number,
+      verseEnd?: number,
+    ) => {
+      if (
+        typeof verseEnd === "number" &&
+        Number.isFinite(verseEnd) &&
+        verseEnd !== verseStart
+      ) {
+        openReaderTarget(
+          {
+            type: "selection",
+            bookIndex,
+            chapterIndex,
+            ranges: [{ start: verseStart, end: verseEnd }],
+          },
+          searchResultOpenTarget,
+        );
+        return;
+      }
+
+      openReaderTarget(
+        {
+          type: "verse",
+          bookIndex,
+          chapterIndex,
+          verseNumber: verseStart,
+        },
+        searchResultOpenTarget,
+      );
+    },
+    [openReaderTarget, searchResultOpenTarget],
+  );
 
   const openChapterReferenceInNewTab = useCallback(
     (
@@ -2478,48 +2944,6 @@ export function KJVReader() {
     [
       clearAllVerseHighlights,
       queueVerseHighlight,
-      setIsProgressOpen,
-      setSelectedHighlightScope,
-      tabsOrientation,
-    ],
-  );
-
-  const openChapterHighlightsInNewTab = useCallback(
-    (
-      bookIndex: number,
-      chapterIndex: number,
-      ranges: Array<{ start: number; end: number }>,
-    ) => {
-      clearAllVerseHighlights();
-      setSelectedHighlightScope(null);
-      const nextTabId = createId();
-      const nextLeaf = createLeaf(bookIndex, chapterIndex, "reader");
-      setTabs((currentTabs) => [
-        ...currentTabs,
-        {
-          id: nextTabId,
-          title: `Tab ${currentTabs.length + 1}`,
-          root: {
-            ...nextLeaf,
-            pickerTestament: null,
-            pickerBookIndex: null,
-          },
-        },
-      ]);
-      queueVerseHighlights(nextLeaf.id, ranges);
-      setActiveTabId(nextTabId);
-      setIsProgressOpen(false);
-      requestAnimationFrame(() => {
-        tabEndRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: tabsOrientation === "vertical" ? "end" : "nearest",
-          inline: tabsOrientation === "vertical" ? "nearest" : "end",
-        });
-      });
-    },
-    [
-      clearAllVerseHighlights,
-      queueVerseHighlights,
       setIsProgressOpen,
       setSelectedHighlightScope,
       tabsOrientation,
@@ -3228,149 +3652,35 @@ export function KJVReader() {
           strongCode: null,
         });
       };
-
-      const applyReaderTargetEffects = (leafId: string) => {
-        if (target.type === "selection") {
-          setActiveReaderWordHighlight(null);
-          queueVerseHighlights(leafId, target.ranges);
-          setSelectedHighlightScope({
-            type: "selection",
-            bookIndex: target.bookIndex,
-            chapterIndex: target.chapterIndex,
-            ranges: target.ranges,
-          });
-          scrollVerseIntoView(leafId, target.ranges[0]?.start ?? 1);
-        } else if (target.type !== "chapter") {
-          if (target.type === "word") {
-            const rawWord = normalizeConcordanceWord(target.word) || target.word;
-            setActiveReaderWordHighlight({
-              leafId,
-              verseNumber: target.verseNumber,
-              word: rawWord,
-            });
-          } else {
-            setActiveReaderWordHighlight(null);
-          }
-          queueVerseHighlight(leafId, {
-            start: target.verseNumber,
-            end: target.verseNumber,
-          });
-          setSelectedHighlightScope({
+      if (target.type === "word") {
+        const rawWord = normalizeConcordanceWord(target.word) || target.word;
+        const leafId = openReaderTarget(
+          {
             type: "verse",
             bookIndex: target.bookIndex,
             chapterIndex: target.chapterIndex,
             verseNumber: target.verseNumber,
+          },
+          notesLinkOpenTarget,
+        );
+        if (leafId) {
+          setActiveReaderWordHighlight({
+            leafId,
+            verseNumber: target.verseNumber,
+            word: rawWord,
           });
-          scrollVerseIntoView(leafId, target.verseNumber);
-        } else {
-          setActiveReaderWordHighlight(null);
         }
         syncWordTarget();
-      };
-
-      const openReaderTargetInNewTab = () => {
-        clearAllVerseHighlights();
-        setSelectedHighlightScope(null);
-        const nextTabId = createId();
-        const nextLeaf = createLeaf(target.bookIndex, target.chapterIndex, "reader");
-        setTabs((currentTabs) => [
-          ...currentTabs,
-          {
-            id: nextTabId,
-            title: `Tab ${currentTabs.length + 1}`,
-            root: nextLeaf,
-          },
-        ]);
-        showTabById(nextTabId);
-        applyReaderTargetEffects(nextLeaf.id);
-      };
-
-      const openReaderTargetInNewPanel = () => {
-        if (!activeTabId) {
-          openReaderTargetInNewTab();
-          return;
-        }
-
-        const nextReaderLeaf = createLeaf(
-          target.bookIndex,
-          target.chapterIndex,
-          "reader",
-        );
-
-        setTabs((currentTabs) => {
-          const activeIndex = currentTabs.findIndex(
-            (tab) => tab.id === activeTabId,
-          );
-          if (activeIndex < 0) {
-            return currentTabs;
-          }
-          const active = currentTabs[activeIndex];
-          const nextRoot: PanelNode = {
-            id: createId(),
-            type: "split",
-            orientation: "horizontal",
-            ratio: 42,
-            first: active.root,
-            second: nextReaderLeaf,
-          };
-          const nextTabs = [...currentTabs];
-          nextTabs[activeIndex] = { ...active, root: nextRoot };
-          return nextTabs;
-        });
-
-        applyReaderTargetEffects(nextReaderLeaf.id);
-      };
-
-      const openReaderTargetInTargetedPanel = () => {
-        const currentTargetedPanelLeafId = targetedPanelLeafIdRef.current;
-        if (!currentTargetedPanelLeafId) {
-          const nextLeafId = createTargetedReaderPanelInActiveTab(target);
-          if (nextLeafId) {
-            applyReaderTargetEffects(nextLeafId);
-            return;
-          }
-          openReaderTargetInNewPanel();
-          return;
-        }
-
-        const targetTab = findTabContainingLeafId(currentTargetedPanelLeafId);
-        if (!targetTab) {
-          return;
-        }
-
-        navigateReaderLeafToNoteTarget(
-          targetTab.id,
-          currentTargetedPanelLeafId,
-          target,
-        );
-        showTabById(targetTab.id);
-        applyReaderTargetEffects(currentTargetedPanelLeafId);
-      };
-
-      if (notesLinkOpenTarget === "targeted-panel") {
-        openReaderTargetInTargetedPanel();
         return;
       }
-      if (notesLinkOpenTarget === "new-tab") {
-        openReaderTargetInNewTab();
-        return;
-      }
-      openReaderTargetInNewPanel();
+
+      openReaderTarget(target, notesLinkOpenTarget);
     },
     [
-      activeTabId,
-      clearAllVerseHighlights,
-      createTargetedReaderPanelInActiveTab,
-      findTabContainingLeafId,
-      navigateReaderLeafToNoteTarget,
       notesLinkOpenTarget,
-      queueVerseHighlight,
-      queueVerseHighlights,
-      scrollVerseIntoView,
-      setSelectedHighlightScope,
+      openReaderTarget,
       setNotesContext,
-      setTabs,
-      showTabById,
+      setActiveReaderWordHighlight,
       syncTokenAccordionState,
       syncWordStudySelections,
     ],
@@ -4162,7 +4472,7 @@ export function KJVReader() {
   const sharedBookmarksProps = {
     books,
     bookmarks: readerBookmarks,
-    onOpenBookmark: openBookmarkInNewTab,
+    onOpenBookmark: openBookmarkTarget,
     onUpdateBookmark: updateBookmark,
     onDeleteBookmark: deleteBookmark,
   };
@@ -4181,7 +4491,7 @@ export function KJVReader() {
       <div
         key={tab.id}
         className={isActive ? "absolute inset-0 min-h-0 min-w-0" : "hidden"}
-        aria-hidden={!isActive}
+        inert={!isActive}
       >
         <ReaderPanelTree
           root={tab.root}
@@ -4229,7 +4539,7 @@ export function KJVReader() {
           concordanceWords={concordanceWords}
           verseSearchIndex={verseSearchIndex}
           ensureConcordanceWordsLoaded={ensureConcordanceLoaded}
-          onOpenSearchResult={openChapterReferenceInNewTab}
+                onOpenSearchResult={openSearchResultTarget}
           notes={readerNotes}
           notesContext={notesContext}
           activeReaderWordHighlight={activeReaderWordHighlight}
@@ -4524,6 +4834,10 @@ export function KJVReader() {
             onWordVerseSelectionTargetChange={setWordVerseSelectionTarget}
             notesLinkOpenTarget={notesLinkOpenTarget}
             onNotesLinkOpenTargetChange={setNotesLinkOpenTarget}
+            searchResultOpenTarget={searchResultOpenTarget}
+            onSearchResultOpenTargetChange={setSearchResultOpenTarget}
+            bookmarkOpenTarget={bookmarkOpenTarget}
+            onBookmarkOpenTargetChange={setBookmarkOpenTarget}
           />
         </Suspense>
       ) : null}

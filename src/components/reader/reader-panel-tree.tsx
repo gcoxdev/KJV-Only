@@ -1148,49 +1148,55 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 onTouchCancelCapture={finishReaderSwipe}
               >
                 <ScrollArea className="h-full w-full" data-panel-content-scroll>
-                  <ChapterTextContent
-                    bookName={book.name}
-                    chapterNumber={chapter.chapter}
-                    verses={chapter.verses}
-                    flowVersesByParagraph={flowVersesByParagraph}
-                    readModeParagraphIndent={readModeParagraphIndent}
-                    showVerseNumbers={showVerseNumbers}
-                    isStudyMode={isStudyMode}
-                    enableVerseSelection={isStudyMode || highlightModeEnabled}
-                    highlightModeEnabled={highlightModeEnabled}
-                    highlightedVerseRanges={
-                      highlightedVerseRangesByLeafId[leaf.id] ?? null
-                    }
-                    noteWordHighlight={
-                      activeReaderWordHighlight?.leafId === leaf.id
-                        ? {
-                            verseNumber: activeReaderWordHighlight.verseNumber,
-                            word: activeReaderWordHighlight.word,
-                          }
-                        : null
-                    }
-                    fontSize={fontSize}
-                    verseSpacing={verseSpacing}
-                    onOpenTokenDetails={(element, token, verseNumber, tokenIndex) =>
-                      onOpenTokenDetails(
-                        element,
-                        leaf.id,
-                        token,
-                        leaf.bookIndex,
-                        leaf.chapterIndex,
-                        verseNumber,
-                        tokenIndex,
-                      )
-                    }
-                    onSelectVerse={(verseNumber) =>
-                      onSelectVerse(
-                        leaf.id,
-                        leaf.bookIndex,
-                        leaf.chapterIndex,
-                        verseNumber,
-                      )
-                    }
-                  />
+                  <div
+                    data-reader-chapter-root
+                    data-book-index={leaf.bookIndex}
+                    data-chapter-index={leaf.chapterIndex}
+                  >
+                    <ChapterTextContent
+                      bookName={book.name}
+                      chapterNumber={chapter.chapter}
+                      verses={chapter.verses}
+                      flowVersesByParagraph={flowVersesByParagraph}
+                      readModeParagraphIndent={readModeParagraphIndent}
+                      showVerseNumbers={showVerseNumbers}
+                      isStudyMode={isStudyMode}
+                      enableVerseSelection={isStudyMode || highlightModeEnabled}
+                      highlightModeEnabled={highlightModeEnabled}
+                      highlightedVerseRanges={
+                        highlightedVerseRangesByLeafId[leaf.id] ?? null
+                      }
+                      noteWordHighlight={
+                        activeReaderWordHighlight?.leafId === leaf.id
+                          ? {
+                              verseNumber: activeReaderWordHighlight.verseNumber,
+                              word: activeReaderWordHighlight.word,
+                            }
+                          : null
+                      }
+                      fontSize={fontSize}
+                      verseSpacing={verseSpacing}
+                      onOpenTokenDetails={(element, token, verseNumber, tokenIndex) =>
+                        onOpenTokenDetails(
+                          element,
+                          leaf.id,
+                          token,
+                          leaf.bookIndex,
+                          leaf.chapterIndex,
+                          verseNumber,
+                          tokenIndex,
+                        )
+                      }
+                      onSelectVerse={(verseNumber) =>
+                        onSelectVerse(
+                          leaf.id,
+                          leaf.bookIndex,
+                          leaf.chapterIndex,
+                          verseNumber,
+                        )
+                      }
+                    />
+                  </div>
                 </ScrollArea>
               </div>
             </CardContent>
