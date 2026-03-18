@@ -1,7 +1,9 @@
 import { DownloadPage } from "@/components/reader/download-page";
+import { HowToGetSavedPage } from "@/components/reader/how-to-get-saved-page";
 import { getStaticPage } from "@/lib/static-pages";
 import type { Book } from "@/types/bible";
 import type { StaticPageId } from "@/types/reader";
+import type { ReactNode } from "react";
 
 type StaticPageProps = {
   books: Book[];
@@ -9,6 +11,9 @@ type StaticPageProps = {
   canInstallPwa?: boolean;
   isPwaInstalled?: boolean;
   onInstallPwa?: () => void | Promise<void>;
+  renderPreview?: (reference: string, highlightWord: string) => ReactNode;
+  onOpenReference?: (reference: string) => void;
+  onCloseSidebar?: () => void;
 };
 
 export function StaticPage({
@@ -17,6 +22,9 @@ export function StaticPage({
   canInstallPwa = false,
   isPwaInstalled = false,
   onInstallPwa,
+  renderPreview,
+  onOpenReference,
+  onCloseSidebar,
 }: StaticPageProps) {
   const page = getStaticPage(pageId);
 
@@ -41,9 +49,18 @@ export function StaticPage({
           </h1>
         </div>
         <div className="flex flex-col gap-4 text-sm leading-7 text-muted-foreground">
-          {page.content.paragraphs.map((paragraph, index) => (
-            <p key={`${page.id}-paragraph-${index}`}>{paragraph}</p>
-          ))}
+          {page.id !== "saved" && page.id !== "download"
+            ? page.content.paragraphs.map((paragraph, index) => (
+                <p key={`${page.id}-paragraph-${index}`}>{paragraph}</p>
+              ))
+            : null}
+          {page.id === "saved" && renderPreview && onOpenReference && onCloseSidebar ? (
+            <HowToGetSavedPage
+              renderPreview={renderPreview}
+              onOpenReference={onOpenReference}
+              onCloseSidebar={onCloseSidebar}
+            />
+          ) : null}
           {page.id === "download" ? (
             <DownloadPage
               books={books}
@@ -52,7 +69,7 @@ export function StaticPage({
               onInstallPwa={onInstallPwa}
             />
           ) : null}
-          {page.content.links ? (
+          {page.id !== "saved" && page.id !== "download" && page.content.links ? (
             <div className="flex flex-col gap-3 pt-2">
               {page.content.links.map((link) => (
                 <div
