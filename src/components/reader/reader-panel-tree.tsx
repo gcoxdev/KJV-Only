@@ -266,6 +266,9 @@ type ReaderPanelTreeProps = {
   bookmarksPanelProps: ComponentProps<typeof BookmarksTool>;
   settingsPanelProps: ComponentProps<typeof SettingsPanelContent>;
   progressPanelProps: ComponentProps<typeof ProgressPanelContent>;
+  canInstallPwa: boolean;
+  isPwaInstalled: boolean;
+  onInstallPwa: () => void | Promise<void>;
 };
 
 type ReaderLeafPanelProps = Omit<ReaderPanelTreeProps, "root"> & {
@@ -358,6 +361,9 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   bookmarksPanelProps,
   settingsPanelProps,
   progressPanelProps,
+  canInstallPwa,
+  isPwaInstalled,
+  onInstallPwa,
 }: ReaderLeafPanelProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -1553,7 +1559,12 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 <ProgressPanelContent {...progressPanelProps} />
               </div>
             ) : (
-              <StaticPage pageId={leaf.pageId} />
+              <StaticPage
+                pageId={leaf.pageId}
+                canInstallPwa={canInstallPwa}
+                isPwaInstalled={isPwaInstalled}
+                onInstallPwa={onInstallPwa}
+              />
             )}
           </CardContent>
         ) : (
@@ -1746,6 +1757,9 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   bookmarksPanelProps,
   settingsPanelProps,
   progressPanelProps,
+  canInstallPwa,
+  isPwaInstalled,
+  onInstallPwa,
 }: ReaderPanelTreeProps) {
   const renderLeaf = (leaf: LeafNode) => (
     <ReaderLeafPanel
@@ -1828,6 +1842,9 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       bookmarksPanelProps={bookmarksPanelProps}
       settingsPanelProps={settingsPanelProps}
       progressPanelProps={progressPanelProps}
+      canInstallPwa={canInstallPwa}
+      isPwaInstalled={isPwaInstalled}
+      onInstallPwa={onInstallPwa}
     />
   );
 
