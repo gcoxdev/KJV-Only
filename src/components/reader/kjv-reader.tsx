@@ -310,6 +310,11 @@ export function KJVReader() {
   const [targetedPanelLeafId, setTargetedPanelLeafId] = useState<string | null>(
     null,
   );
+  const [activeReaderWordHighlight, setActiveReaderWordHighlight] = useState<{
+    leafId: string;
+    verseNumber: number;
+    word: string;
+  } | null>(null);
   const targetedPanelLeafIdRef = useRef<string | null>(null);
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [sidebarCloseRequestKey, setSidebarCloseRequestKey] = useState(0);
@@ -3089,6 +3094,7 @@ export function KJVReader() {
 
       const applyReaderTargetEffects = (leafId: string) => {
         if (target.type === "selection") {
+          setActiveReaderWordHighlight(null);
           queueVerseHighlights(leafId, target.ranges);
           setSelectedHighlightScope({
             type: "selection",
@@ -3098,6 +3104,16 @@ export function KJVReader() {
           });
           scrollVerseIntoView(leafId, target.ranges[0]?.start ?? 1);
         } else if (target.type !== "chapter") {
+          if (target.type === "word") {
+            const rawWord = normalizeConcordanceWord(target.word) || target.word;
+            setActiveReaderWordHighlight({
+              leafId,
+              verseNumber: target.verseNumber,
+              word: rawWord,
+            });
+          } else {
+            setActiveReaderWordHighlight(null);
+          }
           queueVerseHighlight(leafId, {
             start: target.verseNumber,
             end: target.verseNumber,
@@ -3109,6 +3125,8 @@ export function KJVReader() {
             verseNumber: target.verseNumber,
           });
           scrollVerseIntoView(leafId, target.verseNumber);
+        } else {
+          setActiveReaderWordHighlight(null);
         }
         syncWordTarget();
       };
@@ -3232,10 +3250,12 @@ export function KJVReader() {
         highlightModeEnabledByLeafId[leafId],
       );
       if (!highlightModeEnabled) {
+        setActiveReaderWordHighlight(null);
         openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
         return;
       }
 
+      setActiveReaderWordHighlight(null);
       setNotesContext({ bookIndex, chapterIndex, verseNumber });
       const existingRanges = highlightedVerseRangesByLeafId[leafId] ?? [];
       const selectedVerses = new Set<number>();
@@ -3303,6 +3323,7 @@ export function KJVReader() {
       highlightedVerseRangesByLeafId,
       highlightModeEnabledByLeafId,
       openCrossReferencesForVerse,
+      setActiveReaderWordHighlight,
       setLeafHighlights,
       setNotesContext,
       setSelectedHighlightScope,
@@ -3379,13 +3400,14 @@ export function KJVReader() {
   const openTokenDetailsFromElement = useCallback(
     (
       element: HTMLElement,
+      leafId: string,
       token: VerseToken,
       bookIndex: number,
       chapterIndex: number,
       verseNumber: number,
       tokenIndex: number,
     ) => {
-      if (!token.strong) {
+      if (!token.strong && !token.added) {
         const rect = element.getBoundingClientRect();
         const popupWidth = 280;
         const safeX = Math.max(
@@ -3406,19 +3428,29 @@ export function KJVReader() {
       if (Number.isFinite(verseNumber) && verseNumber > 0) {
         openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
         if (rawWord) {
+          setActiveReaderWordHighlight({
+            leafId,
+            verseNumber,
+            word: rawWord,
+          });
           setNotesContext({
             bookIndex,
             chapterIndex,
             verseNumber,
             word: rawWord,
           });
+        } else {
+          setActiveReaderWordHighlight(null);
         }
       } else if (rawWord) {
+        setActiveReaderWordHighlight(null);
         setNotesContext({
           bookIndex,
           chapterIndex,
           word: rawWord,
         });
+      } else {
+        setActiveReaderWordHighlight(null);
       }
 
       if (!rawWord) {
@@ -3622,6 +3654,7 @@ export function KJVReader() {
       phrases,
       resolveAIDictionarySelectionAtLocation,
       resolvePhraseSelectionAtLocation,
+      setActiveReaderWordHighlight,
       setConcordanceError,
       setIsConcordanceLoading,
       setIsStrongsLoading,
@@ -4098,6 +4131,7 @@ export function KJVReader() {
                 onOpenSearchResult={openChapterReferenceInNewTab}
                 notes={readerNotes}
                 notesContext={notesContext}
+                activeReaderWordHighlight={activeReaderWordHighlight}
                 notesTabStateByLeafId={notesTabStateByLeafId}
                 onChangeNotesTabState={changeNotesTabState}
                 searchPageStateByLeafId={searchPageStateByLeafId}
