@@ -50,7 +50,14 @@ export function ReaderTopBar({
       <div className="flex min-w-0 items-center gap-3">
         <DropdownMenu>
           <DropdownMenuTrigger
-            render={<Button variant="ghost" size="icon" aria-label="Open menu" />}
+            render={
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open menu"
+                data-tour="main-menu"
+              />
+            }
           >
             <MenuIcon aria-hidden="true" />
           </DropdownMenuTrigger>
@@ -102,6 +109,7 @@ export function ReaderTopBar({
           size="icon"
           aria-label="Open search"
           onClick={onOpenSearch}
+          data-tour="search-button"
         >
           <SearchIcon aria-hidden="true" />
         </Button>
@@ -112,10 +120,11 @@ export function ReaderTopBar({
           aria-label="Share layout"
           onClick={onShareLayout}
           title={isShareCopied ? "Layout link copied" : "Share layout"}
+          data-tour="share-button"
         >
           {isShareCopied ? <CheckIcon aria-hidden="true" /> : <Share2Icon aria-hidden="true" />}
         </Button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" data-tour="mode-toggle">
           <span className="tabular-data text-sm font-medium">
             {isStudyMode ? "Study" : "Read"}
           </span>
@@ -127,7 +136,10 @@ export function ReaderTopBar({
           />
         </div>
         {isStudyMode && showSidebarToggle ? (
-          <SidebarTrigger className="border border-subtle-divider/70 bg-workspace-panel" />
+          <SidebarTrigger
+            className="border border-subtle-divider/70 bg-workspace-panel"
+            data-tour="sidebar-toggle"
+          />
         ) : null}
       </div>
     </header>

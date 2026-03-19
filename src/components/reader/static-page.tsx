@@ -1,5 +1,6 @@
 import { DownloadPage } from "@/components/reader/download-page";
 import { HowToGetSavedPage } from "@/components/reader/how-to-get-saved-page";
+import { WelcomeHomePage } from "@/components/reader/welcome-home-page";
 import { getStaticPage } from "@/lib/static-pages";
 import type { Book } from "@/types/bible";
 import type { StaticPageId } from "@/types/reader";
@@ -14,6 +15,7 @@ type StaticPageProps = {
   renderPreview?: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference?: (reference: string) => void;
   onCloseSidebar?: () => void;
+  onStartTour?: () => void;
 };
 
 export function StaticPage({
@@ -25,6 +27,7 @@ export function StaticPage({
   renderPreview,
   onOpenReference,
   onCloseSidebar,
+  onStartTour,
 }: StaticPageProps) {
   const page = getStaticPage(pageId);
 
@@ -49,11 +52,16 @@ export function StaticPage({
           </h1>
         </div>
         <div className="flex flex-col gap-4 text-sm leading-7 text-muted-foreground">
-          {page.id !== "saved" && page.id !== "download"
+          {page.id !== "saved" &&
+          page.id !== "download" &&
+          page.id !== "welcome-home"
             ? page.content.paragraphs.map((paragraph, index) => (
                 <p key={`${page.id}-paragraph-${index}`}>{paragraph}</p>
               ))
             : null}
+          {page.id === "welcome-home" && onStartTour ? (
+            <WelcomeHomePage onStartTour={onStartTour} />
+          ) : null}
           {page.id === "saved" && renderPreview && onOpenReference && onCloseSidebar ? (
             <HowToGetSavedPage
               renderPreview={renderPreview}
@@ -69,7 +77,10 @@ export function StaticPage({
               onInstallPwa={onInstallPwa}
             />
           ) : null}
-          {page.id !== "saved" && page.id !== "download" && page.content.links ? (
+          {page.id !== "saved" &&
+          page.id !== "download" &&
+          page.id !== "welcome-home" &&
+          page.content.links ? (
             <div className="flex flex-col gap-3 pt-2">
               {page.content.links.map((link) => (
                 <div

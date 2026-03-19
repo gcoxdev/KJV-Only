@@ -38,21 +38,21 @@ export function ReaderStudySidebar({
   ...toolsProps
 }: ReaderStudySidebarProps) {
   return (
-    <StudyToolsSidebar
-      visible={visible}
-      activeTab={activeTab}
-      accordionValue={accordionValue}
-      onAccordionValueChange={onAccordionValueChange}
-      onActiveTabChange={onActiveTabChange}
-      onExpandAll={onExpandAll}
-      onCollapseAll={onCollapseAll}
-      canExpand={canExpand}
-      canCollapse={canCollapse}
-      notesContent={<NotesTool {...notesProps} />}
-      bookmarksContent={<BookmarksTool {...bookmarksProps} />}
-      toolsContent={
-        <ReaderStudyToolsContent {...toolsProps} />
-      }
-    />
+    <div data-tour="sidebar">
+      <StudyToolsSidebar
+        visible={visible}
+        activeTab={activeTab}
+        accordionValue={accordionValue}
+        onAccordionValueChange={onAccordionValueChange}
+        onActiveTabChange={onActiveTabChange}
+        onExpandAll={onExpandAll}
+        onCollapseAll={onCollapseAll}
+        canExpand={canExpand}
+        canCollapse={canCollapse}
+        notesContent={<NotesTool {...notesProps} />}
+        bookmarksContent={<BookmarksTool {...bookmarksProps} />}
+        toolsContent={<ReaderStudyToolsContent {...toolsProps} />}
+      />
+    </div>
   );
 }

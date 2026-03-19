@@ -174,6 +174,7 @@ export type SearchPageState = {
 export type StaticPageId =
   | "settings"
   | "progress"
+  | "welcome-home"
   | "saved"
   | "kjv-only"
   | "resources"
