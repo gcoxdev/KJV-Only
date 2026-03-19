@@ -8,6 +8,7 @@ import {
   DownloadIcon,
   FileTextIcon,
   HeartHandshakeIcon,
+  HouseIcon,
   InfoIcon,
   LibraryBigIcon,
   ScrollTextIcon,
@@ -59,6 +60,17 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
       paragraphs: [
         "Track chapter completion across the whole Bible.",
       ],
+    },
+  },
+  {
+    id: "welcome-home",
+    title: "Welcome Home",
+    menuLabel: "Welcome Home",
+    icon: HouseIcon,
+    content: {
+      eyebrow: "Start Here",
+      heading: "Welcome Home",
+      paragraphs: [],
     },
   },
   {

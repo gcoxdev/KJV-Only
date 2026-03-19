@@ -354,7 +354,11 @@ export function TabsStrip({
   };
 
   return (
-    <ScrollArea ref={scrollAreaRef} className="h-full w-full">
+    <ScrollArea
+      ref={scrollAreaRef}
+      className="h-full w-full"
+      data-tour="tabs-strip"
+    >
       <div
         className={cn(
           "p-2.5",
