@@ -48,7 +48,6 @@ import {
   collectLeafIds,
   countLeaves,
   createId,
-  createInitialTab,
   createLeaf,
   directionOrientation,
   findContiguousGroupRootId,
@@ -133,6 +132,10 @@ import { TabsWorkspace } from "@/components/reader/tabs-workspace";
 import { ReaderStatusScreen } from "@/components/reader/reader-status-screen";
 import { ReaderPanelTree } from "@/components/reader/reader-panel-tree";
 import { CompletionCelebration } from "@/components/reader/completion-celebration";
+import {
+  GuidedTour,
+  type GuidedTourStep,
+} from "@/components/reader/guided-tour";
 import { getStaticPage } from "@/lib/static-pages";
 import type { StaticPageId } from "@/types/reader";
 
@@ -318,6 +321,25 @@ type BeforeInstallPromptEvent = Event & {
   }>;
 };
 
+function createWelcomeHomeTab(): ReaderTab {
+  return {
+    id: createId(),
+    title: "Welcome Home",
+    root: {
+      ...createLeaf(0, 0, "page"),
+      pageId: "welcome-home",
+    },
+  };
+}
+
+function createGenesisReaderTab(): ReaderTab {
+  return {
+    id: createId(),
+    title: "Genesis 1",
+    root: createLeaf(0, 0, "reader"),
+  };
+}
+
 export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -376,6 +398,8 @@ export function KJVReader() {
   const [completionCelebrationVerse, setCompletionCelebrationVerse] = useState(
     COMPLETION_CELEBRATION_VERSES[0],
   );
+  const [isGuidedTourOpen, setIsGuidedTourOpen] = useState(false);
+  const [guidedTourStepIndex, setGuidedTourStepIndex] = useState(0);
   const [deferredInstallPrompt, setDeferredInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isPwaInstalled, setIsPwaInstalled] = useState(false);
@@ -762,9 +786,10 @@ export function KJVReader() {
             queueVerseHighlights(leafId, ranges);
           }
         } else {
-          const initialTab = createInitialTab(1);
-          setTabs([initialTab]);
-          setActiveTabId(initialTab.id);
+          const welcomeTab = createWelcomeHomeTab();
+          const readerTab = createGenesisReaderTab();
+          setTabs([welcomeTab, readerTab]);
+          setActiveTabId(welcomeTab.id);
         }
         setLoadError(null);
         setIsLoaded(true);
@@ -4290,6 +4315,108 @@ export function KJVReader() {
     [highlightColor],
   );
 
+  const firstReaderTabId = useMemo(
+    () =>
+      tabs.find((tab) => panelNodeContainsView(tab.root, "reader"))?.id ?? null,
+    [tabs],
+  );
+
+  const guidedTourSteps = useMemo<GuidedTourStep[]>(
+    () => [
+      {
+        id: "main-menu",
+        title: "Main Menu",
+        description:
+          "Use the menu to open built-in pages such as Settings, Reading Progress, Download, Help, and more.",
+        selector: "[data-tour='main-menu']",
+      },
+      {
+        id: "search-button",
+        title: "Search",
+        description:
+          "Open the search workspace from here to run phrase, word, and regex searches across the Bible.",
+        selector: "[data-tour='search-button']",
+      },
+      {
+        id: "share-button",
+        title: "Share Layout",
+        description:
+          "Use this button to copy a link to the current layout so the same tabs, panels, and positions can be reopened.",
+        selector: "[data-tour='share-button']",
+      },
+      {
+        id: "mode-toggle",
+        title: "Read and Study Modes",
+        description:
+          "Switch between simpler reading and full study mode here. Study mode enables the sidebar and broader tool workflow.",
+        selector: "[data-tour='mode-toggle']",
+      },
+      {
+        id: "tabs-strip",
+        title: "Tabs",
+        description:
+          "Your layouts live in tabs. Tabs stay mounted in memory so notes and panel state are retained when you switch.",
+        selector: "[data-tour='tabs-strip']",
+      },
+      {
+        id: "sidebar",
+        title: "Study Sidebar",
+        description:
+          "In study mode, the sidebar gives quick access to tools, notes, and bookmarks alongside the Bible text.",
+        selector: "[data-tour='sidebar']",
+      },
+      {
+        id: "reader-panel",
+        title: "Reader Panel",
+        description:
+          "This is the main Bible reading workspace. From here you can read, split panels, highlight verses, and open study tools.",
+        selector: "[data-tour='reader-panel']",
+      },
+      {
+        id: "panel-menu",
+        title: "Panel Options",
+        description:
+          "Each panel has its own menu for history, fullscreen, home, splitting, moving, and other panel-specific actions.",
+        selector: "[data-tour='panel-menu']",
+      },
+      {
+        id: "panel-bottom-bar",
+        title: "Panel Bottom Bar",
+        description:
+          "The bottom bar gives quick access to chapter audio, reading progress, and chapter-level actions like marking read.",
+        selector: "[data-tour='panel-bottom-bar']",
+      },
+    ],
+    [],
+  );
+
+  const goToGuidedTourStep = useCallback(
+    (nextIndex: number) => {
+      const clampedIndex = Math.max(
+        0,
+        Math.min(nextIndex, guidedTourSteps.length - 1),
+      );
+      const step = guidedTourSteps[clampedIndex];
+      if (
+        (step.id === "reader-panel" || step.id === "panel-menu") &&
+        firstReaderTabId
+      ) {
+        setActiveTabId(firstReaderTabId);
+      }
+      setGuidedTourStepIndex(clampedIndex);
+    },
+    [firstReaderTabId, guidedTourSteps],
+  );
+
+  const startGuidedTour = useCallback(() => {
+    setIsGuidedTourOpen(true);
+    goToGuidedTourStep(0);
+  }, [goToGuidedTourStep]);
+
+  const closeGuidedTour = useCallback(() => {
+    setIsGuidedTourOpen(false);
+  }, []);
+
   if (!isLoaded) {
     return <ReaderStatusScreen message="Loading Bible data..." />;
   }
@@ -4682,6 +4809,7 @@ export function KJVReader() {
           renderReferencePreview={referencePreviewContent}
           onOpenReference={openConcordanceReference}
           onCloseSidebar={closeRightSidebarForMobile}
+          onStartTour={startGuidedTour}
         />
       </div>
     );
@@ -4730,11 +4858,27 @@ export function KJVReader() {
           <TabsWorkspace
             tabsOrientation={tabsOrientation}
             tabsStrip={tabsStrip}
-            readerContent={
+          readerContent={
               <div className="relative flex h-full min-h-0 min-w-0 flex-1 overflow-hidden">
                 {mountedTabPanels}
               </div>
             }
+          />
+          <GuidedTour
+            open={isGuidedTourOpen}
+            stepIndex={guidedTourStepIndex}
+            steps={guidedTourSteps}
+            onNext={() => {
+              if (guidedTourStepIndex >= guidedTourSteps.length - 1) {
+                closeGuidedTour();
+                return;
+              }
+              goToGuidedTourStep(guidedTourStepIndex + 1);
+            }}
+            onPrevious={() => {
+              goToGuidedTourStep(guidedTourStepIndex - 1);
+            }}
+            onClose={closeGuidedTour}
           />
         </SidebarInset>
 

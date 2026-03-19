@@ -272,6 +272,7 @@ type ReaderPanelTreeProps = {
   renderReferencePreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
   onCloseSidebar: () => void;
+  onStartTour: () => void;
 };
 
 type ReaderLeafPanelProps = Omit<ReaderPanelTreeProps, "root"> & {
@@ -370,6 +371,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   renderReferencePreview,
   onOpenReference,
   onCloseSidebar,
+  onStartTour,
 }: ReaderLeafPanelProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -712,7 +714,10 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
         isFullscreenLeaf && "fixed inset-0 z-40 h-screen w-screen",
       )}
     >
-      <Card className="flex h-full min-h-0 w-full min-w-0 flex-col rounded-none py-0">
+      <Card
+        className="flex h-full min-h-0 w-full min-w-0 flex-col rounded-none py-0"
+        data-tour={leaf.view === "reader" ? "reader-panel" : undefined}
+      >
         <CardHeader className="border-b p-2!">
           <div className="flex flex-wrap items-center gap-2">
             {showTargetedPanelToggle ? (
@@ -801,7 +806,12 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
             >
               <DropdownMenuTrigger
                 render={
-                  <Button variant="outline" size="icon-sm" className="ml-auto" />
+                  <Button
+                    variant="outline"
+                    size="icon-sm"
+                    className="ml-auto"
+                    data-tour={leaf.view === "reader" ? "panel-menu" : undefined}
+                  />
                 }
               >
                 <EllipsisVerticalIcon />
@@ -1421,7 +1431,10 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   )}
                 </div>
               ) : null}
-              <div className="@container/toolbar flex items-center justify-between p-2">
+              <div
+                className="@container/toolbar flex items-center justify-between p-2"
+                data-tour="panel-bottom-bar"
+              >
                 <Button
                   variant="outline"
                   size="sm"
@@ -1574,6 +1587,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 renderPreview={renderReferencePreview}
                 onOpenReference={onOpenReference}
                 onCloseSidebar={onCloseSidebar}
+                onStartTour={onStartTour}
               />
             )}
           </CardContent>
@@ -1773,6 +1787,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   renderReferencePreview,
   onOpenReference,
   onCloseSidebar,
+  onStartTour,
 }: ReaderPanelTreeProps) {
   const renderLeaf = (leaf: LeafNode) => (
     <ReaderLeafPanel
@@ -1861,6 +1876,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       renderReferencePreview={renderReferencePreview}
       onOpenReference={onOpenReference}
       onCloseSidebar={onCloseSidebar}
+      onStartTour={onStartTour}
     />
   );
 
