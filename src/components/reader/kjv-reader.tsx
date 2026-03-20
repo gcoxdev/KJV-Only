@@ -51,6 +51,7 @@ import {
   parseImportedBookmarksPayload,
   parseImportedNotesPayload,
 } from "@/lib/reader-transfer";
+import { swapRecordEntries, swapSingleLeafReference } from "@/lib/leaf-state";
 import {
   collectLeafIds,
   countLeaves,
@@ -578,6 +579,7 @@ export function KJVReader() {
     setLeafHighlights,
     queueVerseHighlights,
     setVerseHighlights,
+    swapLeafHighlights,
   } = useVerseHighlights({
     panelElementRefs,
     activeTabId,
@@ -905,15 +907,15 @@ export function KJVReader() {
           continue;
         }
 
-        const currentEntry = existing.entries[existing.index];
-        if (currentEntry && leafHistoryEntryEquals(currentEntry, entry)) {
-          next[leafId] = existing;
-          continue;
-        }
-
         if (pendingLeafHistoryNavigationRef.current.has(leafId)) {
           pendingLeafHistoryNavigationRef.current.delete(leafId);
           next[leafId] = { ...existing };
+          continue;
+        }
+
+        const currentEntry = existing.entries[existing.index];
+        if (currentEntry && leafHistoryEntryEquals(currentEntry, entry)) {
+          next[leafId] = existing;
           continue;
         }
 
@@ -1117,6 +1119,7 @@ export function KJVReader() {
     importNotes,
     changeNotesTabState,
     initializeNotesTabState,
+    swapNotesTabState,
     generalNotes,
     contextNotes,
   } = useReaderNotes({
@@ -1134,6 +1137,7 @@ export function KJVReader() {
     importBookmarks,
     toggleHighlightModeForLeaf,
     disableHighlightModeForLeaf,
+    swapHighlightModeForLeaves,
     createChapterBookmark,
   } = useReaderBookmarks({
     books,
@@ -2093,6 +2097,33 @@ export function KJVReader() {
     if (!targetLeafId) {
       return;
     }
+
+    swapNotesTabState(leafId, targetLeafId);
+    setSearchPageStateByLeafId((current) =>
+      swapRecordEntries(current, leafId, targetLeafId),
+    );
+    setLeafHistoryByLeafId((current) =>
+      swapRecordEntries(current, leafId, targetLeafId),
+    );
+    swapHighlightModeForLeaves(leafId, targetLeafId);
+    swapLeafHighlights(leafId, targetLeafId);
+    setActiveReaderWordHighlight((current) =>
+      swapSingleLeafReference(current, leafId, targetLeafId),
+    );
+    setPendingReaderScrollTarget((current) =>
+      swapSingleLeafReference(current, leafId, targetLeafId),
+    );
+    setTargetedPanelLeafId((current) => {
+      if (current === leafId) {
+        targetedPanelLeafIdRef.current = targetLeafId;
+        return targetLeafId;
+      }
+      if (current === targetLeafId) {
+        targetedPanelLeafIdRef.current = leafId;
+        return leafId;
+      }
+      return current;
+    });
 
     updateActiveTab((tab) => ({
       ...tab,

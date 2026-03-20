@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { bookmarkCanonicalKey, bookmarkScopeLabel, normalizeRangePoints } from "@/lib/bookmarks";
+import { swapRecordEntries } from "@/lib/leaf-state";
 import { createId } from "@/lib/reader-layout";
 import type { Book } from "@/types/bible";
 import type {
@@ -177,6 +178,15 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
     });
   }, []);
 
+  const swapHighlightModeForLeaves = useCallback(
+    (sourceLeafId: string, targetLeafId: string) => {
+      setHighlightModeEnabledByLeafId((current) =>
+        swapRecordEntries(current, sourceLeafId, targetLeafId),
+      );
+    },
+    [],
+  );
+
   const createChapterBookmark = useCallback(
     (bookIndex: number, chapterIndex: number) => {
       upsertBookmark({
@@ -199,6 +209,7 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
     importBookmarks,
     toggleHighlightModeForLeaf,
     disableHighlightModeForLeaf,
+    swapHighlightModeForLeaves,
     createChapterBookmark,
   };
 }

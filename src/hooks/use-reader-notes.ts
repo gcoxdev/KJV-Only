@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { migrateNoteBodyInternalLinks } from "@/lib/note-links";
+import { swapRecordEntries } from "@/lib/leaf-state";
 import { noteMatchesContext } from "@/lib/notes";
 import { createId, findLeafNode, collectLeafIds } from "@/lib/reader-layout";
 import type { NotesContext, NotesTabState, ReaderNote } from "@/types/notes";
@@ -235,6 +236,12 @@ export function useReaderNotes({ activeTab }: UseReaderNotesArgs) {
     [],
   );
 
+  const swapNotesTabState = useCallback((sourceLeafId: string, targetLeafId: string) => {
+    setNotesTabStateByLeafId((current) =>
+      swapRecordEntries(current, sourceLeafId, targetLeafId),
+    );
+  }, []);
+
   const generalNotes = useMemo(
     () =>
       readerNotes
@@ -267,6 +274,7 @@ export function useReaderNotes({ activeTab }: UseReaderNotesArgs) {
     importNotes,
     changeNotesTabState,
     initializeNotesTabState,
+    swapNotesTabState,
     generalNotes,
     contextNotes,
   };
