@@ -540,7 +540,7 @@ export function tokenizeStrongsDerivation(input: string): StrongsDerivationToken
 
 export function parseBibleReference(reference: string) {
   const chapterSpanMatch = reference.match(
-    /^([1-3]?[A-Z]{2,3})\.(\d+)\.(\d+):(\d+)\.(\d+)$/,
+    /^([1-3]?[A-Z]{2,3})\.(\d+)\.(\d+)(?::|-)(\d+)\.(\d+)$/,
   );
   if (chapterSpanMatch) {
     const [
