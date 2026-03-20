@@ -2,13 +2,13 @@ export const STUDY_ACCORDION_ITEMS = [
   "cross-refs",
   "concordance",
   "websters",
-  "ai-dictionary",
   "strongs",
-  "bible-word-book",
   "kjv-words-phrases",
-  "maps",
+  "bible-word-book",
   "hitchcocks",
+  "ai-dictionary",
   "genealogy",
+  "maps",
 ] as const;
 
 type UseStudySidebarStateArgs = {
