@@ -20,6 +20,19 @@ export type NoteLinkTarget =
       ranges: Array<{ start: number; end: number }>;
     }
   | {
+      type: "range";
+      start: {
+        bookIndex: number;
+        chapterIndex: number;
+        verseNumber: number;
+      };
+      end: {
+        bookIndex: number;
+        chapterIndex: number;
+        verseNumber: number;
+      };
+    }
+  | {
       type: "word";
       bookIndex: number;
       chapterIndex: number;

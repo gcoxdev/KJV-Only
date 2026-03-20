@@ -7,6 +7,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import type { LexicalEditor } from "lexical"
 
+import { normalizeRangePoints } from "@/lib/bookmarks"
 import { ContentEditable } from "@/components/editor/editor-ui/content-editable"
 import { AutoLinkPlugin } from "@/components/editor/plugins/auto-link-plugin"
 import { FloatingLinkEditorPlugin } from "@/components/editor/plugins/floating-link-editor-plugin"
@@ -111,22 +112,11 @@ function noteLinkTargetFromHighlightScope(
     }
   }
   if (scope.type === "range") {
-    if (
-      scope.start.bookIndex !== scope.end.bookIndex ||
-      scope.start.chapterIndex !== scope.end.chapterIndex
-    ) {
-      return null
-    }
+    const normalized = normalizeRangePoints(scope.start, scope.end)
     return {
-      type: "selection",
-      bookIndex: scope.start.bookIndex,
-      chapterIndex: scope.start.chapterIndex,
-      ranges: [
-        {
-          start: scope.start.verseNumber,
-          end: scope.end.verseNumber,
-        },
-      ],
+      type: "range",
+      start: normalized.start,
+      end: normalized.end,
     }
   }
   return null
