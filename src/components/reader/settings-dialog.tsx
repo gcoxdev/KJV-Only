@@ -51,9 +51,12 @@ export type SettingsPanelContentProps = {
   onIncreaseFontSize: () => void;
   onDecreaseFontSize: () => void;
   onResetFontSize: () => void;
-  highlightColor: string;
-  onHighlightColorChange: (value: string) => void;
-  onResetHighlightColor: () => void;
+  lightHighlightColor: string;
+  onLightHighlightColorChange: (value: string) => void;
+  onResetLightHighlightColor: () => void;
+  darkHighlightColor: string;
+  onDarkHighlightColorChange: (value: string) => void;
+  onResetDarkHighlightColor: () => void;
   verseSpacing: number;
   onVerseSpacingChange: (value: number) => void;
   hideReadModeVerseNumbers: boolean;
@@ -90,9 +93,12 @@ export function SettingsPanelContent({
   onIncreaseFontSize,
   onDecreaseFontSize,
   onResetFontSize,
-  highlightColor,
-  onHighlightColorChange,
-  onResetHighlightColor,
+  lightHighlightColor,
+  onLightHighlightColorChange,
+  onResetLightHighlightColor,
+  darkHighlightColor,
+  onDarkHighlightColorChange,
+  onResetDarkHighlightColor,
   verseSpacing,
   onVerseSpacingChange,
   hideReadModeVerseNumbers,
@@ -114,7 +120,23 @@ export function SettingsPanelContent({
   referenceLinkOpenTarget,
   onReferenceLinkOpenTargetChange,
 }: SettingsPanelContentProps) {
-  const [draftHighlightColor, setDraftHighlightColor] = useState(highlightColor);
+  const readerColorThemeLabels: Record<ReaderColorTheme, string> = {
+    brown: "Brown",
+    contrast: "Contrast",
+    slate: "Slate",
+    crimson: "Crimson",
+    amber: "Amber",
+    forest: "Forest",
+    navy: "Navy",
+    indigo: "Indigo",
+    violet: "Violet",
+  };
+  const [draftLightHighlightColor, setDraftLightHighlightColor] = useState(
+    lightHighlightColor,
+  );
+  const [draftDarkHighlightColor, setDraftDarkHighlightColor] = useState(
+    darkHighlightColor,
+  );
   const wordVerseSelectionTargetLabel =
     wordVerseSelectionTarget === "sidebar"
       ? "Sidebar"
@@ -147,32 +169,51 @@ export function SettingsPanelContent({
       : referenceLinkOpenTarget === "new-panel"
         ? "New Panel"
         : "Targeted Panel";
-  const readerColorThemeLabel =
-    readerColorTheme === "brown"
-      ? "Brown"
-      : readerColorTheme === "slate"
-        ? "Slate"
-        : readerColorTheme === "forest"
-          ? "Forest"
-          : "Navy";
+  const readerColorThemeLabel = readerColorThemeLabels[readerColorTheme];
 
   useEffect(() => {
-    setDraftHighlightColor(highlightColor);
-  }, [highlightColor]);
+    setDraftLightHighlightColor(lightHighlightColor);
+  }, [lightHighlightColor]);
 
   useEffect(() => {
-    if (draftHighlightColor === highlightColor) {
+    if (draftLightHighlightColor === lightHighlightColor) {
       return;
     }
 
     const timeoutId = window.setTimeout(() => {
-      onHighlightColorChange(draftHighlightColor);
+      onLightHighlightColorChange(draftLightHighlightColor);
     }, 120);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [draftHighlightColor, highlightColor, onHighlightColorChange]);
+  }, [
+    draftLightHighlightColor,
+    lightHighlightColor,
+    onLightHighlightColorChange,
+  ]);
+
+  useEffect(() => {
+    setDraftDarkHighlightColor(darkHighlightColor);
+  }, [darkHighlightColor]);
+
+  useEffect(() => {
+    if (draftDarkHighlightColor === darkHighlightColor) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      onDarkHighlightColorChange(draftDarkHighlightColor);
+    }, 120);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [
+    darkHighlightColor,
+    draftDarkHighlightColor,
+    onDarkHighlightColorChange,
+  ]);
 
   return (
     <Tabs defaultValue="visual" className="flex h-full min-h-0 flex-col overflow-hidden">
@@ -204,9 +245,14 @@ export function SettingsPanelContent({
                   onValueChange={(value) => {
                     if (
                       value === "brown" ||
+                      value === "contrast" ||
                       value === "slate" ||
+                      value === "crimson" ||
+                      value === "amber" ||
                       value === "forest" ||
-                      value === "navy"
+                      value === "navy" ||
+                      value === "indigo" ||
+                      value === "violet"
                     ) {
                       onReaderColorThemeChange(value);
                     }
@@ -219,9 +265,14 @@ export function SettingsPanelContent({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="brown">Brown</SelectItem>
+                    <SelectItem value="contrast">Contrast</SelectItem>
                     <SelectItem value="slate">Slate</SelectItem>
+                    <SelectItem value="crimson">Crimson</SelectItem>
+                    <SelectItem value="amber">Amber</SelectItem>
                     <SelectItem value="forest">Forest</SelectItem>
                     <SelectItem value="navy">Navy</SelectItem>
+                    <SelectItem value="indigo">Indigo</SelectItem>
+                    <SelectItem value="violet">Violet</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -262,18 +313,18 @@ export function SettingsPanelContent({
               </div>
               <div className="space-y-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">
-                  <Label htmlFor="highlight-color">Highlight Color</Label>
+                  <Label htmlFor="light-highlight-color">Light Highlight Color</Label>
                   <span className="font-mono text-xs text-muted-foreground">
-                    {draftHighlightColor}
+                    {draftLightHighlightColor}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Input
-                    id="highlight-color"
+                    id="light-highlight-color"
                     type="color"
-                    value={draftHighlightColor}
+                    value={draftLightHighlightColor}
                     onChange={(event) =>
-                      setDraftHighlightColor(event.currentTarget.value)
+                      setDraftLightHighlightColor(event.currentTarget.value)
                     }
                     className="h-9 w-14 shrink-0 p-1"
                   />
@@ -281,7 +332,35 @@ export function SettingsPanelContent({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={onResetHighlightColor}
+                    onClick={onResetLightHighlightColor}
+                  >
+                    <RotateCcwIcon />
+                    Reset
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2 border-t pt-3">
+                <div className="flex min-w-0 items-center justify-between gap-3">
+                  <Label htmlFor="dark-highlight-color">Dark Highlight Color</Label>
+                  <span className="font-mono text-xs text-muted-foreground">
+                    {draftDarkHighlightColor}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="dark-highlight-color"
+                    type="color"
+                    value={draftDarkHighlightColor}
+                    onChange={(event) =>
+                      setDraftDarkHighlightColor(event.currentTarget.value)
+                    }
+                    className="h-9 w-14 shrink-0 p-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={onResetDarkHighlightColor}
                   >
                     <RotateCcwIcon />
                     Reset
