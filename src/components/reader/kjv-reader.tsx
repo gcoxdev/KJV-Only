@@ -100,6 +100,7 @@ import type {
   WordVerseSelectionTarget,
   NotesLinkOpenTarget,
   BookmarkOpenTarget,
+  ReferenceLinkOpenTarget,
 } from "@/types/reader";
 import type { BookmarkScope, ReaderBookmark } from "@/types/bookmarks";
 import type { NoteLinkTarget } from "@/types/notes";
@@ -362,6 +363,8 @@ export function KJVReader() {
     useState<SearchResultOpenTarget>("new-panel");
   const [bookmarkOpenTarget, setBookmarkOpenTarget] =
     useState<BookmarkOpenTarget>("new-panel");
+  const [referenceLinkOpenTarget, setReferenceLinkOpenTarget] =
+    useState<ReferenceLinkOpenTarget>("new-tab");
   const [targetedPanelLeafId, setTargetedPanelLeafId] = useState<string | null>(
     null,
   );
@@ -547,10 +550,8 @@ export function KJVReader() {
 
   const {
     highlightedVerseRangesByLeafId,
-    clearAllVerseHighlights,
     clearLeafHighlights,
     setLeafHighlights,
-    queueVerseHighlight,
     queueVerseHighlights,
     setVerseHighlights,
   } = useVerseHighlights({
@@ -595,6 +596,7 @@ export function KJVReader() {
         notesLinkOpenTarget?: NotesLinkOpenTarget;
         searchResultOpenTarget?: SearchResultOpenTarget;
         bookmarkOpenTarget?: BookmarkOpenTarget;
+        referenceLinkOpenTarget?: ReferenceLinkOpenTarget;
       };
       if (typeof parsed.fontSize === "number") {
         setFontSize(Math.max(8, Math.round(parsed.fontSize)));
@@ -663,6 +665,13 @@ export function KJVReader() {
       ) {
         setBookmarkOpenTarget(parsed.bookmarkOpenTarget);
       }
+      if (
+        parsed.referenceLinkOpenTarget === "new-tab" ||
+        parsed.referenceLinkOpenTarget === "new-panel" ||
+        parsed.referenceLinkOpenTarget === "targeted-panel"
+      ) {
+        setReferenceLinkOpenTarget(parsed.referenceLinkOpenTarget);
+      }
     } catch {
       // Ignore malformed persisted display settings.
     }
@@ -683,6 +692,7 @@ export function KJVReader() {
         notesLinkOpenTarget,
         searchResultOpenTarget,
         bookmarkOpenTarget,
+        referenceLinkOpenTarget,
       }),
     );
   }, [
@@ -697,6 +707,7 @@ export function KJVReader() {
     notesLinkOpenTarget,
     searchResultOpenTarget,
     bookmarkOpenTarget,
+    referenceLinkOpenTarget,
   ]);
 
   useEffect(() => {
@@ -891,10 +902,12 @@ export function KJVReader() {
       wordVerseSelectionTarget === "targeted-panel" ||
       notesLinkOpenTarget === "targeted-panel" ||
       searchResultOpenTarget === "targeted-panel" ||
-      bookmarkOpenTarget === "targeted-panel",
+      bookmarkOpenTarget === "targeted-panel" ||
+      referenceLinkOpenTarget === "targeted-panel",
     [
       bookmarkOpenTarget,
       notesLinkOpenTarget,
+      referenceLinkOpenTarget,
       searchResultOpenTarget,
       wordVerseSelectionTarget,
     ],
@@ -2984,45 +2997,31 @@ export function KJVReader() {
     [openReaderTarget, searchResultOpenTarget],
   );
 
-  const openChapterReferenceInNewTab = useCallback(
+  const openChapterReference = useCallback(
     (
       bookIndex: number,
       chapterIndex: number,
       verseStart: number,
       verseEnd = verseStart,
     ) => {
-      clearAllVerseHighlights();
-      setSelectedHighlightScope(null);
-      const nextTabId = createId();
-      const nextLeaf = createLeaf(bookIndex, chapterIndex, "reader");
-      setTabs((currentTabs) => [
-        ...currentTabs,
-        {
-          id: nextTabId,
-          title: `Tab ${currentTabs.length + 1}`,
-          root: {
-            ...nextLeaf,
-            pickerTestament: null,
-            pickerBookIndex: null,
-          },
-        },
-      ]);
-      queueVerseHighlight(nextLeaf.id, { start: verseStart, end: verseEnd });
-      setActiveTabId(nextTabId);
-      requestAnimationFrame(() => {
-        tabEndRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: tabsOrientation === "vertical" ? "end" : "nearest",
-          inline: tabsOrientation === "vertical" ? "nearest" : "end",
-        });
-      });
+      openReaderTarget(
+        verseStart === verseEnd
+          ? {
+              type: "verse",
+              bookIndex,
+              chapterIndex,
+              verseNumber: verseStart,
+            }
+          : {
+              type: "selection",
+              bookIndex,
+              chapterIndex,
+              ranges: [{ start: verseStart, end: verseEnd }],
+            },
+        referenceLinkOpenTarget,
+      );
     },
-    [
-      clearAllVerseHighlights,
-      queueVerseHighlight,
-      setSelectedHighlightScope,
-      tabsOrientation,
-    ],
+    [openReaderTarget, referenceLinkOpenTarget],
   );
 
   const handleClearLeafHighlights = useCallback(
@@ -4208,7 +4207,7 @@ export function KJVReader() {
     renderPreview: referencePreviewContent,
   } = useReferencePreview({
     books,
-    openChapterReferenceInNewTab,
+    openChapterReference,
   });
 
   const selectGenealogyPerson = useCallback(
@@ -4682,6 +4681,8 @@ export function KJVReader() {
     onSearchResultOpenTargetChange: setSearchResultOpenTarget,
     bookmarkOpenTarget,
     onBookmarkOpenTargetChange: setBookmarkOpenTarget,
+    referenceLinkOpenTarget,
+    onReferenceLinkOpenTargetChange: setReferenceLinkOpenTarget,
   };
   const progressPanelProps = {
     totalProgressPercent,
