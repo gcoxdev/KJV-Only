@@ -1,3 +1,9 @@
+import { normalizeBookmarkRanges, normalizeRangePoints } from "@/lib/bookmarks";
+import {
+  BOOK_ICON_CODES,
+  chapterVerseKey,
+  parseBibleReference,
+} from "@/lib/references";
 import type { Book } from "@/types/bible";
 import type { NoteLinkTarget, ParsedBibleReference } from "@/types/notes";
 
@@ -27,9 +33,19 @@ function findBookIndexByName(books: Book[], bookName: string) {
   return books.findIndex((book) => book.name === bookName);
 }
 
+function bookCodeForIndex(bookIndex: number) {
+  return BOOK_ICON_CODES[bookIndex] ?? "GEN";
+}
+
+function parseBookCode(bookCode: string) {
+  return BOOK_ICON_CODES.findIndex((code) => code === bookCode);
+}
+
 function encodeRanges(ranges: Array<{ start: number; end: number }>) {
-  return ranges
-    .map((range) => `${range.start}-${range.end}`)
+  return normalizeBookmarkRanges(ranges)
+    .map((range) =>
+      range.start === range.end ? `${range.start}` : `${range.start}-${range.end}`,
+    )
     .join(",");
 }
 
@@ -37,9 +53,13 @@ function decodeRanges(value: string) {
   const ranges = value
     .split(",")
     .map((segment) => {
-      const [startText, endText] = segment.split("-");
+      const normalizedSegment = segment.trim();
+      if (!normalizedSegment) {
+        return null;
+      }
+      const [startText, endText] = normalizedSegment.split("-");
       const start = Number.parseInt(startText ?? "", 10);
-      const end = Number.parseInt(endText ?? "", 10);
+      const end = Number.parseInt(endText ?? startText ?? "", 10);
       if (
         !Number.isInteger(start) ||
         start <= 0 ||
@@ -52,20 +72,95 @@ function decodeRanges(value: string) {
     })
     .filter((range): range is { start: number; end: number } => range !== null);
 
-  return ranges.length > 0 ? ranges : null;
+  return ranges.length > 0 ? normalizeBookmarkRanges(ranges) : null;
+}
+
+function parseChapterHref(path: string): NoteLinkTarget | null {
+  const match = path.match(/^([1-3]?[A-Z]{2,3})\.(\d+)$/);
+  if (!match) {
+    return null;
+  }
+
+  const [, bookCode, chapterText] = match;
+  const bookIndex = parseBookCode(bookCode);
+  const chapterNumber = Number.parseInt(chapterText ?? "", 10);
+  if (bookIndex < 0 || !Number.isInteger(chapterNumber) || chapterNumber <= 0) {
+    return null;
+  }
+
+  return {
+    type: "chapter",
+    bookIndex,
+    chapterIndex: chapterNumber - 1,
+  };
+}
+
+function parseSelectionHref(path: string): NoteLinkTarget | null {
+  const match = path.match(/^([1-3]?[A-Z]{2,3})\.(\d+)\.([\d,\-\s]+)$/);
+  if (!match) {
+    return null;
+  }
+
+  const [, bookCode, chapterText, rangesText] = match;
+  const bookIndex = parseBookCode(bookCode);
+  const chapterNumber = Number.parseInt(chapterText ?? "", 10);
+  const ranges = decodeRanges(rangesText ?? "");
+  if (
+    bookIndex < 0 ||
+    !Number.isInteger(chapterNumber) ||
+    chapterNumber <= 0 ||
+    !ranges
+  ) {
+    return null;
+  }
+
+  if (ranges.length === 1 && ranges[0]?.start === ranges[0]?.end) {
+    return {
+      type: "verse",
+      bookIndex,
+      chapterIndex: chapterNumber - 1,
+      verseNumber: ranges[0].start,
+    };
+  }
+
+  return {
+    type: "selection",
+    bookIndex,
+    chapterIndex: chapterNumber - 1,
+    ranges,
+  };
 }
 
 export function buildNoteLinkHref(target: NoteLinkTarget): string {
   if (target.type === "chapter") {
-    return `${NOTE_LINK_PROTOCOL}chapter/${target.bookIndex}/${target.chapterIndex}`;
+    return `${NOTE_LINK_PROTOCOL}${bookCodeForIndex(target.bookIndex)}.${target.chapterIndex + 1}`;
   }
   if (target.type === "verse") {
-    return `${NOTE_LINK_PROTOCOL}verse/${target.bookIndex}/${target.chapterIndex}/${target.verseNumber}`;
+    return `${NOTE_LINK_PROTOCOL}${chapterVerseKey(
+      target.bookIndex,
+      target.chapterIndex,
+      target.verseNumber,
+    )}`;
   }
   if (target.type === "selection") {
-    return `${NOTE_LINK_PROTOCOL}selection/${target.bookIndex}/${target.chapterIndex}/${encodeRanges(target.ranges)}`;
+    return `${NOTE_LINK_PROTOCOL}${bookCodeForIndex(target.bookIndex)}.${target.chapterIndex + 1}.${encodeRanges(target.ranges)}`;
   }
-  return `${NOTE_LINK_PROTOCOL}word/${target.bookIndex}/${target.chapterIndex}/${target.verseNumber}/${encodeURIComponent(target.word)}`;
+  if (target.type === "range") {
+    const normalized = normalizeRangePoints(target.start, target.end);
+    const startCode = bookCodeForIndex(normalized.start.bookIndex);
+    if (
+      normalized.start.bookIndex === normalized.end.bookIndex &&
+      normalized.start.chapterIndex === normalized.end.chapterIndex
+    ) {
+      return `${NOTE_LINK_PROTOCOL}${startCode}.${normalized.start.chapterIndex + 1}.${normalized.start.verseNumber}-${normalized.end.verseNumber}`;
+    }
+    return `${NOTE_LINK_PROTOCOL}${startCode}.${normalized.start.chapterIndex + 1}.${normalized.start.verseNumber}-${normalized.end.chapterIndex + 1}.${normalized.end.verseNumber}`;
+  }
+  return `${NOTE_LINK_PROTOCOL}${chapterVerseKey(
+    target.bookIndex,
+    target.chapterIndex,
+    target.verseNumber,
+  )}/${encodeURIComponent(target.word)}`;
 }
 
 export function parseNoteLinkHref(href: string): NoteLinkTarget | null {
@@ -77,13 +172,19 @@ export function parseNoteLinkHref(href: string): NoteLinkTarget | null {
   } else {
     return null;
   }
+
   const segments = path.split("/");
   const kind = segments[0];
 
   if (kind === "chapter" && segments.length === 3) {
     const bookIndex = Number.parseInt(segments[1] ?? "", 10);
     const chapterIndex = Number.parseInt(segments[2] ?? "", 10);
-    if (Number.isInteger(bookIndex) && bookIndex >= 0 && Number.isInteger(chapterIndex) && chapterIndex >= 0) {
+    if (
+      Number.isInteger(bookIndex) &&
+      bookIndex >= 0 &&
+      Number.isInteger(chapterIndex) &&
+      chapterIndex >= 0
+    ) {
       return { type: "chapter", bookIndex, chapterIndex };
     }
   }
@@ -138,6 +239,77 @@ export function parseNoteLinkHref(href: string): NoteLinkTarget | null {
     }
   }
 
+  const [referencePath, ...wordSegments] = path.split("/");
+  if (wordSegments.length > 0) {
+    const parsedReference = parseBibleReference(referencePath ?? "");
+    const word = decodeURIComponent(wordSegments.join("/"));
+    if (
+      parsedReference &&
+      parsedReference.startChapterIndex === parsedReference.endChapterIndex &&
+      parsedReference.startVerse === parsedReference.endVerse &&
+      word.trim()
+    ) {
+      return {
+        type: "word",
+        bookIndex: parsedReference.bookIndex,
+        chapterIndex: parsedReference.startChapterIndex,
+        verseNumber: parsedReference.startVerse,
+        word,
+      };
+    }
+    return null;
+  }
+
+  const chapterTarget = parseChapterHref(path);
+  if (chapterTarget) {
+    return chapterTarget;
+  }
+
+  const parsedReference = parseBibleReference(path);
+  if (parsedReference) {
+    if (
+      parsedReference.startChapterIndex !== parsedReference.endChapterIndex
+    ) {
+      return {
+        type: "range",
+        start: {
+          bookIndex: parsedReference.bookIndex,
+          chapterIndex: parsedReference.startChapterIndex,
+          verseNumber: parsedReference.startVerse,
+        },
+        end: {
+          bookIndex: parsedReference.bookIndex,
+          chapterIndex: parsedReference.endChapterIndex,
+          verseNumber: parsedReference.endVerse,
+        },
+      };
+    }
+    if (parsedReference.startVerse === parsedReference.endVerse) {
+      return {
+        type: "verse",
+        bookIndex: parsedReference.bookIndex,
+        chapterIndex: parsedReference.startChapterIndex,
+        verseNumber: parsedReference.startVerse,
+      };
+    }
+    return {
+      type: "selection",
+      bookIndex: parsedReference.bookIndex,
+      chapterIndex: parsedReference.startChapterIndex,
+      ranges: [
+        {
+          start: parsedReference.startVerse,
+          end: parsedReference.endVerse,
+        },
+      ],
+    };
+  }
+
+  const selectionTarget = parseSelectionHref(path);
+  if (selectionTarget) {
+    return selectionTarget;
+  }
+
   return null;
 }
 
@@ -159,12 +331,10 @@ export function migrateNoteBodyInternalLinks(body: string) {
       const isLinkLikeNode = record.type === "link" || record.type === "autolink";
       if (url && isLinkLikeNode) {
         const normalizedUrl = url.replace(`${NOTE_LINK_WEB_ORIGIN}/`, NOTE_LINK_PROTOCOL);
-        if (
-          normalizedUrl.startsWith(NOTE_LINK_PROTOCOL) ||
-          normalizedUrl.startsWith(`${NOTE_LINK_WEB_ORIGIN}/`)
-        ) {
+        const parsedTarget = parseNoteLinkHref(normalizedUrl);
+        if (parsedTarget) {
           record.type = "kjv-link";
-          record.url = normalizedUrl;
+          record.url = buildNoteLinkHref(parsedTarget);
         } else if (record.type === "autolink") {
           record.type = "link";
           record.url = normalizedUrl;
@@ -198,6 +368,20 @@ export function migrateNoteBodyInternalLinks(body: string) {
 }
 
 export function formatNoteLinkLabel(target: NoteLinkTarget, books: Book[]): string {
+  if (target.type === "range") {
+    const normalized = normalizeRangePoints(target.start, target.end);
+    const bookName =
+      books[normalized.start.bookIndex]?.name ??
+      `Book ${normalized.start.bookIndex + 1}`;
+    if (
+      normalized.start.bookIndex === normalized.end.bookIndex &&
+      normalized.start.chapterIndex === normalized.end.chapterIndex
+    ) {
+      return `${bookName} ${normalized.start.chapterIndex + 1}:${normalized.start.verseNumber}-${normalized.end.verseNumber}`;
+    }
+    return `${bookName} ${normalized.start.chapterIndex + 1}:${normalized.start.verseNumber}-${normalized.end.chapterIndex + 1}:${normalized.end.verseNumber}`;
+  }
+
   const bookName = books[target.bookIndex]?.name ?? `Book ${target.bookIndex + 1}`;
   const chapterNumber = target.chapterIndex + 1;
   if (target.type === "chapter") {

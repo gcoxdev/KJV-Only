@@ -25,7 +25,7 @@ describe("note links", () => {
       chapterIndex: 2,
     });
 
-    expect(href).toBe("kjv://chapter/1/2");
+    expect(href).toBe("kjv://EXO.3");
     expect(parseNoteLinkHref(href)).toEqual({
       type: "chapter",
       bookIndex: 1,
@@ -41,6 +41,7 @@ describe("note links", () => {
       verseNumber: 16,
     });
 
+    expect(href).toBe("kjv://EXO.3.16");
     expect(parseNoteLinkHref(href)).toEqual({
       type: "verse",
       bookIndex: 1,
@@ -58,6 +59,7 @@ describe("note links", () => {
       word: "touching",
     });
 
+    expect(href).toBe("kjv://NUM.4.10/touching");
     expect(parseNoteLinkHref(href)).toEqual({
       type: "word",
       bookIndex: 3,
@@ -78,6 +80,7 @@ describe("note links", () => {
       ],
     });
 
+    expect(href).toBe("kjv://EXO.3.16-18,20");
     expect(parseNoteLinkHref(href)).toEqual({
       type: "selection",
       bookIndex: 1,
@@ -89,13 +92,44 @@ describe("note links", () => {
     });
   });
 
+  it("builds and parses cross-chapter range hrefs", () => {
+    const href = buildNoteLinkHref({
+      type: "range",
+      start: {
+        bookIndex: 0,
+        chapterIndex: 0,
+        verseNumber: 31,
+      },
+      end: {
+        bookIndex: 0,
+        chapterIndex: 1,
+        verseNumber: 3,
+      },
+    });
+
+    expect(href).toBe("kjv://GEN.1.31-2.3");
+    expect(parseNoteLinkHref(href)).toEqual({
+      type: "range",
+      start: {
+        bookIndex: 0,
+        chapterIndex: 0,
+        verseNumber: 31,
+      },
+      end: {
+        bookIndex: 0,
+        chapterIndex: 1,
+        verseNumber: 3,
+      },
+    });
+  });
+
   it("rejects malformed hrefs", () => {
     expect(parseNoteLinkHref("kjv://verse/1/2")).toBeNull();
     expect(parseNoteLinkHref("https://kjv.local/verse/1/2")).toBeNull();
     expect(parseNoteLinkHref("kjv://word/1/2/0/faith")).toBeNull();
     expect(parseNoteLinkHref("https://example.com")).toBeNull();
-    expect(isInternalNoteLink("kjv://verse/1/2/16")).toBe(true);
-    expect(isInternalNoteLink("https://kjv.local/verse/1/2/16")).toBe(true);
+    expect(isInternalNoteLink("kjv://JHN.3.16")).toBe(true);
+    expect(isInternalNoteLink("https://kjv.local/JHN.3.16")).toBe(true);
     expect(isInternalNoteLink("mailto:test@example.com")).toBe(false);
   });
 
@@ -138,6 +172,24 @@ describe("note links", () => {
         books,
       ),
     ).toBe('Colossians 4:10 • "touching"');
+    expect(
+      formatNoteLinkLabel(
+        {
+          type: "range",
+          start: {
+            bookIndex: 0,
+            chapterIndex: 0,
+            verseNumber: 31,
+          },
+          end: {
+            bookIndex: 0,
+            chapterIndex: 1,
+            verseNumber: 3,
+          },
+        },
+        books,
+      ),
+    ).toBe("Genesis 1:31-2:3");
   });
 
   it("parses typed chapter and verse references", () => {
@@ -199,6 +251,25 @@ describe("note links", () => {
 
     expect(migrated).toContain('"type":"link"');
     expect(migrated).toContain('"type":"kjv-link"');
+    expect(migrated).toContain('"url":"kjv://EXO.3.16"');
     expect(migrated).not.toContain('"type":"autolink"');
+  });
+
+  it("parses legacy note link hrefs", () => {
+    expect(parseNoteLinkHref("kjv://chapter/0/0")).toEqual({
+      type: "chapter",
+      bookIndex: 0,
+      chapterIndex: 0,
+    });
+    expect(parseNoteLinkHref("kjv://selection/0/0/1-2,4-4,6-6")).toEqual({
+      type: "selection",
+      bookIndex: 0,
+      chapterIndex: 0,
+      ranges: [
+        { start: 1, end: 2 },
+        { start: 4, end: 4 },
+        { start: 6, end: 6 },
+      ],
+    });
   });
 });

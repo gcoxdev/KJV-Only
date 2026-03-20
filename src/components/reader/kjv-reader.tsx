@@ -2680,6 +2680,16 @@ export function KJVReader() {
 
   const navigateReaderLeafToNoteTarget = useCallback(
     (tabId: string, leafId: string, target: NoteLinkTarget) => {
+      const location =
+        target.type === "range"
+          ? {
+              bookIndex: target.start.bookIndex,
+              chapterIndex: target.start.chapterIndex,
+            }
+          : {
+              bookIndex: target.bookIndex,
+              chapterIndex: target.chapterIndex,
+            };
       clearLeafHighlights(leafId);
       setSelectedHighlightScope(null);
       setTabs((currentTabs) =>
@@ -2688,8 +2698,8 @@ export function KJVReader() {
             ? {
                 ...tab,
                 root: updateLeafNode(tab.root, leafId, {
-                  bookIndex: target.bookIndex,
-                  chapterIndex: target.chapterIndex,
+                  bookIndex: location.bookIndex,
+                  chapterIndex: location.chapterIndex,
                   view: "reader",
                   pickerTestament: null,
                   pickerBookIndex: null,
@@ -2714,10 +2724,20 @@ export function KJVReader() {
         return null;
       }
 
+      const location =
+        target.type === "range"
+          ? {
+              bookIndex: target.start.bookIndex,
+              chapterIndex: target.start.chapterIndex,
+            }
+          : {
+              bookIndex: target.bookIndex,
+              chapterIndex: target.chapterIndex,
+            };
       const active = currentTabs[activeIndex];
       const nextLeaf = createLeaf(
-        target.bookIndex,
-        target.chapterIndex,
+        location.bookIndex,
+        location.chapterIndex,
         "reader",
       );
       const nextRoot: PanelNode = {
@@ -2758,9 +2778,32 @@ export function KJVReader() {
             bookIndex: number;
             chapterIndex: number;
             ranges: Array<{ start: number; end: number }>;
+          }
+        | {
+            type: "range";
+            start: {
+              bookIndex: number;
+              chapterIndex: number;
+              verseNumber: number;
+            };
+            end: {
+              bookIndex: number;
+              chapterIndex: number;
+              verseNumber: number;
+            };
           },
       destination: NotesLinkOpenTarget | SearchResultOpenTarget | BookmarkOpenTarget,
     ) => {
+      const location =
+        target.type === "range"
+          ? {
+              bookIndex: target.start.bookIndex,
+              chapterIndex: target.start.chapterIndex,
+            }
+          : {
+              bookIndex: target.bookIndex,
+              chapterIndex: target.chapterIndex,
+            };
       const applyReaderTargetEffects = (leafId: string) => {
         if (target.type === "selection") {
           setActiveReaderWordHighlight(null);
@@ -2780,6 +2823,35 @@ export function KJVReader() {
             mode: "verse-range",
             verseStart: firstRange?.start ?? 1,
             verseEnd: lastRange?.end ?? firstRange?.end ?? firstRange?.start ?? 1,
+          });
+        } else if (target.type === "range") {
+          const normalized = normalizeRangePoints(target.start, target.end);
+          const endVerseInActiveChapter =
+            normalized.start.bookIndex === normalized.end.bookIndex &&
+            normalized.start.chapterIndex === normalized.end.chapterIndex
+              ? normalized.end.verseNumber
+              : (books[normalized.start.bookIndex]?.chapters[
+                  normalized.start.chapterIndex
+                ]?.verses.at(-1)?.verse ?? normalized.start.verseNumber);
+          setActiveReaderWordHighlight(null);
+          setLeafHighlights(leafId, [
+            {
+              start: normalized.start.verseNumber,
+              end: endVerseInActiveChapter,
+            },
+          ]);
+          setSelectedHighlightScope({
+            type: "range",
+            start: normalized.start,
+            end: normalized.end,
+          });
+          setPendingReaderScrollTarget({
+            leafId,
+            bookIndex: normalized.start.bookIndex,
+            chapterIndex: normalized.start.chapterIndex,
+            mode: "verse-range",
+            verseStart: normalized.start.verseNumber,
+            verseEnd: endVerseInActiveChapter,
           });
         } else if (target.type === "verse") {
           setActiveReaderWordHighlight(null);
@@ -2820,7 +2892,11 @@ export function KJVReader() {
 
       const openInNewTab = () => {
         const nextTabId = createId();
-        const nextLeaf = createLeaf(target.bookIndex, target.chapterIndex, "reader");
+        const nextLeaf = createLeaf(
+          location.bookIndex,
+          location.chapterIndex,
+          "reader",
+        );
         setTabs((currentTabs) => [
           ...currentTabs,
           {
@@ -2840,8 +2916,8 @@ export function KJVReader() {
         }
 
         const nextReaderLeaf = createLeaf(
-          target.bookIndex,
-          target.chapterIndex,
+          location.bookIndex,
+          location.chapterIndex,
           "reader",
         );
 
@@ -2906,6 +2982,7 @@ export function KJVReader() {
     },
     [
       activeTabId,
+      books,
       clearLeafHighlights,
       createTargetedReaderPanelInActiveTab,
       findTabContainingLeafId,
@@ -3743,6 +3820,12 @@ export function KJVReader() {
                 chapterIndex: target.chapterIndex,
                 verseNumber: target.verseNumber,
               }
+            : target.type === "range"
+              ? {
+                  bookIndex: target.start.bookIndex,
+                  chapterIndex: target.start.chapterIndex,
+                  verseNumber: target.start.verseNumber,
+                }
             : target.type === "selection"
               ? {
                   bookIndex: target.bookIndex,
