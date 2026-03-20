@@ -350,7 +350,10 @@ export function KJVReader() {
   const [readerColorTheme, setReaderColorTheme] =
     useState<ReaderColorTheme>("brown");
   const [fontSize, setFontSize] = useState(16);
-  const [highlightColor, setHighlightColor] = useState(defaultHighlightColor);
+  const [lightHighlightColor, setLightHighlightColor] =
+    useState(defaultHighlightColor);
+  const [darkHighlightColor, setDarkHighlightColor] =
+    useState(defaultHighlightColor);
   const [verseSpacing, setVerseSpacing] = useState(0);
   const [hideReadModeVerseNumbers, setHideReadModeVerseNumbers] =
     useState(false);
@@ -600,6 +603,8 @@ export function KJVReader() {
         readerColorTheme?: ReaderColorTheme;
         fontSize?: number;
         highlightColor?: string;
+        lightHighlightColor?: string;
+        darkHighlightColor?: string;
         verseSpacing?: number;
         hideReadModeVerseNumbers?: boolean;
         readModeParagraphIndent?: boolean;
@@ -615,14 +620,26 @@ export function KJVReader() {
       if (typeof parsed.fontSize === "number") {
         setFontSize(Math.max(8, Math.round(parsed.fontSize)));
       }
-      if (typeof parsed.highlightColor === "string") {
-        setHighlightColor(normalizeHighlightColor(parsed.highlightColor));
+      if (typeof parsed.lightHighlightColor === "string") {
+        setLightHighlightColor(normalizeHighlightColor(parsed.lightHighlightColor));
+      } else if (typeof parsed.highlightColor === "string") {
+        setLightHighlightColor(normalizeHighlightColor(parsed.highlightColor));
+      }
+      if (typeof parsed.darkHighlightColor === "string") {
+        setDarkHighlightColor(normalizeHighlightColor(parsed.darkHighlightColor));
+      } else if (typeof parsed.highlightColor === "string") {
+        setDarkHighlightColor(normalizeHighlightColor(parsed.highlightColor));
       }
       if (
         parsed.readerColorTheme === "brown" ||
+        parsed.readerColorTheme === "contrast" ||
         parsed.readerColorTheme === "slate" ||
+        parsed.readerColorTheme === "crimson" ||
+        parsed.readerColorTheme === "amber" ||
         parsed.readerColorTheme === "forest" ||
-        parsed.readerColorTheme === "navy"
+        parsed.readerColorTheme === "navy" ||
+        parsed.readerColorTheme === "indigo" ||
+        parsed.readerColorTheme === "violet"
       ) {
         setReaderColorTheme(parsed.readerColorTheme);
       }
@@ -705,7 +722,8 @@ export function KJVReader() {
       JSON.stringify({
         readerColorTheme,
         fontSize,
-        highlightColor,
+        lightHighlightColor,
+        darkHighlightColor,
         verseSpacing,
         hideReadModeVerseNumbers,
         readModeParagraphIndent,
@@ -721,7 +739,8 @@ export function KJVReader() {
   }, [
     readerColorTheme,
     fontSize,
-    highlightColor,
+    lightHighlightColor,
+    darkHighlightColor,
     verseSpacing,
     hideReadModeVerseNumbers,
     readModeParagraphIndent,
@@ -4333,9 +4352,11 @@ export function KJVReader() {
     }
   }
 
+  const activeHighlightColor =
+    theme === "dark" ? darkHighlightColor : lightHighlightColor;
   const highlightTextColor = useMemo(
-    () => readableHighlightTextColor(highlightColor),
-    [highlightColor],
+    () => readableHighlightTextColor(activeHighlightColor),
+    [activeHighlightColor],
   );
 
   const firstReaderTabId = useMemo(
@@ -4699,10 +4720,16 @@ export function KJVReader() {
     onIncreaseFontSize: () => setFontSize((current) => current + 4),
     onDecreaseFontSize: () => setFontSize((current) => Math.max(8, current - 4)),
     onResetFontSize: () => setFontSize(16),
-    highlightColor,
-    onHighlightColorChange: (value: string) =>
-      setHighlightColor(normalizeHighlightColor(value)),
-    onResetHighlightColor: () => setHighlightColor(defaultHighlightColor()),
+    lightHighlightColor,
+    onLightHighlightColorChange: (value: string) =>
+      setLightHighlightColor(normalizeHighlightColor(value)),
+    onResetLightHighlightColor: () =>
+      setLightHighlightColor(defaultHighlightColor()),
+    darkHighlightColor,
+    onDarkHighlightColorChange: (value: string) =>
+      setDarkHighlightColor(normalizeHighlightColor(value)),
+    onResetDarkHighlightColor: () =>
+      setDarkHighlightColor(defaultHighlightColor()),
     verseSpacing,
     onVerseSpacingChange: setVerseSpacing,
     hideReadModeVerseNumbers,
@@ -4860,7 +4887,7 @@ export function KJVReader() {
       className="reader-shell h-screen w-full overflow-hidden bg-background"
       style={
         {
-          "--verse-highlight-bg": highlightColor,
+          "--verse-highlight-bg": activeHighlightColor,
           "--verse-highlight-fg": highlightTextColor,
         } as React.CSSProperties
       }

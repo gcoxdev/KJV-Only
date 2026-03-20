@@ -171,7 +171,16 @@ export type SearchPageState = {
   error: string | null;
 };
 
-export type ReaderColorTheme = "brown" | "slate" | "forest" | "navy";
+export type ReaderColorTheme =
+  | "brown"
+  | "contrast"
+  | "slate"
+  | "crimson"
+  | "amber"
+  | "forest"
+  | "navy"
+  | "indigo"
+  | "violet";
 
 export type StaticPageId =
   | "settings"
