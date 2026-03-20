@@ -22,6 +22,21 @@ export function swapRecordEntries<T>(
   return next;
 }
 
+export function filterRecordEntries<T>(
+  current: Record<string, T>,
+  validLeafIds: ReadonlySet<string>,
+) {
+  const nextEntries = Object.entries(current).filter(([leafId]) =>
+    validLeafIds.has(leafId),
+  );
+
+  if (nextEntries.length === Object.keys(current).length) {
+    return current;
+  }
+
+  return Object.fromEntries(nextEntries) as Record<string, T>;
+}
+
 export function swapSingleLeafReference<T extends { leafId: string }>(
   current: T | null,
   sourceLeafId: string,
@@ -37,4 +52,14 @@ export function swapSingleLeafReference<T extends { leafId: string }>(
     return { ...current, leafId: sourceLeafId };
   }
   return current;
+}
+
+export function clearSingleLeafReferenceIfMissing<T extends { leafId: string }>(
+  current: T | null,
+  validLeafIds: ReadonlySet<string>,
+) {
+  if (!current || validLeafIds.has(current.leafId)) {
+    return current;
+  }
+  return null;
 }
