@@ -431,6 +431,7 @@ export function TabsStrip({
                       <Button
                         variant="outline"
                         size="icon-sm"
+                        data-tour={active ? "tab-options" : undefined}
                         className={cn(
                           "relative border-subtle-divider/80 bg-workspace-panel-elevated",
                           tabsOrientation === "vertical" && "h-auto self-stretch",
@@ -487,6 +488,7 @@ export function TabsStrip({
           variant="outline"
           size="icon-sm"
           onClick={onAddTab}
+          data-tour="add-tab"
           aria-label="New Tab"
           className={cn(
             "border-dashed border-subtle-divider/80 bg-workspace-panel/70",
