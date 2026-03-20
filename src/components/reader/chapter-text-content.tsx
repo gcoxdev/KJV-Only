@@ -258,8 +258,9 @@ export const ChapterTextContent = memo(
                                   checked={highlighted}
                                   aria-label={`Select verse ${verse.verse} for highlight`}
                                   className={cn(
+                                    "border-foreground/55 dark:border-foreground/65",
                                     highlighted &&
-                                      "border-[var(--verse-highlight-fg)] text-[var(--verse-highlight-fg)] data-checked:border-[var(--verse-highlight-fg)] data-checked:bg-[var(--verse-highlight-fg)] data-checked:text-[var(--verse-highlight-bg)]",
+                                      "border-[var(--verse-highlight-fg)] text-[var(--verse-highlight-fg)] ring-1 ring-[var(--verse-highlight-fg)] ring-offset-1 ring-offset-[var(--verse-highlight-bg)] data-checked:border-[var(--verse-highlight-fg)] data-checked:bg-[var(--verse-highlight-fg)] data-checked:text-[var(--verse-highlight-checkbox-fg)] dark:data-checked:bg-[var(--verse-highlight-fg)] dark:data-checked:text-[var(--verse-highlight-checkbox-fg)]",
                                   )}
                                   onClick={(event) => {
                                     event.stopPropagation();
@@ -345,8 +346,9 @@ export const ChapterTextContent = memo(
                               checked={highlighted}
                               aria-label={`Select verse ${verse.verse} for highlight`}
                               className={cn(
+                                "border-foreground/55 dark:border-foreground/65",
                                 highlighted &&
-                                  "border-[var(--verse-highlight-fg)] text-[var(--verse-highlight-fg)] data-checked:border-[var(--verse-highlight-fg)] data-checked:bg-[var(--verse-highlight-fg)] data-checked:text-[var(--verse-highlight-bg)]",
+                                  "border-[var(--verse-highlight-fg)] text-[var(--verse-highlight-fg)] ring-1 ring-[var(--verse-highlight-fg)] ring-offset-1 ring-offset-[var(--verse-highlight-bg)] data-checked:border-[var(--verse-highlight-fg)] data-checked:bg-[var(--verse-highlight-fg)] data-checked:text-[var(--verse-highlight-checkbox-fg)] dark:data-checked:bg-[var(--verse-highlight-fg)] dark:data-checked:text-[var(--verse-highlight-checkbox-fg)]",
                               )}
                               onClick={(event) => {
                                 event.stopPropagation();
