@@ -139,6 +139,19 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
     );
   }, []);
 
+  const importBookmarks = useCallback((importedBookmarks: ReaderBookmark[]) => {
+    setReaderBookmarks((current) => {
+      const merged = new Map<string, ReaderBookmark>();
+      for (const bookmark of current) {
+        merged.set(bookmark.id, bookmark);
+      }
+      for (const bookmark of importedBookmarks) {
+        merged.set(bookmark.id, bookmark);
+      }
+      return [...merged.values()].sort((a, b) => b.updatedAt - a.updatedAt);
+    });
+  }, []);
+
   const toggleHighlightModeForLeaf = useCallback((leafId: string) => {
     setHighlightModeEnabledByLeafId((current) => {
       const nextValue = !current[leafId];
@@ -183,6 +196,7 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
     upsertBookmark,
     updateBookmark,
     deleteBookmark,
+    importBookmarks,
     toggleHighlightModeForLeaf,
     disableHighlightModeForLeaf,
     createChapterBookmark,

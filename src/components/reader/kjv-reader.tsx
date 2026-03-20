@@ -45,6 +45,13 @@ import {
 } from "@/lib/highlight-color";
 import { chapterProgressKey, panelViewportElement } from "@/lib/reader-view";
 import {
+  createBookmarksExportPayload,
+  createNotesExportPayload,
+  downloadJsonFile,
+  parseImportedBookmarksPayload,
+  parseImportedNotesPayload,
+} from "@/lib/reader-transfer";
+import {
   collectLeafIds,
   countLeaves,
   createId,
@@ -1107,6 +1114,7 @@ export function KJVReader() {
     createContextNote,
     updateNote,
     deleteNote,
+    importNotes,
     changeNotesTabState,
     initializeNotesTabState,
     generalNotes,
@@ -1123,6 +1131,7 @@ export function KJVReader() {
     upsertBookmark,
     updateBookmark,
     deleteBookmark,
+    importBookmarks,
     toggleHighlightModeForLeaf,
     disableHighlightModeForLeaf,
     createChapterBookmark,
@@ -1132,6 +1141,8 @@ export function KJVReader() {
   const [searchPageStateByLeafId, setSearchPageStateByLeafId] = useState<
     Record<string, SearchPageState>
   >({});
+  const notesImportInputRef = useRef<HTMLInputElement | null>(null);
+  const bookmarksImportInputRef = useRef<HTMLInputElement | null>(null);
 
   const notesHighlightScope = useMemo<BookmarkScope | null>(() => {
     if (selectedHighlightScope) {
@@ -4877,6 +4888,47 @@ export function KJVReader() {
     onUpdateBookmark: updateBookmark,
     onDeleteBookmark: deleteBookmark,
   };
+  const exportNotes = () => {
+    downloadJsonFile(
+      `kjv-reader-notes-${new Date().toISOString().slice(0, 10)}.json`,
+      createNotesExportPayload(readerNotes),
+    );
+  };
+
+  const exportBookmarks = () => {
+    downloadJsonFile(
+      `kjv-reader-bookmarks-${new Date().toISOString().slice(0, 10)}.json`,
+      createBookmarksExportPayload(readerBookmarks),
+    );
+  };
+
+  const handleImportNotesFile = async (file: File | null) => {
+    if (!file) {
+      return;
+    }
+    try {
+      const importedNotes = parseImportedNotesPayload(await file.text());
+      importNotes(importedNotes);
+    } catch (error) {
+      window.alert(
+        error instanceof Error ? error.message : "Failed to import notes.",
+      );
+    }
+  };
+
+  const handleImportBookmarksFile = async (file: File | null) => {
+    if (!file) {
+      return;
+    }
+    try {
+      const importedBookmarks = parseImportedBookmarksPayload(await file.text());
+      importBookmarks(importedBookmarks);
+    } catch (error) {
+      window.alert(
+        error instanceof Error ? error.message : "Failed to import bookmarks.",
+      );
+    }
+  };
   const settingsPanelProps = {
     theme,
     onThemeChange: setTheme,
@@ -5088,6 +5140,32 @@ export function KJVReader() {
             onOpenProgress={() => openStaticPageTab("progress")}
             onOpenSettings={() => openStaticPageTab("settings")}
             onOpenPage={openStaticPageTab}
+            onExportNotes={exportNotes}
+            onImportNotes={() => notesImportInputRef.current?.click()}
+            onExportBookmarks={exportBookmarks}
+            onImportBookmarks={() => bookmarksImportInputRef.current?.click()}
+          />
+          <input
+            ref={notesImportInputRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0] ?? null;
+              event.currentTarget.value = "";
+              void handleImportNotesFile(file);
+            }}
+          />
+          <input
+            ref={bookmarksImportInputRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0] ?? null;
+              event.currentTarget.value = "";
+              void handleImportBookmarksFile(file);
+            }}
           />
 
           <TabsWorkspace
