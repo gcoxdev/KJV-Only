@@ -85,6 +85,7 @@ import type {
   PhrasesPayload,
   PanelDirection,
   PanelNode,
+  ReaderColorTheme,
   ReaderTab,
   SearchPageState,
   SearchResultOpenTarget,
@@ -346,6 +347,8 @@ export function KJVReader() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [readerColorTheme, setReaderColorTheme] =
+    useState<ReaderColorTheme>("brown");
   const [fontSize, setFontSize] = useState(16);
   const [highlightColor, setHighlightColor] = useState(defaultHighlightColor);
   const [verseSpacing, setVerseSpacing] = useState(0);
@@ -564,11 +567,6 @@ export function KJVReader() {
     const storedTheme = window.localStorage.getItem("theme");
     if (storedTheme === "dark" || storedTheme === "light") {
       setTheme(storedTheme);
-      return;
-    }
-
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("dark");
     }
   }, [queueVerseHighlights, setTabsOrientation, setVerseHighlights]);
 
@@ -578,12 +576,17 @@ export function KJVReader() {
   }, [theme]);
 
   useEffect(() => {
+    document.documentElement.dataset.readerTheme = readerColorTheme;
+  }, [readerColorTheme]);
+
+  useEffect(() => {
     try {
       const stored = window.localStorage.getItem("kjv-display-settings-v1");
       if (!stored) {
         return;
       }
       const parsed = JSON.parse(stored) as {
+        readerColorTheme?: ReaderColorTheme;
         fontSize?: number;
         highlightColor?: string;
         verseSpacing?: number;
@@ -603,6 +606,14 @@ export function KJVReader() {
       }
       if (typeof parsed.highlightColor === "string") {
         setHighlightColor(normalizeHighlightColor(parsed.highlightColor));
+      }
+      if (
+        parsed.readerColorTheme === "brown" ||
+        parsed.readerColorTheme === "slate" ||
+        parsed.readerColorTheme === "forest" ||
+        parsed.readerColorTheme === "navy"
+      ) {
+        setReaderColorTheme(parsed.readerColorTheme);
       }
       if (typeof parsed.verseSpacing === "number") {
         setVerseSpacing(
@@ -681,6 +692,7 @@ export function KJVReader() {
     window.localStorage.setItem(
       "kjv-display-settings-v1",
       JSON.stringify({
+        readerColorTheme,
         fontSize,
         highlightColor,
         verseSpacing,
@@ -696,6 +708,7 @@ export function KJVReader() {
       }),
     );
   }, [
+    readerColorTheme,
     fontSize,
     highlightColor,
     verseSpacing,
@@ -4655,6 +4668,8 @@ export function KJVReader() {
   const settingsPanelProps = {
     theme,
     onThemeChange: setTheme,
+    readerColorTheme,
+    onReaderColorThemeChange: setReaderColorTheme,
     fontSize,
     onIncreaseFontSize: () => setFontSize((current) => current + 4),
     onDecreaseFontSize: () => setFontSize((current) => Math.max(8, current - 4)),

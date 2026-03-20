@@ -20,6 +20,7 @@ import {
 import type {
   BookmarkOpenTarget,
   NotesLinkOpenTarget,
+  ReaderColorTheme,
   ReferenceLinkOpenTarget,
   SearchResultOpenTarget,
   TabsOrientation,
@@ -44,6 +45,8 @@ import {
 export type SettingsPanelContentProps = {
   theme: "light" | "dark";
   onThemeChange: (theme: "light" | "dark") => void;
+  readerColorTheme: ReaderColorTheme;
+  onReaderColorThemeChange: (theme: ReaderColorTheme) => void;
   fontSize: number;
   onIncreaseFontSize: () => void;
   onDecreaseFontSize: () => void;
@@ -81,6 +84,8 @@ type SettingsDialogProps = SettingsPanelContentProps & {
 export function SettingsPanelContent({
   theme,
   onThemeChange,
+  readerColorTheme,
+  onReaderColorThemeChange,
   fontSize,
   onIncreaseFontSize,
   onDecreaseFontSize,
@@ -142,6 +147,14 @@ export function SettingsPanelContent({
       : referenceLinkOpenTarget === "new-panel"
         ? "New Panel"
         : "Targeted Panel";
+  const readerColorThemeLabel =
+    readerColorTheme === "brown"
+      ? "Brown"
+      : readerColorTheme === "slate"
+        ? "Slate"
+        : readerColorTheme === "forest"
+          ? "Forest"
+          : "Navy";
 
   useEffect(() => {
     setDraftHighlightColor(highlightColor);
@@ -181,6 +194,36 @@ export function SettingsPanelContent({
                     onThemeChange(checked ? "dark" : "light")
                   }
                 />
+              </div>
+              <div className="space-y-2 border-t pt-3">
+                <div className="flex min-w-0 items-center justify-between gap-3">
+                  <Label htmlFor="reader-color-theme">Color Theme</Label>
+                </div>
+                <Select
+                  value={readerColorTheme}
+                  onValueChange={(value) => {
+                    if (
+                      value === "brown" ||
+                      value === "slate" ||
+                      value === "forest" ||
+                      value === "navy"
+                    ) {
+                      onReaderColorThemeChange(value);
+                    }
+                  }}
+                >
+                  <SelectTrigger id="reader-color-theme" className="w-full">
+                    <SelectValue placeholder="Brown">
+                      {readerColorThemeLabel}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="brown">Brown</SelectItem>
+                    <SelectItem value="slate">Slate</SelectItem>
+                    <SelectItem value="forest">Forest</SelectItem>
+                    <SelectItem value="navy">Navy</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">

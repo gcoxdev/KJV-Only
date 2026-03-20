@@ -171,6 +171,8 @@ export type SearchPageState = {
   error: string | null;
 };
 
+export type ReaderColorTheme = "brown" | "slate" | "forest" | "navy";
+
 export type StaticPageId =
   | "settings"
   | "progress"
