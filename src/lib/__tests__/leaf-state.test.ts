@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { swapRecordEntries, swapSingleLeafReference } from "@/lib/leaf-state";
+import {
+  clearSingleLeafReferenceIfMissing,
+  filterRecordEntries,
+  swapRecordEntries,
+  swapSingleLeafReference,
+} from "@/lib/leaf-state";
 
 describe("leaf state helpers", () => {
   it("swaps record entries between leaf ids", () => {
@@ -55,5 +60,34 @@ describe("leaf state helpers", () => {
         "b",
       ),
     ).toEqual({ leafId: "c", mode: "chapter-top" });
+  });
+
+  it("filters record entries to the current leaf set", () => {
+    expect(
+      filterRecordEntries(
+        {
+          a: { value: "keep" },
+          b: { value: "drop" },
+        },
+        new Set(["a"]),
+      ),
+    ).toEqual({
+      a: { value: "keep" },
+    });
+  });
+
+  it("clears single-leaf references when their leaf disappears", () => {
+    expect(
+      clearSingleLeafReferenceIfMissing(
+        { leafId: "a", mode: "chapter-top" },
+        new Set(["b"]),
+      ),
+    ).toBeNull();
+    expect(
+      clearSingleLeafReferenceIfMissing(
+        { leafId: "a", mode: "chapter-top" },
+        new Set(["a", "b"]),
+      ),
+    ).toEqual({ leafId: "a", mode: "chapter-top" });
   });
 });
