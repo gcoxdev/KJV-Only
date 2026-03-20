@@ -4358,6 +4358,10 @@ export function KJVReader() {
     () => readableHighlightTextColor(activeHighlightColor),
     [activeHighlightColor],
   );
+  const highlightCheckboxColor = useMemo(
+    () => readableHighlightTextColor(highlightTextColor),
+    [highlightTextColor],
+  );
 
   const firstReaderTabId = useMemo(
     () =>
@@ -4889,6 +4893,7 @@ export function KJVReader() {
         {
           "--verse-highlight-bg": activeHighlightColor,
           "--verse-highlight-fg": highlightTextColor,
+          "--verse-highlight-checkbox-fg": highlightCheckboxColor,
         } as React.CSSProperties
       }
     >
