@@ -3363,6 +3363,78 @@ export function KJVReader() {
     [books],
   );
 
+  const findGenealogyMatches = useCallback(
+    (
+      people: GenealogyPayload | null | undefined,
+      rawWord: string,
+      referenceKey?: string | null,
+    ) => {
+      if (!people) {
+        return [] as GenealogyPerson[];
+      }
+
+      const normalizedWord = normalizeConcordanceWord(rawWord).toLowerCase();
+      if (!normalizedWord) {
+        return [] as GenealogyPerson[];
+      }
+
+      const matches = people
+        .map((person) => {
+          const exactNameMatch = person.names.some(
+            (name) =>
+              normalizeConcordanceWord(name).toLowerCase() === normalizedWord,
+          );
+          const byNameMatches = (person.verses?.byName ?? []).filter(
+            (entry) =>
+              normalizeConcordanceWord(entry.name).toLowerCase() === normalizedWord,
+          );
+          const currentReferenceMatch =
+            Boolean(referenceKey) &&
+            byNameMatches.some((entry) => entry.verses.includes(referenceKey ?? ""));
+
+          let rank = 0;
+          if (currentReferenceMatch) {
+            rank = 4;
+          } else if (byNameMatches.length > 0) {
+            rank = 3;
+          } else if (exactNameMatch) {
+            rank = 2;
+          }
+
+          return {
+            person,
+            rank,
+            totalVerses:
+              person.verses?.totalVerses ??
+              byNameMatches.reduce(
+                (count, entry) => count + (entry.numVerses ?? entry.verses.length),
+                0,
+              ),
+          };
+        })
+        .filter((entry) => entry.rank > 0)
+        .sort(
+          (left, right) =>
+            right.rank - left.rank ||
+            right.totalVerses - left.totalVerses ||
+            (left.person.names[0] ?? left.person.id).localeCompare(
+              right.person.names[0] ?? right.person.id,
+            ),
+        )
+        .map((entry) => entry.person);
+
+      const seen = new Set<string>();
+      return matches.filter((person) => {
+        if (seen.has(person.id)) {
+          return false;
+        }
+        seen.add(person.id);
+        return true;
+      });
+    },
+    [],
+  );
+
   const syncTokenAccordionState = useCallback(
     (
       rawWord: string,
@@ -3463,16 +3535,15 @@ export function KJVReader() {
       }
 
       const genealogyData = options?.genealogyData ?? genealogy;
-      if (
-        genealogyData &&
-        genealogyData.some((person) =>
-          person.names.some(
-            (name) =>
-              normalizeConcordanceWord(name).toLowerCase() ===
-              rawWord.toLowerCase(),
-          ),
-        )
-      ) {
+      const referenceKey =
+        (options?.verseNumber ?? null) !== null
+          ? chapterVerseKey(
+              options?.bookIndex ?? 0,
+              options?.chapterIndex ?? 0,
+              options?.verseNumber ?? 1,
+            )
+          : null;
+      if (findGenealogyMatches(genealogyData, rawWord, referenceKey).length > 0) {
         nextAccordion.push("genealogy");
       }
 
@@ -3483,6 +3554,7 @@ export function KJVReader() {
       aiDictionary,
       bibleWordBook,
       concordance,
+      findGenealogyMatches,
       genealogy,
       hitchcocks,
       oldEnglish,
@@ -3511,6 +3583,7 @@ export function KJVReader() {
         ancientMaps?: AncientMapPayload | null;
         strongsGreek?: StrongsPayload | null;
         strongsHebrew?: StrongsPayload | null;
+        referenceKey?: string | null;
       },
     ) => {
       setConcordanceSearchTerm("");
@@ -3610,12 +3683,10 @@ export function KJVReader() {
       }
 
       if (nextGenealogy) {
-        const matches = nextGenealogy.filter((person) =>
-          person.names.some(
-            (name) =>
-              normalizeConcordanceWord(name).toLowerCase() ===
-              rawWord.toLowerCase(),
-          ),
+        const matches = findGenealogyMatches(
+          nextGenealogy,
+          rawWord,
+          overrides?.referenceKey,
         );
         setSelectedGenealogyIds([...new Set(matches.map((person) => person.id))]);
       } else {
@@ -3661,6 +3732,7 @@ export function KJVReader() {
       ancientMaps,
       aiDictionary,
       bibleWordBook,
+      findGenealogyMatches,
       genealogy,
       hitchcocks,
       oldEnglish,
@@ -3844,7 +3916,13 @@ export function KJVReader() {
           return;
         }
         const rawWord = normalizeConcordanceWord(target.word) || target.word;
-        syncWordStudySelections(rawWord, null);
+        syncWordStudySelections(rawWord, null, {
+          referenceKey: chapterVerseKey(
+            target.bookIndex,
+            target.chapterIndex,
+            target.verseNumber,
+          ),
+        });
         syncTokenAccordionState(rawWord, {
           bookIndex: target.bookIndex,
           chapterIndex: target.chapterIndex,
@@ -4249,6 +4327,7 @@ export function KJVReader() {
             ancientMaps: nextAncientMaps,
             strongsGreek: nextStrongs?.greek ?? null,
             strongsHebrew: nextStrongs?.hebrew ?? null,
+            referenceKey: chapterVerseKey(bookIndex, chapterIndex, verseNumber),
           });
           syncTokenAccordionState(rawWord, {
             bookIndex,

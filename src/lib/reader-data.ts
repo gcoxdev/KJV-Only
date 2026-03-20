@@ -19,7 +19,7 @@ import type {
   UnitsPayload,
   WebstersPayload,
 } from "@/types/reader";
-import { decodeGenealogyPayload } from "@/lib/genealogy";
+import { decodeGenealogyPayload, enrichGenealogyPayload } from "@/lib/genealogy";
 import { decodeStrongsPayload } from "@/lib/strongs";
 
 let kjvBooksPromise: Promise<Book[]> | null = null;
@@ -271,19 +271,23 @@ export function loadUnits() {
 
 export function loadGenealogy() {
   if (!genealogyPromise) {
-    genealogyPromise = fetch(
-      `/references/genealogy.compact.min.json?v=${GENEALOGY_ASSET_VERSION}`,
-      {
-      cache: "no-cache",
-      },
-    )
-      .then(async (response) => {
+    genealogyPromise = Promise.all([
+      fetch(`/references/genealogy.compact.min.json?v=${GENEALOGY_ASSET_VERSION}`, {
+        cache: "no-cache",
+      }).then(async (response) => {
         if (!response.ok) {
           throw new Error("Could not load /references/genealogy.compact.min.json");
         }
         return response.json() as Promise<unknown>;
-      })
-      .then((payload) => decodeGenealogyPayload(payload as GenealogyCompactPayload))
+      }),
+      loadKjvBooks(),
+    ])
+      .then(([payload, books]) =>
+        enrichGenealogyPayload(
+          decodeGenealogyPayload(payload as GenealogyCompactPayload),
+          books,
+        ),
+      )
       .catch((error) => {
         genealogyPromise = null;
         throw error;
