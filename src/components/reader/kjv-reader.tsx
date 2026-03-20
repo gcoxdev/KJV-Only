@@ -51,7 +51,12 @@ import {
   parseImportedBookmarksPayload,
   parseImportedNotesPayload,
 } from "@/lib/reader-transfer";
-import { swapRecordEntries, swapSingleLeafReference } from "@/lib/leaf-state";
+import {
+  clearSingleLeafReferenceIfMissing,
+  filterRecordEntries,
+  swapRecordEntries,
+  swapSingleLeafReference,
+} from "@/lib/leaf-state";
 import {
   collectLeafIds,
   countLeaves,
@@ -580,6 +585,7 @@ export function KJVReader() {
     queueVerseHighlights,
     setVerseHighlights,
     swapLeafHighlights,
+    pruneLeafHighlights,
   } = useVerseHighlights({
     panelElementRefs,
     activeTabId,
@@ -1120,6 +1126,7 @@ export function KJVReader() {
     changeNotesTabState,
     initializeNotesTabState,
     swapNotesTabState,
+    pruneNotesTabState,
     generalNotes,
     contextNotes,
   } = useReaderNotes({
@@ -1138,6 +1145,7 @@ export function KJVReader() {
     toggleHighlightModeForLeaf,
     disableHighlightModeForLeaf,
     swapHighlightModeForLeaves,
+    pruneHighlightModeForLeaves,
     createChapterBookmark,
   } = useReaderBookmarks({
     books,
@@ -1147,6 +1155,10 @@ export function KJVReader() {
   >({});
   const notesImportInputRef = useRef<HTMLInputElement | null>(null);
   const bookmarksImportInputRef = useRef<HTMLInputElement | null>(null);
+  const activeLeafIds = useMemo(
+    () => new Set(tabs.flatMap((tab) => collectLeafIds(tab.root))),
+    [tabs],
+  );
 
   const notesHighlightScope = useMemo<BookmarkScope | null>(() => {
     if (selectedHighlightScope) {
@@ -1256,19 +1268,27 @@ export function KJVReader() {
   );
 
   useEffect(() => {
-    const activeLeafIds = new Set(
-      tabs.flatMap((tab) => collectLeafIds(tab.root)),
+    pruneNotesTabState(activeLeafIds);
+    setSearchPageStateByLeafId((current) =>
+      filterRecordEntries(current, activeLeafIds),
     );
-    setSearchPageStateByLeafId((current) => {
-      const nextEntries = Object.entries(current).filter(([leafId]) =>
-        activeLeafIds.has(leafId),
-      );
-      if (nextEntries.length === Object.keys(current).length) {
-        return current;
-      }
-      return Object.fromEntries(nextEntries);
-    });
-  }, [tabs]);
+    setLeafHistoryByLeafId((current) =>
+      filterRecordEntries(current, activeLeafIds),
+    );
+    pruneHighlightModeForLeaves(activeLeafIds);
+    pruneLeafHighlights(activeLeafIds);
+    setActiveReaderWordHighlight((current) =>
+      clearSingleLeafReferenceIfMissing(current, activeLeafIds),
+    );
+    setPendingReaderScrollTarget((current) =>
+      clearSingleLeafReferenceIfMissing(current, activeLeafIds),
+    );
+  }, [
+    activeLeafIds,
+    pruneHighlightModeForLeaves,
+    pruneLeafHighlights,
+    pruneNotesTabState,
+  ]);
   const mapOldEnglishResult = useCallback(
     (key: string, definitions: string[]) => ({ key, definitions }),
     [],
