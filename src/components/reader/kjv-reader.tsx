@@ -475,6 +475,14 @@ export function KJVReader() {
       return;
     }
 
+    const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? null;
+    const shouldCaptureInstallPrompt =
+      activeTab !== null &&
+      collectLeafIds(activeTab.root).some((leafId) => {
+        const leaf = findLeafNode(activeTab.root, leafId);
+        return leaf?.view === "page" && leaf.pageId === "download";
+      });
+
     const mediaQuery =
       typeof window.matchMedia === "function"
         ? window.matchMedia("(display-mode: standalone)")
@@ -493,6 +501,9 @@ export function KJVReader() {
     };
 
     const handleBeforeInstallPrompt = (event: Event) => {
+      if (!shouldCaptureInstallPrompt) {
+        return;
+      }
       event.preventDefault();
       setDeferredInstallPrompt(event as BeforeInstallPromptEvent);
     };
@@ -518,7 +529,7 @@ export function KJVReader() {
       window.removeEventListener("appinstalled", handleAppInstalled);
       mediaQuery?.removeEventListener?.("change", handleInstalledStateChange);
     };
-  }, []);
+  }, [activeTabId, tabs]);
 
   const installPwa = useCallback(async () => {
     if (!deferredInstallPrompt) {
