@@ -20,6 +20,7 @@ import {
 import type {
   BookmarkOpenTarget,
   NotesLinkOpenTarget,
+  ReferenceLinkOpenTarget,
   SearchResultOpenTarget,
   TabsOrientation,
   WordVerseSelectionTarget,
@@ -68,6 +69,8 @@ export type SettingsPanelContentProps = {
   onSearchResultOpenTargetChange: (target: SearchResultOpenTarget) => void;
   bookmarkOpenTarget: BookmarkOpenTarget;
   onBookmarkOpenTargetChange: (target: BookmarkOpenTarget) => void;
+  referenceLinkOpenTarget: ReferenceLinkOpenTarget;
+  onReferenceLinkOpenTargetChange: (target: ReferenceLinkOpenTarget) => void;
 };
 
 type SettingsDialogProps = SettingsPanelContentProps & {
@@ -103,6 +106,8 @@ export function SettingsPanelContent({
   onSearchResultOpenTargetChange,
   bookmarkOpenTarget,
   onBookmarkOpenTargetChange,
+  referenceLinkOpenTarget,
+  onReferenceLinkOpenTargetChange,
 }: SettingsPanelContentProps) {
   const [draftHighlightColor, setDraftHighlightColor] = useState(highlightColor);
   const wordVerseSelectionTargetLabel =
@@ -129,6 +134,12 @@ export function SettingsPanelContent({
     bookmarkOpenTarget === "new-tab"
       ? "New Tab"
       : bookmarkOpenTarget === "new-panel"
+        ? "New Panel"
+        : "Targeted Panel";
+  const referenceLinkTargetLabel =
+    referenceLinkOpenTarget === "new-tab"
+      ? "New Tab"
+      : referenceLinkOpenTarget === "new-panel"
         ? "New Panel"
         : "Targeted Panel";
 
@@ -399,6 +410,34 @@ export function SettingsPanelContent({
                   <SelectTrigger id="bookmark-target" className="w-full">
                     <SelectValue placeholder="New Panel">
                       {bookmarkTargetLabel}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new-tab">New Tab</SelectItem>
+                    <SelectItem value="new-panel">New Panel</SelectItem>
+                    <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2 border-t pt-3">
+                <div className="flex min-w-0 items-center justify-between gap-3">
+                  <Label htmlFor="reference-link-target">Reference Link Target</Label>
+                </div>
+                <Select
+                  value={referenceLinkOpenTarget}
+                  onValueChange={(value) => {
+                    if (
+                      value === "new-tab" ||
+                      value === "new-panel" ||
+                      value === "targeted-panel"
+                    ) {
+                      onReferenceLinkOpenTargetChange(value);
+                    }
+                  }}
+                >
+                  <SelectTrigger id="reference-link-target" className="w-full">
+                    <SelectValue placeholder="New Tab">
+                      {referenceLinkTargetLabel}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>

@@ -210,6 +210,10 @@ export type SearchResultOpenTarget =
   | "new-panel"
   | "targeted-panel";
 export type BookmarkOpenTarget = "new-tab" | "new-panel" | "targeted-panel";
+export type ReferenceLinkOpenTarget =
+  | "new-tab"
+  | "new-panel"
+  | "targeted-panel";
 
 export type PanelDirection = "left" | "right" | "up" | "down";
 export type SplitOrientation = "horizontal" | "vertical";

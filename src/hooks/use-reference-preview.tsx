@@ -15,7 +15,7 @@ type ReferencePreviewData = {
 
 type UseReferencePreviewParams = {
   books: Book[];
-  openChapterReferenceInNewTab: (
+  openChapterReference: (
     bookIndex: number,
     chapterIndex: number,
     startVerse: number,
@@ -42,7 +42,7 @@ export function formatReferenceCitation(
 
 export function useReferencePreview({
   books,
-  openChapterReferenceInNewTab,
+  openChapterReference,
 }: UseReferencePreviewParams) {
   const referencePreviewCacheRef = useRef<Map<string, ReferencePreviewData>>(
     new Map(),
@@ -65,14 +65,14 @@ export function useReferencePreview({
           ? parsed.endVerse
           : (startChapter?.verses[startChapter.verses.length - 1]?.verse ??
             parsed.startVerse);
-      openChapterReferenceInNewTab(
+      openChapterReference(
         parsed.bookIndex,
         parsed.startChapterIndex,
         parsed.startVerse,
         highlightEnd,
       );
     },
-    [books, openChapterReferenceInNewTab],
+    [books, openChapterReference],
   );
 
   const referencePreviewData = useCallback(
