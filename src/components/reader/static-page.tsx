@@ -1,6 +1,7 @@
 import { DownloadPage } from "@/components/reader/download-page";
 import { HowToGetSavedPage } from "@/components/reader/how-to-get-saved-page";
 import { WelcomeHomePage } from "@/components/reader/welcome-home-page";
+import { WhyKJVOnlyPage } from "@/components/reader/why-kjv-only-page";
 import { getStaticPage } from "@/lib/static-pages";
 import type { Book } from "@/types/bible";
 import type { StaticPageId } from "@/types/reader";
@@ -53,6 +54,7 @@ export function StaticPage({
         </div>
         <div className="flex flex-col gap-4 text-sm leading-7 text-muted-foreground">
           {page.id !== "saved" &&
+          page.id !== "kjv-only" &&
           page.id !== "download" &&
           page.id !== "welcome-home"
             ? page.content.paragraphs.map((paragraph, index) => (
@@ -69,6 +71,16 @@ export function StaticPage({
               onCloseSidebar={onCloseSidebar}
             />
           ) : null}
+          {page.id === "kjv-only" &&
+          renderPreview &&
+          onOpenReference &&
+          onCloseSidebar ? (
+            <WhyKJVOnlyPage
+              renderPreview={renderPreview}
+              onOpenReference={onOpenReference}
+              onCloseSidebar={onCloseSidebar}
+            />
+          ) : null}
           {page.id === "download" ? (
             <DownloadPage
               books={books}
@@ -78,6 +90,7 @@ export function StaticPage({
             />
           ) : null}
           {page.id !== "saved" &&
+          page.id !== "kjv-only" &&
           page.id !== "download" &&
           page.id !== "welcome-home" &&
           page.content.links ? (

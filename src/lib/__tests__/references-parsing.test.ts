@@ -34,6 +34,15 @@ describe("reference parsing helpers", () => {
       bookCode: "1CH",
     });
 
+    expect(parseBibleReference("JHN.7.53-8.11")).toEqual({
+      bookIndex: 42,
+      startChapterIndex: 6,
+      endChapterIndex: 7,
+      startVerse: 53,
+      endVerse: 11,
+      bookCode: "JHN",
+    });
+
     expect(parseBibleReference("BAD.1.1")).toBeNull();
   });
 
