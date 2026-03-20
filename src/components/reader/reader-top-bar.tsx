@@ -1,10 +1,12 @@
 import {
   ChartBarIcon,
   CheckIcon,
+  DownloadIcon,
   MenuIcon,
   SearchIcon,
   SettingsIcon,
   Share2Icon,
+  UploadIcon,
 } from "lucide-react";
 import { STATIC_PAGES } from "@/lib/static-pages";
 import type { StaticPageId } from "@/types/reader";
@@ -32,6 +34,10 @@ type ReaderTopBarProps = {
   onOpenProgress: () => void;
   onOpenSettings: () => void;
   onOpenPage: (pageId: StaticPageId) => void;
+  onExportNotes: () => void;
+  onImportNotes: () => void;
+  onExportBookmarks: () => void;
+  onImportBookmarks: () => void;
 };
 
 export function ReaderTopBar({
@@ -44,6 +50,10 @@ export function ReaderTopBar({
   onOpenProgress,
   onOpenSettings,
   onOpenPage,
+  onExportNotes,
+  onImportNotes,
+  onExportBookmarks,
+  onImportBookmarks,
 }: ReaderTopBarProps) {
   return (
     <header className="z-20 flex shrink-0 items-center justify-between border-b border-subtle-divider/80 bg-workspace-chrome/90 px-3 py-2 backdrop-blur">
@@ -71,6 +81,26 @@ export function ReaderTopBar({
               <SettingsIcon />
               Settings
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Transfer</DropdownMenuLabel>
+              <DropdownMenuItem onClick={onExportNotes}>
+                <DownloadIcon />
+                Export Notes
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onImportNotes}>
+                <UploadIcon />
+                Import Notes
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onExportBookmarks}>
+                <DownloadIcon />
+                Export Bookmarks
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onImportBookmarks}>
+                <UploadIcon />
+                Import Bookmarks
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuLabel>Pages</DropdownMenuLabel>

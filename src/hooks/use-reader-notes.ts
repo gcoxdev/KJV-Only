@@ -10,6 +10,37 @@ type UseReaderNotesArgs = {
   activeTab: ReaderTab | null;
 };
 
+function contextFromScope(scope: ReaderNote["scope"]): NotesContext | null {
+  if (scope.type === "general") {
+    return null;
+  }
+  if (scope.type === "book") {
+    return {
+      bookIndex: scope.bookIndex,
+      chapterIndex: 0,
+    };
+  }
+  if (scope.type === "chapter") {
+    return {
+      bookIndex: scope.bookIndex,
+      chapterIndex: scope.chapterIndex,
+    };
+  }
+  if (scope.type === "verse") {
+    return {
+      bookIndex: scope.bookIndex,
+      chapterIndex: scope.chapterIndex,
+      verseNumber: scope.verseNumber,
+    };
+  }
+  return {
+    bookIndex: scope.bookIndex,
+    chapterIndex: scope.chapterIndex,
+    verseNumber: scope.verseNumber,
+    word: scope.word,
+  };
+}
+
 export function useReaderNotes({ activeTab }: UseReaderNotesArgs) {
   const [readerNotes, setReaderNotes] = useState<ReaderNote[]>([]);
   const [notesContext, setNotesContext] = useState<NotesContext | null>(null);
@@ -148,6 +179,37 @@ export function useReaderNotes({ activeTab }: UseReaderNotesArgs) {
     setReaderNotes((current) => current.filter((note) => note.id !== noteId));
   }, []);
 
+  const importNotes = useCallback((importedNotes: ReaderNote[]) => {
+    setReaderNotes((current) => {
+      const merged = new Map<string, ReaderNote>();
+      for (const note of current) {
+        merged.set(note.id, note);
+      }
+      for (const note of importedNotes) {
+        merged.set(note.id, {
+          ...note,
+          body: migrateNoteBodyInternalLinks(note.body),
+        });
+      }
+      return [...merged.values()].sort((a, b) => b.updatedAt - a.updatedAt);
+    });
+
+    const importedScopedNotes = importedNotes.filter((note) => note.scope.type !== "general");
+    if (importedScopedNotes.length === 0) {
+      return;
+    }
+
+    setNotesContext((current) => {
+      const currentMatchesImported = importedScopedNotes.some((note) =>
+        noteMatchesContext(note, current),
+      );
+      if (currentMatchesImported) {
+        return current;
+      }
+      return contextFromScope(importedScopedNotes[0].scope) ?? current;
+    });
+  }, []);
+
   const changeNotesTabState = useCallback(
     (leafId: string, patch: Partial<NotesTabState>) => {
       setNotesTabStateByLeafId((current) => ({
@@ -202,6 +264,7 @@ export function useReaderNotes({ activeTab }: UseReaderNotesArgs) {
     createContextNote,
     updateNote,
     deleteNote,
+    importNotes,
     changeNotesTabState,
     initializeNotesTabState,
     generalNotes,
