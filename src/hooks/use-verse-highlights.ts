@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type RefObject } from "react";
 
+import { swapRecordEntries } from "@/lib/leaf-state";
 import { panelViewportElement } from "@/lib/reader-view";
 
 export type VerseHighlightRange = {
@@ -125,6 +126,15 @@ export function useVerseHighlights({
     [],
   );
 
+  const swapLeafHighlights = useCallback((sourceLeafId: string, targetLeafId: string) => {
+    setHighlightedVerseRangesByLeafId((current) =>
+      swapRecordEntries(current, sourceLeafId, targetLeafId),
+    );
+    setPendingVerseHighlights((current) =>
+      swapRecordEntries(current, sourceLeafId, targetLeafId),
+    );
+  }, []);
+
   useEffect(() => {
     const entries = Object.entries(pendingVerseHighlights);
     if (entries.length === 0) {
@@ -231,5 +241,6 @@ export function useVerseHighlights({
     queueVerseHighlight,
     queueVerseHighlights,
     setVerseHighlights,
+    swapLeafHighlights,
   };
 }
