@@ -4339,7 +4339,7 @@ export function KJVReader() {
         id: "main-menu",
         title: "Main Menu",
         description:
-          "Use the menu to open built-in pages such as Settings, Reading Progress, Download, Help, and more.",
+          "Use the menu to open pages such as Settings, Reading Progress, Download, Help, and more.",
         selector: "[data-tour='main-menu']",
       },
       {
@@ -4353,7 +4353,7 @@ export function KJVReader() {
         id: "share-button",
         title: "Share Layout",
         description:
-          "Use this button to copy a link to the current layout so the same tabs, panels, and positions can be reopened.",
+          "Use this button to copy a link to the current layout so it can be shared with others and reopened with the same tabs, panels, and positions.",
         selector: "[data-tour='share-button']",
       },
       {
@@ -4367,8 +4367,22 @@ export function KJVReader() {
         id: "tabs-strip",
         title: "Tabs",
         description:
-          "Your layouts live in tabs. Tabs stay mounted in memory so notes and panel state are retained when you switch.",
+          "Your layouts live in tabs, making it easy to organize different reading, study, and page setups.",
         selector: "[data-tour='tabs-strip']",
+      },
+      {
+        id: "add-tab",
+        title: "Add Tabs",
+        description:
+          "Use this button to create another tab for a separate reading layout, page, or study workspace.",
+        selector: "[data-tour='add-tab']",
+      },
+      {
+        id: "tab-options",
+        title: "Tab Options",
+        description:
+          "Each tab has its own options menu for relabeling, reordering, and closing that tab.",
+        selector: "[data-tour='tab-options']",
       },
       {
         id: "sidebar",
@@ -4395,7 +4409,7 @@ export function KJVReader() {
         id: "panel-bottom-bar",
         title: "Panel Bottom Bar",
         description:
-          "The bottom bar gives quick access to chapter audio, reading progress, and chapter-level actions like marking read.",
+          "The bottom bar gives quick access to chapter audio, chapter progress updates, and chapter navigation.",
         selector: "[data-tour='panel-bottom-bar']",
       },
     ],
