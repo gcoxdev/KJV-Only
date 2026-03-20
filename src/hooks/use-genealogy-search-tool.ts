@@ -44,26 +44,50 @@ export function useGenealogySearchTool() {
       .map((person) => ({
         person,
         firstName: person.names[0] ?? person.id,
-        namesLower: person.names.map((name) => name.toLowerCase()),
+        namesLower: [
+          ...person.names,
+          ...(person.verses?.byName ?? []).map((entry) => entry.name),
+        ].map((name) => name.toLowerCase()),
       }))
       .sort((a, b) => a.firstName.localeCompare(b.firstName));
   }, [genealogy]);
 
-  const dedupePeopleById = useCallback((people: GenealogyPerson[]) => {
-    const seen = new Set<string>();
-    return people.filter((person) => {
-      if (seen.has(person.id)) {
-        return false;
-      }
-      seen.add(person.id);
-      return true;
-    });
+  const personSemanticKey = useCallback((person: GenealogyPerson) => {
+    const byNameKey = (person.verses?.byName ?? [])
+      .map(
+        (entry) =>
+          `${entry.name}:${entry.numOccurrences ?? 0}:${entry.numVerses ?? entry.verses.length}:${entry.verses.join("|")}`,
+      )
+      .sort()
+      .join("||");
+    return [
+      person.names.join("|"),
+      person.verses?.first ?? "",
+      person.verses?.totalOccurrences ?? 0,
+      person.verses?.totalVerses ?? 0,
+      byNameKey,
+    ].join("::");
   }, []);
+
+  const dedupeEquivalentPeople = useCallback(
+    (people: GenealogyPerson[]) => {
+      const seen = new Set<string>();
+      return people.filter((person) => {
+        const key = personSemanticKey(person);
+        if (seen.has(key)) {
+          return false;
+        }
+        seen.add(key);
+        return true;
+      });
+    },
+    [personSemanticKey],
+  );
 
   const genealogySearchResults = useMemo(() => {
     const term = genealogySearchTerm.trim().toLowerCase();
     if (term) {
-      return dedupePeopleById(
+      return dedupeEquivalentPeople(
         indexedGenealogy
           .filter((item) => item.namesLower.some((name) => name.includes(term)))
           .map((item) => item.person),
@@ -72,13 +96,13 @@ export function useGenealogySearchTool() {
     if (selectedGenealogyIds.length === 0) {
       return [] as GenealogyPerson[];
     }
-    return dedupePeopleById(
+    return dedupeEquivalentPeople(
       selectedGenealogyIds
         .map((id) => genealogyById.get(id))
         .filter((person): person is GenealogyPerson => Boolean(person)),
     );
   }, [
-    dedupePeopleById,
+    dedupeEquivalentPeople,
     genealogyById,
     genealogySearchTerm,
     indexedGenealogy,
