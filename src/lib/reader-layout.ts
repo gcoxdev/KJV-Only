@@ -532,6 +532,7 @@ export function swapLeafContent(
     chapterIndex: sourceLeaf.chapterIndex,
     pickerTestament: sourceLeaf.pickerTestament,
     pickerBookIndex: sourceLeaf.pickerBookIndex,
+    pageId: sourceLeaf.pageId,
   };
   const targetContent = {
     view: targetLeaf.view,
@@ -539,6 +540,7 @@ export function swapLeafContent(
     chapterIndex: targetLeaf.chapterIndex,
     pickerTestament: targetLeaf.pickerTestament,
     pickerBookIndex: targetLeaf.pickerBookIndex,
+    pageId: targetLeaf.pageId,
   };
 
   return updateLeafNode(

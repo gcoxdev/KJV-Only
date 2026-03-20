@@ -921,7 +921,9 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                         {nextOrientationLabel}
                       </DropdownMenuItem>
                     ) : null}
-                    <DropdownMenuSeparator />
+                    {leaf.view === "reader" || parentSplit || moveDirections.length > 0 ? (
+                      <DropdownMenuSeparator />
+                    ) : null}
                     {moveDirections.length > 0 ? (
                       <>
                         <DropdownMenuGroup>
