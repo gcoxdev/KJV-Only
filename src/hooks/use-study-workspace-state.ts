@@ -7,13 +7,13 @@ const STUDY_WORKSPACE_TOOLS: StudyWorkspaceTool[] = [
   "cross-refs",
   "concordance",
   "websters",
-  "ai-dictionary",
   "strongs",
   "kjv-words-phrases",
   "bible-word-book",
-  "maps",
-  "genealogy",
   "hitchcocks",
+  "ai-dictionary",
+  "genealogy",
+  "maps",
 ];
 
 export function normalizeStudyWorkspaceTab(

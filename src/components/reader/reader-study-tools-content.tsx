@@ -41,13 +41,13 @@ export function ReaderStudyToolsContent({
       <CrossRefsTool {...crossRefsProps} />
       <ConcordanceTool {...concordanceProps} />
       <WebstersTool {...webstersProps} />
-      <AIDictionaryTool {...aiDictionaryProps} />
       <StrongsTool {...strongsProps} />
       <KJVWordsPhrasesTool {...kjvWordsPhrasesProps} />
       <BibleWordBookTool {...bibleWordBookProps} />
-      <MapsTool {...mapsProps} />
-      <GenealogyTool {...genealogyProps} />
       <HitchcocksTool {...hitchcocksProps} />
+      <AIDictionaryTool {...aiDictionaryProps} />
+      <GenealogyTool {...genealogyProps} />
+      <MapsTool {...mapsProps} />
     </>
   );
 }
