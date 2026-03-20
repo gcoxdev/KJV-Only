@@ -26,6 +26,18 @@ function leaf(id: string, bookIndex: number, chapterIndex: number): LeafNode {
   };
 }
 
+function customLeaf(
+  id: string,
+  overrides: Partial<LeafNode>,
+): LeafNode {
+  return {
+    ...leaf(id, 0, 0),
+    ...overrides,
+    id,
+    type: "leaf",
+  };
+}
+
 function split(
   id: string,
   orientation: "horizontal" | "vertical",
@@ -63,6 +75,37 @@ describe("reader layout helpers", () => {
 
     expect(findLeafNode(next, "a")).toMatchObject({ bookIndex: 1, chapterIndex: 1 });
     expect(findLeafNode(next, "b")).toMatchObject({ bookIndex: 0, chapterIndex: 0 });
+  });
+
+  it("swaps page and picker leaf state completely", () => {
+    const root = split(
+      "root",
+      "vertical",
+      customLeaf("top", {
+        view: "picker",
+        pickerTestament: "old",
+        pickerBookIndex: 0,
+      }),
+      customLeaf("bottom", {
+        view: "page",
+        pageId: "welcome-home",
+      }),
+    );
+
+    const next = swapLeafContent(root, "top", "bottom");
+
+    expect(findLeafNode(next, "top")).toMatchObject({
+      view: "page",
+      pageId: "welcome-home",
+      pickerTestament: null,
+      pickerBookIndex: null,
+    });
+    expect(findLeafNode(next, "bottom")).toMatchObject({
+      view: "picker",
+      pageId: null,
+      pickerTestament: "old",
+      pickerBookIndex: 0,
+    });
   });
 
   it("finds the correct parent split and group target", () => {
