@@ -50,7 +50,6 @@ import {
 } from "@/lib/leaf-state";
 import {
   collectLeafIds,
-  countLeaves,
   createId,
   createLeaf,
   directionOrientation,
@@ -59,7 +58,7 @@ import {
   findNodeById,
   findParentSplitForLeaf,
   insertLeafIntoParentGroup,
-  removeLeafNode,
+  closeLeafInTab,
   splitNodeById,
   splitPanelNode,
   swapLeafContent,
@@ -1964,20 +1963,7 @@ export function KJVReader() {
   }
 
   function closeLeaf(leafId: string) {
-    updateActiveTab((tab) => {
-      if (countLeaves(tab.root) <= 1) {
-        return {
-          ...tab,
-          root: updateLeafNode(tab.root, leafId, {
-            view: "picker",
-            pickerTestament: null,
-            pickerBookIndex: null,
-          }),
-        };
-      }
-      const result = removeLeafNode(tab.root, leafId);
-      return result.next ? { ...tab, root: result.next } : tab;
-    });
+    updateActiveTab((tab) => closeLeafInTab(tab, leafId));
     if (fullscreenLeafId === leafId && document.fullscreenElement) {
       void document.exitFullscreen();
     }

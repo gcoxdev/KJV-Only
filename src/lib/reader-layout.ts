@@ -354,6 +354,22 @@ export function removeLeafNode(
   return { next: node, removed: false };
 }
 
+export function closeLeafInTab(tab: ReaderTab, leafId: string): ReaderTab {
+  if (countLeaves(tab.root) <= 1) {
+    return {
+      ...tab,
+      root: updateLeafNode(tab.root, leafId, {
+        view: "picker",
+        pickerTestament: null,
+        pickerBookIndex: null,
+      }),
+    };
+  }
+
+  const result = removeLeafNode(tab.root, leafId);
+  return result.next ? { ...tab, root: result.next } : tab;
+}
+
 export function updateLeafNode(
   node: PanelNode,
   targetLeafId: string,

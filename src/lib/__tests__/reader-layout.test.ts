@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  closeLeafInTab,
   collectLeafIds,
   extractLeafNode,
   findGroupTargetNodeId,
@@ -67,6 +68,55 @@ describe("reader layout helpers", () => {
     const extracted = extractLeafNode(root, "b");
     expect(extracted.extracted?.id).toBe("b");
     expect(extracted.next).toEqual(leaf("a", 0, 0));
+  });
+
+  it("resets a single-leaf tab back to picker when closing the leaf", () => {
+    const tab = {
+      id: "tab-1",
+      title: "Welcome Home",
+      root: customLeaf("solo", {
+        view: "page",
+        pageId: "welcome-home",
+      }),
+    };
+
+    const next = closeLeafInTab(tab, "solo");
+
+    expect(next.root).toMatchObject({
+      id: "solo",
+      type: "leaf",
+      view: "picker",
+      pageId: "welcome-home",
+      pickerTestament: null,
+      pickerBookIndex: null,
+    });
+  });
+
+  it("removes a leaf from a multi-leaf tab when closing it", () => {
+    const tab = {
+      id: "tab-1",
+      title: "Genesis 1",
+      root: split(
+        "root",
+        "horizontal",
+        customLeaf("left", { view: "picker" }),
+        customLeaf("right", {
+          view: "reader",
+          bookIndex: 0,
+          chapterIndex: 0,
+        }),
+      ),
+    };
+
+    const next = closeLeafInTab(tab, "left");
+
+    expect(next.root).toMatchObject({
+      id: "right",
+      type: "leaf",
+      view: "reader",
+      bookIndex: 0,
+      chapterIndex: 0,
+    });
   });
 
   it("swaps leaf content without changing ids", () => {
