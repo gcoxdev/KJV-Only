@@ -36,9 +36,20 @@ let aiDictionaryPromise: Promise<AIDictionaryPayload> | null = null;
 let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
 let ancientMapPromise: Promise<AncientMapPayload> | null = null;
+let dailyScriptureTopicsPromise: Promise<DailyScriptureTopicsPayload> | null = null;
 const mapGeoJsonPromiseCache = new Map<string, Promise<MapGeoJsonPayload>>();
 export const GENEALOGY_ASSET_VERSION = "20260312-philip-fix-1";
 export const STRONGS_ASSET_VERSION = "20260313-derivation-links-2";
+
+export type DailyScriptureTopicsPayload = {
+  generatedAt: string;
+  source: string;
+  keepFraction: number;
+  topics: Array<{
+    topic: string;
+    references: string[];
+  }>;
+};
 
 function parseBooks(input: unknown): Book[] | null {
   if (Array.isArray(input)) {
@@ -360,6 +371,27 @@ export function loadAncientMap() {
   }
 
   return ancientMapPromise;
+}
+
+export function loadDailyScriptureTopics() {
+  if (!dailyScriptureTopicsPromise) {
+    dailyScriptureTopicsPromise = fetch("/topics/daily-scripture-topics.json", {
+      cache: "no-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /topics/daily-scripture-topics.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as DailyScriptureTopicsPayload)
+      .catch((error) => {
+        dailyScriptureTopicsPromise = null;
+        throw error;
+      });
+  }
+
+  return dailyScriptureTopicsPromise;
 }
 
 export function loadMapGeoJson(geojsonFile: string) {
