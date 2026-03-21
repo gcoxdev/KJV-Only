@@ -4,6 +4,7 @@ import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ExternalLinkIcon,
   LoaderCircleIcon,
   MinusSquareIcon,
   PlusSquareIcon,
@@ -887,16 +888,18 @@ export function SearchPage({
                               {item.example}
                             </p>
                             {item.links?.length ? (
-                              <div className="mt-2 flex flex-wrap gap-2">
+                              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                <span className="font-medium">Learn more:</span>
                                 {item.links.map((link) => (
                                   <a
                                     key={link.href}
                                     href={link.href}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="text-xs font-medium text-primary underline-offset-2 hover:underline"
+                                    className="inline-flex items-center gap-1 font-medium text-primary underline-offset-2 hover:underline"
                                   >
                                     {link.label}
+                                    <ExternalLinkIcon className="size-3" />
                                   </a>
                                 ))}
                               </div>
