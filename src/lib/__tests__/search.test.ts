@@ -7,6 +7,7 @@ import {
   extractSearchWords,
   matchSelectedWords,
   scoreSmartSearch,
+  suggestConcordanceWords,
   suggestSmartCorrections,
 } from "@/lib/search";
 import type { Book } from "@/types/bible";
@@ -204,5 +205,33 @@ describe("search helpers", () => {
 
     expect(suggestions[0]).toBe("methuselah");
     expect(suggestions[1]).toBe("mathusala");
+  });
+
+  it("keeps prefix concordance suggestions ahead of earlier includes matches", () => {
+    const suggestions = suggestConcordanceWords(
+      [
+        "attest",
+        "contest",
+        "detest",
+        "protest",
+        "restest",
+        "test",
+        "testament",
+        "tester",
+        "testing",
+      ],
+      "test",
+      [],
+      5,
+    );
+
+    expect(suggestions).toEqual([
+      "test",
+      "testament",
+      "tester",
+      "testing",
+      "attest",
+    ]);
+    expect(suggestions).not.toContain("restest");
   });
 });

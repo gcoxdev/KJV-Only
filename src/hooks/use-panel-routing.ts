@@ -90,6 +90,54 @@ type UsePanelRoutingParams = {
   >;
 };
 
+export function buildTargetedReaderPanelInTabState(
+  tabs: ReaderTab[],
+  activeTabId: string | null,
+  target: ReaderNavigationTarget,
+) {
+  if (!activeTabId) {
+    return null;
+  }
+
+  const activeIndex = tabs.findIndex((tab) => tab.id === activeTabId);
+  if (activeIndex < 0) {
+    return null;
+  }
+
+  const location =
+    target.type === "range"
+      ? {
+          bookIndex: target.start.bookIndex,
+          chapterIndex: target.start.chapterIndex,
+        }
+      : {
+          bookIndex: target.bookIndex,
+          chapterIndex: target.chapterIndex,
+        };
+  const active = tabs[activeIndex];
+  const nextLeaf = createLeaf(
+    location.bookIndex,
+    location.chapterIndex,
+    "reader",
+  );
+  const nextRoot: PanelNode = {
+    id: createId(),
+    type: "split",
+    orientation: "horizontal",
+    ratio: 42,
+    first: active.root,
+    second: nextLeaf,
+  };
+
+  const nextTabs = [...tabs];
+  nextTabs[activeIndex] = { ...active, root: nextRoot };
+
+  return {
+    nextTabs,
+    nextLeafId: nextLeaf.id,
+  };
+}
+
 export function usePanelRouting({
   activeTabId,
   books,
@@ -141,47 +189,18 @@ export function usePanelRouting({
 
   const createTargetedReaderPanelInActiveTab = useCallback(
     (target: ReaderNavigationTarget) => {
-      if (!activeTabId) {
-        return null;
-      }
-
-      const currentTabs = tabsRef.current;
-      const activeIndex = currentTabs.findIndex((tab) => tab.id === activeTabId);
-      if (activeIndex < 0) {
-        return null;
-      }
-
-      const location =
-        target.type === "range"
-          ? {
-              bookIndex: target.start.bookIndex,
-              chapterIndex: target.start.chapterIndex,
-            }
-          : {
-              bookIndex: target.bookIndex,
-              chapterIndex: target.chapterIndex,
-            };
-      const active = currentTabs[activeIndex];
-      const nextLeaf = createLeaf(
-        location.bookIndex,
-        location.chapterIndex,
-        "reader",
+      const nextState = buildTargetedReaderPanelInTabState(
+        tabsRef.current,
+        activeTabId,
+        target,
       );
-      const nextRoot: PanelNode = {
-        id: createId(),
-        type: "split",
-        orientation: "horizontal",
-        ratio: 42,
-        first: active.root,
-        second: nextLeaf,
-      };
+      if (!nextState) {
+        return null;
+      }
 
-      const nextTabs = [...currentTabs];
-      nextTabs[activeIndex] = { ...active, root: nextRoot };
+      const { nextTabs, nextLeafId } = nextState;
       tabsRef.current = nextTabs;
       setTabs(nextTabs);
-
-      const nextLeafId = nextLeaf.id;
       targetedPanelLeafIdRef.current = nextLeafId;
       setTargetedPanelLeafId(nextLeafId);
       showTabById(activeTabId);

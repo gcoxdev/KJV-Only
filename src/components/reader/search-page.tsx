@@ -23,6 +23,7 @@ import {
   matchSelectedWords,
   prepareSmartSearch,
   scorePreparedSmartSearch,
+  suggestConcordanceWords,
   suggestSmartCorrections,
   type VerseSearchIndexEntry,
 } from "@/lib/search";
@@ -243,41 +244,14 @@ export function SearchPage({
     }
   }, [ensureConcordanceWordsLoaded, searchMode]);
 
-  const concordanceWordEntries = useMemo(
-    () =>
-      concordanceWords.map((word) => ({
-        word,
-        lower: word.toLowerCase(),
-      })),
-    [concordanceWords],
-  );
-
   const concordanceSuggestions = useMemo(() => {
-    const query = deferredChipInput.trim().toLowerCase();
-    if (query.length < 2) {
-      return [] as string[];
-    }
-    const selected = new Set(selectedWords.map((word) => word.toLowerCase()));
-    const startsWith: string[] = [];
-    const includes: string[] = [];
-
-    for (const entry of concordanceWordEntries) {
-      if (selected.has(entry.lower)) {
-        continue;
-      }
-      if (entry.lower.startsWith(query)) {
-        startsWith.push(entry.word);
-      } else if (entry.lower.includes(query)) {
-        includes.push(entry.word);
-      }
-
-      if (startsWith.length + includes.length >= MAX_CONCORDANCE_SUGGESTIONS) {
-        break;
-      }
-    }
-
-    return [...startsWith, ...includes].slice(0, MAX_CONCORDANCE_SUGGESTIONS);
-  }, [concordanceWordEntries, deferredChipInput, selectedWords]);
+    return suggestConcordanceWords(
+      concordanceWords,
+      deferredChipInput,
+      selectedWords,
+      MAX_CONCORDANCE_SUGGESTIONS,
+    );
+  }, [concordanceWords, deferredChipInput, selectedWords]);
 
   const smartVocabulary = useMemo(() => {
     const values = new Set<string>();

@@ -21,7 +21,7 @@ type LeafHistoryState = Record<
   }
 >;
 
-function buildLeafHistoryEntry(leaf: LeafNode): LeafHistoryEntry {
+export function buildLeafHistoryEntry(leaf: LeafNode): LeafHistoryEntry {
   return {
     view: leaf.view,
     bookIndex: leaf.bookIndex,
@@ -32,7 +32,7 @@ function buildLeafHistoryEntry(leaf: LeafNode): LeafHistoryEntry {
   };
 }
 
-function leafHistoryEntryEquals(left: LeafHistoryEntry, right: LeafHistoryEntry) {
+export function leafHistoryEntryEquals(left: LeafHistoryEntry, right: LeafHistoryEntry) {
   return (
     left.view === right.view &&
     left.bookIndex === right.bookIndex &&
@@ -41,6 +41,62 @@ function leafHistoryEntryEquals(left: LeafHistoryEntry, right: LeafHistoryEntry)
     left.pickerBookIndex === right.pickerBookIndex &&
     left.pageId === right.pageId
   );
+}
+
+export function reconcileLeafHistoryState(
+  current: LeafHistoryState,
+  leafEntries: Map<string, LeafHistoryEntry>,
+  pendingNavigationLeafIds: Set<string>,
+) {
+  let changed = false;
+  const next: LeafHistoryState = {};
+
+  for (const [leafId, entry] of leafEntries) {
+    const existing = current[leafId];
+    if (!existing) {
+      next[leafId] = { entries: [entry], index: 0 };
+      changed = true;
+      continue;
+    }
+
+    if (pendingNavigationLeafIds.has(leafId)) {
+      pendingNavigationLeafIds.delete(leafId);
+      next[leafId] = { ...existing };
+      continue;
+    }
+
+    const currentEntry = existing.entries[existing.index];
+    if (currentEntry && leafHistoryEntryEquals(currentEntry, entry)) {
+      next[leafId] = existing;
+      continue;
+    }
+
+    next[leafId] = {
+      entries: [...existing.entries.slice(0, existing.index + 1), entry],
+      index: existing.index + 1,
+    };
+    changed = true;
+  }
+
+  for (const leafId of Object.keys(current)) {
+    if (!leafEntries.has(leafId)) {
+      changed = true;
+    }
+  }
+
+  return changed ? next : current;
+}
+
+export function canNavigateLeafHistory(
+  history: LeafHistoryState[string] | undefined,
+  direction: -1 | 1,
+) {
+  if (!history) {
+    return false;
+  }
+
+  const nextIndex = history.index + direction;
+  return nextIndex >= 0 && nextIndex < history.entries.length;
 }
 
 type UseLeafHistoryParams = {
@@ -70,58 +126,22 @@ export function useLeafHistory({
     }
 
     setLeafHistoryByLeafId((current) => {
-      let changed = false;
-      const next: LeafHistoryState = {};
-
-      for (const [leafId, entry] of leafEntries) {
-        const existing = current[leafId];
-        if (!existing) {
-          next[leafId] = { entries: [entry], index: 0 };
-          changed = true;
-          continue;
-        }
-
-        if (pendingLeafHistoryNavigationRef.current.has(leafId)) {
-          pendingLeafHistoryNavigationRef.current.delete(leafId);
-          next[leafId] = { ...existing };
-          continue;
-        }
-
-        const currentEntry = existing.entries[existing.index];
-        if (currentEntry && leafHistoryEntryEquals(currentEntry, entry)) {
-          next[leafId] = existing;
-          continue;
-        }
-
-        next[leafId] = {
-          entries: [...existing.entries.slice(0, existing.index + 1), entry],
-          index: existing.index + 1,
-        };
-        changed = true;
-      }
-
-      for (const leafId of Object.keys(current)) {
-        if (!leafEntries.has(leafId)) {
-          changed = true;
-        }
-      }
-
-      return changed ? next : current;
+      return reconcileLeafHistoryState(
+        current,
+        leafEntries,
+        pendingLeafHistoryNavigationRef.current,
+      );
     });
   }, [tabs]);
 
   const navigateLeafHistory = useCallback(
     (leafId: string, direction: -1 | 1) => {
       const history = leafHistoryByLeafId[leafId];
-      if (!history) {
+      if (!canNavigateLeafHistory(history, direction)) {
         return;
       }
 
       const nextIndex = history.index + direction;
-      if (nextIndex < 0 || nextIndex >= history.entries.length) {
-        return;
-      }
-
       const entry = history.entries[nextIndex];
       pendingLeafHistoryNavigationRef.current.add(leafId);
       setLeafHistoryByLeafId((current) => ({

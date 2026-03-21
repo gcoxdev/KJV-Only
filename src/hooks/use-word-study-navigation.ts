@@ -84,7 +84,7 @@ type UseWordStudyNavigationParams = {
   setTokenPopup: (value: { token: VerseToken; x: number; y: number } | null) => void;
 };
 
-function contextFromNoteLinkTarget(target: NoteLinkTarget): NotesContext {
+export function contextFromNoteLinkTarget(target: NoteLinkTarget): NotesContext {
   if (target.type === "chapter") {
     return {
       bookIndex: target.bookIndex,
