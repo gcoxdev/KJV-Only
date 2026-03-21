@@ -37,6 +37,7 @@ let strongsGreekPromise: Promise<StrongsPayload> | null = null;
 let strongsHebrewPromise: Promise<StrongsPayload> | null = null;
 let ancientMapPromise: Promise<AncientMapPayload> | null = null;
 let dailyScriptureTopicsPromise: Promise<DailyScriptureTopicsPayload> | null = null;
+let topicsIndexPromise: Promise<TopicsIndexPayload> | null = null;
 const mapGeoJsonPromiseCache = new Map<string, Promise<MapGeoJsonPayload>>();
 export const GENEALOGY_ASSET_VERSION = "20260312-philip-fix-1";
 export const STRONGS_ASSET_VERSION = "20260313-derivation-links-2";
@@ -45,6 +46,15 @@ export type DailyScriptureTopicsPayload = {
   generatedAt: string;
   source: string;
   keepFraction: number;
+  topics: Array<{
+    topic: string;
+    references: string[];
+  }>;
+};
+
+export type TopicsIndexPayload = {
+  generatedAt: string;
+  source: string;
   topics: Array<{
     topic: string;
     references: string[];
@@ -392,6 +402,27 @@ export function loadDailyScriptureTopics() {
   }
 
   return dailyScriptureTopicsPromise;
+}
+
+export function loadTopicsIndex() {
+  if (!topicsIndexPromise) {
+    topicsIndexPromise = fetch("/topics/topics-index.json", {
+      cache: "no-cache",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Could not load /topics/topics-index.json");
+        }
+        return response.json() as Promise<unknown>;
+      })
+      .then((payload) => payload as TopicsIndexPayload)
+      .catch((error) => {
+        topicsIndexPromise = null;
+        throw error;
+      });
+  }
+
+  return topicsIndexPromise;
 }
 
 export function loadMapGeoJson(geojsonFile: string) {

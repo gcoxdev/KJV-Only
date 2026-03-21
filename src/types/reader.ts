@@ -198,10 +198,11 @@ export type StaticPageId =
   | "contact"
   | "help";
 
-export type StudyWorkspaceTab = "tools" | "notes" | "bookmarks";
+export type StudyWorkspaceTab = "tools" | "topics" | "notes" | "bookmarks";
 export type StudyWorkspaceTool =
   | "cross-refs"
   | "concordance"
+  | "topics"
   | "websters"
   | "ai-dictionary"
   | "strongs"
@@ -239,6 +240,7 @@ export type LeafNode = {
     | "picker"
     | "search"
     | "notes"
+    | "topics"
     | "page"
     | "tools"
     | "bookmarks";

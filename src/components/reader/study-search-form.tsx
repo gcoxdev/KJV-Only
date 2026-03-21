@@ -15,6 +15,7 @@ type StudySearchFormProps = {
   loading: boolean;
   value: string;
   inputRef?: Ref<HTMLInputElement>;
+  liveSearch?: boolean;
   onSearch: (value: string) => void;
 };
 
@@ -25,6 +26,7 @@ export function StudySearchForm({
   loading,
   value,
   inputRef,
+  liveSearch = false,
   onSearch,
 }: StudySearchFormProps) {
   const [draftValue, setDraftValue] = useState(value);
@@ -48,7 +50,13 @@ export function StudySearchForm({
           placeholder={placeholder}
           className="bg-transparent"
           value={draftValue}
-          onChange={(event) => setDraftValue(event.target.value)}
+          onChange={(event) => {
+            const nextValue = event.target.value;
+            setDraftValue(nextValue);
+            if (liveSearch) {
+              onSearch(nextValue);
+            }
+          }}
         />
         <InputGroupAddon align="inline-end">
           <InputGroupButton

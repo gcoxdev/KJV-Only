@@ -2,10 +2,11 @@ import { startTransition, useCallback, useState } from "react";
 
 import type { StudyWorkspaceTab, StudyWorkspaceTool } from "@/types/reader";
 
-const STUDY_WORKSPACE_TABS: StudyWorkspaceTab[] = ["tools", "notes", "bookmarks"];
+const STUDY_WORKSPACE_TABS: StudyWorkspaceTab[] = ["tools", "topics", "notes", "bookmarks"];
 const STUDY_WORKSPACE_TOOLS: StudyWorkspaceTool[] = [
   "cross-refs",
   "concordance",
+  "topics",
   "websters",
   "strongs",
   "kjv-words-phrases",
@@ -50,7 +51,7 @@ export function useStudyWorkspaceState({
 
   const showTool = useCallback((tool: StudyWorkspaceTool) => {
     startTransition(() => {
-      setActiveTab("tools");
+      setActiveTab(tool === "topics" ? "topics" : "tools");
       setActiveTool(tool);
       setAccordionValue((current) =>
         current.includes(tool) ? current : [...current, tool],
