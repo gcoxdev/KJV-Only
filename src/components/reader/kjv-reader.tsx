@@ -343,6 +343,8 @@ export function KJVReader() {
     useState(false);
   const [readModeParagraphIndent, setReadModeParagraphIndent] = useState(false);
   const [flowVersesByParagraph, setFlowVersesByParagraph] = useState(false);
+  const [showWelcomeHomeAtStartup, setShowWelcomeHomeAtStartup] =
+    useState(true);
   const [wordVerseSelectionTarget, setWordVerseSelectionTarget] =
     useState<WordVerseSelectionTarget>("sidebar");
   const wordVerseSelectionTargetRef =
@@ -376,6 +378,7 @@ export function KJVReader() {
     useState<BeforeInstallPromptEvent | null>(null);
   const [isPwaInstalled, setIsPwaInstalled] = useState(false);
   const previousBibleCompletionRef = useRef(false);
+  const didApplyStartupWelcomeHomeRef = useRef(false);
   const pendingActiveTabIdRef = useRef<string | null>(null);
   const pendingToolsTabScrollRef = useRef(false);
   const pendingToolsTabIdRef = useRef<string | null>(null);
@@ -394,6 +397,9 @@ export function KJVReader() {
   const [tabs, setTabs] = useState<ReaderTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [isShareCopied, setIsShareCopied] = useState(false);
+  const [activeSettingsTab, setActiveSettingsTab] = useState<
+    "visual" | "targeting" | "other"
+  >("visual");
   const [tokenPopup, setTokenPopup] = useState<TokenPopupState | null>(null);
   const [fullscreenLeafId, setFullscreenLeafId] = useState<string | null>(null);
   const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(
@@ -597,6 +603,7 @@ export function KJVReader() {
         searchResultOpenTarget?: SearchResultOpenTarget;
         bookmarkOpenTarget?: BookmarkOpenTarget;
         referenceLinkOpenTarget?: ReferenceLinkOpenTarget;
+        showWelcomeHomeAtStartup?: boolean;
       };
       if (typeof parsed.fontSize === "number") {
         setFontSize(Math.max(8, Math.round(parsed.fontSize)));
@@ -637,6 +644,9 @@ export function KJVReader() {
       }
       if (typeof parsed.flowVersesByParagraph === "boolean") {
         setFlowVersesByParagraph(parsed.flowVersesByParagraph);
+      }
+      if (typeof parsed.showWelcomeHomeAtStartup === "boolean") {
+        setShowWelcomeHomeAtStartup(parsed.showWelcomeHomeAtStartup);
       }
       if (
         parsed.tabsOrientation === "horizontal" ||
@@ -709,6 +719,7 @@ export function KJVReader() {
         hideReadModeVerseNumbers,
         readModeParagraphIndent,
         flowVersesByParagraph,
+        showWelcomeHomeAtStartup,
         tabsOrientation,
         wordVerseSelectionTarget,
         notesLinkOpenTarget,
@@ -726,6 +737,7 @@ export function KJVReader() {
     hideReadModeVerseNumbers,
     readModeParagraphIndent,
     flowVersesByParagraph,
+    showWelcomeHomeAtStartup,
     tabsOrientation,
     wordVerseSelectionTarget,
     notesLinkOpenTarget,
@@ -808,10 +820,12 @@ export function KJVReader() {
         if (parsedLayout && parsedLayout.tabs.length > 0) {
           applyParsedLayout(parsedLayout);
         } else {
-          const welcomeTab = createWelcomeHomeTab();
           const readerTab = createGenesisReaderTab();
-          setTabs([welcomeTab, readerTab]);
-          setActiveTabId(welcomeTab.id);
+          const initialTabs = showWelcomeHomeAtStartup
+            ? [readerTab, createWelcomeHomeTab()]
+            : [readerTab];
+          setTabs(initialTabs);
+          setActiveTabId(initialTabs[initialTabs.length - 1]?.id ?? readerTab.id);
         }
         setLoadError(null);
         setIsLoaded(true);
@@ -835,7 +849,48 @@ export function KJVReader() {
   }, [
     applyParsedLayout,
     parseCurrentLayoutHash,
+    showWelcomeHomeAtStartup,
   ]);
+
+  useEffect(() => {
+    if (!isLoaded || didApplyStartupWelcomeHomeRef.current) {
+      return;
+    }
+    didApplyStartupWelcomeHomeRef.current = true;
+    setTabs((currentTabs) => {
+      if (currentTabs.length === 0) {
+        return currentTabs;
+      }
+      const existingWelcomeTab = currentTabs.find(
+        (tab) =>
+          tab.root.type === "leaf" &&
+          tab.root.view === "page" &&
+          tab.root.pageId === "welcome-home",
+      );
+      const otherTabs = currentTabs.filter(
+        (tab) =>
+          !(
+            tab.root.type === "leaf" &&
+            tab.root.view === "page" &&
+            tab.root.pageId === "welcome-home"
+          ),
+      );
+      const nextTabs =
+        showWelcomeHomeAtStartup
+          ? [...otherTabs, existingWelcomeTab ?? createWelcomeHomeTab()]
+          : currentTabs;
+      const welcomeTab = nextTabs.find(
+        (tab) =>
+          tab.root.type === "leaf" &&
+          tab.root.view === "page" &&
+          tab.root.pageId === "welcome-home",
+      );
+      if (welcomeTab) {
+        setActiveTabId(welcomeTab.id);
+      }
+      return nextTabs;
+    });
+  }, [isLoaded, setTabs, showWelcomeHomeAtStartup, tabs]);
 
   useEffect(() => {
     tabsRef.current = tabs;
@@ -4167,6 +4222,8 @@ export function KJVReader() {
     onDeleteBookmark: deleteBookmark,
   };
   const settingsPanelProps = {
+    activeTab: activeSettingsTab,
+    onActiveTabChange: setActiveSettingsTab,
     theme,
     onThemeChange: setTheme,
     readerColorTheme,
@@ -4205,6 +4262,8 @@ export function KJVReader() {
     onBookmarkOpenTargetChange: setBookmarkOpenTarget,
     referenceLinkOpenTarget,
     onReferenceLinkOpenTargetChange: setReferenceLinkOpenTarget,
+    showWelcomeHomeAtStartup,
+    onShowWelcomeHomeAtStartupChange: setShowWelcomeHomeAtStartup,
   };
   const progressPanelProps = {
     totalProgressPercent,

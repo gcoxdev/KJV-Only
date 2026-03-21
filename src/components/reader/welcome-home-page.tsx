@@ -20,6 +20,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 import { parseBibleReference } from "@/lib/references";
 import {
@@ -37,6 +39,8 @@ type WelcomeHomePageProps = {
   renderPreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
   onCloseSidebar: () => void;
+  showAtStartup: boolean;
+  onShowAtStartupChange: (checked: boolean) => void;
 };
 
 type DailyScriptureEntry = {
@@ -83,6 +87,8 @@ export function WelcomeHomePage({
   renderPreview,
   onOpenReference,
   onCloseSidebar,
+  showAtStartup,
+  onShowAtStartupChange,
 }: WelcomeHomePageProps) {
   const [dailyTopics, setDailyTopics] = useState<
     DailyScriptureTopicsPayload["topics"]
@@ -247,6 +253,16 @@ export function WelcomeHomePage({
             A Genesis 1 reading tab is already open beside this page, so you
             can begin immediately, open search, or take the guided tour first.
           </p>
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-background/55 px-3 py-2">
+            <Label htmlFor="welcome-home-startup-card">
+              Open Welcome Home Tab At Startup
+            </Label>
+            <Switch
+              id="welcome-home-startup-card"
+              checked={showAtStartup}
+              onCheckedChange={onShowAtStartupChange}
+            />
+          </div>
           <div className="grid gap-3 pt-1 sm:grid-cols-2 xl:grid-cols-4">
             <Button type="button" onClick={onStartTour}>
               <CompassIcon />

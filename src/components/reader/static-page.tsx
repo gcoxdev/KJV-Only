@@ -20,6 +20,8 @@ type StaticPageProps = {
   onStartTour?: () => void;
   onOpenSearch?: () => void;
   onOpenPage?: (pageId: StaticPageId) => void;
+  showWelcomeHomeAtStartup?: boolean;
+  onShowWelcomeHomeAtStartupChange?: (checked: boolean) => void;
 };
 
 export function StaticPage({
@@ -34,6 +36,8 @@ export function StaticPage({
   onStartTour,
   onOpenSearch,
   onOpenPage,
+  showWelcomeHomeAtStartup = true,
+  onShowWelcomeHomeAtStartupChange,
 }: StaticPageProps) {
   const page = getStaticPage(pageId);
 
@@ -73,7 +77,8 @@ export function StaticPage({
           onOpenPage &&
           renderPreview &&
           onOpenReference &&
-          onCloseSidebar ? (
+          onCloseSidebar &&
+          onShowWelcomeHomeAtStartupChange ? (
             <WelcomeHomePage
               books={books}
               onStartTour={onStartTour}
@@ -82,6 +87,8 @@ export function StaticPage({
               renderPreview={renderPreview}
               onOpenReference={onOpenReference}
               onCloseSidebar={onCloseSidebar}
+              showAtStartup={showWelcomeHomeAtStartup}
+              onShowAtStartupChange={onShowWelcomeHomeAtStartupChange}
             />
           ) : null}
           {page.id === "saved" && renderPreview && onOpenReference && onCloseSidebar ? (

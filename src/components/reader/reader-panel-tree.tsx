@@ -1597,6 +1597,10 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 onStartTour={onStartTour}
                 onOpenSearch={onOpenSearchTab}
                 onOpenPage={onOpenStaticPageTab}
+                showWelcomeHomeAtStartup={settingsPanelProps.showWelcomeHomeAtStartup}
+                onShowWelcomeHomeAtStartupChange={
+                  settingsPanelProps.onShowWelcomeHomeAtStartupChange
+                }
               />
             )}
           </CardContent>
