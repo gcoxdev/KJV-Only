@@ -17,6 +17,8 @@ type StaticPageProps = {
   onOpenReference?: (reference: string) => void;
   onCloseSidebar?: () => void;
   onStartTour?: () => void;
+  onOpenSearch?: () => void;
+  onOpenPage?: (pageId: StaticPageId) => void;
 };
 
 export function StaticPage({
@@ -29,6 +31,8 @@ export function StaticPage({
   onOpenReference,
   onCloseSidebar,
   onStartTour,
+  onOpenSearch,
+  onOpenPage,
 }: StaticPageProps) {
   const page = getStaticPage(pageId);
 
@@ -61,8 +65,12 @@ export function StaticPage({
                 <p key={`${page.id}-paragraph-${index}`}>{paragraph}</p>
               ))
             : null}
-          {page.id === "welcome-home" && onStartTour ? (
-            <WelcomeHomePage onStartTour={onStartTour} />
+          {page.id === "welcome-home" && onStartTour && onOpenSearch && onOpenPage ? (
+            <WelcomeHomePage
+              onStartTour={onStartTour}
+              onOpenSearch={onOpenSearch}
+              onOpenPage={onOpenPage}
+            />
           ) : null}
           {page.id === "saved" && renderPreview && onOpenReference && onCloseSidebar ? (
             <HowToGetSavedPage

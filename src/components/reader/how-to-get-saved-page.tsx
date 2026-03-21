@@ -141,12 +141,17 @@ export function HowToGetSavedPage({
 }: HowToGetSavedPageProps) {
   return (
     <div className="flex flex-col gap-6">
-      <Card className="border-border/70 bg-card/70">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="border-border/70 bg-card/70 shadow-sm">
+        <CardHeader className="gap-3">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <HeartHandshakeIcon className="size-4 text-muted-foreground" />
             The Romans Road to Salvation
           </CardTitle>
+          <CardDescription>
+            A simple presentation from the book of Romans showing man's need,
+            God's provision in Christ, and the Bible's call to believe on the
+            Lord Jesus Christ.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
           <p>
@@ -154,14 +159,40 @@ export function HowToGetSavedPage({
             Christ died and rose again for sinners, and that whosoever believes
             on him and calls upon him shall be saved.
           </p>
+          <div className="grid gap-3 pt-1 sm:grid-cols-3">
+            <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                Need
+              </p>
+              <p className="mt-2 text-sm leading-6">
+                Every man is a sinner before a holy God.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                Provision
+              </p>
+              <p className="mt-2 text-sm leading-6">
+                Jesus Christ died and rose again for sinners.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                Response
+              </p>
+              <p className="mt-2 text-sm leading-6">
+                Believe on Christ and call upon the Lord.
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
       <div className="grid gap-4">
         {ROMANS_ROAD_STEPS.map((step) => (
-          <Card key={step.title} className="border-border/70 bg-card/70">
-            <CardHeader>
-              <CardTitle>{step.title}</CardTitle>
+          <Card key={step.title} className="border-border/70 bg-card/70 shadow-sm">
+            <CardHeader className="gap-2">
+              <CardTitle className="text-base sm:text-lg">{step.title}</CardTitle>
               <CardDescription>{step.summary}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -177,9 +208,9 @@ export function HowToGetSavedPage({
         ))}
       </div>
 
-      <Card className="border-border/70 bg-card/70">
-        <CardHeader>
-          <CardTitle>What Should You Do?</CardTitle>
+      <Card className="border-border/70 bg-card/70 shadow-sm">
+        <CardHeader className="gap-2">
+          <CardTitle className="text-base sm:text-lg">What Should You Do?</CardTitle>
           <CardDescription>
             Believe on the Lord Jesus Christ. Do not trust your works, your
             religion, or your feelings. Trust Christ alone.

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { ScrollTextIcon } from "lucide-react";
+import { ScrollTextIcon, BookMarkedIcon, ShieldCheckIcon, LanguagesIcon } from "lucide-react";
 
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
 import {
@@ -243,30 +243,6 @@ const EXTERNAL_SOURCES: ExternalSource[] = [
       "Notes how KJV-style pronouns and italics preserve grammatical distinctions and show supplied English words.",
   },
   {
-    label: "ESV on Mark 16:9-20",
-    href: "https://www.esv.org/verses/Mark%2B16%3A9%E2%80%9320/",
-    description:
-      "An example of a modern version flagging a received passage with a manuscript warning.",
-  },
-  {
-    label: "ESV on John 7:53-8:11",
-    href: "https://www.esv.org/verses/John%2B7%3A53%E2%80%938%3A11/",
-    description:
-      "Another example of a well-known passage marked as absent from the earliest manuscripts.",
-  },
-  {
-    label: "ESV on 1 Timothy 3:16",
-    href: "https://www.esv.org/verses/1%20Timothy%203%3A16%3B%204%3A1/",
-    description:
-      "A useful comparison point for one of the most-discussed wording differences in KJV-only discussions.",
-  },
-  {
-    label: "ESV on Colossians 1:13-14",
-    href: "https://www.esv.org/Colossians%2B1%3A13%E2%80%9314%3BColossians%2B2%3A13%E2%80%9314%3BColossians%2B3%3A9%E2%80%9311/",
-    description:
-      "A comparison point for the omission of the phrase \"through his blood\" in many modern texts and translations.",
-  },
-  {
     label: "King James Bible College: What's Missing?",
     href: "https://kingjamesbiblecollege.org/the-king-james-bible-vs-modern-translations-whats-missing/",
     description:
@@ -323,9 +299,9 @@ export function WhyKJVOnlyPage({
 }: WhyKJVOnlyPageProps) {
   return (
     <div className="flex flex-col gap-6">
-      <Card className="border-border/70 bg-card/70">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="border-border/70 bg-card/70 shadow-sm">
+        <CardHeader className="gap-3">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <ScrollTextIcon className="size-4 text-muted-foreground" />
             Why KJV Only?
           </CardTitle>
@@ -335,17 +311,54 @@ export function WhyKJVOnlyPage({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
-          {CASE_AT_A_GLANCE.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
+          <p>
+            The KJV-only position is not merely a preference for older wording.
+            It is an argument about textual stability, public church use,
+            doctrinal clarity, and the long-term value of one settled Bible for
+            English-speaking believers.
+          </p>
+          <div className="grid gap-3 pt-1 sm:grid-cols-3">
+            <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <BookMarkedIcon className="size-3.5" />
+                Stability
+              </p>
+              <p className="mt-2 text-sm leading-6">
+                One stable Bible for reading, preaching, memorizing, and public use.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <LanguagesIcon className="size-3.5" />
+                Precision
+              </p>
+              <p className="mt-2 text-sm leading-6">
+                Older English forms often preserve distinctions modern English flattens.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <ShieldCheckIcon className="size-3.5" />
+                Confidence
+              </p>
+              <p className="mt-2 text-sm leading-6">
+                A complete and publicly trusted English Bible instead of a moving target of revisions and doubt.
+              </p>
+            </div>
+          </div>
+          <div className="space-y-2 pt-1">
+            {CASE_AT_A_GLANCE.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
       <div className="grid gap-4">
         {KJV_ONLY_SECTIONS.map((section) => (
-          <Card key={section.title} className="border-border/70 bg-card/70">
-            <CardHeader>
-              <CardTitle>{section.title}</CardTitle>
+          <Card key={section.title} className="border-border/70 bg-card/70 shadow-sm">
+            <CardHeader className="gap-2">
+              <CardTitle className="text-base sm:text-lg">{section.title}</CardTitle>
               <CardDescription>{section.summary}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
@@ -367,9 +380,9 @@ export function WhyKJVOnlyPage({
         ))}
       </div>
 
-      <Card className="border-border/70 bg-card/70">
-        <CardHeader>
-          <CardTitle>Historical and Comparative Source Notes</CardTitle>
+      <Card className="border-border/70 bg-card/70 shadow-sm">
+        <CardHeader className="gap-2">
+          <CardTitle className="text-base sm:text-lg">Historical and Comparative Source Notes</CardTitle>
           <CardDescription>
             These are useful source trails for the historical background,
             translation process, pronoun distinctions, and manuscript examples
@@ -380,7 +393,7 @@ export function WhyKJVOnlyPage({
           {EXTERNAL_SOURCES.map((source) => (
             <div
               key={source.href}
-              className="rounded-lg border border-border/70 bg-background/70 p-3"
+              className="rounded-xl border border-border/70 bg-background/70 p-3"
             >
               <a
                 href={source.href}
