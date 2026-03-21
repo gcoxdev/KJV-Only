@@ -116,6 +116,38 @@ export function matchSelectedWords(
     : needles.every((needle) => haystack.has(needle));
 }
 
+export function suggestConcordanceWords(
+  words: string[],
+  input: string,
+  selectedWords: string[] = [],
+  limit = 40,
+) {
+  const query = input.trim().toLowerCase();
+  if (query.length < 2) {
+    return [] as string[];
+  }
+
+  const selected = new Set(selectedWords.map((word) => word.toLowerCase()));
+  const startsWith: string[] = [];
+  const includes: string[] = [];
+
+  for (const word of words) {
+    const lower = word.toLowerCase();
+    if (selected.has(lower)) {
+      continue;
+    }
+    if (lower.startsWith(query)) {
+      startsWith.push(word);
+      continue;
+    }
+    if (lower.includes(query)) {
+      includes.push(word);
+    }
+  }
+
+  return [...startsWith, ...includes].slice(0, limit);
+}
+
 export function buildRegexMatcher(pattern: string, caseSensitive: boolean) {
   const trimmed = pattern.trim();
   if (!trimmed) {
