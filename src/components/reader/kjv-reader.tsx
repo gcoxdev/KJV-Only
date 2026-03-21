@@ -37,7 +37,6 @@ import {
   resolveUnitsKey,
   resolveWebstersKey,
 } from "@/lib/references";
-import { normalizeRangePoints } from "@/lib/bookmarks";
 import {
   defaultHighlightColor,
   normalizeHighlightColor,
@@ -133,6 +132,10 @@ import { useMapsSearchTool } from "@/hooks/use-maps-search-tool";
 import { useConcordanceCrossRefsTool } from "@/hooks/use-concordance-crossrefs-tool";
 import { useReaderBookmarks } from "@/hooks/use-reader-bookmarks";
 import { useReaderNotes } from "@/hooks/use-reader-notes";
+import {
+  usePanelRouting,
+  type PendingReaderScrollTarget,
+} from "@/hooks/use-panel-routing";
 import { useVerseHighlights } from "@/hooks/use-verse-highlights";
 import {
   STUDY_ACCORDION_ITEMS,
@@ -318,15 +321,6 @@ function leafHistoryEntryEquals(
     left.pageId === right.pageId
   );
 }
-
-type PendingReaderScrollTarget = {
-  leafId: string;
-  bookIndex: number;
-  chapterIndex: number;
-  mode: "chapter-top" | "verse-range";
-  verseStart: number;
-  verseEnd: number;
-};
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -2740,406 +2734,32 @@ export function KJVReader() {
     });
   }, [setActiveTabId, setTabs]);
 
-  const navigateReaderLeafToNoteTarget = useCallback(
-    (tabId: string, leafId: string, target: NoteLinkTarget) => {
-      const location =
-        target.type === "range"
-          ? {
-              bookIndex: target.start.bookIndex,
-              chapterIndex: target.start.chapterIndex,
-            }
-          : {
-              bookIndex: target.bookIndex,
-              chapterIndex: target.chapterIndex,
-            };
-      clearLeafHighlights(leafId);
-      setSelectedHighlightScope(null);
-      setTabs((currentTabs) =>
-        currentTabs.map((tab) =>
-          tab.id === tabId
-            ? {
-                ...tab,
-                root: updateLeafNode(tab.root, leafId, {
-                  bookIndex: location.bookIndex,
-                  chapterIndex: location.chapterIndex,
-                  view: "reader",
-                  pickerTestament: null,
-                  pickerBookIndex: null,
-                }),
-              }
-            : tab,
-        ),
-      );
-    },
-    [clearLeafHighlights, setSelectedHighlightScope, setTabs],
-  );
-
-  const createTargetedReaderPanelInActiveTab = useCallback(
-    (target: NoteLinkTarget) => {
-      if (!activeTabId) {
-        return null;
-      }
-
-      const currentTabs = tabsRef.current;
-      const activeIndex = currentTabs.findIndex((tab) => tab.id === activeTabId);
-      if (activeIndex < 0) {
-        return null;
-      }
-
-      const location =
-        target.type === "range"
-          ? {
-              bookIndex: target.start.bookIndex,
-              chapterIndex: target.start.chapterIndex,
-            }
-          : {
-              bookIndex: target.bookIndex,
-              chapterIndex: target.chapterIndex,
-            };
-      const active = currentTabs[activeIndex];
-      const nextLeaf = createLeaf(
-        location.bookIndex,
-        location.chapterIndex,
-        "reader",
-      );
-      const nextRoot: PanelNode = {
-        id: createId(),
-        type: "split",
-        orientation: "horizontal",
-        ratio: 42,
-        first: active.root,
-        second: nextLeaf,
-      };
-
-      const nextTabs = [...currentTabs];
-      nextTabs[activeIndex] = { ...active, root: nextRoot };
-      tabsRef.current = nextTabs;
-      setTabs(nextTabs);
-
-      const nextLeafId = nextLeaf.id;
-      targetedPanelLeafIdRef.current = nextLeafId;
-      setTargetedPanelLeafId(nextLeafId);
-      showTabById(activeTabId);
-      return nextLeafId;
-    },
-    [activeTabId, setTabs, showTabById],
-  );
-
-  const openReaderTarget = useCallback(
-    (
-      target:
-        | { type: "chapter"; bookIndex: number; chapterIndex: number }
-        | {
-            type: "verse";
-            bookIndex: number;
-            chapterIndex: number;
-            verseNumber: number;
-          }
-        | {
-            type: "selection";
-            bookIndex: number;
-            chapterIndex: number;
-            ranges: Array<{ start: number; end: number }>;
-          }
-        | {
-            type: "range";
-            start: {
-              bookIndex: number;
-              chapterIndex: number;
-              verseNumber: number;
-            };
-            end: {
-              bookIndex: number;
-              chapterIndex: number;
-              verseNumber: number;
-            };
-          },
-      destination: NotesLinkOpenTarget | SearchResultOpenTarget | BookmarkOpenTarget,
-    ) => {
-      const location =
-        target.type === "range"
-          ? {
-              bookIndex: target.start.bookIndex,
-              chapterIndex: target.start.chapterIndex,
-            }
-          : {
-              bookIndex: target.bookIndex,
-              chapterIndex: target.chapterIndex,
-            };
-      const applyReaderTargetEffects = (leafId: string) => {
-        if (target.type === "selection") {
-          setActiveReaderWordHighlight(null);
-          setLeafHighlights(leafId, target.ranges);
-          setSelectedHighlightScope({
-            type: "selection",
-            bookIndex: target.bookIndex,
-            chapterIndex: target.chapterIndex,
-            ranges: target.ranges,
-          });
-          const firstRange = target.ranges[0];
-          const lastRange = target.ranges[target.ranges.length - 1];
-          setPendingReaderScrollTarget({
-            leafId,
-            bookIndex: target.bookIndex,
-            chapterIndex: target.chapterIndex,
-            mode: "verse-range",
-            verseStart: firstRange?.start ?? 1,
-            verseEnd: lastRange?.end ?? firstRange?.end ?? firstRange?.start ?? 1,
-          });
-        } else if (target.type === "range") {
-          const normalized = normalizeRangePoints(target.start, target.end);
-          const endVerseInActiveChapter =
-            normalized.start.bookIndex === normalized.end.bookIndex &&
-            normalized.start.chapterIndex === normalized.end.chapterIndex
-              ? normalized.end.verseNumber
-              : (books[normalized.start.bookIndex]?.chapters[
-                  normalized.start.chapterIndex
-                ]?.verses.at(-1)?.verse ?? normalized.start.verseNumber);
-          setActiveReaderWordHighlight(null);
-          setLeafHighlights(leafId, [
-            {
-              start: normalized.start.verseNumber,
-              end: endVerseInActiveChapter,
-            },
-          ]);
-          setSelectedHighlightScope({
-            type: "range",
-            start: normalized.start,
-            end: normalized.end,
-          });
-          setPendingReaderScrollTarget({
-            leafId,
-            bookIndex: normalized.start.bookIndex,
-            chapterIndex: normalized.start.chapterIndex,
-            mode: "verse-range",
-            verseStart: normalized.start.verseNumber,
-            verseEnd: endVerseInActiveChapter,
-          });
-        } else if (target.type === "verse") {
-          setActiveReaderWordHighlight(null);
-          setLeafHighlights(leafId, [
-            {
-              start: target.verseNumber,
-              end: target.verseNumber,
-            },
-          ]);
-          setSelectedHighlightScope({
-            type: "verse",
-            bookIndex: target.bookIndex,
-            chapterIndex: target.chapterIndex,
-            verseNumber: target.verseNumber,
-          });
-          setPendingReaderScrollTarget({
-            leafId,
-            bookIndex: target.bookIndex,
-            chapterIndex: target.chapterIndex,
-            mode: "verse-range",
-            verseStart: target.verseNumber,
-            verseEnd: target.verseNumber,
-          });
-        } else {
-          setActiveReaderWordHighlight(null);
-          clearLeafHighlights(leafId);
-          setSelectedHighlightScope(null);
-          setPendingReaderScrollTarget({
-            leafId,
-            bookIndex: target.bookIndex,
-            chapterIndex: target.chapterIndex,
-            mode: "chapter-top",
-            verseStart: 1,
-            verseEnd: 1,
-          });
-        }
-      };
-
-      const openInNewTab = () => {
-        const nextTabId = createId();
-        const nextLeaf = createLeaf(
-          location.bookIndex,
-          location.chapterIndex,
-          "reader",
-        );
-        setTabs((currentTabs) => [
-          ...currentTabs,
-          {
-            id: nextTabId,
-            title: `Tab ${currentTabs.length + 1}`,
-            root: nextLeaf,
-          },
-        ]);
-        showTabById(nextTabId);
-        applyReaderTargetEffects(nextLeaf.id);
-        return nextLeaf.id;
-      };
-
-      const openInNewPanel = () => {
-        if (!activeTabId) {
-          return openInNewTab();
-        }
-
-        const nextReaderLeaf = createLeaf(
-          location.bookIndex,
-          location.chapterIndex,
-          "reader",
-        );
-
-        setTabs((currentTabs) => {
-          const activeIndex = currentTabs.findIndex(
-            (tab) => tab.id === activeTabId,
-          );
-          if (activeIndex < 0) {
-            return currentTabs;
-          }
-          const active = currentTabs[activeIndex];
-          const nextRoot: PanelNode = {
-            id: createId(),
-            type: "split",
-            orientation: "horizontal",
-            ratio: 42,
-            first: active.root,
-            second: nextReaderLeaf,
-          };
-          const nextTabs = [...currentTabs];
-          nextTabs[activeIndex] = { ...active, root: nextRoot };
-          return nextTabs;
-        });
-
-        applyReaderTargetEffects(nextReaderLeaf.id);
-        return nextReaderLeaf.id;
-      };
-
-      const openInTargetedPanel = () => {
-        const currentTargetedPanelLeafId = targetedPanelLeafIdRef.current;
-        if (!currentTargetedPanelLeafId) {
-          const nextLeafId = createTargetedReaderPanelInActiveTab(target);
-          if (nextLeafId) {
-            applyReaderTargetEffects(nextLeafId);
-            return nextLeafId;
-          }
-          return openInNewPanel();
-        }
-
-        const targetTab = findTabContainingLeafId(currentTargetedPanelLeafId);
-        if (!targetTab) {
-          return null;
-        }
-
-        navigateReaderLeafToNoteTarget(
-          targetTab.id,
-          currentTargetedPanelLeafId,
-          target,
-        );
-        showTabById(targetTab.id);
-        applyReaderTargetEffects(currentTargetedPanelLeafId);
-        return currentTargetedPanelLeafId;
-      };
-
-      if (destination === "targeted-panel") {
-        return openInTargetedPanel();
-      }
-      if (destination === "new-tab") {
-        return openInNewTab();
-      }
-      return openInNewPanel();
-    },
-    [
-      activeTabId,
-      books,
-      clearLeafHighlights,
-      createTargetedReaderPanelInActiveTab,
-      findTabContainingLeafId,
-      navigateReaderLeafToNoteTarget,
-      setPendingReaderScrollTarget,
-      setLeafHighlights,
-      setSelectedHighlightScope,
-      setTabs,
-      showTabById,
-    ],
-  );
+  const {
+    openReaderTarget,
+    openBookmarkTarget: openBookmarkTargetRaw,
+    openSearchResultTarget: openSearchResultTargetRaw,
+    openChapterReference: openChapterReferenceRaw,
+  } = usePanelRouting({
+    activeTabId,
+    books,
+    tabsRef,
+    targetedPanelLeafIdRef,
+    setTabs,
+    setTargetedPanelLeafId,
+    showTabById,
+    findTabContainingLeafId,
+    clearLeafHighlights,
+    setLeafHighlights,
+    setSelectedHighlightScope,
+    setPendingReaderScrollTarget,
+    setActiveReaderWordHighlight,
+  });
 
   const openBookmarkTarget = useCallback(
     (bookmark: ReaderBookmark) => {
-      if (bookmark.scope.type === "chapter") {
-        openReaderTarget(
-          {
-            type: "chapter",
-            bookIndex: bookmark.scope.bookIndex,
-            chapterIndex: bookmark.scope.chapterIndex,
-          },
-          bookmarkOpenTarget,
-        );
-        return;
-      }
-
-      if (bookmark.scope.type === "verse") {
-        openReaderTarget(
-          {
-            type: "verse",
-            bookIndex: bookmark.scope.bookIndex,
-            chapterIndex: bookmark.scope.chapterIndex,
-            verseNumber: bookmark.scope.verseNumber,
-          },
-          bookmarkOpenTarget,
-        );
-        return;
-      }
-
-      if (bookmark.scope.type === "selection") {
-        openReaderTarget(
-          {
-            type: "selection",
-            bookIndex: bookmark.scope.bookIndex,
-            chapterIndex: bookmark.scope.chapterIndex,
-            ranges: bookmark.scope.ranges,
-          },
-          bookmarkOpenTarget,
-        );
-        return;
-      }
-
-      const normalized = normalizeRangePoints(
-        bookmark.scope.start,
-        bookmark.scope.end,
-      );
-      const isSameChapter =
-        normalized.start.bookIndex === normalized.end.bookIndex &&
-        normalized.start.chapterIndex === normalized.end.chapterIndex;
-      if (isSameChapter) {
-        openReaderTarget(
-          {
-            type:
-              normalized.start.verseNumber === normalized.end.verseNumber
-                ? "verse"
-                : "selection",
-            bookIndex: normalized.start.bookIndex,
-            chapterIndex: normalized.start.chapterIndex,
-            ...(normalized.start.verseNumber === normalized.end.verseNumber
-              ? { verseNumber: normalized.start.verseNumber }
-              : {
-                  ranges: [
-                    {
-                      start: normalized.start.verseNumber,
-                      end: normalized.end.verseNumber,
-                    },
-                  ],
-                }),
-          },
-          bookmarkOpenTarget,
-        );
-        return;
-      }
-
-      openReaderTarget(
-        {
-          type: "verse",
-          bookIndex: normalized.start.bookIndex,
-          chapterIndex: normalized.start.chapterIndex,
-          verseNumber: normalized.start.verseNumber,
-        },
-        bookmarkOpenTarget,
-      );
+      openBookmarkTargetRaw(bookmark, bookmarkOpenTarget);
     },
-    [bookmarkOpenTarget, openReaderTarget],
+    [bookmarkOpenTarget, openBookmarkTargetRaw],
   );
 
   const openSearchResultTarget = useCallback(
@@ -3149,34 +2769,15 @@ export function KJVReader() {
       verseStart: number,
       verseEnd?: number,
     ) => {
-      if (
-        typeof verseEnd === "number" &&
-        Number.isFinite(verseEnd) &&
-        verseEnd !== verseStart
-      ) {
-        openReaderTarget(
-          {
-            type: "selection",
-            bookIndex,
-            chapterIndex,
-            ranges: [{ start: verseStart, end: verseEnd }],
-          },
-          searchResultOpenTarget,
-        );
-        return;
-      }
-
-      openReaderTarget(
-        {
-          type: "verse",
-          bookIndex,
-          chapterIndex,
-          verseNumber: verseStart,
-        },
+      openSearchResultTargetRaw(
+        bookIndex,
+        chapterIndex,
+        verseStart,
+        verseEnd,
         searchResultOpenTarget,
       );
     },
-    [openReaderTarget, searchResultOpenTarget],
+    [openSearchResultTargetRaw, searchResultOpenTarget],
   );
 
   const openChapterReference = useCallback(
@@ -3186,24 +2787,15 @@ export function KJVReader() {
       verseStart: number,
       verseEnd = verseStart,
     ) => {
-      openReaderTarget(
-        verseStart === verseEnd
-          ? {
-              type: "verse",
-              bookIndex,
-              chapterIndex,
-              verseNumber: verseStart,
-            }
-          : {
-              type: "selection",
-              bookIndex,
-              chapterIndex,
-              ranges: [{ start: verseStart, end: verseEnd }],
-            },
+      openChapterReferenceRaw(
+        bookIndex,
+        chapterIndex,
+        verseStart,
+        verseEnd,
         referenceLinkOpenTarget,
       );
     },
-    [openReaderTarget, referenceLinkOpenTarget],
+    [openChapterReferenceRaw, referenceLinkOpenTarget],
   );
 
   const handleClearLeafHighlights = useCallback(
@@ -3421,6 +3013,47 @@ export function KJVReader() {
       return matchedKey
         ? { key: matchedKey, entry: aiDictionaryData[matchedKey] }
         : null;
+    },
+    [books],
+  );
+
+  const resolveWordTokenAtLocation = useCallback(
+    (
+      bookIndex: number,
+      chapterIndex: number,
+      verseNumber: number,
+      rawWord: string,
+    ) => {
+      const verse = books[bookIndex]?.chapters[chapterIndex]?.verses.find(
+        (item) => item.verse === verseNumber,
+      );
+      if (!verse) {
+        return null;
+      }
+
+      const normalizedWord = normalizeConcordanceWord(rawWord).toLowerCase();
+      if (!normalizedWord) {
+        return null;
+      }
+
+      let fallbackMatch: { token: VerseToken; tokenIndex: number } | null = null;
+
+      for (const [tokenIndex, token] of verse.tokens.entries()) {
+        const normalizedToken = normalizeConcordanceWord(token.text).toLowerCase();
+        if (normalizedToken !== normalizedWord) {
+          continue;
+        }
+
+        const nextMatch = { token, tokenIndex };
+        if (token.strong) {
+          return nextMatch;
+        }
+        if (!fallbackMatch) {
+          fallbackMatch = nextMatch;
+        }
+      }
+
+      return fallbackMatch;
     },
     [books],
   );
@@ -3940,8 +3573,7 @@ export function KJVReader() {
     ],
   );
 
-  const openNoteLinkTarget = useCallback(
-    (target: NoteLinkTarget) => {
+  function openNoteLinkTarget(target: NoteLinkTarget) {
       setNotesContext(
         target.type === "chapter"
           ? {
@@ -3978,18 +3610,29 @@ export function KJVReader() {
           return;
         }
         const rawWord = normalizeConcordanceWord(target.word) || target.word;
-        syncWordStudySelections(rawWord, null, {
-          referenceKey: chapterVerseKey(
-            target.bookIndex,
-            target.chapterIndex,
-            target.verseNumber,
-          ),
+        const matchedToken = resolveWordTokenAtLocation(
+          target.bookIndex,
+          target.chapterIndex,
+          target.verseNumber,
+          rawWord,
+        );
+        openWordInStudyTools({
+          rawWord,
+          bookIndex: target.bookIndex,
+          chapterIndex: target.chapterIndex,
+          verseNumber: target.verseNumber,
+          tokenIndex: matchedToken?.tokenIndex ?? null,
+          strongCode: matchedToken?.token.strong
+            ? normalizeStrongsCode(matchedToken.token.strong)
+            : null,
         });
         syncTokenAccordionState(rawWord, {
           bookIndex: target.bookIndex,
           chapterIndex: target.chapterIndex,
           verseNumber: target.verseNumber,
-          strongCode: null,
+          strongCode: matchedToken?.token.strong
+            ? normalizeStrongsCode(matchedToken.token.strong)
+            : null,
         });
       };
       if (target.type === "word") {
@@ -4015,16 +3658,7 @@ export function KJVReader() {
       }
 
       openReaderTarget(target, notesLinkOpenTarget);
-    },
-    [
-      notesLinkOpenTarget,
-      openReaderTarget,
-      setNotesContext,
-      setActiveReaderWordHighlight,
-      syncTokenAccordionState,
-      syncWordStudySelections,
-    ],
-  );
+  }
 
   const handleVerseSelection = useCallback(
     (
@@ -4184,69 +3818,24 @@ export function KJVReader() {
     setSidebarCloseRequestKey((current) => current + 1);
   }, []);
 
-  const openTokenDetailsFromElement = useCallback(
-    (
-      element: HTMLElement,
-      leafId: string,
-      token: VerseToken,
-      bookIndex: number,
-      chapterIndex: number,
-      verseNumber: number,
-      tokenIndex: number,
-    ) => {
-      if (!token.strong && !token.added) {
-        const rect = element.getBoundingClientRect();
-        const popupWidth = 280;
-        const safeX = Math.max(
-          8,
-          Math.min(window.innerWidth - popupWidth - 8, rect.left),
-        );
-        const safeY = Math.min(window.innerHeight - 180, rect.bottom + 8);
-        setTokenPopup({
-          token,
-          x: safeX,
-          y: safeY,
-        });
-      } else {
-        setTokenPopup(null);
-      }
-
-      const rawWord = normalizeConcordanceWord(token.text);
-      if (Number.isFinite(verseNumber) && verseNumber > 0) {
+  function openWordInStudyTools({
+    rawWord,
+    bookIndex,
+    chapterIndex,
+    verseNumber,
+    tokenIndex,
+    strongCode,
+  }: {
+    rawWord: string;
+    bookIndex: number;
+    chapterIndex: number;
+    verseNumber: number | null;
+    tokenIndex: number | null;
+    strongCode: string | null;
+  }) {
+      if (verseNumber !== null) {
         openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
-        if (rawWord) {
-          setActiveReaderWordHighlight({
-            leafId,
-            verseNumber,
-            word: rawWord,
-          });
-          setNotesContext({
-            bookIndex,
-            chapterIndex,
-            verseNumber,
-            word: rawWord,
-          });
-        } else {
-          setActiveReaderWordHighlight(null);
-        }
-      } else if (rawWord) {
-        setActiveReaderWordHighlight(null);
-        setNotesContext({
-          bookIndex,
-          chapterIndex,
-          word: rawWord,
-        });
-      } else {
-        setActiveReaderWordHighlight(null);
       }
-
-      if (!rawWord) {
-        return;
-      }
-
-      const normalizedCode = token.strong
-        ? normalizeStrongsCode(token.strong)
-        : null;
 
       openStudyTool("concordance");
       setConcordanceError(null);
@@ -4261,7 +3850,7 @@ export function KJVReader() {
       setSelectedGenealogyIds([]);
       setSelectedMapsEntries([]);
       setStrongsWordAccordionValue([]);
-      if (!normalizedCode) {
+      if (!strongCode) {
         setSelectedStrongsEntry(null);
       }
 
@@ -4302,7 +3891,7 @@ export function KJVReader() {
         | Promise<{ greek: StrongsPayload; hebrew: StrongsPayload } | null>
         | null = null;
 
-      if (normalizedCode) {
+      if (strongCode) {
         setStrongsError(null);
         setIsStrongsLoading(true);
         setStrongsSearchTerm("");
@@ -4362,21 +3951,27 @@ export function KJVReader() {
           nextAncientMaps,
           nextStrongs,
         ]) => {
-          const aiDictionarySelection = resolveAIDictionarySelectionAtLocation(
-            nextAIDictionary,
-            bookIndex,
-            chapterIndex,
-            verseNumber,
-            tokenIndex,
-          );
-          const phraseSelection = resolvePhraseSelectionAtLocation(
-            nextPhrases,
-            bookIndex,
-            chapterIndex,
-            verseNumber,
-            tokenIndex,
-          );
-          syncWordStudySelections(rawWord, normalizedCode, {
+          const aiDictionarySelection =
+            tokenIndex !== null && verseNumber !== null
+              ? resolveAIDictionarySelectionAtLocation(
+                  nextAIDictionary,
+                  bookIndex,
+                  chapterIndex,
+                  verseNumber,
+                  tokenIndex,
+                )
+              : null;
+          const phraseSelection =
+            tokenIndex !== null && verseNumber !== null
+              ? resolvePhraseSelectionAtLocation(
+                  nextPhrases,
+                  bookIndex,
+                  chapterIndex,
+                  verseNumber,
+                  tokenIndex,
+                )
+              : null;
+          syncWordStudySelections(rawWord, strongCode, {
             websters: nextWebsters,
             aiDictionary: nextAIDictionary,
             aiDictionarySelection,
@@ -4389,14 +3984,16 @@ export function KJVReader() {
             ancientMaps: nextAncientMaps,
             strongsGreek: nextStrongs?.greek ?? null,
             strongsHebrew: nextStrongs?.hebrew ?? null,
-            referenceKey: chapterVerseKey(bookIndex, chapterIndex, verseNumber),
+            referenceKey:
+              verseNumber !== null
+                ? chapterVerseKey(bookIndex, chapterIndex, verseNumber)
+                : null,
           });
           syncTokenAccordionState(rawWord, {
             bookIndex,
             chapterIndex,
-            verseNumber:
-              Number.isFinite(verseNumber) && verseNumber > 0 ? verseNumber : null,
-            strongCode: normalizedCode,
+            verseNumber,
+            strongCode,
             concordanceData: nextConcordance,
             webstersData: nextWebsters,
             aiDictionaryData: nextAIDictionary,
@@ -4413,61 +4010,84 @@ export function KJVReader() {
           });
         },
       ).finally(() => {
-        if (normalizedCode) {
+        if (strongCode) {
           setIsStrongsLoading(false);
         }
       });
-    },
-    [
-      ancientMaps,
-      aiDictionary,
-      concordance,
-      bibleWordBook,
-      ensureConcordanceLoaded,
-      ensureAIDictionaryLoaded,
-      ensureAncientMapsLoaded,
-      ensureBibleWordBookLoaded,
-      ensureGenealogyLoaded,
-      ensureHitchcocksLoaded,
-      ensureOldEnglishLoaded,
-      ensurePhrasesLoaded,
-      ensureUnitsLoaded,
-      openCrossReferencesForVerse,
-      openStudyTool,
-      ensureStrongsLoaded,
-      ensureWebstersLoaded,
-      genealogy,
-      hitchcocks,
-      oldEnglish,
-      phrases,
-      resolveAIDictionarySelectionAtLocation,
-      resolvePhraseSelectionAtLocation,
-      setActiveReaderWordHighlight,
-      setConcordanceError,
-      setIsConcordanceLoading,
-      setIsStrongsLoading,
-      setIsStrongsSearching,
-      setNotesContext,
-      setSelectedConcordanceWord,
-      setSelectedGenealogyIds,
-      setSelectedHitchcocksEntry,
-      setSelectedMapsEntries,
-      setSelectedOldEnglishEntry,
-      setSelectedPhrasesEntry,
-      setSelectedStrongsEntry,
-      setSelectedUnitsEntry,
-      setSelectedWebstersEntry,
-      setStrongsError,
-      setStrongsSearchTerm,
-      strongsGreek,
-      strongsHebrew,
-      syncTokenAccordionState,
-      syncWordStudySelections,
-      setConcordanceWordAccordionValue,
-      units,
-      websters,
-    ],
-  );
+  }
+
+  function openTokenDetailsFromElement(
+    element: HTMLElement,
+    leafId: string,
+    token: VerseToken,
+    bookIndex: number,
+    chapterIndex: number,
+    verseNumber: number,
+    tokenIndex: number,
+  ) {
+      if (!token.strong && !token.added) {
+        const rect = element.getBoundingClientRect();
+        const popupWidth = 280;
+        const safeX = Math.max(
+          8,
+          Math.min(window.innerWidth - popupWidth - 8, rect.left),
+        );
+        const safeY = Math.min(window.innerHeight - 180, rect.bottom + 8);
+        setTokenPopup({
+          token,
+          x: safeX,
+          y: safeY,
+        });
+      } else {
+        setTokenPopup(null);
+      }
+
+      const rawWord = normalizeConcordanceWord(token.text);
+      if (Number.isFinite(verseNumber) && verseNumber > 0) {
+        openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
+        if (rawWord) {
+          setActiveReaderWordHighlight({
+            leafId,
+            verseNumber,
+            word: rawWord,
+          });
+          setNotesContext({
+            bookIndex,
+            chapterIndex,
+            verseNumber,
+            word: rawWord,
+          });
+        } else {
+          setActiveReaderWordHighlight(null);
+        }
+      } else if (rawWord) {
+        setActiveReaderWordHighlight(null);
+        setNotesContext({
+          bookIndex,
+          chapterIndex,
+          word: rawWord,
+        });
+      } else {
+        setActiveReaderWordHighlight(null);
+      }
+
+      if (!rawWord) {
+        return;
+      }
+
+      const normalizedCode = token.strong
+        ? normalizeStrongsCode(token.strong)
+        : null;
+      openWordInStudyTools({
+        rawWord,
+        bookIndex,
+        chapterIndex,
+        verseNumber:
+          Number.isFinite(verseNumber) && verseNumber > 0 ? verseNumber : null,
+        tokenIndex,
+        strongCode: normalizedCode,
+      });
+  }
 
   const {
     openReference: openConcordanceReference,
