@@ -47,8 +47,8 @@ import {
   createBookmarksExportPayload,
   createNotesExportPayload,
   downloadJsonFile,
-  parseImportedBookmarksPayload,
-  parseImportedNotesPayload,
+  parseImportedBookmarksPayloadDetailed,
+  parseImportedNotesPayloadDetailed,
 } from "@/lib/reader-transfer";
 import {
   clearSingleLeafReferenceIfMissing,
@@ -80,7 +80,7 @@ import {
   buildLeafNeighborMapFromDom,
   type LeafNeighbors,
 } from "@/lib/reader-neighbors";
-import { parseLayoutHash, serializeLayoutHash } from "@/lib/layout-hash";
+import { useLayoutHashSync } from "@/hooks/use-layout-hash-sync";
 import type {
   AIDictionaryEntry,
   AIDictionaryPayload,
@@ -118,6 +118,15 @@ import type {
 import type { BookmarkScope, ReaderBookmark } from "@/types/bookmarks";
 import type { NoteLinkTarget } from "@/types/notes";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { SidebarOpenRequestSync } from "@/components/reader/sidebar-open-request-sync";
 import { SidebarCloseRequestSync } from "@/components/reader/sidebar-close-request-sync";
 import { GenealogyPersonDetails } from "@/components/reader/genealogy-person-details";
@@ -305,6 +314,15 @@ type BeforeInstallPromptEvent = Event & {
     outcome: "accepted" | "dismissed";
     platform: string;
   }>;
+};
+
+type ImportSummaryState = {
+  kind: "notes" | "bookmarks";
+  importedCount: number;
+  replacedCount: number;
+  skippedCount: number;
+  isError: boolean;
+  message: string;
 };
 
 function createWelcomeHomeTab(): ReaderTab {
@@ -524,7 +542,6 @@ export function KJVReader() {
       setIsPwaInstalled(true);
     }
   }, [deferredInstallPrompt]);
-  const syncedLayoutHashRef = useRef("");
   const domNeighborCacheRef = useRef<{
     root: PanelNode | null;
     neighbors: Map<string, LeafNeighbors>;
@@ -554,6 +571,21 @@ export function KJVReader() {
     panelElementRefs,
     activeTabId,
     tabsVersion: tabs,
+  });
+  const { parseCurrentLayoutHash, applyParsedLayout } = useLayoutHashSync({
+    isLoaded,
+    tabs,
+    activeTabId,
+    tabsOrientation,
+    highlightedVerseRangesByLeafId,
+    targetedPanelLeafId,
+    showTargetedPanelToggle,
+    setTabs,
+    setActiveTabId,
+    setTabsOrientation,
+    setVerseHighlights,
+    queueVerseHighlights,
+    setTargetedPanelLeafId,
   });
 
   useEffect(() => {
@@ -802,22 +834,9 @@ export function KJVReader() {
           return;
         }
         setBooks(parsedBooks);
-        const parsedLayout = parseLayoutHash(window.location.hash);
+        const parsedLayout = parseCurrentLayoutHash();
         if (parsedLayout && parsedLayout.tabs.length > 0) {
-          setTabs(parsedLayout.tabs);
-          setActiveTabId(
-            parsedLayout.tabs[parsedLayout.activeTabIndex]?.id ??
-              parsedLayout.tabs[0]?.id ??
-              null,
-          );
-          setTargetedPanelLeafId(parsedLayout.targetedPanelLeafId);
-          setTabsOrientation(parsedLayout.tabsOrientation);
-          setVerseHighlights(parsedLayout.highlightedVerseRangesByLeafId);
-          for (const [leafId, ranges] of Object.entries(
-            parsedLayout.highlightedVerseRangesByLeafId,
-          )) {
-            queueVerseHighlights(leafId, ranges);
-          }
+          applyParsedLayout(parsedLayout);
         } else {
           const welcomeTab = createWelcomeHomeTab();
           const readerTab = createGenesisReaderTab();
@@ -844,45 +863,13 @@ export function KJVReader() {
       cancelled = true;
     };
   }, [
-    queueVerseHighlights,
-    setTabsOrientation,
-    setTargetedPanelLeafId,
-    setVerseHighlights,
+    applyParsedLayout,
+    parseCurrentLayoutHash,
   ]);
 
   useEffect(() => {
     tabsRef.current = tabs;
   }, [tabs]);
-
-  useEffect(() => {
-    if (!isLoaded || tabs.length === 0) {
-      return;
-    }
-    const nextHash = serializeLayoutHash({
-      tabs,
-      activeTabId,
-      tabsOrientation,
-      highlightedVerseRangesByLeafId,
-      targetedPanelLeafId: showTargetedPanelToggle ? targetedPanelLeafId : null,
-    });
-    if (
-      syncedLayoutHashRef.current === nextHash &&
-      window.location.hash === nextHash
-    ) {
-      return;
-    }
-    syncedLayoutHashRef.current = nextHash;
-    const nextUrl = `${window.location.pathname}${window.location.search}${nextHash}`;
-    window.history.replaceState(null, "", nextUrl);
-  }, [
-    activeTabId,
-    highlightedVerseRangesByLeafId,
-    isLoaded,
-    showTargetedPanelToggle,
-    tabs,
-    tabsOrientation,
-    targetedPanelLeafId,
-  ]);
 
   useEffect(() => {
     const pendingTabId = pendingActiveTabIdRef.current;
@@ -915,46 +902,6 @@ export function KJVReader() {
 
     setActiveTabId(pendingTabId);
   }, [activeTabId, tabs, tabsOrientation]);
-
-  useEffect(() => {
-    function onHashChange() {
-      const parsed = parseLayoutHash(window.location.hash);
-      if (!parsed) {
-        return;
-      }
-      const nextHash = serializeLayoutHash({
-        tabs: parsed.tabs,
-        activeTabId:
-          parsed.tabs[parsed.activeTabIndex]?.id ?? parsed.tabs[0]?.id ?? null,
-        tabsOrientation: parsed.tabsOrientation,
-        highlightedVerseRangesByLeafId: parsed.highlightedVerseRangesByLeafId,
-        targetedPanelLeafId: parsed.targetedPanelLeafId,
-      });
-      syncedLayoutHashRef.current = nextHash;
-      setTabs(parsed.tabs);
-      setActiveTabId(
-        parsed.tabs[parsed.activeTabIndex]?.id ?? parsed.tabs[0]?.id ?? null,
-      );
-      setTargetedPanelLeafId(parsed.targetedPanelLeafId);
-      setTabsOrientation(parsed.tabsOrientation);
-      setVerseHighlights(parsed.highlightedVerseRangesByLeafId);
-      for (const [leafId, ranges] of Object.entries(
-        parsed.highlightedVerseRangesByLeafId,
-      )) {
-        queueVerseHighlights(leafId, ranges);
-      }
-    }
-
-    window.addEventListener("hashchange", onHashChange);
-    return () => {
-      window.removeEventListener("hashchange", onHashChange);
-    };
-  }, [
-    queueVerseHighlights,
-    setTabsOrientation,
-    setTargetedPanelLeafId,
-    setVerseHighlights,
-  ]);
 
   const {
     chapterRefs,
@@ -1040,6 +987,9 @@ export function KJVReader() {
   const [searchPageStateByLeafId, setSearchPageStateByLeafId] = useState<
     Record<string, SearchPageState>
   >({});
+  const [importSummary, setImportSummary] = useState<ImportSummaryState | null>(
+    null,
+  );
   const notesImportInputRef = useRef<HTMLInputElement | null>(null);
   const bookmarksImportInputRef = useRef<HTMLInputElement | null>(null);
   const activeLeafIds = useMemo(
@@ -3702,6 +3652,18 @@ export function KJVReader() {
   }) {
       if (verseNumber !== null) {
         openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
+        setNotesContext({
+          bookIndex,
+          chapterIndex,
+          verseNumber,
+          word: rawWord,
+        });
+      } else {
+        setNotesContext({
+          bookIndex,
+          chapterIndex,
+          word: rawWord,
+        });
       }
 
       openStudyTool("concordance");
@@ -4445,12 +4407,33 @@ export function KJVReader() {
       return;
     }
     try {
-      const importedNotes = parseImportedNotesPayload(await file.text());
-      importNotes(importedNotes);
+      const result = parseImportedNotesPayloadDetailed(await file.text());
+      importNotes(result.entries);
+      const existingIds = new Set(readerNotes.map((note) => note.id));
+      const replacedCount = result.entries.filter((note) =>
+        existingIds.has(note.id),
+      ).length;
+      setImportSummary({
+        kind: "notes",
+        importedCount: result.entries.length,
+        replacedCount,
+        skippedCount: result.skippedInvalidCount,
+        isError: false,
+        message:
+          result.skippedInvalidCount > 0
+            ? "Imported the valid notes and skipped invalid entries."
+            : "Imported all notes successfully.",
+      });
     } catch (error) {
-      window.alert(
-        error instanceof Error ? error.message : "Failed to import notes.",
-      );
+      setImportSummary({
+        kind: "notes",
+        importedCount: 0,
+        replacedCount: 0,
+        skippedCount: 0,
+        isError: true,
+        message:
+          error instanceof Error ? error.message : "Failed to import notes.",
+      });
     }
   };
 
@@ -4459,12 +4442,35 @@ export function KJVReader() {
       return;
     }
     try {
-      const importedBookmarks = parseImportedBookmarksPayload(await file.text());
-      importBookmarks(importedBookmarks);
+      const result = parseImportedBookmarksPayloadDetailed(await file.text());
+      importBookmarks(result.entries);
+      const existingIds = new Set(readerBookmarks.map((bookmark) => bookmark.id));
+      const replacedCount = result.entries.filter((bookmark) =>
+        existingIds.has(bookmark.id),
+      ).length;
+      setImportSummary({
+        kind: "bookmarks",
+        importedCount: result.entries.length,
+        replacedCount,
+        skippedCount: result.skippedInvalidCount,
+        isError: false,
+        message:
+          result.skippedInvalidCount > 0
+            ? "Imported the valid bookmarks and skipped invalid entries."
+            : "Imported all bookmarks successfully.",
+      });
     } catch (error) {
-      window.alert(
-        error instanceof Error ? error.message : "Failed to import bookmarks.",
-      );
+      setImportSummary({
+        kind: "bookmarks",
+        importedCount: 0,
+        replacedCount: 0,
+        skippedCount: 0,
+        isError: true,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to import bookmarks.",
+      });
     }
   };
   const settingsPanelProps = {
@@ -4699,6 +4705,45 @@ export function KJVReader() {
               void handleImportBookmarksFile(file);
             }}
           />
+          <AlertDialog
+            open={importSummary !== null}
+            onOpenChange={(open) => {
+              if (!open) {
+                setImportSummary(null);
+              }
+            }}
+          >
+            <AlertDialogContent size="sm">
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {importSummary?.isError
+                    ? `Import ${importSummary?.kind === "bookmarks" ? "Bookmarks" : "Notes"} Failed`
+                    : `${importSummary?.kind === "bookmarks" ? "Bookmarks" : "Notes"} Imported`}
+                </AlertDialogTitle>
+                <AlertDialogDescription className="space-y-2">
+                  <span className="block">{importSummary?.message}</span>
+                  {importSummary && !importSummary.isError ? (
+                    <>
+                      <span className="block">
+                        Imported: {importSummary.importedCount}
+                      </span>
+                      <span className="block">
+                        Replaced existing: {importSummary.replacedCount}
+                      </span>
+                      <span className="block">
+                        Skipped invalid: {importSummary.skippedCount}
+                      </span>
+                    </>
+                  ) : null}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogAction onClick={() => setImportSummary(null)}>
+                  OK
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           <TabsWorkspace
             tabsOrientation={tabsOrientation}

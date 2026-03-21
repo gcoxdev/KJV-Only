@@ -15,6 +15,13 @@ type BookmarksExportPayload = {
   bookmarks: ReaderBookmark[];
 };
 
+export type ImportParseResult<T> = {
+  entries: T[];
+  totalEntries: number;
+  skippedInvalidCount: number;
+  source: "array" | "wrapped";
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
@@ -213,45 +220,80 @@ export function downloadJsonFile(filename: string, payload: unknown) {
   URL.revokeObjectURL(url);
 }
 
-export function parseImportedNotesPayload(text: string): ReaderNote[] {
+function parseImportArrayPayload(
+  text: string,
+  key: "notes" | "bookmarks",
+): {
+  entries: unknown[];
+  source: "array" | "wrapped";
+} {
   const parsed = JSON.parse(text) as unknown;
-  const notes = Array.isArray(parsed)
+  const entries = Array.isArray(parsed)
     ? parsed
-    : isRecord(parsed) && Array.isArray(parsed.notes)
-      ? parsed.notes
+    : isRecord(parsed) && Array.isArray(parsed[key])
+      ? parsed[key]
       : null;
 
-  if (!notes) {
-    throw new Error("Invalid notes file.");
+  if (!entries) {
+    throw new Error(`Invalid ${key} file.`);
   }
 
-  const validNotes = notes.filter(isValidReaderNote);
-  if (validNotes.length !== notes.length) {
-    throw new Error("Notes file contains invalid entries.");
+  if (entries.length === 0) {
+    throw new Error(`The ${key} file does not contain any entries.`);
   }
 
-  if (looksLikeLegacyOneBasedNotes(validNotes)) {
-    return validNotes.map(normalizeLegacyImportedNote);
+  return {
+    entries,
+    source: Array.isArray(parsed) ? "array" : "wrapped",
+  };
+}
+
+export function parseImportedNotesPayloadDetailed(
+  text: string,
+): ImportParseResult<ReaderNote> {
+  const { entries, source } = parseImportArrayPayload(text, "notes");
+  const validNotes = entries.filter(isValidReaderNote);
+  const skippedInvalidCount = entries.length - validNotes.length;
+
+  if (validNotes.length === 0) {
+    throw new Error("The notes file does not contain any valid entries.");
   }
 
-  return validNotes;
+  const normalizedNotes = looksLikeLegacyOneBasedNotes(validNotes)
+    ? validNotes.map(normalizeLegacyImportedNote)
+    : validNotes;
+
+  return {
+    entries: normalizedNotes,
+    totalEntries: entries.length,
+    skippedInvalidCount,
+    source,
+  };
+}
+
+export function parseImportedNotesPayload(text: string): ReaderNote[] {
+  return parseImportedNotesPayloadDetailed(text).entries;
+}
+
+export function parseImportedBookmarksPayloadDetailed(
+  text: string,
+): ImportParseResult<ReaderBookmark> {
+  const { entries, source } = parseImportArrayPayload(text, "bookmarks");
+  const validBookmarks = entries.filter(isValidReaderBookmark);
+  const skippedInvalidCount = entries.length - validBookmarks.length;
+
+  if (validBookmarks.length === 0) {
+    throw new Error("The bookmarks file does not contain any valid entries.");
+  }
+
+  return {
+    entries: validBookmarks,
+    totalEntries: entries.length,
+    skippedInvalidCount,
+    source,
+  };
 }
 
 export function parseImportedBookmarksPayload(text: string): ReaderBookmark[] {
-  const parsed = JSON.parse(text) as unknown;
-  const bookmarks = Array.isArray(parsed)
-    ? parsed
-    : isRecord(parsed) && Array.isArray(parsed.bookmarks)
-      ? parsed.bookmarks
-      : null;
-
-  if (!bookmarks) {
-    throw new Error("Invalid bookmarks file.");
-  }
-
-  const validBookmarks = bookmarks.filter(isValidReaderBookmark);
-  if (validBookmarks.length !== bookmarks.length) {
-    throw new Error("Bookmarks file contains invalid entries.");
-  }
-  return validBookmarks;
+  return parseImportedBookmarksPayloadDetailed(text).entries;
 }
