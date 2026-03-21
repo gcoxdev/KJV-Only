@@ -58,6 +58,7 @@ import type {
   PanelDirection,
   PanelNode,
   SearchPageState,
+  StaticPageId,
 } from "@/types/reader";
 import { cn } from "@/lib/utils";
 import { countLeaves, findParentSplitForLeaf } from "@/lib/reader-layout";
@@ -273,6 +274,8 @@ type ReaderPanelTreeProps = {
   onOpenReference: (reference: string) => void;
   onCloseSidebar: () => void;
   onStartTour: () => void;
+  onOpenSearchTab: () => void;
+  onOpenStaticPageTab: (pageId: StaticPageId) => void;
 };
 
 type ReaderLeafPanelProps = Omit<ReaderPanelTreeProps, "root"> & {
@@ -372,6 +375,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   onOpenReference,
   onCloseSidebar,
   onStartTour,
+  onOpenSearchTab,
+  onOpenStaticPageTab,
 }: ReaderLeafPanelProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -1590,6 +1595,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 onOpenReference={onOpenReference}
                 onCloseSidebar={onCloseSidebar}
                 onStartTour={onStartTour}
+                onOpenSearch={onOpenSearchTab}
+                onOpenPage={onOpenStaticPageTab}
               />
             )}
           </CardContent>
@@ -1790,6 +1797,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   onOpenReference,
   onCloseSidebar,
   onStartTour,
+  onOpenSearchTab,
+  onOpenStaticPageTab,
 }: ReaderPanelTreeProps) {
   const renderLeaf = (leaf: LeafNode) => (
     <ReaderLeafPanel
@@ -1879,6 +1888,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       onOpenReference={onOpenReference}
       onCloseSidebar={onCloseSidebar}
       onStartTour={onStartTour}
+      onOpenSearchTab={onOpenSearchTab}
+      onOpenStaticPageTab={onOpenStaticPageTab}
     />
   );
 

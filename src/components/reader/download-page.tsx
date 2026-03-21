@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import type { Book } from "@/types/bible";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -67,6 +68,27 @@ const CORE_SIZE_LABEL = "~91 MB";
 const MAPS_SIZE_LABEL = "~97 MB";
 const OT_AUDIO_SIZE_LABEL = "~559 MB";
 const NT_AUDIO_SIZE_LABEL = "~174 MB";
+
+function bundleCachedPercent(status: BundleStatus) {
+  return status.total > 0 ? Math.round((status.cached / status.total) * 100) : 0;
+}
+
+function bundleDownloadPercent(status: BundleStatus) {
+  return status.total > 0 ? Math.round((status.completed / status.total) * 100) : 0;
+}
+
+function bundleStatusLabel(status: BundleStatus) {
+  if (status.downloading) {
+    return "Downloading";
+  }
+  if (status.cached === 0) {
+    return "Not downloaded";
+  }
+  if (status.cached >= status.total && status.total > 0) {
+    return "Fully cached";
+  }
+  return "Partially cached";
+}
 
 function buildAudioUrls(books: Book[], range: "old" | "new") {
   const startIndex = range === "old" ? 0 : 39;
@@ -167,6 +189,18 @@ export function DownloadPage({
 
     return definitions;
   }, [books, mapUrls]);
+
+  const totalCachedFiles = useMemo(
+    () =>
+      Object.values(bundleStatuses).reduce((count, status) => count + status.cached, 0),
+    [bundleStatuses],
+  );
+
+  const totalBundleFiles = useMemo(
+    () =>
+      Object.values(bundleStatuses).reduce((count, status) => count + status.total, 0),
+    [bundleStatuses],
+  );
 
   const refreshStorageEstimate = useCallback(async () => {
     if (!("storage" in navigator) || typeof navigator.storage.estimate !== "function") {
@@ -286,17 +320,17 @@ export function DownloadPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <Card className="border-border/70 bg-card/70">
+      <Card className="border-border/70 bg-card/70 shadow-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <DownloadIcon className="size-4 text-muted-foreground" />
             Install the app on this device
           </CardTitle>
           <CardDescription>
-            Install adds the app shell. Offline content downloads are managed separately below.
+            Installing adds the app shell to this device. Bible data, maps, and audio are managed separately below.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-3">
+        <CardContent className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <Button
               type="button"
@@ -307,61 +341,127 @@ export function DownloadPage({
             >
               Install App
             </Button>
-            <p className="text-xs leading-5 text-muted-foreground">
+            <Badge variant="outline" className="font-normal">
+              {isPwaInstalled
+                ? "Installed"
+                : canInstallPwa
+                  ? "Ready to install"
+                  : "Prompt unavailable"}
+            </Badge>
+          </div>
+          <p className="text-xs leading-5 text-muted-foreground">
               {isPwaInstalled
                 ? "Already installed on this device."
                 : canInstallPwa
                   ? "Install is available in this browser."
                   : "This browser has not exposed an install prompt for this session. On Android or Brave, use the browser menu and choose Install app or Add to Home screen."}
-            </p>
-          </div>
+          </p>
         </CardContent>
       </Card>
 
-      <Card className="border-border/70 bg-card/70">
+      <Card className="border-border/70 bg-card/70 shadow-sm">
         <CardHeader>
-          <CardTitle>Offline Storage</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Offline Library</CardTitle>
           <CardDescription>
-            Download the content bundles you want available without a network connection.
+            Download only the bundles you want available without a network connection.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-2">
-          <p className="text-sm text-muted-foreground">
-            {storageEstimate
-              ? `Using ${formatOfflineBytes(storageEstimate.usage)} of ${formatOfflineBytes(storageEstimate.quota)} available browser storage.`
-              : "Browser storage usage is not available in this environment."}
-          </p>
-          <p className="text-xs leading-5 text-muted-foreground">
-            Each bundle below can now be downloaded, refreshed, or cleared separately.
-          </p>
+        <CardContent className="grid gap-3 md:grid-cols-3">
+          <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Browser Storage
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {storageEstimate
+                ? `Using ${formatOfflineBytes(storageEstimate.usage)} of ${formatOfflineBytes(storageEstimate.quota)} available browser storage.`
+                : "Browser storage usage is not available in this environment."}
+            </p>
+          </div>
+          <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Cached Files
+            </p>
+            <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+              {totalCachedFiles}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              of {totalBundleFiles} known files currently cached
+            </p>
+          </div>
+          <div className="rounded-xl border border-border/70 bg-background/60 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Bundle Actions
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Use download for first-time caching, check for missing files to fill gaps, refresh to replace cached files, and clear to free space.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
       <div className="grid gap-4">
         {bundleDefinitions.map((bundle) => {
           const status = bundleStatuses[bundle.id];
-          const percent =
-            status.total > 0 ? Math.round((status.cached / status.total) * 100) : 0;
-          const downloadPercent =
-            status.total > 0 ? Math.round((status.completed / status.total) * 100) : 0;
+          const percent = bundleCachedPercent(status);
+          const downloadPercent = bundleDownloadPercent(status);
           const Icon = bundle.icon;
           const isReady = bundle.urls.length > 0;
+          const statusLabel = bundleStatusLabel(status);
+          const isFullyCached = status.cached === status.total && status.total > 0;
 
           return (
-            <Card key={bundle.id} className="border-border/70 bg-card/70">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Icon className="size-4 text-muted-foreground" />
-                  {bundle.title}
-                </CardTitle>
-                <CardDescription>{bundle.description}</CardDescription>
+            <Card key={bundle.id} className="border-border/70 bg-card/70 shadow-sm">
+              <CardHeader className="gap-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="space-y-2">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                      <Icon className="size-4 text-muted-foreground" />
+                      {bundle.title}
+                    </CardTitle>
+                    <CardDescription>{bundle.description}</CardDescription>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant={isFullyCached ? "default" : "outline"}>
+                      {statusLabel}
+                    </Badge>
+                    <Badge variant="outline" className="font-normal">
+                      {bundle.sizeLabel}
+                    </Badge>
+                  </div>
+                </div>
               </CardHeader>
-              <CardContent className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
-                  <span>{bundle.sizeLabel}</span>
-                  <span>
-                    {status.cached}/{status.total} files cached
-                  </span>
+              <CardContent className="flex flex-col gap-4">
+                <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
+                  <div className="rounded-lg border border-border/60 bg-background/50 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Cached
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-foreground">
+                      {status.cached}/{status.total}
+                    </p>
+                    <p className="text-xs">files available offline</p>
+                  </div>
+                  <div className="rounded-lg border border-border/60 bg-background/50 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Current State
+                    </p>
+                    <p className="mt-1 text-lg font-semibold text-foreground">
+                      {status.downloading ? `${downloadPercent}%` : `${percent}%`}
+                    </p>
+                    <p className="text-xs">
+                      {status.downloading ? "download progress" : "cache coverage"}
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-border/60 bg-background/50 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Refresh Path
+                    </p>
+                    <p className="mt-1 text-sm leading-6">
+                      {isFullyCached
+                        ? "Check for missing files to fill gaps or refresh to replace cached copies."
+                        : "Download the bundle first, then use refresh later when you want to replace cached copies."}
+                    </p>
+                  </div>
                 </div>
                 <Progress value={status.downloading ? downloadPercent : percent}>
                   <ProgressLabel>
@@ -374,16 +474,19 @@ export function DownloadPage({
                 {status.error ? (
                   <p className="text-xs text-destructive">{status.error}</p>
                 ) : null}
+                {!isReady ? (
+                  <p className="text-xs text-muted-foreground">Preparing asset list…</p>
+                ) : null}
                 <div className="flex flex-wrap items-center gap-3">
                   <Button
                     type="button"
-                    variant={status.cached === status.total && status.total > 0 ? "outline" : "default"}
+                    variant={isFullyCached ? "outline" : "default"}
                     disabled={!isReady || activeBundleId !== null || clearingBundleId !== null}
                     onClick={() => {
                       void runBundleDownload(bundle, false);
                     }}
                   >
-                    {status.cached === status.total && status.total > 0
+                    {isFullyCached
                       ? "Check for Missing Files"
                       : `Download ${bundle.title}`}
                   </Button>
@@ -409,9 +512,6 @@ export function DownloadPage({
                     <Trash2Icon />
                     {clearingBundleId === bundle.id ? "Clearing..." : "Clear Bundle"}
                   </Button>
-                  {!isReady ? (
-                    <p className="text-xs text-muted-foreground">Preparing asset list…</p>
-                  ) : null}
                 </div>
               </CardContent>
             </Card>

@@ -26,7 +26,6 @@ import {
   decodeConcordanceReferences,
   chapterVerseKey,
   normalizeConcordanceWord,
-  normalizeStrongsCode,
   resolveAIDictionaryKey,
   resolveAIDictionaryPhraseKeyForToken,
   resolveConcordanceKey,
@@ -78,7 +77,6 @@ import type {
   AIDictionaryEntry,
   AIDictionaryPayload,
   ConcordancePayload,
-  CrossRefsPayload,
   BibleWordBookEntry,
   BibleWordBookPayload,
   GenealogyPayload,
@@ -109,7 +107,6 @@ import type {
   ReferenceLinkOpenTarget,
 } from "@/types/reader";
 import type { BookmarkScope, ReaderBookmark } from "@/types/bookmarks";
-import type { NoteLinkTarget } from "@/types/notes";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import {
   AlertDialog,
@@ -141,6 +138,7 @@ import {
   usePanelRouting,
   type PendingReaderScrollTarget,
 } from "@/hooks/use-panel-routing";
+import { useWordStudyNavigation } from "@/hooks/use-word-study-navigation";
 import { useVerseHighlights } from "@/hooks/use-verse-highlights";
 import {
   STUDY_ACCORDION_ITEMS,
@@ -458,14 +456,6 @@ export function KJVReader() {
       return;
     }
 
-    const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? null;
-    const shouldCaptureInstallPrompt =
-      activeTab !== null &&
-      collectLeafIds(activeTab.root).some((leafId) => {
-        const leaf = findLeafNode(activeTab.root, leafId);
-        return leaf?.view === "page" && leaf.pageId === "download";
-      });
-
     const mediaQuery =
       typeof window.matchMedia === "function"
         ? window.matchMedia("(display-mode: standalone)")
@@ -484,10 +474,6 @@ export function KJVReader() {
     };
 
     const handleBeforeInstallPrompt = (event: Event) => {
-      if (!shouldCaptureInstallPrompt) {
-        return;
-      }
-      event.preventDefault();
       setDeferredInstallPrompt(event as BeforeInstallPromptEvent);
     };
 
@@ -512,7 +498,7 @@ export function KJVReader() {
       window.removeEventListener("appinstalled", handleAppInstalled);
       mediaQuery?.removeEventListener?.("change", handleInstalledStateChange);
     };
-  }, [activeTabId, tabs]);
+  }, []);
 
   const installPwa = useCallback(async () => {
     if (!deferredInstallPrompt) {
@@ -3336,141 +3322,26 @@ export function KJVReader() {
     ],
   );
 
-  const openCrossReferencesForVerse = useCallback(
-    (bookIndex: number, chapterIndex: number, verseNumber: number) => {
-      setNotesContext({
-        bookIndex,
-        chapterIndex,
-        verseNumber,
-      });
-      const key = chapterVerseKey(bookIndex, chapterIndex, verseNumber);
-
-      openStudyTool("cross-refs");
-      setCrossRefsError(null);
-      setIsCrossRefsLoading(true);
-
-      const applyCrossRefsSelection = (data: CrossRefsPayload) => {
-        setSelectedCrossReferences({
-          key,
-          references: data[key] ?? [],
-        });
-        setIsCrossRefsLoading(false);
-      };
-
-      if (crossRefs) {
-        applyCrossRefsSelection(crossRefs);
-      } else {
-        void ensureCrossRefsLoaded()
-          .then((data) => {
-            applyCrossRefsSelection(data);
-          })
-          .catch((error) => {
-            const message =
-              error instanceof Error
-                ? error.message
-                : "Failed to load cross-reference data";
-            setCrossRefsError(message);
-            setIsCrossRefsLoading(false);
-          });
-      }
-    },
-    [
-      crossRefs,
-      ensureCrossRefsLoaded,
-      openStudyTool,
-      setCrossRefsError,
-      setIsCrossRefsLoading,
-      setNotesContext,
-      setSelectedCrossReferences,
-    ],
-  );
-
-  function openNoteLinkTarget(target: NoteLinkTarget) {
-      setNotesContext(
-        target.type === "chapter"
-          ? {
-              bookIndex: target.bookIndex,
-              chapterIndex: target.chapterIndex,
-            }
-          : target.type === "verse"
-            ? {
-                bookIndex: target.bookIndex,
-                chapterIndex: target.chapterIndex,
-                verseNumber: target.verseNumber,
-              }
-            : target.type === "range"
-              ? {
-                  bookIndex: target.start.bookIndex,
-                  chapterIndex: target.start.chapterIndex,
-                  verseNumber: target.start.verseNumber,
-                }
-            : target.type === "selection"
-              ? {
-                  bookIndex: target.bookIndex,
-                  chapterIndex: target.chapterIndex,
-                }
-            : {
-                bookIndex: target.bookIndex,
-                chapterIndex: target.chapterIndex,
-                verseNumber: target.verseNumber,
-                word: target.word,
-              },
-      );
-
-      const syncWordTarget = () => {
-        if (target.type !== "word") {
-          return;
-        }
-        const rawWord = normalizeConcordanceWord(target.word) || target.word;
-        const matchedToken = resolveWordTokenAtLocation(
-          target.bookIndex,
-          target.chapterIndex,
-          target.verseNumber,
-          rawWord,
-        );
-        openWordInStudyTools({
-          rawWord,
-          bookIndex: target.bookIndex,
-          chapterIndex: target.chapterIndex,
-          verseNumber: target.verseNumber,
-          tokenIndex: matchedToken?.tokenIndex ?? null,
-          strongCode: matchedToken?.token.strong
-            ? normalizeStrongsCode(matchedToken.token.strong)
-            : null,
-        });
-        syncTokenAccordionState(rawWord, {
-          bookIndex: target.bookIndex,
-          chapterIndex: target.chapterIndex,
-          verseNumber: target.verseNumber,
-          strongCode: matchedToken?.token.strong
-            ? normalizeStrongsCode(matchedToken.token.strong)
-            : null,
-        });
-      };
-      if (target.type === "word") {
-        const rawWord = normalizeConcordanceWord(target.word) || target.word;
-        const leafId = openReaderTarget(
-          {
-            type: "verse",
-            bookIndex: target.bookIndex,
-            chapterIndex: target.chapterIndex,
-            verseNumber: target.verseNumber,
-          },
-          notesLinkOpenTarget,
-        );
-        if (leafId) {
-          setActiveReaderWordHighlight({
-            leafId,
-            verseNumber: target.verseNumber,
-            word: rawWord,
-          });
-        }
-        syncWordTarget();
-        return;
-      }
-
-      openReaderTarget(target, notesLinkOpenTarget);
-  }
+  const {
+    openCrossReferencesForVerse,
+    openNoteLinkTarget,
+    openTokenDetailsFromElement,
+  } = useWordStudyNavigation({
+    crossRefs,
+    ensureCrossRefsLoaded,
+    openStudyTool,
+    setCrossRefsError,
+    setIsCrossRefsLoading,
+    setSelectedCrossReferences,
+    setNotesContext,
+    openReaderTarget,
+    notesLinkOpenTarget,
+    setActiveReaderWordHighlight,
+    resolveWordTokenAtLocation,
+    syncTokenAccordionState,
+    openWordInStudyTools,
+    setTokenPopup,
+  });
 
   const handleVerseSelection = useCallback(
     (
@@ -3837,79 +3708,6 @@ export function KJVReader() {
         if (strongCode) {
           setIsStrongsLoading(false);
         }
-      });
-  }
-
-  function openTokenDetailsFromElement(
-    element: HTMLElement,
-    leafId: string,
-    token: VerseToken,
-    bookIndex: number,
-    chapterIndex: number,
-    verseNumber: number,
-    tokenIndex: number,
-  ) {
-      if (!token.strong && !token.added) {
-        const rect = element.getBoundingClientRect();
-        const popupWidth = 280;
-        const safeX = Math.max(
-          8,
-          Math.min(window.innerWidth - popupWidth - 8, rect.left),
-        );
-        const safeY = Math.min(window.innerHeight - 180, rect.bottom + 8);
-        setTokenPopup({
-          token,
-          x: safeX,
-          y: safeY,
-        });
-      } else {
-        setTokenPopup(null);
-      }
-
-      const rawWord = normalizeConcordanceWord(token.text);
-      if (Number.isFinite(verseNumber) && verseNumber > 0) {
-        openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
-        if (rawWord) {
-          setActiveReaderWordHighlight({
-            leafId,
-            verseNumber,
-            word: rawWord,
-          });
-          setNotesContext({
-            bookIndex,
-            chapterIndex,
-            verseNumber,
-            word: rawWord,
-          });
-        } else {
-          setActiveReaderWordHighlight(null);
-        }
-      } else if (rawWord) {
-        setActiveReaderWordHighlight(null);
-        setNotesContext({
-          bookIndex,
-          chapterIndex,
-          word: rawWord,
-        });
-      } else {
-        setActiveReaderWordHighlight(null);
-      }
-
-      if (!rawWord) {
-        return;
-      }
-
-      const normalizedCode = token.strong
-        ? normalizeStrongsCode(token.strong)
-        : null;
-      openWordInStudyTools({
-        rawWord,
-        bookIndex,
-        chapterIndex,
-        verseNumber:
-          Number.isFinite(verseNumber) && verseNumber > 0 ? verseNumber : null,
-        tokenIndex,
-        strongCode: normalizedCode,
       });
   }
 
@@ -4544,6 +4342,8 @@ export function KJVReader() {
           onOpenReference={openConcordanceReference}
           onCloseSidebar={closeRightSidebarForMobile}
           onStartTour={startGuidedTour}
+          onOpenSearchTab={openSearchTab}
+          onOpenStaticPageTab={openStaticPageTab}
         />
       </div>
     );
