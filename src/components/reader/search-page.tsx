@@ -1256,7 +1256,7 @@ export function SearchPage({
                       }
                     />
                     <img
-                      src="/icons/app-icon.png"
+                      src="/icons/app-icon.svg"
                       alt="Entire Bible icon"
                       width={20}
                       height={20}
