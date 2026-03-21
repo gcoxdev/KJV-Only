@@ -120,7 +120,7 @@ export function ReaderTopBar({
         </DropdownMenu>
         <div className="flex min-w-0 items-center gap-3">
           <img
-            src="/icons/app-icon.png"
+            src="/icons/app-icon.svg"
             alt="KJV Only icon"
             width={24}
             height={24}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="KJV Only app icon">
+  <rect x="3" y="0" width="26" height="32" rx="1.5" fill="#A15D30" />
+  <rect x="13.6" y="2.5" width="4.8" height="19" rx="1.2" fill="#FFDB99" />
+  <rect x="9.3" y="7.4" width="13.4" height="4.7" rx="1.2" fill="#FFDB99" />
+  <rect x="14.5" y="3.75" width="3" height="15.8" rx="0.9" fill="#FFF3C9" opacity="0.75" />
+  <rect x="10.35" y="8.15" width="11.3" height="3.2" rx="0.9" fill="#FFF3C9" opacity="0.75" />
+  <text x="16" y="29.2" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="6.2" font-weight="700" letter-spacing="0.35" fill="#FFF3C9">
+    KJV
+  </text>
+</svg>

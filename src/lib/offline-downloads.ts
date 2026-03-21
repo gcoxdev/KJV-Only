@@ -6,7 +6,7 @@ export const CORE_OFFLINE_URLS = [
   "/index.html",
   "/manifest.webmanifest",
   "/sw.js",
-  "/icons/app-icon.png",
+  "/icons/app-icon.svg",
   "/data/kjv.json",
   "/references/concordance.compact.delta.min.json",
   "/references/cross-refs.json",
