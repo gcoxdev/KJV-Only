@@ -16,7 +16,7 @@ export type SerializedVerseRange = {
   end: number;
 };
 
-type ParsedLayoutHash = {
+export type ParsedLayoutHash = {
   activeTabIndex: number;
   tabsOrientation: TabsOrientation;
   tabs: ReaderTab[];
