@@ -1,0 +1,1300 @@
+10 commandments	numeric/date/event-like
+13th generation	numeric/date/event-like
+2012	numeric/date/event-like
+2nd marriage	numeric/date/event-like
+4th of july	numeric/date/event-like
+666	numeric/date/event-like
+7 deadly sins	numeric/date/event-like
+7th day	numeric/date/event-like
+911	numeric/date/event-like
+abortion	explicitly negative/problematic
+abstain from drugs	explicitly negative/problematic
+abuse	explicitly negative/problematic
+abuse from a spouse	explicitly negative/problematic
+abuse in a marriage	explicitly negative/problematic
+abusing my wife	relationship niche or low-fit
+abusive husbands	explicitly negative/problematic
+abusive marriages	explicitly negative/problematic
+abusive parents	explicitly negative/problematic
+abusive relationships	explicitly negative/problematic
+accountancy	occupational or hobby niche
+acting	occupational or hobby niche
+actors	occupational or hobby niche
+addiction	explicitly negative/problematic
+addictions	explicitly negative/problematic
+adhd	medical niche
+adult children	relationship niche or low-fit
+adulterers	explicitly negative/problematic
+adulteresses	explicitly negative/problematic
+adultery	explicitly negative/problematic
+adultery and divorce	explicitly negative/problematic
+adultery in the church	explicitly negative/problematic
+adultery pregnancy	explicitly negative/problematic
+affirmative action	political or demographic
+african americans	political or demographic
+age difference	relationship niche or low-fit
+age difference when dating	relationship niche or low-fit
+age differences in marriage	relationship niche or low-fit
+age differences in relationship	relationship niche or low-fit
+age differences in relationships	relationship niche or low-fit
+agriculture	occupational or hobby niche
+aids	explicitly negative/problematic
+airplanes	low-signal niche
+alchemy	occult or fringe
+alcohol	explicitly negative/problematic
+alcohol abuse	explicitly negative/problematic
+alcohol and drugs	explicitly negative/problematic
+alcohol consumption	explicitly negative/problematic
+alcohol rehab	explicitly negative/problematic
+alcoholics	explicitly negative/problematic
+alcoholism	explicitly negative/problematic
+aliens	occult or fringe
+allah	occult or fringe
+allergies	medical niche
+america	political or demographic
+america in the end times	political or demographic
+amulets	occult or fringe
+ancestral worship	occult or fringe
+angel of death	occult or fringe
+angry wives	relationship niche or low-fit
+angry women	relationship niche or low-fit
+animal molesters	explicitly negative/problematic
+animals in the house	relationship niche or low-fit
+anime	low-signal niche
+ankh	occult or fringe
+annulment	relationship niche or low-fit
+anorexia	explicitly negative/problematic
+anorexia nervosa	explicitly negative/problematic
+antibiotic	medical niche
+ants	low-signal niche
+apes	low-signal niche
+apple	low-signal niche
+apples	low-signal niche
+army	occupational or hobby niche
+artificial insemination	low-signal niche
+artist	occupational or hobby niche
+assassination	explicitly negative/problematic
+assisted suicide	explicitly negative/problematic
+asthma	medical niche
+astral projection	occult or fringe
+astrology	occult or fringe
+astronomy	occupational or hobby niche
+athlete	occupational or hobby niche
+athletes	occupational or hobby niche
+athletics	occupational or hobby niche
+atlantis	occult or fringe
+auras	occult or fringe
+autism	medical niche
+automobiles	low-signal niche
+avian flu	medical niche
+azrael	occult or fringe
+baboons	low-signal niche
+baby mothers	relationship niche or low-fit
+baby showers	relationship niche or low-fit
+bad husbands	explicitly negative/problematic
+bad parents	explicitly negative/problematic
+bad relationships	explicitly negative/problematic
+bald eagle	low-signal niche
+baseball	low-signal niche
+basketball	low-signal niche
+bastard	explicitly negative/problematic
+bastard children	explicitly negative/problematic
+beans	low-signal niche
+beard	low-signal niche
+beards	low-signal niche
+bears	low-signal niche
+beating my wife	explicitly negative/problematic
+beer	low-signal niche
+character assassination	explicitly negative/problematic
+child abuse	explicitly negative/problematic
+child of adultery	explicitly negative/problematic
+commiting adultery	explicitly negative/problematic
+committing adultery	explicitly negative/problematic
+consuming alcohol	explicitly negative/problematic
+divorce and adultery	explicitly negative/problematic
+doing drugs	explicitly negative/problematic
+domestic abuse	explicitly negative/problematic
+domestic violence and abuse	explicitly negative/problematic
+drinking alcohol	explicitly negative/problematic
+drinking beer	low-signal niche
+drinking drugs and smoking	explicitly negative/problematic
+drinking wine alcohol	explicitly negative/problematic
+drug abuse	explicitly negative/problematic
+drug addiction	explicitly negative/problematic
+drug use	explicitly negative/problematic
+drugs	explicitly negative/problematic
+drugs and alcohol	explicitly negative/problematic
+elder abuse	explicitly negative/problematic
+emotional abuse	explicitly negative/problematic
+forgiveness of adultery	explicitly negative/problematic
+gambling addictions	explicitly negative/problematic
+hiv aids	explicitly negative/problematic
+living with verbal abuse	explicitly negative/problematic
+mental abuse	explicitly negative/problematic
+mixing religion and politics	political or demographic
+parents with addictions	explicitly negative/problematic
+physical abuse	explicitly negative/problematic
+physical abuse in marriage	explicitly negative/problematic
+politics	political or demographic
+politics and religion	political or demographic
+prescription drugs	explicitly negative/problematic
+punishment for adultery	explicitly negative/problematic
+republican party	political or demographic
+results of adultery	explicitly negative/problematic
+self abuse	explicitly negative/problematic
+selling drugs	explicitly negative/problematic
+sexual abuse	explicitly negative/problematic
+space aliens	occult or fringe
+spouse abuse	explicitly negative/problematic
+substance abuse	explicitly negative/problematic
+taking drugs	explicitly negative/problematic
+the angel of death	occult or fringe
+the woman caught in the act of adultery	explicitly negative/problematic
+the year 2012	one-off event
+verbal abuse	explicitly negative/problematic
+aaron	specific person
+abel and cain	specific person
+abigail	specific person
+abijah	specific person
+abishag	specific person
+abraham	specific person
+abraham isaac	specific person
+adam	specific person
+adam and eve	specific person
+adam and eve disobey god	specific person
+africa	specific place or region
+alcoholic beverages	drugs or alcohol
+all authority has been given to me in heaven and on earth	specific place or region
+almonds	food-related
+ananias	specific person
+andrew	specific person
+animals going to heaven	specific place or region
+animals in heaven	specific place or region
+anna	specific person
+apollos	specific person
+asenath	specific person
+assyria	specific place or region
+baal	specific person
+babies going to heaven	specific place or region
+babylon	specific place or region
+barnabas	specific person
+bathsheba	specific person
+being gay	lgbt-related
+bethany	specific place or region
+bethlehem	specific place or region
+bread	food-related
+buy your way into heaven	specific place or region
+cakes	food-related
+children and heaven	specific place or region
+children going to heaven	specific place or region
+children going to hell	specific place or region
+cigarette smoking	drugs or alcohol
+damascus	specific place or region
+dancing in heaven	specific place or region
+daniel	specific person
+dating in heaven	specific place or region
+daughter of zion	specific place or region
+david	specific person
+david and goliath	specific person
+david and jonathan	specific person
+david and nathan	specific person
+david danced	specific person
+deborah	specific person
+delilah	specific person
+destruction of israel	specific place or region
+destruction of jerusalem	specific place or region
+destruction of sodom	specific place or region
+diffrent religions going to heaven	specific place or region
+do animals go to heaven	specific place or region
+doctrine of hell	specific place or region
+dogs going to heaven	specific place or region
+dogs in heaven	specific place or region
+drinking and smoking	drugs or alcohol
+drunkenness	drugs or alcohol
+eden	specific place or region
+egypt	specific place or region
+elijah	specific person
+elisha	specific person
+enoch	specific person
+ephesus	specific place or region
+esther	specific person
+ethiopia	specific place or region
+europe	specific place or region
+eve	specific person
+ezekiel	specific person
+father in heaven	specific place or region
+first heaven	specific place or region
+fish	food-related
+flesh	food-related
+fruit	food-related
+fruits	food-related
+gabriel	specific person
+gates of hell	specific place or region
+gay	lgbt-related
+gay marriage	lgbt-related
+gay marriages	lgbt-related
+gay people	lgbt-related
+gays	lgbt-related
+gaza	specific place or region
+getting into heaven	specific place or region
+getting to heaven	specific place or region
+gideon	specific person
+going to heaven	specific place or region
+going to hell	specific place or region
+good deeds to go to heaven	specific place or region
+grapes	food-related
+hagar	specific person
+hannah	specific person
+heaven	specific place or region
+heaven and hell	specific place or region
+hell	specific place or region
+homosexual	lgbt-related
+homosexuality	lgbt-related
+homosexuals	lgbt-related
+honey	food-related
+how to get in heaven	specific place or region
+how to get to heaven	specific place or region
+how to go to heaven	specific place or region
+husbands and wives in heaven	specific place or region
+infants going to heaven	specific place or region
+isaac	specific person
+isaiah	specific person
+israel	specific place or region
+israel and palestine	specific place or region
+israel and the end times	specific place or region
+israel becoming a state	specific place or region
+israel giving up gaza	specific place or region
+israel in the last days	specific place or region
+israel war	specific place or region
+jacob	specific person
+jacob and rachel	specific person
+jacob saw that leah was ugly	specific person
+james	specific person
+jeremiah	specific person
+jericho	specific place or region
+jerusalem	specific place or region
+jesus rejected at nazareth	specific place or region
+jesus ruling in jerusalem	specific place or region
+jews going to heaven	specific place or region
+jezebel	specific person
+job	specific person
+job hunting	specific person
+job loss	specific person
+job security	specific person
+job wife	specific person
+joel	specific person
+john	specific person
+john being the author of the gospel of john	specific person
+john macarthur	specific person
+john the baptist	specific person
+jonah	specific person
+jonathan and david	specific person
+jordan	specific place or region
+joseph	specific person
+joseph and mary	specific person
+joseph had a coat of many colors	specific person
+joshua	specific person
+judah	specific place or region
+judas	specific person
+judas hanging himself	specific person
+judas iscariot	specific person
+kingdom of heaven	specific place or region
+lazarus	specific person
+lesbian	lgbt-related
+lesbians	lgbt-related
+levels of hell	specific place or region
+locusts	food-related
+loved ones in heaven	specific place or region
+luke	specific person
+man and wife in heaven	specific place or region
+marijuana	drugs or alcohol
+mark	specific person
+mark of the beast	specific person
+marriage in heaven	specific place or region
+married in heaven	specific place or region
+martha	specific person
+mary	specific person
+mary magdalene	specific person
+mary of bethany	specific person
+mary the mother of jesus	specific person
+meat	food-related
+milk	food-related
+moab	specific place or region
+moses	specific person
+moses and pharaoh	specific person
+moses building the tabernacle	specific person
+mount zion	specific place or region
+mt sinai	specific place or region
+naomi	specific person
+nazareth	specific place or region
+nicodemus	specific person
+noah	specific person
+noah rainbow	specific person
+paul	specific person
+paul first mission	specific person
+peace in the middle east	specific place or region
+people in heaven	specific place or region
+peter	specific person
+pets going to heaven	specific place or region
+pets in heaven	specific place or region
+promised land	specific place or region
+promised land boundaries	specific place or region
+protecting israel	specific place or region
+rachel	specific person
+rahab	specific person
+relationships in heaven	specific place or region
+religion in egypt	specific place or region
+rewards in heaven	specific place or region
+rich in heaven	specific place or region
+rich man entering heaven	specific place or region
+rome	specific place or region
+ruth	specific person
+ruth and naomi	specific person
+salt	food-related
+same-sex marriage	lgbt-related
+samson	specific person
+samson and delilah	specific person
+samuel	specific person
+sarah	specific person
+satan and a third of angels caste out of heaven	specific place or region
+saul	specific person
+saul on the road to damascus	specific person
+sea of galilee	specific place or region
+seed	food-related
+seed and harvest	food-related
+seeds	food-related
+smoking	drugs or alcohol
+smoking cigarettes	drugs or alcohol
+smoking marijuana	drugs or alcohol
+smoking pot	drugs or alcohol
+sodom	specific place or region
+solomon	specific person
+strong drink	food-related
+suicide and going to heaven	specific place or region
+the garden of eden	specific place or region
+the gaza pull out	specific place or region
+the gaza pullout	specific place or region
+the holy land	specific place or region
+the kingdom of heaven	specific place or region
+the land of israel	specific place or region
+the middle east	specific place or region
+the middle east conflict	specific place or region
+the middle east war	specific place or region
+the new jerusalem	specific place or region
+the united states	specific place or region
+the war in heaven	specific place or region
+the war in israel	specific place or region
+those who are against israel	specific place or region
+timothy	specific person
+treasure in heaven	specific place or region
+vegetables	food-related
+vinegar	food-related
+walls of jericho	specific place or region
+war in heaven	specific place or region
+war in israel	specific place or region
+water	food-related
+wheat	food-related
+who goes to heaven	specific place or region
+who is going to heaven	specific place or region
+wine	food-related
+wine and its use	food-related
+zion	specific place or region
+abstaining from meat	food-related
+animal cruelty	animals
+animal rights	animals
+animal sacrifices	animals
+animal souls	animals
+animal testing	animals
+animals	animals
+animals after death	animals
+animals having a soul	animals
+animals having souls	animals
+animals in captivity	animals
+animals not having souls	animals
+balaams donkey	animals
+bearing bad fruit	food-related
+bees	animals
+bird	animals
+birds	animals
+blessing food	food-related
+breaking bread	food-related
+buying and selling dogs	animals
+can you eat meat	food-related
+care of animals	animals
+care of your animal	animals
+cats	animals
+celebrities	pop or modern culture
+cigarettes	alcohol or drugs
+clean and unclean animals	animals
+cruelty to animals	animals
+decieve woman for sex	sex-related
+do animals have a spirits	animals
+dog	animals
+dogs	animals
+domestic animals	animals
+dove	animals
+doves	animals
+drink	food-related
+drinking	alcohol or drugs
+drinking alcoholic beverages	alcohol or drugs
+drinking and driving	alcohol or drugs
+drinking blood	alcohol or drugs
+drinking in moderation	alcohol or drugs
+drinking wine	alcohol or drugs
+eagle	animals
+eagles	animals
+eagles wings	animals
+eating	food-related
+eating animal blood	animals
+eating animals	animals
+eating catfish	food-related
+eating certain foods	food-related
+eating disorder	food-related
+eating disorders	food-related
+eating fish	animals
+eating healthy	food-related
+eating in church	food-related
+eating meat	food-related
+eating pig	food-related
+eating pigs	food-related
+eating pork	food-related
+eating red meat	food-related
+eating seafood	food-related
+eating shellfish	food-related
+eating shrimp	food-related
+eating swine	food-related
+eating the right foods	food-related
+eating too much	food-related
+eating too much food	food-related
+eating vegetables	food-related
+facebook	pop or modern culture
+first fruits	food-related
+fishers of men	food-related
+flying birds	animals
+food	food-related
+food portions	food-related
+foods	food-related
+fornication	sex-related
+fruit of the spirit	food-related
+fruits of the spirit	food-related
+fruits of the sprit	food-related
+gaming	pop or modern culture
+gentiles	specific people group
+goats	animals
+good fruits	food-related
+healthy eating	food-related
+hebrews	specific people group
+horror movies	pop or modern culture
+horse	animals
+horses	animals
+immorality	sex-related
+jews	specific people group
+junk food	food-related
+killing animals	animals
+lamb	animals
+lambs book of life	animals
+lion	animals
+lions	animals
+lost sheep	animals
+lust	sex-related
+magic in movies	pop or modern culture
+mans role regarding animals	animals
+marital sex	sex-related
+masturbation	sex-related
+mount of olives	food-related
+movies	pop or modern culture
+nation eagle	animals
+nation take up the eagle	animals
+no sex before marriage	sex-related
+olive oil	food-related
+opposite sex	sex-related
+opposite sex naked	sex-related
+oral sex	sex-related
+pharisees	specific people group
+pornography	sex-related
+pornography and marriage	sex-related
+praying over food	food-related
+premarital sex	sex-related
+providing food	food-related
+romans	specific people group
+sadducees	specific people group
+selling animals	animals
+serpent	animals
+sex	sex-related
+sex and not married	sex-related
+sex before marrage	sex-related
+sex before marriage	sex-related
+sex change	sex-related
+sex demon	sex-related
+sex how often	sex-related
+sex in marriage	sex-related
+sexual assault	sex-related
+sexual equality	sex-related
+sexual fantasies	sex-related
+sexual immorality	sex-related
+sexual impurity	sex-related
+sexual purity	sex-related
+sexual sin	sex-related
+sexuality	sex-related
+sheep	animals
+snake handling	animals
+snakes	animals
+social drinking	alcohol or drugs
+spiritual food	food-related
+taking care of animals	animals
+taking care of your animal	animals
+taking care of your animals	animals
+television	pop or modern culture
+the ant	animals
+the dove	animals
+the eagle	animals
+the food we eat	food-related
+the fruit of the spirit	food-related
+the fruits of the spirit	food-related
+the lost sheep	animals
+the marriage supper of the lamb	animals
+the number of the fish	animals
+the serpent	animals
+tigers	animals
+treating animals	animals
+turning water to wine	alcohol or drugs
+tv	pop or modern culture
+unclean animals	animals
+unclean food	food-related
+unclean foods	food-related
+underage drinking	alcohol or drugs
+unleavened bread	food-related
+unmarried sex	sex-related
+video games	pop or modern culture
+watching television	pop or modern culture
+watching tv	pop or modern culture
+watching worldly television	pop or modern culture
+what is sexual immorality	sex-related
+wine drinking	alcohol or drugs
+wise as a serpent	animals
+wolf	animals
+a healthy marriage	role-specific or narrow family topic
+a husband	role-specific or narrow family topic
+a man	role-specific or narrow family topic
+a man working	role-specific or narrow family topic
+a mans character	role-specific or narrow family topic
+a mans reputation	role-specific or narrow family topic
+abusing children	role-specific or narrow family topic
+access	low-signal or niche abstract
+accidents	low-signal or niche abstract
+achievement	low-signal or niche abstract
+achievements	low-signal or niche abstract
+achieving balance between god and work in your life	first/second-person phrasing
+action	low-signal or niche abstract
+actions	low-signal or niche abstract
+administration	low-signal or niche abstract
+adulthood	role-specific or narrow family topic
+adults	role-specific or narrow family topic
+advantage	low-signal or niche abstract
+after death communication	occult or speculative
+after life	occult or speculative
+afterlife	occult or speculative
+age discrimination	low-signal or niche abstract
+agism	low-signal or niche abstract
+agnostic	controversial or doctrinally narrow
+agnostics	controversial or doctrinally narrow
+air	low-signal or niche abstract
+all sins being equal	controversial or doctrinally narrow
+altering the body	ritual or niche practice
+am i saved	question-style topic
+angel	eschatology or fringe/supernatural niche
+angels	eschatology or fringe/supernatural niche
+angels and death	eschatology or fringe/supernatural niche
+angels and demons	eschatology or fringe/supernatural niche
+angels and humans	eschatology or fringe/supernatural niche
+angels helping us	first/second-person phrasing
+angels rejoice	eschatology or fringe/supernatural niche
+angels singing	eschatology or fringe/supernatural niche
+angles	low-signal or niche abstract
+angry	role-specific or narrow family topic
+anklets	ritual or niche practice
+anniversaries	role-specific or narrow family topic
+anniversary	role-specific or narrow family topic
+anointing oil	ritual or niche practice
+anointing with oil	ritual or niche practice
+anointing your home	first/second-person phrasing
+antichrist	eschatology or fringe/supernatural niche
+antidepressants	low-signal or niche abstract
+apostasy	controversial or doctrinally narrow
+apostates	controversial or doctrinally narrow
+apostle paul	specific person
+appearance	low-signal or niche abstract
+appearance of evil	low-signal or niche abstract
+appearances	low-signal or niche abstract
+approachability	low-signal or niche abstract
+approval	low-signal or niche abstract
+archangel angel michael	specific person
+archangels	eschatology or fringe/supernatural niche
+are there angels on earth	question-style topic
+arguments in the church	controversial or doctrinally narrow
+arianism	controversial or doctrinally narrow
+armageddon	eschatology or fringe/supernatural niche
+aroma	low-signal or niche abstract
+art	low-signal or niche abstract
+ash wednesday	ritual or niche practice
+ask and you shall receive	first/second-person phrasing
+atheism	controversial or doctrinally narrow
+atheist	controversial or doctrinally narrow
+atheists	controversial or doctrinally narrow
+attention seekers	low-signal or niche abstract
+attraction	low-signal or niche abstract
+attractive	low-signal or niche abstract
+authority over your children	first/second-person phrasing
+autumn	low-signal or niche abstract
+availability	low-signal or niche abstract
+avenging angels	eschatology or fringe/supernatural niche
+babies	role-specific or narrow family topic
+baby	role-specific or narrow family topic
+baby jesus	role-specific or narrow family topic
+bad children	role-specific or narrow family topic
+bad company	controversial or doctrinally narrow
+bad luck	controversial or doctrinally narrow
+bad news	controversial or doctrinally narrow
+bankruptcy	low-signal or niche abstract
+banner	low-signal or niche abstract
+banners	low-signal or niche abstract
+baptism and salvation	controversial or doctrinally narrow
+baptism of babies	role-specific or narrow family topic
+baptism of the holy spirit	controversial or doctrinally narrow
+baptizing children	role-specific or narrow family topic
+barren women	role-specific or narrow family topic
+be angry and sin not	role-specific or narrow family topic
+bearing children	role-specific or narrow family topic
+becoming an adult	role-specific or narrow family topic
+behold i am with you	first/second-person phrasing
+being a good husband	role-specific or narrow family topic
+being a good parent	role-specific or narrow family topic
+being a husband	role-specific or narrow family topic
+being a man	role-specific or narrow family topic
+being a man of god	role-specific or narrow family topic
+being a parent	role-specific or narrow family topic
+being angry	role-specific or narrow family topic
+being taken advantage of	low-signal or niche abstract
+birth of a baby	role-specific or narrow family topic
+black and white marriage	role-specific or narrow family topic
+blessing your pastor	first/second-person phrasing
+blessings of children	role-specific or narrow family topic
+body piercings	ritual or niche practice
+body piercings and tattoos	ritual or niche practice
+body tattoos	ritual or niche practice
+boyfriends	role-specific or narrow family topic
+boyfriends and girlfriends	role-specific or narrow family topic
+braiding your hair	first/second-person phrasing
+call me blessed	first/second-person phrasing
+can a pastor divorce and remarry	question-style topic
+care for your body	first/second-person phrasing
+caring for aging parents	role-specific or narrow family topic
+caring for children	role-specific or narrow family topic
+caring for elderly parents	role-specific or narrow family topic
+caring for parents	role-specific or narrow family topic
+caring for your family	first/second-person phrasing
+cast your cares	first/second-person phrasing
+casting out demons	eschatology or fringe/supernatural niche
+causing your brother to stumble	first/second-person phrasing
+changing churches	modern culture or event-specific
+children	role-specific or narrow family topic
+children and death	role-specific or narrow family topic
+children and parents	role-specific or narrow family topic
+children and prayer	role-specific or narrow family topic
+children and sin	role-specific or narrow family topic
+children are a blessing	role-specific or narrow family topic
+children as a blessing	role-specific or narrow family topic
+children being a blessing	role-specific or narrow family topic
+children being obedient	role-specific or narrow family topic
+children born out of wedlock	role-specific or narrow family topic
+children growing up	role-specific or narrow family topic
+children leaving home	role-specific or narrow family topic
+children leaving their parents	role-specific or narrow family topic
+children murdering parents	role-specific or narrow family topic
+children obeying their parents	role-specific or narrow family topic
+children of god	role-specific or narrow family topic
+children out of wedlock	role-specific or narrow family topic
+children responsibility	role-specific or narrow family topic
+children returning home	role-specific or narrow family topic
+children salvation	role-specific or narrow family topic
+choices we make	first/second-person phrasing
+choosing your friends carefully	first/second-person phrasing
+christian actions	low-signal or niche abstract
+christian dating	role-specific or narrow family topic
+christian marriage	role-specific or narrow family topic
+christian single dating	role-specific or narrow family topic
+church anniversary	role-specific or narrow family topic
+churches	modern culture or event-specific
+cleaning up your life	first/second-person phrasing
+come as you are	first/second-person phrasing
+come just as you are	first/second-person phrasing
+common law marriage	role-specific or narrow family topic
+communication in marriage	role-specific or narrow family topic
+conceiving a baby	role-specific or narrow family topic
+confess with your mouth	first/second-person phrasing
+controlling our emotions	first/second-person phrasing
+controlling parents	role-specific or narrow family topic
+controlling your anger	first/second-person phrasing
+controlling your thoughts	first/second-person phrasing
+counting your blessings	first/second-person phrasing
+courtship	role-specific or narrow family topic
+cousin marriage	role-specific or narrow family topic
+covenant with my eyes	first/second-person phrasing
+cursing your parents	first/second-person phrasing
+cutting your hair	first/second-person phrasing
+dating	role-specific or narrow family topic
+dating a married man	role-specific or narrow family topic
+dating a muslim	role-specific or narrow family topic
+dating age	role-specific or narrow family topic
+dating an unbeliever	role-specific or narrow family topic
+dating and courting	role-specific or narrow family topic
+dating and relationships	role-specific or narrow family topic
+dating courting	role-specific or narrow family topic
+dating different races	role-specific or narrow family topic
+dating intimacy	role-specific or narrow family topic
+dating non believers	role-specific or narrow family topic
+dating nonbelievers	role-specific or narrow family topic
+dating nonchristians	role-specific or narrow family topic
+dating other races	role-specific or narrow family topic
+dating while separated	role-specific or narrow family topic
+deaf and dumb demons	eschatology or fringe/supernatural niche
+dealing with death of parent	role-specific or narrow family topic
+defending our faith	first/second-person phrasing
+defending your family	first/second-person phrasing
+demon	eschatology or fringe/supernatural niche
+demon appearance	eschatology or fringe/supernatural niche
+demon possessed	eschatology or fringe/supernatural niche
+demon possession	eschatology or fringe/supernatural niche
+demons	eschatology or fringe/supernatural niche
+deserted wives	role-specific or narrow family topic
+designer babies	role-specific or narrow family topic
+desires of your heart	first/second-person phrasing
+devil	eschatology or fringe/supernatural niche
+devil is real	eschatology or fringe/supernatural niche
+disabled children	role-specific or narrow family topic
+discipline of children	role-specific or narrow family topic
+disciplining children	role-specific or narrow family topic
+dishonor parents	role-specific or narrow family topic
+disobedient children	role-specific or narrow family topic
+disobedient to parents	role-specific or narrow family topic
+disobedient wives	role-specific or narrow family topic
+disobeying parents	role-specific or narrow family topic
+disobeying your parents	first/second-person phrasing
+disrespectful children	role-specific or narrow family topic
+disrespectful wives	role-specific or narrow family topic
+divorce and marriage	role-specific or narrow family topic
+do not give up	question-style topic
+do unto others	question-style topic
+doctrine	controversial or doctrinally narrow
+does god forgive gays	question-style topic
+does god hate any humans he has created	question-style topic
+doing your best	first/second-person phrasing
+dont hide your light	first/second-person phrasing
+draw me close to you	first/second-person phrasing
+dying your hair	first/second-person phrasing
+early marriage	role-specific or narrow family topic
+eat my body	first/second-person phrasing
+educating our children	first/second-person phrasing
+education of children	role-specific or narrow family topic
+end times	eschatology or fringe/supernatural niche
+engagement before marriage	role-specific or narrow family topic
+explaining death to children	role-specific or narrow family topic
+fallen angels	eschatology or fringe/supernatural niche
+false doctrine	controversial or doctrinally narrow
+fathers and children	role-specific or narrow family topic
+fathers who leave their children	role-specific or narrow family topic
+filing bankruptcy	low-signal or niche abstract
+finding a good husband	role-specific or narrow family topic
+finding a husband	role-specific or narrow family topic
+finding a job	specific person
+finding your mate	first/second-person phrasing
+finding your true love	first/second-person phrasing
+finding your wife	first/second-person phrasing
+finishing what you start	first/second-person phrasing
+following your heart	first/second-person phrasing
+following your husband	first/second-person phrasing
+forgiven those who hurt you	first/second-person phrasing
+forgiveness in marriage	role-specific or narrow family topic
+forgiving your enemies	first/second-person phrasing
+getting a job	specific person
+getting tattoos	ritual or niche practice
+getting your house in order	first/second-person phrasing
+girlfriend	role-specific or narrow family topic
+girlfriend and boyfriend	role-specific or narrow family topic
+girlfriend before marriage	role-specific or narrow family topic
+girlfriends	role-specific or narrow family topic
+giving me a sign	first/second-person phrasing
+giving to your pastor	first/second-person phrasing
+god accepting me	first/second-person phrasing
+god being our husband	first/second-person phrasing
+god being with us	first/second-person phrasing
+god communicating with us	first/second-person phrasing
+god knows your name	first/second-person phrasing
+god loves me	first/second-person phrasing
+god loving all of his children	role-specific or narrow family topic
+god made us	first/second-person phrasing
+god made us perfect	first/second-person phrasing
+god speaking to you	first/second-person phrasing
+god testing abraham	specific person
+god with us	first/second-person phrasing
+god working through you	first/second-person phrasing
+gods appearance	low-signal or niche abstract
+gods children	role-specific or narrow family topic
+gods love for us	first/second-person phrasing
+gods love for you	first/second-person phrasing
+gods purpose for me	first/second-person phrasing
+going to your brother	first/second-person phrasing
+grieving for parent	role-specific or narrow family topic
+grown children treating their parents	role-specific or narrow family topic
+guardian angel	eschatology or fringe/supernatural niche
+guardian angels	eschatology or fringe/supernatural niche
+guarding your heart	first/second-person phrasing
+handling your finances	first/second-person phrasing
+harming children	role-specific or narrow family topic
+harming your body	first/second-person phrasing
+harming your body with tatoos	first/second-person phrasing
+hateful parents	role-specific or narrow family topic
+hating your brother	first/second-person phrasing
+hating your enemy	first/second-person phrasing
+hating your parents	first/second-person phrasing
+have children	role-specific or narrow family topic
+having a baby	role-specific or narrow family topic
+having a baby out of wedlock	role-specific or narrow family topic
+having a lot of children	specific person
+having babies	role-specific or narrow family topic
+having children	role-specific or narrow family topic
+having children out of wedlock	role-specific or narrow family topic
+having children outside of marriage	role-specific or narrow family topic
+having girlfriend	role-specific or narrow family topic
+healthy babies	role-specific or narrow family topic
+healthy marriage	role-specific or narrow family topic
+help you through rough times	first/second-person phrasing
+help you through rough times for mothers	first/second-person phrasing
+helping children	role-specific or narrow family topic
+hide your light under a bushel	first/second-person phrasing
+holding your peace	first/second-person phrasing
+holding your tongue	first/second-person phrasing
+honor your husband	first/second-person phrasing
+honor your wife	first/second-person phrasing
+honoring children	role-specific or narrow family topic
+honoring parents	role-specific or narrow family topic
+honoring the parents	role-specific or narrow family topic
+honoring thy parents	role-specific or narrow family topic
+honoring your body	first/second-person phrasing
+honoring your father and mother	first/second-person phrasing
+honoring your husband	first/second-person phrasing
+honoring your parents	first/second-person phrasing
+house churches	modern culture or event-specific
+how do we know god exists	question-style topic
+how god wants us to live	question-style topic
+how long we will live	question-style topic
+how many children did adam and eve have	specific person
+how should we pray	question-style topic
+how to act	question-style topic
+how to be saved	question-style topic
+how to become a christian	question-style topic
+how to consecrate oil	question-style topic
+how to dress	question-style topic
+how to dress for church	question-style topic
+how to follow jesus	question-style topic
+how to get saved	question-style topic
+how to live	question-style topic
+how to make peace	question-style topic
+how to pray	question-style topic
+how to raise a child	question-style topic
+how to take care of our bodies	question-style topic
+how to train your children	question-style topic
+how to treat others	question-style topic
+how to treat people	question-style topic
+how to treat your enemies	question-style topic
+how to treat your neighbor	question-style topic
+how to vote	question-style topic
+how to wait on god	question-style topic
+how we dress	question-style topic
+how we should dress for church	question-style topic
+how we should live	question-style topic
+how we should live our lives	question-style topic
+how you should dress	question-style topic
+hurting children	role-specific or narrow family topic
+hurting the one you love	first/second-person phrasing
+husband	role-specific or narrow family topic
+husband and wife	role-specific or narrow family topic
+husband as leader	role-specific or narrow family topic
+husband being the spiritual leader	role-specific or narrow family topic
+husbands	role-specific or narrow family topic
+husbands and children	role-specific or narrow family topic
+husbands and wives	role-specific or narrow family topic
+husbands love	role-specific or narrow family topic
+husbands love your wife	first/second-person phrasing
+husbands loving their wives	role-specific or narrow family topic
+husbands role	role-specific or narrow family topic
+i am	first/second-person phrasing
+i am only joking	first/second-person phrasing
+i am the resurrection	first/second-person phrasing
+i can do all things	first/second-person phrasing
+i want to mend you say lord	first/second-person phrasing
+i will never leave you nor forsake you	first/second-person phrasing
+illegitimate children	role-specific or narrow family topic
+infant and adult baptism	role-specific or narrow family topic
+interfaith marriage	role-specific or narrow family topic
+internet dating	role-specific or narrow family topic
+interracial marriage	role-specific or narrow family topic
+is all sin the same	question-style topic
+is gambling a sin	question-style topic
+is gambling a sin gambling	question-style topic
+jesus being our first love	first/second-person phrasing
+jesus is our husband	first/second-person phrasing
+jesus with us now	first/second-person phrasing
+judging on appearances	low-signal or niche abstract
+keeping your promise	first/second-person phrasing
+keeping your word	first/second-person phrasing
+king david	specific person
+king james	specific person
+king james bible	specific person
+king solomon	specific person
+kissing before marriage	role-specific or narrow family topic
+knowing your destiny	first/second-person phrasing
+lake of fire	eschatology or fringe/supernatural niche
+leading children	role-specific or narrow family topic
+leading children astray	role-specific or narrow family topic
+leaving parents	role-specific or narrow family topic
+let the children come	role-specific or narrow family topic
+let your word be your word	first/second-person phrasing
+levirate marriage	role-specific or narrow family topic
+little children	role-specific or narrow family topic
+little eyes what you see	first/second-person phrasing
+living together before marriage	role-specific or narrow family topic
+living together outside of marriage	role-specific or narrow family topic
+living with someone before marriage	role-specific or narrow family topic
+long courtship	role-specific or narrow family topic
+looking for a husband	role-specific or narrow family topic
+losing a baby	role-specific or narrow family topic
+losing the one you love	first/second-person phrasing
+losing your salvation	first/second-person phrasing
+love and marriage	role-specific or narrow family topic
+love in marriage	role-specific or narrow family topic
+love the lord with all your heart	first/second-person phrasing
+love your enemies	first/second-person phrasing
+love your enemy	first/second-person phrasing
+love your neighbor	first/second-person phrasing
+loving children	role-specific or narrow family topic
+loving your body	first/second-person phrasing
+loving your brother and sister	first/second-person phrasing
+loving your child	first/second-person phrasing
+loving your children	first/second-person phrasing
+loving your enemies	first/second-person phrasing
+loving your enemy	first/second-person phrasing
+loving your family	first/second-person phrasing
+loving your husband	first/second-person phrasing
+loving your neighbor	first/second-person phrasing
+loving your neighbors	first/second-person phrasing
+loving your siblings	first/second-person phrasing
+loving your sister	first/second-person phrasing
+loving your son	first/second-person phrasing
+loving your wife	first/second-person phrasing
+making our skin	first/second-person phrasing
+managing your business	first/second-person phrasing
+marking your body	first/second-person phrasing
+marriage	role-specific or narrow family topic
+marriage after death	role-specific or narrow family topic
+marriage after divorce	role-specific or narrow family topic
+marriage and children	role-specific or narrow family topic
+marriage and divorce	role-specific or narrow family topic
+marriage and family	role-specific or narrow family topic
+marriage and finances	role-specific or narrow family topic
+marriage and love	role-specific or narrow family topic
+marriage and the bible	role-specific or narrow family topic
+marriage and the family	role-specific or narrow family topic
+marriage and virginity	role-specific or narrow family topic
+marriage arguments	role-specific or narrow family topic
+marriage between cousins	role-specific or narrow family topic
+marriage ceremonies	role-specific or narrow family topic
+marriage counceling	role-specific or narrow family topic
+marriage covenant	role-specific or narrow family topic
+marriage divorce and remarriage	role-specific or narrow family topic
+marriage laws	role-specific or narrow family topic
+marriage problems	role-specific or narrow family topic
+marriage reconciliation	role-specific or narrow family topic
+marriage relationship	role-specific or narrow family topic
+marriage separation	role-specific or narrow family topic
+marriage troubles	role-specific or narrow family topic
+marriage vows	role-specific or narrow family topic
+married women having children	role-specific or narrow family topic
+marrying your first cousin	first/second-person phrasing
+me	first/second-person phrasing
+michael	specific person
+minding your business	first/second-person phrasing
+minding your own business	first/second-person phrasing
+miriam and aaron	specific person
+misleading children	role-specific or narrow family topic
+mixed race marriage	role-specific or narrow family topic
+multiple wives	role-specific or narrow family topic
+music and the devil	eschatology or fringe/supernatural niche
+my brothers keeper	first/second-person phrasing
+my future	first/second-person phrasing
+my image	first/second-person phrasing
+my purpose	first/second-person phrasing
+my purpose in life	first/second-person phrasing
+nagging husband	role-specific or narrow family topic
+necromancy	occult or speculative
+new job	specific person
+new parents	role-specific or narrow family topic
+newborn baby	role-specific or narrow family topic
+not having children	role-specific or narrow family topic
+not paying your bills	first/second-person phrasing
+not to break you	first/second-person phrasing
+obeying parents	role-specific or narrow family topic
+obeying your parents	first/second-person phrasing
+occult	occult or speculative
+once a man twice a child	role-specific or narrow family topic
+only god can judge me	first/second-person phrasing
+our appearance	first/second-person phrasing
+our bodies	first/second-person phrasing
+our body	first/second-person phrasing
+our children	first/second-person phrasing
+our countenance	first/second-person phrasing
+our deceased loved ones	first/second-person phrasing
+our dress	first/second-person phrasing
+our enemies	first/second-person phrasing
+our environment	first/second-person phrasing
+our feelings	first/second-person phrasing
+our first love	first/second-person phrasing
+our future	first/second-person phrasing
+our heart	first/second-person phrasing
+our minds	first/second-person phrasing
+our past	first/second-person phrasing
+our purpose	first/second-person phrasing
+our responsibilities as parents	first/second-person phrasing
+our savior	first/second-person phrasing
+our souls	first/second-person phrasing
+our speech	first/second-person phrasing
+our thoughts	first/second-person phrasing
+our tongue	first/second-person phrasing
+our weakness	first/second-person phrasing
+our words	first/second-person phrasing
+our worth to god	first/second-person phrasing
+outer appearance	low-signal or niche abstract
+parent	role-specific or narrow family topic
+parent advice	role-specific or narrow family topic
+parent child relationship	role-specific or narrow family topic
+parent responsibility	role-specific or narrow family topic
+parenting	role-specific or narrow family topic
+parents	role-specific or narrow family topic
+parents and children	role-specific or narrow family topic
+parents responsibilities	role-specific or narrow family topic
+parents responsible for children	role-specific or narrow family topic
+paying back what you owe	first/second-person phrasing
+paying money you owe	first/second-person phrasing
+paying your debts	first/second-person phrasing
+people before adam	specific person
+people hurting you	first/second-person phrasing
+people judging you	first/second-person phrasing
+people taking advantage of you	first/second-person phrasing
+people who dont like you	first/second-person phrasing
+physical appearance	low-signal or niche abstract
+piercings and tattoos	ritual or niche practice
+planting your garden	first/second-person phrasing
+pleasing your husband	first/second-person phrasing
+praying to mary	specific person
+pregnancy before marriage	role-specific or narrow family topic
+problems in marriage	role-specific or narrow family topic
+protecting children	role-specific or narrow family topic
+protecting your heart	first/second-person phrasing
+protection over satan	eschatology or fringe/supernatural niche
+psychics and witchcraft	occult or speculative
+punishing children	role-specific or narrow family topic
+punishing your children	first/second-person phrasing
+queen esther	specific person
+questioning your faith	first/second-person phrasing
+raising children	role-specific or narrow family topic
+raising your children	first/second-person phrasing
+rapture	eschatology or fringe/supernatural niche
+reading your bible	first/second-person phrasing
+reap what you sow	first/second-person phrasing
+reaping what you sow	first/second-person phrasing
+rebellious children	role-specific or narrow family topic
+releasing your burdens and guilt	first/second-person phrasing
+renewing your mind	first/second-person phrasing
+respect husband	role-specific or narrow family topic
+respect the husband	role-specific or narrow family topic
+respecting parents	role-specific or narrow family topic
+respecting your elders	first/second-person phrasing
+respecting your parents	first/second-person phrasing
+responsibility to children	role-specific or narrow family topic
+role of parents	role-specific or narrow family topic
+role of the husband	role-specific or narrow family topic
+sacrament of marriage	role-specific or narrow family topic
+satan	eschatology or fringe/supernatural niche
+satan ruling the airwaves	eschatology or fringe/supernatural niche
+saying i love you	first/second-person phrasing
+saying you are sorry	first/second-person phrasing
+second marriage	role-specific or narrow family topic
+separation in a marriage	role-specific or narrow family topic
+separation in marriage	role-specific or narrow family topic
+september 11	modern culture or event-specific
+september 11 2001	modern culture or event-specific
+showing off how smart you are	first/second-person phrasing
+showing our love for one another	first/second-person phrasing
+sick children	role-specific or narrow family topic
+signs of the end times	eschatology or fringe/supernatural niche
+simon peter	specific person
+single parenting	role-specific or narrow family topic
+single parents	role-specific or narrow family topic
+song of deborah	specific person
+song of moses	specific person
+song of solomon	specific person
+sorcery	occult or speculative
+sound doctrine	controversial or doctrinally narrow
+spanking children	role-specific or narrow family topic
+spanking your child	first/second-person phrasing
+spilling your seed	first/second-person phrasing
+spiritual life of children	role-specific or narrow family topic
+spoiling children	role-specific or narrow family topic
+stay close to your parents	first/second-person phrasing
+step parents	role-specific or narrow family topic
+stillborn babies	role-specific or narrow family topic
+strengthening our relationship with jesus	first/second-person phrasing
+submitting to your husband	first/second-person phrasing
+suing your brother	first/second-person phrasing
+taking action	low-signal or niche abstract
+taking advantage	low-signal or niche abstract
+taking care of children	role-specific or narrow family topic
+taking care of elderly parents	role-specific or narrow family topic
+taking care of our body	first/second-person phrasing
+taking care of parents	role-specific or narrow family topic
+taking care of your body	first/second-person phrasing
+taking care of your children	first/second-person phrasing
+taking care of your family	first/second-person phrasing
+taking care of your mother	first/second-person phrasing
+taking care of your neighbor	first/second-person phrasing
+taking your life	first/second-person phrasing
+taking your own life	first/second-person phrasing
+talk to me jesus	first/second-person phrasing
+tame your tongue	first/second-person phrasing
+taming your tongue	first/second-person phrasing
+tattooing your body	first/second-person phrasing
+tattoos	ritual or niche practice
+tattoos and body piercings	ritual or niche practice
+tattoos and piercings	ritual or niche practice
+tattoos body piercings	ritual or niche practice
+teaching children	role-specific or narrow family topic
+teaching his children	role-specific or narrow family topic
+thank you	first/second-person phrasing
+the afterlife	occult or speculative
+the angel of light	eschatology or fringe/supernatural niche
+the antichrist	eschatology or fringe/supernatural niche
+the appearance of evil	low-signal or niche abstract
+the book of james	specific person
+the daniel fast	specific person
+the death of a baby	role-specific or narrow family topic
+the devil	eschatology or fringe/supernatural niche
+the end times	eschatology or fringe/supernatural niche
+the great tribulation	eschatology or fringe/supernatural niche
+the jezebel spirit	specific person
+the marriage bed	role-specific or narrow family topic
+the marriage ceremony	role-specific or narrow family topic
+the meaning of marriage	role-specific or narrow family topic
+the music we listen to	first/second-person phrasing
+the occult	occult or speculative
+the plans god has for us	first/second-person phrasing
+the prophet isaiah	specific person
+the purpose for our lives	first/second-person phrasing
+the rapture	eschatology or fringe/supernatural niche
+the sanctity of marriage	role-specific or narrow family topic
+the spirit of witchcraft	occult or speculative
+the star of david	specific person
+the tribulation	eschatology or fringe/supernatural niche
+the virgin mary	specific person
+the way we dress	first/second-person phrasing
+the way you should dress	first/second-person phrasing
+those who hurt children	role-specific or narrow family topic
+transforming your heart	first/second-person phrasing
+tribulation	eschatology or fringe/supernatural niche
+trouble in marriage	role-specific or narrow family topic
+trust in marriage	role-specific or narrow family topic
+understanding your beliefs	first/second-person phrasing
+ungodly parents	role-specific or narrow family topic
+unhappiness in a marriage	role-specific or narrow family topic
+unruly children	role-specific or narrow family topic
+unsaved husbands	role-specific or narrow family topic
+us	first/second-person phrasing
+using your time wisely	first/second-person phrasing
+virgin mary	specific person
+virginity before marriage	role-specific or narrow family topic
+walking in your anointing	first/second-person phrasing
+watching us	first/second-person phrasing
+wayward children	role-specific or narrow family topic
+web 20	modern culture or event-specific
+welcome a new baby	role-specific or narrow family topic
+what a blessing it is to have a baby	question-style topic
+what does god think of divorce	question-style topic
+what goes around comes around	question-style topic
+what happens after death	question-style topic
+what happens to pastor that lies	question-style topic
+what happens when you die	question-style topic
+what is a christian	question-style topic
+what is church	question-style topic
+what is gods will for my life	question-style topic
+what is sin	question-style topic
+what jesus looked like	question-style topic
+what jesus wore	question-style topic
+what kind of friends to have	question-style topic
+what marriage is	question-style topic
+what to do when you get message	question-style topic
+what to eat	question-style topic
+what to wear	question-style topic
+what we should eat	question-style topic
+what we should not eat	question-style topic
+what we speak	question-style topic
+when a person sins against you	question-style topic
+when children are accountable	question-style topic
+when life begins	question-style topic
+when non believers accept christ	question-style topic
+when others preach	question-style topic
+when someone dies	question-style topic
+when the world will end	question-style topic
+when to speak	question-style topic
+when we die	question-style topic
+when you hurt others	question-style topic
+where two or more are gathered	question-style topic
+who am i in christ	question-style topic
+who god is	question-style topic
+who i am	question-style topic
+who we are	question-style topic
+who you should marry	question-style topic
+why go to church	question-style topic
+why god created man	question-style topic
+why me	question-style topic
+why we need god	question-style topic
+why we should marry	question-style topic
+wife submit to your husband	first/second-person phrasing
+witchcraft	occult or speculative
+wives	role-specific or narrow family topic
+wives submitting	role-specific or narrow family topic
+words of my mouth	first/second-person phrasing
+world war 3	modern culture or event-specific
+worrying about end times	eschatology or fringe/supernatural niche
+worshipping mary	specific person
+worshipping the devil	eschatology or fringe/supernatural niche
+ww3	modern culture or event-specific
+you	first/second-person phrasing
+you are a royal priesthood	first/second-person phrasing
+young adults	role-specific or narrow family topic
+young marriage	role-specific or narrow family topic
+your birthday	first/second-person phrasing
+your body	first/second-person phrasing
+your body is a temple	first/second-person phrasing
+your enemies	first/second-person phrasing
+your guardian angel	first/second-person phrasing
+your hair	first/second-person phrasing
+your health	first/second-person phrasing
+your heart	first/second-person phrasing
+your husband	first/second-person phrasing
+your job	specific person
+your life	first/second-person phrasing
+your mind	first/second-person phrasing
+your neighbor	first/second-person phrasing
+your past	first/second-person phrasing
+your soul	first/second-person phrasing
+your spouse	first/second-person phrasing
+your thoughts	first/second-person phrasing

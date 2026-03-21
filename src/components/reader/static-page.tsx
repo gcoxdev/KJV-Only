@@ -67,11 +67,21 @@ export function StaticPage({
                 <p key={`${page.id}-paragraph-${index}`}>{paragraph}</p>
               ))
             : null}
-          {page.id === "welcome-home" && onStartTour && onOpenSearch && onOpenPage ? (
+          {page.id === "welcome-home" &&
+          onStartTour &&
+          onOpenSearch &&
+          onOpenPage &&
+          renderPreview &&
+          onOpenReference &&
+          onCloseSidebar ? (
             <WelcomeHomePage
+              books={books}
               onStartTour={onStartTour}
               onOpenSearch={onOpenSearch}
               onOpenPage={onOpenPage}
+              renderPreview={renderPreview}
+              onOpenReference={onOpenReference}
+              onCloseSidebar={onCloseSidebar}
             />
           ) : null}
           {page.id === "saved" && renderPreview && onOpenReference && onCloseSidebar ? (
