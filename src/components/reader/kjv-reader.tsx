@@ -2531,7 +2531,6 @@ export function KJVReader() {
     setTabs,
     setTargetedPanelLeafId,
     showTabById,
-    findTabContainingLeafId,
     clearLeafHighlights,
     setLeafHighlights,
     setSelectedHighlightScope,
