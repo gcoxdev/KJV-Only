@@ -2,6 +2,7 @@ import type { ComponentProps } from "react";
 
 import { NotesTool } from "@/components/reader/study-tools/notes-tool";
 import { BookmarksTool } from "@/components/reader/study-tools/bookmarks-tool";
+import { TopicsPanel, type TopicsPanelProps } from "@/components/reader/study-tools/topics-tool";
 import {
   ReaderStudyToolsContent,
   type ReaderStudyToolsContentProps,
@@ -19,6 +20,7 @@ type ReaderStudySidebarProps = {
   onCollapseAll: () => void;
   canExpand: boolean;
   canCollapse: boolean;
+  topicsProps: TopicsPanelProps;
   notesProps: ComponentProps<typeof NotesTool>;
   bookmarksProps: ComponentProps<typeof BookmarksTool>;
 } & ReaderStudyToolsContentProps;
@@ -33,6 +35,7 @@ export function ReaderStudySidebar({
   onCollapseAll,
   canExpand,
   canCollapse,
+  topicsProps,
   notesProps,
   bookmarksProps,
   ...toolsProps
@@ -49,6 +52,7 @@ export function ReaderStudySidebar({
         onCollapseAll={onCollapseAll}
         canExpand={canExpand}
         canCollapse={canCollapse}
+        topicsContent={<TopicsPanel {...topicsProps} />}
         notesContent={<NotesTool {...notesProps} />}
         bookmarksContent={<BookmarksTool {...bookmarksProps} />}
         toolsContent={<ReaderStudyToolsContent {...toolsProps} />}

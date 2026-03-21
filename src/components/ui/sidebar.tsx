@@ -135,6 +135,7 @@ function SidebarProvider({
         style={
           {
             "--sidebar-width": SIDEBAR_WIDTH,
+            "--sidebar-width-mobile": SIDEBAR_WIDTH_MOBILE,
             "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
             ...style,
           } as React.CSSProperties
@@ -189,10 +190,10 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+          className="data-[side=left]:w-(--sidebar-width)! data-[side=right]:w-(--sidebar-width)! data-[side=left]:max-w-none data-[side=right]:max-w-none bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
           style={
             {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              "--sidebar-width": "var(--sidebar-width-mobile)",
             } as React.CSSProperties
           }
           side={side}
@@ -201,7 +202,9 @@ function Sidebar({
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
-          <div className="flex h-full w-full flex-col">{children}</div>
+          <div className="flex h-full w-full min-w-0 flex-col overflow-x-hidden">
+            {children}
+          </div>
         </SheetContent>
       </Sheet>
     );
@@ -336,7 +339,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-header"
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("flex min-w-0 flex-col gap-2 p-2", className)}
       {...props}
     />
   );
@@ -373,7 +376,7 @@ function SidebarContent({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="sidebar-content"
       data-sidebar="content"
       className={cn(
-        "no-scrollbar flex min-h-0 flex-1 flex-col gap-0 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+        "no-scrollbar flex min-h-0 min-w-0 flex-1 flex-col gap-0 overflow-x-hidden overflow-y-auto group-data-[collapsible=icon]:overflow-hidden",
         className,
       )}
       {...props}

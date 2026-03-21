@@ -124,6 +124,8 @@ function serializeLeaf(
     value = "notes";
   } else if (node.view === "tools") {
     value = "tools";
+  } else if (node.view === "topics") {
+    value = "topics";
   } else if (node.view === "bookmarks") {
     value = "bookmarks";
   }
@@ -157,6 +159,9 @@ function parseLeafToken(
   }
   if (normalizedToken === "tools") {
     return [{ ...createReaderLeaf(0, 0, "tools"), pageId: null }, [], isTargeted];
+  }
+  if (normalizedToken === "topics") {
+    return [{ ...createReaderLeaf(0, 0, "topics"), pageId: null }, [], isTargeted];
   }
   if (normalizedToken === "bookmarks") {
     return [{ ...createReaderLeaf(0, 0, "bookmarks"), pageId: null }, [], isTargeted];

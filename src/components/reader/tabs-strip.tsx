@@ -15,6 +15,7 @@ import {
   BlendIcon,
   BookMarkedIcon,
   BookOpenIcon,
+  BookTextIcon,
   EllipsisVerticalIcon,
   HouseIcon,
   NotebookPenIcon,
@@ -92,6 +93,9 @@ function getTabIcon(tab: ReaderTab) {
   }
   if (firstLeaf.view === "tools") {
     return ToolboxIcon;
+  }
+  if (firstLeaf.view === "topics") {
+    return BookTextIcon;
   }
   if (firstLeaf.view === "notes") {
     return NotebookPenIcon;

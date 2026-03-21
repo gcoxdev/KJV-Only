@@ -128,6 +128,7 @@ import { useStrongsSearchTool } from "@/hooks/use-strongs-search-tool";
 import { useGenealogySearchTool } from "@/hooks/use-genealogy-search-tool";
 import { useMapsSearchTool } from "@/hooks/use-maps-search-tool";
 import { useConcordanceCrossRefsTool } from "@/hooks/use-concordance-crossrefs-tool";
+import { useTopicsTool } from "@/hooks/use-topics-tool";
 import { useReaderBookmarks } from "@/hooks/use-reader-bookmarks";
 import { useReaderNotes } from "@/hooks/use-reader-notes";
 import { useLeafHistory } from "@/hooks/use-leaf-history";
@@ -408,6 +409,7 @@ export function KJVReader() {
   const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
   const [concordanceWordAccordionValue, setConcordanceWordAccordionValue] =
     useState<string[]>([]);
+  const [topicsAccordionValue, setTopicsAccordionValue] = useState<string[]>([]);
   const [webstersWordAccordionValue, setWebstersWordAccordionValue] = useState<
     string[]
   >([]);
@@ -1214,6 +1216,35 @@ export function KJVReader() {
     [concordance],
   );
   const verseSearchIndex = useMemo(() => buildVerseSearchIndex(books), [books]);
+
+  const {
+    searchTerm: topicsSearchTerm,
+    selectedLetters: topicsSelectedLetters,
+    isLoading: isTopicsLoading,
+    isSearching: isTopicsSearching,
+    error: topicsError,
+    results: topicsResults,
+    availableLetters: topicsAvailableLetters,
+    ensureTopicsLoaded,
+    applySearch: applyTopicsSearch,
+    selectLetter: selectTopicsLetter,
+  } = useTopicsTool();
+
+  const applyTopicsFilter = useCallback(
+    (rawValue?: string) => {
+      setTopicsAccordionValue([]);
+      applyTopicsSearch(rawValue);
+    },
+    [applyTopicsSearch],
+  );
+
+  const selectTopicsLetterFilter = useCallback(
+    (letter: string) => {
+      setTopicsAccordionValue([]);
+      selectTopicsLetter(letter);
+    },
+    [selectTopicsLetter],
+  );
 
   const {
     payload: websters,
@@ -3985,6 +4016,33 @@ export function KJVReader() {
     setIsGuidedTourOpen(false);
   }, []);
 
+  useEffect(() => {
+    const hasTopicsLeaf = tabs.some((tab) => {
+      const stack = [tab.root];
+      while (stack.length > 0) {
+        const node = stack.pop();
+        if (!node) {
+          continue;
+        }
+        if (node.type === "leaf") {
+          if (node.view === "topics") {
+            return true;
+          }
+          continue;
+        }
+        stack.push(node.first, node.second);
+      }
+      return false;
+    });
+
+    if (studyWorkspaceTab !== "topics" && !hasTopicsLeaf) {
+      return;
+    }
+    void ensureTopicsLoaded().catch(() => {
+      // Error state is set by ensureTopicsLoaded.
+    });
+  }, [ensureTopicsLoaded, studyWorkspaceTab, tabs]);
+
   if (!isLoaded) {
     return <ReaderStatusScreen message="Loading Bible data..." />;
   }
@@ -4214,6 +4272,23 @@ export function KJVReader() {
     },
   };
 
+  const topicsPanelProps = {
+    isLoading: isTopicsLoading,
+    isSearching: isTopicsSearching,
+    error: topicsError,
+    searchTerm: topicsSearchTerm,
+    selectedLetters: topicsSelectedLetters,
+    availableLetters: topicsAvailableLetters,
+    results: topicsResults,
+    topicAccordionValue: topicsAccordionValue,
+    onTopicAccordionValueChange: setTopicsAccordionValue,
+    onSearch: applyTopicsFilter,
+    onSelectLetter: selectTopicsLetterFilter,
+    renderPreview: referencePreviewContent,
+    onOpenReference: openConcordanceReference,
+    onCloseSidebar: closeRightSidebarForMobile,
+  };
+
   const sharedBookmarksProps = {
     books,
     bookmarks: readerBookmarks,
@@ -4376,6 +4451,7 @@ export function KJVReader() {
             canCollapse: concordanceAccordionValue.length > 0,
             ...sharedStudyToolsProps,
           }}
+          topicsPanelProps={topicsPanelProps}
           bookmarksPanelProps={sharedBookmarksProps}
           settingsPanelProps={settingsPanelProps}
           progressPanelProps={progressPanelProps}
@@ -4411,7 +4487,12 @@ export function KJVReader() {
           }
           setIsRightSidebarOpen(open);
         }}
-        style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
+        style={
+          {
+            "--sidebar-width": "24rem",
+            "--sidebar-width-mobile": "94vw",
+          } as React.CSSProperties
+        }
       >
         <SidebarOpenRequestSync
           requestKey={sidebarOpenRequestKey}
@@ -4539,6 +4620,7 @@ export function KJVReader() {
               canExpand={!allStudyAccordionsOpen}
               canCollapse={concordanceAccordionValue.length > 0}
               {...sharedStudyToolsProps}
+              topicsProps={topicsPanelProps}
               notesProps={{
                 books,
                 generalNotes,

@@ -193,4 +193,36 @@ describe("layout hash", () => {
       parsed?.tabs[0]?.root.type === "leaf" ? parsed.tabs[0].root.id : null,
     );
   });
+
+  it("serializes and parses a topics leaf", () => {
+    const tabs: ReaderTab[] = [
+      {
+        id: "tab-topics",
+        title: "Topics",
+        root: {
+          id: "leaf-topics",
+          type: "leaf",
+          view: "topics",
+          bookIndex: 0,
+          chapterIndex: 0,
+          pickerTestament: null,
+          pickerBookIndex: null,
+          pageId: null,
+        },
+      },
+    ];
+
+    const hash = serializeLayoutHash({
+      tabs,
+      activeTabId: "tab-topics",
+      tabsOrientation: "horizontal",
+    });
+
+    expect(hash).toContain("Topics:topics");
+
+    const parsed = parseLayoutHash(hash);
+    expect(parsed?.tabs[0]?.root.type === "leaf" ? parsed.tabs[0].root.view : null).toBe(
+      "topics",
+    );
+  });
 });

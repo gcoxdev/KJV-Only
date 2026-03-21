@@ -26,6 +26,7 @@ import {
   HouseIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  BookTextIcon,
   CrosshairIcon,
   EraserIcon,
   EllipsisVerticalIcon,
@@ -75,6 +76,7 @@ import { StaticPage } from "@/components/reader/static-page";
 import { SettingsPanelContent } from "@/components/reader/settings-dialog";
 import { ProgressPanelContent } from "@/components/reader/progress-dialog";
 import { StudyToolsPanel } from "@/components/reader/study-tools-panel";
+import { TopicsPanel } from "@/components/reader/study-tools/topics-tool";
 import { getStaticPage } from "@/lib/static-pages";
 import {
   DropdownMenu,
@@ -264,6 +266,7 @@ type ReaderPanelTreeProps = {
   onToggleHighlightMode: (leafId: string) => void;
   onBookmarkLeafSelection: (leafId: string) => void;
   studyToolsPanelProps: ComponentProps<typeof StudyToolsPanel>;
+  topicsPanelProps: ComponentProps<typeof TopicsPanel>;
   bookmarksPanelProps: ComponentProps<typeof BookmarksTool>;
   settingsPanelProps: ComponentProps<typeof SettingsPanelContent>;
   progressPanelProps: ComponentProps<typeof ProgressPanelContent>;
@@ -365,6 +368,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   onToggleHighlightMode,
   onBookmarkLeafSelection,
   studyToolsPanelProps,
+  topicsPanelProps,
   bookmarksPanelProps,
   settingsPanelProps,
   progressPanelProps,
@@ -687,6 +691,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
       <HouseIcon className="size-4 shrink-0 text-muted-foreground" />
     ) : leaf.view === "tools" ? (
       <ToolboxIcon className="size-4 shrink-0 text-muted-foreground" />
+    ) : leaf.view === "topics" ? (
+      <BookTextIcon className="size-4 shrink-0 text-muted-foreground" />
     ) : leaf.view === "notes" ? (
       <NotebookPenIcon className="size-4 shrink-0 text-muted-foreground" />
     ) : leaf.view === "bookmarks" ? (
@@ -766,6 +772,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   <p className="text-sm text-muted-foreground">Panel Home</p>
                 ) : leaf.view === "search" ? (
                   <p className="text-sm text-muted-foreground">Search</p>
+                ) : leaf.view === "topics" ? (
+                  <p className="text-sm text-muted-foreground">Topics</p>
                 ) : leaf.view === "notes" ? (
                   <p className="text-sm text-muted-foreground">Notes</p>
                 ) : leaf.view === "tools" ? (
@@ -780,6 +788,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
               </>
             ) : leaf.view === "search" ? (
               <p className="text-sm text-muted-foreground">Search</p>
+            ) : leaf.view === "topics" ? (
+              <p className="text-sm text-muted-foreground">Topics</p>
             ) : leaf.view === "notes" ? (
               <p className="text-sm text-muted-foreground">Notes</p>
             ) : leaf.view === "tools" ? (
@@ -1570,6 +1580,10 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
           <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
             <StudyToolsPanel {...studyToolsPanelProps} />
           </CardContent>
+        ) : leaf.view === "topics" ? (
+          <CardContent className="min-h-0 flex-1 overflow-hidden p-2">
+            <TopicsPanel {...topicsPanelProps} />
+          </CardContent>
         ) : leaf.view === "bookmarks" ? (
           <CardContent className="min-h-0 flex-1 overflow-hidden p-2">
             <BookmarksTool {...bookmarksPanelProps} />
@@ -1617,6 +1631,16 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 >
                   <ToolboxIcon />
                   Tools
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="justify-center"
+                  onClick={() => updateLeafLocation(leaf.id, { view: "topics" })}
+                >
+                  <BookTextIcon />
+                  Topics
                 </Button>
                 <Button
                   type="button"
@@ -1791,6 +1815,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   onToggleHighlightMode,
   onBookmarkLeafSelection,
   studyToolsPanelProps,
+  topicsPanelProps,
   bookmarksPanelProps,
   settingsPanelProps,
   progressPanelProps,
@@ -1882,6 +1907,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       onToggleHighlightMode={onToggleHighlightMode}
       onBookmarkLeafSelection={onBookmarkLeafSelection}
       studyToolsPanelProps={studyToolsPanelProps}
+      topicsPanelProps={topicsPanelProps}
       bookmarksPanelProps={bookmarksPanelProps}
       settingsPanelProps={settingsPanelProps}
       progressPanelProps={progressPanelProps}

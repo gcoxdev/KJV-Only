@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import {
   BookMarkedIcon,
+  BookTextIcon,
   CopyMinusIcon,
   CopyPlusIcon,
   NotebookPenIcon,
@@ -31,6 +32,7 @@ type StudyToolsSidebarProps = {
   canExpand: boolean;
   canCollapse: boolean;
   toolsContent: ReactNode;
+  topicsContent: ReactNode;
   notesContent: ReactNode;
   bookmarksContent: ReactNode;
 };
@@ -46,6 +48,7 @@ export function StudyToolsSidebar({
   canExpand,
   canCollapse,
   toolsContent,
+  topicsContent,
   notesContent,
   bookmarksContent,
 }: StudyToolsSidebarProps) {
@@ -54,7 +57,7 @@ export function StudyToolsSidebar({
   }
 
   return (
-    <Sidebar side="right" className="h-screen border-l border-sidebar-border/80 bg-sidebar/95 backdrop-blur-sm">
+    <Sidebar side="right" className="h-screen min-w-0 border-l border-sidebar-border/80 bg-sidebar/95 backdrop-blur-sm">
       <SidebarHeader className="gap-3 border-b border-sidebar-border/70 bg-sidebar/85 px-3 py-3">
         <ToggleGroup
           value={[activeTab]}
@@ -62,6 +65,7 @@ export function StudyToolsSidebar({
             const nextValue = value[0];
             if (
               nextValue === "tools" ||
+              nextValue === "topics" ||
               nextValue === "notes" ||
               nextValue === "bookmarks"
             ) {
@@ -70,32 +74,40 @@ export function StudyToolsSidebar({
           }}
           variant="outline"
           size="sm"
-          className="grid w-full grid-cols-3"
+          spacing={0}
+          className="flex w-full"
         >
           <ToggleGroupItem
             value="tools"
-            className="justify-center data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+            className="min-w-0 grow basis-auto justify-center data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
           >
             <ToolboxIcon />
             Tools
           </ToggleGroupItem>
           <ToggleGroupItem
+            value="topics"
+            className="min-w-0 grow basis-auto justify-center data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+          >
+            <BookTextIcon />
+            Topics
+          </ToggleGroupItem>
+          <ToggleGroupItem
             value="notes"
-            className="justify-center data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+            className="min-w-0 grow basis-auto justify-center data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
           >
             <NotebookPenIcon />
             Notes
           </ToggleGroupItem>
           <ToggleGroupItem
             value="bookmarks"
-            className="justify-center data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
+            className="min-w-0 grow basis-auto justify-center data-[pressed]:border-primary! data-[pressed]:bg-primary/92! data-[pressed]:text-primary-foreground! hover:data-[pressed]:bg-primary/90! hover:data-[pressed]:text-primary-foreground!"
           >
             <BookMarkedIcon />
             Bookmarks
           </ToggleGroupItem>
         </ToggleGroup>
       </SidebarHeader>
-      <SidebarContent className="px-2 pb-3">
+      <SidebarContent className="min-w-0 px-2 pb-3">
         {activeTab === "tools" ? (
           <div className="flex flex-col gap-2">
             <div className="sticky top-0 z-10 flex flex-col gap-2 bg-sidebar/95 px-1 pt-1 backdrop-blur-sm">
@@ -135,6 +147,12 @@ export function StudyToolsSidebar({
             >
               {toolsContent}
             </Accordion>
+          </div>
+        ) : activeTab === "topics" ? (
+          <div className="min-w-0 pt-1">
+            <div className="workspace-panel-elevated min-w-0 w-full rounded-2xl border p-3">
+              {topicsContent}
+            </div>
           </div>
         ) : activeTab === "notes" ? (
           <div className="pt-1">
