@@ -43,6 +43,8 @@ import {
 } from "@/components/ui/tabs";
 
 export type SettingsPanelContentProps = {
+  activeTab: "visual" | "targeting" | "other";
+  onActiveTabChange: (tab: "visual" | "targeting" | "other") => void;
   theme: "light" | "dark";
   onThemeChange: (theme: "light" | "dark") => void;
   readerColorTheme: ReaderColorTheme;
@@ -77,6 +79,8 @@ export type SettingsPanelContentProps = {
   onBookmarkOpenTargetChange: (target: BookmarkOpenTarget) => void;
   referenceLinkOpenTarget: ReferenceLinkOpenTarget;
   onReferenceLinkOpenTargetChange: (target: ReferenceLinkOpenTarget) => void;
+  showWelcomeHomeAtStartup: boolean;
+  onShowWelcomeHomeAtStartupChange: (checked: boolean) => void;
 };
 
 type SettingsDialogProps = SettingsPanelContentProps & {
@@ -85,6 +89,8 @@ type SettingsDialogProps = SettingsPanelContentProps & {
 };
 
 export function SettingsPanelContent({
+  activeTab,
+  onActiveTabChange,
   theme,
   onThemeChange,
   readerColorTheme,
@@ -119,6 +125,8 @@ export function SettingsPanelContent({
   onBookmarkOpenTargetChange,
   referenceLinkOpenTarget,
   onReferenceLinkOpenTargetChange,
+  showWelcomeHomeAtStartup,
+  onShowWelcomeHomeAtStartupChange,
 }: SettingsPanelContentProps) {
   const readerColorThemeLabels: Record<ReaderColorTheme, string> = {
     brown: "Brown",
@@ -216,10 +224,19 @@ export function SettingsPanelContent({
   ]);
 
   return (
-    <Tabs defaultValue="visual" className="flex h-full min-h-0 flex-col overflow-hidden">
-      <TabsList className="grid w-full grid-cols-2">
+    <Tabs
+      value={activeTab}
+      onValueChange={(value) => {
+        if (value === "visual" || value === "targeting" || value === "other") {
+          onActiveTabChange(value);
+        }
+      }}
+      className="flex h-full min-h-0 flex-col overflow-hidden"
+    >
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="visual">Visual</TabsTrigger>
         <TabsTrigger value="targeting">Targeting</TabsTrigger>
+        <TabsTrigger value="other">Other</TabsTrigger>
       </TabsList>
       <TabsContent
         value="visual"
@@ -569,7 +586,22 @@ export function SettingsPanelContent({
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+        </div>
+      </TabsContent>
+      <TabsContent
+        value="other"
+        className="mt-3 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-2"
+      >
+        <div className="space-y-3">
+          <div className="flex min-w-0 items-center justify-between gap-3">
+            <Label htmlFor="welcome-home-startup">Open Welcome Home Tab At Startup</Label>
+            <Switch
+              id="welcome-home-startup"
+              checked={showWelcomeHomeAtStartup}
+              onCheckedChange={onShowWelcomeHomeAtStartupChange}
+            />
+          </div>
+        </div>
       </TabsContent>
     </Tabs>
   );
