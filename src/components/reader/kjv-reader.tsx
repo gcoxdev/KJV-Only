@@ -44,13 +44,6 @@ import {
 } from "@/lib/highlight-color";
 import { chapterProgressKey, panelViewportElement } from "@/lib/reader-view";
 import {
-  createBookmarksExportPayload,
-  createNotesExportPayload,
-  downloadJsonFile,
-  parseImportedBookmarksPayloadDetailed,
-  parseImportedNotesPayloadDetailed,
-} from "@/lib/reader-transfer";
-import {
   clearSingleLeafReferenceIfMissing,
   filterRecordEntries,
   swapRecordEntries,
@@ -142,6 +135,7 @@ import { useConcordanceCrossRefsTool } from "@/hooks/use-concordance-crossrefs-t
 import { useReaderBookmarks } from "@/hooks/use-reader-bookmarks";
 import { useReaderNotes } from "@/hooks/use-reader-notes";
 import { useLeafHistory } from "@/hooks/use-leaf-history";
+import { usePanelTransfer } from "@/hooks/use-panel-transfer";
 import { usePanelTargeting } from "@/hooks/use-panel-targeting";
 import {
   usePanelRouting,
@@ -314,15 +308,6 @@ type BeforeInstallPromptEvent = Event & {
     outcome: "accepted" | "dismissed";
     platform: string;
   }>;
-};
-
-type ImportSummaryState = {
-  kind: "notes" | "bookmarks";
-  importedCount: number;
-  replacedCount: number;
-  skippedCount: number;
-  isError: boolean;
-  message: string;
 };
 
 function createWelcomeHomeTab(): ReaderTab {
@@ -984,14 +969,24 @@ export function KJVReader() {
   } = useReaderBookmarks({
     books,
   });
+  const {
+    importSummary,
+    closeImportSummary,
+    notesImportInputRef,
+    bookmarksImportInputRef,
+    exportNotes,
+    exportBookmarks,
+    handleImportNotesFile,
+    handleImportBookmarksFile,
+  } = usePanelTransfer({
+    readerNotes,
+    readerBookmarks,
+    importNotes,
+    importBookmarks,
+  });
   const [searchPageStateByLeafId, setSearchPageStateByLeafId] = useState<
     Record<string, SearchPageState>
   >({});
-  const [importSummary, setImportSummary] = useState<ImportSummaryState | null>(
-    null,
-  );
-  const notesImportInputRef = useRef<HTMLInputElement | null>(null);
-  const bookmarksImportInputRef = useRef<HTMLInputElement | null>(null);
   const activeLeafIds = useMemo(
     () => new Set(tabs.flatMap((tab) => collectLeafIds(tab.root))),
     [tabs],
@@ -4388,91 +4383,6 @@ export function KJVReader() {
     onUpdateBookmark: updateBookmark,
     onDeleteBookmark: deleteBookmark,
   };
-  const exportNotes = () => {
-    downloadJsonFile(
-      `kjv-reader-notes-${new Date().toISOString().slice(0, 10)}.json`,
-      createNotesExportPayload(readerNotes),
-    );
-  };
-
-  const exportBookmarks = () => {
-    downloadJsonFile(
-      `kjv-reader-bookmarks-${new Date().toISOString().slice(0, 10)}.json`,
-      createBookmarksExportPayload(readerBookmarks),
-    );
-  };
-
-  const handleImportNotesFile = async (file: File | null) => {
-    if (!file) {
-      return;
-    }
-    try {
-      const result = parseImportedNotesPayloadDetailed(await file.text());
-      importNotes(result.entries);
-      const existingIds = new Set(readerNotes.map((note) => note.id));
-      const replacedCount = result.entries.filter((note) =>
-        existingIds.has(note.id),
-      ).length;
-      setImportSummary({
-        kind: "notes",
-        importedCount: result.entries.length,
-        replacedCount,
-        skippedCount: result.skippedInvalidCount,
-        isError: false,
-        message:
-          result.skippedInvalidCount > 0
-            ? "Imported the valid notes and skipped invalid entries."
-            : "Imported all notes successfully.",
-      });
-    } catch (error) {
-      setImportSummary({
-        kind: "notes",
-        importedCount: 0,
-        replacedCount: 0,
-        skippedCount: 0,
-        isError: true,
-        message:
-          error instanceof Error ? error.message : "Failed to import notes.",
-      });
-    }
-  };
-
-  const handleImportBookmarksFile = async (file: File | null) => {
-    if (!file) {
-      return;
-    }
-    try {
-      const result = parseImportedBookmarksPayloadDetailed(await file.text());
-      importBookmarks(result.entries);
-      const existingIds = new Set(readerBookmarks.map((bookmark) => bookmark.id));
-      const replacedCount = result.entries.filter((bookmark) =>
-        existingIds.has(bookmark.id),
-      ).length;
-      setImportSummary({
-        kind: "bookmarks",
-        importedCount: result.entries.length,
-        replacedCount,
-        skippedCount: result.skippedInvalidCount,
-        isError: false,
-        message:
-          result.skippedInvalidCount > 0
-            ? "Imported the valid bookmarks and skipped invalid entries."
-            : "Imported all bookmarks successfully.",
-      });
-    } catch (error) {
-      setImportSummary({
-        kind: "bookmarks",
-        importedCount: 0,
-        replacedCount: 0,
-        skippedCount: 0,
-        isError: true,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to import bookmarks.",
-      });
-    }
-  };
   const settingsPanelProps = {
     theme,
     onThemeChange: setTheme,
@@ -4709,7 +4619,7 @@ export function KJVReader() {
             open={importSummary !== null}
             onOpenChange={(open) => {
               if (!open) {
-                setImportSummary(null);
+                closeImportSummary();
               }
             }}
           >
@@ -4738,9 +4648,7 @@ export function KJVReader() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogAction onClick={() => setImportSummary(null)}>
-                  OK
-                </AlertDialogAction>
+                <AlertDialogAction onClick={closeImportSummary}>OK</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
