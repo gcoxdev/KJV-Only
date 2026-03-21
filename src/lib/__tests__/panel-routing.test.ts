@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { buildTargetedReaderPanelInTabState } from "@/hooks/use-panel-routing";
+import {
+  buildTargetedReaderPanelInTabState,
+  resolveTargetedReaderPanelAction,
+} from "@/hooks/use-panel-routing";
 import { contextFromNoteLinkTarget } from "@/hooks/use-word-study-navigation";
 import type { ReaderTab } from "@/types/reader";
 import type { NoteLinkTarget } from "@/types/notes";
@@ -161,5 +164,67 @@ describe("panel routing helpers", () => {
         chapterIndex: 0,
       }),
     ).toBeNull();
+  });
+
+  it("reuses the targeted panel when it still exists", () => {
+    const tabs: ReaderTab[] = [
+      {
+        id: "tab-1",
+        title: "Genesis 1",
+        root: leaf("reader", {
+          view: "reader",
+          bookIndex: 0,
+          chapterIndex: 0,
+        }),
+      },
+    ];
+
+    expect(
+      resolveTargetedReaderPanelAction(tabs, "reader", "tab-1"),
+    ).toEqual({
+      type: "reuse",
+      tabId: "tab-1",
+      leafId: "reader",
+    });
+  });
+
+  it("creates a new targeted panel in the active tab when the target is missing", () => {
+    const tabs: ReaderTab[] = [
+      {
+        id: "tab-1",
+        title: "Genesis 1",
+        root: leaf("reader", {
+          view: "reader",
+          bookIndex: 0,
+          chapterIndex: 0,
+        }),
+      },
+    ];
+
+    expect(
+      resolveTargetedReaderPanelAction(tabs, "missing-leaf", "tab-1"),
+    ).toEqual({
+      type: "create-in-active-tab",
+    });
+  });
+
+  it("falls back to a normal new-panel path when there is no active tab to create into", () => {
+    const tabs: ReaderTab[] = [
+      {
+        id: "tab-1",
+        title: "Genesis 1",
+        root: leaf("reader", {
+          view: "reader",
+          bookIndex: 0,
+          chapterIndex: 0,
+        }),
+      },
+    ];
+
+    expect(
+      resolveTargetedReaderPanelAction(tabs, "missing-leaf", null),
+    ).toEqual({
+      type: "fallback-new-panel",
+    });
   });
 });

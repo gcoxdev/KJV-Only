@@ -4,6 +4,7 @@ import { normalizeRangePoints } from "@/lib/bookmarks";
 import {
   createId,
   createLeaf,
+  findLeafNode,
   updateLeafNode,
 } from "@/lib/reader-layout";
 import type { VerseHighlightRange } from "@/hooks/use-verse-highlights";
@@ -75,10 +76,6 @@ type UsePanelRoutingParams = {
   setTabs: Dispatch<SetStateAction<ReaderTab[]>>;
   setTargetedPanelLeafId: Dispatch<SetStateAction<string | null>>;
   showTabById: (tabId: string) => void;
-  findTabContainingLeafId: (
-    leafId: string,
-    sourceTabs?: ReaderTab[],
-  ) => ReaderTab | null;
   clearLeafHighlights: (leafId: string) => void;
   setLeafHighlights: (leafId: string, ranges: VerseHighlightRange[]) => void;
   setSelectedHighlightScope: Dispatch<SetStateAction<BookmarkScope | null>>;
@@ -138,6 +135,33 @@ export function buildTargetedReaderPanelInTabState(
   };
 }
 
+export function resolveTargetedReaderPanelAction(
+  tabs: ReaderTab[],
+  targetedPanelLeafId: string | null,
+  activeTabId: string | null,
+):
+  | { type: "reuse"; tabId: string; leafId: string }
+  | { type: "create-in-active-tab" }
+  | { type: "fallback-new-panel" } {
+  if (targetedPanelLeafId) {
+    for (const tab of tabs) {
+      if (findLeafNode(tab.root, targetedPanelLeafId)) {
+        return {
+          type: "reuse",
+          tabId: tab.id,
+          leafId: targetedPanelLeafId,
+        };
+      }
+    }
+  }
+
+  if (activeTabId && tabs.some((tab) => tab.id === activeTabId)) {
+    return { type: "create-in-active-tab" };
+  }
+
+  return { type: "fallback-new-panel" };
+}
+
 export function usePanelRouting({
   activeTabId,
   books,
@@ -146,7 +170,6 @@ export function usePanelRouting({
   setTabs,
   setTargetedPanelLeafId,
   showTabById,
-  findTabContainingLeafId,
   clearLeafHighlights,
   setLeafHighlights,
   setSelectedHighlightScope,
@@ -379,8 +402,13 @@ export function usePanelRouting({
       };
 
       const openInTargetedPanel = () => {
-        const currentTargetedPanelLeafId = targetedPanelLeafIdRef.current;
-        if (!currentTargetedPanelLeafId) {
+        const action = resolveTargetedReaderPanelAction(
+          tabsRef.current,
+          targetedPanelLeafIdRef.current,
+          activeTabId,
+        );
+
+        if (action.type === "create-in-active-tab") {
           const nextLeafId = createTargetedReaderPanelInActiveTab(target);
           if (nextLeafId) {
             applyReaderTargetEffects(nextLeafId);
@@ -389,19 +417,18 @@ export function usePanelRouting({
           return openInNewPanel();
         }
 
-        const targetTab = findTabContainingLeafId(currentTargetedPanelLeafId);
-        if (!targetTab) {
-          return null;
+        if (action.type === "fallback-new-panel") {
+          return openInNewPanel();
         }
 
         navigateReaderLeafToTarget(
-          targetTab.id,
-          currentTargetedPanelLeafId,
+          action.tabId,
+          action.leafId,
           target,
         );
-        showTabById(targetTab.id);
-        applyReaderTargetEffects(currentTargetedPanelLeafId);
-        return currentTargetedPanelLeafId;
+        showTabById(action.tabId);
+        applyReaderTargetEffects(action.leafId);
+        return action.leafId;
       };
 
       if (destination === "targeted-panel") {
@@ -417,7 +444,6 @@ export function usePanelRouting({
       books,
       clearLeafHighlights,
       createTargetedReaderPanelInActiveTab,
-      findTabContainingLeafId,
       navigateReaderLeafToTarget,
       setActiveReaderWordHighlight,
       setLeafHighlights,
@@ -425,6 +451,7 @@ export function usePanelRouting({
       setSelectedHighlightScope,
       setTabs,
       showTabById,
+      tabsRef,
       targetedPanelLeafIdRef,
     ],
   );
