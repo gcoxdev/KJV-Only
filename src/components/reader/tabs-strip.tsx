@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState, type DragEvent, type PointerEvent, type RefObject } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type DragEvent,
+  type PointerEvent,
+  type RefObject,
+  type WheelEvent,
+} from "react";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
@@ -353,11 +361,48 @@ export function TabsStrip({
     onActivateTab(tabId);
   };
 
+  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
+    if (tabsOrientation !== "horizontal") {
+      return;
+    }
+
+    const viewport = scrollAreaRef.current?.querySelector<HTMLElement>(
+      "[data-slot='scroll-area-viewport']",
+    );
+    if (!viewport) {
+      return;
+    }
+
+    const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY)
+      ? event.deltaX
+      : event.deltaY;
+    if (delta === 0) {
+      return;
+    }
+
+    const maxScrollLeft = viewport.scrollWidth - viewport.clientWidth;
+    if (maxScrollLeft <= 0) {
+      return;
+    }
+
+    const clampedDelta = Math.max(
+      -viewport.scrollLeft,
+      Math.min(delta, maxScrollLeft - viewport.scrollLeft),
+    );
+    if (clampedDelta === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    viewport.scrollBy({ left: clampedDelta, behavior: "smooth" });
+  };
+
   return (
     <ScrollArea
       ref={scrollAreaRef}
       className="h-full w-full"
       data-tour="tabs-strip"
+      onWheel={handleWheel}
     >
       <div
         className={cn(
