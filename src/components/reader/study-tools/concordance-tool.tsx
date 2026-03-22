@@ -88,10 +88,14 @@ export function ConcordanceTool({
                 >
                   {results.map((entry) => (
                     <AccordionItem key={entry.key} value={entry.key}>
-                      <AccordionTrigger>
-                        <span className="flex items-center gap-2">
-                          <span>{entry.key}</span>
-                          <Badge variant="outline">{entry.references.length}</Badge>
+                      <AccordionTrigger className="min-w-0">
+                        <span className="flex min-w-0 flex-1 items-start gap-2">
+                          <span className="min-w-0 flex-1 break-words text-left">
+                            {entry.key}
+                          </span>
+                          <Badge variant="outline" className="shrink-0">
+                            {entry.references.length}
+                          </Badge>
                         </span>
                       </AccordionTrigger>
                     <AccordionContent>

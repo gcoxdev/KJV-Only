@@ -82,10 +82,12 @@ export function GenealogyPersonDetails({
                 key={`${person.id}-${entry.name}`}
                 value={`${person.id}-${entry.name}`}
               >
-                <AccordionTrigger>
-                  <span className="flex items-center gap-2">
-                    <span>{entry.name}</span>
-                    <Badge variant="outline">
+                <AccordionTrigger className="min-w-0">
+                  <span className="flex min-w-0 flex-1 items-start gap-2">
+                    <span className="min-w-0 flex-1 break-words text-left">
+                      {entry.name}
+                    </span>
+                    <Badge variant="outline" className="shrink-0">
                       {entry.numVerses ?? entry.verses.length}
                     </Badge>
                   </span>
