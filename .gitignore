@@ -24,3 +24,6 @@ pnpm-debug.log*
 # cache/temp
 .tmp/
 .cache/
+
+# quarantine for public assets under review
+public/delete/
