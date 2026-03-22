@@ -31,6 +31,8 @@ export function GenealogyPersonDetails({
   onOpenReference,
   onCloseSidebar,
 }: GenealogyPersonDetailsProps) {
+  const labelWithCount = (label: string, count: number) =>
+    count > 1 ? `${label} (${count})` : label;
   const primaryName = person.names[0] ?? person.id;
   const byName = person.verses?.byName ?? [];
   const spouses = Array.isArray(person.spouses) ? person.spouses : [];
@@ -144,7 +146,9 @@ export function GenealogyPersonDetails({
         ) : null}
         {spouses.length > 0 ? (
           <p>
-            <span className="font-semibold">Spouses:</span>{" "}
+            <span className="font-semibold">
+              {labelWithCount("Spouses", spouses.length)}:
+            </span>{" "}
             {spouses.map((relation, index) => (
               <Fragment key={`${person.id}-spouse-${relation.id}-${index}`}>
                 <Button
@@ -162,7 +166,9 @@ export function GenealogyPersonDetails({
         ) : null}
         {siblings.length > 0 ? (
           <p>
-            <span className="font-semibold">Siblings:</span>{" "}
+            <span className="font-semibold">
+              {labelWithCount("Siblings", siblings.length)}:
+            </span>{" "}
             {siblings.map((relation, index) => (
               <Fragment key={`${person.id}-sibling-${relation.id}-${index}`}>
                 <Button
@@ -180,7 +186,9 @@ export function GenealogyPersonDetails({
         ) : null}
         {children.length > 0 ? (
           <p>
-            <span className="font-semibold">Children:</span>{" "}
+            <span className="font-semibold">
+              {labelWithCount("Children", children.length)}:
+            </span>{" "}
             {children.map((relation, index) => (
               <Fragment key={`${person.id}-child-${relation.id}-${index}`}>
                 <Button
