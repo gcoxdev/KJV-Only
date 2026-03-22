@@ -199,10 +199,10 @@ export function DonatePage({
                 href="https://www.paypal.com/donate/?business=3HTE99BG8ESZJ&no_recurring=0&currency_code=USD"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-md border border-border/70 bg-card px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-background"
+                className="inline-flex items-center gap-2 rounded-md border border-amber-600/70 bg-amber-500 px-3 py-2 text-sm font-medium text-amber-950 shadow-sm transition-colors hover:border-amber-500 hover:bg-amber-400"
               >
                 Open PayPal Donate
-                <ExternalLinkIcon className="size-4 text-muted-foreground" />
+                <ExternalLinkIcon className="size-4 text-amber-900/80" />
               </a>
               <p className="text-xs leading-5 text-muted-foreground">
                 PayPal donation link:
