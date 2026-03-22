@@ -225,6 +225,43 @@ export type ReferenceLinkOpenTarget =
   | "new-panel"
   | "targeted-panel";
 
+export type ReaderNavigationTarget =
+  | { type: "chapter"; bookIndex: number; chapterIndex: number }
+  | {
+      type: "verse";
+      bookIndex: number;
+      chapterIndex: number;
+      verseNumber: number;
+    }
+  | {
+      type: "selection";
+      bookIndex: number;
+      chapterIndex: number;
+      ranges: Array<{ start: number; end: number }>;
+    }
+  | {
+      type: "range";
+      start: {
+        bookIndex: number;
+        chapterIndex: number;
+        verseNumber: number;
+      };
+      end: {
+        bookIndex: number;
+        chapterIndex: number;
+        verseNumber: number;
+      };
+    };
+
+export type PendingReaderScrollTarget = {
+  leafId: string;
+  bookIndex: number;
+  chapterIndex: number;
+  mode: "chapter-top" | "verse-range";
+  verseStart: number;
+  verseEnd: number;
+};
+
 export type PanelDirection = "left" | "right" | "up" | "down";
 export type SplitOrientation = "horizontal" | "vertical";
 export type TabsOrientation = "horizontal" | "vertical";

@@ -197,7 +197,6 @@ export const ChapterTextContent = memo(
               <article
                 key={`${bookName}-${chapterNumber}-paragraph-${groupIndex}`}
                 data-verse-number={group[0]?.verse ?? 1}
-                className="[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]"
                 onClick={(event) => {
                   if (!enableVerseSelection) {
                     return;
@@ -316,7 +315,6 @@ export const ChapterTextContent = memo(
                     key={`${bookName}-${chapterNumber}-${verse.verse}`}
                     data-verse-number={verse.verse}
                     className={cn(
-                      "[content-visibility:auto] [contain-intrinsic-size:0_2.5rem]",
                       hasAnyHighlightedVerse && !highlightModeEnabled && "pl-1",
                       highlighted && "verse-reference-highlight",
                     )}
