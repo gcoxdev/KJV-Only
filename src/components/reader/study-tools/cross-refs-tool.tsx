@@ -80,10 +80,14 @@ export function CrossRefsTool({
                   multiple
                 >
                   <AccordionItem value="cross-refs-references">
-                    <AccordionTrigger>
-                      <span className="flex items-center gap-2">
-                        <span>References</span>
-                        <Badge variant="outline">{selected.references.length}</Badge>
+                    <AccordionTrigger className="min-w-0">
+                      <span className="flex min-w-0 flex-1 items-start gap-2">
+                        <span className="min-w-0 flex-1 break-words text-left">
+                          References
+                        </span>
+                        <Badge variant="outline" className="shrink-0">
+                          {selected.references.length}
+                        </Badge>
                       </span>
                     </AccordionTrigger>
                     <AccordionContent>

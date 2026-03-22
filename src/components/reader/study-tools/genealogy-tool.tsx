@@ -83,10 +83,12 @@ export function GenealogyTool({
                     key={`${person.id}-${person.names[0] ?? "person"}`}
                     value={`genealogy-${person.id}`}
                   >
-                    <AccordionTrigger>
-                      <span className="flex items-center gap-2">
-                        <span>{person.names[0] ?? person.id}</span>
-                        <Badge variant="outline">
+                    <AccordionTrigger className="min-w-0">
+                      <span className="flex min-w-0 flex-1 items-start gap-2">
+                        <span className="min-w-0 flex-1 break-words text-left">
+                          {person.names[0] ?? person.id}
+                        </span>
+                        <Badge variant="outline" className="shrink-0">
                           {referenceCountForPerson(person)}
                         </Badge>
                       </span>

@@ -116,10 +116,14 @@ export function StrongsTool({
                           >
                             {Object.entries(entry.kjv_refs).map(([word, references]) => (
                               <AccordionItem key={`${code}-${word}`} value={`${code}-${word}`}>
-                                <AccordionTrigger>
-                                  <span className="flex items-center gap-2">
-                                    <span>{word}</span>
-                                    <Badge variant="outline">{references.length}</Badge>
+                                <AccordionTrigger className="min-w-0">
+                                  <span className="flex min-w-0 flex-1 items-start gap-2">
+                                    <span className="min-w-0 flex-1 break-words text-left">
+                                      {word}
+                                    </span>
+                                    <Badge variant="outline" className="shrink-0">
+                                      {references.length}
+                                    </Badge>
                                   </span>
                                 </AccordionTrigger>
                                 <AccordionContent>
