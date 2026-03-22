@@ -9,6 +9,25 @@ export type StrongsSearchResult = {
   entry: StrongsEntry;
 };
 
+export function deriveStrongsSearchResults(
+  indexedStrongsEntries: Array<{
+    code: string;
+    testament: "greek" | "hebrew";
+    entry: StrongsEntry;
+    haystackLower: string;
+  }>,
+  selectedStrongsEntry: StrongsSearchResult | null,
+  strongsSearchTerm: string,
+) {
+  const term = strongsSearchTerm.trim().toLowerCase();
+  if (!term) {
+    return selectedStrongsEntry ? [selectedStrongsEntry] : [];
+  }
+  return indexedStrongsEntries
+    .filter((item) => item.haystackLower.includes(term))
+    .map(({ code, testament, entry }) => ({ code, testament, entry }));
+}
+
 export function useStrongsSearchTool() {
   const [strongsGreek, setStrongsGreek] = useState<StrongsPayload | null>(null);
   const [strongsHebrew, setStrongsHebrew] = useState<StrongsPayload | null>(null);
@@ -78,13 +97,11 @@ export function useStrongsSearchTool() {
   }, [strongsGreek, strongsHebrew]);
 
   const strongsSearchResults = useMemo(() => {
-    const term = strongsSearchTerm.trim().toLowerCase();
-    if (!term) {
-      return selectedStrongsEntry ? [selectedStrongsEntry] : [];
-    }
-    return indexedStrongsEntries
-      .filter((item) => item.haystackLower.includes(term))
-      .map(({ code, testament, entry }) => ({ code, testament, entry }));
+    return deriveStrongsSearchResults(
+      indexedStrongsEntries,
+      selectedStrongsEntry,
+      strongsSearchTerm,
+    );
   }, [indexedStrongsEntries, selectedStrongsEntry, strongsSearchTerm]);
 
   const applyStrongsSearch = useCallback(

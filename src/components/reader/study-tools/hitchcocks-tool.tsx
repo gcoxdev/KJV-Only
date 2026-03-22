@@ -48,6 +48,7 @@ export function HitchcocksTool({
               ariaLabel="Search Hitchcock's Bible Names"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

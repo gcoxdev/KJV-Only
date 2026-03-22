@@ -1,4 +1,4 @@
-import { LoaderCircleIcon, SearchIcon } from "lucide-react";
+import { LoaderCircleIcon, SearchIcon, XIcon } from "lucide-react";
 import { type Ref, useEffect, useState } from "react";
 
 import {
@@ -16,8 +16,24 @@ type StudySearchFormProps = {
   value: string;
   inputRef?: Ref<HTMLInputElement>;
   liveSearch?: boolean;
+  allowReset?: boolean;
   onSearch: (value: string) => void;
 };
+
+export function shouldShowStudySearchResetButton(
+  allowReset: boolean,
+  draftValue: string,
+) {
+  return allowReset && draftValue.trim().length > 0;
+}
+
+export function resetStudySearchDraft(
+  setDraftValue: (value: string) => void,
+  onSearch: (value: string) => void,
+) {
+  setDraftValue("");
+  onSearch("");
+}
 
 export function StudySearchForm({
   name,
@@ -27,6 +43,7 @@ export function StudySearchForm({
   value,
   inputRef,
   liveSearch = false,
+  allowReset = false,
   onSearch,
 }: StudySearchFormProps) {
   const [draftValue, setDraftValue] = useState(value);
@@ -34,6 +51,11 @@ export function StudySearchForm({
   useEffect(() => {
     setDraftValue(value);
   }, [value]);
+
+  const showResetButton = shouldShowStudySearchResetButton(
+    allowReset,
+    draftValue,
+  );
 
   return (
     <form
@@ -58,7 +80,24 @@ export function StudySearchForm({
             }
           }}
         />
-        <InputGroupAddon align="inline-end">
+        <InputGroupAddon align="inline-end" className="gap-0.5">
+          {allowReset ? (
+            <InputGroupButton
+              type="button"
+              size="icon-sm"
+              variant="ghost"
+              className={
+                showResetButton
+                  ? "justify-center"
+                  : "pointer-events-none invisible justify-center"
+              }
+              aria-label="Reset search"
+              disabled={!showResetButton}
+              onClick={() => resetStudySearchDraft(setDraftValue, onSearch)}
+            >
+              <XIcon />
+            </InputGroupButton>
+          ) : null}
           <InputGroupButton
             type="submit"
             size="icon-sm"

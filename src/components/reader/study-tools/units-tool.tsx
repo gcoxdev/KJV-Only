@@ -66,6 +66,7 @@ export function UnitsTool({
               ariaLabel="Search biblical units"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (
