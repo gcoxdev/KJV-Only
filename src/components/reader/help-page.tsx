@@ -530,7 +530,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What the guided tour covers",
         body:
-          "The guided tour introduces the main menu, search, sharing, mode toggle, tabs, sidebar, reader panel, panel options, and panel bottom bar.",
+          "The guided tour introduces the main menu, search, mode toggle, tabs, sidebar, reader panel, panel options, and panel bottom bar.",
         keywords: ["tour", "guided tour"],
       },
       {

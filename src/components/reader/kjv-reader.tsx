@@ -399,7 +399,6 @@ export function KJVReader() {
   } = useReaderShellState();
   const [tabs, setTabs] = useState<ReaderTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
-  const [isShareCopied, setIsShareCopied] = useState(false);
   const [activeSettingsTab, setActiveSettingsTab] = useState<
     "visual" | "targeting" | "other"
   >("visual");
@@ -2204,13 +2203,8 @@ export function KJVReader() {
     const href = window.location.href;
     try {
       await navigator.clipboard.writeText(href);
-      setIsShareCopied(true);
       toast.success("Layout copied to clipboard.");
-      window.setTimeout(() => {
-        setIsShareCopied(false);
-      }, 1500);
     } catch {
-      setIsShareCopied(false);
       toast.error("Unable to copy layout to clipboard.");
     }
   }, []);
@@ -3927,13 +3921,6 @@ export function KJVReader() {
         selector: "[data-tour='search-button']",
       },
       {
-        id: "share-button",
-        title: "Share Layout",
-        description:
-          "Use this button to copy a link to the current layout so it can be shared with others and reopened with the same tabs, panels, and positions.",
-        selector: "[data-tour='share-button']",
-      },
-      {
         id: "mode-toggle",
         title: "Read and Study Modes",
         description:
@@ -4509,7 +4496,6 @@ export function KJVReader() {
         <SidebarInset className="flex h-screen min-h-0 flex-col overflow-hidden">
           <ReaderTopBar
             isStudyMode={isStudyMode}
-            isShareCopied={isShareCopied}
             showSidebarToggle={sidebarAvailable}
             onStudyModeChange={setIsStudyMode}
             onOpenSearch={openSearchTab}
