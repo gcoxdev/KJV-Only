@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useState } from "react";
+import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -261,16 +261,18 @@ function GenealogyRelationGrid({
     return null;
   }
 
+  const displayTitle = relations.length > 1 ? `${title} (${relations.length})` : title;
+
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      {icon}
-        <span>{title}</span>
+        {icon}
+        <span>{displayTitle}</span>
       </div>
       <div className={cn("grid gap-3", gridClassName)}>
         {relations.map((relation) => (
           <GenealogyNode
-            key={`${title}-${relation.id}`}
+            key={`${displayTitle}-${relation.id}`}
             title={relation.name}
             person={relation.person}
             onSelectPerson={onSelectPerson}
@@ -294,6 +296,7 @@ export function GenealogyTreeDialog({
   onOpenReference,
   onCloseSidebar,
 }: GenealogyTreeDialogProps) {
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const primaryName = person?.names[0] ?? "";
   const aliases = person?.names.slice(1) ?? [];
   const father = resolveParent(person?.father, genealogyById);
@@ -307,6 +310,13 @@ export function GenealogyTreeDialog({
   const children = (Array.isArray(person?.children) ? person.children : []).map((relation) =>
     resolveRelation(relation, genealogyById),
   );
+
+  useEffect(() => {
+    const viewport = scrollAreaRef.current?.querySelector<HTMLElement>(
+      "[data-slot='scroll-area-viewport']",
+    );
+    viewport?.scrollTo({ top: 0 });
+  }, [person?.id]);
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -323,7 +333,7 @@ export function GenealogyTreeDialog({
         </AlertDialogHeader>
         <Separator />
         <div className="min-h-0 flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
+          <ScrollArea ref={scrollAreaRef} className="h-full">
             <div className="flex flex-col gap-5 px-3 py-3 sm:px-4 sm:py-4">
               {person ? (
                 <>
