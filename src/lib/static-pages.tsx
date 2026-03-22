@@ -122,8 +122,34 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
       eyebrow: "Fellowship",
       heading: "Local Churches",
       paragraphs: [
-        "This page is reserved for helping users find local churches, likely with filtering by location, doctrine, and contact information.",
-        "It should eventually support directory browsing and submission or verification workflows.",
+        "These external church directories can help you begin looking for KJV-only, Bible-believing, or independent Baptist churches.",
+        "Always verify doctrine, gospel clarity, and local reputation for yourself before attending or recommending a church.",
+      ],
+      links: [
+        {
+          label: "Fundamental.org KJV Church Directory",
+          href: "https://fundamental.org/kjv-church-directory/",
+          description:
+            "A directory of KJV churches from a long-running fundamental Baptist resource site.",
+        },
+        {
+          label: "KJVChurches.com",
+          href: "https://www.kjvchurches.com/churches/tags/kjv-only/",
+          description:
+            "A directory focused on KJV-only church listings and tag-based browsing.",
+        },
+        {
+          label: "Real Bible Believers Church Finder",
+          href: "https://realbiblebelievers.com/bible-believing-church",
+          description:
+            "A church-finder page connected to the Real Bible Believers ministry.",
+        },
+        {
+          label: "IndependentBaptist.Church",
+          href: "https://independentbaptist.church/",
+          description:
+            "An independent Baptist church directory for location-based browsing.",
+        },
       ],
     },
   },
