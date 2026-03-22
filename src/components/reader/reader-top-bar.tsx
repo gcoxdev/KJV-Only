@@ -126,7 +126,7 @@ export function ReaderTopBar({
             height={24}
             className="size-6"
           />
-          <p className="workspace-heading truncate text-lg font-semibold leading-none">
+          <p className="workspace-heading truncate pb-px pr-px text-lg font-semibold leading-tight">
             KJV Only
           </p>
         </div>
