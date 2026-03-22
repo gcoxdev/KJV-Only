@@ -62,6 +62,7 @@ export function ConcordanceTool({
               ariaLabel="Search concordance"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

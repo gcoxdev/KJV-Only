@@ -100,6 +100,7 @@ export function KJVWordsPhrasesTool({
               ariaLabel="Search KJV words and phrases"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

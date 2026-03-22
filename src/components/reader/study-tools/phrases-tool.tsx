@@ -58,6 +58,7 @@ export function PhrasesTool({
               ariaLabel="Search KJV phrases"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

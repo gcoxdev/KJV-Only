@@ -123,6 +123,7 @@ export function MapsTool({
               ariaLabel="Search maps"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

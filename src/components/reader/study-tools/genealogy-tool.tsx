@@ -58,6 +58,7 @@ export function GenealogyTool({
               ariaLabel="Search genealogy"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (
