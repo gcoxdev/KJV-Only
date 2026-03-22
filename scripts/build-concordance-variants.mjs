@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 
 const DEFAULT_INPUT = "public/references/concordance.json";
@@ -11,6 +12,7 @@ const DEFAULT_NESTED_MIN = "public/references/concordance.nested.min.json";
 const DEFAULT_COMPACT_DELTA_MIN =
   "public/references/concordance.compact.delta.min.json";
 const DEFAULT_REPORT = "public/references/concordance.build-report.json";
+const FALLBACK_INPUT = "public/delete/public/references/concordance.json";
 
 function parseArgs(argv) {
   const options = {
@@ -185,6 +187,9 @@ function computeNestedStats(nestedPayload) {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
+  if (options.input === DEFAULT_INPUT && !existsSync(options.input) && existsSync(FALLBACK_INPUT)) {
+    options.input = FALLBACK_INPUT;
+  }
   const rawText = await fs.readFile(options.input, "utf8");
   const concordance = JSON.parse(rawText);
 

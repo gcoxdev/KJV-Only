@@ -1,15 +1,30 @@
 import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 
 const repoRoot = process.cwd();
 
+function resolveInputPath(...candidates) {
+  const existing = candidates.find((candidate) => existsSync(candidate));
+  if (!existing) {
+    throw new Error(`Missing input file. Checked: ${candidates.join(", ")}`);
+  }
+  return existing;
+}
+
 const files = [
   {
-    input: path.join(repoRoot, "public/references/strongs-greek.json"),
+    input: resolveInputPath(
+      path.join(repoRoot, "public/references/strongs-greek.json"),
+      path.join(repoRoot, "public/delete/public/references/strongs-greek.json"),
+    ),
     label: "greek",
   },
   {
-    input: path.join(repoRoot, "public/references/strongs-hebrew.json"),
+    input: resolveInputPath(
+      path.join(repoRoot, "public/references/strongs-hebrew.json"),
+      path.join(repoRoot, "public/delete/public/references/strongs-hebrew.json"),
+    ),
     label: "hebrew",
   },
 ];
