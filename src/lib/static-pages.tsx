@@ -3,9 +3,9 @@ import {
   ChartBarIcon,
   BadgeHelpIcon,
   ChurchIcon,
-  CoinsIcon,
   ContactRoundIcon,
   DownloadIcon,
+  GiftIcon,
   HeartHandshakeIcon,
   HouseIcon,
   LibraryBigIcon,
@@ -171,7 +171,7 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
     id: "donate",
     title: "Donate",
     menuLabel: "Donate",
-    icon: CoinsIcon,
+    icon: GiftIcon,
     content: {
       eyebrow: "Support",
       heading: "Donate",
@@ -241,6 +241,12 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
           href: "https://github.com/CrossCrusaders/Websters1828API",
           description:
             "Source used for the Webster's 1828 dictionary data in this app.",
+        },
+        {
+          label: "OverviewBible Free Bible Icons",
+          href: "https://overviewbible.com/free-bible-icons/",
+          description:
+            "Source used for the Bible book icons in the app.",
         },
         {
           label: "Biblical Units",
