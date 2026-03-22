@@ -132,6 +132,19 @@ function compareTopic(left, right) {
   return left.localeCompare(right);
 }
 
+function toTitleCase(topic) {
+  return topic
+    .split(/(\s+|-)/)
+    .map((part) => {
+      if (!part || /^\s+$/.test(part) || part === "-") {
+        return part;
+      }
+
+      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+    })
+    .join("");
+}
+
 async function main() {
   const input = await readFile(INPUT_PATH, "utf8");
 
@@ -162,7 +175,7 @@ async function main() {
     topics: Array.from(grouped.entries())
       .sort(([left], [right]) => compareTopic(left, right))
       .map(([topic, references]) => ({
-        topic,
+        topic: toTitleCase(topic),
         references,
       })),
   };

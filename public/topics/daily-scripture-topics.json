@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-03-21T20:47:48.106Z",
+  "generatedAt": "2026-03-22T23:16:41.236Z",
   "source": "OpenBible topic-scores.txt (curated positive-living topics)",
   "keepFraction": 0.25,
   "topics": [
     {
-      "topic": "adversity",
+      "topic": "Adversity",
       "references": [
         "JAS.1.2-4",
         "PRO.24.10",
@@ -14,7 +14,7 @@
       ]
     },
     {
-      "topic": "be strong",
+      "topic": "Be Strong",
       "references": [
         "DEU.31.6",
         "EPH.6.10-18",
@@ -22,13 +22,13 @@
       ]
     },
     {
-      "topic": "being a christian",
+      "topic": "Being A Christian",
       "references": [
         "EPH.4.29-32"
       ]
     },
     {
-      "topic": "being a good christian",
+      "topic": "Being A Good Christian",
       "references": [
         "EPH.2.8",
         "HEB.10.25",
@@ -36,7 +36,7 @@
       ]
     },
     {
-      "topic": "being a good leader",
+      "topic": "Being A Good Leader",
       "references": [
         "TIT.1.7-14",
         "PRO.16.9",
@@ -45,7 +45,7 @@
       ]
     },
     {
-      "topic": "being a good wife",
+      "topic": "Being A Good Wife",
       "references": [
         "1PE.3.1-6",
         "EPH.5.33",
@@ -54,13 +54,13 @@
       ]
     },
     {
-      "topic": "being a wife",
+      "topic": "Being A Wife",
       "references": [
         "EPH.5.22"
       ]
     },
     {
-      "topic": "being humble",
+      "topic": "Being Humble",
       "references": [
         "1PE.5.6",
         "2CH.7.14",
@@ -68,7 +68,7 @@
       ]
     },
     {
-      "topic": "being strong",
+      "topic": "Being Strong",
       "references": [
         "JOS.1.9",
         "PHP.4.13",
@@ -77,7 +77,7 @@
       ]
     },
     {
-      "topic": "believe",
+      "topic": "Believe",
       "references": [
         "HEB.11.6",
         "JHN.3.16",
@@ -86,7 +86,7 @@
       ]
     },
     {
-      "topic": "believers",
+      "topic": "Believers",
       "references": [
         "2CO.5.17",
         "JHN.3.16",
@@ -96,7 +96,7 @@
       ]
     },
     {
-      "topic": "believing",
+      "topic": "Believing",
       "references": [
         "MRK.11.24",
         "MRK.11.22",
@@ -104,7 +104,7 @@
       ]
     },
     {
-      "topic": "building",
+      "topic": "Building",
       "references": [
         "1CO.3.9-15",
         "1TH.5.11",
@@ -112,7 +112,7 @@
       ]
     },
     {
-      "topic": "building each other up",
+      "topic": "Building Each Other Up",
       "references": [
         "1TH.5.11",
         "EPH.4.29",
@@ -120,7 +120,7 @@
       ]
     },
     {
-      "topic": "building relationships",
+      "topic": "Building Relationships",
       "references": [
         "EPH.4.29",
         "PHP.2.3",
@@ -129,13 +129,13 @@
       ]
     },
     {
-      "topic": "building up of others",
+      "topic": "Building Up Of Others",
       "references": [
         "1TH.5.11"
       ]
     },
     {
-      "topic": "care",
+      "topic": "Care",
       "references": [
         "1PE.5.7",
         "EPH.4.32",
@@ -143,7 +143,7 @@
       ]
     },
     {
-      "topic": "christian attributes",
+      "topic": "Christian Attributes",
       "references": [
         "GAL.5.22",
         "1PE.3.2",
@@ -152,20 +152,20 @@
       ]
     },
     {
-      "topic": "christian character",
+      "topic": "Christian Character",
       "references": [
         "GAL.5.22-23",
         "1JN.4.8"
       ]
     },
     {
-      "topic": "christian families",
+      "topic": "Christian Families",
       "references": [
         "EPH.6.4"
       ]
     },
     {
-      "topic": "christian maturity",
+      "topic": "Christian Maturity",
       "references": [
         "1CO.13.11",
         "HEB.5.12-14",
@@ -175,7 +175,7 @@
       ]
     },
     {
-      "topic": "christian service",
+      "topic": "Christian Service",
       "references": [
         "ACT.20.35",
         "ROM.15.1-2",
@@ -183,7 +183,7 @@
       ]
     },
     {
-      "topic": "daily christian living",
+      "topic": "Daily Christian Living",
       "references": [
         "ROM.12.1-2",
         "1TH.5.16-18",
@@ -193,7 +193,7 @@
       ]
     },
     {
-      "topic": "family",
+      "topic": "Family",
       "references": [
         "EXO.20.12",
         "PRO.22.6",
@@ -201,7 +201,7 @@
       ]
     },
     {
-      "topic": "family love",
+      "topic": "Family Love",
       "references": [
         "1CO.13.4-7",
         "1TI.5.8",
@@ -210,7 +210,7 @@
       ]
     },
     {
-      "topic": "family relationships",
+      "topic": "Family Relationships",
       "references": [
         "1TI.5.8",
         "EPH.6.1-4",
@@ -220,7 +220,7 @@
       ]
     },
     {
-      "topic": "family unity",
+      "topic": "Family Unity",
       "references": [
         "1TI.5.8",
         "EPH.6.1-4",
@@ -229,7 +229,7 @@
       ]
     },
     {
-      "topic": "forgive",
+      "topic": "Forgive",
       "references": [
         "MAT.6.14-15",
         "EPH.4.31-32",
@@ -238,7 +238,7 @@
       ]
     },
     {
-      "topic": "forgiveness",
+      "topic": "Forgiveness",
       "references": [
         "EPH.4.32",
         "1JN.1.9",
@@ -247,7 +247,7 @@
       ]
     },
     {
-      "topic": "forgiving",
+      "topic": "Forgiving",
       "references": [
         "EPH.4.32",
         "LUK.17.3-4",
@@ -256,7 +256,7 @@
       ]
     },
     {
-      "topic": "forgiving each other",
+      "topic": "Forgiving Each Other",
       "references": [
         "EPH.4.32",
         "MAT.6.14-15",
@@ -265,7 +265,7 @@
       ]
     },
     {
-      "topic": "forgiving one another",
+      "topic": "Forgiving One Another",
       "references": [
         "EPH.4.32",
         "LUK.17.3-4",
@@ -275,7 +275,7 @@
       ]
     },
     {
-      "topic": "forgiving others",
+      "topic": "Forgiving Others",
       "references": [
         "COL.3.13",
         "1JN.1.9",
@@ -283,7 +283,7 @@
       ]
     },
     {
-      "topic": "friend",
+      "topic": "Friend",
       "references": [
         "PRO.18.24",
         "JHN.15.13",
@@ -293,7 +293,7 @@
       ]
     },
     {
-      "topic": "friends",
+      "topic": "Friends",
       "references": [
         "JHN.15.13",
         "ECC.4.10",
@@ -301,7 +301,7 @@
       ]
     },
     {
-      "topic": "friends and friendship",
+      "topic": "Friends And Friendship",
       "references": [
         "PRO.17.17",
         "PRO.18.24",
@@ -310,7 +310,7 @@
       ]
     },
     {
-      "topic": "friendship",
+      "topic": "Friendship",
       "references": [
         "PRO.18.24",
         "ECC.4.9-12",
@@ -320,7 +320,7 @@
       ]
     },
     {
-      "topic": "generosity",
+      "topic": "Generosity",
       "references": [
         "ACT.20.35",
         "LUK.6.38",
@@ -329,7 +329,7 @@
       ]
     },
     {
-      "topic": "giving",
+      "topic": "Giving",
       "references": [
         "2CO.9.7",
         "ACT.20.35",
@@ -338,14 +338,14 @@
       ]
     },
     {
-      "topic": "giving and stewardship",
+      "topic": "Giving And Stewardship",
       "references": [
         "LUK.6.38",
         "EPH.4.28"
       ]
     },
     {
-      "topic": "giving back",
+      "topic": "Giving Back",
       "references": [
         "2CO.9.7",
         "ACT.20.35",
@@ -354,7 +354,7 @@
       ]
     },
     {
-      "topic": "giving thanks",
+      "topic": "Giving Thanks",
       "references": [
         "1TH.5.18",
         "COL.3.17",
@@ -363,7 +363,7 @@
       ]
     },
     {
-      "topic": "giving to others",
+      "topic": "Giving To Others",
       "references": [
         "2CO.9.7",
         "LUK.6.38",
@@ -371,7 +371,7 @@
       ]
     },
     {
-      "topic": "giving to others in need",
+      "topic": "Giving To Others In Need",
       "references": [
         "LUK.6.38",
         "ACT.20.35",
@@ -381,14 +381,14 @@
       ]
     },
     {
-      "topic": "giving to the needy",
+      "topic": "Giving To The Needy",
       "references": [
         "2CO.9.7",
         "ACT.20.35"
       ]
     },
     {
-      "topic": "giving to the poor",
+      "topic": "Giving To The Poor",
       "references": [
         "PRO.19.17",
         "HEB.13.16",
@@ -396,7 +396,7 @@
       ]
     },
     {
-      "topic": "good wife",
+      "topic": "Good Wife",
       "references": [
         "PRO.12.4",
         "PRO.18.22",
@@ -405,7 +405,7 @@
       ]
     },
     {
-      "topic": "happiness",
+      "topic": "Happiness",
       "references": [
         "PSA.37.4",
         "PHP.4.4",
@@ -414,7 +414,7 @@
       ]
     },
     {
-      "topic": "happy",
+      "topic": "Happy",
       "references": [
         "PRO.15.13",
         "PSA.144.15",
@@ -423,7 +423,7 @@
       ]
     },
     {
-      "topic": "hospitality",
+      "topic": "Hospitality",
       "references": [
         "HEB.13.2",
         "1PE.4.9",
@@ -431,7 +431,7 @@
       ]
     },
     {
-      "topic": "humble",
+      "topic": "Humble",
       "references": [
         "JAS.4.6",
         "JAS.4.10",
@@ -439,7 +439,7 @@
       ]
     },
     {
-      "topic": "humbleness",
+      "topic": "Humbleness",
       "references": [
         "EPH.4.2",
         "MAT.23.12",
@@ -447,7 +447,7 @@
       ]
     },
     {
-      "topic": "lead by example",
+      "topic": "Lead By Example",
       "references": [
         "1TI.4.12",
         "1PE.5.3",
@@ -456,13 +456,13 @@
       ]
     },
     {
-      "topic": "leader",
+      "topic": "Leader",
       "references": [
         "1TI.3.1-13"
       ]
     },
     {
-      "topic": "leaders",
+      "topic": "Leaders",
       "references": [
         "HEB.13.7",
         "LUK.22.26",
@@ -470,7 +470,7 @@
       ]
     },
     {
-      "topic": "leadership",
+      "topic": "Leadership",
       "references": [
         "1TI.4.12",
         "PHP.2.3",
@@ -479,7 +479,7 @@
       ]
     },
     {
-      "topic": "leading by example",
+      "topic": "Leading By Example",
       "references": [
         "TIT.2.7",
         "1TI.4.12",
@@ -488,7 +488,7 @@
       ]
     },
     {
-      "topic": "love",
+      "topic": "Love",
       "references": [
         "1CO.13.4-8",
         "1CO.16.14",
@@ -496,7 +496,7 @@
       ]
     },
     {
-      "topic": "love and compassion",
+      "topic": "Love And Compassion",
       "references": [
         "JHN.13.34",
         "1CO.13.7",
@@ -505,7 +505,7 @@
       ]
     },
     {
-      "topic": "love each other",
+      "topic": "Love Each Other",
       "references": [
         "1CO.16.14",
         "1JN.4.18",
@@ -513,7 +513,7 @@
       ]
     },
     {
-      "topic": "love for one another",
+      "topic": "Love For One Another",
       "references": [
         "JHN.13.34",
         "1CO.13.1-13",
@@ -522,14 +522,14 @@
       ]
     },
     {
-      "topic": "love god",
+      "topic": "Love God",
       "references": [
         "JHN.3.16",
         "1JN.3.1"
       ]
     },
     {
-      "topic": "love is",
+      "topic": "Love Is",
       "references": [
         "1CO.13.4-7",
         "1CO.13.13",
@@ -537,7 +537,7 @@
       ]
     },
     {
-      "topic": "love is patient",
+      "topic": "Love Is Patient",
       "references": [
         "1CO.13.4-8",
         "1CO.13.4-7",
@@ -547,7 +547,7 @@
       ]
     },
     {
-      "topic": "love of god",
+      "topic": "Love Of God",
       "references": [
         "JHN.3.16",
         "ROM.5.8",
@@ -555,7 +555,7 @@
       ]
     },
     {
-      "topic": "love one another",
+      "topic": "Love One Another",
       "references": [
         "JHN.13.34",
         "1JN.4.20",
@@ -563,14 +563,14 @@
       ]
     },
     {
-      "topic": "love others",
+      "topic": "Love Others",
       "references": [
         "1JN.4.11",
         "EPH.4.32"
       ]
     },
     {
-      "topic": "love thy neighbor",
+      "topic": "Love Thy Neighbor",
       "references": [
         "1JN.4.20-21",
         "LEV.19.18",
@@ -579,13 +579,13 @@
       ]
     },
     {
-      "topic": "loving as jesus loved",
+      "topic": "Loving As Jesus Loved",
       "references": [
         "JHN.13.34"
       ]
     },
     {
-      "topic": "man and wife",
+      "topic": "Man And Wife",
       "references": [
         "EPH.5.22-33",
         "GEN.2.24",
@@ -593,28 +593,28 @@
       ]
     },
     {
-      "topic": "marital love",
+      "topic": "Marital Love",
       "references": [
         "1PE.3.7-12",
         "PRO.5.18-19"
       ]
     },
     {
-      "topic": "marriages",
+      "topic": "Marriages",
       "references": [
         "HEB.13.4",
         "1PE.3.7"
       ]
     },
     {
-      "topic": "overcome",
+      "topic": "Overcome",
       "references": [
         "JHN.16.33",
         "2TI.1.7"
       ]
     },
     {
-      "topic": "overcoming",
+      "topic": "Overcoming",
       "references": [
         "JHN.16.33",
         "ROM.12.21",
@@ -623,7 +623,7 @@
       ]
     },
     {
-      "topic": "overcoming disappointment",
+      "topic": "Overcoming Disappointment",
       "references": [
         "PHP.4.6-7",
         "ROM.8.28",
@@ -632,7 +632,7 @@
       ]
     },
     {
-      "topic": "overcoming fear",
+      "topic": "Overcoming Fear",
       "references": [
         "2TI.1.7",
         "ISA.41.10",
@@ -641,7 +641,7 @@
       ]
     },
     {
-      "topic": "overcoming rejection",
+      "topic": "Overcoming Rejection",
       "references": [
         "JHN.1.11",
         "LUK.6.22",
@@ -651,7 +651,7 @@
       ]
     },
     {
-      "topic": "overcoming stress",
+      "topic": "Overcoming Stress",
       "references": [
         "PHP.4.6-7",
         "JHN.14.27",
@@ -660,7 +660,7 @@
       ]
     },
     {
-      "topic": "peace",
+      "topic": "Peace",
       "references": [
         "2TH.3.16",
         "JHN.16.33",
@@ -670,7 +670,7 @@
       ]
     },
     {
-      "topic": "peace of mind",
+      "topic": "Peace Of Mind",
       "references": [
         "ISA.26.3",
         "JHN.14.27",
@@ -678,7 +678,7 @@
       ]
     },
     {
-      "topic": "peacemakers",
+      "topic": "Peacemakers",
       "references": [
         "MAT.5.9",
         "ROM.12.18",
@@ -687,13 +687,13 @@
       ]
     },
     {
-      "topic": "peacemaking",
+      "topic": "Peacemaking",
       "references": [
         "ROM.12.17-21"
       ]
     },
     {
-      "topic": "practical christian living",
+      "topic": "Practical Christian Living",
       "references": [
         "ROM.12.2",
         "1JN.2.15",
@@ -701,7 +701,7 @@
       ]
     },
     {
-      "topic": "pray",
+      "topic": "Pray",
       "references": [
         "1TH.5.17",
         "JER.33.3",
@@ -711,7 +711,7 @@
       ]
     },
     {
-      "topic": "pray without ceasing",
+      "topic": "Pray Without Ceasing",
       "references": [
         "ROM.12.12",
         "1TH.5.16-18",
@@ -720,7 +720,7 @@
       ]
     },
     {
-      "topic": "prayer",
+      "topic": "Prayer",
       "references": [
         "1TH.5.17",
         "COL.4.2",
@@ -728,13 +728,13 @@
       ]
     },
     {
-      "topic": "prayers",
+      "topic": "Prayers",
       "references": [
         "JAS.5.16"
       ]
     },
     {
-      "topic": "praying",
+      "topic": "Praying",
       "references": [
         "1TH.5.17",
         "JHN.15.7",
@@ -743,7 +743,7 @@
       ]
     },
     {
-      "topic": "praying for each other",
+      "topic": "Praying For Each Other",
       "references": [
         "JAS.5.16",
         "1TI.2.1",
@@ -751,7 +751,7 @@
       ]
     },
     {
-      "topic": "praying for others",
+      "topic": "Praying For Others",
       "references": [
         "1TI.2.1",
         "JAS.5.16",
@@ -760,7 +760,7 @@
       ]
     },
     {
-      "topic": "praying together",
+      "topic": "Praying Together",
       "references": [
         "MAT.18.20",
         "MAT.18.19",
@@ -769,7 +769,7 @@
       ]
     },
     {
-      "topic": "respect",
+      "topic": "Respect",
       "references": [
         "MAT.7.12",
         "1PE.2.17",
@@ -777,7 +777,7 @@
       ]
     },
     {
-      "topic": "respect for others",
+      "topic": "Respect For Others",
       "references": [
         "MAT.7.12",
         "LUK.6.38",
@@ -785,7 +785,7 @@
       ]
     },
     {
-      "topic": "respecting others",
+      "topic": "Respecting Others",
       "references": [
         "ROM.12.10",
         "MAT.5.43-48",
@@ -794,7 +794,7 @@
       ]
     },
     {
-      "topic": "service",
+      "topic": "Service",
       "references": [
         "1PE.4.10",
         "1PE.4.9-11",
@@ -802,7 +802,7 @@
       ]
     },
     {
-      "topic": "service to others",
+      "topic": "Service To Others",
       "references": [
         "ACT.20.35",
         "1PE.4.10",
@@ -811,7 +811,7 @@
       ]
     },
     {
-      "topic": "serving",
+      "topic": "Serving",
       "references": [
         "MRK.10.45",
         "1PE.4.10",
@@ -820,7 +820,7 @@
       ]
     },
     {
-      "topic": "serving one another",
+      "topic": "Serving One Another",
       "references": [
         "1PE.4.10",
         "GAL.5.13",
@@ -828,7 +828,7 @@
       ]
     },
     {
-      "topic": "serving others",
+      "topic": "Serving Others",
       "references": [
         "1PE.4.10",
         "ACT.20.35",
@@ -837,7 +837,7 @@
       ]
     },
     {
-      "topic": "serving the lord",
+      "topic": "Serving The Lord",
       "references": [
         "MAT.6.24",
         "MAL.3.14-18",
@@ -845,7 +845,7 @@
       ]
     },
     {
-      "topic": "serving the poor",
+      "topic": "Serving The Poor",
       "references": [
         "PRO.14.31",
         "PRO.19.17",
@@ -853,7 +853,7 @@
       ]
     },
     {
-      "topic": "staying strong",
+      "topic": "Staying Strong",
       "references": [
         "ISA.41.10",
         "JHN.16.33",
@@ -861,7 +861,7 @@
       ]
     },
     {
-      "topic": "strong",
+      "topic": "Strong",
       "references": [
         "DEU.31.6",
         "JOS.1.9",
@@ -869,7 +869,7 @@
       ]
     },
     {
-      "topic": "trust",
+      "topic": "Trust",
       "references": [
         "PRO.3.5",
         "PSA.56.3-4",
@@ -877,7 +877,7 @@
       ]
     },
     {
-      "topic": "trust god",
+      "topic": "Trust God",
       "references": [
         "PRO.3.5-6",
         "PSA.9.10",
@@ -885,7 +885,7 @@
       ]
     },
     {
-      "topic": "trust in god",
+      "topic": "Trust In God",
       "references": [
         "PRO.3.5-6",
         "HEB.11.6",
@@ -893,7 +893,7 @@
       ]
     },
     {
-      "topic": "trust in the lord",
+      "topic": "Trust In The Lord",
       "references": [
         "PRO.3.5-6",
         "ISA.12.2",
@@ -901,7 +901,7 @@
       ]
     },
     {
-      "topic": "trusting",
+      "topic": "Trusting",
       "references": [
         "HEB.11.6",
         "HEB.13.8",
@@ -909,7 +909,7 @@
       ]
     },
     {
-      "topic": "trusting and believing",
+      "topic": "Trusting And Believing",
       "references": [
         "ROM.15.13",
         "ACT.16.31",
@@ -919,7 +919,7 @@
       ]
     },
     {
-      "topic": "trusting god",
+      "topic": "Trusting God",
       "references": [
         "PRO.3.5",
         "PSA.37.4-6",
@@ -929,7 +929,7 @@
       ]
     },
     {
-      "topic": "trusting in god",
+      "topic": "Trusting In God",
       "references": [
         "PRO.3.5",
         "HEB.13.8",
@@ -937,7 +937,7 @@
       ]
     },
     {
-      "topic": "trusting in the lord",
+      "topic": "Trusting In The Lord",
       "references": [
         "PRO.3.5",
         "ROM.8.28",
@@ -945,7 +945,7 @@
       ]
     },
     {
-      "topic": "virtuous wife",
+      "topic": "Virtuous Wife",
       "references": [
         "PRO.31.1-31",
         "PRO.31.10"

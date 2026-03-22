@@ -16,7 +16,9 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import type { StudyWorkspaceTab } from "@/types/reader";
@@ -52,6 +54,8 @@ export function StudyToolsSidebar({
   notesContent,
   bookmarksContent,
 }: StudyToolsSidebarProps) {
+  const { isMobile, setOpenMobile } = useSidebar();
+
   if (!visible) {
     return null;
   }
@@ -107,9 +111,9 @@ export function StudyToolsSidebar({
           </ToggleGroupItem>
         </ToggleGroup>
       </SidebarHeader>
-      <SidebarContent className="min-w-0 px-2 pb-3">
+      <SidebarContent className="min-w-0 max-w-full px-2 pb-3">
         {activeTab === "tools" ? (
-          <div className="flex flex-col gap-2">
+          <div className="flex min-w-0 max-w-full flex-col gap-2 overflow-x-hidden [contain:inline-size]">
             <div className="sticky top-0 z-10 flex flex-col gap-2 bg-sidebar/95 px-1 pt-1 backdrop-blur-sm">
               <div className="flex items-center gap-2">
                   <Button
@@ -138,7 +142,7 @@ export function StudyToolsSidebar({
               <Separator />
             </div>
             <Accordion
-              className="workspace-panel-elevated w-full rounded-2xl border px-3 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
+              className="workspace-panel-elevated min-w-0 max-w-full w-full rounded-2xl border px-3 **:data-[slot=accordion-trigger]:transition-none [&_[data-slot=accordion-trigger]>svg]:transition-none"
               multiple
               value={accordionValue}
               onValueChange={(value) =>
@@ -149,25 +153,37 @@ export function StudyToolsSidebar({
             </Accordion>
           </div>
         ) : activeTab === "topics" ? (
-          <div className="min-w-0 pt-1">
-            <div className="workspace-panel-elevated min-w-0 w-full rounded-2xl border p-3">
+          <div className="min-w-0 max-w-full pt-1 overflow-x-hidden [contain:inline-size]">
+            <div className="workspace-panel-elevated min-w-0 max-w-full w-full rounded-2xl border p-3">
               {topicsContent}
             </div>
           </div>
         ) : activeTab === "notes" ? (
-          <div className="pt-1">
-            <div className="workspace-panel-elevated w-full rounded-2xl border p-3">
+          <div className="min-w-0 max-w-full pt-1 overflow-x-hidden [contain:inline-size]">
+            <div className="workspace-panel-elevated min-w-0 max-w-full w-full rounded-2xl border p-3">
               {notesContent}
             </div>
           </div>
         ) : (
-          <div className="pt-1">
-            <div className="workspace-panel-elevated w-full rounded-2xl border p-3">
+          <div className="min-w-0 max-w-full pt-1 overflow-x-hidden [contain:inline-size]">
+            <div className="workspace-panel-elevated min-w-0 max-w-full w-full rounded-2xl border p-3">
               {bookmarksContent}
             </div>
           </div>
         )}
       </SidebarContent>
+      {isMobile ? (
+        <SidebarFooter className="border-t border-sidebar-border/70 bg-sidebar/90 px-3 py-3">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => setOpenMobile(false)}
+          >
+            Close Sidebar
+          </Button>
+        </SidebarFooter>
+      ) : null}
     </Sidebar>
   );
 }
