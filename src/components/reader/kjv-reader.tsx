@@ -107,6 +107,7 @@ import type {
 } from "@/types/reader";
 import type { BookmarkScope, ReaderBookmark } from "@/types/bookmarks";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -116,6 +117,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import { SidebarOpenRequestSync } from "@/components/reader/sidebar-open-request-sync";
 import { SidebarCloseRequestSync } from "@/components/reader/sidebar-close-request-sync";
 import { GenealogyPersonDetails } from "@/components/reader/genealogy-person-details";
@@ -2203,11 +2205,13 @@ export function KJVReader() {
     try {
       await navigator.clipboard.writeText(href);
       setIsShareCopied(true);
+      toast.success("Layout copied to clipboard.");
       window.setTimeout(() => {
         setIsShareCopied(false);
       }, 1500);
     } catch {
       setIsShareCopied(false);
+      toast.error("Unable to copy layout to clipboard.");
     }
   }, []);
 
@@ -4657,6 +4661,8 @@ export function KJVReader() {
           </Suspense>
         ) : null}
       </SidebarProvider>
+
+      <Toaster theme={theme} />
 
       {tokenPopupCard}
 
