@@ -2275,7 +2275,7 @@ export function KJVReader() {
       ]);
       initializeNotesTabState(nextLeaf.id, {
         selectedNoteId: selectedNoteId ?? null,
-        filter: selectedNoteId ? "all" : "context",
+        filter: "all",
         context: notesContext,
       });
       setActiveTabId(nextTabId);

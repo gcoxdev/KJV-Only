@@ -245,6 +245,19 @@ function convertOsisToStandardReference(osis) {
   return `${start.bookCode}.${start.chapter}.${start.verse}-${end.chapter}.${end.verse}`;
 }
 
+function toTitleCase(topic) {
+  return topic
+    .split(/(\s+|-)/)
+    .map((part) => {
+      if (!part || /^\s+$/.test(part) || part === "-") {
+        return part;
+      }
+
+      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+    })
+    .join("");
+}
+
 function buildCuratedTopics(rows) {
   const grouped = new Map();
 
@@ -279,7 +292,7 @@ function buildCuratedTopics(rows) {
     );
 
     return {
-      topic,
+      topic: toTitleCase(topic),
       references: entries.slice(0, keepCount).map((entry) => entry.reference),
     };
   }).filter((entry) => entry.references.length > 0);
