@@ -1,6 +1,8 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from "react";
 
 import { normalizeRangePoints } from "@/lib/bookmarks";
+import { buildReaderTabFromTargets } from "@/lib/reference-command";
+import { queuePendingReaderScrollTarget } from "@/lib/reader-scroll-targets";
 import {
   createId,
   createLeaf,
@@ -13,6 +15,8 @@ import type {
   BookmarkOpenTarget,
   NotesLinkOpenTarget,
   PanelNode,
+  PendingReaderScrollTarget,
+  ReaderNavigationTarget,
   ReaderTab,
   ReferenceLinkOpenTarget,
   SearchResultOpenTarget,
@@ -24,43 +28,6 @@ type ReaderWordHighlight = {
   verseNumber: number;
   word: string;
 };
-
-export type PendingReaderScrollTarget = {
-  leafId: string;
-  bookIndex: number;
-  chapterIndex: number;
-  mode: "chapter-top" | "verse-range";
-  verseStart: number;
-  verseEnd: number;
-};
-
-export type ReaderNavigationTarget =
-  | { type: "chapter"; bookIndex: number; chapterIndex: number }
-  | {
-      type: "verse";
-      bookIndex: number;
-      chapterIndex: number;
-      verseNumber: number;
-    }
-  | {
-      type: "selection";
-      bookIndex: number;
-      chapterIndex: number;
-      ranges: Array<{ start: number; end: number }>;
-    }
-  | {
-      type: "range";
-      start: {
-        bookIndex: number;
-        chapterIndex: number;
-        verseNumber: number;
-      };
-      end: {
-        bookIndex: number;
-        chapterIndex: number;
-        verseNumber: number;
-      };
-    };
 
 type ReaderOpenDestination =
   | NotesLinkOpenTarget
@@ -79,8 +46,8 @@ type UsePanelRoutingParams = {
   clearLeafHighlights: (leafId: string) => void;
   setLeafHighlights: (leafId: string, ranges: VerseHighlightRange[]) => void;
   setSelectedHighlightScope: Dispatch<SetStateAction<BookmarkScope | null>>;
-  setPendingReaderScrollTarget: Dispatch<
-    SetStateAction<PendingReaderScrollTarget | null>
+  setPendingReaderScrollTargets: Dispatch<
+    SetStateAction<PendingReaderScrollTarget[]>
   >;
   setActiveReaderWordHighlight: Dispatch<
     SetStateAction<ReaderWordHighlight | null>
@@ -173,7 +140,7 @@ export function usePanelRouting({
   clearLeafHighlights,
   setLeafHighlights,
   setSelectedHighlightScope,
-  setPendingReaderScrollTarget,
+  setPendingReaderScrollTargets,
   setActiveReaderWordHighlight,
 }: UsePanelRoutingParams) {
   const navigateReaderLeafToTarget = useCallback(
@@ -239,6 +206,117 @@ export function usePanelRouting({
     ],
   );
 
+  const applyReaderTargetEffects = useCallback(
+    (target: ReaderNavigationTarget, leafId: string) => {
+      if (target.type === "selection") {
+        setActiveReaderWordHighlight(null);
+        setLeafHighlights(leafId, target.ranges);
+        setSelectedHighlightScope({
+          type: "selection",
+          bookIndex: target.bookIndex,
+          chapterIndex: target.chapterIndex,
+          ranges: target.ranges,
+        });
+        const firstRange = target.ranges[0];
+        const lastRange = target.ranges[target.ranges.length - 1];
+        setPendingReaderScrollTargets((current) =>
+          queuePendingReaderScrollTarget(current, {
+            leafId,
+            bookIndex: target.bookIndex,
+            chapterIndex: target.chapterIndex,
+            mode: "verse-range",
+            verseStart: firstRange?.start ?? 1,
+            verseEnd: lastRange?.end ?? firstRange?.end ?? firstRange?.start ?? 1,
+          }),
+        );
+        return;
+      }
+
+      if (target.type === "range") {
+        const normalized = normalizeRangePoints(target.start, target.end);
+        const endVerseInActiveChapter =
+          normalized.start.bookIndex === normalized.end.bookIndex &&
+          normalized.start.chapterIndex === normalized.end.chapterIndex
+            ? normalized.end.verseNumber
+            : (books[normalized.start.bookIndex]?.chapters[
+                normalized.start.chapterIndex
+              ]?.verses.at(-1)?.verse ?? normalized.start.verseNumber);
+        setActiveReaderWordHighlight(null);
+        setLeafHighlights(leafId, [
+          {
+            start: normalized.start.verseNumber,
+            end: endVerseInActiveChapter,
+          },
+        ]);
+        setSelectedHighlightScope({
+          type: "range",
+          start: normalized.start,
+          end: normalized.end,
+        });
+        setPendingReaderScrollTargets((current) =>
+          queuePendingReaderScrollTarget(current, {
+            leafId,
+            bookIndex: normalized.start.bookIndex,
+            chapterIndex: normalized.start.chapterIndex,
+            mode: "verse-range",
+            verseStart: normalized.start.verseNumber,
+            verseEnd: endVerseInActiveChapter,
+          }),
+        );
+        return;
+      }
+
+      if (target.type === "verse") {
+        setActiveReaderWordHighlight(null);
+        setLeafHighlights(leafId, [
+          {
+            start: target.verseNumber,
+            end: target.verseNumber,
+          },
+        ]);
+        setSelectedHighlightScope({
+          type: "verse",
+          bookIndex: target.bookIndex,
+          chapterIndex: target.chapterIndex,
+          verseNumber: target.verseNumber,
+        });
+        setPendingReaderScrollTargets((current) =>
+          queuePendingReaderScrollTarget(current, {
+            leafId,
+            bookIndex: target.bookIndex,
+            chapterIndex: target.chapterIndex,
+            mode: "verse-range",
+            verseStart: target.verseNumber,
+            verseEnd: target.verseNumber,
+          }),
+        );
+        return;
+      }
+
+      setActiveReaderWordHighlight(null);
+      clearLeafHighlights(leafId);
+      setSelectedHighlightScope(null);
+      setPendingReaderScrollTargets((current) =>
+        queuePendingReaderScrollTarget(current, {
+          leafId,
+          bookIndex: target.bookIndex,
+          chapterIndex: target.chapterIndex,
+          mode: "chapter-top",
+          verseStart: 1,
+          verseEnd: 1,
+        }),
+      );
+    },
+    [
+      books,
+      clearLeafHighlights,
+      setActiveReaderWordHighlight,
+      setLeafHighlights,
+      setPendingReaderScrollTargets,
+      setSelectedHighlightScope,
+    ],
+  );
+
   const openReaderTarget = useCallback(
     (target: ReaderNavigationTarget, destination: ReaderOpenDestination) => {
       const location =
@@ -251,99 +329,6 @@ export function usePanelRouting({
               bookIndex: target.bookIndex,
               chapterIndex: target.chapterIndex,
             };
-
-      const applyReaderTargetEffects = (leafId: string) => {
-        if (target.type === "selection") {
-          setActiveReaderWordHighlight(null);
-          setLeafHighlights(leafId, target.ranges);
-          setSelectedHighlightScope({
-            type: "selection",
-            bookIndex: target.bookIndex,
-            chapterIndex: target.chapterIndex,
-            ranges: target.ranges,
-          });
-          const firstRange = target.ranges[0];
-          const lastRange = target.ranges[target.ranges.length - 1];
-          setPendingReaderScrollTarget({
-            leafId,
-            bookIndex: target.bookIndex,
-            chapterIndex: target.chapterIndex,
-            mode: "verse-range",
-            verseStart: firstRange?.start ?? 1,
-            verseEnd: lastRange?.end ?? firstRange?.end ?? firstRange?.start ?? 1,
-          });
-          return;
-        }
-
-        if (target.type === "range") {
-          const normalized = normalizeRangePoints(target.start, target.end);
-          const endVerseInActiveChapter =
-            normalized.start.bookIndex === normalized.end.bookIndex &&
-            normalized.start.chapterIndex === normalized.end.chapterIndex
-              ? normalized.end.verseNumber
-              : (books[normalized.start.bookIndex]?.chapters[
-                  normalized.start.chapterIndex
-                ]?.verses.at(-1)?.verse ?? normalized.start.verseNumber);
-          setActiveReaderWordHighlight(null);
-          setLeafHighlights(leafId, [
-            {
-              start: normalized.start.verseNumber,
-              end: endVerseInActiveChapter,
-            },
-          ]);
-          setSelectedHighlightScope({
-            type: "range",
-            start: normalized.start,
-            end: normalized.end,
-          });
-          setPendingReaderScrollTarget({
-            leafId,
-            bookIndex: normalized.start.bookIndex,
-            chapterIndex: normalized.start.chapterIndex,
-            mode: "verse-range",
-            verseStart: normalized.start.verseNumber,
-            verseEnd: endVerseInActiveChapter,
-          });
-          return;
-        }
-
-        if (target.type === "verse") {
-          setActiveReaderWordHighlight(null);
-          setLeafHighlights(leafId, [
-            {
-              start: target.verseNumber,
-              end: target.verseNumber,
-            },
-          ]);
-          setSelectedHighlightScope({
-            type: "verse",
-            bookIndex: target.bookIndex,
-            chapterIndex: target.chapterIndex,
-            verseNumber: target.verseNumber,
-          });
-          setPendingReaderScrollTarget({
-            leafId,
-            bookIndex: target.bookIndex,
-            chapterIndex: target.chapterIndex,
-            mode: "verse-range",
-            verseStart: target.verseNumber,
-            verseEnd: target.verseNumber,
-          });
-          return;
-        }
-
-        setActiveReaderWordHighlight(null);
-        clearLeafHighlights(leafId);
-        setSelectedHighlightScope(null);
-        setPendingReaderScrollTarget({
-          leafId,
-          bookIndex: target.bookIndex,
-          chapterIndex: target.chapterIndex,
-          mode: "chapter-top",
-          verseStart: 1,
-          verseEnd: 1,
-        });
-      };
 
       const openInNewTab = () => {
         const nextTabId = createId();
@@ -361,7 +346,7 @@ export function usePanelRouting({
           },
         ]);
         showTabById(nextTabId);
-        applyReaderTargetEffects(nextLeaf.id);
+        applyReaderTargetEffects(target, nextLeaf.id);
         return nextLeaf.id;
       };
 
@@ -397,7 +382,7 @@ export function usePanelRouting({
           return nextTabs;
         });
 
-        applyReaderTargetEffects(nextReaderLeaf.id);
+        applyReaderTargetEffects(target, nextReaderLeaf.id);
         return nextReaderLeaf.id;
       };
 
@@ -411,7 +396,7 @@ export function usePanelRouting({
         if (action.type === "create-in-active-tab") {
           const nextLeafId = createTargetedReaderPanelInActiveTab(target);
           if (nextLeafId) {
-            applyReaderTargetEffects(nextLeafId);
+            applyReaderTargetEffects(target, nextLeafId);
             return nextLeafId;
           }
           return openInNewPanel();
@@ -427,7 +412,7 @@ export function usePanelRouting({
           target,
         );
         showTabById(action.tabId);
-        applyReaderTargetEffects(action.leafId);
+        applyReaderTargetEffects(target, action.leafId);
         return action.leafId;
       };
 
@@ -441,19 +426,42 @@ export function usePanelRouting({
     },
     [
       activeTabId,
-      books,
-      clearLeafHighlights,
+      applyReaderTargetEffects,
       createTargetedReaderPanelInActiveTab,
       navigateReaderLeafToTarget,
-      setActiveReaderWordHighlight,
-      setLeafHighlights,
-      setPendingReaderScrollTarget,
-      setSelectedHighlightScope,
       setTabs,
       showTabById,
       tabsRef,
       targetedPanelLeafIdRef,
     ],
+  );
+
+  const openReaderTargetsInSingleNewTab = useCallback(
+    (targets: ReaderNavigationTarget[]) => {
+      if (targets.length === 0) {
+        return [];
+      }
+
+      const nextTabId = createId();
+      const nextTabState = buildReaderTabFromTargets(targets);
+      setTabs((currentTabs) => [
+        ...currentTabs,
+        {
+          id: nextTabId,
+          title: `Tab ${currentTabs.length + 1}`,
+          root: nextTabState.root,
+        },
+      ]);
+      showTabById(nextTabId);
+      targets.forEach((target, index) => {
+        const leafId = nextTabState.leafIds[index];
+        if (leafId) {
+          applyReaderTargetEffects(target, leafId);
+        }
+      });
+      return nextTabState.leafIds;
+    },
+    [applyReaderTargetEffects, setTabs, showTabById],
   );
 
   const openBookmarkTarget = useCallback(
@@ -609,6 +617,7 @@ export function usePanelRouting({
 
   return {
     openReaderTarget,
+    openReaderTargetsInSingleNewTab,
     openBookmarkTarget,
     openSearchResultTarget,
     openChapterReference,

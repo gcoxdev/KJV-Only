@@ -204,7 +204,7 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
           label: "OpenBible.info",
           href: "https://www.openbible.info/geo/",
           description:
-            "Bible geocoding and atlas data used for map/place work. Cross-reference ordering also incorporates OpenBible.info vote data derived primarily from TSK. Topic browsing and daily Scripture topic groupings are also derived from OpenBible.info topic data.",
+            "Map and place data, topic data, cross-reference vote data, and the Bible reference parser used in this app.",
         },
         {
           label: "Complete Bible Genealogy",
