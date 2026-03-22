@@ -10,10 +10,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { parseBibleReference } from "@/lib/references";
+import type { Book } from "@/types/bible";
 
 type ScriptureReference = {
   reference: string;
-  note?: string;
 };
 
 type GospelStep = {
@@ -23,6 +24,7 @@ type GospelStep = {
 };
 
 type HowToGetSavedPageProps = {
+  books: Book[];
   renderPreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
   onCloseSidebar: () => void;
@@ -34,8 +36,8 @@ const ROMANS_ROAD_STEPS: GospelStep[] = [
     summary:
       "Salvation begins with the truth that all have sinned and none are righteous in themselves.",
     references: [
-      { reference: "ROM.3.10", note: "\"There is none righteous, no, not one.\"" },
-      { reference: "ROM.3.23", note: "\"For all have sinned, and come short of the glory of God.\"" },
+      { reference: "ROM.3.10" },
+      { reference: "ROM.3.23" },
     ],
   },
   {
@@ -43,8 +45,8 @@ const ROMANS_ROAD_STEPS: GospelStep[] = [
     summary:
       "Sin is not light or harmless. Its wages are death, and without Christ a man remains condemned.",
     references: [
-      { reference: "ROM.6.23", note: "\"For the wages of sin is death...\"" },
-      { reference: "ROM.5.12", note: "Death passed upon all men, for that all have sinned." },
+      { reference: "ROM.6.23" },
+      { reference: "ROM.5.12" },
     ],
   },
   {
@@ -52,8 +54,8 @@ const ROMANS_ROAD_STEPS: GospelStep[] = [
     summary:
       "Though we were sinners, Christ died for us. Salvation is provided by what Jesus Christ did, not by what we do.",
     references: [
-      { reference: "ROM.5.8", note: "\"But God commendeth his love toward us, in that, while we were yet sinners, Christ died for us.\"" },
-      { reference: "ROM.5.9", note: "We are justified by his blood and saved from wrath through him." },
+      { reference: "ROM.5.8" },
+      { reference: "ROM.5.9" },
     ],
   },
   {
@@ -61,9 +63,10 @@ const ROMANS_ROAD_STEPS: GospelStep[] = [
     summary:
       "A sinner is not saved by reform, religion, or personal righteousness, but by believing on the Lord Jesus Christ.",
     references: [
-      { reference: "ROM.4.5", note: "God justifieth the ungodly; faith is counted for righteousness." },
-      { reference: "ROM.10.9", note: "Believe in thine heart that God hath raised him from the dead, and thou shalt be saved." },
-      { reference: "ROM.10.10", note: "With the heart man believeth unto righteousness." },
+      { reference: "ROM.4.5" },
+      { reference: "ROM.6.23" },
+      { reference: "ROM.10.9" },
+      { reference: "ROM.10.10" },
     ],
   },
   {
@@ -71,8 +74,8 @@ const ROMANS_ROAD_STEPS: GospelStep[] = [
     summary:
       "The sinner who believes the gospel should call upon the Lord Jesus Christ for salvation.",
     references: [
-      { reference: "ROM.10.13", note: "\"For whosoever shall call upon the name of the Lord shall be saved.\"" },
-      { reference: "ROM.10.17", note: "Faith cometh by hearing, and hearing by the word of God." },
+      { reference: "ROM.10.13" },
+      { reference: "ROM.10.17" },
     ],
   },
   {
@@ -80,19 +83,70 @@ const ROMANS_ROAD_STEPS: GospelStep[] = [
     summary:
       "The one justified by faith has peace with God and stands no longer under condemnation.",
     references: [
-      { reference: "ROM.5.1", note: "\"Therefore being justified by faith, we have peace with God through our Lord Jesus Christ.\"" },
-      { reference: "ROM.8.1", note: "There is therefore now no condemnation to them which are in Christ Jesus." },
+      { reference: "ROM.5.1" },
+      { reference: "ROM.8.1" },
     ],
   },
 ];
 
+function renderReferenceText(books: Book[], reference: string) {
+  const parsed = parseBibleReference(reference);
+  if (!parsed) {
+    return "";
+  }
+
+  const book = books[parsed.bookIndex];
+  if (!book) {
+    return "";
+  }
+
+  const chapterTexts: string[] = [];
+  for (
+    let chapterIndex = parsed.startChapterIndex;
+    chapterIndex <= parsed.endChapterIndex;
+    chapterIndex += 1
+  ) {
+    const chapter = book.chapters[chapterIndex];
+    if (!chapter) {
+      continue;
+    }
+
+    const verseStart =
+      chapterIndex === parsed.startChapterIndex ? parsed.startVerse : 1;
+    const verseEnd =
+      chapterIndex === parsed.endChapterIndex
+        ? parsed.endVerse
+        : chapter.verses[chapter.verses.length - 1]?.verse ?? 0;
+
+    const text = chapter.verses
+      .filter((verse) => verse.verse >= verseStart && verse.verse <= verseEnd)
+      .map((verse) =>
+        verse.tokens.reduce((result, token, index) => {
+          const tokenText = token.divineName ? token.text.toUpperCase() : token.text;
+          const noLeadingSpace =
+            index === 0 || /^['")\].,;:!?]+$/.test(tokenText) || tokenText === "'s";
+          return `${result}${noLeadingSpace ? "" : " "}${tokenText}`;
+        }, ""),
+      )
+      .join(" ");
+
+    if (text) {
+      chapterTexts.push(text);
+    }
+  }
+
+  return chapterTexts.join(" ");
+}
+
 function ReferenceList({
+  books,
   references,
   renderPreview,
   onOpenReference,
   onCloseSidebar,
   inline = false,
 }: {
+  books: Book[];
   references: ScriptureReference[];
   renderPreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
@@ -112,7 +166,7 @@ function ReferenceList({
           key={item.reference}
           className={
             inline
-              ? "inline-flex max-w-full flex-row flex-wrap items-baseline gap-x-2 gap-y-1"
+              ? "flex w-full max-w-full items-start gap-2"
               : "flex flex-col gap-1 rounded-lg border border-border/70 bg-background/70 px-3 py-2"
           }
         >
@@ -123,9 +177,9 @@ function ReferenceList({
             onOpenReference={onOpenReference}
             onCloseSidebar={onCloseSidebar}
           />
-          {item.note ? (
-            <p className="max-w-xl text-xs leading-5 text-muted-foreground">
-              {item.note}
+          {renderReferenceText(books, item.reference) ? (
+            <p className="min-w-0 flex-1 text-xs leading-5 text-muted-foreground">
+              {renderReferenceText(books, item.reference)}
             </p>
           ) : null}
         </div>
@@ -135,6 +189,7 @@ function ReferenceList({
 }
 
 export function HowToGetSavedPage({
+  books,
   renderPreview,
   onOpenReference,
   onCloseSidebar,
@@ -197,6 +252,7 @@ export function HowToGetSavedPage({
             </CardHeader>
             <CardContent>
               <ReferenceList
+                books={books}
                 references={step.references}
                 renderPreview={renderPreview}
                 onOpenReference={onOpenReference}
@@ -223,19 +279,14 @@ export function HowToGetSavedPage({
             and rose again, and call upon him for mercy and salvation.
           </p>
           <ReferenceList
+            books={books}
             references={[
-              {
-                reference: "ACT.16.31",
-                note: "\"Believe on the Lord Jesus Christ, and thou shalt be saved...\"",
-              },
-              {
-                reference: "EPH.2.8-9",
-                note: "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God: not of works.",
-              },
-              {
-                reference: "JHN.3.16",
-                note: "Whosoever believeth in him should not perish, but have everlasting life.",
-              },
+              { reference: "1CO.15.1-4" },
+              { reference: "EPH.1.13" },
+              { reference: "ACT.16.31" },
+              { reference: "EPH.2.8-9" },
+              { reference: "TIT.3.5-6" },
+              { reference: "JHN.3.16" },
             ]}
             renderPreview={renderPreview}
             onOpenReference={onOpenReference}
