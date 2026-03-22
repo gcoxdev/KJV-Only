@@ -152,24 +152,6 @@ export function StrongsTool({
                           {entry.strongs_def}
                         </p>
                       ) : null}
-                      {entry.lemma ? (
-                        <p>
-                          <span className="text-muted-foreground">Lemma:</span>{" "}
-                          <span className="font-mono">{entry.lemma}</span>
-                        </p>
-                      ) : null}
-                      {entry.translit ? (
-                        <p>
-                          <span className="text-muted-foreground">Transliteration:</span>{" "}
-                          <span className="font-mono">{entry.translit}</span>
-                        </p>
-                      ) : null}
-                      {entry.pron ? (
-                        <p>
-                          <span className="text-muted-foreground">Pronunciation:</span>{" "}
-                          {entry.pron}
-                        </p>
-                      ) : null}
                       {entry.derivation ? (
                         <p>
                           <span className="text-muted-foreground">Derivation:</span>{" "}
