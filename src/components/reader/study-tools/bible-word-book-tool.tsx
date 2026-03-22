@@ -60,6 +60,7 @@ export function BibleWordBookTool({
               ariaLabel="Search Bible Word-Book"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

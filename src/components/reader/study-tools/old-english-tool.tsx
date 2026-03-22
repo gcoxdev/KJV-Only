@@ -48,6 +48,7 @@ export function OldEnglishTool({
               ariaLabel="Search Old English dictionary"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

@@ -4,6 +4,30 @@ import { loadConcordance, loadCrossRefs } from "@/lib/reader-data";
 import { decodeConcordanceReferences } from "@/lib/references";
 import type { ConcordancePayload, CrossRefsPayload } from "@/types/reader";
 
+export function deriveConcordanceSearchResults(
+  indexedConcordance: Array<{
+    key: string;
+    keyLower: string;
+    references: string[];
+  }>,
+  concordanceSearchTerm: string,
+  selectedConcordanceWord: {
+    key: string;
+    references: string[];
+  } | null,
+) {
+  const term = concordanceSearchTerm.trim().toLowerCase();
+  if (!term) {
+    return selectedConcordanceWord ? [selectedConcordanceWord] : [];
+  }
+  if (indexedConcordance.length === 0) {
+    return [];
+  }
+  return indexedConcordance
+    .filter((item) => item.keyLower.includes(term))
+    .map((item) => ({ key: item.key, references: item.references }));
+}
+
 export function useConcordanceCrossRefsTool() {
   const [concordance, setConcordance] = useState<ConcordancePayload | null>(null);
   const [crossRefs, setCrossRefs] = useState<CrossRefsPayload | null>(null);
@@ -79,16 +103,11 @@ export function useConcordanceCrossRefsTool() {
   }, [crossRefs]);
 
   const concordanceSearchResults = useMemo(() => {
-    const term = concordanceSearchTerm.trim().toLowerCase();
-    if (!term) {
-      return selectedConcordanceWord ? [selectedConcordanceWord] : [];
-    }
-    if (indexedConcordance.length === 0) {
-      return [];
-    }
-    return indexedConcordance
-      .filter((item) => item.keyLower.includes(term))
-      .map((item) => ({ key: item.key, references: item.references }));
+    return deriveConcordanceSearchResults(
+      indexedConcordance,
+      concordanceSearchTerm,
+      selectedConcordanceWord,
+    );
   }, [indexedConcordance, concordanceSearchTerm, selectedConcordanceWord]);
 
   const applyConcordanceSearch = useCallback(

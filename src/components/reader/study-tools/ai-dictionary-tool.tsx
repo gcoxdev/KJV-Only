@@ -99,6 +99,7 @@ export function AIDictionaryTool({
               ariaLabel="Search AI Dictionary"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

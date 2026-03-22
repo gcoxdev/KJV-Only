@@ -7,6 +7,36 @@ type UseDictionarySearchToolArgs<TPayload extends Record<string, TValue>, TValue
   getSearchStrings?: (key: string, value: TValue) => string[];
 };
 
+export function deriveDictionarySearchResults<
+  TValue,
+  TResult,
+>(
+  indexedEntries: Array<{
+    key: string;
+    keyLower: string;
+    searchStrings: string[];
+    value: TValue;
+  }>,
+  mapResult: (key: string, value: TValue) => TResult,
+  searchTerm: string,
+  selectedResult: TResult | null,
+) {
+  const term = searchTerm.trim().toLowerCase();
+  if (!term) {
+    return selectedResult ? [selectedResult] : [];
+  }
+  if (indexedEntries.length === 0) {
+    return [] as TResult[];
+  }
+  return indexedEntries
+    .filter(
+      (item) =>
+        item.keyLower.includes(term) ||
+        item.searchStrings.some((value) => value.includes(term)),
+    )
+    .map((item) => mapResult(item.key, item.value));
+}
+
 export function useDictionarySearchTool<
   TPayload extends Record<string, TValue>,
   TValue,
@@ -61,20 +91,12 @@ export function useDictionarySearchTool<
   }, [errorMessage, load, payload]);
 
   const results = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    if (!term) {
-      return selectedResult ? [selectedResult] : [];
-    }
-    if (indexedEntries.length === 0) {
-      return [] as TResult[];
-    }
-    return indexedEntries
-      .filter(
-        (item) =>
-          item.keyLower.includes(term) ||
-          item.searchStrings.some((value) => value.includes(term)),
-      )
-      .map((item) => mapResult(item.key, item.value));
+    return deriveDictionarySearchResults(
+      indexedEntries,
+      mapResult,
+      searchTerm,
+      selectedResult,
+    );
   }, [indexedEntries, mapResult, searchTerm, selectedResult]);
 
   const applySearch = useCallback(

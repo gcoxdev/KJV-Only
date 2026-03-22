@@ -54,6 +54,7 @@ export function WebstersTool({
               ariaLabel="Search Webster's dictionary"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (

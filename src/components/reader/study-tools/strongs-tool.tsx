@@ -73,6 +73,7 @@ export function StrongsTool({
               ariaLabel="Search Strong's dictionary"
               loading={isLoading || isSearching}
               value={searchTerm}
+              allowReset
               onSearch={onSearch}
             />
             {isLoading || isSearching ? (
