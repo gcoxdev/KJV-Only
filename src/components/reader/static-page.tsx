@@ -1,6 +1,7 @@
 import { DownloadPage } from "@/components/reader/download-page";
 import { HelpPage } from "@/components/reader/help-page";
 import { HowToGetSavedPage } from "@/components/reader/how-to-get-saved-page";
+import { ResourcesPage } from "@/components/reader/resources-page";
 import { WelcomeHomePage } from "@/components/reader/welcome-home-page";
 import { WhyKJVOnlyPage } from "@/components/reader/why-kjv-only-page";
 import { getStaticPage } from "@/lib/static-pages";
@@ -66,7 +67,8 @@ export function StaticPage({
           page.id !== "kjv-only" &&
           page.id !== "download" &&
           page.id !== "welcome-home" &&
-          page.id !== "help"
+          page.id !== "help" &&
+          page.id !== "resources"
             ? page.content.paragraphs.map((paragraph, index) => (
                 <p key={`${page.id}-paragraph-${index}`}>{paragraph}</p>
               ))
@@ -117,11 +119,13 @@ export function StaticPage({
             />
           ) : null}
           {page.id === "help" ? <HelpPage /> : null}
+          {page.id === "resources" ? <ResourcesPage /> : null}
           {page.id !== "saved" &&
           page.id !== "kjv-only" &&
           page.id !== "download" &&
           page.id !== "welcome-home" &&
           page.id !== "help" &&
+          page.id !== "resources" &&
           page.content.links ? (
             <div className="flex flex-col gap-3 pt-2">
               {page.content.links.map((link) => (
