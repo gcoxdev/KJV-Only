@@ -1,6 +1,5 @@
 import {
   ChartBarIcon,
-  CheckIcon,
   DownloadIcon,
   MenuIcon,
   SearchIcon,
@@ -26,7 +25,6 @@ import { Switch } from "@/components/ui/switch";
 
 type ReaderTopBarProps = {
   isStudyMode: boolean;
-  isShareCopied: boolean;
   showSidebarToggle: boolean;
   onStudyModeChange: (checked: boolean) => void;
   onOpenSearch: () => void;
@@ -42,7 +40,6 @@ type ReaderTopBarProps = {
 
 export function ReaderTopBar({
   isStudyMode,
-  isShareCopied,
   showSidebarToggle,
   onStudyModeChange,
   onOpenSearch,
@@ -80,6 +77,11 @@ export function ReaderTopBar({
             <DropdownMenuItem onClick={onOpenSettings}>
               <SettingsIcon />
               Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onShareLayout}>
+              <Share2Icon />
+              Share Current Layout
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
@@ -142,17 +144,6 @@ export function ReaderTopBar({
           data-tour="search-button"
         >
           <SearchIcon aria-hidden="true" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="Share layout"
-          onClick={onShareLayout}
-          title={isShareCopied ? "Layout link copied" : "Share layout"}
-          data-tour="share-button"
-        >
-          {isShareCopied ? <CheckIcon aria-hidden="true" /> : <Share2Icon aria-hidden="true" />}
         </Button>
         <div className="flex items-center gap-2" data-tour="mode-toggle">
           <span className="tabular-data text-sm font-medium">
