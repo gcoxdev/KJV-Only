@@ -33,6 +33,16 @@ describe("search helpers", () => {
     );
   });
 
+  it("normalizes dash variants for smart and token search", () => {
+    const entry = createSearchableVerseEntry("Bath–sheba bowed before the king");
+
+    expect(entry.searchWords).toContain("Bath-sheba");
+    expect(matchSelectedWords(entry, ["Bath-sheba"], "contains-any", false)).toBe(
+      true,
+    );
+    expect(scoreSmartSearch(entry, "Bath-sheba", false)).toBeGreaterThan(0);
+  });
+
   it("builds verse search text from displayed divine-name casing", () => {
     const books: Book[] = [
       {
