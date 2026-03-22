@@ -1,3 +1,4 @@
+import { DonatePage } from "@/components/reader/donate-page";
 import { DownloadPage } from "@/components/reader/download-page";
 import { HelpPage } from "@/components/reader/help-page";
 import { HowToGetSavedPage } from "@/components/reader/how-to-get-saved-page";
@@ -68,7 +69,8 @@ export function StaticPage({
           page.id !== "download" &&
           page.id !== "welcome-home" &&
           page.id !== "help" &&
-          page.id !== "resources"
+          page.id !== "resources" &&
+          page.id !== "donate"
             ? page.content.paragraphs.map((paragraph, index) => (
                 <p key={`${page.id}-paragraph-${index}`}>{paragraph}</p>
               ))
@@ -121,12 +123,21 @@ export function StaticPage({
           ) : null}
           {page.id === "help" ? <HelpPage /> : null}
           {page.id === "resources" ? <ResourcesPage /> : null}
+          {page.id === "donate" && renderPreview && onOpenReference && onCloseSidebar ? (
+            <DonatePage
+              books={books}
+              renderPreview={renderPreview}
+              onOpenReference={onOpenReference}
+              onCloseSidebar={onCloseSidebar}
+            />
+          ) : null}
           {page.id !== "saved" &&
           page.id !== "kjv-only" &&
           page.id !== "download" &&
           page.id !== "welcome-home" &&
           page.id !== "help" &&
           page.id !== "resources" &&
+          page.id !== "donate" &&
           page.content.links ? (
             <div className="flex flex-col gap-3 pt-2">
               {page.content.links.map((link) => (
