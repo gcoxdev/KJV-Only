@@ -190,7 +190,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="data-[side=left]:w-(--sidebar-width)! data-[side=right]:w-(--sidebar-width)! data-[side=left]:max-w-none data-[side=right]:max-w-none bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+          className="data-[side=left]:w-(--sidebar-width)! data-[side=right]:w-(--sidebar-width)! data-[side=left]:max-w-none data-[side=right]:max-w-none bg-sidebar p-0 text-sidebar-foreground [&>[data-slot=sheet-close]]:hidden"
           style={
             {
               "--sidebar-width": "var(--sidebar-width-mobile)",
