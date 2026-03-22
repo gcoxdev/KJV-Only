@@ -95,6 +95,7 @@ export function StaticPage({
           ) : null}
           {page.id === "saved" && renderPreview && onOpenReference && onCloseSidebar ? (
             <HowToGetSavedPage
+              books={books}
               renderPreview={renderPreview}
               onOpenReference={onOpenReference}
               onCloseSidebar={onCloseSidebar}

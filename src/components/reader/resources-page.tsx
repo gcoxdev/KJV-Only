@@ -222,6 +222,21 @@ const RESOURCE_SECTIONS: ResourceSection[] = [
         ],
       },
       {
+        label: "Robert Breaker",
+        description:
+          "A widely known grace-oriented teaching ministry with strong emphasis on dispensational study, right division, and Bible teaching through The Cloud Church.",
+        links: [
+          {
+            label: "The Cloud Church",
+            href: "https://thecloudchurch.org/",
+          },
+          {
+            label: "YouTube",
+            href: "https://www.youtube.com/@Robertbreaker3",
+          },
+        ],
+      },
+      {
         label: "Sufficient Grace Bible Fellowship",
         description:
           "A grace-focused fellowship with studies on mid-Acts doctrine, right division, and practical Bible teaching.",
@@ -270,6 +285,90 @@ const RESOURCE_SECTIONS: ResourceSection[] = [
           {
             label: "Website",
             href: "https://divideitright.com/",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "young-earth-creation",
+    title: "Young Earth Creation Resources",
+    summary:
+      "These entries cover creation ministries and teachers focused on biblical creation, a young earth, and Scripture-first responses to evolutionary and old-earth claims.",
+    icon: LibraryBigIcon,
+    items: [
+      {
+        label: "Kent Hovind",
+        description:
+          "A well-known young-earth creation teacher whose material focuses on creation apologetics, dinosaurs, and public challenges to evolutionary claims.",
+        links: [
+          {
+            label: "Dr. Dino",
+            href: "https://www.drdino.com/",
+          },
+          {
+            label: "Rumble",
+            href: "https://rumble.com/c/kenthovindofficial",
+          },
+        ],
+      },
+      {
+        label: "Ken Ham and Answers in Genesis",
+        description:
+          "One of the largest creation ministries, offering articles, videos, curriculum, and apologetics material centered on Genesis and a young-earth view.",
+        links: [
+          {
+            label: "Answers in Genesis",
+            href: "https://answersingenesis.org/",
+          },
+          {
+            label: "YouTube",
+            href: "https://www.youtube.com/channel/UCOtgG1fKGni_YHapU4RMMRQ",
+          },
+        ],
+      },
+      {
+        label: "Institute for Creation Research",
+        description:
+          "A longstanding creation ministry known for research articles, educational resources, and scientific apologetics from a creationist perspective.",
+        links: [
+          {
+            label: "Website",
+            href: "https://www.icr.org/",
+          },
+          {
+            label: "YouTube",
+            href: "https://www.youtube.com/@icrscience",
+          },
+        ],
+      },
+      {
+        label: "Creation Ministries International",
+        description:
+          "A major international creation ministry with a large article library, magazine material, and apologetics resources defending biblical creation.",
+        links: [
+          {
+            label: "Website",
+            href: "https://creation.com/",
+          },
+          {
+            label: "YouTube",
+            href: "https://www.youtube.com/@creationministriesintl",
+          },
+        ],
+      },
+      {
+        label: "Dr. Jason Lisle and the Biblical Science Institute",
+        description:
+          "Creation and astronomy material focused on biblical cosmology, scientific apologetics, and a Scripture-first understanding of origins.",
+        links: [
+          {
+            label: "Biblical Science Institute",
+            href: "https://biblicalscienceinstitute.com/",
+          },
+          {
+            label: "YouTube",
+            href: "https://www.youtube.com/@biblicalscienceinstitute259",
           },
         ],
       },
