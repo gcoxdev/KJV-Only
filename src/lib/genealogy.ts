@@ -243,6 +243,130 @@ function collectChristOnlyReferenceData(books: Book[]) {
   };
 }
 
+function collapseGenealogyNameVariant(rawName: string) {
+  return normalizeConcordanceWord(rawName).toLowerCase().replace(/-/g, "");
+}
+
+function buildGenealogyTokenVariantIndex(books: Book[]) {
+  const index = new Map<
+    string,
+    {
+      displayForms: Map<string, number>;
+      verses: string[];
+      occurrences: number;
+    }
+  >();
+
+  for (let bookIndex = 0; bookIndex < books.length; bookIndex += 1) {
+    const book = books[bookIndex];
+    for (let chapterIndex = 0; chapterIndex < book.chapters.length; chapterIndex += 1) {
+      const chapter = book.chapters[chapterIndex];
+      for (const verse of chapter.verses) {
+        const reference = chapterVerseKey(bookIndex, chapterIndex, verse.verse);
+        for (const token of verse.tokens) {
+          const normalizedWord = normalizeConcordanceWord(token.text);
+          const collapsed = collapseGenealogyNameVariant(normalizedWord);
+          if (!collapsed || !/[a-z]/i.test(normalizedWord)) {
+            continue;
+          }
+
+          const existing = index.get(collapsed);
+          if (existing) {
+            existing.displayForms.set(
+              normalizedWord,
+              (existing.displayForms.get(normalizedWord) ?? 0) + 1,
+            );
+            existing.verses.push(reference);
+            existing.occurrences += 1;
+          } else {
+            index.set(collapsed, {
+              displayForms: new Map([[normalizedWord, 1]]),
+              verses: [reference],
+              occurrences: 1,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return index;
+}
+
+function canonicalizeGenealogyPersonNames(
+  person: GenealogyPerson,
+  tokenVariantIndex: ReturnType<typeof buildGenealogyTokenVariantIndex>,
+) {
+  const canonicalByName: GenealogyVerseByName[] = [];
+  const sourceByName = person.verses?.byName ?? [];
+  const aliasesInOrder = [...person.names, ...sourceByName.map((entry) => entry.name)];
+  const nextNames: string[] = [];
+
+  for (const alias of aliasesInOrder) {
+    const collapsed = collapseGenealogyNameVariant(alias);
+    if (!collapsed) {
+      continue;
+    }
+
+    const tokenData = tokenVariantIndex.get(collapsed);
+    const canonicalName = tokenData
+      ? [...tokenData.displayForms.entries()]
+          .sort(
+            (left, right) =>
+              Number(right[0].includes("-")) - Number(left[0].includes("-")) ||
+              right[1] - left[1] ||
+              left[0].localeCompare(right[0]),
+          )[0]?.[0] ?? alias
+      : alias;
+
+    if (!nextNames.includes(canonicalName)) {
+      nextNames.push(canonicalName);
+    }
+
+    const matchingEntries = sourceByName.filter(
+      (entry) => collapseGenealogyNameVariant(entry.name) === collapsed,
+    );
+    const verses = tokenData
+      ? dedupeReferences(tokenData.verses)
+      : dedupeReferences(matchingEntries.flatMap((entry) => entry.verses));
+    const numOccurrences = tokenData
+      ? tokenData.occurrences
+      : Math.max(
+          ...matchingEntries.map((entry) => entry.numOccurrences ?? entry.verses.length),
+          0,
+        );
+
+    if (verses.length > 0) {
+      upsertByNameEntry(canonicalByName, {
+        name: canonicalName,
+        verses,
+        numOccurrences: numOccurrences || undefined,
+        numVerses: verses.length,
+      });
+    }
+  }
+
+  const totalVerses = dedupeReferences(canonicalByName.flatMap((entry) => entry.verses));
+
+  return {
+    ...person,
+    names: nextNames.length > 0 ? nextNames : person.names,
+    verses: person.verses
+      ? {
+          ...person.verses,
+          byName: canonicalByName,
+          totalOccurrences:
+            canonicalByName.reduce(
+              (count, entry) => count + (entry.numOccurrences ?? entry.verses.length),
+              0,
+            ) || undefined,
+          totalVerses: totalVerses.length || undefined,
+          first: totalVerses[0] ?? person.verses.first,
+        }
+      : person.verses,
+  };
+}
+
 export function decodeGenealogyPayload(compact: GenealogyCompactPayload): GenealogyPayload {
   const people = compact.p.map((personValue): GenealogyPerson => {
     const [
@@ -280,6 +404,9 @@ export function decodeGenealogyPayload(compact: GenealogyCompactPayload): Geneal
             return null;
           }
           const decodedVerses = decodeReferences(compact, encodedVerses);
+          if (decodedVerses.length === 0) {
+            return null;
+          }
           return {
             name,
             verses: decodedVerses,
@@ -396,6 +523,7 @@ export function enrichGenealogyPayload(
   people: GenealogyPayload,
   books: Book[],
 ): GenealogyPayload {
+  const tokenVariantIndex = buildGenealogyTokenVariantIndex(books);
   const jesusData = collectJesusOnlyReferenceData(books);
   const christData = collectChristOnlyReferenceData(books);
   const jesusChristData = collectPhraseReferenceData(books, ["Jesus", "Christ"]);
@@ -403,16 +531,18 @@ export function enrichGenealogyPayload(
   const emmanuelData = collectTokenReferenceData(books, "Emmanuel");
 
   return people.map((person) => {
-    if (!person.names.includes("Jesus Christ")) {
-      return person;
+    const canonicalPerson = canonicalizeGenealogyPersonNames(person, tokenVariantIndex);
+
+    if (!canonicalPerson.names.includes("Jesus Christ")) {
+      return canonicalPerson;
     }
 
-    const byName = [...(person.verses?.byName ?? [])].filter(
+    const byName = [...(canonicalPerson.verses?.byName ?? [])].filter(
       (entry) => !["Jesus", "Christ", "Jesus Christ"].includes(entry.name),
     );
     const existingByName = new Map(byName.map((entry) => [entry.name, entry]));
     const combinedVerses = dedupeReferences([
-      ...(person.verses?.byName ?? [])
+      ...(canonicalPerson.verses?.byName ?? [])
         .filter((entry) => !["Jesus", "Christ", "Jesus Christ"].includes(entry.name))
         .flatMap((entry) => entry.verses),
       ...jesusChristData.verses,
@@ -485,12 +615,13 @@ export function enrichGenealogyPayload(
 
     return {
       ...person,
+      ...canonicalPerson,
       verses: {
         byName,
         totalOccurrences:
-          nextJesusChristEntry?.numOccurrences || person.verses?.totalOccurrences || undefined,
-        totalVerses: combinedVerses.length || person.verses?.totalVerses || undefined,
-        first: combinedVerses[0] ?? person.verses?.first,
+          nextJesusChristEntry?.numOccurrences || canonicalPerson.verses?.totalOccurrences || undefined,
+        totalVerses: combinedVerses.length || canonicalPerson.verses?.totalVerses || undefined,
+        first: combinedVerses[0] ?? canonicalPerson.verses?.first,
       },
     };
   });

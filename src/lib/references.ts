@@ -79,8 +79,14 @@ export const BOOK_ICON_CODES = [
   "REV",
 ] as const;
 
+const DASH_VARIANTS_PATTERN = /[‐‑‒–—−]/g;
+const CURLY_APOSTROPHES_PATTERN = /[’‘]/g;
+
 export function normalizeConcordanceWord(input: string) {
-  return input.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, "");
+  return input
+    .replace(CURLY_APOSTROPHES_PATTERN, "'")
+    .replace(DASH_VARIANTS_PATTERN, "-")
+    .replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, "");
 }
 
 export function resolveConcordanceKey(
@@ -103,6 +109,15 @@ export function resolveConcordanceKey(
     if (concordance.words[candidate]) {
       return candidate;
     }
+  }
+
+  const lowered = cleaned.toLowerCase();
+  const fallback = Object.keys(concordance.words).find(
+    (key) => normalizeConcordanceWord(key).toLowerCase() === lowered,
+  );
+
+  if (fallback) {
+    return fallback;
   }
 
   return null;

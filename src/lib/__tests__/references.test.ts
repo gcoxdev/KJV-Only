@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   decodeConcordanceReferences,
+  normalizeConcordanceWord,
   resolveAIDictionaryKey,
   resolveAIDictionaryPhraseKey,
   resolveAIDictionaryPhraseKeyForToken,
@@ -30,6 +31,18 @@ describe("concordance helpers", () => {
     expect(resolveConcordanceKey(concordance, "\"the,\"")).toBe("The");
     expect(resolveConcordanceKey(concordance, "FAITH")).toBe("faith");
     expect(resolveConcordanceKey(concordance, "...")).toBeNull();
+  });
+
+  it("normalizes dash variants for concordance lookups", () => {
+    const payload: ConcordancePayload = {
+      verses: ["2SA.11.3"],
+      words: {
+        "Bath-sheba": [0],
+      },
+    };
+
+    expect(normalizeConcordanceWord("Bath–sheba")).toBe("Bath-sheba");
+    expect(resolveConcordanceKey(payload, "Bath–sheba")).toBe("Bath-sheba");
   });
 
   it("decodes delta-encoded references", () => {
