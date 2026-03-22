@@ -193,8 +193,6 @@ export type StaticPageId =
   | "download"
   | "donate"
   | "credits"
-  | "whats-new"
-  | "about"
   | "contact"
   | "help";
 

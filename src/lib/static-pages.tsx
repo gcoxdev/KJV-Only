@@ -6,10 +6,8 @@ import {
   CoinsIcon,
   ContactRoundIcon,
   DownloadIcon,
-  FileTextIcon,
   HeartHandshakeIcon,
   HouseIcon,
-  InfoIcon,
   LibraryBigIcon,
   ScrollTextIcon,
   SettingsIcon,
@@ -223,34 +221,6 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
           description:
             "Units data is currently project-curated from Scripture references and standard historical approximations for biblical measures, weights, volumes, currency, and time. A single verified upstream source has not yet been documented for this dataset.",
         },
-      ],
-    },
-  },
-  {
-    id: "whats-new",
-    title: "What's New",
-    menuLabel: "What's New",
-    icon: FileTextIcon,
-    content: {
-      eyebrow: "Release Notes",
-      heading: "What's New",
-      paragraphs: [
-        "This page is intended for release notes, recent feature additions, bug fixes, and data updates.",
-        "It should later present updates chronologically and make it easy to see what changed between versions.",
-      ],
-    },
-  },
-  {
-    id: "about",
-    title: "About",
-    menuLabel: "About",
-    icon: InfoIcon,
-    content: {
-      eyebrow: "Project",
-      heading: "About",
-      paragraphs: [
-        "This page is reserved for the purpose of the application, its goals, and the principles guiding its development.",
-        "It should later explain the mission, scope, and intended audience of the project.",
       ],
     },
   },
