@@ -1,5 +1,6 @@
 import {
   ChartBarIcon,
+  CompassIcon,
   DownloadIcon,
   MenuIcon,
   SearchIcon,
@@ -27,6 +28,7 @@ type ReaderTopBarProps = {
   isStudyMode: boolean;
   showSidebarToggle: boolean;
   onStudyModeChange: (checked: boolean) => void;
+  onOpenReferenceCommand: () => void;
   onOpenSearch: () => void;
   onShareLayout: () => void;
   onOpenProgress: () => void;
@@ -42,6 +44,7 @@ export function ReaderTopBar({
   isStudyMode,
   showSidebarToggle,
   onStudyModeChange,
+  onOpenReferenceCommand,
   onOpenSearch,
   onShareLayout,
   onOpenProgress,
@@ -135,6 +138,16 @@ export function ReaderTopBar({
       </div>
 
       <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label="Open reference command"
+          onClick={onOpenReferenceCommand}
+          data-tour="reference-command-button"
+        >
+          <CompassIcon aria-hidden="true" />
+        </Button>
         <Button
           type="button"
           variant="ghost"

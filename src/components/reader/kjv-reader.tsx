@@ -23,6 +23,10 @@ import {
 } from "@/lib/reader-data";
 import { buildVerseSearchIndex } from "@/lib/search";
 import {
+  type ReferenceCommandAction,
+  type ReferenceCommandTarget,
+} from "@/lib/reference-command";
+import {
   decodeConcordanceReferences,
   chapterVerseKey,
   normalizeConcordanceWord,
@@ -42,6 +46,12 @@ import {
   readableHighlightTextColor,
 } from "@/lib/highlight-color";
 import { chapterProgressKey, panelViewportElement } from "@/lib/reader-view";
+import {
+  calculateReaderScrollTop,
+  dequeuePendingReaderScrollTarget,
+  prunePendingReaderScrollTargets,
+  swapPendingReaderScrollTargets,
+} from "@/lib/reader-scroll-targets";
 import {
   clearSingleLeafReferenceIfMissing,
   filterRecordEntries,
@@ -103,6 +113,7 @@ import type {
   WordVerseSelectionTarget,
   NotesLinkOpenTarget,
   BookmarkOpenTarget,
+  PendingReaderScrollTarget,
   ReferenceLinkOpenTarget,
 } from "@/types/reader";
 import type { BookmarkScope, ReaderBookmark } from "@/types/bookmarks";
@@ -138,7 +149,6 @@ import { usePanelTransfer } from "@/hooks/use-panel-transfer";
 import { usePanelTargeting } from "@/hooks/use-panel-targeting";
 import {
   usePanelRouting,
-  type PendingReaderScrollTarget,
 } from "@/hooks/use-panel-routing";
 import { useWordStudyNavigation } from "@/hooks/use-word-study-navigation";
 import { useVerseHighlights } from "@/hooks/use-verse-highlights";
@@ -151,6 +161,7 @@ import { useStudyWorkspaceState } from "@/hooks/use-study-workspace-state";
 import { TabsStrip } from "@/components/reader/tabs-strip";
 import { TokenPopupCard } from "@/components/reader/token-popup-card";
 import { ReaderTopBar } from "@/components/reader/reader-top-bar";
+import { ReferenceCommandDialog } from "@/components/reader/reference-command-dialog";
 import { TabsWorkspace } from "@/components/reader/tabs-workspace";
 import { ReaderStatusScreen } from "@/components/reader/reader-status-screen";
 import { ReaderPanelTree } from "@/components/reader/reader-panel-tree";
@@ -365,8 +376,9 @@ export function KJVReader() {
     verseNumber: number;
     word: string;
   } | null>(null);
-  const [pendingReaderScrollTarget, setPendingReaderScrollTarget] =
-    useState<PendingReaderScrollTarget | null>(null);
+  const [pendingReaderScrollTargets, setPendingReaderScrollTargets] = useState<
+    PendingReaderScrollTarget[]
+  >([]);
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [sidebarCloseRequestKey, setSidebarCloseRequestKey] = useState(0);
   const [isCompletionCelebrationOpen, setIsCompletionCelebrationOpen] =
@@ -377,6 +389,7 @@ export function KJVReader() {
   );
   const [isGuidedTourOpen, setIsGuidedTourOpen] = useState(false);
   const [guidedTourStepIndex, setGuidedTourStepIndex] = useState(0);
+  const [isReferenceCommandOpen, setIsReferenceCommandOpen] = useState(false);
   const [deferredInstallPrompt, setDeferredInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isPwaInstalled, setIsPwaInstalled] = useState(false);
@@ -1152,8 +1165,8 @@ export function KJVReader() {
     setActiveReaderWordHighlight((current) =>
       clearSingleLeafReferenceIfMissing(current, activeLeafIds),
     );
-    setPendingReaderScrollTarget((current) =>
-      clearSingleLeafReferenceIfMissing(current, activeLeafIds),
+    setPendingReaderScrollTargets((current) =>
+      prunePendingReaderScrollTargets(current, activeLeafIds),
     );
   }, [
     activeLeafIds,
@@ -2029,8 +2042,8 @@ export function KJVReader() {
     setActiveReaderWordHighlight((current) =>
       swapSingleLeafReference(current, leafId, targetLeafId),
     );
-    setPendingReaderScrollTarget((current) =>
-      swapSingleLeafReference(current, leafId, targetLeafId),
+    setPendingReaderScrollTargets((current) =>
+      swapPendingReaderScrollTargets(current, leafId, targetLeafId),
     );
     setTargetedPanelLeafId((current) => {
       if (current === leafId) {
@@ -2354,14 +2367,24 @@ export function KJVReader() {
             startVerseElement.offsetHeight,
             blockBottom - blockTop,
           );
-          const nextTop =
-            blockTop -
-            viewport.clientHeight / 2 +
-            blockHeight / 2;
-          const maxTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight);
+          const nextTop = calculateReaderScrollTop(
+            blockTop,
+            blockHeight,
+            viewport.clientHeight,
+            viewport.scrollHeight,
+          );
+
+          if (blockHeight >= viewport.clientHeight) {
+            startVerseElement.scrollIntoView({
+              block: "start",
+              inline: "nearest",
+              behavior: "smooth",
+            });
+            return;
+          }
 
           viewport.scrollTo({
-            top: Math.min(Math.max(0, nextTop), maxTop),
+            top: nextTop,
             behavior: "smooth",
           });
           return;
@@ -2411,6 +2434,7 @@ export function KJVReader() {
   );
 
   useEffect(() => {
+    const pendingReaderScrollTarget = pendingReaderScrollTargets[0];
     if (!pendingReaderScrollTarget) {
       return;
     }
@@ -2443,15 +2467,8 @@ export function KJVReader() {
               pendingReaderScrollTarget.verseEnd,
             );
           }
-          setPendingReaderScrollTarget((current) =>
-            current?.leafId === pendingReaderScrollTarget.leafId &&
-            current.mode === pendingReaderScrollTarget.mode &&
-            current.bookIndex === pendingReaderScrollTarget.bookIndex &&
-            current.chapterIndex === pendingReaderScrollTarget.chapterIndex &&
-            current.verseStart === pendingReaderScrollTarget.verseStart &&
-            current.verseEnd === pendingReaderScrollTarget.verseEnd
-              ? null
-              : current,
+          setPendingReaderScrollTargets((current) =>
+            dequeuePendingReaderScrollTarget(current, pendingReaderScrollTarget),
           );
         });
       });
@@ -2465,7 +2482,7 @@ export function KJVReader() {
   }, [
     activeTabId,
     highlightedVerseRangesByLeafId,
-    pendingReaderScrollTarget,
+    pendingReaderScrollTargets,
     scrollChapterToTop,
     scrollVerseIntoView,
     tabs,
@@ -2604,6 +2621,7 @@ export function KJVReader() {
 
   const {
     openReaderTarget,
+    openReaderTargetsInSingleNewTab,
     openBookmarkTarget: openBookmarkTargetRaw,
     openSearchResultTarget: openSearchResultTargetRaw,
     openChapterReference: openChapterReferenceRaw,
@@ -2618,7 +2636,7 @@ export function KJVReader() {
     clearLeafHighlights,
     setLeafHighlights,
     setSelectedHighlightScope,
-    setPendingReaderScrollTarget,
+    setPendingReaderScrollTargets,
     setActiveReaderWordHighlight,
   });
 
@@ -2663,6 +2681,55 @@ export function KJVReader() {
       );
     },
     [openChapterReferenceRaw, referenceLinkOpenTarget],
+  );
+
+  const runReferenceCommandAction = useCallback(
+    (
+      actionId: ReferenceCommandAction["id"],
+      targets: ReferenceCommandTarget[],
+    ) => {
+      const navigationTargets = targets.map((target) => target.target);
+      const firstTarget = navigationTargets[0];
+      if (!firstTarget) {
+        return;
+      }
+
+      if (actionId === "single-new-tab") {
+        openReaderTarget(firstTarget, "new-tab");
+        return;
+      }
+
+      if (actionId === "single-new-panel") {
+        openReaderTarget(firstTarget, "new-panel");
+        return;
+      }
+
+      if (actionId === "multiple-new-tabs") {
+        navigationTargets.forEach((target) => {
+          openReaderTarget(target, "new-tab");
+        });
+        return;
+      }
+
+      if (actionId === "multiple-single-tab") {
+        openReaderTargetsInSingleNewTab(navigationTargets);
+        return;
+      }
+
+      if (!activeTabId) {
+        openReaderTargetsInSingleNewTab(navigationTargets);
+        return;
+      }
+
+      navigationTargets.forEach((target) => {
+        openReaderTarget(target, "new-panel");
+      });
+    },
+    [
+      activeTabId,
+      openReaderTarget,
+      openReaderTargetsInSingleNewTab,
+    ],
   );
 
   const handleClearLeafHighlights = useCallback(
@@ -3914,6 +3981,13 @@ export function KJVReader() {
         selector: "[data-tour='main-menu']",
       },
       {
+        id: "reference-command-button",
+        title: "Quick Open",
+        description:
+          "Use Quick Open to type Bible references such as John 3:16 or several passages at once, then choose whether to open them in tabs or panels.",
+        selector: "[data-tour='reference-command-button']",
+      },
+      {
         id: "search-button",
         title: "Search",
         description:
@@ -4498,6 +4572,7 @@ export function KJVReader() {
             isStudyMode={isStudyMode}
             showSidebarToggle={sidebarAvailable}
             onStudyModeChange={setIsStudyMode}
+            onOpenReferenceCommand={() => setIsReferenceCommandOpen(true)}
             onOpenSearch={openSearchTab}
             onShareLayout={shareLayout}
             onOpenProgress={() => openStaticPageTab("progress")}
@@ -4507,6 +4582,12 @@ export function KJVReader() {
             onImportNotes={() => notesImportInputRef.current?.click()}
             onExportBookmarks={exportBookmarks}
             onImportBookmarks={() => bookmarksImportInputRef.current?.click()}
+          />
+          <ReferenceCommandDialog
+            books={books}
+            open={isReferenceCommandOpen}
+            onOpenChange={setIsReferenceCommandOpen}
+            onRunAction={runReferenceCommandAction}
           />
           <input
             ref={notesImportInputRef}

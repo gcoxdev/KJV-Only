@@ -9,3 +9,6 @@
 
 * make panel targeting tab context first then other tabs secondarily
 * how to get saved page - have a way to submit whether they've accepted Jesus today, possibly have some kind of counter, collect email / anonymous, possibly separate testimony page
+
+* update readme.md
+* update agent.md to ensure always prompt for commands instead of silently failing and taking another path
