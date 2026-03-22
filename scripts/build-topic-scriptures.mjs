@@ -1,7 +1,20 @@
+import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-const INPUT_PATH = path.resolve("public/topics/topic-scores.txt");
+function resolveInputPath(...candidates) {
+  const resolved = candidates.map((candidate) => path.resolve(candidate));
+  const existing = resolved.find((candidate) => existsSync(candidate));
+  if (!existing) {
+    throw new Error(`Missing input file. Checked: ${resolved.join(", ")}`);
+  }
+  return existing;
+}
+
+const INPUT_PATH = resolveInputPath(
+  "public/topics/topic-scores.txt",
+  "public/delete/public/topics/topic-scores.txt",
+);
 const OUTPUT_PATH = path.resolve("public/topics/daily-scripture-topics.json");
 const KEEP_FRACTION = 0.25;
 const MAX_REFERENCES_PER_TOPIC = 5;

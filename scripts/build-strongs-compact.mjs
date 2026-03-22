@@ -1,14 +1,29 @@
 import fs from "node:fs";
 import path from "node:path";
 
+function resolveInputPath(...candidates) {
+  const resolved = candidates.map((candidate) => path.resolve(candidate));
+  const existing = resolved.find((candidate) => fs.existsSync(candidate));
+  if (!existing) {
+    throw new Error(`Missing input file. Checked: ${resolved.join(", ")}`);
+  }
+  return existing;
+}
+
 const FILES = [
   {
-    input: path.resolve("public/references/strongs-greek.json"),
+    input: resolveInputPath(
+      "public/references/strongs-greek.json",
+      "public/delete/public/references/strongs-greek.json",
+    ),
     output: path.resolve("public/references/strongs-greek.compact.min.json"),
     report: path.resolve("public/references/strongs-greek.build-report.json"),
   },
   {
-    input: path.resolve("public/references/strongs-hebrew.json"),
+    input: resolveInputPath(
+      "public/references/strongs-hebrew.json",
+      "public/delete/public/references/strongs-hebrew.json",
+    ),
     output: path.resolve("public/references/strongs-hebrew.compact.min.json"),
     report: path.resolve("public/references/strongs-hebrew.build-report.json"),
   },

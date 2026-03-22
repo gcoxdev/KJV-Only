@@ -1,7 +1,19 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const inputPath = path.resolve("public/references/genealogy.json");
+function resolveInputPath(...candidates) {
+  const resolved = candidates.map((candidate) => path.resolve(candidate));
+  const existing = resolved.find((candidate) => fs.existsSync(candidate));
+  if (!existing) {
+    throw new Error(`Missing input file. Checked: ${resolved.join(", ")}`);
+  }
+  return existing;
+}
+
+const inputPath = resolveInputPath(
+  "public/references/genealogy.json",
+  "public/delete/public/references/genealogy.json",
+);
 const outputPath = path.resolve("public/references/genealogy.compact.min.json");
 const reportPath = path.resolve("public/references/genealogy.build-report.json");
 const BOOK_ORDER = [
