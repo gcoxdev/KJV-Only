@@ -265,8 +265,15 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
       eyebrow: "Communication",
       heading: "Contact",
       paragraphs: [
-        "This page is intended for contact methods, feedback channels, and support requests.",
-        "It should later include structured ways to report issues, ask questions, or make ministry-related inquiries.",
+        "Questions, feedback, issues, and other communication for this project should go through the GitHub repository.",
+      ],
+      links: [
+        {
+          label: "KJV Only on GitHub",
+          href: "https://github.com/gcoxdev/KJV-Only",
+          description:
+            "Use the repository for issues, discussion, feedback, and project updates.",
+        },
       ],
     },
   },
