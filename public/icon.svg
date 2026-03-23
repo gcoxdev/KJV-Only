@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <rect width="256" height="256" rx="32" fill="#111827" />
-  <path d="M56 56h92c18 0 32 14 32 32v112c-10-8-20-12-32-12H56z" fill="#f8fafc" />
-  <path d="M148 56h52v132c0 18-14 32-32 32h-20z" fill="#dc2626" />
-  <text x="84" y="146" font-family="serif" font-size="44" font-weight="700" fill="#111827">KJV</text>
-</svg>
