@@ -1,46 +1,66 @@
 # KJV Only
 
-React + Vite + shadcn-based KJV Bible reader scaffold with:
-- offline-capable PWA shell
-- red-letter rendering for words of Jesus
-- Strong's token support
-- SQLite data model for advanced search work
+`KJV Only` is a React + Vite Bible reader focused on the King James Bible, study workflow, and offline use.
 
-## Data Pipeline (SWORD/OSIS -> SQLite + JSON)
+## Current App State
 
-1. Put your OSIS XML source at:
-   - `data-source/kjv.osis.xml`
-2. Build data artifacts:
-   - `npm run build:data`
-3. Generated outputs:
-   - `public/data/kjv.sqlite`
-   - `public/data/kjv.json`
+The application currently includes:
 
-The reader loads `/data/kjv.json` when present. If not found, it falls back to the sample dataset in `src/data/kjv-sample.ts`.
+- Multi-tab, multi-panel Bible reading and study workspace
+- Quick Open command palette for opening books, chapters, verses, and ranges from one input
+- Full search page with multiple search modes
+- Strong's, concordance, cross references, dictionaries, genealogy, maps, topics, and related study data
+- Bible audio support
+- Local-first notes and bookmarks with import/export support
+- Reading progress tracker and related reading workflow features
+- Settings for theme, layout, reading display, and other application behavior
+- Desktop-friendly and mobile-friendly interface
+- Installable PWA behavior and offline download bundles
 
-## App Commands
+## Tech Stack
 
-- `npm run dev`: start local dev server
-- `npm run build:data`: generate SQLite + reader JSON from OSIS
-- `npm run build`: compile frontend
-- `npm run build:all`: generate data then compile frontend
+- React 19
+- Vite
+- TypeScript
+- Tailwind CSS 4
+- shadcn/ui + Base UI
+- Lexical
+- Leaflet / React Leaflet
 
-## SQLite Schema
+## Development
 
-Generated DB tables:
-- `books`
-- `chapters`
-- `verses`
-- `tokens`
-- `verse_fts` (FTS5 full-text index)
+Install dependencies:
 
-This prepares the project for advanced verse/token/Strong's search features.
+```bash
+npm install
+```
 
-## Offline Support
+Start the dev server:
 
-PWA files:
-- `public/manifest.webmanifest`
-- `public/sw.js`
-- service worker registration in `src/lib/register-sw.ts`
+```bash
+npm run dev
+```
 
-The service worker caches app shell assets and runtime same-origin requests.
+Build the frontend:
+
+```bash
+npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+Lint:
+
+```bash
+npm run lint
+```
+
+Run tests:
+
+```bash
+npm test
+```
