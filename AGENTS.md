@@ -21,3 +21,6 @@ A skill is a set of local instructions to follow that is stored in a `SKILL.md` 
   - Prefer direct references from `SKILL.md` over deep recursive exploration.
 - Safety/fallback:
   - If a skill is incomplete or unclear, state the issue and continue with the best practical approach.
+
+## Command Approval
+- If a command needed to complete the task requires approval or fails due to sandbox restrictions, request escalation immediately rather than silently avoiding the command or switching to a weaker fallback path.
