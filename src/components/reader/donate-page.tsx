@@ -218,7 +218,7 @@ export function DonatePage({
               </p>
             </div>
             <img
-              src="/donate/paypal-donate-qr.svg"
+              src="/other/paypal-donate-qr.svg"
               alt="QR code for the PayPal donation link"
               className="h-32 w-32 rounded-md border border-border/70 bg-white p-2"
             />
