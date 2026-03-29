@@ -43,7 +43,7 @@ function formatSearchTokenText(verse: Verse, tokenIndex: number) {
 
 function formatVerseText(verse: Verse) {
   let value = "";
-  verse.tokens.forEach((token, index) => {
+  verse.tokens.forEach((_, index) => {
     const tokenText = formatSearchTokenText(verse, index);
     if (index > 0 && !isPunctuationTokenText(tokenText)) {
       value += " ";

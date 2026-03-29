@@ -22,7 +22,6 @@ import {
 import {
   Progress,
   ProgressLabel,
-  ProgressValue,
 } from "@/components/ui/progress";
 import { bookCodeForIndex } from "@/lib/reader-view";
 import {
@@ -467,9 +466,9 @@ export function DownloadPage({
                   <ProgressLabel>
                     {status.downloading ? "Downloading" : "Cached"}
                   </ProgressLabel>
-                  <ProgressValue>
+                  <span className="ml-auto text-sm text-muted-foreground tabular-nums">
                     {status.downloading ? `${downloadPercent}%` : `${percent}%`}
-                  </ProgressValue>
+                  </span>
                 </Progress>
                 {status.error ? (
                   <p className="text-xs text-destructive">{status.error}</p>

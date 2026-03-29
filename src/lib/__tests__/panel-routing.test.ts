@@ -5,13 +5,13 @@ import {
   resolveTargetedReaderPanelAction,
 } from "@/hooks/use-panel-routing";
 import { contextFromNoteLinkTarget } from "@/hooks/use-word-study-navigation";
-import type { ReaderTab } from "@/types/reader";
+import type { LeafNode, ReaderTab } from "@/types/reader";
 import type { NoteLinkTarget } from "@/types/notes";
 
 function leaf(
   id: string,
-  overrides: Partial<ReaderTab["root"]> = {},
-): ReaderTab["root"] {
+  overrides: Partial<LeafNode> = {},
+): LeafNode {
   return {
     id,
     type: "leaf",
