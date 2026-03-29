@@ -1,4 +1,4 @@
-const APP_CACHE = "kjv-only-cache-v3"
+const APP_CACHE = "kjv-only-cache-v4"
 const APP_SHELL = ["/", "/index.html", "/manifest.webmanifest"]
 const LIVE_DATA_PREFIXES = ["/references/", "/data/", "/maps/"]
 
@@ -6,12 +6,21 @@ function shouldUseNetworkFirst(requestUrl) {
   return LIVE_DATA_PREFIXES.some((prefix) => requestUrl.pathname.startsWith(prefix))
 }
 
+function isRangedRequest(request) {
+  const rangeHeader = request.headers.get("range")
+  return typeof rangeHeader === "string" && rangeHeader.trim().length > 0
+}
+
+function shouldCacheResponse(response) {
+  return response.status === 200
+}
+
 async function networkFirst(request) {
   const cache = await caches.open(APP_CACHE)
 
   try {
     const response = await fetch(request)
-    if (response.ok) {
+    if (shouldCacheResponse(response)) {
       await cache.put(request, response.clone())
     }
     return response
@@ -28,7 +37,7 @@ async function cacheFirst(request) {
   }
 
   const response = await fetch(request)
-  if (response.ok) {
+  if (shouldCacheResponse(response)) {
     const cache = await caches.open(APP_CACHE)
     await cache.put(request, response.clone())
   }
@@ -65,6 +74,11 @@ self.addEventListener("fetch", (event) => {
 
   const requestUrl = new URL(event.request.url)
   if (requestUrl.origin !== self.location.origin) {
+    return
+  }
+
+  if (isRangedRequest(event.request)) {
+    event.respondWith(fetch(event.request))
     return
   }
 
