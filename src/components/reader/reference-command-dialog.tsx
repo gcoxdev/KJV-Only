@@ -114,7 +114,7 @@ export function ReferenceCommandDialog({
 
           {actions.length > 0 ? (
             <CommandGroup heading="Open">
-              {actions.map((action) => {
+              {actions.map((action: ReferenceCommandAction) => {
                 const Icon = actionIcon(action.id);
 
                 return (

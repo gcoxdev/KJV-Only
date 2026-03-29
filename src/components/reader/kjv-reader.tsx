@@ -50,6 +50,7 @@ import {
   calculateReaderScrollTop,
   dequeuePendingReaderScrollTarget,
   prunePendingReaderScrollTargets,
+  selectPendingReaderScrollTargetForActiveTab,
   swapPendingReaderScrollTargets,
 } from "@/lib/reader-scroll-targets";
 import {
@@ -2434,7 +2435,11 @@ export function KJVReader() {
   );
 
   useEffect(() => {
-    const pendingReaderScrollTarget = pendingReaderScrollTargets[0];
+    const pendingReaderScrollTarget = selectPendingReaderScrollTargetForActiveTab(
+      pendingReaderScrollTargets,
+      tabs,
+      activeTabId,
+    );
     if (!pendingReaderScrollTarget) {
       return;
     }

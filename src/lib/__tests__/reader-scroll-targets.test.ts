@@ -5,8 +5,10 @@ import {
   dequeuePendingReaderScrollTarget,
   prunePendingReaderScrollTargets,
   queuePendingReaderScrollTarget,
+  selectPendingReaderScrollTargetForActiveTab,
   swapPendingReaderScrollTargets,
 } from "@/lib/reader-scroll-targets";
+import type { ReaderTab } from "@/types/reader";
 
 describe("reader scroll targets", () => {
   it("queues multiple panel scroll targets instead of overwriting them", () => {
@@ -104,5 +106,86 @@ describe("reader scroll targets", () => {
 
   it("centers shorter highlighted blocks when there is room", () => {
     expect(calculateReaderScrollTop(240, 80, 400, 2000)).toBe(80);
+  });
+
+  it("selects the pending target for the active tab without consuming hidden-tab targets first", () => {
+    const queue = [
+      {
+        leafId: "gen-leaf",
+        bookIndex: 0,
+        chapterIndex: 0,
+        mode: "verse-range" as const,
+        verseStart: 2,
+        verseEnd: 2,
+      },
+      {
+        leafId: "john-leaf",
+        bookIndex: 42,
+        chapterIndex: 2,
+        mode: "verse-range" as const,
+        verseStart: 16,
+        verseEnd: 16,
+      },
+      {
+        leafId: "rev-leaf",
+        bookIndex: 65,
+        chapterIndex: 21,
+        mode: "verse-range" as const,
+        verseStart: 12,
+        verseEnd: 12,
+      },
+    ];
+
+    const tabs: ReaderTab[] = [
+      {
+        id: "tab-gen",
+        title: "Genesis 1:2",
+        root: {
+          id: "gen-leaf",
+          type: "leaf",
+          view: "reader",
+          bookIndex: 0,
+          chapterIndex: 0,
+          pickerTestament: null,
+          pickerBookIndex: null,
+          pageId: null,
+        },
+      },
+      {
+        id: "tab-john",
+        title: "John 3:16",
+        root: {
+          id: "john-leaf",
+          type: "leaf",
+          view: "reader",
+          bookIndex: 42,
+          chapterIndex: 2,
+          pickerTestament: null,
+          pickerBookIndex: null,
+          pageId: null,
+        },
+      },
+      {
+        id: "tab-rev",
+        title: "Revelation 22:12",
+        root: {
+          id: "rev-leaf",
+          type: "leaf",
+          view: "reader",
+          bookIndex: 65,
+          chapterIndex: 21,
+          pickerTestament: null,
+          pickerBookIndex: null,
+          pageId: null,
+        },
+      },
+    ];
+
+    expect(selectPendingReaderScrollTargetForActiveTab(queue, tabs, "tab-rev")).toEqual(
+      queue[2],
+    );
+    expect(selectPendingReaderScrollTargetForActiveTab(queue, tabs, "tab-john")).toEqual(
+      queue[1],
+    );
   });
 });

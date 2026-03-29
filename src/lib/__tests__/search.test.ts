@@ -54,10 +54,10 @@ describe("search helpers", () => {
               {
                 verse: 3,
                 tokens: [
-                  { text: "by", punctuation: false, divineName: false },
-                  { text: "my", punctuation: false, divineName: false },
-                  { text: "name", punctuation: false, divineName: false },
-                  { text: "Jehovah", punctuation: false, divineName: true },
+                  { text: "by", divineName: false },
+                  { text: "my", divineName: false },
+                  { text: "name", divineName: false },
+                  { text: "Jehovah", divineName: true },
                 ],
               },
             ],

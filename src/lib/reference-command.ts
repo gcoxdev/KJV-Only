@@ -91,6 +91,8 @@ type ParsedEntity = {
   };
 };
 
+type OsisBookCode = (typeof OSIS_BOOK_CODES)[number];
+
 type ReferenceUnit = {
   kind: "chapter" | "selection" | "range";
   bookIndex: number;
@@ -118,6 +120,10 @@ export type ReferenceCommandAction = {
 const osisBookToIndex = new Map(
   OSIS_BOOK_CODES.map((code, index) => [code, index]),
 );
+
+function isOsisBookCode(value: string): value is OsisBookCode {
+  return OSIS_BOOK_CODES.includes(value as OsisBookCode);
+}
 
 function createReferenceParser() {
   const parser = new bcv_parser(bibleReferenceLanguage);
@@ -172,8 +178,8 @@ function formatCrossChapterRangeLabel(
   return `${startLabel}-${endBook} ${target.end.chapterIndex + 1}:${target.end.verseNumber}`;
 }
 
-function flattenParsedEntities(entities: ParsedEntity[]) {
-  return entities.flatMap((entity) => {
+function flattenParsedEntities(entities: ParsedEntity[]): ParsedEntity[] {
+  return entities.flatMap((entity): ParsedEntity[] => {
     if (Array.isArray(entity.entities) && entity.entities.length > 0) {
       return flattenParsedEntities(entity.entities);
     }
@@ -224,7 +230,10 @@ function matchBookOnlyInput(input: string, books: Book[]) {
   return null;
 }
 
-function normalizeParsedEntity(entity: ParsedEntity, books: Book[]) {
+function normalizeParsedEntity(
+  entity: ParsedEntity,
+  books: Book[],
+): ReferenceUnit | null {
   const startBookCode = entity.start?.b;
   const endBookCode = entity.end?.b ?? startBookCode;
   const startChapterNumber = entity.start?.c;
@@ -239,6 +248,10 @@ function normalizeParsedEntity(entity: ParsedEntity, books: Book[]) {
     !startVerseNumber ||
     !endVerseNumber
   ) {
+    return null;
+  }
+
+  if (!isOsisBookCode(startBookCode) || !isOsisBookCode(endBookCode)) {
     return null;
   }
 
@@ -457,7 +470,7 @@ export function parseReferenceCommandInput(input: string, books: Book[]) {
   const parser = createReferenceParser();
   const parsed = parser.parse(trimmed).parsed_entities() as ParsedEntity[];
   const units = flattenParsedEntities(parsed)
-    .map((entity) => normalizeParsedEntity(entity, books))
+    .map((entity: ParsedEntity) => normalizeParsedEntity(entity, books))
     .filter((value): value is ReferenceUnit => value !== null);
 
   if (units.length === 0) {
@@ -478,7 +491,7 @@ export function buildReferenceCommandActions(targets: ReferenceCommandTarget[]) 
   }
 
   if (targets.length === 1) {
-    return [
+    const actions: ReferenceCommandAction[] = [
       {
         id: "single-new-tab",
         label: "Open in New Tab",
@@ -490,9 +503,10 @@ export function buildReferenceCommandActions(targets: ReferenceCommandTarget[]) 
         description: targets[0].label,
       },
     ];
+    return actions;
   }
 
-  return [
+  const actions: ReferenceCommandAction[] = [
     {
       id: "multiple-new-tabs",
       label: "Open Each in Its Own New Tab",
@@ -509,6 +523,7 @@ export function buildReferenceCommandActions(targets: ReferenceCommandTarget[]) 
       description: `${targets.length} panels in the current tab`,
     },
   ];
+  return actions;
 }
 
 function locationFromTarget(target: ReaderNavigationTarget) {
