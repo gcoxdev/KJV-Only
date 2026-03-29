@@ -3,7 +3,10 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import type { JSX } from "react";
 import { $createTextNode, $isTextNode, TextNode } from "lexical";
 
-import { $createKjvInternalLinkNode } from "@/components/editor/nodes/kjv-internal-link-node";
+import {
+  $createKjvInternalLinkNode,
+  KjvInternalLinkNode,
+} from "@/components/editor/nodes/kjv-internal-link-node";
 import {
   buildNoteLinkHref,
   parseTypedBibleReference,
@@ -15,7 +18,7 @@ export function NoteLinkAutoLinkPlugin({
   books,
 }: {
   books: Book[];
-}): JSX.Element {
+}): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -34,8 +37,9 @@ export function NoteLinkAutoLinkPlugin({
           return;
         }
         const nextHref = buildNoteLinkHref(nextTarget);
-        if (parent.getURL() !== nextHref) {
-          parent.setURL(nextHref);
+        const linkParent = parent as KjvInternalLinkNode;
+        if (linkParent.getURL() !== nextHref) {
+          linkParent.setURL(nextHref);
         }
         return;
       }
@@ -52,7 +56,7 @@ export function NoteLinkAutoLinkPlugin({
       }
 
       const href = buildNoteLinkHref(match.target);
-      let matchedNode: TextNode;
+      let matchedNode: TextNode | null = null;
       if (match.index === 0 && match.length === text.length) {
         matchedNode = node;
       } else if (match.index === 0) {
@@ -61,6 +65,10 @@ export function NoteLinkAutoLinkPlugin({
         [, matchedNode] = node.splitText(match.index);
       } else {
         [, matchedNode] = node.splitText(match.index, match.index + match.length);
+      }
+
+      if (!matchedNode) {
+        return;
       }
 
       const linkNode = $createKjvInternalLinkNode(href);

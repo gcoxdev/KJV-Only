@@ -70,7 +70,6 @@ function renderVerseText(book: Book, chapterIndex: number, verseStart: number, v
         const tokenText = token.divineName ? token.text.toUpperCase() : token.text;
         const noLeadingSpace =
           index === 0 ||
-          token.punctuation ||
           /^['")\].,;:!?]+$/.test(tokenText) ||
           tokenText === "'s";
         return `${text}${noLeadingSpace ? "" : " "}${tokenText}`;

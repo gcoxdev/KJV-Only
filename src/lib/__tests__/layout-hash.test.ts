@@ -32,7 +32,7 @@ describe("layout hash", () => {
             chapterIndex: 0,
             pickerTestament: null,
             pickerBookIndex: null,
-            pageId: "about",
+            pageId: "help",
           },
         },
       },

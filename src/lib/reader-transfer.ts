@@ -1,6 +1,9 @@
 import type { ReaderBookmark } from "@/types/bookmarks";
 import type { NoteScope, ReaderNote } from "@/types/notes";
 
+type NonGeneralNoteScope = Exclude<NoteScope, { type: "general" }>;
+type ScopedReaderNote = ReaderNote & { scope: NonGeneralNoteScope };
+
 type NotesExportPayload = {
   type: "kjv-reader-notes";
   version: 1;
@@ -101,7 +104,9 @@ function normalizeLegacyImportedNote(note: ReaderNote): ReaderNote {
 }
 
 function looksLikeLegacyOneBasedNotes(notes: ReaderNote[]) {
-  const scopedNotes = notes.filter((note) => note.scope.type !== "general");
+  const scopedNotes = notes.filter(
+    (note): note is ScopedReaderNote => note.scope.type !== "general",
+  );
   if (scopedNotes.length === 0) {
     return false;
   }

@@ -179,6 +179,10 @@ export function usePanelRouting({
 
   const createTargetedReaderPanelInActiveTab = useCallback(
     (target: ReaderNavigationTarget) => {
+      if (!activeTabId) {
+        return null;
+      }
+
       const nextState = buildTargetedReaderPanelInTabState(
         tabsRef.current,
         activeTabId,
@@ -512,25 +516,27 @@ export function usePanelRouting({
         normalized.start.bookIndex === normalized.end.bookIndex &&
         normalized.start.chapterIndex === normalized.end.chapterIndex;
       if (isSameChapter) {
+        const nextTarget: ReaderNavigationTarget =
+          normalized.start.verseNumber === normalized.end.verseNumber
+            ? {
+                type: "verse",
+                bookIndex: normalized.start.bookIndex,
+                chapterIndex: normalized.start.chapterIndex,
+                verseNumber: normalized.start.verseNumber,
+              }
+            : {
+                type: "selection",
+                bookIndex: normalized.start.bookIndex,
+                chapterIndex: normalized.start.chapterIndex,
+                ranges: [
+                  {
+                    start: normalized.start.verseNumber,
+                    end: normalized.end.verseNumber,
+                  },
+                ],
+              };
         openReaderTarget(
-          {
-            type:
-              normalized.start.verseNumber === normalized.end.verseNumber
-                ? "verse"
-                : "selection",
-            bookIndex: normalized.start.bookIndex,
-            chapterIndex: normalized.start.chapterIndex,
-            ...(normalized.start.verseNumber === normalized.end.verseNumber
-              ? { verseNumber: normalized.start.verseNumber }
-              : {
-                  ranges: [
-                    {
-                      start: normalized.start.verseNumber,
-                      end: normalized.end.verseNumber,
-                    },
-                  ],
-                }),
-          },
+          nextTarget,
           destination,
         );
         return;

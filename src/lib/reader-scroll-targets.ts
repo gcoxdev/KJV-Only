@@ -1,4 +1,5 @@
-import type { PendingReaderScrollTarget } from "@/types/reader";
+import { findLeafNode } from "@/lib/reader-layout";
+import type { PendingReaderScrollTarget, ReaderTab } from "@/types/reader";
 
 export function queuePendingReaderScrollTarget(
   queue: PendingReaderScrollTarget[],
@@ -9,9 +10,10 @@ export function queuePendingReaderScrollTarget(
 
 export function prunePendingReaderScrollTargets(
   queue: PendingReaderScrollTarget[],
-  activeLeafIds: string[],
+  activeLeafIds: string[] | ReadonlySet<string>,
 ) {
-  const activeLeafIdSet = new Set(activeLeafIds);
+  const activeLeafIdSet =
+    activeLeafIds instanceof Set ? activeLeafIds : new Set(activeLeafIds);
   return queue.filter((entry) => activeLeafIdSet.has(entry.leafId));
 }
 
@@ -36,6 +38,25 @@ export function dequeuePendingReaderScrollTarget(
   processed: PendingReaderScrollTarget,
 ) {
   return queue.filter((entry) => entry !== processed);
+}
+
+export function selectPendingReaderScrollTargetForActiveTab(
+  queue: PendingReaderScrollTarget[],
+  tabs: ReaderTab[],
+  activeTabId: string | null,
+) {
+  if (!activeTabId) {
+    return null;
+  }
+
+  const activeTab = tabs.find((tab) => tab.id === activeTabId);
+  if (!activeTab) {
+    return null;
+  }
+
+  return (
+    queue.find((entry) => Boolean(findLeafNode(activeTab.root, entry.leafId))) ?? null
+  );
 }
 
 export function calculateReaderScrollTop(
