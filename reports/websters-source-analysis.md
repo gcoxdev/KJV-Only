@@ -6,7 +6,7 @@ Short answer: **very likely yes, or else from the same underlying transcription*
 
 ### Evidence
 
-Our local subset currently has `1019` entries in [`public/references/websters.json`](<project-root>/public/references/websters.json).
+Our local subset currently has `1019` entries in [`public/references/websters.json`](../public/references/websters.json).
 
 Spot checks against the public site show exact wording matches for existing entries:
 

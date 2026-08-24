@@ -1,6 +1,6 @@
 # Webster Import-Ready Candidates
 
-This file refines the earlier preview into the actual shape used by [`websters.json`](<project-root>/public/references/websters.json), while separating entries by confidence level.
+This file refines the earlier preview into the actual shape used by [`websters.json`](../public/references/websters.json), while separating entries by confidence level.
 
 ## Categories
 

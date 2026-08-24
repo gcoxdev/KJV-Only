@@ -13,8 +13,8 @@ The codebase is moving in the right direction. Recent extractions around routing
 ### 1. `KJVReader` is still too large and too state-dense
 
 Files:
-- [src/components/reader/kjv-reader.tsx](<project-root>/src/components/reader/kjv-reader.tsx)
-- [src/components/reader/reader-panel-tree.tsx](<project-root>/src/components/reader/reader-panel-tree.tsx)
+- [src/components/reader/kjv-reader.tsx](../src/components/reader/kjv-reader.tsx)
+- [src/components/reader/reader-panel-tree.tsx](../src/components/reader/reader-panel-tree.tsx)
 
 Why it matters:
 - `kjv-reader.tsx` is still about `4800` lines.
@@ -37,10 +37,10 @@ Improve:
 ### 2. Panel lifecycle reliability still needs stronger invariants
 
 Files:
-- [src/lib/reader-layout.ts](<project-root>/src/lib/reader-layout.ts)
-- [src/lib/leaf-state.ts](<project-root>/src/lib/leaf-state.ts)
-- [src/hooks/use-leaf-history.ts](<project-root>/src/hooks/use-leaf-history.ts)
-- [src/hooks/use-panel-targeting.ts](<project-root>/src/hooks/use-panel-targeting.ts)
+- [src/lib/reader-layout.ts](../src/lib/reader-layout.ts)
+- [src/lib/leaf-state.ts](../src/lib/leaf-state.ts)
+- [src/hooks/use-leaf-history.ts](../src/hooks/use-leaf-history.ts)
+- [src/hooks/use-panel-targeting.ts](../src/hooks/use-panel-targeting.ts)
 
 Why it matters:
 - Recent fixes prove this area is still the highest bug-density zone.
@@ -65,8 +65,8 @@ Improve:
 ### 3. There are still too many reader-side effects coupled together
 
 Files:
-- [src/components/reader/kjv-reader.tsx](<project-root>/src/components/reader/kjv-reader.tsx)
-- [src/hooks/use-panel-routing.ts](<project-root>/src/hooks/use-panel-routing.ts)
+- [src/components/reader/kjv-reader.tsx](../src/components/reader/kjv-reader.tsx)
+- [src/hooks/use-panel-routing.ts](../src/hooks/use-panel-routing.ts)
 
 Why it matters:
 - Word clicks, note links, cross references, notes context, reader highlight state, and study tool state are still tightly coupled.
@@ -89,8 +89,8 @@ Improve:
 ### 4. UI wrapper contracts are not always explicit enough
 
 Files:
-- [src/components/ui/alert-dialog.tsx](<project-root>/src/components/ui/alert-dialog.tsx)
-- [src/components/reader/kjv-reader.tsx](<project-root>/src/components/reader/kjv-reader.tsx)
+- [src/components/ui/alert-dialog.tsx](../src/components/ui/alert-dialog.tsx)
+- [src/components/reader/kjv-reader.tsx](../src/components/reader/kjv-reader.tsx)
 
 Why it matters:
 - Recent import-dialog warnings happened because wrapper behavior was assumed instead of enforced.
@@ -106,7 +106,7 @@ Improve:
 ### 5. Test coverage is decent at the library level but still thin at the workflow level
 
 Files:
-- [src/lib/__tests__](<project-root>/src/lib/__tests__)
+- [src/lib/__tests__](../src/lib/__tests__)
 
 Why it matters:
 - The codebase has solid unit-style coverage for parsing and layout helpers.
@@ -126,9 +126,9 @@ Improve:
 ### 6. Offline/download UX is useful but still not fully self-explanatory
 
 Files:
-- [src/components/reader/download-page.tsx](<project-root>/src/components/reader/download-page.tsx)
-- [src/lib/offline-downloads.ts](<project-root>/src/lib/offline-downloads.ts)
-- [public/sw.js](<project-root>/public/sw.js)
+- [src/components/reader/download-page.tsx](../src/components/reader/download-page.tsx)
+- [src/lib/offline-downloads.ts](../src/lib/offline-downloads.ts)
+- [public/sw.js](../public/sw.js)
 
 Why it matters:
 - The feature exists, which is good.
@@ -143,9 +143,9 @@ Improve:
 ### 7. Local persistence works, but schema/version strategy should be more formal
 
 Files:
-- [src/hooks/use-reader-notes.ts](<project-root>/src/hooks/use-reader-notes.ts)
-- [src/hooks/use-reader-bookmarks.ts](<project-root>/src/hooks/use-reader-bookmarks.ts)
-- [src/components/reader/kjv-reader.tsx](<project-root>/src/components/reader/kjv-reader.tsx)
+- [src/hooks/use-reader-notes.ts](../src/hooks/use-reader-notes.ts)
+- [src/hooks/use-reader-bookmarks.ts](../src/hooks/use-reader-bookmarks.ts)
+- [src/components/reader/kjv-reader.tsx](../src/components/reader/kjv-reader.tsx)
 
 Why it matters:
 - Notes, bookmarks, settings, and reader state rely heavily on local storage.
@@ -159,10 +159,10 @@ Improve:
 ### 8. Static pages are improving, but the quality level is still uneven
 
 Files:
-- [src/components/reader/welcome-home-page.tsx](<project-root>/src/components/reader/welcome-home-page.tsx)
-- [src/components/reader/download-page.tsx](<project-root>/src/components/reader/download-page.tsx)
-- [src/components/reader/how-to-get-saved-page.tsx](<project-root>/src/components/reader/how-to-get-saved-page.tsx)
-- [src/components/reader/why-kjv-only-page.tsx](<project-root>/src/components/reader/why-kjv-only-page.tsx)
+- [src/components/reader/welcome-home-page.tsx](../src/components/reader/welcome-home-page.tsx)
+- [src/components/reader/download-page.tsx](../src/components/reader/download-page.tsx)
+- [src/components/reader/how-to-get-saved-page.tsx](../src/components/reader/how-to-get-saved-page.tsx)
+- [src/components/reader/why-kjv-only-page.tsx](../src/components/reader/why-kjv-only-page.tsx)
 
 Why it matters:
 - These pages are part of the product identity now, not just filler.
@@ -180,9 +180,9 @@ Improve:
 ### 9. Some bundle and render costs could be trimmed further
 
 Files:
-- [src/components/reader/kjv-reader.tsx](<project-root>/src/components/reader/kjv-reader.tsx)
-- [src/components/reader/download-page.tsx](<project-root>/src/components/reader/download-page.tsx)
-- [src/components/reader/search-page.tsx](<project-root>/src/components/reader/search-page.tsx)
+- [src/components/reader/kjv-reader.tsx](../src/components/reader/kjv-reader.tsx)
+- [src/components/reader/download-page.tsx](../src/components/reader/download-page.tsx)
+- [src/components/reader/search-page.tsx](../src/components/reader/search-page.tsx)
 
 Why it matters:
 - You already use some lazy loading, which is good.
@@ -198,7 +198,7 @@ Improve:
 ### 10. Welcome page could do more as a product entry point
 
 File:
-- [src/components/reader/welcome-home-page.tsx](<project-root>/src/components/reader/welcome-home-page.tsx)
+- [src/components/reader/welcome-home-page.tsx](../src/components/reader/welcome-home-page.tsx)
 
 Improve:
 - Add clearer quick actions:
@@ -210,7 +210,7 @@ Improve:
 ### 11. Download page can be clearer visually
 
 File:
-- [src/components/reader/download-page.tsx](<project-root>/src/components/reader/download-page.tsx)
+- [src/components/reader/download-page.tsx](../src/components/reader/download-page.tsx)
 
 Improve:
 - Better grouping between:

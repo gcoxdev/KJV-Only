@@ -2,7 +2,7 @@
 A skill is a set of local instructions to follow that is stored in a `SKILL.md` file.
 
 ### Available skills
-- shadcn: Manages shadcn components and projects — adding, searching, fixing, debugging, styling, and composing UI. (file: <project-root>/.agents/skills/shadcn/SKILL.md)
+- shadcn: Manages shadcn components and projects — adding, searching, fixing, debugging, styling, and composing UI. (file: .agents/skills/shadcn/SKILL.md)
 
 ### How to use skills
 - Discovery: The list above is the skills available in this repo/session (name + description + file path).
