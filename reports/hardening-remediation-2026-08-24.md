@@ -4,6 +4,8 @@
 **Assessment baseline:** `reports/project-assessment-2026-08-23.md`, committed as `191555f`
 **Compatibility objective:** Improve security, structure, reliability, performance, design consistency, and delivery controls without changing the product's existing user-facing behavior.
 
+> **Follow-up:** The remaining selected structural, startup, corpus-integrity, workflow, and release-gate work is complete. Current measurements and final disposition are recorded in [Assessment Follow-Up and Final Hardening Record](assessment-follow-up-2026-08-24.md). AWS Amplify-side controls remain owner-deferred, and no S3/CDN migration was performed.
+
 ## Executive result
 
 The repository-local recommendations from the assessment have been implemented. The application retains its existing reader, workspace, study tools, notes, bookmarks, search, layout sharing, maps, audio, offline packages, and public URL contracts. Hardening was performed at boundaries rather than through a product redesign.

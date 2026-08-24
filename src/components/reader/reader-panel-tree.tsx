@@ -210,6 +210,9 @@ type ReaderPanelTreeProps = {
   ) => void;
   concordanceWords: string[];
   verseSearchIndex: VerseSearchIndexEntry[];
+  isVerseSearchIndexBuilding: boolean;
+  isVerseSearchIndexReady: boolean;
+  verseSearchIndexError: string | null;
   ensureConcordanceWordsLoaded: () => Promise<unknown>;
   onOpenSearchResult: (
     bookIndex: number,
@@ -339,6 +342,9 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   onSelectVerse,
   concordanceWords,
   verseSearchIndex,
+  isVerseSearchIndexBuilding,
+  isVerseSearchIndexReady,
+  verseSearchIndexError,
   ensureConcordanceWordsLoaded,
   onOpenSearchResult,
   notes,
@@ -1531,6 +1537,9 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 books={books}
                 concordanceWords={concordanceWords}
                 verseIndex={verseSearchIndex}
+                isVerseIndexBuilding={isVerseSearchIndexBuilding}
+                isVerseIndexReady={isVerseSearchIndexReady}
+                verseIndexError={verseSearchIndexError}
                 ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
                 state={
                   searchPageStateByLeafId[leaf.id] ?? {
@@ -1787,6 +1796,9 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   onSelectVerse,
   concordanceWords,
   verseSearchIndex,
+  isVerseSearchIndexBuilding,
+  isVerseSearchIndexReady,
+  verseSearchIndexError,
   ensureConcordanceWordsLoaded,
   onOpenSearchResult,
   notes,
@@ -1879,6 +1891,9 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       onSelectVerse={onSelectVerse}
       concordanceWords={concordanceWords}
       verseSearchIndex={verseSearchIndex}
+      isVerseSearchIndexBuilding={isVerseSearchIndexBuilding}
+      isVerseSearchIndexReady={isVerseSearchIndexReady}
+      verseSearchIndexError={verseSearchIndexError}
       ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
       onOpenSearchResult={onOpenSearchResult}
       notes={notes}

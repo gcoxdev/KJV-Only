@@ -2,6 +2,7 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import { createHash } from "node:crypto";
 
 const DIST_DIR = path.resolve("dist");
 const REQUIRED_PATHS = [
@@ -9,7 +10,9 @@ const REQUIRED_PATHS = [
   "manifest.webmanifest",
   "sw.js",
   "app-cache-config.js",
+  "data/kjv-bootstrap.json",
   "data/kjv.json",
+  "data/kjv-manifest.json",
   "icons/app-icon.svg",
 ];
 const FORBIDDEN_PATHS = [
@@ -28,9 +31,14 @@ const FORBIDDEN_FILE_PATTERNS = [
 const BUDGETS = {
   maxFiles: 7_000,
   maxTotalBytes: 1_150_000_000,
-  maxEntryJavaScriptBytes: 650_000,
-  maxEntryCssBytes: 200_000,
+  maxEntryJavaScriptBytes: 600_000,
+  maxEntryCssBytes: 180_000,
 };
+
+async function sha256(filePath) {
+  const contents = await fs.readFile(filePath);
+  return createHash("sha256").update(contents).digest("hex");
+}
 
 async function exists(relativePath) {
   try {
@@ -53,6 +61,24 @@ async function collectFiles(directory) {
     }
   }
   return files;
+}
+
+function isPositiveSafeInteger(value) {
+  return Number.isSafeInteger(value) && value > 0;
+}
+
+function isCorpusAsset(asset, expected) {
+  return (
+    asset &&
+    typeof asset === "object" &&
+    !Array.isArray(asset) &&
+    asset.url === expected.url &&
+    /^[a-f0-9]{64}$/.test(asset.sha256) &&
+    isPositiveSafeInteger(asset.bytes) &&
+    asset.bookCount === expected.bookCount &&
+    asset.chapterCount === expected.chapterCount &&
+    asset.verseCount === expected.verseCount
+  );
 }
 
 const failures = [];
@@ -84,6 +110,59 @@ const entryJavaScript = files.find((file) =>
 const entryCss = files.find((file) =>
   /\/assets\/index-[^/]+\.css$/.test(file.path),
 );
+
+try {
+  const manifest = JSON.parse(
+    await fs.readFile(path.join(DIST_DIR, "data/kjv-manifest.json"), "utf8"),
+  );
+  if (
+    !manifest ||
+    typeof manifest !== "object" ||
+    Array.isArray(manifest) ||
+    manifest.schemaVersion !== 1 ||
+    !/^sha256-[a-f0-9]{16}$/.test(manifest.corpusVersion)
+  ) {
+    throw new Error("Invalid corpus manifest schema");
+  }
+  const expectedAssets = [
+    [manifest.bootstrap, {
+      url: "/data/kjv-bootstrap.json",
+      bookCount: 1,
+      chapterCount: 1,
+      verseCount: 31,
+    }],
+    [manifest.full, {
+      url: "/data/kjv.json",
+      bookCount: 66,
+      chapterCount: 1189,
+      verseCount: 31102,
+    }],
+  ];
+  for (const [asset, expected] of expectedAssets) {
+    if (!isCorpusAsset(asset, expected)) {
+      failures.push(`Invalid corpus manifest asset: ${expected.url}`);
+      continue;
+    }
+    const assetPath = path.join(DIST_DIR, expected.url.replace(/^\//, ""));
+    const stats = await fs.stat(assetPath);
+    if (stats.size !== asset.bytes) {
+      failures.push(
+        `Corpus manifest byte mismatch: ${expected.url} (${stats.size} !== ${asset.bytes})`,
+      );
+    }
+    if ((await sha256(assetPath)) !== asset.sha256) {
+      failures.push(`Corpus manifest hash mismatch: ${expected.url}`);
+    }
+  }
+  const fullHash = await sha256(path.join(DIST_DIR, "data/kjv.json"));
+  if (manifest.corpusVersion !== `sha256-${fullHash.slice(0, 16)}`) {
+    failures.push("Corpus manifest version does not match the full corpus hash");
+  }
+} catch (error) {
+  failures.push(
+    `Could not validate corpus manifest: ${error instanceof Error ? error.message : String(error)}`,
+  );
+}
 
 if (files.length > BUDGETS.maxFiles) {
   failures.push(`File budget exceeded: ${files.length} > ${BUDGETS.maxFiles}`);

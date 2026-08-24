@@ -14,15 +14,49 @@ async function expectReaderReady(page: import("@playwright/test").Page) {
 }
 
 test("loads the default reader and preserves chapter navigation", async ({ page }) => {
-  await page.goto("/")
-  await expectReaderReady(page)
+  let releaseCorpus: () => void = () => {}
+  const corpusGate = new Promise<void>((resolve) => {
+    releaseCorpus = resolve
+  })
+  await page.route("**/data/kjv.json", async (route) => {
+    await corpusGate
+    await route.continue()
+  })
 
+  await page.goto("/")
+  try {
+    await expectReaderReady(page)
+
+    const earlyMeasures = await page.evaluate(() => ({
+      bootstrap: performance.getEntriesByName("kjv:bootstrap-load").at(-1)
+        ?.duration,
+      firstReader: performance.getEntriesByName("kjv:first-reader-ready").at(-1)
+        ?.duration,
+      corpusCount: performance.getEntriesByName("kjv:corpus-load").length,
+    }))
+    expect(earlyMeasures.bootstrap).toBeGreaterThan(0)
+    expect(earlyMeasures.bootstrap).toBeLessThan(5_000)
+    expect(earlyMeasures.firstReader).toBeGreaterThan(0)
+    expect(earlyMeasures.firstReader).toBeLessThan(5_000)
+    expect(earlyMeasures.corpusCount).toBe(0)
+  } finally {
+    releaseCorpus()
+  }
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => performance.getEntriesByName("kjv:corpus-load").at(-1)?.duration,
+      ),
+    )
+    .toBeTruthy()
   const corpusLoadDuration = await page.evaluate(
-    () => performance.getEntriesByName("kjv:corpus-load")[0]?.duration,
+    () => performance.getEntriesByName("kjv:corpus-load").at(-1)?.duration,
   )
   expect(corpusLoadDuration).toBeGreaterThan(0)
-  expect(corpusLoadDuration).toBeLessThan(60_000)
+  expect(corpusLoadDuration).toBeLessThan(30_000)
 
+  await expect(page.getByLabel("Next chapter").first()).toBeEnabled()
   await page.getByLabel("Next chapter").first().click()
   await expect(
     page.getByRole("button", { name: "Genesis 2", exact: true }),
@@ -47,14 +81,35 @@ test("builds the lazy search index and returns the expected verse", async ({ pag
   await page.getByLabel("Open search").click()
   await expect(page.getByRole("heading", { name: "Search" })).toBeVisible()
   await page.getByLabel("Word or phrase").fill('"In the beginning"')
-  await page.getByRole("button", { name: "Search", exact: true }).last().click()
+  await page.getByLabel("Run Bible search").click()
   await expect(page.getByText("Genesis 1:1", { exact: true })).toBeVisible()
 
   const indexBuildDuration = await page.evaluate(
-    () => performance.getEntriesByName("kjv:search-index-build")[0]?.duration,
+    () => performance.getEntriesByName("kjv:search-index-build").at(-1)?.duration,
   )
   expect(indexBuildDuration).toBeGreaterThan(0)
-  expect(indexBuildDuration).toBeLessThan(60_000)
+  expect(indexBuildDuration).toBeLessThan(15_000)
+})
+
+test("restores a shared chapter layout after reload", async ({ page }) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+  await expect(page.getByLabel("Next chapter").first()).toBeEnabled()
+  await page.getByLabel("Next chapter").first().click()
+  await expect(
+    page.getByRole("button", { name: "Genesis 2", exact: true }),
+  ).toBeVisible()
+  await expect.poll(() => new URL(page.url()).hash).toContain("GEN.2")
+
+  await page.reload()
+  await page.getByRole("button", { name: "Genesis 1", exact: true }).click()
+  await expect(
+    page
+      .getByText("Thus the heavens and the earth were finished", {
+        exact: false,
+      })
+      .filter({ visible: true }),
+  ).toBeVisible()
 })
 
 test("imports notes through the worker and persists the result", async ({ page }) => {

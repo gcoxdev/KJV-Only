@@ -23,7 +23,9 @@ const RUNTIME_PUBLIC_ENTRIES = [
 const EXACT_RUNTIME_ASSETS = new Set([
   "_headers",
   "app-cache-config.js",
+  "data/kjv-bootstrap.json",
   "data/kjv.json",
+  "data/kjv-manifest.json",
   "icons/app-icon.svg",
   "manifest.webmanifest",
   "maps/data/map.json",
@@ -45,10 +47,10 @@ const EXACT_RUNTIME_ASSETS = new Set([
   "topics/topics-index.json",
 ])
 
-function isAllowedRuntimeFile(relative: string) {
+export function isAllowedRuntimeFile(relative: string) {
   return (
     EXACT_RUNTIME_ASSETS.has(relative) ||
-    /^audio\/[A-Z0-9]{2,4}\.\d{1,3}\.mp3$/.test(relative) ||
+    /^audio\/[A-Z0-9]{2,4}\.[1-9]\d{0,2}\.mp3$/.test(relative) ||
     /^icons\/(?:bw|color)\/[A-Za-z0-9][A-Za-z0-9._-]{0,99}\.png$/.test(
       relative,
     ) ||
@@ -61,6 +63,30 @@ function isAllowedRuntimeFile(relative: string) {
   )
 }
 
+export function runtimeAssetRequestPath(requestUrl: string | undefined) {
+  if (!requestUrl) return null
+
+  try {
+    const rawPathname = requestUrl.split(/[?#]/, 1)[0]
+    if (
+      !rawPathname.startsWith("/") ||
+      rawPathname.startsWith("//") ||
+      rawPathname.includes("\\") ||
+      /%(?:2f|5c)/i.test(rawPathname)
+    ) {
+      return null
+    }
+    const pathname = decodeURIComponent(rawPathname)
+    if (pathname.split("/").some((segment) => segment === "." || segment === "..")) {
+      return null
+    }
+    const relative = pathname.slice(1)
+    return isAllowedRuntimeFile(relative) ? relative : null
+  } catch {
+    return null
+  }
+}
+
 function runtimePublicAssets(): Plugin {
   let outputDirectory = path.resolve(__dirname, "dist")
   const publicDirectory = path.resolve(__dirname, "public")
@@ -71,17 +97,7 @@ function runtimePublicAssets(): Plugin {
   })
 
   function isRuntimeAssetRequest(requestUrl: string | undefined) {
-    if (!requestUrl) return false
-
-    try {
-      const pathname = decodeURIComponent(
-        new URL(requestUrl, "http://runtime-assets.local").pathname,
-      )
-      const relative = pathname.replace(/^\/+/, "")
-      return isAllowedRuntimeFile(relative)
-    } catch {
-      return false
-    }
+    return runtimeAssetRequestPath(requestUrl) !== null
   }
 
   function installRuntimeAssetMiddleware(middlewares: Connect.Server) {

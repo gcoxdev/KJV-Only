@@ -1,4 +1,15 @@
 import { expect, test } from "@playwright/test"
+import { readFileSync } from "node:fs"
+
+const ISOLATION_TEST_URL = "/icons/app-icon.svg?cache-isolation-test=1"
+const APP_CACHE = readFileSync(
+  new URL("../public/app-cache-config.js", import.meta.url),
+  "utf8",
+).match(/cacheName:\s*["']([^"']+)["']/)?.[1]
+
+if (!APP_CACHE) {
+  throw new Error("Could not read the application cache name")
+}
 
 test.skip(
   !process.env.PLAYWRIGHT_USE_PREVIEW,
@@ -20,35 +31,35 @@ test("upgrades and reads only application-owned caches", async ({ page, context 
   await expect
     .poll(
       () =>
-        page.evaluate(async () => {
+        page.evaluate(async (currentCacheName) => {
           const keys = await caches.keys()
           return {
-            current: keys.includes("kjv-only-cache-v5"),
+            current: keys.includes(currentCacheName),
             obsolete: keys.includes("kjv-only-cache-obsolete-test"),
             unrelated: keys.includes("unrelated-application-cache"),
           }
-        }),
+        }, APP_CACHE),
       { timeout: 30_000 },
     )
     .toEqual({ current: true, obsolete: false, unrelated: true })
 
-  await page.evaluate(async () => {
-    const appCache = await caches.open("kjv-only-cache-v5")
-    await appCache.delete("/icons/app-icon.svg")
+  await page.evaluate(async ({ isolationTestUrl, currentCacheName }) => {
+    const appCache = await caches.open(currentCacheName)
+    await appCache.delete(isolationTestUrl)
     const unrelated = await caches.open("unrelated-application-cache")
     await unrelated.put(
-      "/icons/app-icon.svg",
+      isolationTestUrl,
       new Response("poison", { headers: { "content-type": "image/svg+xml" } }),
     )
-  })
+  }, { isolationTestUrl: ISOLATION_TEST_URL, currentCacheName: APP_CACHE })
   await context.setOffline(true)
-  const isolatedCacheResult = await page.evaluate(async () => {
+  const isolatedCacheResult = await page.evaluate(async (isolationTestUrl) => {
     try {
-      return await (await fetch("/icons/app-icon.svg")).text()
+      return await (await fetch(isolationTestUrl)).text()
     } catch {
       return "network-error"
     }
-  })
+  }, ISOLATION_TEST_URL)
   expect(isolatedCacheResult).toBe("network-error")
   await context.setOffline(false)
 

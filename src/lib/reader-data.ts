@@ -23,8 +23,16 @@ import { chapterVerseKey, normalizeConcordanceWord } from "@/lib/references";
 import { decodeStrongsPayload } from "@/lib/strongs";
 import { parseBooks } from "@/lib/bible-payload";
 import { beginPerformanceMeasure } from "@/lib/performance";
+import {
+  KJV_CORPUS_MANIFEST_URL,
+  matchesKjvCorpusAsset,
+  parseKjvCorpusManifest,
+  type KjvCorpusManifest,
+} from "@/lib/kjv-corpus-manifest";
 
 let kjvBooksPromise: Promise<Book[]> | null = null;
+let kjvBootstrapPromise: Promise<Book[]> | null = null;
+let kjvManifestPromise: Promise<KjvCorpusManifest> | null = null;
 let concordancePromise: Promise<ConcordancePayload> | null = null;
 let crossRefsPromise: Promise<CrossRefsPayload> | null = null;
 let hitchcocksPromise: Promise<HitchcocksPayload> | null = null;
@@ -63,19 +71,19 @@ export type TopicsIndexPayload = {
   }>;
 };
 
-async function fetchKjvBooksOnMainThread() {
-  const response = await fetch("/data/kjv.json", { cache: "no-cache" });
+async function fetchKjvBooksOnMainThread(url: string) {
+  const response = await fetch(url, { cache: "no-cache" });
   if (!response.ok) {
-    throw new Error("Could not load /data/kjv.json");
+    throw new Error(`Could not load ${url}`);
   }
   const parsedBooks = parseBooks((await response.json()) as unknown);
   if (!parsedBooks || parsedBooks.length === 0) {
-    throw new Error("Invalid reader data format in /data/kjv.json");
+    throw new Error(`Invalid reader data format in ${url}`);
   }
   return parsedBooks;
 }
 
-function fetchKjvBooksInWorker() {
+function fetchKjvBooksInWorker(url: string) {
   return new Promise<Book[]>((resolve, reject) => {
     const worker = new Worker(
       new URL("../workers/reader-data.worker.ts", import.meta.url),
@@ -89,7 +97,7 @@ function fetchKjvBooksInWorker() {
           resolve(event.data.books);
           return;
         }
-        reject(new Error(event.data.error ?? "Could not load /data/kjv.json"));
+        reject(new Error(event.data.error ?? `Could not load ${url}`));
       },
       { once: true },
     );
@@ -101,7 +109,7 @@ function fetchKjvBooksInWorker() {
       },
       { once: true },
     );
-    worker.postMessage({ url: "/data/kjv.json" });
+    worker.postMessage({ url });
   });
 }
 
@@ -199,12 +207,81 @@ export function augmentConcordanceWithNormalizedWordForms(
   return changed ? { ...concordance, words: nextWords } : concordance;
 }
 
+export function loadKjvManifest() {
+  if (!kjvManifestPromise) {
+    kjvManifestPromise = fetch(KJV_CORPUS_MANIFEST_URL, { cache: "no-cache" })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ${KJV_CORPUS_MANIFEST_URL}`);
+        }
+        const manifest = parseKjvCorpusManifest(
+          (await response.json()) as unknown,
+        );
+        if (!manifest) {
+          throw new Error(`Invalid corpus manifest in ${KJV_CORPUS_MANIFEST_URL}`);
+        }
+        return manifest;
+      })
+      .catch((error) => {
+        kjvManifestPromise = null;
+        throw error;
+      });
+  }
+
+  return kjvManifestPromise;
+}
+
+export function loadKjvBootstrap() {
+  if (!kjvBootstrapPromise) {
+    const finishMeasure = beginPerformanceMeasure("kjv:bootstrap-load");
+    kjvBootstrapPromise = loadKjvManifest()
+      .then(async (manifest) => ({
+        manifest,
+        books: await fetchKjvBooksOnMainThread(manifest.bootstrap.url),
+      }))
+      .then(({ books, manifest }) => {
+        if (
+          books[0]?.name !== "Genesis" ||
+          books[0]?.chapters[0]?.chapter !== 1
+        ) {
+          throw new Error("Invalid Genesis 1 bootstrap corpus");
+        }
+        if (!matchesKjvCorpusAsset(books, manifest.bootstrap)) {
+          throw new Error("Invalid bootstrap corpus counts");
+        }
+        return books;
+      })
+      .finally(finishMeasure)
+      .catch((error) => {
+        kjvBootstrapPromise = null;
+        throw error;
+      });
+  }
+
+  return kjvBootstrapPromise;
+}
+
 export function loadKjvBooks() {
   if (!kjvBooksPromise) {
     const finishMeasure = beginPerformanceMeasure("kjv:corpus-load");
-    kjvBooksPromise = (typeof Worker === "function"
-      ? fetchKjvBooksInWorker().catch(() => fetchKjvBooksOnMainThread())
-      : fetchKjvBooksOnMainThread())
+    kjvBooksPromise = loadKjvManifest()
+      .then(async (manifest) => ({
+        manifest,
+        books: await (typeof Worker === "function"
+          ? fetchKjvBooksInWorker(manifest.full.url).catch(() =>
+              fetchKjvBooksOnMainThread(manifest.full.url),
+            )
+          : fetchKjvBooksOnMainThread(manifest.full.url)),
+      }))
+      .then(({ books, manifest }) => {
+        if (books[0]?.name !== "Genesis") {
+          throw new Error("Invalid canonical Bible corpus order");
+        }
+        if (!matchesKjvCorpusAsset(books, manifest.full)) {
+          throw new Error("Invalid full Bible corpus counts");
+        }
+        return books;
+      })
       .finally(finishMeasure)
       .catch((error) => {
         kjvBooksPromise = null;
