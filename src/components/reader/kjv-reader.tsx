@@ -43,35 +43,18 @@ import {
   dequeuePendingReaderScrollTarget,
   prunePendingReaderScrollTargets,
   selectPendingReaderScrollTargetForActiveTab,
-  swapPendingReaderScrollTargets,
 } from "@/lib/reader-scroll-targets";
-import {
-  clearSingleLeafReferenceIfMissing,
-  swapSingleLeafReference,
-} from "@/lib/leaf-state";
+import { clearSingleLeafReferenceIfMissing } from "@/lib/leaf-state";
 import {
   collectLeafIds,
   createId,
   createLeaf,
-  directionOrientation,
-  findContiguousGroupRootId,
   findLeafNode,
-  findNodeById,
-  findParentSplitForLeaf,
-  insertLeafIntoParentGroup,
-  closeLeafInTab,
-  splitNodeById,
-  splitPanelNode,
-  swapLeafContent,
   updateLeafNode,
   updateSameOrientationGroupLayout,
-  updateSplitOrientation,
   updateSplitRatio,
 } from "@/lib/reader-layout";
-import {
-  buildLeafNeighborMapFromDom,
-  type LeafNeighbors,
-} from "@/lib/reader-neighbors";
+import type { LeafNeighbors } from "@/lib/reader-neighbors";
 import { useLayoutHashSync } from "@/hooks/use-layout-hash-sync";
 import type {
   AIDictionaryEntry,
@@ -84,7 +67,6 @@ import type {
   OldEnglishPayload,
   PhraseEntry,
   PhrasesPayload,
-  PanelDirection,
   PanelNode,
   ReaderTab,
   SplitOrientation,
@@ -129,9 +111,8 @@ import { useReaderNotes } from "@/hooks/use-reader-notes";
 import { useLeafHistory } from "@/hooks/use-leaf-history";
 import { usePanelTransfer } from "@/hooks/use-panel-transfer";
 import { usePanelTargeting } from "@/hooks/use-panel-targeting";
-import {
-  usePanelRouting,
-} from "@/hooks/use-panel-routing";
+import { usePanelRouting } from "@/hooks/use-panel-routing";
+import { usePanelInteractionController } from "@/hooks/use-panel-interaction-controller";
 import { useWordStudyNavigation } from "@/hooks/use-word-study-navigation";
 import { useWordStudyCoordinator } from "@/hooks/use-word-study-coordinator";
 import { useVerseHighlights } from "@/hooks/use-verse-highlights";
@@ -161,6 +142,8 @@ const LazyReaderStudySidebar = lazy(async () => {
   const module = await import("@/components/reader/reader-study-sidebar");
   return { default: module.ReaderStudySidebar };
 });
+
+const EMPTY_LEAF_NEIGHBORS = new Map<string, LeafNeighbors>();
 
 const LazyMapAndPhotoDialogs = lazy(async () => {
   const module = await import("@/components/reader/map-and-photo-dialogs");
@@ -498,11 +481,6 @@ export function KJVReader() {
   const tabEndRef = useRef<HTMLDivElement>(null);
   const strongsSearchInputRef = useRef<HTMLInputElement | null>(null);
   const panelElementRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const previewLeafIdRef = useRef<string | null>(null);
-  const addPreviewLeafIdsRef = useRef<string[]>([]);
-  const addPreviewDirectionRef = useRef<PanelDirection | null>(null);
-  const addPreviewIsGroupRef = useRef(false);
-  const orientationPreviewLeafIdsRef = useRef<string[]>([]);
   const fullscreenRequestedLeafIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -567,13 +545,6 @@ export function KJVReader() {
       setIsPwaInstalled(true);
     }
   }, [deferredInstallPrompt]);
-  const domNeighborCacheRef = useRef<{
-    root: PanelNode | null;
-    neighbors: Map<string, LeafNeighbors>;
-  }>({
-    root: null,
-    neighbors: new Map(),
-  });
   const {
     activeTab: studyWorkspaceTab,
     accordionValue: concordanceAccordionValue,
@@ -1430,429 +1401,20 @@ export function KJVReader() {
     setBibleWordBookWordAccordionValue,
   ]);
 
-  useEffect(() => {
-    domNeighborCacheRef.current = { root: null, neighbors: new Map() };
-  }, [activeTab]);
-  const updateActiveTab = useCallback((updater: (tab: ReaderTab) => ReaderTab) => {
-    if (!activeTabId) {
-      return;
-    }
+  const updateActiveTab = useCallback(
+    (updater: (tab: ReaderTab) => ReaderTab) => {
+      if (!activeTabId) {
+        return;
+      }
 
-    setTabs((currentTabs) =>
-      currentTabs.map((tab) => (tab.id === activeTabId ? updater(tab) : tab)),
-    );
-  }, [activeTabId, setTabs]);
-
-  function splitLeaf(leafId: string, direction: PanelDirection) {
-    updateActiveTab((tab) => {
-      const result = splitPanelNode(tab.root, leafId, direction);
-      return { ...tab, root: result.next };
-    });
-  }
-
-  function neighborsForLeaf(leafId: string): LeafNeighbors {
-    return modelLeafNeighbors.get(leafId) ?? {};
-  }
-
-  function neighborForDirection(leafId: string, direction: PanelDirection) {
-    const modelNeighbor = modelLeafNeighbors.get(leafId)?.[direction];
-    if (modelNeighbor) {
-      return modelNeighbor;
-    }
-
-    if (!activeTab) {
-      return null;
-    }
-
-    if (domNeighborCacheRef.current.root !== activeTab.root) {
-      domNeighborCacheRef.current = {
-        root: activeTab.root,
-        neighbors: buildLeafNeighborMapFromDom(
-          activeTab.root,
-          panelElementRefs.current,
+      setTabs((currentTabs) =>
+        currentTabs.map((tab) =>
+          tab.id === activeTabId ? updater(tab) : tab,
         ),
-      };
-    }
-    return (
-      domNeighborCacheRef.current.neighbors.get(leafId)?.[direction] ?? null
-    );
-  }
-
-  const panelCardElement = useCallback((leafId: string) => {
-    const panelElement = panelElementRefs.current[leafId];
-    return (
-      panelElement?.querySelector<HTMLElement>(':scope > [data-slot="card"]') ??
-      null
-    );
-  }, []);
-
-  const clearMovePreview = useCallback(() => {
-    const previewId = previewLeafIdRef.current;
-    if (!previewId) {
-      return;
-    }
-
-    const previewSurface = panelCardElement(previewId);
-    previewSurface?.classList.remove("panel-move-preview-surface");
-    previewLeafIdRef.current = null;
-  }, [panelCardElement]);
-
-  function applyMovePreview(targetLeafId: string | null) {
-    clearMovePreview();
-    if (!targetLeafId) {
-      return;
-    }
-
-    const previewSurface = panelCardElement(targetLeafId);
-    if (!previewSurface) {
-      return;
-    }
-
-    previewSurface.classList.add("panel-move-preview-surface");
-    previewLeafIdRef.current = targetLeafId;
-  }
-
-  const clearAddPreview = useCallback(() => {
-    const leafIds = addPreviewLeafIdsRef.current;
-    const direction = addPreviewDirectionRef.current;
-    const isGroup = addPreviewIsGroupRef.current;
-
-    if (leafIds.length === 0 || !direction) {
-      return;
-    }
-
-    for (const leafId of leafIds) {
-      const previewSurface = panelCardElement(leafId);
-      if (!previewSurface) {
-        continue;
-      }
-      previewSurface.classList.remove("panel-add-preview-target");
-      previewSurface.classList.remove(`panel-add-preview-${direction}`);
-      if (isGroup) {
-        previewSurface.classList.remove("panel-add-preview-group");
-      }
-    }
-
-    addPreviewLeafIdsRef.current = [];
-    addPreviewDirectionRef.current = null;
-    addPreviewIsGroupRef.current = false;
-  }, [panelCardElement]);
-
-  const clearOrientationPreview = useCallback(() => {
-    const leafIds = orientationPreviewLeafIdsRef.current;
-    if (leafIds.length === 0) {
-      return;
-    }
-
-    for (const leafId of leafIds) {
-      const previewSurface = panelCardElement(leafId);
-      previewSurface?.classList.remove("panel-orientation-preview");
-    }
-
-    orientationPreviewLeafIdsRef.current = [];
-  }, [panelCardElement]);
-
-  const clearAllPanelPreviews = useCallback(() => {
-    clearMovePreview();
-    clearAddPreview();
-    clearOrientationPreview();
-  }, [clearAddPreview, clearMovePreview, clearOrientationPreview]);
-
-  useEffect(() => {
-    function onFullscreenChange() {
-      const element = document.fullscreenElement as HTMLElement | null;
-      const leafId = element
-        ? (fullscreenRequestedLeafIdRef.current ?? null)
-        : null;
-      setFullscreenLeafId(leafId);
-      setPanelMenuOpenLeafId(null);
-      clearAllPanelPreviews();
-      if (!element) {
-        fullscreenRequestedLeafIdRef.current = null;
-      }
-    }
-
-    document.addEventListener("fullscreenchange", onFullscreenChange);
-    return () => {
-      document.removeEventListener("fullscreenchange", onFullscreenChange);
-    };
-  }, [clearAllPanelPreviews]);
-
-  useEffect(() => {
-    if (!panelMenuOpenLeafId || !activeTab) {
-      return;
-    }
-
-    if (!findLeafNode(activeTab.root, panelMenuOpenLeafId)) {
-      setPanelMenuOpenLeafId(null);
-      clearAllPanelPreviews();
-    }
-  }, [activeTab, clearAllPanelPreviews, panelMenuOpenLeafId]);
-
-  function applyAddPreview(
-    leafIds: string[],
-    direction: PanelDirection,
-    isGroup: boolean,
-  ) {
-    clearAddPreview();
-    if (leafIds.length === 0) {
-      return;
-    }
-
-    const appliedLeafIds: string[] = [];
-    for (const leafId of leafIds) {
-      const previewSurface = panelCardElement(leafId);
-      if (!previewSurface) {
-        continue;
-      }
-      previewSurface.classList.add("panel-add-preview-target");
-      previewSurface.classList.add(`panel-add-preview-${direction}`);
-      if (isGroup) {
-        previewSurface.classList.add("panel-add-preview-group");
-      }
-      appliedLeafIds.push(leafId);
-    }
-
-    addPreviewLeafIdsRef.current = appliedLeafIds;
-    addPreviewDirectionRef.current = direction;
-    addPreviewIsGroupRef.current = isGroup;
-  }
-
-  function setMovePreviewTarget(leafId: string, direction: PanelDirection) {
-    clearAddPreview();
-    clearOrientationPreview();
-    const targetLeafId = neighborForDirection(leafId, direction);
-    applyMovePreview(targetLeafId);
-  }
-
-  function setAddPreviewTarget(leafId: string, direction: PanelDirection) {
-    clearMovePreview();
-    clearOrientationPreview();
-    applyAddPreview([leafId], direction, false);
-  }
-
-  function setGroupInsertPreviewTarget(
-    leafId: string,
-    direction: PanelDirection,
-  ) {
-    clearMovePreview();
-    clearOrientationPreview();
-    if (!activeTab) {
-      return;
-    }
-
-    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
-    if (
-      !parentSplit ||
-      parentSplit.orientation !== directionOrientation(direction)
-    ) {
-      return;
-    }
-
-    applyAddPreview([leafId], direction, true);
-  }
-
-  function setAroundGroupPreviewTarget(
-    leafId: string,
-    direction: PanelDirection,
-  ) {
-    clearMovePreview();
-    clearOrientationPreview();
-    if (!activeTab) {
-      return;
-    }
-
-    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
-    if (!parentSplit) {
-      return;
-    }
-
-    const targetOrientation = parentSplit.orientation;
-    if (targetOrientation === directionOrientation(direction)) {
-      return;
-    }
-
-    const targetNodeId = findContiguousGroupRootId(
-      activeTab.root,
-      leafId,
-      targetOrientation,
-    );
-    if (!targetNodeId) {
-      return;
-    }
-
-    const targetNode = findNodeById(activeTab.root, targetNodeId);
-    if (!targetNode) {
-      return;
-    }
-
-    const targetLeafIds = collectLeafIds(targetNode);
-    const allRects = targetLeafIds
-      .map((id) => panelElementRefs.current[id]?.getBoundingClientRect())
-      .filter((item): item is DOMRect => Boolean(item));
-    if (allRects.length === 0) {
-      return;
-    }
-
-    const epsilon = 0.5;
-    const minLeft = Math.min(...allRects.map((item) => item.left));
-    const maxRight = Math.max(...allRects.map((item) => item.right));
-    const minTop = Math.min(...allRects.map((item) => item.top));
-    const maxBottom = Math.max(...allRects.map((item) => item.bottom));
-
-    const edgeLeafIds = targetLeafIds.filter((targetLeafId) => {
-      const panelElement = panelElementRefs.current[targetLeafId];
-      const rect = panelElement?.getBoundingClientRect();
-      if (!rect) {
-        return false;
-      }
-      if (direction === "left") {
-        return Math.abs(rect.left - minLeft) <= epsilon;
-      }
-      if (direction === "right") {
-        return Math.abs(rect.right - maxRight) <= epsilon;
-      }
-      if (direction === "up") {
-        return Math.abs(rect.top - minTop) <= epsilon;
-      }
-      return Math.abs(rect.bottom - maxBottom) <= epsilon;
-    });
-
-    applyAddPreview(edgeLeafIds, direction, true);
-  }
-
-  function setOrientationPreviewTarget(leafId: string) {
-    clearMovePreview();
-    clearAddPreview();
-    clearOrientationPreview();
-    if (!activeTab) {
-      return;
-    }
-
-    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
-    if (!parentSplit) {
-      return;
-    }
-
-    const leafIds = collectLeafIds(parentSplit);
-    for (const id of leafIds) {
-      const previewSurface = panelCardElement(id);
-      previewSurface?.classList.add("panel-orientation-preview");
-    }
-    orientationPreviewLeafIdsRef.current = leafIds;
-  }
-
-  function insertPanelInGroup(leafId: string, direction: PanelDirection) {
-    if (!activeTab) {
-      return;
-    }
-
-    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
-    if (
-      !parentSplit ||
-      parentSplit.orientation !== directionOrientation(direction)
-    ) {
-      return;
-    }
-
-    updateActiveTab((tab) => {
-      const result = insertLeafIntoParentGroup(tab.root, leafId, direction);
-      return result.changed ? { ...tab, root: result.next } : tab;
-    });
-  }
-
-  function addAroundGroup(leafId: string, direction: PanelDirection) {
-    if (!activeTab) {
-      return;
-    }
-
-    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
-    if (!parentSplit) {
-      return;
-    }
-
-    const targetOrientation = parentSplit.orientation;
-    if (targetOrientation === directionOrientation(direction)) {
-      return;
-    }
-
-    const targetNodeId = findContiguousGroupRootId(
-      activeTab.root,
-      leafId,
-      targetOrientation,
-    );
-    if (!targetNodeId) {
-      return;
-    }
-
-    updateActiveTab((tab) => {
-      const result = splitNodeById(tab.root, targetNodeId, direction);
-      return result.changed ? { ...tab, root: result.next } : tab;
-    });
-  }
-
-  function toggleParentGroupOrientation(leafId: string) {
-    if (!activeTab) {
-      return;
-    }
-
-    const parentSplit = findParentSplitForLeaf(activeTab.root, leafId);
-    if (!parentSplit) {
-      return;
-    }
-
-    const nextOrientation: SplitOrientation =
-      parentSplit.orientation === "horizontal" ? "vertical" : "horizontal";
-
-    updateActiveTab((tab) => ({
-      ...tab,
-      root: updateSplitOrientation(tab.root, parentSplit.id, nextOrientation),
-    }));
-  }
-
-  function moveLeaf(leafId: string, direction: PanelDirection) {
-    if (!activeTab) {
-      return;
-    }
-    const targetLeafId = neighborForDirection(leafId, direction);
-    if (!targetLeafId) {
-      return;
-    }
-
-    swapNotesTabState(leafId, targetLeafId);
-    swapSearchPageState(leafId, targetLeafId);
-    swapLeafHistoryState(leafId, targetLeafId);
-    swapHighlightModeForLeaves(leafId, targetLeafId);
-    swapLeafHighlights(leafId, targetLeafId);
-    setActiveReaderWordHighlight((current) =>
-      swapSingleLeafReference(current, leafId, targetLeafId),
-    );
-    setPendingReaderScrollTargets((current) =>
-      swapPendingReaderScrollTargets(current, leafId, targetLeafId),
-    );
-    setTargetedPanelLeafId((current) => {
-      if (current === leafId) {
-        return targetLeafId;
-      }
-      if (current === targetLeafId) {
-        return leafId;
-      }
-      return current;
-    });
-
-    updateActiveTab((tab) => ({
-      ...tab,
-      root: swapLeafContent(tab.root, leafId, targetLeafId),
-    }));
-    clearAllPanelPreviews();
-  }
-
-  function closeLeaf(leafId: string) {
-    updateActiveTab((tab) => closeLeafInTab(tab, leafId));
-    if (fullscreenLeafId === leafId && document.fullscreenElement) {
-      void document.exitFullscreen();
-    }
-  }
+      );
+    },
+    [activeTabId, setTabs],
+  );
 
   const updateLeafLocation = useCallback((
     leafId: string,
@@ -1896,23 +1458,60 @@ export function KJVReader() {
 
   const { leafHistoryByLeafId, navigateLeafHistory, swapLeafHistoryState } =
     useLeafHistory({
-    tabs,
-    applyHistoryEntry: (leafId, entry) => {
-      updateLeafLocation(leafId, {
-        view: entry.view,
-        bookIndex: entry.bookIndex,
-        chapterIndex: entry.chapterIndex,
-        pickerTestament: entry.pickerTestament,
-        pickerBookIndex: entry.pickerBookIndex,
-      });
-      updateActiveTab((tab) => ({
-        ...tab,
-        root: updateLeafNode(tab.root, leafId, {
-          pageId: entry.pageId,
-        }),
-      }));
-    },
+      tabs,
+      applyHistoryEntry: (leafId, entry) => {
+        updateLeafLocation(leafId, {
+          view: entry.view,
+          bookIndex: entry.bookIndex,
+          chapterIndex: entry.chapterIndex,
+          pickerTestament: entry.pickerTestament,
+          pickerBookIndex: entry.pickerBookIndex,
+        });
+        updateActiveTab((tab) => ({
+          ...tab,
+          root: updateLeafNode(tab.root, leafId, {
+            pageId: entry.pageId,
+          }),
+        }));
+      },
     });
+
+  const {
+    neighborsForLeaf,
+    clearAllPanelPreviews,
+    clearMovePreview,
+    clearAddPreview,
+    clearOrientationPreview,
+    splitLeaf,
+    setMovePreviewTarget,
+    setAddPreviewTarget,
+    setGroupInsertPreviewTarget,
+    setAroundGroupPreviewTarget,
+    setOrientationPreviewTarget,
+    insertPanelInGroup,
+    addAroundGroup,
+    toggleParentGroupOrientation,
+    moveLeaf,
+    closeLeaf,
+  } = usePanelInteractionController({
+    activeRoot: activeTab?.root ?? null,
+    modelLeafNeighbors,
+    panelElementRefs,
+    panelMenuOpenLeafId,
+    setPanelMenuOpenLeafId,
+    fullscreenLeafId,
+    setFullscreenLeafId,
+    fullscreenRequestedLeafIdRef,
+    updateActiveTab,
+    swapNotesTabState,
+    swapSearchPageState,
+    swapLeafHistoryState,
+    swapHighlightModeForLeaves,
+    swapLeafHighlights,
+    setActiveReaderWordHighlight,
+    setPendingReaderScrollTargets,
+    setTargetedPanelLeafId,
+  });
 
   function moveLeafChapter(leafId: string, direction: -1 | 1) {
     if (!activeTab) {
@@ -3608,7 +3207,9 @@ export function KJVReader() {
           hideReadModeVerseNumbers={hideReadModeVerseNumbers}
           panelMenuOpenLeafId={panelMenuOpenLeafId}
           setPanelMenuOpenLeafId={setPanelMenuOpenLeafId}
-          modelLeafNeighbors={isActive ? modelLeafNeighbors : new Map()}
+          modelLeafNeighbors={
+            isActive ? modelLeafNeighbors : EMPTY_LEAF_NEIGHBORS
+          }
           neighborsForLeaf={neighborsForLeaf}
           fullscreenLeafId={fullscreenLeafId}
           panelElementRefs={panelElementRefs}

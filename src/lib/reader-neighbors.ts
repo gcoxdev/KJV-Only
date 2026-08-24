@@ -1,7 +1,7 @@
 import type { PanelDirection, PanelNode } from "@/types/reader";
 import { collectLeafIds } from "@/lib/reader-layout";
 
-type LeafRect = {
+export type LeafRect = {
   x: number;
   y: number;
   width: number;
@@ -9,6 +9,50 @@ type LeafRect = {
 };
 
 export type LeafNeighbors = Partial<Record<PanelDirection, string>>;
+
+export function leafIdsAtGroupEdge(
+  leafIds: string[],
+  rects: ReadonlyMap<string, LeafRect>,
+  direction: PanelDirection,
+  epsilon = 0.5,
+) {
+  let minX = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
+
+  for (const leafId of leafIds) {
+    const rect = rects.get(leafId);
+    if (!rect) {
+      continue;
+    }
+    minX = Math.min(minX, rect.x);
+    maxX = Math.max(maxX, rect.x + rect.width);
+    minY = Math.min(minY, rect.y);
+    maxY = Math.max(maxY, rect.y + rect.height);
+  }
+
+  if (!Number.isFinite(minX)) {
+    return [];
+  }
+
+  return leafIds.filter((leafId) => {
+    const rect = rects.get(leafId);
+    if (!rect) {
+      return false;
+    }
+    if (direction === "left") {
+      return Math.abs(rect.x - minX) <= epsilon;
+    }
+    if (direction === "right") {
+      return Math.abs(rect.x + rect.width - maxX) <= epsilon;
+    }
+    if (direction === "up") {
+      return Math.abs(rect.y - minY) <= epsilon;
+    }
+    return Math.abs(rect.y + rect.height - maxY) <= epsilon;
+  });
+}
 
 function collectLeafRects(
   node: PanelNode,
