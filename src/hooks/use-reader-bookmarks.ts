@@ -1,8 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { bookmarkCanonicalKey, bookmarkScopeLabel, normalizeRangePoints } from "@/lib/bookmarks";
+import {
+  READER_STORAGE_KEYS,
+  readLocalStorageValue,
+  reportLocalStorageIssue,
+  writeLocalStorageJson,
+} from "@/lib/local-storage";
 import { filterRecordEntries, swapRecordEntries } from "@/lib/leaf-state";
 import { createId } from "@/lib/reader-layout";
+import { parseStoredBookmarksPayloadDetailed } from "@/lib/reader-transfer";
 import type { Book } from "@/types/bible";
 import type {
   BookmarkScope,
@@ -15,6 +22,9 @@ type UseReaderBookmarksArgs = {
 
 export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
   const [readerBookmarks, setReaderBookmarks] = useState<ReaderBookmark[]>([]);
+  const [bookmarksHydrated, setBookmarksHydrated] = useState(false);
+  const initialReaderBookmarksRef = useRef(readerBookmarks);
+  const blockedPersistStateRef = useRef<ReaderBookmark[] | null>(null);
   const [highlightModeEnabledByLeafId, setHighlightModeEnabledByLeafId] =
     useState<Record<string, boolean>>({});
   const [selectedHighlightScope, setSelectedHighlightScope] =
@@ -22,30 +32,33 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
 
   useEffect(() => {
     try {
-      const stored = window.localStorage.getItem("kjv-reader-bookmarks-v1");
+      const stored = readLocalStorageValue(READER_STORAGE_KEYS.bookmarks);
       if (!stored) {
         return;
       }
-      const parsed = JSON.parse(stored) as ReaderBookmark[];
-      if (!Array.isArray(parsed)) {
-        return;
+      const parsed = parseStoredBookmarksPayloadDetailed(stored);
+      if (parsed.skippedInvalidCount > 0) {
+        reportLocalStorageIssue(READER_STORAGE_KEYS.bookmarks);
       }
-      setReaderBookmarks(parsed);
+      setReaderBookmarks(parsed.entries);
     } catch {
-      // Ignore invalid stored bookmarks payloads.
+      blockedPersistStateRef.current = initialReaderBookmarksRef.current;
+      reportLocalStorageIssue(READER_STORAGE_KEYS.bookmarks);
+    } finally {
+      setBookmarksHydrated(true);
     }
   }, []);
 
   useEffect(() => {
+    if (!bookmarksHydrated || blockedPersistStateRef.current === readerBookmarks) {
+      return;
+    }
     try {
-      window.localStorage.setItem(
-        "kjv-reader-bookmarks-v1",
-        JSON.stringify(readerBookmarks),
-      );
+      writeLocalStorageJson(READER_STORAGE_KEYS.bookmarks, readerBookmarks);
     } catch {
       // Ignore persistence errors (quota/private mode edge cases).
     }
-  }, [readerBookmarks]);
+  }, [bookmarksHydrated, readerBookmarks]);
 
   const upsertBookmark = useCallback(
     (

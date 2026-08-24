@@ -34,12 +34,12 @@ export function HitchcocksTool({
   return (
     <AccordionItem value="hitchcocks">
       <AccordionTrigger
-        className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
+        className={cn(hasInfo && "text-success")}
       >
         <BookUserIcon />
         Hitchcock&apos;s Bible Names
       </AccordionTrigger>
-      <AccordionContent className="space-y-2 overflow-visible">
+      <AccordionContent className="flex flex-col gap-2 overflow-visible">
         {isOpen ? (
           <>
             <StudySearchForm
@@ -65,7 +65,7 @@ export function HitchcocksTool({
                   : "Click a word in the text or search Hitchcock's Bible Names."}
               </p>
             ) : (
-              <div className="space-y-2 text-sm leading-relaxed">
+              <div className="flex flex-col gap-2 text-sm leading-relaxed">
                 {results.map(({ key, definition }) => (
                   <p key={key}>
                     <span className="font-semibold">{key}</span>

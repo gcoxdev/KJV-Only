@@ -1,0 +1,23 @@
+# Data, Offline Cache, and Deployment
+
+## Asset classes
+
+Vite's default public-directory copying is disabled. The `runtimePublicAssets` plugin in `vite.config.ts` exposes and builds only exact browser data files plus narrowly matched audio, book-icon, GeoJSON, and map-thumbnail files. The same file-level allowlist is used by the loopback development and preview servers. The tracked OSIS input lives in `data-sources/`; the generated SQLite database lives in ignored `.generated/`; only browser-ready JSON lives under `public/data/`.
+
+`public/delete/` is quarantine, never a runtime source. Raw OSIS, SQLite, JSONL/KML, backups, and other generator inputs must remain outside the deploy allowlist. Adding a new public runtime path requires updating the allowlist and the build-artifact check deliberately.
+
+## Generation
+
+The `build:*` scripts in `package.json` produce Bible and reference artifacts. Run the narrow generator for the data being changed, review record counts and diff size, then run the full verification sequence in `docs/release.md`. Generators must use bounded inputs, deterministic ordering, and atomic output replacement. Networked generators must validate allowed origins, redirects, response types/sizes, and output containment.
+
+## Offline lifecycle
+
+`public/app-cache-config.js` is the single cache-name/version source shared by the application and service worker. Increment its version whenever the application shell or cache contract becomes incompatible. Old caches are deleted only when their name starts with `kjv-only-cache-`; caches and service workers owned by other same-origin applications are untouched.
+
+Core references, maps, and Old/New Testament audio remain separate user-selected packages. Cache only complete HTTP 200 responses; range responses stay network-only. A release changing cache behavior must test install, refresh, offline navigation, partial failure, clear, and upgrade from the preceding cache version.
+
+## Deployment controls
+
+`npm run build` performs type checking, builds only allowlisted assets, and runs `scripts/check-dist.mjs`. The check fails on missing core assets, forbidden intermediates, excessive file/byte counts, or entry JS/CSS regressions. `public/_headers` supplies a restrictive CSP, HSTS, MIME sniffing protection, referrer and permissions policies, COOP, and cache rules for hosts that support this file format. Equivalent headers must be configured explicitly on other hosts.
+
+Audio and maps dominate repository/deploy size. Moving them to release artifacts, object storage, a CDN, or Git LFS is an operational migration: retain their current URLs through a mapping layer, record integrity hashes, test offline-package parity, and establish rollback before removing local copies or rewriting Git history.

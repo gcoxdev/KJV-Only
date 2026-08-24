@@ -68,7 +68,7 @@ export function BookChapterPicker({
     displayTestament === "old" ? "Old Testament" : "New Testament";
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {displayTestament ? (
         <div className="flex flex-wrap items-center gap-1.5">
           <Button variant="outline" size="sm" onClick={() => onBackToTestaments()}>

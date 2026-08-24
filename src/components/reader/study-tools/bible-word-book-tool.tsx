@@ -46,12 +46,12 @@ export function BibleWordBookTool({
   return (
     <AccordionItem value="bible-word-book">
       <AccordionTrigger
-        className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
+        className={cn(hasInfo && "text-success")}
       >
         <BookMarkedIcon />
         Bible Word-Book
       </AccordionTrigger>
-      <AccordionContent className="space-y-2 overflow-visible">
+      <AccordionContent className="flex flex-col gap-2 overflow-visible">
         {isOpen ? (
           <>
             <StudySearchForm
@@ -90,7 +90,7 @@ export function BibleWordBookTool({
                     <AccordionTrigger>
                       <span className="truncate">{key}</span>
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-2 text-sm leading-relaxed">
+                    <AccordionContent className="flex flex-col gap-2 text-sm leading-relaxed">
                       <div className="flex flex-wrap items-center gap-2">
                         {entry.partOfSpeechLabel ? (
                           <Badge variant="outline">{entry.partOfSpeechLabel}</Badge>

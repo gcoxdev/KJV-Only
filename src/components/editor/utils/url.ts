@@ -1,23 +1,31 @@
-const SUPPORTED_URL_PROTOCOLS = new Set([
-  "http:",
-  "https:",
-  "kjv:",
-  "mailto:",
-  "sms:",
-  "tel:",
-])
+import { BLOCKED_URL, sanitizeUrl } from "@/lib/url-policy"
 
-export function sanitizeUrl(url: string): string {
-  try {
-    const parsedUrl = new URL(url)
-    // eslint-disable-next-line no-script-url
-    if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
-      return "about:blank"
-    }
-  } catch {
-    return url
+export { BLOCKED_URL, sanitizeUrl } from "@/lib/url-policy"
+
+type OpenWindow = (
+  url?: string | URL,
+  target?: string,
+  features?: string,
+) => Window | null
+
+export function openUrlInNewTab(
+  url: string,
+  openWindow: OpenWindow = window.open.bind(window),
+) {
+  const sanitizedUrl = sanitizeUrl(url)
+  if (sanitizedUrl === BLOCKED_URL) {
+    return false
   }
-  return url
+
+  const openedWindow = openWindow(
+    sanitizedUrl,
+    "_blank",
+    "noopener,noreferrer",
+  )
+  if (openedWindow) {
+    openedWindow.opener = null
+  }
+  return true
 }
 
 // Source: https://stackoverflow.com/a/8234912/2013580

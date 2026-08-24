@@ -52,6 +52,7 @@ function parseArgs(argv) {
       case "--help":
         printUsage();
         process.exit(0);
+        break;
       default:
         throw new Error(`Unknown argument: ${arg}`);
     }

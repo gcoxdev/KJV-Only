@@ -64,3 +64,14 @@ Run tests:
 ```bash
 npm test
 ```
+
+Run the complete local verification gates:
+
+```bash
+npm run typecheck
+npm run test:coverage
+npm run build
+npm run test:e2e
+```
+
+Maintainer documentation lives in [`docs/architecture.md`](docs/architecture.md), [`docs/data-and-deployment.md`](docs/data-and-deployment.md), and [`docs/release.md`](docs/release.md). Security reports should follow [`SECURITY.md`](SECURITY.md).

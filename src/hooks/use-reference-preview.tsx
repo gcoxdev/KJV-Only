@@ -172,7 +172,7 @@ export function useReferencePreview({
 
       if (verseLines.length === 0) {
         return (
-          <div className="space-y-1">
+          <div className="flex flex-col gap-1">
             <p className="font-semibold">{citation}</p>
             <p>{reference}</p>
           </div>
@@ -180,9 +180,9 @@ export function useReferencePreview({
       }
 
       return (
-        <div className="space-y-1">
+        <div className="flex flex-col gap-1">
           <p className="font-semibold">{citation}</p>
-          <div className="space-y-1">
+          <div className="flex flex-col gap-1">
             {verseLines.map((line) => (
               <p key={`${reference}-line-${line.label}`}>
                 <span className="mr-1 text-xs font-semibold text-muted-foreground">

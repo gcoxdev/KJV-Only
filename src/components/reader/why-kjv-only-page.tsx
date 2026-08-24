@@ -310,7 +310,7 @@ export function WhyKJVOnlyPage({
             English Bible for doctrine, preaching, memorization, and public use.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+        <CardContent className="flex flex-col gap-3 text-sm leading-7 text-muted-foreground">
           <p>
             The KJV-only position is not merely a preference for older wording.
             It is an argument about textual stability, public church use,
@@ -346,7 +346,7 @@ export function WhyKJVOnlyPage({
               </p>
             </div>
           </div>
-          <div className="space-y-2 pt-1">
+          <div className="flex flex-col gap-2 pt-1">
             {CASE_AT_A_GLANCE.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}
@@ -361,7 +361,7 @@ export function WhyKJVOnlyPage({
               <CardTitle className="text-base sm:text-lg">{section.title}</CardTitle>
               <CardDescription>{section.summary}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+            <CardContent className="flex flex-col gap-3 text-sm leading-7 text-muted-foreground">
               {section.body.map((paragraph) => (
                 <p key={`${section.title}-${paragraph.slice(0, 40)}`}>
                   {paragraph}

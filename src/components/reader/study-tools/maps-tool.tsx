@@ -109,12 +109,12 @@ export function MapsTool({
   return (
     <AccordionItem value="maps">
       <AccordionTrigger
-        className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
+        className={cn(hasInfo && "text-success")}
       >
         <MapIcon />
         Maps
       </AccordionTrigger>
-      <AccordionContent className="space-y-2 overflow-visible">
+      <AccordionContent className="flex flex-col gap-2 overflow-visible">
         {isOpen ? (
           <>
             <StudySearchForm
@@ -140,8 +140,8 @@ export function MapsTool({
                   : "Click a word in the text or search maps."}
               </p>
             ) : (
-              <div className="space-y-3 rounded-md border p-3">
-                <div className="space-y-2">
+              <div className="flex flex-col gap-3 rounded-md border p-3">
+                <div className="flex flex-col gap-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     Map Entries ({displayEntries.length})
                   </p>
@@ -171,7 +171,7 @@ export function MapsTool({
                 </div>
 
                 {linkedPlaces.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       Linked Places ({linkedPlaces.length})
                     </p>

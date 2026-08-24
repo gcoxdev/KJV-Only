@@ -13,9 +13,9 @@ export function ReaderStatusScreen({ message }: ReaderStatusScreenProps) {
             <img
               src="/icons/app-icon.svg"
               alt="KJV Only app icon"
-              className="h-16 w-16 object-contain"
+              className="size-16 object-contain"
             />
-            <div className="space-y-1">
+            <div className="flex flex-col gap-1">
               <CardTitle className="text-xl">KJV Only</CardTitle>
               <p className="text-sm text-muted-foreground">{message}</p>
             </div>

@@ -675,7 +675,7 @@ export function HelpPage() {
             Search by task, feature, workflow, or setting to get quick answers.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4 pt-2 text-sm leading-7 text-muted-foreground">
+        <CardContent className="flex flex-col gap-4 pt-2 text-sm leading-7 text-muted-foreground">
           <div className="relative">
             <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -718,7 +718,7 @@ export function HelpPage() {
                 </CardTitle>
                 <CardDescription>{section.summary}</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="flex flex-col gap-3">
                 {section.items.map((item) => (
                   <div
                     key={`${section.id}-${item.label}`}

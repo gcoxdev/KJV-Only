@@ -1,12 +1,13 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
+  assertReaderEntryMergeLimit,
+  assertReaderImportFileSize,
   createBookmarksExportPayload,
   createNotesExportPayload,
   downloadJsonFile,
-  parseImportedBookmarksPayloadDetailed,
-  parseImportedNotesPayloadDetailed,
 } from "@/lib/reader-transfer";
+import { parseReaderImportInWorker } from "@/lib/reader-transfer-worker";
 import type { ReaderBookmark } from "@/types/bookmarks";
 import type { ReaderNote } from "@/types/notes";
 
@@ -37,6 +38,21 @@ export function usePanelTransfer({
   );
   const notesImportInputRef = useRef<HTMLInputElement | null>(null);
   const bookmarksImportInputRef = useRef<HTMLInputElement | null>(null);
+  const activeImportRef = useRef<AbortController | null>(null);
+
+  useEffect(
+    () => () => {
+      activeImportRef.current?.abort();
+    },
+    [],
+  );
+
+  const beginImport = useCallback(() => {
+    activeImportRef.current?.abort();
+    const controller = new AbortController();
+    activeImportRef.current = controller;
+    return controller;
+  }, []);
 
   const exportNotes = useCallback(() => {
     downloadJsonFile(
@@ -57,8 +73,15 @@ export function usePanelTransfer({
       if (!file) {
         return;
       }
+      const controller = beginImport();
       try {
-        const result = parseImportedNotesPayloadDetailed(await file.text());
+        assertReaderImportFileSize(file.size);
+        const result = await parseReaderImportInWorker(
+          "notes",
+          await file.text(),
+          controller.signal,
+        );
+        assertReaderEntryMergeLimit("notes", readerNotes, result.entries);
         importNotes(result.entries);
         const existingIds = new Set(readerNotes.map((note) => note.id));
         const replacedCount = result.entries.filter((note) =>
@@ -76,6 +99,9 @@ export function usePanelTransfer({
               : "Imported all notes successfully.",
         });
       } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
         setImportSummary({
           kind: "notes",
           importedCount: 0,
@@ -87,7 +113,7 @@ export function usePanelTransfer({
         });
       }
     },
-    [importNotes, readerNotes],
+    [beginImport, importNotes, readerNotes],
   );
 
   const handleImportBookmarksFile = useCallback(
@@ -95,8 +121,15 @@ export function usePanelTransfer({
       if (!file) {
         return;
       }
+      const controller = beginImport();
       try {
-        const result = parseImportedBookmarksPayloadDetailed(await file.text());
+        assertReaderImportFileSize(file.size);
+        const result = await parseReaderImportInWorker(
+          "bookmarks",
+          await file.text(),
+          controller.signal,
+        );
+        assertReaderEntryMergeLimit("bookmarks", readerBookmarks, result.entries);
         importBookmarks(result.entries);
         const existingIds = new Set(readerBookmarks.map((bookmark) => bookmark.id));
         const replacedCount = result.entries.filter((bookmark) =>
@@ -114,6 +147,9 @@ export function usePanelTransfer({
               : "Imported all bookmarks successfully.",
         });
       } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
         setImportSummary({
           kind: "bookmarks",
           importedCount: 0,
@@ -127,7 +163,7 @@ export function usePanelTransfer({
         });
       }
     },
-    [importBookmarks, readerBookmarks],
+    [beginImport, importBookmarks, readerBookmarks],
   );
 
   const closeImportSummary = useCallback(() => {

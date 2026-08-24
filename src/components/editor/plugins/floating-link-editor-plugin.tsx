@@ -35,7 +35,10 @@ import { createPortal } from "react-dom"
 
 import { getSelectedNode } from "@/components/editor/utils/get-selected-node"
 import { setFloatingElemPositionForLinkEditor } from "@/components/editor/utils/set-floating-elem-position-for-link-editor"
-import { sanitizeUrl } from "@/components/editor/utils/url"
+import {
+  openUrlInNewTab,
+  sanitizeUrl,
+} from "@/components/editor/utils/url"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -178,7 +181,7 @@ function FloatingLinkEditor({
       inputRef.current.focus()
       setIsLink(true)
     }
-  }, [isLinkEditMode, isLink])
+  }, [isLinkEditMode, setIsLink])
 
   const monitorInputInteraction = (
     event: React.KeyboardEvent<HTMLInputElement>
@@ -221,7 +224,7 @@ function FloatingLinkEditor({
       className="absolute top-0 left-0 w-full max-w-sm rounded-md opacity-0 shadow-md"
     >
       {!isLink ? null : isLinkEditMode ? (
-        <div className="flex items-center space-x-2 rounded-md border p-1 pl-2">
+        <div className="flex items-center gap-2 rounded-md border p-1 pl-2">
           <Input
             ref={inputRef}
             value={editedLinkUrl}
@@ -238,14 +241,14 @@ function FloatingLinkEditor({
             }}
             className="shrink-0"
           >
-            <X className="h-4 w-4" />
+            <X data-icon="inline-start" />
           </Button>
           <Button
             size="icon"
             onClick={handleLinkSubmission}
             className="shrink-0"
           >
-            <Check className="h-4 w-4" />
+            <Check data-icon="inline-start" />
           </Button>
         </div>
       ) : (
@@ -254,7 +257,7 @@ function FloatingLinkEditor({
             href={sanitizeUrl(linkUrl)}
             target="_blank"
             rel="noopener noreferrer"
-            className="overflow-hidden text-sm text-ellipsis whitespace-nowrap"
+            className="truncate text-sm"
           >
             {linkUrl}
           </a>
@@ -267,7 +270,7 @@ function FloatingLinkEditor({
                 setIsLinkEditMode(true)
               }}
             >
-              <Pencil className="h-4 w-4" />
+              <Pencil data-icon="inline-start" />
             </Button>
             <Button
               size="icon"
@@ -276,7 +279,7 @@ function FloatingLinkEditor({
                 editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
               }}
             >
-              <Trash className="h-4 w-4" />
+              <Trash data-icon="inline-start" />
             </Button>
           </div>
         </div>
@@ -366,8 +369,7 @@ function useFloatingLinkEditorToolbar(
             const node = getSelectedNode(selection)
             const linkNode = $findMatchingParent(node, $isLinkNode)
             if ($isLinkNode(linkNode) && (payload.metaKey || payload.ctrlKey)) {
-              window.open(linkNode.getURL(), "_blank")
-              return true
+              return openUrlInNewTab(linkNode.getURL())
             }
           }
           return false

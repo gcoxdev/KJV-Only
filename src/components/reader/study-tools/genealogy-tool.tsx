@@ -44,7 +44,7 @@ export function GenealogyTool({
   return (
     <AccordionItem value="genealogy">
       <AccordionTrigger
-        className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
+        className={cn(hasInfo && "text-success")}
       >
         <UserSearchIcon />
         Genealogy

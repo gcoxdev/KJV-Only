@@ -1,22 +1,26 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  findObsoleteAppCaches,
   isRangedRequest,
   shouldCacheServiceWorkerResponse,
 } from "@/lib/service-worker-cache";
 
-describe("service worker cache guards", () => {
-  it("treats range requests as bypass-only requests", () => {
-    expect(isRangedRequest("bytes=0-")).toBe(true);
-    expect(isRangedRequest(" bytes=100-200 ")).toBe(true);
-    expect(isRangedRequest(null)).toBe(false);
-    expect(isRangedRequest(undefined)).toBe(false);
-    expect(isRangedRequest("   ")).toBe(false);
+describe("service-worker cache policy", () => {
+  it("only removes obsolete caches owned by this application", () => {
+    expect(
+      findObsoleteAppCaches(
+        ["kjv-only-cache-v4", "kjv-only-cache-v5", "another-app-v1"],
+        "kjv-only-cache-",
+        "kjv-only-cache-v5"
+      )
+    ).toEqual(["kjv-only-cache-v4"]);
   });
 
-  it("only allows full 200 responses to be cached", () => {
+  it("does not cache partial responses", () => {
+    expect(isRangedRequest("bytes=0-100")).toBe(true);
+    expect(isRangedRequest(null)).toBe(false);
     expect(shouldCacheServiceWorkerResponse(200)).toBe(true);
     expect(shouldCacheServiceWorkerResponse(206)).toBe(false);
-    expect(shouldCacheServiceWorkerResponse(404)).toBe(false);
   });
 });

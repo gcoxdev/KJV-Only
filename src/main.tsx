@@ -8,8 +8,8 @@ import { registerServiceWorker } from "@/lib/register-sw"
 
 registerServiceWorker()
 
-const app = <App />
-
 createRoot(document.getElementById("root")!).render(
-  import.meta.env.DEV ? app : <StrictMode>{app}</StrictMode>
+  <StrictMode>
+    <App />
+  </StrictMode>
 )

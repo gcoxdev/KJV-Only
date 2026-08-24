@@ -58,12 +58,12 @@ export function StrongsTool({
   return (
     <AccordionItem value="strongs">
       <AccordionTrigger
-        className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
+        className={cn(hasInfo && "text-success")}
       >
         <BookKeyIcon />
         Strong&apos;s Dictionary
       </AccordionTrigger>
-      <AccordionContent className="space-y-2 overflow-visible">
+      <AccordionContent className="flex flex-col gap-2 overflow-visible">
         {isOpen ? (
           <>
             <StudySearchForm
@@ -101,7 +101,7 @@ export function StrongsTool({
                 {results.map(({ code, testament, entry }) => (
                   <AccordionItem key={code} value={code}>
                     <AccordionTrigger>{`${code} (${testament})`}</AccordionTrigger>
-                    <AccordionContent className="space-y-2 text-sm">
+                    <AccordionContent className="flex flex-col gap-2 text-sm">
                       {entry.kjv_def ? (
                         <p>
                           <span className="text-muted-foreground">KJV Definition:</span>{" "}
@@ -109,7 +109,7 @@ export function StrongsTool({
                         </p>
                       ) : null}
                       {entry.kjv_refs && Object.keys(entry.kjv_refs).length > 0 ? (
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-1">
                           <p className="text-muted-foreground">KJV References</p>
                           <Accordion
                             className="w-full rounded-md border px-2 [&_[data-slot=accordion-content]]:pb-1 [&_[data-slot=accordion-trigger]]:py-1"

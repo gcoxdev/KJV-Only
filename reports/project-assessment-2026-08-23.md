@@ -4,6 +4,8 @@
 **Repository revision:** `25c01411c5d7b9c312ae4c9b96a7d50720e0c0a4`  
 **Goal:** Harden and improve the current product without changing its existing user-facing functionality.
 
+> **Implementation update (2026-08-24):** The repository-local remediation work from this assessment has been implemented and verified. See [Hardening Remediation Report](hardening-remediation-2026-08-24.md) for the recommendation-by-recommendation disposition, final Graphify map, security closure, measurements, and compatibility evidence.
+
 ## Executive assessment
 
 The application has a sound functional base. It is a privacy-friendly, client-only React 19/Vite PWA; TypeScript is strict; the current lint, unit-test, and production-build baselines pass; major secondary views are already lazy-loaded; data loaders generally cache their promises; and Graphify found no import cycles. The code also shows real progress toward separating pure domain logic and hooks from presentation.

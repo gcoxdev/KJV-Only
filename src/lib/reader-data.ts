@@ -13,7 +13,6 @@ import type {
   BibleWordBookPayload,
   OldEnglishPayload,
   PhrasesPayload,
-  ReaderPayload,
   StrongsCompactPayload,
   StrongsPayload,
   UnitsPayload,
@@ -22,6 +21,8 @@ import type {
 import { decodeGenealogyPayload, enrichGenealogyPayload } from "@/lib/genealogy";
 import { chapterVerseKey, normalizeConcordanceWord } from "@/lib/references";
 import { decodeStrongsPayload } from "@/lib/strongs";
+import { parseBooks } from "@/lib/bible-payload";
+import { beginPerformanceMeasure } from "@/lib/performance";
 
 let kjvBooksPromise: Promise<Book[]> | null = null;
 let concordancePromise: Promise<ConcordancePayload> | null = null;
@@ -62,19 +63,46 @@ export type TopicsIndexPayload = {
   }>;
 };
 
-function parseBooks(input: unknown): Book[] | null {
-  if (Array.isArray(input)) {
-    return input as Book[];
+async function fetchKjvBooksOnMainThread() {
+  const response = await fetch("/data/kjv.json", { cache: "no-cache" });
+  if (!response.ok) {
+    throw new Error("Could not load /data/kjv.json");
   }
-
-  if (typeof input === "object" && input !== null) {
-    const payload = input as ReaderPayload;
-    if (Array.isArray(payload.books)) {
-      return payload.books;
-    }
+  const parsedBooks = parseBooks((await response.json()) as unknown);
+  if (!parsedBooks || parsedBooks.length === 0) {
+    throw new Error("Invalid reader data format in /data/kjv.json");
   }
+  return parsedBooks;
+}
 
-  return null;
+function fetchKjvBooksInWorker() {
+  return new Promise<Book[]>((resolve, reject) => {
+    const worker = new Worker(
+      new URL("../workers/reader-data.worker.ts", import.meta.url),
+      { type: "module" },
+    );
+    worker.addEventListener(
+      "message",
+      (event: MessageEvent<{ books?: Book[]; error?: string }>) => {
+        worker.terminate();
+        if (event.data.books && event.data.books.length > 0) {
+          resolve(event.data.books);
+          return;
+        }
+        reject(new Error(event.data.error ?? "Could not load /data/kjv.json"));
+      },
+      { once: true },
+    );
+    worker.addEventListener(
+      "error",
+      () => {
+        worker.terminate();
+        reject(new Error("Bible data worker failed"));
+      },
+      { once: true },
+    );
+    worker.postMessage({ url: "/data/kjv.json" });
+  });
 }
 
 function deltaEncode(values: number[]) {
@@ -173,20 +201,11 @@ export function augmentConcordanceWithNormalizedWordForms(
 
 export function loadKjvBooks() {
   if (!kjvBooksPromise) {
-    kjvBooksPromise = fetch("/data/kjv.json", { cache: "no-cache" })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Could not load /data/kjv.json");
-        }
-        return response.json() as Promise<unknown>;
-      })
-      .then((payload) => {
-        const parsedBooks = parseBooks(payload);
-        if (!parsedBooks || parsedBooks.length === 0) {
-          throw new Error("Invalid reader data format in /data/kjv.json");
-        }
-        return parsedBooks;
-      })
+    const finishMeasure = beginPerformanceMeasure("kjv:corpus-load");
+    kjvBooksPromise = (typeof Worker === "function"
+      ? fetchKjvBooksInWorker().catch(() => fetchKjvBooksOnMainThread())
+      : fetchKjvBooksOnMainThread())
+      .finally(finishMeasure)
       .catch((error) => {
         kjvBooksPromise = null;
         throw error;

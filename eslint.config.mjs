@@ -10,8 +10,6 @@ export default tseslint.config(
       "dist",
       "coverage",
       "node_modules",
-      "public",
-      "src/components/editor/**",
     ],
   },
   {
@@ -47,6 +45,40 @@ export default tseslint.config(
           caughtErrorsIgnorePattern: "^_",
         },
       ],
+    },
+  },
+  {
+    extends: [js.configs.recommended],
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      globals: globals.node,
+    },
+  },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ["*.config.ts", "e2e/**/*.ts"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    extends: [js.configs.recommended],
+    files: ["public/sw.js", "public/app-cache-config.js"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      globals: {
+        ...globals.browser,
+        ...globals.serviceworker,
+      },
     },
   },
 );

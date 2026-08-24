@@ -61,11 +61,11 @@ export function BookmarksTool({
   );
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {sortedBookmarks.length === 0 ? (
         <p className="text-sm text-muted-foreground">No bookmarks yet.</p>
       ) : (
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           {sortedBookmarks.map((bookmark) => (
             <div key={bookmark.id} className="rounded-md border p-2">
               <div className="flex items-start gap-2">
@@ -124,7 +124,7 @@ export function BookmarksTool({
             <DialogTitle>Edit Bookmark</DialogTitle>
             <DialogDescription>Update the bookmark label or note.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Input
               value={draftLabel}
               onChange={(event) => setDraftLabel(event.target.value)}

@@ -1,120 +1,16 @@
-import type { Book, Verse } from "@/types/bible";
-import { normalizeConcordanceWord } from "@/lib/references";
-import type { SearchMode } from "@/types/reader";
+import {
+  extractSearchWords,
+  type SearchableVerseEntry,
+} from "@/lib/verse-search-index";
 
-export type SearchableVerseEntry = {
-  text: string;
-  textLower: string;
-  searchWords: string[];
-  searchWordsLower: string[];
-  searchWordPhonetics: string[];
-};
-
-export type VerseSearchIndexEntry = SearchableVerseEntry & {
-  bookIndex: number;
-  chapterIndex: number;
-  verseNumber: number;
-  bookName: string;
-};
-
-function isPunctuationTokenText(text: string) {
-  return /^[,.;:!?)]$/.test(text) || /^['"]$/.test(text) || /^--?$/.test(text);
-}
-
-function normalizeSearchDisplayText(text: string) {
-  return text.replace(/[’‘]/g, "'").replace(/[‐‑‒–—−]/g, "-");
-}
-
-function formatSearchTokenText(verse: Verse, tokenIndex: number) {
-  const token = verse.tokens[tokenIndex];
-  const normalized = normalizeSearchDisplayText(token.text);
-  if (!token.divineName) {
-    return normalized;
-  }
-
-  const nextToken = verse.tokens[tokenIndex + 1];
-  const hasPossessiveSuffix =
-    nextToken &&
-    (normalizeSearchDisplayText(nextToken.text) === "'s" ||
-      normalizeSearchDisplayText(nextToken.text) === "'");
-
-  return hasPossessiveSuffix ? normalized.toUpperCase() : normalized.toUpperCase();
-}
-
-function formatVerseText(verse: Verse) {
-  let value = "";
-  verse.tokens.forEach((_, index) => {
-    const tokenText = formatSearchTokenText(verse, index);
-    if (index > 0 && !isPunctuationTokenText(tokenText)) {
-      value += " ";
-    }
-    value += tokenText;
-  });
-  return value;
-}
-
-export function extractSearchWords(text: string) {
-  return text
-    .split(/\s+/)
-    .map((word) => normalizeConcordanceWord(normalizeSearchDisplayText(word)))
-    .filter(Boolean);
-}
-
-export function createSearchableVerseEntry(text: string): SearchableVerseEntry {
-  const searchWords = extractSearchWords(text);
-  return {
-    text,
-    textLower: text.toLowerCase(),
-    searchWords,
-    searchWordsLower: searchWords.map((word) => word.toLowerCase()),
-    searchWordPhonetics: searchWords.map((word) => phoneticCode(word.toLowerCase())),
-  };
-}
-
-export function buildVerseSearchIndex(books: Book[]): VerseSearchIndexEntry[] {
-  const indexed: VerseSearchIndexEntry[] = [];
-  books.forEach((book, bookIndex) => {
-    book.chapters.forEach((chapter, chapterIndex) => {
-      chapter.verses.forEach((verse) => {
-        const text = formatVerseText(verse);
-        indexed.push({
-          bookIndex,
-          chapterIndex,
-          verseNumber: verse.verse,
-          bookName: book.name,
-          ...createSearchableVerseEntry(text),
-        });
-      });
-    });
-  });
-  return indexed;
-}
-
-export function matchSelectedWords(
-  entry: Pick<SearchableVerseEntry, "searchWords" | "searchWordsLower">,
-  selectedWords: string[],
-  mode: Extract<SearchMode, "contains-any" | "contains-all">,
-  caseSensitive: boolean,
-) {
-  const normalizedNeedles = selectedWords
-    .map((word) => normalizeConcordanceWord(word.trim()))
-    .filter(Boolean);
-
-  if (normalizedNeedles.length === 0) {
-    return false;
-  }
-
-  const haystack = new Set(
-    caseSensitive ? entry.searchWords : entry.searchWordsLower,
-  );
-  const needles = caseSensitive
-    ? normalizedNeedles
-    : normalizedNeedles.map((word) => word.toLowerCase());
-
-  return mode === "contains-any"
-    ? needles.some((needle) => haystack.has(needle))
-    : needles.every((needle) => haystack.has(needle));
-}
+export {
+  buildVerseSearchIndex,
+  createSearchableVerseEntry,
+  extractSearchWords,
+  matchSelectedWords,
+  type SearchableVerseEntry,
+  type VerseSearchIndexEntry,
+} from "@/lib/verse-search-index";
 
 export function suggestConcordanceWords(
   words: string[],
@@ -154,6 +50,12 @@ export function buildRegexMatcher(pattern: string, caseSensitive: boolean) {
     return {
       regex: null,
       error: "Enter a regular expression.",
+    };
+  }
+  if (trimmed.length > 512) {
+    return {
+      regex: null,
+      error: "Regular expressions are limited to 512 characters.",
     };
   }
 

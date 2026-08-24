@@ -30,7 +30,7 @@ export function NotesTool({
   const canSetChapterContext = Boolean(context && (context.verseNumber || context.word));
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="outline" onClick={() => onOpenNotesTab()}>
           <BookOpenTextIcon />
@@ -38,7 +38,7 @@ export function NotesTool({
         </Button>
       </div>
 
-      <div className="space-y-1">
+      <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs font-semibold text-muted-foreground">GENERAL</p>
           <Button
@@ -69,7 +69,7 @@ export function NotesTool({
 
       <Separator />
 
-      <div className="space-y-1">
+      <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs font-semibold text-muted-foreground">CONTEXT</p>
           <Button

@@ -21,7 +21,12 @@ import {
   loadUnits,
   loadWebsters,
 } from "@/lib/reader-data";
-import { buildVerseSearchIndex } from "@/lib/search";
+import { buildVerseSearchIndex } from "@/lib/verse-search-index";
+import { measureSynchronous } from "@/lib/performance";
+import {
+  consumeLocalStorageIssueKeys,
+  LOCAL_STORAGE_ISSUE_EVENT,
+} from "@/lib/local-storage";
 import {
   type ReferenceCommandAction,
   type ReferenceCommandTarget,
@@ -98,24 +103,18 @@ import type {
   PhrasesPayload,
   PanelDirection,
   PanelNode,
-  ReaderColorTheme,
   ReaderTab,
   SearchPageState,
-  SearchResultOpenTarget,
   SplitOrientation,
   StrongsPayload,
   StudyWorkspaceTool,
-  TabsOrientation,
   TokenPopupState,
   UnitsEntry,
   UnitsPayload,
   WebstersEntry,
   WebstersPayload,
   WordVerseSelectionTarget,
-  NotesLinkOpenTarget,
-  BookmarkOpenTarget,
   PendingReaderScrollTarget,
-  ReferenceLinkOpenTarget,
 } from "@/types/reader";
 import type { BookmarkScope, ReaderBookmark } from "@/types/bookmarks";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -158,6 +157,7 @@ import {
   deriveStudySidebarState,
 } from "@/hooks/use-study-sidebar-state";
 import { useReaderShellState } from "@/hooks/use-reader-shell-state";
+import { useReaderController } from "@/hooks/use-reader-controller";
 import { useStudyWorkspaceState } from "@/hooks/use-study-workspace-state";
 import { TabsStrip } from "@/components/reader/tabs-strip";
 import { TokenPopupCard } from "@/components/reader/token-popup-card";
@@ -345,33 +345,6 @@ export function KJVReader() {
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [readerColorTheme, setReaderColorTheme] =
-    useState<ReaderColorTheme>("brown");
-  const [fontSize, setFontSize] = useState(16);
-  const [lightHighlightColor, setLightHighlightColor] =
-    useState(defaultHighlightColor);
-  const [darkHighlightColor, setDarkHighlightColor] =
-    useState(defaultHighlightColor);
-  const [verseSpacing, setVerseSpacing] = useState(0);
-  const [hideReadModeVerseNumbers, setHideReadModeVerseNumbers] =
-    useState(false);
-  const [readModeParagraphIndent, setReadModeParagraphIndent] = useState(false);
-  const [flowVersesByParagraph, setFlowVersesByParagraph] = useState(false);
-  const [showWelcomeHomeAtStartup, setShowWelcomeHomeAtStartup] =
-    useState(true);
-  const [wordVerseSelectionTarget, setWordVerseSelectionTarget] =
-    useState<WordVerseSelectionTarget>("sidebar");
-  const wordVerseSelectionTargetRef =
-    useRef<WordVerseSelectionTarget>("sidebar");
-  const [notesLinkOpenTarget, setNotesLinkOpenTarget] =
-    useState<NotesLinkOpenTarget>("new-panel");
-  const [searchResultOpenTarget, setSearchResultOpenTarget] =
-    useState<SearchResultOpenTarget>("new-panel");
-  const [bookmarkOpenTarget, setBookmarkOpenTarget] =
-    useState<BookmarkOpenTarget>("new-panel");
-  const [referenceLinkOpenTarget, setReferenceLinkOpenTarget] =
-    useState<ReferenceLinkOpenTarget>("new-tab");
   const [activeReaderWordHighlight, setActiveReaderWordHighlight] = useState<{
     leafId: string;
     verseNumber: number;
@@ -411,6 +384,61 @@ export function KJVReader() {
     setIsGenealogyTreeOpen,
     setGenealogyTreePersonId,
   } = useReaderShellState();
+  const {
+    preferences: {
+      theme,
+      setTheme,
+      readerColorTheme,
+      setReaderColorTheme,
+      fontSize,
+      setFontSize,
+      lightHighlightColor,
+      setLightHighlightColor,
+      darkHighlightColor,
+      setDarkHighlightColor,
+      verseSpacing,
+      setVerseSpacing,
+      hideReadModeVerseNumbers,
+      setHideReadModeVerseNumbers,
+      readModeParagraphIndent,
+      setReadModeParagraphIndent,
+      flowVersesByParagraph,
+      setFlowVersesByParagraph,
+      showWelcomeHomeAtStartup,
+      setShowWelcomeHomeAtStartup,
+      wordVerseSelectionTarget,
+      setWordVerseSelectionTarget,
+      notesLinkOpenTarget,
+      setNotesLinkOpenTarget,
+      searchResultOpenTarget,
+      setSearchResultOpenTarget,
+      bookmarkOpenTarget,
+      setBookmarkOpenTarget,
+      referenceLinkOpenTarget,
+      setReferenceLinkOpenTarget,
+    },
+    readingProgress: { readChapters, setReadChapters },
+  } = useReaderController({ tabsOrientation, setTabsOrientation });
+  const wordVerseSelectionTargetRef =
+    useRef<WordVerseSelectionTarget>(wordVerseSelectionTarget);
+
+  useEffect(() => {
+    let lastNotifiedAt = 0;
+    const notify = () => {
+      const issueKeys = consumeLocalStorageIssueKeys();
+      if (issueKeys.length === 0 || Date.now() - lastNotifiedAt < 1_000) {
+        return;
+      }
+      lastNotifiedAt = Date.now();
+      toast.warning("Some saved reader data could not be used.", {
+        description:
+          "The reader recovered safely. Export important notes/bookmarks before clearing site data if the warning continues.",
+      });
+    };
+    notify();
+    window.addEventListener(LOCAL_STORAGE_ISSUE_EVENT, notify);
+    return () => window.removeEventListener(LOCAL_STORAGE_ISSUE_EVENT, notify);
+  }, []);
   const [tabs, setTabs] = useState<ReaderTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [activeSettingsTab, setActiveSettingsTab] = useState<
@@ -421,7 +449,6 @@ export function KJVReader() {
   const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(
     null,
   );
-  const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
   const [concordanceWordAccordionValue, setConcordanceWordAccordionValue] =
     useState<string[]>([]);
   const [topicsAccordionValue, setTopicsAccordionValue] = useState<string[]>([]);
@@ -582,188 +609,6 @@ export function KJVReader() {
   });
 
   useEffect(() => {
-    const storedTheme = window.localStorage.getItem("theme");
-    if (storedTheme === "dark" || storedTheme === "light") {
-      setTheme(storedTheme);
-    }
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    window.localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  useEffect(() => {
-    document.documentElement.dataset.readerTheme = readerColorTheme;
-  }, [readerColorTheme]);
-
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem("kjv-display-settings-v1");
-      if (!stored) {
-        return;
-      }
-      const parsed = JSON.parse(stored) as {
-        readerColorTheme?: ReaderColorTheme;
-        fontSize?: number;
-        highlightColor?: string;
-        lightHighlightColor?: string;
-        darkHighlightColor?: string;
-        verseSpacing?: number;
-        hideReadModeVerseNumbers?: boolean;
-        readModeParagraphIndent?: boolean;
-        flowVersesByParagraph?: boolean;
-        tabsOrientation?: TabsOrientation;
-        studyToolOpenTarget?: "sidebar" | "panel" | "tab";
-        wordVerseSelectionTarget?: WordVerseSelectionTarget;
-        notesLinkOpenTarget?: NotesLinkOpenTarget;
-        searchResultOpenTarget?: SearchResultOpenTarget;
-        bookmarkOpenTarget?: BookmarkOpenTarget;
-        referenceLinkOpenTarget?: ReferenceLinkOpenTarget;
-        showWelcomeHomeAtStartup?: boolean;
-      };
-      if (typeof parsed.fontSize === "number") {
-        setFontSize(Math.max(8, Math.round(parsed.fontSize)));
-      }
-      if (typeof parsed.lightHighlightColor === "string") {
-        setLightHighlightColor(normalizeHighlightColor(parsed.lightHighlightColor));
-      } else if (typeof parsed.highlightColor === "string") {
-        setLightHighlightColor(normalizeHighlightColor(parsed.highlightColor));
-      }
-      if (typeof parsed.darkHighlightColor === "string") {
-        setDarkHighlightColor(normalizeHighlightColor(parsed.darkHighlightColor));
-      } else if (typeof parsed.highlightColor === "string") {
-        setDarkHighlightColor(normalizeHighlightColor(parsed.highlightColor));
-      }
-      if (
-        parsed.readerColorTheme === "brown" ||
-        parsed.readerColorTheme === "contrast" ||
-        parsed.readerColorTheme === "slate" ||
-        parsed.readerColorTheme === "crimson" ||
-        parsed.readerColorTheme === "amber" ||
-        parsed.readerColorTheme === "forest" ||
-        parsed.readerColorTheme === "navy" ||
-        parsed.readerColorTheme === "indigo" ||
-        parsed.readerColorTheme === "violet"
-      ) {
-        setReaderColorTheme(parsed.readerColorTheme);
-      }
-      if (typeof parsed.verseSpacing === "number") {
-        setVerseSpacing(
-          Math.max(0, Math.min(24, Math.round(parsed.verseSpacing))),
-        );
-      }
-      if (typeof parsed.hideReadModeVerseNumbers === "boolean") {
-        setHideReadModeVerseNumbers(parsed.hideReadModeVerseNumbers);
-      }
-      if (typeof parsed.readModeParagraphIndent === "boolean") {
-        setReadModeParagraphIndent(parsed.readModeParagraphIndent);
-      }
-      if (typeof parsed.flowVersesByParagraph === "boolean") {
-        setFlowVersesByParagraph(parsed.flowVersesByParagraph);
-      }
-      if (typeof parsed.showWelcomeHomeAtStartup === "boolean") {
-        setShowWelcomeHomeAtStartup(parsed.showWelcomeHomeAtStartup);
-      }
-      if (
-        parsed.tabsOrientation === "horizontal" ||
-        parsed.tabsOrientation === "vertical"
-      ) {
-        setTabsOrientation(parsed.tabsOrientation);
-      }
-      if (
-        parsed.wordVerseSelectionTarget === "sidebar" ||
-        parsed.wordVerseSelectionTarget === "new-tab" ||
-        parsed.wordVerseSelectionTarget === "new-panel" ||
-        parsed.wordVerseSelectionTarget === "targeted-panel"
-      ) {
-        setWordVerseSelectionTarget(parsed.wordVerseSelectionTarget);
-      } else if (
-        parsed.studyToolOpenTarget === "sidebar" ||
-        parsed.studyToolOpenTarget === "panel" ||
-        parsed.studyToolOpenTarget === "tab"
-      ) {
-        setWordVerseSelectionTarget(
-          parsed.studyToolOpenTarget === "sidebar"
-            ? "sidebar"
-            : parsed.studyToolOpenTarget === "panel"
-              ? "new-panel"
-              : "new-tab",
-        );
-      }
-      if (
-        parsed.notesLinkOpenTarget === "new-tab" ||
-        parsed.notesLinkOpenTarget === "new-panel" ||
-        parsed.notesLinkOpenTarget === "targeted-panel"
-      ) {
-        setNotesLinkOpenTarget(parsed.notesLinkOpenTarget);
-      }
-      if (
-        parsed.searchResultOpenTarget === "new-tab" ||
-        parsed.searchResultOpenTarget === "new-panel" ||
-        parsed.searchResultOpenTarget === "targeted-panel"
-      ) {
-        setSearchResultOpenTarget(parsed.searchResultOpenTarget);
-      }
-      if (
-        parsed.bookmarkOpenTarget === "new-tab" ||
-        parsed.bookmarkOpenTarget === "new-panel" ||
-        parsed.bookmarkOpenTarget === "targeted-panel"
-      ) {
-        setBookmarkOpenTarget(parsed.bookmarkOpenTarget);
-      }
-      if (
-        parsed.referenceLinkOpenTarget === "new-tab" ||
-        parsed.referenceLinkOpenTarget === "new-panel" ||
-        parsed.referenceLinkOpenTarget === "targeted-panel"
-      ) {
-        setReferenceLinkOpenTarget(parsed.referenceLinkOpenTarget);
-      }
-    } catch {
-      // Ignore malformed persisted display settings.
-    }
-  }, [setTabsOrientation]);
-
-  useEffect(() => {
-    window.localStorage.setItem(
-      "kjv-display-settings-v1",
-      JSON.stringify({
-        readerColorTheme,
-        fontSize,
-        lightHighlightColor,
-        darkHighlightColor,
-        verseSpacing,
-        hideReadModeVerseNumbers,
-        readModeParagraphIndent,
-        flowVersesByParagraph,
-        showWelcomeHomeAtStartup,
-        tabsOrientation,
-        wordVerseSelectionTarget,
-        notesLinkOpenTarget,
-        searchResultOpenTarget,
-        bookmarkOpenTarget,
-        referenceLinkOpenTarget,
-      }),
-    );
-  }, [
-    readerColorTheme,
-    fontSize,
-    lightHighlightColor,
-    darkHighlightColor,
-    verseSpacing,
-    hideReadModeVerseNumbers,
-    readModeParagraphIndent,
-    flowVersesByParagraph,
-    showWelcomeHomeAtStartup,
-    tabsOrientation,
-    wordVerseSelectionTarget,
-    notesLinkOpenTarget,
-    searchResultOpenTarget,
-    bookmarkOpenTarget,
-    referenceLinkOpenTarget,
-  ]);
-
-  useEffect(() => {
     wordVerseSelectionTargetRef.current = wordVerseSelectionTarget;
   }, [wordVerseSelectionTarget]);
 
@@ -793,35 +638,6 @@ export function KJVReader() {
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [tokenPopup]);
-
-  useEffect(() => {
-    try {
-      const storedProgress = window.localStorage.getItem(
-        "kjv-read-chapters-v1",
-      );
-      if (!storedProgress) {
-        return;
-      }
-      const parsed = JSON.parse(storedProgress) as string[];
-      if (Array.isArray(parsed)) {
-        setReadChapters(new Set(parsed));
-      }
-    } catch {
-      // Ignore malformed local progress.
-    }
-  }, [
-    queueVerseHighlights,
-    setTabsOrientation,
-    setTargetedPanelLeafId,
-    setVerseHighlights,
-  ]);
-
-  useEffect(() => {
-    window.localStorage.setItem(
-      "kjv-read-chapters-v1",
-      JSON.stringify(Array.from(readChapters)),
-    );
-  }, [readChapters]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1230,7 +1046,19 @@ export function KJVReader() {
         : [],
     [concordance],
   );
-  const verseSearchIndex = useMemo(() => buildVerseSearchIndex(books), [books]);
+  const hasOpenSearchView = useMemo(
+    () => tabs.some((tab) => panelNodeContainsView(tab.root, "search")),
+    [tabs],
+  );
+  const verseSearchIndex = useMemo(
+    () =>
+      hasOpenSearchView
+        ? measureSynchronous("kjv:search-index-build", () =>
+            buildVerseSearchIndex(books),
+          )
+        : [],
+    [books, hasOpenSearchView],
+  );
 
   const {
     searchTerm: topicsSearchTerm,
@@ -4631,7 +4459,7 @@ export function KJVReader() {
                     ? `Import ${importSummary?.kind === "bookmarks" ? "Bookmarks" : "Notes"} Failed`
                     : `${importSummary?.kind === "bookmarks" ? "Bookmarks" : "Notes"} Imported`}
                 </AlertDialogTitle>
-                <AlertDialogDescription className="space-y-2">
+                <AlertDialogDescription className="flex flex-col gap-2">
                   <span className="block">{importSummary?.message}</span>
                   {importSummary && !importSummary.isError ? (
                     <>

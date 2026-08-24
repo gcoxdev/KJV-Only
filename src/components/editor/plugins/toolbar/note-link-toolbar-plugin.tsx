@@ -9,6 +9,7 @@ import type { NoteLinkTarget } from "@/types/notes";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -89,18 +90,20 @@ export function NoteLinkToolbarPlugin({
           />
         }
       >
-        <Link2Icon className="h-4 w-4" />
+        <Link2Icon className="size-4" data-icon="inline-start" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
-        {options.map((option) => (
-          <DropdownMenuItem
-            key={option.label}
-            disabled={!option.target}
-            onClick={() => insertTarget(option.target)}
-          >
-            {option.label}
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuGroup>
+          {options.map((option) => (
+            <DropdownMenuItem
+              key={option.label}
+              disabled={!option.target}
+              onClick={() => insertTarget(option.target)}
+            >
+              {option.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

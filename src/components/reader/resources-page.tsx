@@ -419,7 +419,7 @@ export function ResourcesPage() {
             Recommended
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+        <CardContent className="flex flex-col gap-3 text-sm leading-7 text-muted-foreground">
           <p>
             The list below includes both KJV defense material and
             grace/right-division study material. These resources do not all

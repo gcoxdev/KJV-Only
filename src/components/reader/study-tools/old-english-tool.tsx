@@ -34,12 +34,12 @@ export function OldEnglishTool({
   return (
     <AccordionItem value="old-english">
       <AccordionTrigger
-        className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
+        className={cn(hasInfo && "text-success")}
       >
         <BookCheckIcon />
         Old English Dictionary
       </AccordionTrigger>
-      <AccordionContent className="space-y-2 overflow-visible">
+      <AccordionContent className="flex flex-col gap-2 overflow-visible">
         {isOpen ? (
           <>
             <StudySearchForm
@@ -65,7 +65,7 @@ export function OldEnglishTool({
                   : "Click a word in the text or search Old English dictionary."}
               </p>
             ) : (
-              <div className="space-y-2 text-sm leading-relaxed">
+              <div className="flex flex-col gap-2 text-sm leading-relaxed">
                 {results.map(({ key, definitions }) => (
                   <p key={key}>
                     <span className="font-semibold">{key}</span>

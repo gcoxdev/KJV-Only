@@ -1,6 +1,8 @@
+import { Fragment } from "react";
 import { BookTypeIcon, LoaderCircleIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { splitWebsterDefinitionLines } from "@/lib/websters";
 import type { WebstersEntry } from "@/types/reader";
 import {
   Accordion,
@@ -40,12 +42,12 @@ export function WebstersTool({
   return (
     <AccordionItem value="websters">
       <AccordionTrigger
-        className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
+        className={cn(hasInfo && "text-primary")}
       >
         <BookTypeIcon />
         Webster&apos;s 1828 Dictionary
       </AccordionTrigger>
-      <AccordionContent className="space-y-2 overflow-visible">
+      <AccordionContent className="flex flex-col gap-2 overflow-visible">
         {isOpen ? (
           <>
             <StudySearchForm
@@ -82,19 +84,28 @@ export function WebstersTool({
                 {results.map(({ key, entry }) => (
                   <AccordionItem key={key} value={key}>
                     <AccordionTrigger>{key}</AccordionTrigger>
-                    <AccordionContent className="space-y-2">
+                    <AccordionContent className="flex flex-col gap-2">
                       {entry.pronunciation ? (
                         <p className="text-sm text-muted-foreground">{entry.pronunciation}</p>
                       ) : null}
                       {entry.definitions.length > 0 ? (
-                        <div className="space-y-2 text-sm">
+                        <div className="flex flex-col gap-2 text-sm">
                           {entry.definitions.map((definition, index) => (
-                            <div key={`${key}-definition-${index}`} className="space-y-1">
+                            <div
+                              key={`${key}-definition-${index}`}
+                              className="flex flex-col gap-1"
+                            >
                               <p className="font-medium capitalize">{definition.type}</p>
-                              <p
-                                className="leading-relaxed"
-                                dangerouslySetInnerHTML={{ __html: definition.text }}
-                              />
+                              <p className="leading-relaxed">
+                                {splitWebsterDefinitionLines(definition.text).map(
+                                  (line, lineIndex) => (
+                                    <Fragment key={`${key}-definition-${index}-${lineIndex}`}>
+                                      {lineIndex > 0 ? <br /> : null}
+                                      {line}
+                                    </Fragment>
+                                  ),
+                                )}
+                              </p>
                             </div>
                           ))}
                         </div>

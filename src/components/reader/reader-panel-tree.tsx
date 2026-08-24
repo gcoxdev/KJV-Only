@@ -101,6 +101,7 @@ import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -825,11 +826,12 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                     variant="outline"
                     size="icon-sm"
                     className="ml-auto"
+                    aria-label="Panel options"
                     data-tour={leaf.view === "reader" ? "panel-menu" : undefined}
                   />
                 }
               >
-                <EllipsisVerticalIcon />
+                <EllipsisVerticalIcon data-icon="inline-start" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem
@@ -1251,7 +1253,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 aria-label={`Reading progress for ${book?.name ?? "Book"} ${chapter.chapter}`}
               />
               {audioVisible ? (
-                <div className="space-y-2 border-b p-2">
+                <div className="flex flex-col gap-2 border-b p-2">
                   {audioSrc ? (
                     <>
                       <audio
@@ -1369,15 +1371,17 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent className="w-20 min-w-0">
-                                {AUDIO_PLAYBACK_RATE_OPTIONS.map((option) => (
-                                  <SelectItem
-                                    key={option.value}
-                                    value={option.label}
-                                    className="pr-8"
-                                  >
-                                    {option.label}
-                                  </SelectItem>
-                                ))}
+                                <SelectGroup>
+                                  {AUDIO_PLAYBACK_RATE_OPTIONS.map((option) => (
+                                    <SelectItem
+                                      key={option.value}
+                                      value={option.label}
+                                      className="pr-8"
+                                    >
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
                               </SelectContent>
                             </Select>
                             <div className="flex min-w-0 flex-1 items-center gap-1.5">

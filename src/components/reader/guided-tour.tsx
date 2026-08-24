@@ -133,7 +133,7 @@ export function GuidedTour({
         className="pointer-events-auto absolute w-[min(20rem,calc(100vw-2rem))] rounded-xl border border-border bg-background p-4 shadow-2xl"
         style={popoverStyle}
       >
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Tour Step {stepIndex + 1} of {steps.length}
           </p>

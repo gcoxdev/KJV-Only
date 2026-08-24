@@ -131,7 +131,7 @@ export function DonatePage({
             Support This Work
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+        <CardContent className="flex flex-col gap-3 text-sm leading-7 text-muted-foreground">
           <p>
             This site and app is intended to remain available and free forever,
             or at least until the Lord returns.
@@ -155,7 +155,7 @@ export function DonatePage({
             support someone may choose to give back.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+        <CardContent className="flex flex-col gap-3 text-sm leading-7 text-muted-foreground">
           <p>
             A large part of the reason for building and maintaining this app is
             the conviction that God gives different gifts, abilities, and
@@ -189,12 +189,12 @@ export function DonatePage({
             optional way to give.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+        <CardContent className="flex flex-col gap-3 text-sm leading-7 text-muted-foreground">
           <p>
             You can use the link below, or scan the QR code on another device.
           </p>
           <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-background/60 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <a
                 href="https://www.paypal.com/donate/?business=3HTE99BG8ESZJ&no_recurring=0&currency_code=USD"
                 target="_blank"
@@ -220,7 +220,7 @@ export function DonatePage({
             <img
               src="/other/paypal-donate-qr.svg"
               alt="QR code for the PayPal donation link"
-              className="h-32 w-32 rounded-md border border-border/70 bg-white p-2"
+              className="size-32 rounded-md border border-border/70 bg-white p-2"
             />
           </div>
         </CardContent>

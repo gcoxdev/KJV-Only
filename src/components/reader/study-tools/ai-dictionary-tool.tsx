@@ -85,12 +85,12 @@ export function AIDictionaryTool({
   return (
     <AccordionItem value="ai-dictionary">
       <AccordionTrigger
-        className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
+        className={cn(hasInfo && "text-success")}
       >
         <BrainCircuitIcon />
         AI Dictionary
       </AccordionTrigger>
-      <AccordionContent className="space-y-2 overflow-visible">
+      <AccordionContent className="flex flex-col gap-2 overflow-visible">
         {isOpen ? (
           <>
             <StudySearchForm
@@ -127,7 +127,7 @@ export function AIDictionaryTool({
                 {results.map(({ key, entry }) => (
                   <AccordionItem key={key} value={key}>
                     <AccordionTrigger>{key}</AccordionTrigger>
-                    <AccordionContent className="space-y-2">
+                    <AccordionContent className="flex flex-col gap-2">
                       {(() => {
                         const aliasTargets =
                           entry.aliases?.map((alias) => ({
@@ -186,7 +186,7 @@ export function AIDictionaryTool({
                           </Badge>
                         ) : null}
                       </div>
-                      <div className="space-y-2 text-sm leading-relaxed">
+                      <div className="flex flex-col gap-2 text-sm leading-relaxed">
                         {entry.definitions.map((definition, index) =>
                           renderAIDictionaryDefinition(
                             key,
@@ -198,7 +198,7 @@ export function AIDictionaryTool({
                         )}
                       </div>
                       {clickableAliases.length > 0 || plainAliases.length > 0 ? (
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-1">
                           <p className="text-xs text-muted-foreground">Also:</p>
                           {clickableAliases.length > 0 ? (
                             <div className="flex flex-wrap gap-1">
@@ -224,7 +224,7 @@ export function AIDictionaryTool({
                         </div>
                       ) : null}
                       {clickableRelated.length > 0 ? (
-                        <div className="space-y-1">
+                        <div className="flex flex-col gap-1">
                           <p className="text-xs text-muted-foreground">Related:</p>
                           <div className="flex flex-wrap gap-1">
                             {clickableRelated.map(({ label }) => (

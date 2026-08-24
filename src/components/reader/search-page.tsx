@@ -168,7 +168,14 @@ export function SearchPage({
     total: number;
   } | null>(null);
   const searchRunIdRef = useRef(0);
+  const regexWorkerRef = useRef<Worker | null>(null);
   const resultsScrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      regexWorkerRef.current?.terminate();
+    };
+  }, []);
 
   const {
     searchMode: rawSearchMode,
@@ -475,8 +482,11 @@ export function SearchPage({
 
   const search = () => {
     onStateChange({ error: null });
+    regexWorkerRef.current?.terminate();
+    regexWorkerRef.current = null;
     let matcher: ((entry: VerseSearchIndexEntry) => boolean) | null = null;
     let smartQuery: string | null = null;
+    let regexPattern: string | null = null;
     const nextSearchRunId = searchRunIdRef.current + 1;
     searchRunIdRef.current = nextSearchRunId;
 
@@ -537,14 +547,14 @@ export function SearchPage({
           });
           return;
         }
-        matcher = (entry) => regex.test(entry.text);
+        regexPattern = pattern;
       } catch {
         onStateChange({ error: "Invalid regular expression.", results: [] });
         return;
       }
     }
 
-    if (!matcher && !smartQuery) {
+    if (!matcher && !smartQuery && !regexPattern) {
       onStateChange({ results: [] });
       return;
     }
@@ -633,7 +643,6 @@ export function SearchPage({
 
       const processBatch = () => {
         if (searchRunIdRef.current !== nextSearchRunId) {
-          cancelSearch();
           return;
         }
 
@@ -679,29 +688,102 @@ export function SearchPage({
       return;
     }
 
-    window.requestAnimationFrame(() => {
+    if (regexPattern) {
+      const worker = new Worker(
+        new URL("../../workers/regex-search.worker.ts", import.meta.url),
+        { type: "module" },
+      );
+      regexWorkerRef.current = worker;
+      worker.addEventListener(
+        "message",
+        (event: MessageEvent<{ matches: SearchMatch[]; error: string | null }>) => {
+          worker.terminate();
+          if (regexWorkerRef.current === worker) {
+            regexWorkerRef.current = null;
+          }
+          if (searchRunIdRef.current !== nextSearchRunId) {
+            return;
+          }
+          if (event.data.error) {
+            onStateChange({ error: event.data.error, results: [] });
+            cancelSearch();
+            return;
+          }
+          commitSearch(event.data.matches);
+        },
+        { once: true },
+      );
+      worker.addEventListener(
+        "error",
+        () => {
+          worker.terminate();
+          if (regexWorkerRef.current === worker) {
+            regexWorkerRef.current = null;
+          }
+          if (searchRunIdRef.current === nextSearchRunId) {
+            onStateChange({
+              error: "The regular-expression search worker failed.",
+              results: [],
+            });
+            cancelSearch();
+          }
+        },
+        { once: true },
+      );
+      worker.postMessage({
+        entries: verseIndex,
+        selectedBookIndexes: Array.from(selectedBookIndexes),
+        pattern: regexPattern,
+        caseSensitive,
+        resultLimit: SEARCH_RESULTS_CAP,
+      });
+      return;
+    }
+
+    const matches: SearchMatch[] = [];
+    const batchSize = 1_000;
+    let startIndex = 0;
+    const processMatchBatch = () => {
       if (searchRunIdRef.current !== nextSearchRunId) {
-        cancelSearch();
         return;
       }
       const selected = selectedBookIndexes;
-      const matches = verseIndex
-        .filter((entry) => selected.has(entry.bookIndex))
-        .filter((entry) => matcher?.(entry))
-        .slice(0, 500)
-        .map(({ bookIndex, chapterIndex, verseNumber, bookName, text }) => ({
+      const endIndex = Math.min(startIndex + batchSize, verseIndex.length);
+      for (let index = startIndex; index < endIndex; index += 1) {
+        const entry = verseIndex[index];
+        if (!selected.has(entry.bookIndex) || !matcher?.(entry)) {
+          continue;
+        }
+        const { bookIndex, chapterIndex, verseNumber, bookName, text } = entry;
+        matches.push({
           bookIndex,
           chapterIndex,
           verseNumber,
           bookName,
           text,
-        }));
+        });
+        if (matches.length >= SEARCH_RESULTS_CAP) {
+          break;
+        }
+      }
+      startIndex = endIndex;
+      setSearchProgress({ processed: startIndex, total: verseIndex.length });
+      if (
+        startIndex < verseIndex.length &&
+        matches.length < SEARCH_RESULTS_CAP
+      ) {
+        window.setTimeout(processMatchBatch, 0);
+        return;
+      }
       commitSearch(matches);
-    });
+    };
+    window.setTimeout(processMatchBatch, 0);
   };
 
   const stopSearch = () => {
     searchRunIdRef.current += 1;
+    regexWorkerRef.current?.terminate();
+    regexWorkerRef.current = null;
     setIsSearching(false);
     setSearchProgress(null);
   };
@@ -1306,12 +1388,12 @@ export function SearchPage({
                           <span className="font-medium">Old Testament</span>
                         </div>
                         {expandedBookTree.has("old") ? (
-                          <div className="ml-7 space-y-1 border-l pl-3">
+                          <div className="ml-7 flex flex-col gap-1 border-l pl-3">
                             {groupedBooks.otGroups.map((group) => {
                               const groupNodeId = `group-${group.id}`;
                               const groupExpanded = expandedBookTree.has(groupNodeId);
                               return (
-                                <div key={group.id} className="space-y-1">
+                                <div key={group.id} className="flex flex-col gap-1">
                                   <div className="flex items-center gap-1">
                                     <Button
                                       type="button"
@@ -1379,7 +1461,7 @@ export function SearchPage({
                         ) : null}
                       </div>
 
-                      <div className="space-y-1">
+                      <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-1">
                           <Button
                             type="button"
@@ -1416,12 +1498,12 @@ export function SearchPage({
                           <span className="font-medium">New Testament</span>
                         </div>
                         {expandedBookTree.has("new") ? (
-                          <div className="ml-7 space-y-1 border-l pl-3">
+                          <div className="ml-7 flex flex-col gap-1 border-l pl-3">
                             {groupedBooks.ntGroups.map((group) => {
                               const groupNodeId = `group-${group.id}`;
                               const groupExpanded = expandedBookTree.has(groupNodeId);
                               return (
-                                <div key={group.id} className="space-y-1">
+                                <div key={group.id} className="flex flex-col gap-1">
                                   <div className="flex items-center gap-1">
                                     <Button
                                       type="button"
