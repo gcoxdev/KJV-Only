@@ -48,7 +48,7 @@ export function useConcordanceCrossRefsTool() {
 
   const indexedConcordance = useMemo(
     () =>
-      concordance
+      concordance && concordanceSearchTerm.trim()
         ? Object.keys(concordance.words)
             .sort((a, b) => a.localeCompare(b))
             .map((key) => ({
@@ -57,7 +57,7 @@ export function useConcordanceCrossRefsTool() {
               references: decodeConcordanceReferences(concordance, key),
             }))
         : [],
-    [concordance],
+    [concordance, concordanceSearchTerm],
   );
 
   const ensureConcordanceLoaded = useCallback(async () => {

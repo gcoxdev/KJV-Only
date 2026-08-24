@@ -40,7 +40,11 @@ export function useGenealogySearchTool() {
   }, [genealogy]);
 
   const indexedGenealogy = useMemo(() => {
-    return (genealogy ?? [])
+    if (!genealogy || !genealogySearchTerm.trim()) {
+      return [];
+    }
+
+    return genealogy
       .map((person) => ({
         person,
         firstName: person.names[0] ?? person.id,
@@ -50,7 +54,7 @@ export function useGenealogySearchTool() {
         ].map((name) => name.toLowerCase()),
       }))
       .sort((a, b) => a.firstName.localeCompare(b.firstName));
-  }, [genealogy]);
+  }, [genealogy, genealogySearchTerm]);
 
   const personSemanticKey = useCallback((person: GenealogyPerson) => {
     const byNameKey = (person.verses?.byName ?? [])

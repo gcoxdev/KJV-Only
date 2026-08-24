@@ -91,6 +91,64 @@ test("builds the lazy search index and returns the expected verse", async ({ pag
   expect(indexBuildDuration).toBeLessThan(15_000)
 })
 
+test("loads study-word tools progressively without blocking the reader", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+  await page.evaluate(() => {
+    performance.clearMeasures("kjv:study-word-first-tools")
+    performance.clearMeasures("kjv:study-word-concordance-selection")
+    performance.clearMeasures("kjv:study-word-all-tools")
+  })
+
+  await page
+    .getByRole("button", { name: "Details for beginning", exact: true })
+    .first()
+    .click()
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          performance.getEntriesByName("kjv:study-word-all-tools").at(-1)
+            ?.duration,
+      ),
+    )
+    .toBeTruthy()
+  await expect(
+    page
+      .getByRole("button", { name: "Concordance", exact: true })
+      .filter({ visible: true }),
+  ).toBeVisible()
+  await expect(
+    page
+      .getByRole("button", {
+        name: "Webster's 1828 Dictionary",
+        exact: true,
+      })
+      .filter({ visible: true }),
+  ).toBeVisible()
+
+  const measures = await page.evaluate(() => ({
+    firstTools: performance
+      .getEntriesByName("kjv:study-word-first-tools")
+      .at(-1)?.duration,
+    concordance: performance
+      .getEntriesByName("kjv:study-word-concordance-selection")
+      .at(-1)?.duration,
+    allTools: performance
+      .getEntriesByName("kjv:study-word-all-tools")
+      .at(-1)?.duration,
+  }))
+  expect(measures.firstTools).toBeGreaterThan(0)
+  expect(measures.firstTools).toBeLessThan(5_000)
+  expect(measures.concordance).toBeGreaterThan(0)
+  expect(measures.concordance).toBeLessThan(10_000)
+  expect(measures.allTools).toBeGreaterThan(0)
+  expect(measures.allTools).toBeLessThan(15_000)
+})
+
 test("restores a shared chapter layout after reload", async ({ page }) => {
   await page.goto("/")
   await expectReaderReady(page)

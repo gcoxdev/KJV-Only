@@ -91,10 +91,14 @@ export function useStrongsSearchTool() {
       }
     };
 
+    if (!strongsSearchTerm.trim()) {
+      return index;
+    }
+
     pushEntries(strongsGreek, "greek");
     pushEntries(strongsHebrew, "hebrew");
     return index.sort((a, b) => a.code.localeCompare(b.code));
-  }, [strongsGreek, strongsHebrew]);
+  }, [strongsGreek, strongsHebrew, strongsSearchTerm]);
 
   const strongsSearchResults = useMemo(() => {
     return deriveStrongsSearchResults(

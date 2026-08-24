@@ -146,6 +146,7 @@ import {
   usePanelRouting,
 } from "@/hooks/use-panel-routing";
 import { useWordStudyNavigation } from "@/hooks/use-word-study-navigation";
+import { useWordStudyCoordinator } from "@/hooks/use-word-study-coordinator";
 import { useVerseHighlights } from "@/hooks/use-verse-highlights";
 import {
   STUDY_ACCORDION_ITEMS,
@@ -2993,205 +2994,6 @@ export function KJVReader() {
     ],
   );
 
-  const syncWordStudySelections = useCallback(
-    (
-      rawWord: string,
-      strongCode: string | null,
-      overrides?: {
-        websters?: WebstersPayload | null;
-        aiDictionary?: AIDictionaryPayload | null;
-        aiDictionarySelection?: { key: string; entry: AIDictionaryEntry } | null;
-        bibleWordBook?: BibleWordBookPayload | null;
-        hitchcocks?: HitchcocksPayload | null;
-        oldEnglish?: OldEnglishPayload | null;
-        phrasesSelection?: { key: string; entry: PhraseEntry } | null;
-        units?: UnitsPayload | null;
-        genealogy?: GenealogyPayload | null;
-        ancientMaps?: AncientMapPayload | null;
-        strongsGreek?: StrongsPayload | null;
-        strongsHebrew?: StrongsPayload | null;
-        referenceKey?: string | null;
-      },
-    ) => {
-      setConcordanceSearchTerm("");
-      setWebstersSearchTerm("");
-      setAIDictionarySearchTerm("");
-      setHitchcocksSearchTerm("");
-      setOldEnglishSearchTerm("");
-      setBibleWordBookSearchTerm("");
-      setPhrasesSearchTerm("");
-      setUnitsSearchTerm("");
-      setStrongsSearchTerm("");
-      setGenealogySearchTerm("");
-      setMapsSearchTerm("");
-
-      const nextWebsters = overrides?.websters ?? websters;
-      const nextAIDictionary = overrides?.aiDictionary ?? aiDictionary;
-      const nextBibleWordBook = overrides?.bibleWordBook ?? bibleWordBook;
-      const nextHitchcocks = overrides?.hitchcocks ?? hitchcocks;
-      const nextOldEnglish = overrides?.oldEnglish ?? oldEnglish;
-      const nextUnits = overrides?.units ?? units;
-      const nextGenealogy = overrides?.genealogy ?? genealogy;
-      const nextAncientMaps = overrides?.ancientMaps ?? ancientMaps;
-      const nextStrongsGreek = overrides?.strongsGreek ?? strongsGreek;
-      const nextStrongsHebrew = overrides?.strongsHebrew ?? strongsHebrew;
-
-      if (nextWebsters) {
-        const matchedKey = resolveWebstersKey(nextWebsters, rawWord);
-        setWebstersWordAccordionValue([]);
-        setSelectedWebstersEntry(
-          matchedKey
-            ? { key: matchedKey, entry: nextWebsters[matchedKey] }
-            : null,
-        );
-      } else {
-        setSelectedWebstersEntry(null);
-      }
-
-      if (nextAIDictionary) {
-        const matchedKey = resolveAIDictionaryKey(nextAIDictionary, rawWord);
-        setAIDictionaryWordAccordionValue([]);
-        setSelectedAIDictionaryEntry(
-          overrides?.aiDictionarySelection ??
-            (matchedKey
-              ? { key: matchedKey, entry: nextAIDictionary[matchedKey] }
-              : null),
-        );
-      } else {
-        setSelectedAIDictionaryEntry(null);
-      }
-
-      if (nextBibleWordBook) {
-        const matchedKey = resolveBibleWordBookKey(nextBibleWordBook, rawWord);
-        setBibleWordBookWordAccordionValue([]);
-        setSelectedBibleWordBookEntry(
-          matchedKey
-            ? { key: matchedKey, entry: nextBibleWordBook[matchedKey] }
-            : null,
-        );
-      } else {
-        setSelectedBibleWordBookEntry(null);
-      }
-
-      if (nextHitchcocks) {
-        const matchedKey = resolveHitchcocksKey(nextHitchcocks, rawWord);
-        setSelectedHitchcocksEntry(
-          matchedKey
-            ? { key: matchedKey, definition: nextHitchcocks[matchedKey] }
-            : null,
-        );
-      } else {
-        setSelectedHitchcocksEntry(null);
-      }
-
-      if (nextOldEnglish) {
-        const matchedKey = resolveOldEnglishKey(nextOldEnglish, rawWord);
-        setSelectedOldEnglishEntry(
-          matchedKey
-            ? {
-                key: matchedKey,
-                definitions: nextOldEnglish[matchedKey] ?? [],
-              }
-            : null,
-        );
-      } else {
-        setSelectedOldEnglishEntry(null);
-      }
-
-      setSelectedPhrasesEntry(overrides?.phrasesSelection ?? null);
-
-      if (nextUnits) {
-        const matchedKey = resolveUnitsKey(nextUnits, rawWord);
-        setSelectedUnitsEntry(
-          matchedKey ? { key: matchedKey, entry: nextUnits[matchedKey] } : null,
-        );
-      } else {
-        setSelectedUnitsEntry(null);
-      }
-
-      if (nextGenealogy) {
-        const matches = findGenealogyMatches(
-          nextGenealogy,
-          rawWord,
-          overrides?.referenceKey,
-        );
-        setSelectedGenealogyIds([...new Set(matches.map((person) => person.id))]);
-      } else {
-        setSelectedGenealogyIds([]);
-      }
-
-      if (nextAncientMaps) {
-        setSelectedMapsEntries(
-          nextAncientMaps.filter((entry) =>
-            matchesMapWord(entry, rawWord, normalizeConcordanceWord),
-          ),
-        );
-      } else {
-        setSelectedMapsEntries([]);
-      }
-
-      if (!strongCode) {
-        setStrongsWordAccordionValue([]);
-        setSelectedStrongsEntry(null);
-        return;
-      }
-
-      if (!nextStrongsGreek || !nextStrongsHebrew) {
-        return;
-      }
-
-      const source = strongCode.startsWith("G")
-        ? nextStrongsGreek
-        : nextStrongsHebrew;
-      const entry = source[strongCode];
-      setStrongsWordAccordionValue([]);
-      setSelectedStrongsEntry(
-        entry
-          ? {
-              code: strongCode,
-              testament: strongCode.startsWith("G") ? "greek" : "hebrew",
-              entry,
-            }
-          : null,
-      );
-    },
-    [
-      ancientMaps,
-      aiDictionary,
-      bibleWordBook,
-      findGenealogyMatches,
-      genealogy,
-      hitchcocks,
-      oldEnglish,
-      units,
-      setAIDictionarySearchTerm,
-      setBibleWordBookSearchTerm,
-      setConcordanceSearchTerm,
-      setGenealogySearchTerm,
-      setHitchcocksSearchTerm,
-      setMapsSearchTerm,
-      setOldEnglishSearchTerm,
-      setPhrasesSearchTerm,
-      setBibleWordBookWordAccordionValue,
-      setSelectedBibleWordBookEntry,
-      setSelectedGenealogyIds,
-      setSelectedHitchcocksEntry,
-      setSelectedMapsEntries,
-      setSelectedOldEnglishEntry,
-      setSelectedPhrasesEntry,
-      setSelectedUnitsEntry,
-      setSelectedAIDictionaryEntry,
-      setSelectedStrongsEntry,
-      setSelectedWebstersEntry,
-      setStrongsSearchTerm,
-      setUnitsSearchTerm,
-      setWebstersSearchTerm,
-      strongsGreek,
-      strongsHebrew,
-      websters,
-    ],
-  );
-
   const openLinkedStrongsEntry = useCallback(
     (code: string) => {
       setStrongsError(null);
@@ -3255,6 +3057,71 @@ export function KJVReader() {
       strongsHebrew,
     ],
   );
+
+  const { openWordInStudyTools } = useWordStudyCoordinator({
+    concordance,
+    websters,
+    aiDictionary,
+    bibleWordBook,
+    hitchcocks,
+    oldEnglish,
+    phrases,
+    units,
+    genealogy,
+    ancientMaps,
+    strongsGreek,
+    strongsHebrew,
+    ensureConcordanceLoaded,
+    ensureWebstersLoaded,
+    ensureAIDictionaryLoaded,
+    ensureBibleWordBookLoaded,
+    ensureHitchcocksLoaded,
+    ensureOldEnglishLoaded,
+    ensurePhrasesLoaded,
+    ensureUnitsLoaded,
+    ensureGenealogyLoaded,
+    ensureAncientMapsLoaded,
+    ensureStrongsLoaded,
+    openStudyTool,
+    setNotesContext,
+    setConcordanceAccordionValue,
+    setConcordanceError,
+    setIsConcordanceLoading,
+    setConcordanceSearchTerm,
+    setConcordanceWordAccordionValue,
+    setSelectedConcordanceWord,
+    setWebstersSearchTerm,
+    setWebstersWordAccordionValue,
+    setSelectedWebstersEntry,
+    setAIDictionarySearchTerm,
+    setAIDictionaryWordAccordionValue,
+    setSelectedAIDictionaryEntry,
+    setBibleWordBookSearchTerm,
+    setBibleWordBookWordAccordionValue,
+    setSelectedBibleWordBookEntry,
+    setHitchcocksSearchTerm,
+    setSelectedHitchcocksEntry,
+    setOldEnglishSearchTerm,
+    setSelectedOldEnglishEntry,
+    setPhrasesSearchTerm,
+    setSelectedPhrasesEntry,
+    setUnitsSearchTerm,
+    setSelectedUnitsEntry,
+    setGenealogySearchTerm,
+    setSelectedGenealogyIds,
+    setMapsSearchTerm,
+    setSelectedMapsEntries,
+    setStrongsError,
+    setIsStrongsLoading,
+    setStrongsSearchTerm,
+    setIsStrongsSearching,
+    setStrongsWordAccordionValue,
+    setSelectedStrongsEntry,
+    strongsSearchInputRef,
+    resolveAIDictionarySelectionAtLocation,
+    resolvePhraseSelectionAtLocation,
+    findGenealogyMatches,
+  });
 
   const {
     openCrossReferencesForVerse,
@@ -3435,215 +3302,6 @@ export function KJVReader() {
     setSidebarCloseRequestKey((current) => current + 1);
   }, []);
 
-  function openWordInStudyTools({
-    rawWord,
-    bookIndex,
-    chapterIndex,
-    verseNumber,
-    tokenIndex,
-    strongCode,
-  }: {
-    rawWord: string;
-    bookIndex: number;
-    chapterIndex: number;
-    verseNumber: number | null;
-    tokenIndex: number | null;
-    strongCode: string | null;
-  }) {
-      if (verseNumber !== null) {
-        openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
-        setNotesContext({
-          bookIndex,
-          chapterIndex,
-          verseNumber,
-          word: rawWord,
-        });
-      } else {
-        setNotesContext({
-          bookIndex,
-          chapterIndex,
-          word: rawWord,
-        });
-      }
-
-      openStudyTool("concordance");
-      setConcordanceError(null);
-      setIsConcordanceLoading(true);
-
-      setWebstersWordAccordionValue([]);
-      setSelectedWebstersEntry(null);
-      setSelectedHitchcocksEntry(null);
-      setSelectedOldEnglishEntry(null);
-      setSelectedPhrasesEntry(null);
-      setSelectedUnitsEntry(null);
-      setSelectedGenealogyIds([]);
-      setSelectedMapsEntries([]);
-      setStrongsWordAccordionValue([]);
-      if (!strongCode) {
-        setSelectedStrongsEntry(null);
-      }
-
-      const applyConcordanceSelection = (data: ConcordancePayload) => {
-        const matchedKey = resolveConcordanceKey(data, rawWord) ?? rawWord;
-        const references = decodeConcordanceReferences(data, matchedKey);
-        setConcordanceWordAccordionValue([]);
-        setSelectedConcordanceWord({
-          key: matchedKey,
-          references,
-        });
-        setIsConcordanceLoading(false);
-        return data;
-      };
-
-      const concordancePromise = concordance
-        ? Promise.resolve(concordance)
-        : ensureConcordanceLoaded().catch(() => null);
-
-      if (concordance) {
-        applyConcordanceSelection(concordance);
-      } else {
-        void concordancePromise
-          .then((data) => {
-            if (!data) {
-              return;
-            }
-            applyConcordanceSelection(data);
-          })
-          .catch(() => {
-            setSelectedConcordanceWord(null);
-            setConcordanceWordAccordionValue([]);
-            setIsConcordanceLoading(false);
-          });
-      }
-
-      let strongsPromise:
-        | Promise<{ greek: StrongsPayload; hebrew: StrongsPayload } | null>
-        | null = null;
-
-      if (strongCode) {
-        setStrongsError(null);
-        setIsStrongsLoading(true);
-        setStrongsSearchTerm("");
-        setIsStrongsSearching(false);
-        if (strongsSearchInputRef.current) {
-          strongsSearchInputRef.current.value = "";
-        }
-
-        strongsPromise =
-          strongsGreek && strongsHebrew
-            ? Promise.resolve({ greek: strongsGreek, hebrew: strongsHebrew })
-            : ensureStrongsLoaded().catch((error) => {
-                const message =
-                  error instanceof Error
-                    ? error.message
-                    : "Failed to load Strong's data";
-                setStrongsError(message);
-                return null;
-              });
-      }
-
-      void Promise.all([
-        concordancePromise,
-        websters ? Promise.resolve(websters) : ensureWebstersLoaded().catch(() => null),
-        aiDictionary
-          ? Promise.resolve(aiDictionary)
-          : ensureAIDictionaryLoaded().catch(() => null),
-        bibleWordBook
-          ? Promise.resolve(bibleWordBook)
-          : ensureBibleWordBookLoaded().catch(() => null),
-        hitchcocks
-          ? Promise.resolve(hitchcocks)
-          : ensureHitchcocksLoaded().catch(() => null),
-        oldEnglish
-          ? Promise.resolve(oldEnglish)
-          : ensureOldEnglishLoaded().catch(() => null),
-        phrases ? Promise.resolve(phrases) : ensurePhrasesLoaded().catch(() => null),
-        units ? Promise.resolve(units) : ensureUnitsLoaded().catch(() => null),
-        genealogy
-          ? Promise.resolve(genealogy)
-          : ensureGenealogyLoaded().catch(() => null),
-        ancientMaps
-          ? Promise.resolve(ancientMaps)
-          : ensureAncientMapsLoaded().catch(() => null),
-        strongsPromise ?? Promise.resolve(null),
-      ]).then(
-        ([
-          nextConcordance,
-          nextWebsters,
-          nextAIDictionary,
-          nextBibleWordBook,
-          nextHitchcocks,
-          nextOldEnglish,
-          nextPhrases,
-          nextUnits,
-          nextGenealogy,
-          nextAncientMaps,
-          nextStrongs,
-        ]) => {
-          const aiDictionarySelection =
-            tokenIndex !== null && verseNumber !== null
-              ? resolveAIDictionarySelectionAtLocation(
-                  nextAIDictionary,
-                  bookIndex,
-                  chapterIndex,
-                  verseNumber,
-                  tokenIndex,
-                )
-              : null;
-          const phraseSelection =
-            tokenIndex !== null && verseNumber !== null
-              ? resolvePhraseSelectionAtLocation(
-                  nextPhrases,
-                  bookIndex,
-                  chapterIndex,
-                  verseNumber,
-                  tokenIndex,
-                )
-              : null;
-          syncWordStudySelections(rawWord, strongCode, {
-            websters: nextWebsters,
-            aiDictionary: nextAIDictionary,
-            aiDictionarySelection,
-            bibleWordBook: nextBibleWordBook,
-            hitchcocks: nextHitchcocks,
-            oldEnglish: nextOldEnglish,
-            phrasesSelection: phraseSelection,
-            units: nextUnits,
-            genealogy: nextGenealogy,
-            ancientMaps: nextAncientMaps,
-            strongsGreek: nextStrongs?.greek ?? null,
-            strongsHebrew: nextStrongs?.hebrew ?? null,
-            referenceKey:
-              verseNumber !== null
-                ? chapterVerseKey(bookIndex, chapterIndex, verseNumber)
-                : null,
-          });
-          syncTokenAccordionState(rawWord, {
-            bookIndex,
-            chapterIndex,
-            verseNumber,
-            strongCode,
-            concordanceData: nextConcordance,
-            webstersData: nextWebsters,
-            aiDictionaryData: nextAIDictionary,
-            aiDictionarySelection,
-            bibleWordBookData: nextBibleWordBook,
-            hitchcocksData: nextHitchcocks,
-            oldEnglishData: nextOldEnglish,
-            phraseSelection,
-            unitsData: nextUnits,
-            genealogyData: nextGenealogy,
-            ancientMapsData: nextAncientMaps,
-            strongsGreekData: nextStrongs?.greek ?? null,
-            strongsHebrewData: nextStrongs?.hebrew ?? null,
-          });
-        },
-      ).finally(() => {
-        if (strongCode) {
-          setIsStrongsLoading(false);
-        }
-      });
-  }
 
   const {
     openReference: openConcordanceReference,

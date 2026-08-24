@@ -40,7 +40,7 @@ export function useMapsSearchTool() {
   }, [ancientMaps]);
 
   const indexedAncientMaps = useMemo(() => {
-    if (!ancientMaps) {
+    if (!ancientMaps || !mapsSearchTerm.trim()) {
       return [];
     }
     return ancientMaps
@@ -50,7 +50,7 @@ export function useMapsSearchTool() {
         searchable: mapEntrySearchableText(entry),
       }))
       .sort((a, b) => a.label.localeCompare(b.label));
-  }, [ancientMaps]);
+  }, [ancientMaps, mapsSearchTerm]);
 
   const mapsSearchResults = useMemo(() => {
     const term = mapsSearchTerm.trim().toLowerCase();
