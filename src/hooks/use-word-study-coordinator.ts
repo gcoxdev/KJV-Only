@@ -1,13 +1,12 @@
 import { useRef, type RefObject } from "react";
 
 import { STUDY_ACCORDION_ITEMS } from "@/hooks/use-study-sidebar-state";
-import { matchesMapWord, type AncientMapEntry, type AncientMapPayload } from "@/lib/maps";
+import type { AncientMapEntry, AncientMapPayload } from "@/lib/maps";
 import { beginPerformanceMeasure } from "@/lib/performance";
 import { mayHaveGenealogyMatch } from "@/lib/reader-data";
 import {
   chapterVerseKey,
   decodeConcordanceReferences,
-  normalizeConcordanceWord,
   resolveAIDictionaryKey,
   resolveBibleWordBookKey,
   resolveConcordanceKey,
@@ -16,6 +15,13 @@ import {
   resolveUnitsKey,
   resolveWebstersKey,
 } from "@/lib/references";
+import {
+  findGenealogyMatches,
+  findMapMatches,
+  resolveAIDictionarySelectionAtLocation,
+  resolvePhraseSelectionAtLocation,
+} from "@/lib/word-study-selection";
+import type { Book } from "@/types/bible";
 import type { NotesContext } from "@/types/notes";
 import type {
   AIDictionaryEntry,
@@ -24,7 +30,6 @@ import type {
   BibleWordBookPayload,
   ConcordancePayload,
   GenealogyPayload,
-  GenealogyPerson,
   HitchcocksPayload,
   OldEnglishPayload,
   PhraseEntry,
@@ -41,6 +46,7 @@ import type { StrongsSearchResult } from "@/hooks/use-strongs-search-tool";
 type Setter<T> = (value: T) => void;
 
 type WordStudyCoordinatorParams = {
+  books: Book[];
   concordance: ConcordancePayload | null;
   websters: WebstersPayload | null;
   aiDictionary: AIDictionaryPayload | null;
@@ -127,25 +133,6 @@ type WordStudyCoordinatorParams = {
   setStrongsWordAccordionValue: Setter<string[]>;
   setSelectedStrongsEntry: Setter<StrongsSearchResult | null>;
   strongsSearchInputRef: RefObject<HTMLInputElement | null>;
-  resolveAIDictionarySelectionAtLocation: (
-    data: AIDictionaryPayload | null,
-    bookIndex: number,
-    chapterIndex: number,
-    verseNumber: number,
-    tokenIndex: number,
-  ) => { key: string; entry: AIDictionaryEntry } | null;
-  resolvePhraseSelectionAtLocation: (
-    data: PhrasesPayload | null,
-    bookIndex: number,
-    chapterIndex: number,
-    verseNumber: number,
-    tokenIndex: number,
-  ) => { key: string; entry: PhraseEntry } | null;
-  findGenealogyMatches: (
-    people: GenealogyPayload | null | undefined,
-    rawWord: string,
-    referenceKey?: string | null,
-  ) => GenealogyPerson[];
 };
 
 export type OpenWordInStudyToolsArgs = {
@@ -158,6 +145,7 @@ export type OpenWordInStudyToolsArgs = {
 };
 
 export function useWordStudyCoordinator({
+  books,
   concordance,
   websters,
   aiDictionary,
@@ -217,9 +205,6 @@ export function useWordStudyCoordinator({
   setStrongsWordAccordionValue,
   setSelectedStrongsEntry,
   strongsSearchInputRef,
-  resolveAIDictionarySelectionAtLocation,
-  resolvePhraseSelectionAtLocation,
-  findGenealogyMatches,
 }: WordStudyCoordinatorParams) {
   const requestIdRef = useRef(0);
 
@@ -433,6 +418,7 @@ export function useWordStudyCoordinator({
       const phraseSelection =
         tokenIndex !== null && verseNumber !== null
           ? resolveAIDictionarySelectionAtLocation(
+              books,
               data,
               bookIndex,
               chapterIndex,
@@ -488,6 +474,7 @@ export function useWordStudyCoordinator({
       const selection =
         tokenIndex !== null && verseNumber !== null
           ? resolvePhraseSelectionAtLocation(
+              books,
               data,
               bookIndex,
               chapterIndex,
@@ -528,9 +515,7 @@ export function useWordStudyCoordinator({
 
     void ancientMapsPromise.then((data) => {
       if (!data || !isCurrentRequest()) return;
-      const matches = data.filter((entry) =>
-        matchesMapWord(entry, rawWord, normalizeConcordanceWord),
-      );
+      const matches = findMapMatches(data, rawWord);
       setSelectedMapsEntries(matches);
       updateAccordionMatch("maps", matches.length > 0);
       if (matches.length > 0) finishFirstToolsMeasure();

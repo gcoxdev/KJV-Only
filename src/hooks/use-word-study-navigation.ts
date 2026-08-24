@@ -1,9 +1,10 @@
 import { useCallback, useRef } from "react";
 
 import { chapterVerseKey, normalizeConcordanceWord, normalizeStrongsCode } from "@/lib/references";
+import { resolveWordTokenAtLocation } from "@/lib/word-study-selection";
 import type { CrossRefsPayload } from "@/types/reader";
 import type { NotesContext, NoteLinkTarget } from "@/types/notes";
-import type { VerseToken } from "@/types/bible";
+import type { Book, VerseToken } from "@/types/bible";
 
 type ReaderWordHighlight = {
   leafId: string;
@@ -42,9 +43,8 @@ type OpenReaderTarget = (
   destination: "new-tab" | "new-panel" | "targeted-panel",
 ) => string | null;
 
-type WordTokenMatch = { token: VerseToken; tokenIndex: number } | null;
-
 type UseWordStudyNavigationParams = {
+  books: Book[];
   crossRefs: CrossRefsPayload | null;
   ensureCrossRefsLoaded: () => Promise<CrossRefsPayload>;
   openStudyTool: (tool: "cross-refs" | "concordance") => void;
@@ -58,12 +58,6 @@ type UseWordStudyNavigationParams = {
   openReaderTarget: OpenReaderTarget;
   notesLinkOpenTarget: "new-tab" | "new-panel" | "targeted-panel";
   setActiveReaderWordHighlight: (value: ReaderWordHighlight | null) => void;
-  resolveWordTokenAtLocation: (
-    bookIndex: number,
-    chapterIndex: number,
-    verseNumber: number,
-    rawWord: string,
-  ) => WordTokenMatch;
   syncTokenAccordionState: (
     rawWord: string,
     options?: {
@@ -120,6 +114,7 @@ export function contextFromNoteLinkTarget(target: NoteLinkTarget): NotesContext 
 }
 
 export function useWordStudyNavigation({
+  books,
   crossRefs,
   ensureCrossRefsLoaded,
   openStudyTool,
@@ -130,7 +125,6 @@ export function useWordStudyNavigation({
   openReaderTarget,
   notesLinkOpenTarget,
   setActiveReaderWordHighlight,
-  resolveWordTokenAtLocation,
   syncTokenAccordionState,
   openWordInStudyTools,
   setTokenPopup,
@@ -201,6 +195,7 @@ export function useWordStudyNavigation({
       if (target.type === "word") {
         const rawWord = normalizeConcordanceWord(target.word) || target.word;
         const matchedToken = resolveWordTokenAtLocation(
+          books,
           target.bookIndex,
           target.chapterIndex,
           target.verseNumber,
@@ -251,11 +246,11 @@ export function useWordStudyNavigation({
       openReaderTarget(target, notesLinkOpenTarget);
     },
     [
+      books,
       notesLinkOpenTarget,
       openCrossReferencesForVerse,
       openReaderTarget,
       openWordInStudyTools,
-      resolveWordTokenAtLocation,
       setActiveReaderWordHighlight,
       setNotesContext,
       syncTokenAccordionState,

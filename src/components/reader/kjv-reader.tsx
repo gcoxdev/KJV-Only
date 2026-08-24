@@ -8,8 +8,6 @@ import {
   useState,
 } from "react";
 
-import type { VerseToken } from "@/types/bible";
-import { matchesMapWord, type AncientMapPayload } from "@/lib/maps";
 import {
   loadAIDictionary,
   loadBibleWordBook,
@@ -29,20 +27,11 @@ import {
   type ReferenceCommandAction,
   type ReferenceCommandTarget,
 } from "@/lib/reference-command";
+import { resolveAIDictionaryKey } from "@/lib/references";
 import {
-  decodeConcordanceReferences,
-  chapterVerseKey,
-  normalizeConcordanceWord,
-  resolveAIDictionaryKey,
-  resolveAIDictionaryPhraseKeyForToken,
-  resolveConcordanceKey,
-  resolveBibleWordBookKey,
-  resolveHitchcocksKey,
-  resolveOldEnglishKey,
-  resolvePhraseKeyForToken,
-  resolveUnitsKey,
-  resolveWebstersKey,
-} from "@/lib/references";
+  deriveTokenAccordionState,
+  type TokenAccordionOptions,
+} from "@/lib/word-study-selection";
 import {
   defaultHighlightColor,
   normalizeHighlightColor,
@@ -87,10 +76,8 @@ import { useLayoutHashSync } from "@/hooks/use-layout-hash-sync";
 import type {
   AIDictionaryEntry,
   AIDictionaryPayload,
-  ConcordancePayload,
   BibleWordBookEntry,
   BibleWordBookPayload,
-  GenealogyPayload,
   GenealogyPerson,
   HitchcocksPayload,
   LeafNode,
@@ -2692,297 +2679,30 @@ export function KJVReader() {
     ],
   );
 
-  const resolvePhraseSelectionAtLocation = useCallback(
-    (
-      phraseData: PhrasesPayload | null,
-      bookIndex: number,
-      chapterIndex: number,
-      verseNumber: number,
-      tokenIndex: number,
-    ) => {
-      if (!phraseData) {
-        return null;
-      }
-      const verse = books[bookIndex]?.chapters[chapterIndex]?.verses.find(
-        (item) => item.verse === verseNumber,
-      );
-      if (!verse) {
-        return null;
-      }
-      const matchedKey = resolvePhraseKeyForToken(
-        phraseData,
-        verse.tokens,
-        tokenIndex,
-      );
-      return matchedKey
-        ? { key: matchedKey, entry: phraseData[matchedKey] }
-        : null;
-    },
-    [books],
-  );
-
-  const resolveAIDictionarySelectionAtLocation = useCallback(
-    (
-      aiDictionaryData: AIDictionaryPayload | null,
-      bookIndex: number,
-      chapterIndex: number,
-      verseNumber: number,
-      tokenIndex: number,
-    ) => {
-      if (!aiDictionaryData) {
-        return null;
-      }
-      const verse = books[bookIndex]?.chapters[chapterIndex]?.verses.find(
-        (item) => item.verse === verseNumber,
-      );
-      if (!verse) {
-        return null;
-      }
-      const matchedKey = resolveAIDictionaryPhraseKeyForToken(
-        aiDictionaryData,
-        verse.tokens,
-        tokenIndex,
-      );
-      return matchedKey
-        ? { key: matchedKey, entry: aiDictionaryData[matchedKey] }
-        : null;
-    },
-    [books],
-  );
-
-  const resolveWordTokenAtLocation = useCallback(
-    (
-      bookIndex: number,
-      chapterIndex: number,
-      verseNumber: number,
-      rawWord: string,
-    ) => {
-      const verse = books[bookIndex]?.chapters[chapterIndex]?.verses.find(
-        (item) => item.verse === verseNumber,
-      );
-      if (!verse) {
-        return null;
-      }
-
-      const normalizedWord = normalizeConcordanceWord(rawWord).toLowerCase();
-      if (!normalizedWord) {
-        return null;
-      }
-
-      let fallbackMatch: { token: VerseToken; tokenIndex: number } | null = null;
-
-      for (const [tokenIndex, token] of verse.tokens.entries()) {
-        const normalizedToken = normalizeConcordanceWord(token.text).toLowerCase();
-        if (normalizedToken !== normalizedWord) {
-          continue;
-        }
-
-        const nextMatch = { token, tokenIndex };
-        if (token.strong) {
-          return nextMatch;
-        }
-        if (!fallbackMatch) {
-          fallbackMatch = nextMatch;
-        }
-      }
-
-      return fallbackMatch;
-    },
-    [books],
-  );
-
-  const findGenealogyMatches = useCallback(
-    (
-      people: GenealogyPayload | null | undefined,
-      rawWord: string,
-      referenceKey?: string | null,
-    ) => {
-      if (!people) {
-        return [] as GenealogyPerson[];
-      }
-
-      const normalizedWord = normalizeConcordanceWord(rawWord).toLowerCase();
-      if (!normalizedWord) {
-        return [] as GenealogyPerson[];
-      }
-
-      const matches = people
-        .map((person) => {
-          const exactNameMatch = person.names.some(
-            (name) =>
-              normalizeConcordanceWord(name).toLowerCase() === normalizedWord,
-          );
-          const byNameMatches = (person.verses?.byName ?? []).filter(
-            (entry) =>
-              normalizeConcordanceWord(entry.name).toLowerCase() === normalizedWord,
-          );
-          const currentReferenceMatch =
-            Boolean(referenceKey) &&
-            byNameMatches.some((entry) => entry.verses.includes(referenceKey ?? ""));
-
-          let rank = 0;
-          if (currentReferenceMatch) {
-            rank = 4;
-          } else if (byNameMatches.length > 0) {
-            rank = 3;
-          } else if (exactNameMatch) {
-            rank = 2;
-          }
-
-          return {
-            person,
-            rank,
-            totalVerses:
-              person.verses?.totalVerses ??
-              byNameMatches.reduce(
-                (count, entry) => count + (entry.numVerses ?? entry.verses.length),
-                0,
-              ),
-          };
-        })
-        .filter((entry) => entry.rank > 0)
-        .sort(
-          (left, right) =>
-            right.rank - left.rank ||
-            right.totalVerses - left.totalVerses ||
-            (left.person.names[0] ?? left.person.id).localeCompare(
-              right.person.names[0] ?? right.person.id,
-            ),
-        )
-        .map((entry) => entry.person);
-
-      const seen = new Set<string>();
-      return matches.filter((person) => {
-        if (seen.has(person.id)) {
-          return false;
-        }
-        seen.add(person.id);
-        return true;
-      });
-    },
-    [],
-  );
-
   const syncTokenAccordionState = useCallback(
-    (
-      rawWord: string,
-      options?: {
-        verseNumber?: number | null;
-        bookIndex?: number;
-        chapterIndex?: number;
-        strongCode?: string | null;
-        concordanceData?: ConcordancePayload | null;
-        webstersData?: WebstersPayload | null;
-        aiDictionaryData?: AIDictionaryPayload | null;
-        aiDictionarySelection?: { key: string; entry: AIDictionaryEntry } | null;
-        bibleWordBookData?: BibleWordBookPayload | null;
-        hitchcocksData?: HitchcocksPayload | null;
-        oldEnglishData?: OldEnglishPayload | null;
-        phraseSelection?: { key: string; entry: PhraseEntry } | null;
-        unitsData?: UnitsPayload | null;
-        genealogyData?: GenealogyPayload | null;
-        ancientMapsData?: AncientMapPayload | null;
-        strongsGreekData?: StrongsPayload | null;
-        strongsHebrewData?: StrongsPayload | null;
-      },
-    ) => {
-      const nextAccordion: string[] = [];
-
-      if ((options?.verseNumber ?? null) !== null) {
-        nextAccordion.push("cross-refs");
-      }
-
-      const concordanceData = options?.concordanceData ?? concordance;
-      if (concordanceData) {
-        const matchedKey = resolveConcordanceKey(concordanceData, rawWord);
-        const references = matchedKey
-          ? decodeConcordanceReferences(concordanceData, matchedKey)
-          : [];
-        if (references.length > 0) {
-          nextAccordion.push("concordance");
-        }
-      }
-
-      const webstersData = options?.webstersData ?? websters;
-      if (webstersData && resolveWebstersKey(webstersData, rawWord)) {
-        nextAccordion.push("websters");
-      }
-
-      const aiDictionaryData = options?.aiDictionaryData ?? aiDictionary;
-      if (
-        aiDictionaryData &&
-        (options?.aiDictionarySelection ||
-          resolveAIDictionaryKey(aiDictionaryData, rawWord))
-      ) {
-        nextAccordion.push("ai-dictionary");
-      }
-
-      const bibleWordBookData = options?.bibleWordBookData ?? bibleWordBook;
-      if (
-        bibleWordBookData &&
-        resolveBibleWordBookKey(bibleWordBookData, rawWord)
-      ) {
-        nextAccordion.push("bible-word-book");
-      }
-
-      const strongCode = options?.strongCode ?? null;
-      const strongsGreekData = options?.strongsGreekData ?? strongsGreek;
-      const strongsHebrewData = options?.strongsHebrewData ?? strongsHebrew;
-      if (strongCode && strongsGreekData && strongsHebrewData) {
-        const source = strongCode.startsWith("G")
-          ? strongsGreekData
-          : strongsHebrewData;
-        if (source[strongCode]) {
-          nextAccordion.push("strongs");
-        }
-      }
-
-      const ancientMapsData = options?.ancientMapsData ?? ancientMaps;
-      if (
-        ancientMapsData &&
-        ancientMapsData.some((entry) =>
-          matchesMapWord(entry, rawWord, normalizeConcordanceWord),
-        )
-      ) {
-        nextAccordion.push("maps");
-      }
-
-      const hitchcocksData = options?.hitchcocksData ?? hitchcocks;
-      if (hitchcocksData && resolveHitchcocksKey(hitchcocksData, rawWord)) {
-        nextAccordion.push("hitchcocks");
-      }
-
-      const oldEnglishData = options?.oldEnglishData ?? oldEnglish;
-      const unitsData = options?.unitsData ?? units;
-      if (
-        (oldEnglishData && resolveOldEnglishKey(oldEnglishData, rawWord)) ||
-        options?.phraseSelection ||
-        (unitsData && resolveUnitsKey(unitsData, rawWord))
-      ) {
-        nextAccordion.push("kjv-words-phrases");
-      }
-
-      const genealogyData = options?.genealogyData ?? genealogy;
-      const referenceKey =
-        (options?.verseNumber ?? null) !== null
-          ? chapterVerseKey(
-              options?.bookIndex ?? 0,
-              options?.chapterIndex ?? 0,
-              options?.verseNumber ?? 1,
-            )
-          : null;
-      if (findGenealogyMatches(genealogyData, rawWord, referenceKey).length > 0) {
-        nextAccordion.push("genealogy");
-      }
-
-      setConcordanceAccordionValue(nextAccordion);
+    (rawWord: string, options: TokenAccordionOptions = {}) => {
+      setConcordanceAccordionValue(
+        deriveTokenAccordionState(rawWord, {
+          ...options,
+          concordanceData: options.concordanceData ?? concordance,
+          webstersData: options.webstersData ?? websters,
+          aiDictionaryData: options.aiDictionaryData ?? aiDictionary,
+          bibleWordBookData: options.bibleWordBookData ?? bibleWordBook,
+          hitchcocksData: options.hitchcocksData ?? hitchcocks,
+          oldEnglishData: options.oldEnglishData ?? oldEnglish,
+          unitsData: options.unitsData ?? units,
+          genealogyData: options.genealogyData ?? genealogy,
+          ancientMapsData: options.ancientMapsData ?? ancientMaps,
+          strongsGreekData: options.strongsGreekData ?? strongsGreek,
+          strongsHebrewData: options.strongsHebrewData ?? strongsHebrew,
+        }),
+      );
     },
     [
       ancientMaps,
       aiDictionary,
       bibleWordBook,
       concordance,
-      findGenealogyMatches,
       genealogy,
       hitchcocks,
       oldEnglish,
@@ -3059,6 +2779,7 @@ export function KJVReader() {
   );
 
   const { openWordInStudyTools } = useWordStudyCoordinator({
+    books,
     concordance,
     websters,
     aiDictionary,
@@ -3118,9 +2839,6 @@ export function KJVReader() {
     setStrongsWordAccordionValue,
     setSelectedStrongsEntry,
     strongsSearchInputRef,
-    resolveAIDictionarySelectionAtLocation,
-    resolvePhraseSelectionAtLocation,
-    findGenealogyMatches,
   });
 
   const {
@@ -3128,6 +2846,7 @@ export function KJVReader() {
     openNoteLinkTarget,
     openTokenDetailsFromElement,
   } = useWordStudyNavigation({
+    books,
     crossRefs,
     ensureCrossRefsLoaded,
     openStudyTool,
@@ -3138,7 +2857,6 @@ export function KJVReader() {
     openReaderTarget,
     notesLinkOpenTarget,
     setActiveReaderWordHighlight,
-    resolveWordTokenAtLocation,
     syncTokenAccordionState,
     openWordInStudyTools,
     setTokenPopup,

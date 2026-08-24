@@ -89,6 +89,154 @@ export function normalizeConcordanceWord(input: string) {
     .replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, "");
 }
 
+type OrderedKey = {
+  key: string;
+  order: number;
+};
+
+type AIDictionaryIndex = {
+  exactAliases: Map<string, OrderedKey>;
+  lowerAliases: Map<string, OrderedKey>;
+  normalizedAliases: Map<string, OrderedKey>;
+  lowerKeys: Map<string, OrderedKey>;
+  normalizedKeys: Map<string, OrderedKey>;
+};
+
+const normalizedConcordanceKeyCache = new WeakMap<
+  ConcordancePayload["words"],
+  Map<string, string>
+>();
+const lowerKeyCache = new WeakMap<object, Map<string, string>>();
+const normalizedPhraseKeyCache = new WeakMap<object, Map<string, string>>();
+const aiDictionaryIndexCache = new WeakMap<
+  AIDictionaryPayload,
+  AIDictionaryIndex
+>();
+const bibleWordBookAliasCache = new WeakMap<
+  BibleWordBookPayload,
+  Map<string, OrderedKey>
+>();
+const unitsCandidateCache = new WeakMap<
+  UnitsPayload,
+  Map<string, OrderedKey>
+>();
+
+function firstKeyIndex(
+  payload: object,
+  cache: WeakMap<object, Map<string, string>>,
+  normalizeKey: (key: string) => string,
+) {
+  const cached = cache.get(payload);
+  if (cached) {
+    return cached;
+  }
+
+  const index = new Map<string, string>();
+  for (const key of Object.keys(payload)) {
+    const normalized = normalizeKey(key);
+    if (normalized && !index.has(normalized)) {
+      index.set(normalized, key);
+    }
+  }
+  cache.set(payload, index);
+  return index;
+}
+
+function setFirstOrderedKey(
+  index: Map<string, OrderedKey>,
+  lookup: string,
+  value: OrderedKey,
+) {
+  if (lookup && !index.has(lookup)) {
+    index.set(lookup, value);
+  }
+}
+
+function earliestOrderedKey(
+  matches: Array<OrderedKey | undefined>,
+) {
+  let earliest: OrderedKey | null = null;
+  for (const match of matches) {
+    if (match && (!earliest || match.order < earliest.order)) {
+      earliest = match;
+    }
+  }
+  return earliest?.key ?? null;
+}
+
+function getAIDictionaryIndex(aiDictionary: AIDictionaryPayload) {
+  const cached = aiDictionaryIndexCache.get(aiDictionary);
+  if (cached) {
+    return cached;
+  }
+
+  const index: AIDictionaryIndex = {
+    exactAliases: new Map(),
+    lowerAliases: new Map(),
+    normalizedAliases: new Map(),
+    lowerKeys: new Map(),
+    normalizedKeys: new Map(),
+  };
+  Object.entries(aiDictionary).forEach(([key, entry], order) => {
+    const orderedKey = { key, order };
+    setFirstOrderedKey(index.lowerKeys, key.toLowerCase(), orderedKey);
+    setFirstOrderedKey(
+      index.normalizedKeys,
+      normalizePhraseText(key),
+      orderedKey,
+    );
+    for (const alias of entry.aliases ?? []) {
+      setFirstOrderedKey(index.exactAliases, alias, orderedKey);
+      setFirstOrderedKey(index.lowerAliases, alias.toLowerCase(), orderedKey);
+      setFirstOrderedKey(
+        index.normalizedAliases,
+        normalizePhraseText(alias),
+        orderedKey,
+      );
+    }
+  });
+  aiDictionaryIndexCache.set(aiDictionary, index);
+  return index;
+}
+
+function getBibleWordBookAliasIndex(bibleWordBook: BibleWordBookPayload) {
+  const cached = bibleWordBookAliasCache.get(bibleWordBook);
+  if (cached) {
+    return cached;
+  }
+
+  const index = new Map<string, OrderedKey>();
+  Object.entries(bibleWordBook).forEach(([key, entry], order) => {
+    const orderedKey = { key, order };
+    for (const alias of entry.aliases ?? []) {
+      setFirstOrderedKey(index, alias, orderedKey);
+      setFirstOrderedKey(index, alias.toLowerCase(), orderedKey);
+    }
+  });
+  bibleWordBookAliasCache.set(bibleWordBook, index);
+  return index;
+}
+
+function getUnitsCandidateIndex(units: UnitsPayload) {
+  const cached = unitsCandidateCache.get(units);
+  if (cached) {
+    return cached;
+  }
+
+  const index = new Map<string, OrderedKey>();
+  Object.entries(units).forEach(([key, entry], order) => {
+    const orderedKey = { key, order };
+    setFirstOrderedKey(index, key, orderedKey);
+    setFirstOrderedKey(index, key.toLowerCase(), orderedKey);
+    for (const alias of entry.aliases ?? []) {
+      setFirstOrderedKey(index, alias, orderedKey);
+      setFirstOrderedKey(index, alias.toLowerCase(), orderedKey);
+    }
+  });
+  unitsCandidateCache.set(units, index);
+  return index;
+}
+
 export function resolveConcordanceKey(
   concordance: ConcordancePayload,
   rawWord: string,
@@ -111,16 +259,12 @@ export function resolveConcordanceKey(
     }
   }
 
-  const lowered = cleaned.toLowerCase();
-  const fallback = Object.keys(concordance.words).find(
-    (key) => normalizeConcordanceWord(key).toLowerCase() === lowered,
+  const fallbackKeys = firstKeyIndex(
+    concordance.words,
+    normalizedConcordanceKeyCache,
+    (key) => normalizeConcordanceWord(key).toLowerCase(),
   );
-
-  if (fallback) {
-    return fallback;
-  }
-
-  return null;
+  return fallbackKeys.get(cleaned.toLowerCase()) ?? null;
 }
 
 export function decodeConcordanceReferences(
@@ -164,11 +308,11 @@ export function resolveWebstersKey(websters: WebstersPayload, rawWord: string) {
     }
   }
 
-  const lowered = cleaned.toLowerCase();
-  const fallback = Object.keys(websters).find(
-    (key) => key.toLowerCase() === lowered,
+  return (
+    firstKeyIndex(websters, lowerKeyCache, (key) => key.toLowerCase()).get(
+      cleaned.toLowerCase(),
+    ) ?? null
   );
-  return fallback ?? null;
 }
 
 export function resolveAIDictionaryKey(
@@ -196,55 +340,38 @@ export function resolveAIDictionaryKey(
     }
   }
 
-  for (const [key, entry] of Object.entries(aiDictionary)) {
-    if (
-      entry.aliases?.some(
-        (alias) =>
-          exactCandidates.has(alias) ||
-          (normalizedCandidate && normalizePhraseText(alias) === normalizedCandidate),
-      )
-    ) {
-      return key;
-    }
+  const index = getAIDictionaryIndex(aiDictionary);
+  const aliasMatch = earliestOrderedKey([
+    ...Array.from(exactCandidates, (candidate) =>
+      index.exactAliases.get(candidate),
+    ),
+    normalizedCandidate
+      ? index.normalizedAliases.get(normalizedCandidate)
+      : undefined,
+  ]);
+  if (aliasMatch) {
+    return aliasMatch;
   }
 
-  for (const [key, entry] of Object.entries(aiDictionary)) {
-    const keyLower = key.toLowerCase();
-    if (
-      exactCandidates.has(keyLower) ||
-      (normalizedCandidate && normalizePhraseText(key) === normalizedCandidate)
-    ) {
-      return key;
-    }
-    if (
-      entry.aliases?.some((alias) => {
-        const aliasLower = alias.toLowerCase();
-        return (
-          exactCandidates.has(alias) ||
-          exactCandidates.has(aliasLower) ||
-          (normalizedCandidate && normalizePhraseText(alias) === normalizedCandidate)
-        );
-      })
-    ) {
-      return key;
-    }
+  const normalizedMatch = earliestOrderedKey([
+    ...Array.from(exactCandidates, (candidate) =>
+      index.lowerKeys.get(candidate),
+    ),
+    normalizedCandidate
+      ? index.normalizedKeys.get(normalizedCandidate)
+      : undefined,
+    ...Array.from(exactCandidates, (candidate) =>
+      index.lowerAliases.get(candidate),
+    ),
+  ]);
+  if (normalizedMatch) {
+    return normalizedMatch;
   }
 
-  const singularCandidates = new Set([singular]);
-
-  for (const [key, entry] of Object.entries(aiDictionary)) {
-    const keyLower = key.toLowerCase();
-    if (singularCandidates.has(key) || singularCandidates.has(keyLower)) {
-      return key;
-    }
-    if (
-      entry.aliases?.some((alias) => singularCandidates.has(alias.toLowerCase()))
-    ) {
-      return key;
-    }
-  }
-
-  return null;
+  return earliestOrderedKey([
+    index.lowerKeys.get(singular),
+    index.lowerAliases.get(singular),
+  ]);
 }
 
 export function resolveAIDictionaryPhraseKey(
@@ -256,18 +383,11 @@ export function resolveAIDictionaryPhraseKey(
     return null;
   }
 
-  for (const [key, entry] of Object.entries(aiDictionary)) {
-    if (normalizePhraseText(key) === normalized) {
-      return key;
-    }
-    if (
-      entry.aliases?.some((alias) => normalizePhraseText(alias) === normalized)
-    ) {
-      return key;
-    }
-  }
-
-  return null;
+  const index = getAIDictionaryIndex(aiDictionary);
+  return earliestOrderedKey([
+    index.normalizedKeys.get(normalized),
+    index.normalizedAliases.get(normalized),
+  ]);
 }
 
 export function resolveAIDictionaryPhraseKeyForToken(
@@ -330,11 +450,11 @@ export function resolveHitchcocksKey(
     }
   }
 
-  const lowered = cleaned.toLowerCase();
-  const fallback = Object.keys(hitchcocks).find(
-    (key) => key.toLowerCase() === lowered,
+  return (
+    firstKeyIndex(hitchcocks, lowerKeyCache, (key) => key.toLowerCase()).get(
+      cleaned.toLowerCase(),
+    ) ?? null
   );
-  return fallback ?? null;
 }
 
 export function resolveOldEnglishKey(
@@ -359,11 +479,11 @@ export function resolveOldEnglishKey(
     }
   }
 
-  const lowered = cleaned.toLowerCase();
-  const fallback = Object.keys(oldEnglish).find(
-    (key) => key.toLowerCase() === lowered,
+  return (
+    firstKeyIndex(oldEnglish, lowerKeyCache, (key) => key.toLowerCase()).get(
+      cleaned.toLowerCase(),
+    ) ?? null
   );
-  return fallback ?? null;
 }
 
 export function resolveBibleWordBookKey(
@@ -388,22 +508,22 @@ export function resolveBibleWordBookKey(
     }
   }
 
-  for (const [key, entry] of Object.entries(bibleWordBook)) {
-    if (
-      entry.aliases?.some((alias) => {
-        const aliasLower = alias.toLowerCase();
-        return candidates.includes(alias) || candidates.includes(aliasLower);
-      })
-    ) {
-      return key;
-    }
+  const aliasIndex = getBibleWordBookAliasIndex(bibleWordBook);
+  const aliasMatch = earliestOrderedKey(
+    candidates.flatMap((candidate) => [
+      aliasIndex.get(candidate),
+      aliasIndex.get(candidate.toLowerCase()),
+    ]),
+  );
+  if (aliasMatch) {
+    return aliasMatch;
   }
 
-  const lowered = cleaned.toLowerCase();
-  const fallback = Object.keys(bibleWordBook).find(
-    (key) => key.toLowerCase() === lowered,
+  return (
+    firstKeyIndex(bibleWordBook, lowerKeyCache, (key) =>
+      key.toLowerCase(),
+    ).get(cleaned.toLowerCase()) ?? null
   );
-  return fallback ?? null;
 }
 
 export function resolveUnitsKey(units: UnitsPayload, rawWord: string) {
@@ -422,22 +542,10 @@ export function resolveUnitsKey(units: UnitsPayload, rawWord: string) {
     cleaned.toUpperCase(),
   ]);
 
-  for (const [key, entry] of Object.entries(units)) {
-    const keyLower = key.toLowerCase();
-    if (candidates.has(key) || candidates.has(keyLower)) {
-      return key;
-    }
-    if (
-      entry.aliases?.some((alias) => {
-        const aliasLower = alias.toLowerCase();
-        return candidates.has(alias) || candidates.has(aliasLower);
-      })
-    ) {
-      return key;
-    }
-  }
-
-  return null;
+  const index = getUnitsCandidateIndex(units);
+  return earliestOrderedKey(
+    Array.from(candidates, (candidate) => index.get(candidate)),
+  );
 }
 
 export function normalizePhraseText(input: string) {
@@ -454,16 +562,26 @@ export function resolvePhraseKey(phrases: PhrasesPayload, rawValue: string) {
     return null;
   }
 
-  for (const [key, entry] of Object.entries(phrases)) {
-    if (normalizePhraseText(key) === normalized) {
-      return key;
-    }
-    if (entry.aliases?.some((alias) => normalizePhraseText(alias) === normalized)) {
-      return key;
-    }
+  const cached = normalizedPhraseKeyCache.get(phrases);
+  if (cached) {
+    return cached.get(normalized) ?? null;
   }
 
-  return null;
+  const index = new Map<string, string>();
+  for (const [key, entry] of Object.entries(phrases)) {
+    const normalizedKey = normalizePhraseText(key);
+    if (normalizedKey && !index.has(normalizedKey)) {
+      index.set(normalizedKey, key);
+    }
+    for (const alias of entry.aliases ?? []) {
+      const normalizedAlias = normalizePhraseText(alias);
+      if (normalizedAlias && !index.has(normalizedAlias)) {
+        index.set(normalizedAlias, key);
+      }
+    }
+  }
+  normalizedPhraseKeyCache.set(phrases, index);
+  return index.get(normalized) ?? null;
 }
 
 export function resolvePhraseKeyForToken(
