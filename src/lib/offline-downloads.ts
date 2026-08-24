@@ -1,11 +1,18 @@
-const APP_CACHE_PREFIX = "kjv-only-cache";
-const DEFAULT_APP_CACHE_NAME = "kjv-only-cache-v3";
+const FALLBACK_CACHE_CONFIG = {
+  cachePrefix: "kjv-only-cache-",
+  cacheName: "kjv-only-cache-v5",
+} as const;
+
+function getAppCacheConfig() {
+  return globalThis.KJV_ONLY_CACHE_CONFIG ?? FALLBACK_CACHE_CONFIG;
+}
 
 export const CORE_OFFLINE_URLS = [
   "/",
   "/index.html",
   "/manifest.webmanifest",
   "/sw.js",
+  "/app-cache-config.js",
   "/icons/app-icon.svg",
   "/data/kjv.json",
   "/references/concordance.compact.delta.min.json",
@@ -25,11 +32,7 @@ export function normalizeOfflineAssetUrl(url: string) {
 }
 
 export async function resolveAppCacheName() {
-  const cacheNames = await caches.keys();
-  return (
-    cacheNames.find((cacheName) => cacheName.startsWith(APP_CACHE_PREFIX)) ??
-    DEFAULT_APP_CACHE_NAME
-  );
+  return getAppCacheConfig().cacheName;
 }
 
 export async function openAppCache() {
@@ -39,8 +42,9 @@ export async function openAppCache() {
 
 export async function clearAppOfflineCaches() {
   const cacheNames = await caches.keys();
+  const { cachePrefix } = getAppCacheConfig();
   const appCacheNames = cacheNames.filter((cacheName) =>
-    cacheName.startsWith(APP_CACHE_PREFIX),
+    cacheName.startsWith(cachePrefix),
   );
   await Promise.all(appCacheNames.map((cacheName) => caches.delete(cacheName)));
 }

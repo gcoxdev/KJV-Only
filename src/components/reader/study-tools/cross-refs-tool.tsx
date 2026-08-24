@@ -48,12 +48,12 @@ export function CrossRefsTool({
   return (
     <AccordionItem value="cross-refs">
       <AccordionTrigger
-        className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
+        className={cn(hasInfo && "text-success")}
       >
         <BookSearchIcon />
         Cross References
       </AccordionTrigger>
-      <AccordionContent className="space-y-2 overflow-visible">
+      <AccordionContent className="flex flex-col gap-2 overflow-visible">
         {isOpen ? (
           <>
             {isLoading ? (
@@ -68,12 +68,12 @@ export function CrossRefsTool({
                 Click a word or verse to load cross references.
               </p>
             ) : selected.references.length === 0 ? (
-              <div className="space-y-1">
+              <div className="flex flex-col gap-1">
                 <p className="text-sm font-medium">{selectedLabel(selected.key, books)}</p>
                 <p className="text-sm text-muted-foreground">No cross references found.</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <p className="text-sm font-medium">{selectedLabel(selected.key, books)}</p>
                 <Accordion
                   className="w-full rounded-md border px-2 [&_[data-slot=accordion-content]]:pb-1 [&_[data-slot=accordion-trigger]]:py-1"

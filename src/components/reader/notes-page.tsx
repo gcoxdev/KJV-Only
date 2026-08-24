@@ -35,6 +35,10 @@ import type { Book } from "@/types/bible";
 import type { BookmarkScope } from "@/types/bookmarks";
 import { contextLabel, noteMatchesContext, noteScopeLabel } from "@/lib/notes";
 import { parseNoteLinkHref } from "@/lib/note-links";
+import {
+  isSupportedSerializedEditorState,
+  isValidReaderTimestamp,
+} from "@/lib/reader-transfer";
 import type {
   NoteLinkTarget,
   NotesContext,
@@ -99,7 +103,10 @@ function parseSerializedState(body: string): SerializedEditorState | undefined {
     return undefined;
   }
   try {
-    return JSON.parse(body) as SerializedEditorState;
+    const parsed = JSON.parse(body) as unknown;
+    return isSupportedSerializedEditorState(parsed)
+      ? (parsed as SerializedEditorState)
+      : createPlainTextSerializedState(body);
   } catch {
     return createPlainTextSerializedState(body);
   }
@@ -110,6 +117,9 @@ function isNewNote(note: ReaderNote) {
 }
 
 function formatNoteDateTime(timestamp: number) {
+  if (!isValidReaderTimestamp(timestamp)) {
+    return "Unknown date";
+  }
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
     timeStyle: "short",
@@ -334,7 +344,7 @@ export function NotesPage({
           !isCompactLayout && "flex",
         )}
       >
-        <div className="space-y-2 border-b p-2">
+        <div className="flex flex-col gap-2 border-b p-2">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-semibold">Notes</p>
             <Button
@@ -411,7 +421,7 @@ export function NotesPage({
                   key={note.id}
                   type="button"
                   className={cn(
-                    "block w-full px-3 py-2 text-left text-foreground hover:bg-muted/50 hover:text-foreground",
+                    "block w-full px-3 py-2 text-left text-foreground [content-visibility:auto] [contain-intrinsic-size:auto_3.5rem] hover:bg-muted/50 hover:text-foreground",
                     note.id === selectedNoteId && "bg-muted",
                   )}
                   onClick={() => onTabStateChange({ selectedNoteId: note.id })}

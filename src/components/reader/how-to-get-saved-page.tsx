@@ -208,7 +208,7 @@ export function HowToGetSavedPage({
             Lord Jesus Christ.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+        <CardContent className="flex flex-col gap-3 text-sm leading-7 text-muted-foreground">
           <p>
             The Bible shows that man is a sinner, that sin brings death, that
             Christ died and rose again for sinners, and that whosoever believes
@@ -272,7 +272,7 @@ export function HowToGetSavedPage({
             religion, or your feelings. Trust Christ alone.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+        <CardContent className="flex flex-col gap-3 text-sm leading-7 text-muted-foreground">
           <p>
             If God is dealing with your heart, come to him honestly. Confess
             that you are a sinner, believe that Jesus Christ died for your sins

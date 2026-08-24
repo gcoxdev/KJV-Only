@@ -1,9 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { migrateNoteBodyInternalLinks } from "@/lib/note-links";
+import {
+  READER_STORAGE_KEYS,
+  readLocalStorageValue,
+  reportLocalStorageIssue,
+  writeLocalStorageJson,
+} from "@/lib/local-storage";
 import { filterRecordEntries, swapRecordEntries } from "@/lib/leaf-state";
 import { noteMatchesContext } from "@/lib/notes";
 import { createId, findLeafNode, collectLeafIds } from "@/lib/reader-layout";
+import { parseStoredNotesPayloadDetailed } from "@/lib/reader-transfer";
 import type { NotesContext, NotesTabState, ReaderNote } from "@/types/notes";
 import type { ReaderTab } from "@/types/reader";
 
@@ -44,6 +51,9 @@ function contextFromScope(scope: ReaderNote["scope"]): NotesContext | null {
 
 export function useReaderNotes({ activeTab }: UseReaderNotesArgs) {
   const [readerNotes, setReaderNotes] = useState<ReaderNote[]>([]);
+  const [notesHydrated, setNotesHydrated] = useState(false);
+  const initialReaderNotesRef = useRef(readerNotes);
+  const blockedPersistStateRef = useRef<ReaderNote[] | null>(null);
   const [notesContext, setNotesContext] = useState<NotesContext | null>(null);
   const [notesTabStateByLeafId, setNotesTabStateByLeafId] = useState<
     Record<string, NotesTabState>
@@ -51,32 +61,38 @@ export function useReaderNotes({ activeTab }: UseReaderNotesArgs) {
 
   useEffect(() => {
     try {
-      const stored = window.localStorage.getItem("kjv-reader-notes-v1");
+      const stored = readLocalStorageValue(READER_STORAGE_KEYS.notes);
       if (!stored) {
         return;
       }
-      const parsed = JSON.parse(stored) as ReaderNote[];
-      if (!Array.isArray(parsed)) {
-        return;
+      const parsed = parseStoredNotesPayloadDetailed(stored);
+      if (parsed.skippedInvalidCount > 0) {
+        reportLocalStorageIssue(READER_STORAGE_KEYS.notes);
       }
       setReaderNotes(
-        parsed.map((note) => ({
+        parsed.entries.map((note) => ({
           ...note,
           body: migrateNoteBodyInternalLinks(note.body),
         })),
       );
     } catch {
-      // Ignore invalid stored notes payloads.
+      blockedPersistStateRef.current = initialReaderNotesRef.current;
+      reportLocalStorageIssue(READER_STORAGE_KEYS.notes);
+    } finally {
+      setNotesHydrated(true);
     }
   }, []);
 
   useEffect(() => {
+    if (!notesHydrated || blockedPersistStateRef.current === readerNotes) {
+      return;
+    }
     try {
-      window.localStorage.setItem("kjv-reader-notes-v1", JSON.stringify(readerNotes));
+      writeLocalStorageJson(READER_STORAGE_KEYS.notes, readerNotes);
     } catch {
       // Ignore persistence errors (quota/private mode edge cases).
     }
-  }, [readerNotes]);
+  }, [notesHydrated, readerNotes]);
 
   useEffect(() => {
     if (!activeTab) {

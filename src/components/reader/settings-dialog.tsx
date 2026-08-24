@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -242,7 +243,7 @@ export function SettingsPanelContent({
         value="visual"
         className="mt-3 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-2"
       >
-            <div className="space-y-3">
+            <div className="flex flex-col gap-3">
               <div className="flex min-w-0 items-center justify-between gap-3">
                 <Label htmlFor="theme-mode">Dark Mode</Label>
                 <Switch
@@ -253,7 +254,7 @@ export function SettingsPanelContent({
                   }
                 />
               </div>
-              <div className="space-y-2 border-t pt-3">
+              <div className="flex flex-col gap-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <Label htmlFor="reader-color-theme">Color Theme</Label>
                 </div>
@@ -281,19 +282,21 @@ export function SettingsPanelContent({
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="brown">Brown</SelectItem>
-                    <SelectItem value="contrast">Contrast</SelectItem>
-                    <SelectItem value="slate">Slate</SelectItem>
-                    <SelectItem value="crimson">Crimson</SelectItem>
-                    <SelectItem value="amber">Amber</SelectItem>
-                    <SelectItem value="forest">Forest</SelectItem>
-                    <SelectItem value="navy">Navy</SelectItem>
-                    <SelectItem value="indigo">Indigo</SelectItem>
-                    <SelectItem value="violet">Violet</SelectItem>
+                    <SelectGroup>
+                      <SelectItem value="brown">Brown</SelectItem>
+                      <SelectItem value="contrast">Contrast</SelectItem>
+                      <SelectItem value="slate">Slate</SelectItem>
+                      <SelectItem value="crimson">Crimson</SelectItem>
+                      <SelectItem value="amber">Amber</SelectItem>
+                      <SelectItem value="forest">Forest</SelectItem>
+                      <SelectItem value="navy">Navy</SelectItem>
+                      <SelectItem value="indigo">Indigo</SelectItem>
+                      <SelectItem value="violet">Violet</SelectItem>
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2 border-t pt-3">
+              <div className="flex flex-col gap-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <Label>Font Size</Label>
                   <span className="text-xs text-muted-foreground">{fontSize}px</span>
@@ -328,7 +331,7 @@ export function SettingsPanelContent({
                   </Button>
                 </div>
               </div>
-              <div className="space-y-2 border-t pt-3">
+              <div className="flex flex-col gap-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <Label htmlFor="light-highlight-color">Light Highlight Color</Label>
                   <span className="font-mono text-xs text-muted-foreground">
@@ -356,7 +359,7 @@ export function SettingsPanelContent({
                   </Button>
                 </div>
               </div>
-              <div className="space-y-2 border-t pt-3">
+              <div className="flex flex-col gap-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <Label htmlFor="dark-highlight-color">Dark Highlight Color</Label>
                   <span className="font-mono text-xs text-muted-foreground">
@@ -384,7 +387,7 @@ export function SettingsPanelContent({
                   </Button>
                 </div>
               </div>
-              <div className="space-y-2 border-t pt-3">
+              <div className="flex flex-col gap-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <Label htmlFor="verse-spacing">Line Spacing</Label>
                   <span className="text-xs text-muted-foreground">{verseSpacing}px</span>
@@ -443,8 +446,8 @@ export function SettingsPanelContent({
         value="targeting"
         className="mt-3 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-2"
       >
-            <div className="space-y-3">
-              <div className="space-y-2">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <Label htmlFor="word-verse-selection-target">Word / Verse Selection Target</Label>
                 </div>
@@ -467,14 +470,16 @@ export function SettingsPanelContent({
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="sidebar">Sidebar</SelectItem>
-                    <SelectItem value="new-tab">New Tab</SelectItem>
-                    <SelectItem value="new-panel">New Panel</SelectItem>
-                    <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+                    <SelectGroup>
+                      <SelectItem value="sidebar">Sidebar</SelectItem>
+                      <SelectItem value="new-tab">New Tab</SelectItem>
+                      <SelectItem value="new-panel">New Panel</SelectItem>
+                      <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2 border-t pt-3">
+              <div className="flex flex-col gap-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <Label htmlFor="notes-link-target">Notes Link Target</Label>
                 </div>
@@ -496,13 +501,15 @@ export function SettingsPanelContent({
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new-tab">New Tab</SelectItem>
-                    <SelectItem value="new-panel">New Panel</SelectItem>
-                    <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+                    <SelectGroup>
+                      <SelectItem value="new-tab">New Tab</SelectItem>
+                      <SelectItem value="new-panel">New Panel</SelectItem>
+                      <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2 border-t pt-3">
+              <div className="flex flex-col gap-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <Label htmlFor="search-result-target">Search Result Target</Label>
                 </div>
@@ -524,13 +531,15 @@ export function SettingsPanelContent({
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new-tab">New Tab</SelectItem>
-                    <SelectItem value="new-panel">New Panel</SelectItem>
-                    <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+                    <SelectGroup>
+                      <SelectItem value="new-tab">New Tab</SelectItem>
+                      <SelectItem value="new-panel">New Panel</SelectItem>
+                      <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2 border-t pt-3">
+              <div className="flex flex-col gap-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <Label htmlFor="bookmark-target">Bookmark Target</Label>
                 </div>
@@ -552,13 +561,15 @@ export function SettingsPanelContent({
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new-tab">New Tab</SelectItem>
-                    <SelectItem value="new-panel">New Panel</SelectItem>
-                    <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+                    <SelectGroup>
+                      <SelectItem value="new-tab">New Tab</SelectItem>
+                      <SelectItem value="new-panel">New Panel</SelectItem>
+                      <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2 border-t pt-3">
+              <div className="flex flex-col gap-2 border-t pt-3">
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <Label htmlFor="reference-link-target">Reference Link Target</Label>
                 </div>
@@ -580,9 +591,11 @@ export function SettingsPanelContent({
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new-tab">New Tab</SelectItem>
-                    <SelectItem value="new-panel">New Panel</SelectItem>
-                    <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+                    <SelectGroup>
+                      <SelectItem value="new-tab">New Tab</SelectItem>
+                      <SelectItem value="new-panel">New Panel</SelectItem>
+                      <SelectItem value="targeted-panel">Targeted Panel</SelectItem>
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
@@ -592,7 +605,7 @@ export function SettingsPanelContent({
         value="other"
         className="mt-3 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-2"
       >
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <div className="flex min-w-0 items-center justify-between gap-3">
             <Label htmlFor="welcome-home-startup">Open Welcome Home Tab At Startup</Label>
             <Switch

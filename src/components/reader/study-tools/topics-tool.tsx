@@ -162,7 +162,7 @@ export function TopicsTool({ hasInfo, isOpen, ...props }: TopicsToolProps) {
   return (
     <AccordionItem value="topics">
       <AccordionTrigger
-        className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
+        className={cn(hasInfo && "text-success")}
       >
         <BookTextIcon />
         Topics

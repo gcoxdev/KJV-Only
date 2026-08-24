@@ -12,6 +12,7 @@ import { useUpdateToolbarHandler } from "@/components/editor/editor-hooks/use-up
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select"
@@ -72,15 +73,17 @@ export function FontFamilyToolbarPlugin() {
         <span style={{ fontFamily }}>{fontFamily}</span>
       </SelectTrigger>
       <SelectContent>
-        {FONT_FAMILY_OPTIONS.map((option) => (
-          <SelectItem
-            key={option}
-            value={option}
-            style={{ fontFamily: option }}
-          >
-            {option}
-          </SelectItem>
-        ))}
+        <SelectGroup>
+          {FONT_FAMILY_OPTIONS.map((option) => (
+            <SelectItem
+              key={option}
+              value={option}
+              style={{ fontFamily: option }}
+            >
+              {option}
+            </SelectItem>
+          ))}
+        </SelectGroup>
       </SelectContent>
     </Select>
   )

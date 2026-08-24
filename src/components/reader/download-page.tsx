@@ -412,7 +412,7 @@ export function DownloadPage({
             <Card key={bundle.id} className="border-border/70 bg-card/70 shadow-sm">
               <CardHeader className="gap-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                       <Icon className="size-4 text-muted-foreground" />
                       {bundle.title}

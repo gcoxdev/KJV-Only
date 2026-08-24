@@ -184,7 +184,7 @@ function GenealogyNode({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-2 pt-0 text-xs text-muted-foreground">
+      <CardContent className="flex flex-col gap-2 pt-0 text-xs text-muted-foreground">
         {aliases.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {aliases.map((alias) => (
@@ -195,10 +195,10 @@ function GenealogyNode({
           </div>
         ) : null}
         {detailsOpen ? (
-          <div className="space-y-2 rounded-md border bg-muted/30 p-2">
+          <div className="flex flex-col gap-2 rounded-md border bg-muted/30 p-2">
             {subtitle ? <p>{subtitle}</p> : null}
             {byNameReferences.length > 0 ? (
-              <div className="space-y-1 leading-6">
+              <div className="flex flex-col gap-1 leading-6">
                 <span className="font-medium text-foreground/80">Refs:</span>
                 {byNameReferences.map((entry) => (
                   <div key={`${person?.id ?? title}-${entry.name}`} className="text-xs">
@@ -264,7 +264,7 @@ function GenealogyRelationGrid({
   const displayTitle = relations.length > 1 ? `${title} (${relations.length})` : title;
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {icon}
         <span>{displayTitle}</span>
@@ -338,7 +338,7 @@ export function GenealogyTreeDialog({
               {person ? (
                 <>
                   {(father || mother) ? (
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-3">
                       <div className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                         <NetworkIcon className="size-4" />
                         <span>Parents</span>
@@ -385,7 +385,7 @@ export function GenealogyTreeDialog({
                   ) : null}
 
                   <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(240px,300px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1fr)_minmax(260px,320px)_minmax(0,1fr)]">
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-3">
                       {siblings.length > 0 ? (
                         <GenealogyRelationGrid
                           title="Siblings"
@@ -400,7 +400,7 @@ export function GenealogyTreeDialog({
                       ) : null}
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-3">
                       <GenealogyNode
                         label="Focus"
                         title={primaryName}
@@ -414,7 +414,7 @@ export function GenealogyTreeDialog({
                       />
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-3">
                       {spouses.length > 0 ? (
                         <GenealogyRelationGrid
                           title="Spouses"

@@ -15,7 +15,7 @@ export function TokenPopupCard({ token, x, y }: TokenPopupCardProps) {
       className="fixed z-50 w-[280px] shadow-lg"
       style={{ left: x, top: y }}
     >
-      <CardContent className="space-y-2 p-3 text-sm">
+      <CardContent className="flex flex-col gap-2 p-3 text-sm">
         <p className="font-medium">{formatDisplayTokenText(token)}</p>
         {token.added ? (
           <p className="text-xs text-muted-foreground">

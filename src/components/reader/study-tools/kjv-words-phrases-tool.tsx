@@ -86,12 +86,12 @@ export function KJVWordsPhrasesTool({
   return (
     <AccordionItem value="kjv-words-phrases">
       <AccordionTrigger
-        className={cn(hasInfo && "text-emerald-600 dark:text-emerald-400")}
+        className={cn(hasInfo && "text-success")}
       >
         <BookCheckIcon />
         KJV Words &amp; Phrases
       </AccordionTrigger>
-      <AccordionContent className="space-y-3 overflow-visible">
+      <AccordionContent className="flex flex-col gap-3 overflow-visible">
         {isOpen ? (
           <>
             <StudySearchForm
@@ -119,9 +119,9 @@ export function KJVWordsPhrasesTool({
                   : "Click a word or phrase in the text, or search KJV words and phrases."}
               </p>
             ) : (
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3">
                 {phrases.results.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
                       Phrases
                     </p>
@@ -172,11 +172,11 @@ export function KJVWordsPhrasesTool({
                 ) : null}
 
                 {oldEnglish.results.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
                       Word Meanings
                     </p>
-                    <div className="space-y-2 text-sm leading-relaxed">
+                    <div className="flex flex-col gap-2 text-sm leading-relaxed">
                       {oldEnglish.results.map(({ key, definitions }) => (
                         <div
                           key={`old-english-${key}`}
@@ -194,7 +194,7 @@ export function KJVWordsPhrasesTool({
                 ) : null}
 
                 {units.results.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
                       Units and Measures
                     </p>

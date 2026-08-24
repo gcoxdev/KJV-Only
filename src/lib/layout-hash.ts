@@ -11,6 +11,20 @@ const BOOK_INDEX_BY_CODE = new Map<string, number>(
   BOOK_ICON_CODES.map((code, index) => [code, index]),
 );
 
+export const LAYOUT_HASH_LIMITS = {
+  maxHashLength: 64 * 1024,
+  maxTabs: 32,
+  maxTreeDepth: 32,
+  maxNodes: 255,
+  maxTitleLength: 200,
+  maxVerseRanges: 256,
+  maxNumericDigits: 6,
+} as const;
+
+type ParseBudget = {
+  nodes: number;
+};
+
 export type SerializedVerseRange = {
   start: number;
   end: number;
@@ -53,13 +67,17 @@ function parseVerseRanges(value: string) {
     .split(",")
     .map((part) => part.trim())
     .filter(Boolean);
-  if (parts.length === 0) {
+  if (parts.length === 0 || parts.length > LAYOUT_HASH_LIMITS.maxVerseRanges) {
     return null;
   }
 
   const ranges: SerializedVerseRange[] = [];
   for (const part of parts) {
-    const match = part.match(/^(\d+)(?:-(\d+))?$/);
+    const match = part.match(
+      new RegExp(
+        `^(\\d{1,${LAYOUT_HASH_LIMITS.maxNumericDigits}})(?:-(\\d{1,${LAYOUT_HASH_LIMITS.maxNumericDigits}}))?$`,
+      ),
+    );
     if (!match) {
       return null;
     }
@@ -209,17 +227,34 @@ function parseNode(
   highlightedVerseRangesByLeafId: Record<string, SerializedVerseRange[]>,
   targetedPanelLeafIdRef: { current: string | null },
   startIndex = 0,
+  depth = 0,
+  budget: ParseBudget = { nodes: 0 },
 ): [PanelNode | null, number] {
+  if (
+    depth > LAYOUT_HASH_LIMITS.maxTreeDepth ||
+    budget.nodes >= LAYOUT_HASH_LIMITS.maxNodes
+  ) {
+    return [null, startIndex];
+  }
+  budget.nodes += 1;
+
   const type = input[startIndex];
   const nextChar = input[startIndex + 1];
   if ((type === "h" || type === "v") && /[0-9(]/.test(nextChar ?? "")) {
     let cursor = startIndex + 1;
     let ratioText = "";
-    while (cursor < input.length && /[0-9]/.test(input[cursor])) {
+    while (
+      cursor < input.length &&
+      /[0-9]/.test(input[cursor]) &&
+      ratioText.length <= LAYOUT_HASH_LIMITS.maxNumericDigits
+    ) {
       ratioText += input[cursor];
       cursor += 1;
     }
-    if (input[cursor] !== "(") {
+    if (
+      input[cursor] !== "(" ||
+      ratioText.length > LAYOUT_HASH_LIMITS.maxNumericDigits
+    ) {
       return [null, startIndex];
     }
     const [first, firstEnd] = parseNode(
@@ -227,6 +262,8 @@ function parseNode(
       highlightedVerseRangesByLeafId,
       targetedPanelLeafIdRef,
       cursor + 1,
+      depth + 1,
+      budget,
     );
     if (!first || input[firstEnd] !== ";") {
       return [null, startIndex];
@@ -236,6 +273,8 @@ function parseNode(
       highlightedVerseRangesByLeafId,
       targetedPanelLeafIdRef,
       firstEnd + 1,
+      depth + 1,
+      budget,
     );
     if (!second || input[secondEnd] !== ")") {
       return [null, startIndex];
@@ -294,7 +333,7 @@ export function serializeLayoutHash(args: {
 
 export function parseLayoutHash(hash: string): ParsedLayoutHash | null {
   const value = hash.startsWith("#") ? hash.slice(1) : hash;
-  if (!value) {
+  if (!value || value.length > LAYOUT_HASH_LIMITS.maxHashLength) {
     return null;
   }
   const params = new URLSearchParams(value);
@@ -304,10 +343,17 @@ export function parseLayoutHash(hash: string): ParsedLayoutHash | null {
   }
 
   const tabSegments = layout.split("|").filter(Boolean);
+  if (
+    tabSegments.length === 0 ||
+    tabSegments.length > LAYOUT_HASH_LIMITS.maxTabs
+  ) {
+    return null;
+  }
   const highlightedVerseRangesByLeafId: Record<string, SerializedVerseRange[]> = {};
   const targetedPanelLeafIdRef = { current: null as string | null };
-  const tabs = tabSegments
-    .map((segment, index): ReaderTab | null => {
+  const budget: ParseBudget = { nodes: 0 };
+  const tabs: ReaderTab[] = [];
+  for (const [index, segment] of tabSegments.entries()) {
       const separatorIndex = segment.indexOf(":");
       if (separatorIndex < 0) {
         return null;
@@ -318,6 +364,9 @@ export function parseLayoutHash(hash: string): ParsedLayoutHash | null {
         treeValue,
         highlightedVerseRangesByLeafId,
         targetedPanelLeafIdRef,
+        0,
+        0,
+        budget,
       );
       if (!root || endIndex !== treeValue.length) {
         return null;
@@ -328,13 +377,15 @@ export function parseLayoutHash(hash: string): ParsedLayoutHash | null {
       } catch {
         // Ignore malformed title and fall back.
       }
-      return {
+      if (title.length > LAYOUT_HASH_LIMITS.maxTitleLength) {
+        return null;
+      }
+      tabs.push({
         id: createId(),
         title,
         root,
-      };
-    })
-    .filter((tab): tab is ReaderTab => Boolean(tab));
+      });
+  }
 
   if (tabs.length === 0) {
     return null;

@@ -161,7 +161,7 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
         ref={contentRef}
         side="top"
         align="start"
-        className="w-80 max-w-[calc(100vw-2rem)] space-y-2"
+        className="w-80 max-w-[calc(100vw-2rem)] flex flex-col gap-2"
         onMouseEnter={() => {
           cancelScheduledClose();
           if (supportsHover) {

@@ -194,7 +194,7 @@ export function WelcomeHomePage({
             A Scripture to carry into today's reading and study.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
+        <CardContent className="flex flex-col gap-3 text-sm leading-7 text-muted-foreground">
           {todaysEntry ? (
             <>
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -241,7 +241,7 @@ export function WelcomeHomePage({
             searching, note-taking, and cross-referencing the King James Bible.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
+        <CardContent className="flex flex-col gap-4 text-sm leading-7 text-muted-foreground">
           <p>
             The goal is to keep the Bible text central while giving you fast
             access to notes, bookmarks, cross references, dictionaries,

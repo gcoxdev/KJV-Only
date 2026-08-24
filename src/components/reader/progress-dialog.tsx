@@ -75,7 +75,7 @@ export function ProgressPanelContent({
 }: ProgressPanelContentProps) {
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="min-h-0 flex-1 space-y-3 overflow-auto pr-1 text-sm">
+      <div className="min-h-0 flex-1 flex flex-col gap-3 overflow-auto pr-1 text-sm">
         <Progress value={totalProgressPercent} className="w-full">
           <ProgressLabel className="font-semibold">Whole Bible</ProgressLabel>
           <ProgressValue>
@@ -116,7 +116,7 @@ export function ProgressPanelContent({
                     </Progress>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="space-y-3">
+                <AccordionContent className="flex flex-col gap-3">
                   <Accordion className="w-full rounded-md border px-2" multiple defaultValue={[]}>
                     {testament.books.map((book) => {
                       const bookPercent =
@@ -149,8 +149,8 @@ export function ProgressPanelContent({
                               </Progress>
                             </div>
                           </AccordionTrigger>
-                          <AccordionContent className="space-y-2 px-1">
-                            <div className="space-y-1">
+                          <AccordionContent className="flex flex-col gap-2 px-1">
+                            <div className="flex flex-col gap-1">
                               {book.chapters.map((chapter) => (
                                 <div
                                   key={`${book.name}-${chapter.chapterNumber}`}

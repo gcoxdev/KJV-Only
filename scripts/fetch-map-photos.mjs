@@ -2,6 +2,16 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
+
+import {
+  MAP_PHOTO_LIMITS,
+  assertMapPhotoWriteBudget,
+  fetchImageBuffer,
+  resolveSafeOutputTarget,
+  validateDownloadUrl,
+  writeFileAtomically,
+} from "./lib/map-photo-security.mjs";
 
 const DEFAULT_CANDIDATES_PATH = "public/maps/missing-photo-fetch-candidates.json";
 const DEFAULT_IMAGES_PATH = "public/maps/data/image.jsonl";
@@ -59,6 +69,7 @@ function parseArgs(argv) {
       case "--help":
         printUsage();
         process.exit(0);
+        break;
       default:
         throw new Error(`Unknown argument: ${arg}`);
     }
@@ -163,20 +174,7 @@ async function fileExists(filePath) {
   }
 }
 
-async function fetchBuffer(url) {
-  const response = await fetch(url, {
-    headers: {
-      "user-agent": "kjv-only-map-photo-fetcher/1.0",
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status} ${response.statusText}`);
-  }
-  const arrayBuffer = await response.arrayBuffer();
-  return Buffer.from(arrayBuffer);
-}
-
-async function main() {
+export async function main() {
   const options = parseArgs(process.argv.slice(2));
   const [candidateText, imageText] = await Promise.all([
     fs.readFile(options.candidatesPath, "utf8"),
@@ -189,6 +187,11 @@ async function main() {
   );
   const limitedCandidates =
     options.limit === null ? candidates : candidates.slice(0, options.limit);
+  if (limitedCandidates.length > MAP_PHOTO_LIMITS.maxCandidates) {
+    throw new Error(
+      `Refusing to process more than ${MAP_PHOTO_LIMITS.maxCandidates} candidates in one run`,
+    );
+  }
 
   const imageEntries = parseJsonl(imageText);
   const imageIndex = new Map(imageEntries.map((entry, index) => [entry.id, { entry, index }]));
@@ -205,6 +208,7 @@ async function main() {
     missingDownloadUrls: [],
     errors: [],
   };
+  let downloadedBytes = 0;
 
   for (const candidate of limitedCandidates) {
     report.processedCandidates += 1;
@@ -215,9 +219,21 @@ async function main() {
     }
 
     const entry = indexed.entry;
-    const downloadUrl = resolveDownloadUrl(entry, options.width);
-    if (!downloadUrl) {
+    const rawDownloadUrl = resolveDownloadUrl(entry, options.width);
+    if (!rawDownloadUrl) {
       report.missingDownloadUrls.push(candidate.id);
+      continue;
+    }
+
+    let downloadUrl;
+    try {
+      downloadUrl = validateDownloadUrl(rawDownloadUrl).toString();
+    } catch (error) {
+      report.errors.push({
+        id: candidate.id,
+        url: rawDownloadUrl,
+        message: error instanceof Error ? error.message : String(error),
+      });
       continue;
     }
 
@@ -232,10 +248,31 @@ async function main() {
       continue;
     }
 
-    const targets = Object.values(indexed.entry.thumbnails ?? {})
-      .map((thumbnail) => thumbnail.file)
-      .filter(Boolean)
-      .map((file) => path.join(options.outputDir, file));
+    let targets;
+    try {
+      const targetFiles = Array.from(
+        new Set(
+          Object.values(indexed.entry.thumbnails ?? {})
+          .map((thumbnail) => thumbnail.file)
+          .filter(Boolean),
+        ),
+      );
+      if (targetFiles.length > MAP_PHOTO_LIMITS.maxTargetsPerCandidate) {
+        throw new Error(
+          `A map photo may not write more than ${MAP_PHOTO_LIMITS.maxTargetsPerCandidate} thumbnail files`,
+        );
+      }
+      targets = await Promise.all(
+        targetFiles
+          .map((file) => resolveSafeOutputTarget(options.outputDir, file)),
+      );
+    } catch (error) {
+      report.errors.push({
+        id: candidate.id,
+        message: error instanceof Error ? error.message : String(error),
+      });
+      continue;
+    }
 
     if (targets.length === 0) {
       report.errors.push({
@@ -259,10 +296,15 @@ async function main() {
     }
 
     try {
-      const buffer = await fetchBuffer(downloadUrl);
-      await Promise.all(
-        targets.map((target) => fs.writeFile(target, buffer)),
+      const buffer = await fetchImageBuffer(downloadUrl);
+      downloadedBytes = assertMapPhotoWriteBudget(
+        downloadedBytes,
+        buffer.byteLength,
+        targets.length,
       );
+      for (const target of targets) {
+        await writeFileAtomically(target, buffer);
+      }
       report.downloadedFiles.push(...targets);
     } catch (error) {
       report.errors.push({
@@ -280,7 +322,12 @@ async function main() {
   console.log(JSON.stringify(report, null, 2));
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exit(1);
-});
+const entrypointUrl = process.argv[1]
+  ? pathToFileURL(path.resolve(process.argv[1])).href
+  : null;
+if (entrypointUrl === import.meta.url) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  });
+}
