@@ -1,7 +1,7 @@
 # KJV Only Hardening Remediation Report
 
 **Remediation date:** 2026-08-24
-**Assessment baseline:** `reports/project-assessment-2026-08-23.md`, committed as `c79fd9f`
+**Assessment baseline:** `reports/project-assessment-2026-08-23.md`, committed as `191555f`
 **Compatibility objective:** Improve security, structure, reliability, performance, design consistency, and delivery controls without changing the product's existing user-facing behavior.
 
 ## Executive result

@@ -1,7 +1,7 @@
 # KJV Only Project Assessment
 
 **Assessment date:** 2026-08-23  
-**Repository revision:** `25c01411c5d7b9c312ae4c9b96a7d50720e0c0a4`  
+**Repository revision:** `2d8f7b22dddc10baf30d478a14f48910c5361fd3`
 **Goal:** Harden and improve the current product without changing its existing user-facing functionality.
 
 > **Implementation update (2026-08-24):** The repository-local remediation work from this assessment has been implemented and verified. See [Hardening Remediation Report](hardening-remediation-2026-08-24.md) for the recommendation-by-recommendation disposition, final Graphify map, security closure, measurements, and compatibility evidence.
