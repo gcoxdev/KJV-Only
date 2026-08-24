@@ -170,6 +170,43 @@ test("restores a shared chapter layout after reload", async ({ page }) => {
   ).toBeVisible()
 })
 
+test("preserves panel split, preview, move, and close behavior", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  const panels = page.locator("[data-panel-leaf-id]:visible")
+  const panelOptions = page
+    .getByLabel("Panel options")
+    .filter({ visible: true })
+  await panelOptions.first().click()
+  await page.getByRole("menuitem", { name: "Split Right", exact: true }).click()
+
+  await expect(panels).toHaveCount(2)
+  await expect(panels.nth(0)).toContainText(FIRST_VERSE)
+  await expect(panels.nth(1)).toContainText("Panel Home")
+
+  await panelOptions.first().click()
+  const moveRight = page.getByRole("menuitem", {
+    name: "Move Right",
+    exact: true,
+  })
+  await moveRight.hover()
+  await expect(
+    panels.nth(1).locator(':scope > [data-slot="card"]'),
+  ).toHaveClass(/panel-move-preview-surface/)
+  await moveRight.click()
+
+  await expect(panels.nth(0)).toContainText("Panel Home")
+  await expect(panels.nth(1)).toContainText(FIRST_VERSE)
+
+  await panelOptions.first().click()
+  await page.getByRole("menuitem", { name: "Close Panel", exact: true }).click()
+  await expect(panels).toHaveCount(1)
+  await expect(panels.first()).toContainText(FIRST_VERSE)
+})
+
 test("imports notes through the worker and persists the result", async ({ page }) => {
   await page.goto("/")
   await expectReaderReady(page)
