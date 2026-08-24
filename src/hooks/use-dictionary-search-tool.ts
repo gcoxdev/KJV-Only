@@ -55,20 +55,25 @@ export function useDictionarySearchTool<
   const [selectedResult, setSelectedResult] = useState<TResult | null>(null);
 
   const indexedEntries = useMemo(
-    () =>
-      payload
-        ? Object.keys(payload)
-            .sort((a, b) => a.localeCompare(b))
-            .map((key) => ({
-              key,
-              keyLower: key.toLowerCase(),
-              searchStrings: (
-                getSearchStrings ? getSearchStrings(key, payload[key] as TValue) : [key]
-              ).map((value) => value.toLowerCase()),
-              value: payload[key] as TValue,
-            }))
-        : [],
-    [getSearchStrings, payload],
+    () => {
+      if (!payload || !searchTerm.trim()) {
+        return [];
+      }
+
+      return Object.keys(payload)
+        .sort((a, b) => a.localeCompare(b))
+        .map((key) => ({
+          key,
+          keyLower: key.toLowerCase(),
+          searchStrings: (
+            getSearchStrings
+              ? getSearchStrings(key, payload[key] as TValue)
+              : [key]
+          ).map((value) => value.toLowerCase()),
+          value: payload[key] as TValue,
+        }));
+    },
+    [getSearchStrings, payload, searchTerm],
   );
 
   const ensureLoaded = useCallback(async () => {

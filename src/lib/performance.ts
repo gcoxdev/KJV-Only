@@ -1,11 +1,20 @@
+let performanceMeasureSequence = 0
+
 export function beginPerformanceMeasure(name: string) {
   if (typeof performance === "undefined") {
     return () => undefined
   }
-  const startMark = `${name}:start`
-  const endMark = `${name}:end`
+  performanceMeasureSequence += 1
+  const measureId = performanceMeasureSequence
+  const startMark = `${name}:start:${measureId}`
+  const endMark = `${name}:end:${measureId}`
+  let finished = false
   performance.mark(startMark)
   return () => {
+    if (finished) {
+      return
+    }
+    finished = true
     performance.mark(endMark)
     performance.measure(name, startMark, endMark)
     performance.clearMarks(startMark)

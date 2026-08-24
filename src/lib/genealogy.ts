@@ -99,155 +99,32 @@ function upsertByNameEntry(
   entries[existingIndex] = nextEntry;
 }
 
-function collectTokenReferenceData(books: Book[], rawWord: string) {
-  const normalizedWord = normalizeConcordanceWord(rawWord).toLowerCase();
-  const verses: string[] = [];
-  let occurrences = 0;
-
-  for (let bookIndex = 0; bookIndex < books.length; bookIndex += 1) {
-    const book = books[bookIndex];
-    for (let chapterIndex = 0; chapterIndex < book.chapters.length; chapterIndex += 1) {
-      const chapter = book.chapters[chapterIndex];
-      for (const verse of chapter.verses) {
-        let verseOccurrences = 0;
-        for (const token of verse.tokens) {
-          if (normalizeConcordanceWord(token.text).toLowerCase() === normalizedWord) {
-            verseOccurrences += 1;
-          }
-        }
-        if (verseOccurrences > 0) {
-          occurrences += verseOccurrences;
-          verses.push(chapterVerseKey(bookIndex, chapterIndex, verse.verse));
-        }
-      }
-    }
-  }
-
-  return {
-    verses: dedupeReferences(verses),
-    occurrences,
-  };
-}
-
-function collectPhraseReferenceData(books: Book[], rawWords: string[]) {
-  const normalizedWords = rawWords.map((word) =>
-    normalizeConcordanceWord(word).toLowerCase(),
-  );
-  const verses: string[] = [];
-  let occurrences = 0;
-
-  for (let bookIndex = 0; bookIndex < books.length; bookIndex += 1) {
-    const book = books[bookIndex];
-    for (let chapterIndex = 0; chapterIndex < book.chapters.length; chapterIndex += 1) {
-      const chapter = book.chapters[chapterIndex];
-      for (const verse of chapter.verses) {
-        const normalizedTokens = verse.tokens
-          .map((token) => normalizeConcordanceWord(token.text).toLowerCase())
-          .filter(Boolean);
-        let verseOccurrences = 0;
-
-        for (let index = 0; index <= normalizedTokens.length - normalizedWords.length; index += 1) {
-          const matches = normalizedWords.every(
-            (word, wordIndex) => normalizedTokens[index + wordIndex] === word,
-          );
-          if (matches) {
-            verseOccurrences += 1;
-          }
-        }
-
-        if (verseOccurrences > 0) {
-          occurrences += verseOccurrences;
-          verses.push(chapterVerseKey(bookIndex, chapterIndex, verse.verse));
-        }
-      }
-    }
-  }
-
-  return {
-    verses: dedupeReferences(verses),
-    occurrences,
-  };
-}
-
-function collectJesusOnlyReferenceData(books: Book[]) {
-  const verses: string[] = [];
-  let occurrences = 0;
-
-  for (let bookIndex = 0; bookIndex < books.length; bookIndex += 1) {
-    const book = books[bookIndex];
-    for (let chapterIndex = 0; chapterIndex < book.chapters.length; chapterIndex += 1) {
-      const chapter = book.chapters[chapterIndex];
-      for (const verse of chapter.verses) {
-        const normalizedTokens = verse.tokens
-          .map((token) => normalizeConcordanceWord(token.text).toLowerCase())
-          .filter(Boolean);
-        let verseOccurrences = 0;
-
-        for (let index = 0; index < normalizedTokens.length; index += 1) {
-          if (
-            normalizedTokens[index] === "jesus" &&
-            normalizedTokens[index + 1] !== "christ"
-          ) {
-            verseOccurrences += 1;
-          }
-        }
-
-        if (verseOccurrences > 0) {
-          occurrences += verseOccurrences;
-          verses.push(chapterVerseKey(bookIndex, chapterIndex, verse.verse));
-        }
-      }
-    }
-  }
-
-  return {
-    verses: dedupeReferences(verses),
-    occurrences,
-  };
-}
-
-function collectChristOnlyReferenceData(books: Book[]) {
-  const verses: string[] = [];
-  let occurrences = 0;
-
-  for (let bookIndex = 0; bookIndex < books.length; bookIndex += 1) {
-    const book = books[bookIndex];
-    for (let chapterIndex = 0; chapterIndex < book.chapters.length; chapterIndex += 1) {
-      const chapter = book.chapters[chapterIndex];
-      for (const verse of chapter.verses) {
-        const normalizedTokens = verse.tokens
-          .map((token) => normalizeConcordanceWord(token.text).toLowerCase())
-          .filter(Boolean);
-        let verseOccurrences = 0;
-
-        for (let index = 0; index < normalizedTokens.length; index += 1) {
-          if (
-            normalizedTokens[index] === "christ" &&
-            normalizedTokens[index - 1] !== "jesus"
-          ) {
-            verseOccurrences += 1;
-          }
-        }
-
-        if (verseOccurrences > 0) {
-          occurrences += verseOccurrences;
-          verses.push(chapterVerseKey(bookIndex, chapterIndex, verse.verse));
-        }
-      }
-    }
-  }
-
-  return {
-    verses: dedupeReferences(verses),
-    occurrences,
-  };
-}
-
 function collapseGenealogyNameVariant(rawName: string) {
   return normalizeConcordanceWord(rawName).toLowerCase().replace(/-/g, "");
 }
 
-function buildGenealogyTokenVariantIndex(books: Book[]) {
+type MutableReferenceData = {
+  verses: string[];
+  occurrences: number;
+};
+
+function collectGenealogyCorpusData(
+  books: Book[],
+  people: GenealogyPayload,
+) {
+  const candidateNames = new Set<string>();
+  for (const person of people) {
+    for (const name of [
+      ...person.names,
+      ...(person.verses?.byName ?? []).map((entry) => entry.name),
+    ]) {
+      const collapsed = collapseGenealogyNameVariant(name);
+      if (collapsed) {
+        candidateNames.add(collapsed);
+      }
+    }
+  }
+
   const index = new Map<
     string,
     {
@@ -256,6 +133,11 @@ function buildGenealogyTokenVariantIndex(books: Book[]) {
       occurrences: number;
     }
   >();
+  const jesus: MutableReferenceData = { verses: [], occurrences: 0 };
+  const christ: MutableReferenceData = { verses: [], occurrences: 0 };
+  const jesusChrist: MutableReferenceData = { verses: [], occurrences: 0 };
+  const immanuel: MutableReferenceData = { verses: [], occurrences: 0 };
+  const emmanuel: MutableReferenceData = { verses: [], occurrences: 0 };
 
   for (let bookIndex = 0; bookIndex < books.length; bookIndex += 1) {
     const book = books[bookIndex];
@@ -263,10 +145,19 @@ function buildGenealogyTokenVariantIndex(books: Book[]) {
       const chapter = book.chapters[chapterIndex];
       for (const verse of chapter.verses) {
         const reference = chapterVerseKey(bookIndex, chapterIndex, verse.verse);
+        const normalizedTokens: string[] = [];
         for (const token of verse.tokens) {
           const normalizedWord = normalizeConcordanceWord(token.text);
+          if (!normalizedWord) {
+            continue;
+          }
+          normalizedTokens.push(normalizedWord.toLowerCase());
           const collapsed = collapseGenealogyNameVariant(normalizedWord);
-          if (!collapsed || !/[a-z]/i.test(normalizedWord)) {
+          if (
+            !collapsed ||
+            !candidateNames.has(collapsed) ||
+            !/[a-z]/i.test(normalizedWord)
+          ) {
             continue;
           }
 
@@ -286,16 +177,62 @@ function buildGenealogyTokenVariantIndex(books: Book[]) {
             });
           }
         }
+
+        let jesusInVerse = 0;
+        let christInVerse = 0;
+        let jesusChristInVerse = 0;
+        let immanuelInVerse = 0;
+        let emmanuelInVerse = 0;
+        for (let index = 0; index < normalizedTokens.length; index += 1) {
+          const word = normalizedTokens[index];
+          if (word === "jesus" && normalizedTokens[index + 1] !== "christ") {
+            jesusInVerse += 1;
+          }
+          if (word === "christ" && normalizedTokens[index - 1] !== "jesus") {
+            christInVerse += 1;
+          }
+          if (word === "jesus" && normalizedTokens[index + 1] === "christ") {
+            jesusChristInVerse += 1;
+          }
+          if (word === "immanuel") {
+            immanuelInVerse += 1;
+          }
+          if (word === "emmanuel") {
+            emmanuelInVerse += 1;
+          }
+        }
+
+        for (const [data, occurrences] of [
+          [jesus, jesusInVerse],
+          [christ, christInVerse],
+          [jesusChrist, jesusChristInVerse],
+          [immanuel, immanuelInVerse],
+          [emmanuel, emmanuelInVerse],
+        ] as Array<[MutableReferenceData, number]>) {
+          if (occurrences > 0) {
+            data.occurrences += occurrences;
+            data.verses.push(reference);
+          }
+        }
       }
     }
   }
 
-  return index;
+  return {
+    tokenVariantIndex: index,
+    jesus,
+    christ,
+    jesusChrist,
+    immanuel,
+    emmanuel,
+  };
 }
 
 function canonicalizeGenealogyPersonNames(
   person: GenealogyPerson,
-  tokenVariantIndex: ReturnType<typeof buildGenealogyTokenVariantIndex>,
+  tokenVariantIndex: ReturnType<
+    typeof collectGenealogyCorpusData
+  >["tokenVariantIndex"],
 ) {
   const canonicalByName: GenealogyVerseByName[] = [];
   const sourceByName = person.verses?.byName ?? [];
@@ -523,12 +460,14 @@ export function enrichGenealogyPayload(
   people: GenealogyPayload,
   books: Book[],
 ): GenealogyPayload {
-  const tokenVariantIndex = buildGenealogyTokenVariantIndex(books);
-  const jesusData = collectJesusOnlyReferenceData(books);
-  const christData = collectChristOnlyReferenceData(books);
-  const jesusChristData = collectPhraseReferenceData(books, ["Jesus", "Christ"]);
-  const immanuelData = collectTokenReferenceData(books, "Immanuel");
-  const emmanuelData = collectTokenReferenceData(books, "Emmanuel");
+  const {
+    tokenVariantIndex,
+    jesus: jesusData,
+    christ: christData,
+    jesusChrist: jesusChristData,
+    immanuel: immanuelData,
+    emmanuel: emmanuelData,
+  } = collectGenealogyCorpusData(books, people);
 
   return people.map((person) => {
     const canonicalPerson = canonicalizeGenealogyPersonNames(person, tokenVariantIndex);

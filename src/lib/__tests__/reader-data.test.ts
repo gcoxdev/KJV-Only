@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { augmentConcordanceWithNormalizedWordForms } from "@/lib/reader-data";
+import {
+  augmentConcordanceWithNormalizedWordForms,
+  isGenealogyCandidateWord,
+} from "@/lib/reader-data";
 import type { Book } from "@/types/bible";
-import type { ConcordancePayload } from "@/types/reader";
+import type {
+  ConcordancePayload,
+  GenealogyCompactPayload,
+} from "@/types/reader";
 
 describe("augmentConcordanceWithNormalizedWordForms", () => {
   it("adds normalized hyphenated word entries from Bible tokens", () => {
@@ -32,5 +38,23 @@ describe("augmentConcordanceWithNormalizedWordForms", () => {
     const augmented = augmentConcordanceWithNormalizedWordForms(concordance, books);
 
     expect(augmented.words["Bath-sheba"]).toEqual([0, 1]);
+  });
+});
+
+describe("isGenealogyCandidateWord", () => {
+  const compact: GenealogyCompactPayload = {
+    v: [],
+    w: ["Bath-sheba", "Jesus Christ", "Immanuel"],
+    p: [],
+  };
+
+  it("matches case and hyphen variants without loading the full corpus", () => {
+    expect(isGenealogyCandidateWord(compact, "Bath–sheba")).toBe(true);
+    expect(isGenealogyCandidateWord(compact, "IMMANUEL")).toBe(true);
+    expect(isGenealogyCandidateWord({ ...compact, w: [] }, "Jesus")).toBe(true);
+  });
+
+  it("rejects words that cannot match a genealogy entry", () => {
+    expect(isGenealogyCandidateWord(compact, "beginning")).toBe(false);
   });
 });

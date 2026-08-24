@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 import { chapterVerseKey, normalizeConcordanceWord, normalizeStrongsCode } from "@/lib/references";
 import type { CrossRefsPayload } from "@/types/reader";
@@ -135,8 +135,11 @@ export function useWordStudyNavigation({
   openWordInStudyTools,
   setTokenPopup,
 }: UseWordStudyNavigationParams) {
+  const crossRefsRequestIdRef = useRef(0);
+
   const openCrossReferencesForVerse = useCallback(
     (bookIndex: number, chapterIndex: number, verseNumber: number) => {
+      const requestId = ++crossRefsRequestIdRef.current;
       setNotesContext({
         bookIndex,
         chapterIndex,
@@ -149,6 +152,9 @@ export function useWordStudyNavigation({
       setIsCrossRefsLoading(true);
 
       const applyCrossRefsSelection = (data: CrossRefsPayload) => {
+        if (crossRefsRequestIdRef.current !== requestId) {
+          return;
+        }
         setSelectedCrossReferences({
           key,
           references: data[key] ?? [],
@@ -166,6 +172,9 @@ export function useWordStudyNavigation({
           applyCrossRefsSelection(data);
         })
         .catch((error) => {
+          if (crossRefsRequestIdRef.current !== requestId) {
+            return;
+          }
           const message =
             error instanceof Error
               ? error.message
@@ -213,6 +222,11 @@ export function useWordStudyNavigation({
             word: rawWord,
           });
         }
+        openCrossReferencesForVerse(
+          target.bookIndex,
+          target.chapterIndex,
+          target.verseNumber,
+        );
         openWordInStudyTools({
           rawWord,
           bookIndex: target.bookIndex,
@@ -238,6 +252,7 @@ export function useWordStudyNavigation({
     },
     [
       notesLinkOpenTarget,
+      openCrossReferencesForVerse,
       openReaderTarget,
       openWordInStudyTools,
       resolveWordTokenAtLocation,

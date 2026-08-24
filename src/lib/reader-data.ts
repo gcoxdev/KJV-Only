@@ -40,6 +40,8 @@ let bibleWordBookPromise: Promise<BibleWordBookPayload> | null = null;
 let oldEnglishPromise: Promise<OldEnglishPayload> | null = null;
 let phrasesPromise: Promise<PhrasesPayload> | null = null;
 let unitsPromise: Promise<UnitsPayload> | null = null;
+let genealogyCompactPromise: Promise<GenealogyCompactPayload> | null = null;
+let genealogyCandidateNamesPromise: Promise<Set<string>> | null = null;
 let genealogyPromise: Promise<GenealogyPayload> | null = null;
 let webstersPromise: Promise<WebstersPayload> | null = null;
 let aiDictionaryPromise: Promise<AIDictionaryPayload> | null = null;
@@ -51,6 +53,12 @@ let topicsIndexPromise: Promise<TopicsIndexPayload> | null = null;
 const mapGeoJsonPromiseCache = new Map<string, Promise<MapGeoJsonPayload>>();
 export const GENEALOGY_ASSET_VERSION = "20260312-philip-fix-1";
 export const STRONGS_ASSET_VERSION = "20260313-derivation-links-2";
+const GENEALOGY_ENRICHED_CANDIDATE_WORDS = new Set([
+  "jesus",
+  "christ",
+  "immanuel",
+  "emmanuel",
+]);
 
 export type DailyScriptureTopicsPayload = {
   generatedAt: string;
@@ -488,22 +496,85 @@ export function loadUnits() {
   return unitsPromise;
 }
 
-export function loadGenealogy() {
-  if (!genealogyPromise) {
-    genealogyPromise = Promise.all([
-      fetch(`/references/genealogy.compact.min.json?v=${GENEALOGY_ASSET_VERSION}`, {
-        cache: "no-cache",
-      }).then(async (response) => {
+function loadGenealogyCompact() {
+  if (!genealogyCompactPromise) {
+    genealogyCompactPromise = fetch(
+      `/references/genealogy.compact.min.json?v=${GENEALOGY_ASSET_VERSION}`,
+      { cache: "no-cache" },
+    )
+      .then(async (response) => {
         if (!response.ok) {
           throw new Error("Could not load /references/genealogy.compact.min.json");
         }
-        return response.json() as Promise<unknown>;
-      }),
+        return response.json() as Promise<GenealogyCompactPayload>;
+      })
+      .catch((error) => {
+        genealogyCompactPromise = null;
+        genealogyCandidateNamesPromise = null;
+        throw error;
+      });
+  }
+
+  return genealogyCompactPromise;
+}
+
+export function isGenealogyCandidateWord(
+  compact: GenealogyCompactPayload,
+  rawWord: string,
+) {
+  const normalizedWord = normalizeConcordanceWord(rawWord)
+    .toLowerCase()
+    .replace(/-/g, "");
+  if (!normalizedWord) {
+    return false;
+  }
+  if (GENEALOGY_ENRICHED_CANDIDATE_WORDS.has(normalizedWord)) {
+    return true;
+  }
+
+  return compact.w.some(
+    (name) =>
+      normalizeConcordanceWord(name).toLowerCase().replace(/-/g, "") ===
+      normalizedWord,
+  );
+}
+
+export function mayHaveGenealogyMatch(rawWord: string) {
+  if (!genealogyCandidateNamesPromise) {
+    genealogyCandidateNamesPromise = loadGenealogyCompact().then(
+      (compact) =>
+        new Set(
+          [
+            ...GENEALOGY_ENRICHED_CANDIDATE_WORDS,
+            ...compact.w.map((name) =>
+              normalizeConcordanceWord(name).toLowerCase().replace(/-/g, ""),
+            ),
+          ].filter(Boolean),
+        ),
+    );
+  }
+
+  const normalizedWord = normalizeConcordanceWord(rawWord)
+    .toLowerCase()
+    .replace(/-/g, "");
+  if (!normalizedWord) {
+    return Promise.resolve(false);
+  }
+
+  return genealogyCandidateNamesPromise.then((names) =>
+    names.has(normalizedWord),
+  );
+}
+
+export function loadGenealogy() {
+  if (!genealogyPromise) {
+    genealogyPromise = Promise.all([
+      loadGenealogyCompact(),
       loadKjvBooks(),
     ])
       .then(([payload, books]) =>
         enrichGenealogyPayload(
-          decodeGenealogyPayload(payload as GenealogyCompactPayload),
+          decodeGenealogyPayload(payload),
           books,
         ),
       )
