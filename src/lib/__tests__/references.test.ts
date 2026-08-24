@@ -6,6 +6,7 @@ import {
   resolveAIDictionaryKey,
   resolveAIDictionaryPhraseKey,
   resolveAIDictionaryPhraseKeyForToken,
+  resolveBibleWordBookKey,
   resolveConcordanceKey,
   resolvePhraseKey,
   resolvePhraseKeyForToken,
@@ -74,6 +75,25 @@ describe("concordance helpers", () => {
     expect(resolveUnitsKey(units, "denarius")).toBe("Penny");
   });
 
+  it("preserves first-entry precedence for indexed unit aliases", () => {
+    const units: UnitsPayload = {
+      Earlier: {
+        category: "currency",
+        summary: "Alias entry",
+        approximate: "One unit",
+        aliases: ["measure"],
+      },
+      measure: {
+        category: "length",
+        summary: "Later key",
+        approximate: "One unit",
+      },
+    };
+
+    expect(resolveUnitsKey(units, "measure")).toBe("Earlier");
+    expect(resolveUnitsKey(units, "measure")).toBe("Earlier");
+  });
+
   it("resolves phrases by exact text and aliases", () => {
     const phrases: PhrasesPayload = {
       "by and by": {
@@ -88,6 +108,21 @@ describe("concordance helpers", () => {
     expect(resolvePhraseKey(phrases, "By and by")).toBe("by and by");
     expect(resolvePhraseKey(phrases, "anon")).toBe("by and by");
     expect(resolvePhraseKey(phrases, "God forbid")).toBe("god forbid");
+  });
+
+  it("preserves first-entry precedence for indexed phrase aliases", () => {
+    const phrases: PhrasesPayload = {
+      "earlier entry": {
+        meaning: "Alias match",
+        aliases: ["chosen phrase"],
+      },
+      "chosen phrase": {
+        meaning: "Later key match",
+      },
+    };
+
+    expect(resolvePhraseKey(phrases, "Chosen phrase")).toBe("earlier entry");
+    expect(resolvePhraseKey(phrases, "Chosen phrase")).toBe("earlier entry");
   });
 
   it("resolves AI dictionary entries by case, singular, and aliases", () => {
@@ -165,6 +200,42 @@ describe("concordance helpers", () => {
     expect(resolveAIDictionaryPhraseKey(aiDictionary, "God forbid")).toBe(
       "god forbid",
     );
+  });
+
+  it("preserves first-entry precedence for indexed AI phrase aliases", () => {
+    const aiDictionary: AIDictionaryPayload = {
+      "earlier entry": {
+        definitions: ["Alias match."],
+        aliases: ["chosen phrase"],
+      },
+      "chosen phrase": {
+        definitions: ["Later key match."],
+      },
+    };
+
+    expect(resolveAIDictionaryPhraseKey(aiDictionary, "Chosen phrase")).toBe(
+      "earlier entry",
+    );
+    expect(resolveAIDictionaryPhraseKey(aiDictionary, "Chosen phrase")).toBe(
+      "earlier entry",
+    );
+  });
+
+  it("keeps Bible word-book exact-key priority ahead of aliases", () => {
+    const bibleWordBook = {
+      Earlier: {
+        meaning: "Alias entry",
+        body: "Alias entry.",
+        aliases: ["Adam"],
+      },
+      Adam: {
+        meaning: "Exact entry",
+        body: "Exact entry.",
+      },
+    };
+
+    expect(resolveBibleWordBookKey(bibleWordBook, "Adam")).toBe("Adam");
+    expect(resolveBibleWordBookKey(bibleWordBook, "Adam")).toBe("Adam");
   });
 
   it("resolves AI dictionary phrase matches from a clicked token context", () => {

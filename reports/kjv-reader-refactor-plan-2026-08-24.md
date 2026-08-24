@@ -3,11 +3,11 @@
 **Assessment date:** 2026-08-24
 **Committed baseline:** `cb46f04` (`refactor(reader): harden corpus lifecycle`)
 **Scope:** Reduce `KJVReader` orchestration risk and improve study-word responsiveness without changing product behavior.
-**Status:** The first compatibility-safe extraction and performance slice is implemented but not committed. Nothing has been pushed.
+**Status:** Phase 1 is committed as `8879054`; Phase 2 is implemented and verified locally but remains uncommitted. Nothing has been pushed.
 
 ## Executive result
 
-`KJVReader` was 4,601 lines at the committed baseline. The first slice moves the asynchronous word-study fan-out into `useWordStudyCoordinator`, removes duplicated work, and reduces `KJVReader` to 4,259 lines. The new coordinator is 573 lines and owns one cohesive workflow: converting a selected Bible token into progressively available study-tool selections.
+`KJVReader` was 4,601 lines at the original committed baseline. Phase 1 moved the asynchronous word-study fan-out into `useWordStudyCoordinator`, removed duplicated work, and reduced the component to 4,259 lines. Phase 2 moves the remaining word-study matching algorithms into `word-study-selection.ts`, reduces `KJVReader` to 3,977 lines, and removes three callback adapters from the coordinator/navigation boundary. The coordinator is now 558 lines; the new pure selection module is 435 lines with direct characterization coverage.
 
 The cold-path delay was mainly CPU scheduling, not network transfer. In the initial local Chromium trace, all 13 study responses arrived in about 0.28 seconds, but the click was blocked for about 4.18 seconds and the aggregate loaders took about 5.29 seconds. Genealogy enrichment alone used about 2.30 seconds, and loading each payload caused several search tools to eagerly construct indexes that a word selection did not need.
 
@@ -25,7 +25,7 @@ These are development-machine diagnostics, not universal device guarantees. The 
 
 ## Graphify architecture map
 
-Graphify was refreshed after the extraction. The current graph contains **3,159 nodes, 6,197 edges, and 195 communities**. `KJVReader()` remains the principal application god node with degree 68. The new `useWordStudyCoordinator()` node is present and connected to the study loaders, normalized reference resolvers, performance measures, and study state.
+Graphify was refreshed after Phase 2. The current graph contains **3,146 nodes, 6,296 edges, and 213 communities**. `KJVReader()` remains the principal composition node, but its degree fell from 68 after Phase 1 to 57. `word-study-selection.ts` is now the explicit pure boundary between `KJVReader`, `useWordStudyCoordinator`, `useWordStudyNavigation`, the reference resolvers, and the reader payload types.
 
 ```mermaid
 flowchart TD
@@ -34,9 +34,12 @@ flowchart TD
     App --> StudyHooks[Study data/search hooks]
     App --> Navigation[useWordStudyNavigation]
     App --> Coordinator[useWordStudyCoordinator]
+    App --> Selection[Pure word-study selection]
 
     Navigation --> CrossRefs[Cross-reference selection]
     Navigation --> Coordinator
+    Navigation --> Selection
+    Coordinator --> Selection
 
     Coordinator --> Concordance[Concordance]
     Coordinator --> Dictionaries[Webster / AI / Word-Book / Hitchcock / Old English]
@@ -45,6 +48,7 @@ flowchart TD
 
     StudyHooks --> Data[reader-data loaders]
     Coordinator --> Data
+    Selection --> References[Normalized reference indexes]
     Data --> Assets[Runtime reference assets]
     Data --> Corpus[KJV corpus]
 
@@ -96,9 +100,9 @@ Approximate current regions after the first extraction:
 | Panel preview, movement, split, insert and close lifecycle | 1,449–1,910 | Related invariants are spread across refs and imperative callbacks |
 | Tab, reader navigation, routing and target selection | 1,930–2,533 | Broad workspace command surface with several destination policies |
 | Progress and tab actions | 2,534–2,663 | Smaller, coherent extraction candidate |
-| Study matching and accordion derivation | 2,695–2,996 | Pure matching logic still lives in the component |
-| Study orchestration adapter call | 3,061–3,125 | Explicit boundary now exists, but the argument surface is too wide |
-| Final derived props and render composition | 3,581–4,259 | Large object/prop assembly and inline callbacks obscure view boundaries |
+| Study matching and accordion adapter | 2,684–2,720 | Matching is pure and external; a small state-binding callback remains |
+| Study orchestration adapter call | 2,782–2,864 | Explicit boundary exists, but the state-setter argument surface remains wide |
+| Final derived props and render composition | 3,299–3,977 | Large object/prop assembly and inline callbacks obscure view boundaries |
 
 The line count is a symptom. The more important issue is that a change to one workflow can still touch layout state, routing, tool state, derived props, and render composition in the same component.
 
@@ -106,7 +110,7 @@ The line count is a symptom. The more important issue is that a change to one wo
 
 ### Phase 1 — word-study boundary and characterization
 
-**Status: implemented, awaiting review/commit approval.**
+**Status: committed as `8879054`.**
 
 - Extract `useWordStudyCoordinator`.
 - Make latest-click ownership explicit.
@@ -120,7 +124,9 @@ Exit evidence: typecheck, lint, focused unit tests, focused Playwright test, and
 
 ### Phase 2 — pure word-study matching and indexed exact lookups
 
-Move the remaining component-local matching functions into `src/lib/word-study-selection.ts`:
+**Status: implemented and verified locally; awaiting review/commit approval.**
+
+The remaining component-local matching functions now live in `src/lib/word-study-selection.ts`:
 
 - phrase-at-token resolution;
 - AI-dictionary phrase-at-token resolution;
@@ -128,9 +134,9 @@ Move the remaining component-local matching functions into `src/lib/word-study-s
 - genealogy ranking/deduplication;
 - matching accordion derivation.
 
-Build normalized key/alias maps once per loaded payload with `WeakMap`-backed caches. This removes repeated `Object.keys`/`Object.entries` scans while retaining the current first-match and alias semantics. Characterization fixtures must cover case, plural fallback, aliases, Unicode dashes/apostrophes, phrase precedence, maps, genealogy rank, and missing results.
+Normalized key, alias, genealogy-name, and map-translation indexes are built once per immutable loaded payload and retained in `WeakMap` caches. Direct-key precedence, first-entry alias precedence, plural fallback, case behavior, phrase precedence, and accordion ordering remain unchanged. The coordinator and note-link navigation now receive `books` directly and invoke the pure selectors instead of accepting component-created resolver callbacks.
 
-Expected `KJVReader` reduction: about 300 additional lines.
+Phase result: 282 additional lines removed from `KJVReader` (3,977 lines current), with 219 unit tests, 8 development-browser tests plus one production-only skip, all 9 production-preview browser tests, and the production build passing.
 
 ### Phase 3 — remove corpus-dependent enrichment from the UI thread
 
@@ -215,4 +221,4 @@ Commits and pushes remain approval-gated. Related phases should be batched into 
 
 ## Immediate next recommendation
 
-Review and commit Phase 1 as one cohesive change after the full unit and browser suites pass. Then implement Phase 2 before attempting panel or workspace extraction. It is the lowest-risk way to reduce another component-local algorithm block while making later study-worker/build-time work easier to test.
+Review and commit Phase 2 as one cohesive change after confirming its Graphify artifacts and characterization coverage. Then profile the remaining genealogy-name cold path before choosing build-time enrichment or a worker. The next structural reader extraction should be Phase 4's panel interaction controller; it is independent of any study-data asset decision and can proceed without changing product behavior.
