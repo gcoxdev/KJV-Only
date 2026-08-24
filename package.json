@@ -37,7 +37,7 @@
     "@lexical/selection": "^0.41.0",
     "@lexical/table": "^0.41.0",
     "@lexical/utils": "^0.41.0",
-    "bible-passage-reference-parser": "^3.2.0",
+    "bible-passage-reference-parser": "^4.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
