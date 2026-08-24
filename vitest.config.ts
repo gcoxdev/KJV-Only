@@ -11,7 +11,7 @@ export default defineConfig({
     environment: "node",
     include: [
       "src/**/*.{test,spec}.{ts,tsx}",
-      "scripts/**/*.{test,spec}.mjs",
+      "scripts/**/*.{test,spec}.{mjs,ts}",
     ],
     coverage: {
       provider: "v8",
@@ -19,10 +19,10 @@ export default defineConfig({
       include: ["src/lib/**/*.ts", "src/hooks/**/*.ts"],
       exclude: ["src/**/*.test.ts", "src/**/__tests__/**", "src/types/**"],
       thresholds: {
-        statements: 40,
-        branches: 40,
+        statements: 43,
+        branches: 48,
         functions: 40,
-        lines: 40,
+        lines: 43,
       },
     },
   },

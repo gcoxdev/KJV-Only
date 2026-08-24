@@ -8,21 +8,19 @@ import {
   useState,
 } from "react";
 
-import { type Book, type VerseToken } from "@/types/bible";
+import type { VerseToken } from "@/types/bible";
 import { matchesMapWord, type AncientMapPayload } from "@/lib/maps";
 import {
   loadAIDictionary,
   loadBibleWordBook,
   loadHitchcocks,
-  loadKjvBooks,
   loadMapGeoJson,
   loadOldEnglish,
   loadPhrases,
   loadUnits,
   loadWebsters,
 } from "@/lib/reader-data";
-import { buildVerseSearchIndex } from "@/lib/verse-search-index";
-import { measureSynchronous } from "@/lib/performance";
+import { beginPerformanceMeasure } from "@/lib/performance";
 import {
   consumeLocalStorageIssueKeys,
   LOCAL_STORAGE_ISSUE_EVENT,
@@ -60,8 +58,6 @@ import {
 } from "@/lib/reader-scroll-targets";
 import {
   clearSingleLeafReferenceIfMissing,
-  filterRecordEntries,
-  swapRecordEntries,
   swapSingleLeafReference,
 } from "@/lib/leaf-state";
 import {
@@ -104,7 +100,6 @@ import type {
   PanelDirection,
   PanelNode,
   ReaderTab,
-  SearchPageState,
   SplitOrientation,
   StrongsPayload,
   StudyWorkspaceTool,
@@ -342,9 +337,9 @@ function createGenesisReaderTab(): ReaderTab {
 }
 
 export function KJVReader() {
-  const [books, setBooks] = useState<Book[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [tabs, setTabs] = useState<ReaderTab[]>([]);
+  const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [activeReaderWordHighlight, setActiveReaderWordHighlight] = useState<{
     leafId: string;
     verseNumber: number;
@@ -369,9 +364,15 @@ export function KJVReader() {
   const [isPwaInstalled, setIsPwaInstalled] = useState(false);
   const previousBibleCompletionRef = useRef(false);
   const didApplyStartupWelcomeHomeRef = useRef(false);
+  const didInitializeReaderRef = useRef(false);
+  const finishFirstReaderReadyMeasureRef = useRef<(() => void) | null>(null);
   const pendingActiveTabIdRef = useRef<string | null>(null);
   const pendingToolsTabScrollRef = useRef(false);
   const pendingToolsTabIdRef = useRef<string | null>(null);
+  const hasOpenSearchView = useMemo(
+    () => tabs.some((tab) => panelNodeContainsView(tab.root, "search")),
+    [tabs],
+  );
   const {
     isStudyMode,
     tabsOrientation,
@@ -418,7 +419,25 @@ export function KJVReader() {
       setReferenceLinkOpenTarget,
     },
     readingProgress: { readChapters, setReadChapters },
-  } = useReaderController({ tabsOrientation, setTabsOrientation });
+    corpus: { books, isCorpusLoaded, loadError },
+    searchPages: {
+      stateByLeafId: searchPageStateByLeafId,
+      changeState: changeSearchPageState,
+      initializeState: initializeSearchPageState,
+      pruneState: pruneSearchPageState,
+      swapState: swapSearchPageState,
+    },
+    verseSearch: {
+      index: verseSearchIndex,
+      isBuilding: isVerseSearchIndexBuilding,
+      isReady: isVerseSearchIndexReady,
+      error: verseSearchIndexError,
+    },
+  } = useReaderController({
+    tabsOrientation,
+    setTabsOrientation,
+    searchEnabled: hasOpenSearchView,
+  });
   const wordVerseSelectionTargetRef =
     useRef<WordVerseSelectionTarget>(wordVerseSelectionTarget);
 
@@ -439,8 +458,6 @@ export function KJVReader() {
     window.addEventListener(LOCAL_STORAGE_ISSUE_EVENT, notify);
     return () => window.removeEventListener(LOCAL_STORAGE_ISSUE_EVENT, notify);
   }, []);
-  const [tabs, setTabs] = useState<ReaderTab[]>([]);
-  const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [activeSettingsTab, setActiveSettingsTab] = useState<
     "visual" | "targeting" | "other"
   >("visual");
@@ -593,7 +610,7 @@ export function KJVReader() {
     tabsVersion: tabs,
   });
   const { parseCurrentLayoutHash, applyParsedLayout } = useLayoutHashSync({
-    isLoaded,
+    isLoaded: isLoaded && isCorpusLoaded,
     tabs,
     activeTabId,
     tabsOrientation,
@@ -607,6 +624,17 @@ export function KJVReader() {
     queueVerseHighlights,
     setTargetedPanelLeafId,
   });
+
+  useEffect(() => {
+    const finishMeasure = beginPerformanceMeasure("kjv:first-reader-ready");
+    finishFirstReaderReadyMeasureRef.current = finishMeasure;
+    return () => {
+      if (finishFirstReaderReadyMeasureRef.current === finishMeasure) {
+        finishMeasure();
+        finishFirstReaderReadyMeasureRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     wordVerseSelectionTargetRef.current = wordVerseSelectionTarget;
@@ -640,47 +668,41 @@ export function KJVReader() {
   }, [tokenPopup]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function loadGeneratedData() {
-      try {
-        const parsedBooks = await loadKjvBooks();
-        if (cancelled) {
-          return;
-        }
-        setBooks(parsedBooks);
-        const parsedLayout = parseCurrentLayoutHash();
-        if (parsedLayout && parsedLayout.tabs.length > 0) {
-          applyParsedLayout(parsedLayout);
-        } else {
-          const readerTab = createGenesisReaderTab();
-          const initialTabs = showWelcomeHomeAtStartup
-            ? [readerTab, createWelcomeHomeTab()]
-            : [readerTab];
-          setTabs(initialTabs);
-          setActiveTabId(initialTabs[initialTabs.length - 1]?.id ?? readerTab.id);
-        }
-        setLoadError(null);
-        setIsLoaded(true);
-      } catch (error) {
-        if (!cancelled) {
-          const message =
-            error instanceof Error
-              ? error.message
-              : "Failed to load generated reader data";
-          setLoadError(message);
-          setIsLoaded(true);
-        }
-      }
+    if (didInitializeReaderRef.current) {
+      return;
     }
 
-    void loadGeneratedData();
+    const parsedLayout = parseCurrentLayoutHash();
+    if (loadError) {
+      didInitializeReaderRef.current = true;
+      setIsLoaded(true);
+      finishFirstReaderReadyMeasureRef.current?.();
+      finishFirstReaderReadyMeasureRef.current = null;
+      return;
+    }
+    if (books.length === 0 || (parsedLayout && !isCorpusLoaded)) {
+      return;
+    }
 
-    return () => {
-      cancelled = true;
-    };
+    didInitializeReaderRef.current = true;
+    if (parsedLayout && parsedLayout.tabs.length > 0) {
+      applyParsedLayout(parsedLayout);
+    } else {
+      const readerTab = createGenesisReaderTab();
+      const initialTabs = showWelcomeHomeAtStartup
+        ? [readerTab, createWelcomeHomeTab()]
+        : [readerTab];
+      setTabs(initialTabs);
+      setActiveTabId(initialTabs[initialTabs.length - 1]?.id ?? readerTab.id);
+    }
+    setIsLoaded(true);
+    finishFirstReaderReadyMeasureRef.current?.();
+    finishFirstReaderReadyMeasureRef.current = null;
   }, [
     applyParsedLayout,
+    books,
+    isCorpusLoaded,
+    loadError,
     parseCurrentLayoutHash,
     showWelcomeHomeAtStartup,
   ]);
@@ -857,9 +879,6 @@ export function KJVReader() {
     importNotes,
     importBookmarks,
   });
-  const [searchPageStateByLeafId, setSearchPageStateByLeafId] = useState<
-    Record<string, SearchPageState>
-  >({});
   const activeLeafIds = useMemo(
     () => new Set(tabs.flatMap((tab) => collectLeafIds(tab.root))),
     [tabs],
@@ -925,40 +944,6 @@ export function KJVReader() {
     }
   }, [isRightSidebarOpen, setIsRightSidebarOpen, wordVerseSelectionTarget]);
 
-  const createDefaultSearchPageState = useCallback(
-    (): SearchPageState => ({
-      searchMode: "smart",
-      caseSensitive: false,
-      chipInput: "",
-      phraseInput: "",
-      lastSearchMode: null,
-      lastSearchCaseSensitive: false,
-      lastSearchPhraseInput: "",
-      lastSearchSelectedWords: [],
-      isControlsCollapsed: false,
-      selectedWords: [],
-      expandedBookTree: ["entire", "old", "new"],
-      selectedBookIndexes: books.map((_, index) => index),
-      currentPage: 1,
-      results: [],
-      error: null,
-    }),
-    [books],
-  );
-
-  const changeSearchPageState = useCallback(
-    (leafId: string, patch: Partial<SearchPageState>) => {
-      setSearchPageStateByLeafId((current) => ({
-        ...current,
-        [leafId]: {
-          ...(current[leafId] ?? createDefaultSearchPageState()),
-          ...patch,
-        },
-      }));
-    },
-    [createDefaultSearchPageState],
-  );
-
   const mapWebstersResult = useCallback(
     (key: string, entry: WebstersEntry) => ({ key, entry }),
     [],
@@ -974,9 +959,7 @@ export function KJVReader() {
 
   useEffect(() => {
     pruneNotesTabState(activeLeafIds);
-    setSearchPageStateByLeafId((current) =>
-      filterRecordEntries(current, activeLeafIds),
-    );
+    pruneSearchPageState(activeLeafIds);
     pruneHighlightModeForLeaves(activeLeafIds);
     pruneLeafHighlights(activeLeafIds);
     setActiveReaderWordHighlight((current) =>
@@ -990,6 +973,7 @@ export function KJVReader() {
     pruneHighlightModeForLeaves,
     pruneLeafHighlights,
     pruneNotesTabState,
+    pruneSearchPageState,
   ]);
   const mapOldEnglishResult = useCallback(
     (key: string, definitions: string[]) => ({ key, definitions }),
@@ -1046,20 +1030,6 @@ export function KJVReader() {
         : [],
     [concordance],
   );
-  const hasOpenSearchView = useMemo(
-    () => tabs.some((tab) => panelNodeContainsView(tab.root, "search")),
-    [tabs],
-  );
-  const verseSearchIndex = useMemo(
-    () =>
-      hasOpenSearchView
-        ? measureSynchronous("kjv:search-index-build", () =>
-            buildVerseSearchIndex(books),
-          )
-        : [],
-    [books, hasOpenSearchView],
-  );
-
   const {
     searchTerm: topicsSearchTerm,
     selectedLetters: topicsSelectedLetters,
@@ -1862,9 +1832,7 @@ export function KJVReader() {
     }
 
     swapNotesTabState(leafId, targetLeafId);
-    setSearchPageStateByLeafId((current) =>
-      swapRecordEntries(current, leafId, targetLeafId),
-    );
+    swapSearchPageState(leafId, targetLeafId);
     swapLeafHistoryState(leafId, targetLeafId);
     swapHighlightModeForLeaves(leafId, targetLeafId);
     swapLeafHighlights(leafId, targetLeafId);
@@ -2027,10 +1995,7 @@ export function KJVReader() {
         root: nextLeaf,
       },
     ]);
-    setSearchPageStateByLeafId((current) => ({
-      ...current,
-      [nextLeaf.id]: createDefaultSearchPageState(),
-    }));
+    initializeSearchPageState(nextLeaf.id);
     setActiveTabId(nextTabId);
     requestAnimationFrame(() => {
       tabEndRef.current?.scrollIntoView({
@@ -2039,7 +2004,7 @@ export function KJVReader() {
         inline: tabsOrientation === "vertical" ? "nearest" : "end",
       });
     });
-  }, [createDefaultSearchPageState, tabs, tabsOrientation]);
+  }, [initializeSearchPageState, tabs, tabsOrientation]);
 
   const shareLayout = useCallback(async () => {
     const href = window.location.href;
@@ -4300,6 +4265,9 @@ export function KJVReader() {
           onSelectVerse={handleVerseSelection}
           concordanceWords={concordanceWords}
           verseSearchIndex={verseSearchIndex}
+          isVerseSearchIndexBuilding={isVerseSearchIndexBuilding}
+          isVerseSearchIndexReady={isVerseSearchIndexReady}
+          verseSearchIndexError={verseSearchIndexError}
           ensureConcordanceWordsLoaded={ensureConcordanceLoaded}
                 onOpenSearchResult={openSearchResultTarget}
           notes={readerNotes}

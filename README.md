@@ -47,6 +47,12 @@ Build the frontend:
 npm run build
 ```
 
+Refresh the local runtime corpus manifest/bootstrap from an existing canonical corpus:
+
+```bash
+npm run build:data-manifest
+```
+
 Preview the production build:
 
 ```bash

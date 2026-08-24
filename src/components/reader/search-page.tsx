@@ -53,6 +53,9 @@ type SearchPageProps = {
   books: Book[];
   concordanceWords: string[];
   verseIndex: VerseSearchIndexEntry[];
+  isVerseIndexBuilding: boolean;
+  isVerseIndexReady: boolean;
+  verseIndexError: string | null;
   ensureConcordanceWordsLoaded: () => Promise<unknown>;
   state: SearchPageState;
   onStateChange: (patch: Partial<SearchPageState>) => void;
@@ -156,6 +159,9 @@ export function SearchPage({
   books,
   concordanceWords,
   verseIndex,
+  isVerseIndexBuilding,
+  isVerseIndexReady,
+  verseIndexError,
   ensureConcordanceWordsLoaded,
   state,
   onStateChange,
@@ -231,6 +237,7 @@ export function SearchPage({
   useEffect(() => {
     const nextAll = new Set(books.map((_, index) => index));
     if (
+      (!isVerseIndexReady && selectedBookIndexes.size !== books.length) ||
       state.selectedBookIndexes.length === 0 ||
       selectedBookIndexes.size === 0 ||
       selectedBookIndexes.size > books.length
@@ -244,7 +251,13 @@ export function SearchPage({
         return;
       }
     }
-  }, [books, onStateChange, selectedBookIndexes, state.selectedBookIndexes.length]);
+  }, [
+    books,
+    isVerseIndexReady,
+    onStateChange,
+    selectedBookIndexes,
+    state.selectedBookIndexes.length,
+  ]);
 
   useEffect(() => {
     if (searchMode === "contains-any" || searchMode === "contains-all") {
@@ -481,6 +494,9 @@ export function SearchPage({
   };
 
   const search = () => {
+    if (!isVerseIndexReady) {
+      return;
+    }
     onStateChange({ error: null });
     regexWorkerRef.current?.terminate();
     regexWorkerRef.current = null;
@@ -1205,9 +1221,14 @@ export function SearchPage({
           )}
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button type="button" onClick={search} disabled={isSearching}>
+            <Button
+              type="button"
+              onClick={search}
+              disabled={isSearching || !isVerseIndexReady}
+              aria-label="Run Bible search"
+            >
               <SearchIcon />
-              Search
+              {isVerseIndexBuilding ? "Preparing search..." : "Search"}
             </Button>
             <Button
               type="button"
@@ -1219,6 +1240,13 @@ export function SearchPage({
               Clear Results
             </Button>
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
+            {verseIndexError ? (
+              <p className="text-sm text-destructive">{verseIndexError}</p>
+            ) : isVerseIndexBuilding ? (
+              <p className="text-sm text-muted-foreground" role="status">
+                Preparing the Bible search index in the background...
+              </p>
+            ) : null}
           </div>
         </>
       ) : error ? (

@@ -1,6 +1,6 @@
 const FALLBACK_CACHE_CONFIG = {
   cachePrefix: "kjv-only-cache-",
-  cacheName: "kjv-only-cache-v5",
+  cacheName: "kjv-only-cache-v6",
 } as const;
 
 function getAppCacheConfig() {
@@ -14,6 +14,8 @@ export const CORE_OFFLINE_URLS = [
   "/sw.js",
   "/app-cache-config.js",
   "/icons/app-icon.svg",
+  "/data/kjv-manifest.json",
+  "/data/kjv-bootstrap.json",
   "/data/kjv.json",
   "/references/concordance.compact.delta.min.json",
   "/references/cross-refs.json",
