@@ -29,12 +29,12 @@ import {
   loadAncientMap,
 } from "@/lib/reader-data";
 import {
-  CORE_OFFLINE_URLS,
   buildAudioUrls,
   deleteOfflineAssetBatch,
   downloadOfflineAssetBatch,
   formatOfflineBytes,
   getCachedOfflineAssetKeys,
+  loadCoreOfflineUrls,
 } from "@/lib/offline-downloads";
 
 type DownloadPageProps = {
@@ -53,6 +53,7 @@ type BundleDefinition = {
   icon: typeof HardDriveDownloadIcon;
   urls: string[];
   sizeLabel: string;
+  preparationError?: string | null;
 };
 
 type BundleStatus = {
@@ -95,6 +96,10 @@ export function DownloadPage({
   isPwaInstalled = false,
   onInstallPwa,
 }: DownloadPageProps) {
+  const [coreUrls, setCoreUrls] = useState<string[] | null>(null);
+  const [corePreparationError, setCorePreparationError] = useState<string | null>(
+    null,
+  );
   const [mapUrls, setMapUrls] = useState<string[] | null>(null);
   const [storageEstimate, setStorageEstimate] = useState<{
     usage: number;
@@ -108,6 +113,30 @@ export function DownloadPage({
   });
   const [activeBundleId, setActiveBundleId] = useState<BundleId | null>(null);
   const [clearingBundleId, setClearingBundleId] = useState<BundleId | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void loadCoreOfflineUrls()
+      .then((urls) => {
+        if (cancelled) {
+          return;
+        }
+        setCoreUrls(urls);
+        setCorePreparationError(null);
+      })
+      .catch(() => {
+        if (cancelled) {
+          return;
+        }
+        setCoreUrls([]);
+        setCorePreparationError("Could not prepare the production app shell.");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -135,13 +164,16 @@ export function DownloadPage({
         description:
           "Bible text, concordance, cross references, dictionaries, genealogy, and the app shell needed for offline study.",
         icon: HardDriveDownloadIcon,
-        urls: [
-          ...CORE_OFFLINE_URLS,
-          `/references/genealogy.compact.min.json?v=${GENEALOGY_ASSET_VERSION}`,
-          `/references/strongs-greek.compact.min.json?v=${STRONGS_ASSET_VERSION}`,
-          `/references/strongs-hebrew.compact.min.json?v=${STRONGS_ASSET_VERSION}`,
-        ],
+        urls: coreUrls
+          ? [
+              ...coreUrls,
+              `/references/genealogy.compact.min.json?v=${GENEALOGY_ASSET_VERSION}`,
+              `/references/strongs-greek.compact.min.json?v=${STRONGS_ASSET_VERSION}`,
+              `/references/strongs-hebrew.compact.min.json?v=${STRONGS_ASSET_VERSION}`,
+            ]
+          : [],
         sizeLabel: CORE_SIZE_LABEL,
+        preparationError: corePreparationError,
       },
       {
         id: "maps",
@@ -171,7 +203,7 @@ export function DownloadPage({
     ];
 
     return definitions;
-  }, [books, mapUrls]);
+  }, [books, corePreparationError, coreUrls, mapUrls]);
 
   const totalCachedFiles = useMemo(
     () =>
@@ -388,7 +420,7 @@ export function DownloadPage({
           const percent = bundleCachedPercent(status);
           const downloadPercent = bundleDownloadPercent(status);
           const Icon = bundle.icon;
-          const isReady = bundle.urls.length > 0;
+          const isReady = bundle.urls.length > 0 && !bundle.preparationError;
           const statusLabel = bundleStatusLabel(status);
           const isFullyCached = status.cached === status.total && status.total > 0;
 
@@ -454,10 +486,12 @@ export function DownloadPage({
                     {status.downloading ? `${downloadPercent}%` : `${percent}%`}
                   </span>
                 </Progress>
-                {status.error ? (
-                  <p className="text-xs text-destructive">{status.error}</p>
+                {status.error || bundle.preparationError ? (
+                  <p className="text-xs text-destructive">
+                    {status.error ?? bundle.preparationError}
+                  </p>
                 ) : null}
-                {!isReady ? (
+                {!isReady && !bundle.preparationError ? (
                   <p className="text-xs text-muted-foreground">Preparing asset list…</p>
                 ) : null}
                 <div className="flex flex-wrap items-center gap-3">

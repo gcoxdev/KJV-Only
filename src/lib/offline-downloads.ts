@@ -3,8 +3,18 @@ import { bookCodeForIndex } from "@/lib/reader-view";
 
 const FALLBACK_CACHE_CONFIG = {
   cachePrefix: "kjv-only-cache-",
-  cacheName: "kjv-only-cache-v6",
+  cacheName: "kjv-only-cache-v7",
 } as const;
+
+const APP_SHELL_ASSET_MANIFEST_URL = "/app-shell-assets.json";
+const APP_SHELL_ASSET_URL_PATTERN =
+  /^\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*(?:\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/;
+
+type AppShellAssetManifest = {
+  schemaVersion: 1;
+  startupAssets: string[];
+  assets: string[];
+};
 
 function getAppCacheConfig() {
   return globalThis.KJV_ONLY_CACHE_CONFIG ?? FALLBACK_CACHE_CONFIG;
@@ -16,6 +26,7 @@ export const CORE_OFFLINE_URLS = [
   "/manifest.webmanifest",
   "/sw.js",
   "/app-cache-config.js",
+  APP_SHELL_ASSET_MANIFEST_URL,
   "/icons/app-icon.svg",
   "/data/kjv-manifest.json",
   "/data/kjv-bootstrap.json",
@@ -30,6 +41,54 @@ export const CORE_OFFLINE_URLS = [
   "/references/phrases.json",
   "/references/units.json",
 ] as const;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isAppShellAssetList(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.length <= 500 &&
+    value.every(
+      (url) => typeof url === "string" && APP_SHELL_ASSET_URL_PATTERN.test(url),
+    ) &&
+    new Set(value).size === value.length
+  );
+}
+
+export function parseAppShellAssetManifest(value: unknown): AppShellAssetManifest {
+  if (
+    !isRecord(value) ||
+    value.schemaVersion !== 1 ||
+    !isAppShellAssetList(value.startupAssets) ||
+    !isAppShellAssetList(value.assets)
+  ) {
+    throw new Error("Invalid app-shell asset manifest");
+  }
+
+  const assetSet = new Set(value.assets);
+  if (!value.startupAssets.every((url) => assetSet.has(url))) {
+    throw new Error("Invalid app-shell startup asset");
+  }
+
+  return {
+    schemaVersion: 1,
+    startupAssets: value.startupAssets,
+    assets: value.assets,
+  };
+}
+
+export async function loadCoreOfflineUrls() {
+  const response = await fetch(APP_SHELL_ASSET_MANIFEST_URL, {
+    cache: "no-cache",
+  });
+  if (!response.ok) {
+    throw new Error(`Could not load app-shell assets (HTTP ${response.status})`);
+  }
+  const manifest = parseAppShellAssetManifest(await response.json());
+  return Array.from(new Set([...CORE_OFFLINE_URLS, ...manifest.assets]));
+}
 
 export function buildAudioUrls(books: Book[], range: "old" | "new") {
   const startIndex = range === "old" ? 0 : 39;
@@ -132,7 +191,10 @@ export async function deleteOfflineAssetBatch(urls: string[]) {
   const cache = await openAppCache();
   for (const url of urls) {
     const absoluteUrl = new URL(url, window.location.origin).toString();
-    await cache.delete(absoluteUrl, { ignoreSearch: false });
+    await cache.delete(absoluteUrl, {
+      ignoreSearch: false,
+      ignoreVary: true,
+    });
   }
 }
 

@@ -22,7 +22,7 @@ The `build:*` scripts in `package.json` produce Bible and reference artifacts. `
 
 ## Offline lifecycle
 
-`public/app-cache-config.js` is the single cache-name/version source shared by the application and service worker. The current cache is `kjv-only-cache-v6`, which includes the local corpus manifest and bootstrap in the core offline package. Increment its version whenever the application shell or cache contract becomes incompatible. Old caches are deleted only when their name starts with `kjv-only-cache-`; caches and service workers owned by other same-origin applications are untouched.
+`public/app-cache-config.js` is the single cache-name/version source shared by the application and service worker. The current cache is `kjv-only-cache-v7`, which includes the local corpus manifest, bootstrap, and generated production asset manifest in the core offline package. The build writes `app-shell-assets.json` from the exact hashed files in `dist/assets`; the service worker caches the startup subset, while an explicit Core Bible Data download caches the complete generated shell so lazy tools remain available after an offline reload. Increment the cache version whenever the application shell or cache contract becomes incompatible. Old caches are deleted only when their name starts with `kjv-only-cache-`; caches and service workers owned by other same-origin applications are untouched.
 
 Core references, maps, and Old/New Testament audio remain separate user-selected packages. Cache only complete HTTP 200 responses; range responses stay network-only. A release changing cache behavior must test install, refresh, offline navigation, partial failure, clear, and upgrade from the preceding cache version.
 

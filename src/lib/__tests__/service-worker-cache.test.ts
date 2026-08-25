@@ -10,11 +10,11 @@ describe("service-worker cache policy", () => {
   it("only removes obsolete caches owned by this application", () => {
     expect(
       findObsoleteAppCaches(
-        ["kjv-only-cache-v5", "kjv-only-cache-v6", "another-app-v1"],
+        ["kjv-only-cache-v6", "kjv-only-cache-v7", "another-app-v1"],
         "kjv-only-cache-",
-        "kjv-only-cache-v6"
+        "kjv-only-cache-v7"
       )
-    ).toEqual(["kjv-only-cache-v5"]);
+    ).toEqual(["kjv-only-cache-v6"]);
   });
 
   it("does not cache partial responses", () => {
