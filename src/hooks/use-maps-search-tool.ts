@@ -107,6 +107,13 @@ export function useMapsSearchTool() {
     [ensureAncientMapsLoaded],
   );
 
+  const resetTransientState = useCallback(() => {
+    setMapsError(null);
+    setIsMapsLoading(false);
+    setIsMapsSearching(false);
+    setSelectedMapsEntries([]);
+  }, []);
+
   return {
     ancientMaps,
     mapsSearchTerm,
@@ -123,5 +130,6 @@ export function useMapsSearchTool() {
     setSelectedMapsEntries,
     ensureAncientMapsLoaded,
     applyMapsSearch,
+    resetTransientState,
   };
 }
