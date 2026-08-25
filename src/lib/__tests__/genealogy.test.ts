@@ -1,10 +1,96 @@
 import { describe, expect, it } from "vitest";
 
 import { decodeGenealogyPayload, enrichGenealogyPayload } from "@/lib/genealogy";
+import { encodeGenealogyPayload } from "@/lib/genealogy-compact";
 import type { Book } from "@/types/bible";
-import type { GenealogyCompactPayload } from "@/types/reader";
+import type {
+  GenealogyCompactPayload,
+  GenealogyPayload,
+} from "@/types/reader";
 
 describe("decodeGenealogyPayload", () => {
+  it("round-trips an already enriched payload without legacy bucket merging", () => {
+    const enriched = [
+      {
+        id: "jesus_christ",
+        names: ["Jesus Christ", "Jesus", "Christ"],
+        gender: "male",
+        verses: {
+          byName: [
+            {
+              name: "Jesus",
+              verses: ["MAT.1.1"],
+              numOccurrences: 1,
+              numVerses: 1,
+            },
+            {
+              name: "Christ",
+              verses: ["ROM.5.8"],
+              numOccurrences: 1,
+              numVerses: 1,
+            },
+            {
+              name: "Jesus Christ",
+              verses: ["ROM.5.9"],
+              numOccurrences: 1,
+              numVerses: 1,
+            },
+          ],
+          totalOccurrences: 1,
+          totalVerses: 1,
+          first: "ROM.5.9",
+        },
+      },
+    ];
+
+    const compact = encodeGenealogyPayload(enriched, "test-enriched");
+
+    expect(decodeGenealogyPayload(compact)).toEqual(enriched);
+  });
+
+  it("preserves enriched ordering, display names, and explicit undefined values", () => {
+    const enriched = [
+      {
+        id: "child",
+        names: ["Child"],
+        verses: {
+          byName: [
+            {
+              name: "Child",
+              verses: ["ROM.5.8", "MAT.1.1"],
+              numOccurrences: 2,
+              numVerses: 2,
+            },
+          ],
+          totalOccurrences: 2,
+          totalVerses: 2,
+          first: "MAT.1.1",
+        },
+        father: { id: "parent", name: "Father display name" },
+        spouses: [
+          {
+            id: "spouse",
+            name: "Spouse display name",
+            verse: "MAT.1.1",
+          },
+        ],
+      },
+      {
+        id: "parent",
+        names: ["Canonical parent name"],
+        verses: undefined,
+      },
+      {
+        id: "spouse",
+        names: ["Canonical spouse name"],
+      },
+    ] satisfies GenealogyPayload;
+
+    const compact = encodeGenealogyPayload(enriched, "test-enriched");
+
+    expect(decodeGenealogyPayload(compact)).toEqual(enriched);
+  });
+
   it("decodes names, relationships, and delta-encoded references", () => {
     const compact: GenealogyCompactPayload = {
       v: ["GEN.1.1", "GEN.1.2", "GEN.1.3"],

@@ -149,6 +149,61 @@ test("loads study-word tools progressively without blocking the reader", async (
   expect(measures.allTools).toBeLessThan(15_000)
 })
 
+test.describe("study-data corpus isolation", () => {
+  test.use({ serviceWorkers: "block" })
+
+  test("loads genealogy-name study data without waiting for the full corpus", async ({
+    page,
+  }) => {
+    let releaseCorpus: () => void = () => {}
+    const corpusGate = new Promise<void>((resolve) => {
+      releaseCorpus = resolve
+    })
+    await page.route("**/data/kjv.json", async (route) => {
+      await corpusGate
+      await route.continue()
+    })
+
+    await page.goto("/")
+    try {
+      await expectReaderReady(page)
+      await page.evaluate(() => {
+        performance.clearMeasures("kjv:study-word-all-tools")
+      })
+
+      await page
+        .getByRole("button", { name: "Details for God", exact: true })
+        .first()
+        .click()
+
+      await expect
+        .poll(() =>
+          page.evaluate(
+            () =>
+              performance.getEntriesByName("kjv:study-word-all-tools").at(-1)
+                ?.duration,
+          ),
+        )
+        .toBeTruthy()
+      await expect(
+        page.getByRole("button", { name: "View Tree", exact: true }),
+      ).toBeVisible()
+
+      const measures = await page.evaluate(() => ({
+        allTools: performance
+          .getEntriesByName("kjv:study-word-all-tools")
+          .at(-1)?.duration,
+        corpusCount: performance.getEntriesByName("kjv:corpus-load").length,
+      }))
+      expect(measures.allTools).toBeGreaterThan(0)
+      expect(measures.allTools).toBeLessThan(10_000)
+      expect(measures.corpusCount).toBe(0)
+    } finally {
+      releaseCorpus()
+    }
+  })
+})
+
 test("clears transient study selections when read mode closes the tools", async ({
   page,
 }) => {

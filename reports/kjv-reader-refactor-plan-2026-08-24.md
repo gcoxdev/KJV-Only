@@ -3,11 +3,13 @@
 **Assessment date:** 2026-08-24
 **Committed baseline:** `cb46f04` (`refactor(reader): harden corpus lifecycle`)
 **Scope:** Reduce `KJVReader` orchestration risk and improve study-word responsiveness without changing product behavior.
-**Status:** Phase 1 is committed as `8879054`; Phase 2 is committed as `ee6689b`; Phase 4 is committed as `975039c`; Phase 5 is committed as `52cccc9`; Phase 6 is committed as `850972e`; Phase 7 is committed as `409e955`; Phase 8 is implemented and verified locally but remains uncommitted. Phase 3 remains intentionally deferred. Nothing has been pushed.
+**Status:** Phase 1 is committed as `8879054`; Phase 2 is committed as `ee6689b`; Phase 4 is committed as `975039c`; Phase 5 is committed as `52cccc9`; Phase 6 is committed as `850972e`; Phase 7 is committed as `409e955`; Phase 8 is committed as `c733b87`. Phase 3 is implemented and verified locally but remains uncommitted. Nothing has been pushed.
 
 ## Executive result
 
 `KJVReader` was 4,601 lines at the original committed baseline. Phase 1 moved the asynchronous word-study fan-out into `useWordStudyCoordinator`, removed duplicated work, and reduced the component to 4,259 lines. Phase 2 moved the remaining word-study matching algorithms into `word-study-selection.ts`, reducing `KJVReader` to 3,977 lines. Phase 4 moved panel preview, adjacency, split, move, group insertion, orientation, and close orchestration into `usePanelInteractionController`, reducing `KJVReader` to 3,578 lines. Phase 5 moved tab/tool orchestration and pending reader scrolling into focused hooks while retaining the tested destination engine in `usePanelRouting`, reducing `KJVReader` to 2,949 lines. Phase 6 moved final domain prop assembly behind view models and tab rendering behind a memoized workspace boundary, reducing `KJVReader` to 2,879 lines. Phase 7 moved startup, PWA installation, guided-tour, completion-celebration, and import-control lifecycles behind focused boundaries, reducing `KJVReader` to 2,399 lines. Phase 8 isolates study-mode teardown and the remaining cohesive root lifecycles, reducing `KJVReader` to 2,245 lines. The composition root is 2,356 lines (51.2%) smaller than the baseline without changing its public behavior.
+
+Phase 3 now moves the last corpus-dependent concordance and genealogy enrichment out of the browser and into a reproducible build step. The runtime loaders fetch and decode the same public asset URLs without calling `loadKjvBooks()` or scanning the 73.6 MB corpus. Real-corpus generation is guarded by an exact payload-equivalence assertion, and a browser journey proves that a genealogy-name selection completes while the full-corpus response is deliberately held open.
 
 Phase 6's larger result is initial-load performance rather than line count. Settings, progress, study tools, topics, and bookmarks now retain their existing components and props but load their component modules on first use. The production entry JavaScript fell from 599,860 to 553,528 bytes: 46,332 bytes (7.7%) smaller, with 46,472 bytes of headroom under the unchanged 600,000-byte integrity budget.
 
@@ -25,9 +27,20 @@ After this slice, two fresh common-word runs produced:
 
 These are development-machine diagnostics, not universal device guarantees. The browser regression suite now records the same named measures and enforces conservative ceilings.
 
+Phase 3 removes the remaining runtime enrichment rather than merely optimizing it:
+
+| Phase 3 boundary | Before | Current |
+|---|---:|---:|
+| Concordance corpus scan, Node runtime-equivalent benchmark | ~123 ms | 0 ms in browser; precomputed during generation |
+| Genealogy corpus scan, Node runtime-equivalent benchmark | ~671 ms | 0 ms in browser; precomputed during generation |
+| Full corpus required before genealogy-name tools settle | Yes | No; Chromium test holds `/data/kjv.json` open until after all tools settle |
+| Production entry JavaScript | 556,187 bytes | 551,739 bytes |
+
+The enriched public assets add 450,208 raw bytes, but only about 84 KB across the two gzip-compressed responses. This is a deliberate transfer-for-CPU trade: it removes the full-corpus dependency and its repeated traversal from the latency-sensitive click path without introducing an external storage service or a second in-browser corpus copy.
+
 ## Graphify architecture map
 
-Graphify was refreshed after Phase 8. The current graph contains **3,233 nodes, 6,558 edges, and 204 communities**. `KJVReader()` remains the principal composition node with degree 59; that centrality now represents explicit composition links rather than ownership of the extracted lifecycle algorithms. The new Phase 8 nodes remain small and independently traceable: `useStudyModeLifecycle()` degree 4, `useReaderStorageWarning()` degree 4, `useFirstReaderReadyMeasure()` degree 4, `useTokenPopupDismissal()` degree 3, `useReaderLeafCleanup()` degree 5, and `useTopicsPreload()` degree 4.
+Graphify was refreshed after Phase 3. The current graph contains **3,253 nodes, 6,608 edges, and 205 communities**. `KJVReader()` remains the principal composition node; that centrality represents explicit composition links rather than ownership of the extracted lifecycle algorithms. The refreshed call graph separates the two paths: runtime hooks call `loadConcordance()` or `loadGenealogy()`, which fetch/decode the public assets, while only `scripts/build-study-enrichment.ts` calls `augmentConcordanceWithNormalizedWordForms()` and `enrichGenealogyPayload()` against the canonical corpus.
 
 ```mermaid
 flowchart TD
@@ -86,7 +99,14 @@ flowchart TD
     Coordinator --> Data
     Selection --> References[Normalized reference indexes]
     Data --> Assets[Runtime reference assets]
-    Data --> Corpus[KJV corpus]
+    Controller --> Corpus[KJV corpus]
+
+    Build[Build-time study enrichment] --> Corpus
+    Build --> ConcordanceEnrichment[Concordance normalization]
+    Build --> GenealogyEnrichment[Genealogy corpus enrichment]
+    GenealogyEnrichment --> CompactEncoder[Equivalent compact encoding]
+    ConcordanceEnrichment --> Assets
+    CompactEncoder --> Assets
 
     PanelController --> Layout[Pure reader-layout commands]
     PanelController --> Neighbors[Model and DOM neighbor geometry]
@@ -124,7 +144,7 @@ The graph confirms that extraction alone does not remove `KJVReader` centrality:
 
 The study fan-out covers about 18 MB of raw JSON across concordance, cross references, dictionaries, Strong's, genealogy, and maps. Module-level loader promises already prevent duplicate network fetches after the first request. The remaining performance work is therefore mainly about parsing, matching, main-thread CPU, and when React is asked to build derived indexes.
 
-Concordance and genealogy still depend on the complete corpus for runtime enrichment. Common non-name words now avoid genealogy enrichment, but name selections still pay that cost. This is the next meaningful performance boundary.
+Concordance and genealogy no longer depend on the complete corpus for runtime enrichment. Their loaders fetch the existing runtime URLs directly; full-corpus scanning and compact re-encoding now occur only in the build script. The reader still hydrates the canonical corpus in the background for normal Bible navigation, but study-data completion is no longer gated by that independent lifecycle.
 
 ## Current KJVReader responsibility map
 
@@ -176,16 +196,27 @@ Phase result: 282 additional lines removed from `KJVReader` (3,977 lines current
 
 ### Phase 3 — remove corpus-dependent enrichment from the UI thread
 
-**Status: intentionally deferred.**
+**Status: implemented and verified locally; awaiting review/commit approval.**
 
-Choose one of these compatibility-preserving implementations after profiling representative low-end devices:
+The preferred build-time boundary is implemented without S3, a CDN, or public URL changes:
 
-1. **Build-time enrichment (preferred):** produce versioned, already-enriched concordance and genealogy runtime assets, validate them against the canonical corpus during generation, and keep current public URLs or provide an atomic manifest migration.
-2. **Dedicated study-data worker:** parse and enrich in a worker, return the existing payload contracts, support cancellation/stale generations, and avoid retaining a second full corpus in memory longer than necessary.
+- `scripts/build-study-enrichment.ts` reads the tracked canonical corpus and current compact assets, performs the former runtime enrichment, and writes atomically.
+- `src/lib/concordance-enrichment.ts` owns the unchanged normalized-hyphen concordance algorithm. The runtime concordance loader now fetches the already-enriched asset directly.
+- `src/lib/genealogy-compact.ts` encodes the exact enriched `GenealogyPayload` back into the compact transport contract. Enrichment metadata preserves relationship display names, explicit `verses: undefined` properties, first-reference index zero, and original per-name reference ordering.
+- The genealogy asset carries an enrichment-version marker. Legacy compact assets retain the existing decode repairs; marked assets skip those repairs because their final buckets are already materialized.
+- `build:concordance` and `build:genealogy` finish with the enrichment step, and `build:study-enrichment` can verify/regenerate the two tracked runtime assets together.
+- Generation decodes the newly encoded genealogy payload and requires strict deep equality with the former runtime-enriched payload before replacing the asset.
 
-Build-time assets offer the lowest runtime CPU and memory cost. A worker is the safer interim choice if generator provenance or deployment compatibility prevents an asset-format migration. No S3/CDN move is required for either option.
+Real-data dry runs pass with 254 concordance entries enriched and all 3,151 genealogy people round-tripped exactly. A second dry run over the generated assets reports zero concordance changes, a zero-millisecond genealogy enrichment branch, and the same strict payload equivalence. Unit coverage also characterizes non-canonical reference order, relationship display-name overrides, legacy bucket behavior, explicit undefined fields, and zero-valued compact indexes.
 
-Exit evidence: exact payload-equivalence tests, genealogy-name E2E coverage, no main-thread long task over the agreed budget, and unchanged runtime URL/manifest behavior.
+The unchanged runtime paths are:
+
+- `/references/concordance.compact.delta.min.json`;
+- `/references/genealogy.compact.min.json?v=<enrichment-version>`.
+
+The new Chromium journey disables service workers, holds `/data/kjv.json` unresolved, selects `God` in Genesis 1:1, waits for the complete study fan-out, and verifies visible genealogy details before releasing the corpus request. This directly guards the latency regression that Phase 3 removes.
+
+Phase result: typecheck, full lint, all 240 unit tests, 15 development-browser tests plus the expected production-only skip, all 16 production-preview browser tests, the production build/distribution checks, generation idempotence, strict real-corpus payload equivalence, and `git diff --check` pass. A complete Codex Security working-tree review covered all 14 changed code/artifact surfaces and reported no findings. The production entry script is 551,739 bytes, 48,261 bytes below the unchanged integrity budget.
 
 ### Phase 4 — panel interaction controller
 
@@ -260,7 +291,7 @@ Phase result: 480 additional lines removed from `KJVReader` (2,399 lines current
 
 ### Phase 8 — study teardown and residual lifecycle ownership
 
-**Status: implemented and verified locally; awaiting review/commit approval.**
+**Status: committed as `c733b87`.**
 
 The large study-mode teardown effect is now coordinated by `useStudyModeLifecycle`. Each participating data hook owns one stable transient-reset callback:
 
@@ -317,4 +348,4 @@ Commits and pushes remain approval-gated. Related phases should be batched into 
 
 ## Immediate next recommendation
 
-Review Phase 8 as one cohesive compatibility-preserving change and commit it only after approval. The planned structural refactor is complete: `KJVReader` is inside its target range, its remaining two inline effects are local synchronization rules, and further line-count-driven extraction is not recommended. The next meaningful engineering option is the intentionally deferred Phase 3 corpus-enrichment work for genealogy-name selections. That work should remain a separate performance project with payload-equivalence tests and representative device profiling before choosing build-time enrichment or a worker boundary.
+Review Phase 3 as one cohesive compatibility-preserving performance change and commit it only after approval. The planned structural refactor and the repository-local study-data optimization are then complete: `KJVReader` is inside its target range, its remaining two inline effects are local synchronization rules, and its concordance/genealogy loaders no longer scan or wait for the full corpus. Further line-count-driven extraction is not recommended. The next work should be a formal release-candidate pass on representative mobile/low-end hardware, including the manual study-tool, offline-package, zoom, high-contrast, and reduced-motion matrix already identified in the main assessment.

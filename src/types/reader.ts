@@ -85,6 +85,9 @@ export type GenealogyPerson = {
 export type GenealogyPayload = GenealogyPerson[];
 
 export type GenealogyCompactPayload = {
+  x?: string;
+  n?: Record<string, string>;
+  u?: string[];
   v: string[];
   w: string[];
   p: Array<

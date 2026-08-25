@@ -1,5 +1,5 @@
-import type { Book } from "@/types/bible";
-import { chapterVerseKey, normalizeConcordanceWord } from "@/lib/references";
+import { chapterVerseKey, normalizeConcordanceWord } from "./references.ts";
+import type { Book } from "../types/bible.ts";
 import type {
   GenealogyCompactPayload,
   GenealogyParentRef,
@@ -7,7 +7,9 @@ import type {
   GenealogyPerson,
   GenealogyRelation,
   GenealogyVerseByName,
-} from "@/types/reader";
+} from "../types/reader.ts";
+
+export const GENEALOGY_ENRICHMENT_VERSION = "20260824-build-1";
 
 function expandDelta(values: number[]) {
   let runningTotal = 0;
@@ -63,13 +65,14 @@ function decodeRelation(
   const id = resolveReferencedPersonId(peopleById, rawId) ?? rawId;
   return {
     id,
-    name: peopleById.get(id)?.names[0] ?? id,
+    name: compact.n?.[id] ?? peopleById.get(id)?.names[0] ?? id,
     verse:
       typeof verseIndex === "number" && verseIndex >= 0 ? compact.v[verseIndex] : undefined,
   };
 }
 
 function decodeParent(
+  compact: GenealogyCompactPayload,
   peopleById: Map<string, GenealogyPerson>,
   parentId: string | undefined,
 ): GenealogyParentRef | undefined {
@@ -79,7 +82,7 @@ function decodeParent(
   }
   return {
     id,
-    name: peopleById.get(id)?.names[0] ?? id,
+    name: compact.n?.[id] ?? peopleById.get(id)?.names[0] ?? id,
   };
 }
 
@@ -305,6 +308,7 @@ function canonicalizeGenealogyPersonNames(
 }
 
 export function decodeGenealogyPayload(compact: GenealogyCompactPayload): GenealogyPayload {
+  const isCorpusEnriched = Boolean(compact.x);
   const people = compact.p.map((personValue): GenealogyPerson => {
     const [
       id,
@@ -356,6 +360,7 @@ export function decodeGenealogyPayload(compact: GenealogyCompactPayload): Geneal
       const allVerses = dedupeReferences(byName.flatMap((entry) => entry.verses));
       const primaryName = names[0] ?? "";
       if (
+        !isCorpusEnriched &&
         primaryName &&
         !byName.some((entry) => entry.name === primaryName && entry.verses.length > 0) &&
         allVerses.length > 0
@@ -368,7 +373,11 @@ export function decodeGenealogyPayload(compact: GenealogyCompactPayload): Geneal
         });
       }
 
-      if (names.includes("Jesus Christ") && allVerses.length > 0) {
+      if (
+        !isCorpusEnriched &&
+        names.includes("Jesus Christ") &&
+        allVerses.length > 0
+      ) {
         upsertByNameEntry(byName, {
           name: "Jesus Christ",
           verses: allVerses,
@@ -434,8 +443,8 @@ export function decodeGenealogyPayload(compact: GenealogyCompactPayload): Geneal
     const siblings = compactPerson[7] ?? [];
     const children = compactPerson[8] ?? [];
 
-    person.father = decodeParent(peopleById, person.father?.id);
-    person.mother = decodeParent(peopleById, person.mother?.id);
+    person.father = decodeParent(compact, peopleById, person.father?.id);
+    person.mother = decodeParent(compact, peopleById, person.mother?.id);
     if (Array.isArray(spouses) && spouses.length > 0) {
       person.spouses = spouses.map((relation) =>
         decodeRelation(compact, peopleById, relation),
@@ -450,6 +459,9 @@ export function decodeGenealogyPayload(compact: GenealogyCompactPayload): Geneal
       person.children = children.map((relation) =>
         decodeRelation(compact, peopleById, relation),
       );
+    }
+    if (compact.u?.includes(person.id)) {
+      person.verses = undefined;
     }
   }
 
