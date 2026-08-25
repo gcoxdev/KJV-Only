@@ -10,6 +10,7 @@ const REQUIRED_PATHS = [
   "manifest.webmanifest",
   "sw.js",
   "app-cache-config.js",
+  "app-shell-assets.json",
   "data/kjv-bootstrap.json",
   "data/kjv.json",
   "data/kjv-manifest.json",
@@ -110,6 +111,43 @@ const entryJavaScript = files.find((file) =>
 const entryCss = files.find((file) =>
   /\/assets\/index-[^/]+\.css$/.test(file.path),
 );
+
+try {
+  const manifest = JSON.parse(
+    await fs.readFile(path.join(DIST_DIR, "app-shell-assets.json"), "utf8"),
+  );
+  const assetUrls = files
+    .map((file) => `/${path.relative(DIST_DIR, file.path).split(path.sep).join("/")}`)
+    .filter((url) => url.startsWith("/assets/"))
+    .sort();
+  const assetUrlPattern =
+    /^\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*(?:\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/;
+  if (
+    !manifest ||
+    typeof manifest !== "object" ||
+    Array.isArray(manifest) ||
+    manifest.schemaVersion !== 1 ||
+    !Array.isArray(manifest.assets) ||
+    !Array.isArray(manifest.startupAssets) ||
+    new Set(manifest.assets).size !== manifest.assets.length ||
+    new Set(manifest.startupAssets).size !== manifest.startupAssets.length ||
+    !manifest.assets.every(
+      (url) => typeof url === "string" && assetUrlPattern.test(url),
+    ) ||
+    !manifest.startupAssets.every(
+      (url) => typeof url === "string" && assetUrlPattern.test(url),
+    ) ||
+    JSON.stringify(manifest.assets) !== JSON.stringify(assetUrls) ||
+    manifest.startupAssets.length === 0 ||
+    !manifest.startupAssets.every((url) => assetUrls.includes(url))
+  ) {
+    failures.push("Invalid or incomplete app-shell asset manifest");
+  }
+} catch (error) {
+  failures.push(
+    `Could not validate app-shell asset manifest: ${error instanceof Error ? error.message : String(error)}`,
+  );
+}
 
 try {
   const manifest = JSON.parse(

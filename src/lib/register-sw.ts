@@ -1,3 +1,27 @@
+type ServiceWorkerCacheConfig = {
+  cacheName: string
+  cachePrefix: string
+}
+
+export function buildServiceWorkerScriptUrl(
+  origin: string,
+  config: ServiceWorkerCacheConfig,
+) {
+  const url = new URL("/sw.js", origin)
+  url.searchParams.set("cacheName", config.cacheName)
+  url.searchParams.set("cachePrefix", config.cachePrefix)
+  return url.href
+}
+
+export function isAppServiceWorkerScriptUrl(scriptUrl: string, origin: string) {
+  try {
+    const url = new URL(scriptUrl)
+    return url.origin === origin && url.pathname === "/sw.js"
+  } catch {
+    return false
+  }
+}
+
 export function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) {
     return
@@ -6,14 +30,17 @@ export function registerServiceWorker() {
   // Service workers should not run in Vite dev mode because they can cache
   // module/chunk responses and break HMR or load mismatched React bundles.
   if (import.meta.env.DEV) {
-    const appServiceWorkerUrl = new URL("/sw.js", window.location.origin).href
     void navigator.serviceWorker.getRegistrations().then((registrations) => {
       const appRegistrations = registrations.filter((registration) =>
         [
           registration.active?.scriptURL,
           registration.installing?.scriptURL,
           registration.waiting?.scriptURL,
-        ].includes(appServiceWorkerUrl),
+        ].some(
+          (scriptUrl) =>
+            typeof scriptUrl === "string" &&
+            isAppServiceWorkerScriptUrl(scriptUrl, window.location.origin),
+        ),
       )
       void Promise.all(
         appRegistrations.map((registration) => registration.unregister()),
@@ -37,6 +64,12 @@ export function registerServiceWorker() {
   }
 
   window.addEventListener("load", () => {
-    void navigator.serviceWorker.register("/sw.js")
+    const config = globalThis.KJV_ONLY_CACHE_CONFIG
+    if (!config) {
+      return
+    }
+    void navigator.serviceWorker.register(
+      buildServiceWorkerScriptUrl(window.location.origin, config),
+    )
   })
 }

@@ -110,6 +110,18 @@ function runtimePublicAssets(): Plugin {
     })
   }
 
+  function installDevelopmentManifestMiddleware(middlewares: Connect.Server) {
+    middlewares.use((request, response, next) => {
+      if (request.url?.split(/[?#]/, 1)[0] !== "/app-shell-assets.json") {
+        next()
+        return
+      }
+      response.statusCode = 200
+      response.setHeader("content-type", "application/json; charset=utf-8")
+      response.end('{"schemaVersion":1,"startupAssets":[],"assets":[]}\n')
+    })
+  }
+
   async function collectCopyTasks(
     source: string,
     destination: string,
@@ -171,9 +183,46 @@ function runtimePublicAssets(): Plugin {
     )
   }
 
+  async function collectGeneratedAssetUrls(directory: string): Promise<string[]> {
+    const urls: string[] = []
+    for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
+      const absolute = path.join(directory, entry.name)
+      if (entry.isDirectory()) {
+        urls.push(...(await collectGeneratedAssetUrls(absolute)))
+      } else if (entry.isFile()) {
+        urls.push(`/${path.relative(outputDirectory, absolute).split(path.sep).join("/")}`)
+      }
+    }
+    return urls
+  }
+
+  async function writeAppShellAssetManifest() {
+    const assets = (await collectGeneratedAssetUrls(path.join(outputDirectory, "assets")))
+      .sort()
+    const indexHtml = await fs.readFile(path.join(outputDirectory, "index.html"), "utf8")
+    const assetSet = new Set(assets)
+    const startupAssets = Array.from(
+      new Set(
+        Array.from(
+          indexHtml.matchAll(/\b(?:href|src)=["'](\/assets\/[^"']+)["']/g),
+          (match) => match[1],
+        ).filter((url) => assetSet.has(url)),
+      ),
+    ).sort()
+    const manifestPath = path.join(outputDirectory, "app-shell-assets.json")
+    const temporaryPath = `${manifestPath}.tmp`
+    await fs.writeFile(
+      temporaryPath,
+      `${JSON.stringify({ schemaVersion: 1, startupAssets, assets })}\n`,
+      "utf8",
+    )
+    await fs.rename(temporaryPath, manifestPath)
+  }
+
   return {
     name: "runtime-public-assets",
     configureServer(server) {
+      installDevelopmentManifestMiddleware(server.middlewares)
       installRuntimeAssetMiddleware(server.middlewares)
     },
     configurePreviewServer(server) {
@@ -184,6 +233,7 @@ function runtimePublicAssets(): Plugin {
     },
     async closeBundle() {
       await copyRuntimeEntries()
+      await writeAppShellAssetManifest()
     },
   }
 }

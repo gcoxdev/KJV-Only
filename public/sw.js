@@ -1,13 +1,25 @@
-importScripts("/app-cache-config.js")
-
-const { cacheName: APP_CACHE, cachePrefix: APP_CACHE_PREFIX } =
-  self.KJV_ONLY_CACHE_CONFIG
+const workerUrl = new URL(self.location.href)
+const APP_CACHE = workerUrl.searchParams.get("cacheName")
+const APP_CACHE_PREFIX = workerUrl.searchParams.get("cachePrefix")
+const CACHE_TOKEN_PATTERN = /^[a-z0-9][a-z0-9._-]{0,99}$/
+if (
+  !APP_CACHE ||
+  !APP_CACHE_PREFIX ||
+  !CACHE_TOKEN_PATTERN.test(APP_CACHE) ||
+  !CACHE_TOKEN_PATTERN.test(APP_CACHE_PREFIX) ||
+  !APP_CACHE.startsWith(APP_CACHE_PREFIX)
+) {
+  throw new Error("Invalid service-worker cache configuration")
+}
 const APP_SHELL = [
   "/",
   "/index.html",
   "/manifest.webmanifest",
   "/app-cache-config.js",
+  "/app-shell-assets.json",
 ]
+const APP_SHELL_ASSET_URL_PATTERN =
+  /^\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*(?:\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/
 const LIVE_DATA_PREFIXES = ["/references/", "/data/", "/maps/"]
 
 function shouldUseNetworkFirst(requestUrl) {
@@ -23,6 +35,37 @@ function shouldCacheResponse(response) {
   return response.status === 200
 }
 
+function isAssetList(value) {
+  return (
+    Array.isArray(value) &&
+    value.length <= 500 &&
+    value.every(
+      (url) => typeof url === "string" && APP_SHELL_ASSET_URL_PATTERN.test(url)
+    ) &&
+    new Set(value).size === value.length
+  )
+}
+
+async function cacheAppShell() {
+  const cache = await caches.open(APP_CACHE)
+  await cache.addAll(APP_SHELL)
+  const response = await cache.match("/app-shell-assets.json")
+  const manifest = await response?.json()
+  if (
+    !manifest ||
+    manifest.schemaVersion !== 1 ||
+    !isAssetList(manifest.startupAssets) ||
+    !isAssetList(manifest.assets)
+  ) {
+    throw new Error("Invalid app-shell asset manifest")
+  }
+  const assetSet = new Set(manifest.assets)
+  if (!manifest.startupAssets.every((url) => assetSet.has(url))) {
+    throw new Error("Invalid app-shell startup asset")
+  }
+  await cache.addAll(manifest.startupAssets)
+}
+
 async function networkFirst(request) {
   const cache = await caches.open(APP_CACHE)
   let response
@@ -30,7 +73,7 @@ async function networkFirst(request) {
   try {
     response = await fetch(request)
   } catch {
-    const cached = await cache.match(request)
+    const cached = await cache.match(request, { ignoreVary: true })
     return cached || Response.error()
   }
 
@@ -46,7 +89,7 @@ async function networkFirst(request) {
 
 async function cacheFirst(request) {
   const cache = await caches.open(APP_CACHE)
-  const cached = await cache.match(request)
+  const cached = await cache.match(request, { ignoreVary: true })
   if (cached) {
     return cached
   }
@@ -64,9 +107,7 @@ async function cacheFirst(request) {
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(APP_CACHE)
-      .then((cache) => cache.addAll(APP_SHELL))
+    cacheAppShell()
       .then(() => self.skipWaiting())
   )
 })

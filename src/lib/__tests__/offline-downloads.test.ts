@@ -1,6 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { buildAudioUrls } from "@/lib/offline-downloads";
+import {
+  CORE_OFFLINE_URLS,
+  buildAudioUrls,
+  deleteOfflineAssetBatch,
+  loadCoreOfflineUrls,
+  parseAppShellAssetManifest,
+} from "@/lib/offline-downloads";
 import type { Book } from "@/types/bible";
 
 function book(name: string, chapterCount: number): Book {
@@ -32,5 +38,98 @@ describe("buildAudioUrls", () => {
 
     expect(buildAudioUrls(books, "old")).toHaveLength(39);
     expect(buildAudioUrls(books, "new")).toEqual(["/audio/MAT.1.mp3"]);
+  });
+});
+
+describe("app-shell offline manifest", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("accepts a bounded same-origin asset manifest", () => {
+    expect(
+      parseAppShellAssetManifest({
+        schemaVersion: 1,
+        startupAssets: ["/assets/index-abc.js"],
+        assets: ["/assets/index-abc.js", "/assets/chunks/tool-def.css"],
+      }),
+    ).toEqual({
+      schemaVersion: 1,
+      startupAssets: ["/assets/index-abc.js"],
+      assets: ["/assets/index-abc.js", "/assets/chunks/tool-def.css"],
+    });
+  });
+
+  it("rejects unsafe, duplicate, or unrelated startup assets", () => {
+    expect(() =>
+      parseAppShellAssetManifest({
+        schemaVersion: 1,
+        startupAssets: [],
+        assets: ["/assets/../secret.js"],
+      }),
+    ).toThrow("Invalid app-shell asset manifest");
+    expect(() =>
+      parseAppShellAssetManifest({
+        schemaVersion: 1,
+        startupAssets: [],
+        assets: ["/assets/a.js", "/assets/a.js"],
+      }),
+    ).toThrow("Invalid app-shell asset manifest");
+    expect(() =>
+      parseAppShellAssetManifest({
+        schemaVersion: 1,
+        startupAssets: ["/assets/start.js"],
+        assets: ["/assets/lazy.js"],
+      }),
+    ).toThrow("Invalid app-shell startup asset");
+  });
+
+  it("expands the core package with every generated asset", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          schemaVersion: 1,
+          startupAssets: ["/assets/index-abc.js"],
+          assets: ["/assets/index-abc.js", "/assets/index-def.css"],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(loadCoreOfflineUrls()).resolves.toEqual([
+      ...CORE_OFFLINE_URLS,
+      "/assets/index-abc.js",
+      "/assets/index-def.css",
+    ]);
+    expect(fetchMock).toHaveBeenCalledWith("/app-shell-assets.json", {
+      cache: "no-cache",
+    });
+  });
+
+  it("fails closed when the production manifest is unavailable", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response(null, { status: 503 })),
+    );
+
+    await expect(loadCoreOfflineUrls()).rejects.toThrow(
+      "Could not load app-shell assets (HTTP 503)",
+    );
+  });
+
+  it("deletes owned assets regardless of cached Vary headers", async () => {
+    const deleteMock = vi.fn().mockResolvedValue(true);
+    vi.stubGlobal("window", { location: { origin: "https://reader.test" } });
+    vi.stubGlobal("caches", {
+      open: vi.fn().mockResolvedValue({ delete: deleteMock }),
+    });
+
+    await deleteOfflineAssetBatch(["/data/kjv.json?v=1"]);
+
+    expect(deleteMock).toHaveBeenCalledWith(
+      "https://reader.test/data/kjv.json?v=1",
+      { ignoreSearch: false, ignoreVary: true },
+    );
   });
 });

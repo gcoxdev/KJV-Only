@@ -21,11 +21,26 @@ test("upgrades and reads only application-owned caches", async ({ page, context 
   await expect(page.getByRole("button", { name: "Genesis 1", exact: true })).toBeVisible()
 
   await page.evaluate(async () => {
+    const config = (
+      globalThis as typeof globalThis & {
+        KJV_ONLY_CACHE_CONFIG?: {
+          cacheName: string
+          cachePrefix: string
+        }
+      }
+    ).KJV_ONLY_CACHE_CONFIG
+    if (!config) {
+      throw new Error("Missing application cache configuration")
+    }
+    const workerUrl = new URL("/sw.js", window.location.origin)
+    workerUrl.searchParams.set("cacheName", config.cacheName)
+    workerUrl.searchParams.set("cachePrefix", config.cachePrefix)
+    workerUrl.searchParams.set("upgrade-test", "1")
     const registration = await navigator.serviceWorker.ready
     await registration.unregister()
     await caches.open("kjv-only-cache-obsolete-test")
     await caches.open("unrelated-application-cache")
-    await navigator.serviceWorker.register("/sw.js?upgrade-test=1")
+    await navigator.serviceWorker.register(workerUrl.href)
   })
 
   await expect
