@@ -23,10 +23,6 @@ import {
   consumeLocalStorageIssueKeys,
   LOCAL_STORAGE_ISSUE_EVENT,
 } from "@/lib/local-storage";
-import {
-  type ReferenceCommandAction,
-  type ReferenceCommandTarget,
-} from "@/lib/reference-command";
 import { resolveAIDictionaryKey } from "@/lib/references";
 import {
   deriveTokenAccordionState,
@@ -39,10 +35,7 @@ import {
 } from "@/lib/highlight-color";
 import { chapterProgressKey, panelViewportElement } from "@/lib/reader-view";
 import {
-  calculateReaderScrollTop,
-  dequeuePendingReaderScrollTarget,
   prunePendingReaderScrollTargets,
-  selectPendingReaderScrollTargetForActiveTab,
 } from "@/lib/reader-scroll-targets";
 import { clearSingleLeafReferenceIfMissing } from "@/lib/leaf-state";
 import {
@@ -55,6 +48,7 @@ import {
   updateSplitRatio,
 } from "@/lib/reader-layout";
 import type { LeafNeighbors } from "@/lib/reader-neighbors";
+import { panelNodeContainsView } from "@/lib/workspace-navigation";
 import { useLayoutHashSync } from "@/hooks/use-layout-hash-sync";
 import type {
   AIDictionaryEntry,
@@ -67,11 +61,9 @@ import type {
   OldEnglishPayload,
   PhraseEntry,
   PhrasesPayload,
-  PanelNode,
   ReaderTab,
   SplitOrientation,
   StrongsPayload,
-  StudyWorkspaceTool,
   TokenPopupState,
   UnitsEntry,
   UnitsPayload,
@@ -80,7 +72,7 @@ import type {
   WordVerseSelectionTarget,
   PendingReaderScrollTarget,
 } from "@/types/reader";
-import type { BookmarkScope, ReaderBookmark } from "@/types/bookmarks";
+import type { BookmarkScope } from "@/types/bookmarks";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import {
@@ -113,6 +105,8 @@ import { usePanelTransfer } from "@/hooks/use-panel-transfer";
 import { usePanelTargeting } from "@/hooks/use-panel-targeting";
 import { usePanelRouting } from "@/hooks/use-panel-routing";
 import { usePanelInteractionController } from "@/hooks/use-panel-interaction-controller";
+import { usePendingReaderScroll } from "@/hooks/use-pending-reader-scroll";
+import { useWorkspaceNavigation } from "@/hooks/use-workspace-navigation";
 import { useWordStudyNavigation } from "@/hooks/use-word-study-navigation";
 import { useWordStudyCoordinator } from "@/hooks/use-word-study-coordinator";
 import { useVerseHighlights } from "@/hooks/use-verse-highlights";
@@ -135,8 +129,6 @@ import {
   GuidedTour,
   type GuidedTourStep,
 } from "@/components/reader/guided-tour";
-import { getStaticPage } from "@/lib/static-pages";
-import type { StaticPageId } from "@/types/reader";
 
 const LazyReaderStudySidebar = lazy(async () => {
   const module = await import("@/components/reader/reader-study-sidebar");
@@ -259,27 +251,6 @@ const LazyGenealogyTreeDialog = lazy(async () => {
   return { default: module.GenealogyTreeDialog };
 });
 
-function panelNodeContainsView(
-  node: PanelNode,
-  view: LeafNode["view"],
-): boolean {
-  if (node.type === "leaf") {
-    return node.view === view;
-  }
-
-  return (
-    panelNodeContainsView(node.first, view) ||
-    panelNodeContainsView(node.second, view)
-  );
-}
-
-function isDedicatedLeafViewTab(
-  tab: ReaderTab,
-  view: LeafNode["view"],
-): boolean {
-  return tab.root.type === "leaf" && tab.root.view === view;
-}
-
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{
@@ -337,9 +308,6 @@ export function KJVReader() {
   const didApplyStartupWelcomeHomeRef = useRef(false);
   const didInitializeReaderRef = useRef(false);
   const finishFirstReaderReadyMeasureRef = useRef<(() => void) | null>(null);
-  const pendingActiveTabIdRef = useRef<string | null>(null);
-  const pendingToolsTabScrollRef = useRef(false);
-  const pendingToolsTabIdRef = useRef<string | null>(null);
   const hasOpenSearchView = useMemo(
     () => tabs.some((tab) => panelNodeContainsView(tab.root, "search")),
     [tabs],
@@ -450,7 +418,6 @@ export function KJVReader() {
   const [strongsWordAccordionValue, setStrongsWordAccordionValue] = useState<
     string[]
   >([]);
-  const tabsRef = useRef<ReaderTab[]>([]);
   const {
     targetedPanelLeafId,
     targetedPanelLeafIdRef,
@@ -705,42 +672,6 @@ export function KJVReader() {
       return nextTabs;
     });
   }, [isLoaded, setTabs, showWelcomeHomeAtStartup, tabs]);
-
-  useEffect(() => {
-    tabsRef.current = tabs;
-  }, [tabs]);
-
-  useEffect(() => {
-    const pendingTabId = pendingActiveTabIdRef.current;
-    if (!pendingTabId) {
-      return;
-    }
-
-    if (!tabs.some((tab) => tab.id === pendingTabId)) {
-      return;
-    }
-
-    if (pendingToolsTabScrollRef.current) {
-      pendingToolsTabScrollRef.current = false;
-      requestAnimationFrame(() => {
-        tabEndRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: tabsOrientation === "vertical" ? "end" : "nearest",
-          inline: tabsOrientation === "vertical" ? "nearest" : "end",
-        });
-      });
-    }
-
-    if (activeTabId === pendingTabId) {
-      if (pendingToolsTabIdRef.current === pendingTabId) {
-        pendingToolsTabIdRef.current = null;
-      }
-      pendingActiveTabIdRef.current = null;
-      return;
-    }
-
-    setActiveTabId(pendingTabId);
-  }, [activeTabId, tabs, tabsOrientation]);
 
   const {
     chapterRefs,
@@ -1513,85 +1444,46 @@ export function KJVReader() {
     setTargetedPanelLeafId,
   });
 
-  function moveLeafChapter(leafId: string, direction: -1 | 1) {
-    if (!activeTab) {
-      return;
-    }
+  usePendingReaderScroll({
+    activeTabId,
+    tabs,
+    highlightedVerseRangesByLeafId,
+    pendingReaderScrollTargets,
+    setPendingReaderScrollTargets,
+    panelElementRefs,
+  });
 
-    const leaf = findLeafNode(activeTab.root, leafId);
-    if (!leaf) {
-      return;
-    }
-
-    const key = `${leaf.bookIndex}-${leaf.chapterIndex}`;
-    const currentIndex = chapterRefIndex.get(key);
-    if (currentIndex === undefined) {
-      return;
-    }
-
-    const nextIndex = currentIndex + direction;
-    if (nextIndex < 0 || nextIndex >= chapterRefs.length) {
-      return;
-    }
-
-    const nextRef = chapterRefs[nextIndex];
-    updateLeafLocation(leafId, {
-      bookIndex: nextRef.bookIndex,
-      chapterIndex: nextRef.chapterIndex,
-    });
-  }
-
-  function openChapterInNewTab(bookIndex: number, chapterIndex: number) {
-    const nextTabId = createId();
-    const nextLeaf = createLeaf(bookIndex, chapterIndex, "reader");
-    setTabs((currentTabs) => [
-      ...currentTabs,
-      {
-        id: nextTabId,
-        title: `Tab ${currentTabs.length + 1}`,
-        root: {
-          ...nextLeaf,
-          pickerTestament: null,
-          pickerBookIndex: null,
-        },
-      },
-    ]);
-    setActiveTabId(nextTabId);
-    requestAnimationFrame(() => {
-      tabEndRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: tabsOrientation === "vertical" ? "end" : "nearest",
-        inline: tabsOrientation === "vertical" ? "nearest" : "end",
-      });
-    });
-  }
-
-  const openSearchTab = useCallback(() => {
-    const nextTabId = createId();
-    const nextLeaf = createLeaf(0, 0, "search");
-    const nextSearchNumber =
-      tabs.filter((tab) => tab.title.toLowerCase().startsWith("search"))
-        .length + 1;
-    const nextSearchTitle =
-      nextSearchNumber === 1 ? "Search" : `Search ${nextSearchNumber}`;
-    setTabs((currentTabs) => [
-      ...currentTabs,
-      {
-        id: nextTabId,
-        title: nextSearchTitle,
-        root: nextLeaf,
-      },
-    ]);
-    initializeSearchPageState(nextLeaf.id);
-    setActiveTabId(nextTabId);
-    requestAnimationFrame(() => {
-      tabEndRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: tabsOrientation === "vertical" ? "end" : "nearest",
-        inline: tabsOrientation === "vertical" ? "nearest" : "end",
-      });
-    });
-  }, [initializeSearchPageState, tabs, tabsOrientation]);
+  const {
+    tabsRef,
+    showTabById,
+    moveLeafChapter,
+    openChapterInNewTab,
+    openSearchTab,
+    openStaticPageTab,
+    openNotesTab,
+    openStudyTool,
+  } = useWorkspaceNavigation({
+    tabs,
+    setTabs,
+    activeTabId,
+    setActiveTabId,
+    activeRoot: activeTab?.root ?? null,
+    chapterRefs,
+    chapterRefIndex,
+    tabsOrientation,
+    tabEndRef,
+    initializeSearchPageState,
+    readerNotes,
+    notesContext,
+    initializeNotesTabState,
+    targetedPanelLeafIdRef,
+    setTargetedPanelLeafId,
+    wordVerseSelectionTargetRef,
+    setIsRightSidebarOpen,
+    setSidebarOpenRequestKey,
+    showStudyTool,
+    updateLeafLocation,
+  });
 
   const shareLayout = useCallback(async () => {
     const href = window.location.href;
@@ -1603,413 +1495,12 @@ export function KJVReader() {
     }
   }, []);
 
-  const openStaticPageTab = useCallback(
-    (pageId: StaticPageId) => {
-      const page = getStaticPage(pageId);
-      if (!page) {
-        return;
-      }
-
-      const nextTabId = createId();
-      const nextLeaf = {
-        ...createLeaf(0, 0, "page"),
-        pageId,
-      };
-
-      setTabs((currentTabs) => [
-        ...currentTabs,
-        {
-          id: nextTabId,
-          title: page.title,
-          root: nextLeaf,
-        },
-      ]);
-      setActiveTabId(nextTabId);
-      requestAnimationFrame(() => {
-        tabEndRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: tabsOrientation === "vertical" ? "end" : "nearest",
-          inline: tabsOrientation === "vertical" ? "nearest" : "end",
-        });
-      });
-    },
-    [tabsOrientation],
-  );
-
-  const openNotesTab = useCallback(
-    (selectedNoteId?: string | null) => {
-      const nextTabId = createId();
-      const nextLeaf = createLeaf(0, 0, "notes");
-      const selectedNote = selectedNoteId
-        ? readerNotes.find((note) => note.id === selectedNoteId) ?? null
-        : null;
-      const nextTitle = selectedNote
-        ? selectedNote.title.trim() || "Untitled note"
-        : "Notes";
-      setTabs((currentTabs) => [
-        ...currentTabs,
-        {
-          id: nextTabId,
-          title: nextTitle,
-          root: nextLeaf,
-        },
-      ]);
-      initializeNotesTabState(nextLeaf.id, {
-        selectedNoteId: selectedNoteId ?? null,
-        filter: "all",
-        context: notesContext,
-      });
-      setActiveTabId(nextTabId);
-      requestAnimationFrame(() => {
-        tabEndRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: tabsOrientation === "vertical" ? "end" : "nearest",
-          inline: tabsOrientation === "vertical" ? "nearest" : "end",
-        });
-      });
-    },
-    [initializeNotesTabState, notesContext, readerNotes, tabsOrientation],
-  );
-
-  const findTabContainingLeafId = useCallback(
-    (leafId: string, sourceTabs: ReaderTab[] = tabsRef.current) =>
-      sourceTabs.find((tab) => Boolean(findLeafNode(tab.root, leafId))) ?? null,
-    [],
-  );
-
-  const showTabById = useCallback((tabId: string) => {
-    pendingActiveTabIdRef.current = null;
-    if (typeof document !== "undefined") {
-      const activeElement = document.activeElement;
-      if (activeElement instanceof HTMLElement && activeElement !== document.body) {
-        activeElement.blur();
-      }
-    }
-    setActiveTabId(tabId);
-  }, []);
-
-  const scrollVerseIntoView = useCallback(
-    (
-      leafId: string,
-      bookIndex: number,
-      chapterIndex: number,
-      verseStart: number,
-      verseEnd = verseStart,
-    ) => {
-      let attempts = 0;
-
-      const elementOffsetWithin = (
-        element: HTMLElement,
-        ancestor: HTMLElement,
-      ) => {
-        let offset = 0;
-        let current: HTMLElement | null = element;
-
-        while (current && current !== ancestor) {
-          offset += current.offsetTop;
-          current = current.offsetParent as HTMLElement | null;
-        }
-
-        return offset;
-      };
-
-      const attemptScroll = () => {
-        const panelElement = panelElementRefs.current[leafId];
-        const viewport = panelViewportElement(panelElement);
-        const chapterRoot = panelElement?.querySelector<HTMLElement>(
-          "[data-reader-chapter-root]",
-        );
-        const chapterMatches =
-          chapterRoot?.dataset.bookIndex === `${bookIndex}` &&
-          chapterRoot?.dataset.chapterIndex === `${chapterIndex}`;
-        const startVerseElement =
-          chapterMatches
-            ? panelElement?.querySelector<HTMLElement>(
-                `[data-verse-number="${verseStart}"]`,
-              )
-            : null;
-        const endVerseElement =
-          chapterMatches
-            ? panelElement?.querySelector<HTMLElement>(
-                `[data-verse-number="${verseEnd}"]`,
-              )
-            : null;
-        const panelIsVisible = Boolean(panelElement && panelElement.offsetParent);
-
-        if (startVerseElement && endVerseElement && viewport && panelIsVisible) {
-          const startTop = elementOffsetWithin(startVerseElement, viewport);
-          const endTop = elementOffsetWithin(endVerseElement, viewport);
-          const blockTop = Math.min(startTop, endTop);
-          const blockBottom = Math.max(
-            startTop + startVerseElement.offsetHeight,
-            endTop + endVerseElement.offsetHeight,
-          );
-          const blockHeight = Math.max(
-            startVerseElement.offsetHeight,
-            blockBottom - blockTop,
-          );
-          const nextTop = calculateReaderScrollTop(
-            blockTop,
-            blockHeight,
-            viewport.clientHeight,
-            viewport.scrollHeight,
-          );
-
-          if (blockHeight >= viewport.clientHeight) {
-            startVerseElement.scrollIntoView({
-              block: "start",
-              inline: "nearest",
-              behavior: "smooth",
-            });
-            return;
-          }
-
-          viewport.scrollTo({
-            top: nextTop,
-            behavior: "smooth",
-          });
-          return;
-        }
-
-        if (attempts < 60) {
-          attempts += 1;
-          requestAnimationFrame(attemptScroll);
-          return;
-        }
-      };
-
-      requestAnimationFrame(attemptScroll);
-    },
-    [panelElementRefs],
-  );
-
-  const scrollChapterToTop = useCallback(
-    (leafId: string, bookIndex: number, chapterIndex: number) => {
-      let attempts = 0;
-
-      const attemptScroll = () => {
-        const panelElement = panelElementRefs.current[leafId];
-        const viewport = panelViewportElement(panelElement);
-        const chapterRoot = panelElement?.querySelector<HTMLElement>(
-          "[data-reader-chapter-root]",
-        );
-        const chapterMatches =
-          chapterRoot?.dataset.bookIndex === `${bookIndex}` &&
-          chapterRoot?.dataset.chapterIndex === `${chapterIndex}`;
-        const panelIsVisible = Boolean(panelElement && panelElement.offsetParent);
-
-        if (chapterMatches && viewport && panelIsVisible) {
-          viewport.scrollTo({ top: 0, behavior: "smooth" });
-          return;
-        }
-
-        if (attempts < 60) {
-          attempts += 1;
-          requestAnimationFrame(attemptScroll);
-        }
-      };
-
-      requestAnimationFrame(attemptScroll);
-    },
-    [panelElementRefs],
-  );
-
-  useEffect(() => {
-    const pendingReaderScrollTarget = selectPendingReaderScrollTargetForActiveTab(
-      pendingReaderScrollTargets,
-      tabs,
-      activeTabId,
-    );
-    if (!pendingReaderScrollTarget) {
-      return;
-    }
-
-    let cancelled = false;
-    const run = () => {
-      if (cancelled) {
-        return;
-      }
-      requestAnimationFrame(() => {
-        if (cancelled) {
-          return;
-        }
-        requestAnimationFrame(() => {
-          if (cancelled) {
-            return;
-          }
-          if (pendingReaderScrollTarget.mode === "chapter-top") {
-            scrollChapterToTop(
-              pendingReaderScrollTarget.leafId,
-              pendingReaderScrollTarget.bookIndex,
-              pendingReaderScrollTarget.chapterIndex,
-            );
-          } else {
-            scrollVerseIntoView(
-              pendingReaderScrollTarget.leafId,
-              pendingReaderScrollTarget.bookIndex,
-              pendingReaderScrollTarget.chapterIndex,
-              pendingReaderScrollTarget.verseStart,
-              pendingReaderScrollTarget.verseEnd,
-            );
-          }
-          setPendingReaderScrollTargets((current) =>
-            dequeuePendingReaderScrollTarget(current, pendingReaderScrollTarget),
-          );
-        });
-      });
-    };
-
-    run();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    activeTabId,
-    highlightedVerseRangesByLeafId,
-    pendingReaderScrollTargets,
-    scrollChapterToTop,
-    scrollVerseIntoView,
-    tabs,
-  ]);
-
-  const ensureToolsPanelInActiveTab = useCallback(() => {
-    if (!activeTabId) {
-      return;
-    }
-
-    setTabs((currentTabs) => {
-      const activeIndex = currentTabs.findIndex((tab) => tab.id === activeTabId);
-      if (activeIndex < 0) {
-        return currentTabs;
-      }
-
-      const active = currentTabs[activeIndex];
-      if (panelNodeContainsView(active.root, "tools")) {
-        return currentTabs;
-      }
-
-      const nextLeaf = createLeaf(0, 0, "tools");
-      const nextRoot: PanelNode = {
-        id: createId(),
-        type: "split",
-        orientation: "horizontal",
-        ratio: 68,
-        first: active.root,
-        second: nextLeaf,
-      };
-
-      const nextTabs = [...currentTabs];
-      nextTabs[activeIndex] = { ...active, root: nextRoot };
-      return nextTabs;
-    });
-  }, [activeTabId, setTabs]);
-
-  const createTargetedToolsPanelInActiveTab = useCallback(() => {
-    if (!activeTabId) {
-      return false;
-    }
-
-    const currentTabs = tabsRef.current;
-    const activeIndex = currentTabs.findIndex((tab) => tab.id === activeTabId);
-    if (activeIndex < 0) {
-      return false;
-    }
-
-    const active = currentTabs[activeIndex];
-    const nextLeaf = createLeaf(0, 0, "tools");
-    const nextRoot: PanelNode = {
-      id: createId(),
-      type: "split",
-      orientation: "horizontal",
-      ratio: 68,
-      first: active.root,
-      second: nextLeaf,
-    };
-
-    const nextTabs = [...currentTabs];
-    nextTabs[activeIndex] = { ...active, root: nextRoot };
-    tabsRef.current = nextTabs;
-    setTabs(nextTabs);
-
-    const nextLeafId = nextLeaf.id;
-    setTargetedPanelLeafId(nextLeafId);
-    showTabById(activeTabId);
-    return true;
-  }, [activeTabId, setTabs, setTargetedPanelLeafId, showTabById]);
-
-  const openToolsInTargetedPanel = useCallback(() => {
-    const currentTargetedPanelLeafId = targetedPanelLeafIdRef.current;
-    if (!currentTargetedPanelLeafId) {
-      return false;
-    }
-
-    const targetTab = findTabContainingLeafId(currentTargetedPanelLeafId);
-    if (!targetTab) {
-      return true;
-    }
-
-    setTabs((currentTabs) =>
-      currentTabs.map((tab) =>
-        tab.id === targetTab.id
-          ? {
-              ...tab,
-              root: updateLeafNode(tab.root, currentTargetedPanelLeafId, {
-                view: "tools",
-                pickerTestament: null,
-                pickerBookIndex: null,
-              }),
-            }
-          : tab,
-      ),
-    );
-    showTabById(targetTab.id);
-    return true;
-  }, [findTabContainingLeafId, setTabs, showTabById, targetedPanelLeafIdRef]);
-
-  const openToolsTab = useCallback(() => {
-    const pendingToolsTabId = pendingToolsTabIdRef.current;
-    if (pendingToolsTabId) {
-      pendingActiveTabIdRef.current = pendingToolsTabId;
-      setActiveTabId(pendingToolsTabId);
-      return;
-    }
-
-    const existingToolsTab = tabsRef.current.find((tab) =>
-      isDedicatedLeafViewTab(tab, "tools"),
-    );
-    if (existingToolsTab) {
-      pendingActiveTabIdRef.current = null;
-      pendingToolsTabScrollRef.current = false;
-      pendingToolsTabIdRef.current = null;
-      setActiveTabId(existingToolsTab.id);
-      return;
-    }
-
-    const nextTabId = createId();
-    const nextLeaf = createLeaf(0, 0, "tools");
-    pendingActiveTabIdRef.current = nextTabId;
-    pendingToolsTabScrollRef.current = true;
-    pendingToolsTabIdRef.current = nextTabId;
-
-    setTabs((currentTabs) => {
-      return [
-        ...currentTabs,
-        {
-          id: nextTabId,
-          title: "Tools",
-          root: nextLeaf,
-        },
-      ];
-    });
-  }, [setActiveTabId, setTabs]);
-
   const {
     openReaderTarget,
-    openReaderTargetsInSingleNewTab,
-    openBookmarkTarget: openBookmarkTargetRaw,
-    openSearchResultTarget: openSearchResultTargetRaw,
-    openChapterReference: openChapterReferenceRaw,
+    openBookmarkTarget,
+    openSearchResultTarget,
+    openChapterReference,
+    runReferenceCommandAction,
   } = usePanelRouting({
     activeTabId,
     books,
@@ -2023,99 +1514,10 @@ export function KJVReader() {
     setSelectedHighlightScope,
     setPendingReaderScrollTargets,
     setActiveReaderWordHighlight,
+    bookmarkOpenTarget,
+    searchResultOpenTarget,
+    referenceLinkOpenTarget,
   });
-
-  const openBookmarkTarget = useCallback(
-    (bookmark: ReaderBookmark) => {
-      openBookmarkTargetRaw(bookmark, bookmarkOpenTarget);
-    },
-    [bookmarkOpenTarget, openBookmarkTargetRaw],
-  );
-
-  const openSearchResultTarget = useCallback(
-    (
-      bookIndex: number,
-      chapterIndex: number,
-      verseStart: number,
-      verseEnd?: number,
-    ) => {
-      openSearchResultTargetRaw(
-        bookIndex,
-        chapterIndex,
-        verseStart,
-        verseEnd,
-        searchResultOpenTarget,
-      );
-    },
-    [openSearchResultTargetRaw, searchResultOpenTarget],
-  );
-
-  const openChapterReference = useCallback(
-    (
-      bookIndex: number,
-      chapterIndex: number,
-      verseStart: number,
-      verseEnd = verseStart,
-    ) => {
-      openChapterReferenceRaw(
-        bookIndex,
-        chapterIndex,
-        verseStart,
-        verseEnd,
-        referenceLinkOpenTarget,
-      );
-    },
-    [openChapterReferenceRaw, referenceLinkOpenTarget],
-  );
-
-  const runReferenceCommandAction = useCallback(
-    (
-      actionId: ReferenceCommandAction["id"],
-      targets: ReferenceCommandTarget[],
-    ) => {
-      const navigationTargets = targets.map((target) => target.target);
-      const firstTarget = navigationTargets[0];
-      if (!firstTarget) {
-        return;
-      }
-
-      if (actionId === "single-new-tab") {
-        openReaderTarget(firstTarget, "new-tab");
-        return;
-      }
-
-      if (actionId === "single-new-panel") {
-        openReaderTarget(firstTarget, "new-panel");
-        return;
-      }
-
-      if (actionId === "multiple-new-tabs") {
-        navigationTargets.forEach((target) => {
-          openReaderTarget(target, "new-tab");
-        });
-        return;
-      }
-
-      if (actionId === "multiple-single-tab") {
-        openReaderTargetsInSingleNewTab(navigationTargets);
-        return;
-      }
-
-      if (!activeTabId) {
-        openReaderTargetsInSingleNewTab(navigationTargets);
-        return;
-      }
-
-      navigationTargets.forEach((target) => {
-        openReaderTarget(target, "new-panel");
-      });
-    },
-    [
-      activeTabId,
-      openReaderTarget,
-      openReaderTargetsInSingleNewTab,
-    ],
-  );
 
   const handleClearLeafHighlights = useCallback(
     (leafId: string) => {
@@ -2246,37 +1648,6 @@ export function KJVReader() {
     tabEndRef,
     clearAllPanelPreviews,
   });
-
-  const openStudyTool = useCallback(
-    (tool: StudyWorkspaceTool, options?: { openSidebar?: boolean }) => {
-      const destination =
-        options?.openSidebar === false
-          ? "new-panel"
-          : wordVerseSelectionTargetRef.current;
-
-      if (destination === "sidebar") {
-        setIsRightSidebarOpen(true);
-        setSidebarOpenRequestKey((current) => current + 1);
-      } else if (destination === "targeted-panel") {
-        if (!openToolsInTargetedPanel()) {
-          createTargetedToolsPanelInActiveTab();
-        }
-      } else if (destination === "new-panel") {
-        ensureToolsPanelInActiveTab();
-      } else {
-        openToolsTab();
-      }
-      showStudyTool(tool);
-    },
-    [
-      createTargetedToolsPanelInActiveTab,
-      ensureToolsPanelInActiveTab,
-      openToolsInTargetedPanel,
-      openToolsTab,
-      setIsRightSidebarOpen,
-      showStudyTool,
-    ],
-  );
 
   const syncTokenAccordionState = useCallback(
     (rawWord: string, options: TokenAccordionOptions = {}) => {

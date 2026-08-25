@@ -1,7 +1,11 @@
 import { useCallback, type Dispatch, type MutableRefObject, type SetStateAction } from "react";
 
 import { normalizeRangePoints } from "@/lib/bookmarks";
-import { buildReaderTabFromTargets } from "@/lib/reference-command";
+import {
+  buildReaderTabFromTargets,
+  type ReferenceCommandAction,
+  type ReferenceCommandTarget,
+} from "@/lib/reference-command";
 import { queuePendingReaderScrollTarget } from "@/lib/reader-scroll-targets";
 import {
   createId,
@@ -52,6 +56,9 @@ type UsePanelRoutingParams = {
   setActiveReaderWordHighlight: Dispatch<
     SetStateAction<ReaderWordHighlight | null>
   >;
+  bookmarkOpenTarget: BookmarkOpenTarget;
+  searchResultOpenTarget: SearchResultOpenTarget;
+  referenceLinkOpenTarget: ReferenceLinkOpenTarget;
 };
 
 export function buildTargetedReaderPanelInTabState(
@@ -142,6 +149,9 @@ export function usePanelRouting({
   setSelectedHighlightScope,
   setPendingReaderScrollTargets,
   setActiveReaderWordHighlight,
+  bookmarkOpenTarget,
+  searchResultOpenTarget,
+  referenceLinkOpenTarget,
 }: UsePanelRoutingParams) {
   const navigateReaderLeafToTarget = useCallback(
     (tabId: string, leafId: string, target: ReaderNavigationTarget) => {
@@ -468,7 +478,7 @@ export function usePanelRouting({
     [applyReaderTargetEffects, setTabs, showTabById],
   );
 
-  const openBookmarkTarget = useCallback(
+  const openBookmarkTargetWithDestination = useCallback(
     (bookmark: ReaderBookmark, destination: BookmarkOpenTarget) => {
       if (bookmark.scope.type === "chapter") {
         openReaderTarget(
@@ -555,7 +565,7 @@ export function usePanelRouting({
     [openReaderTarget],
   );
 
-  const openSearchResultTarget = useCallback(
+  const openSearchResultTargetWithDestination = useCallback(
     (
       bookIndex: number,
       chapterIndex: number,
@@ -593,7 +603,7 @@ export function usePanelRouting({
     [openReaderTarget],
   );
 
-  const openChapterReference = useCallback(
+  const openChapterReferenceWithDestination = useCallback(
     (
       bookIndex: number,
       chapterIndex: number,
@@ -621,11 +631,100 @@ export function usePanelRouting({
     [openReaderTarget],
   );
 
+  const openBookmarkTarget = useCallback(
+    (bookmark: ReaderBookmark) => {
+      openBookmarkTargetWithDestination(bookmark, bookmarkOpenTarget);
+    },
+    [bookmarkOpenTarget, openBookmarkTargetWithDestination],
+  );
+
+  const openSearchResultTarget = useCallback(
+    (
+      bookIndex: number,
+      chapterIndex: number,
+      verseStart: number,
+      verseEnd?: number,
+    ) => {
+      openSearchResultTargetWithDestination(
+        bookIndex,
+        chapterIndex,
+        verseStart,
+        verseEnd,
+        searchResultOpenTarget,
+      );
+    },
+    [openSearchResultTargetWithDestination, searchResultOpenTarget],
+  );
+
+  const openChapterReference = useCallback(
+    (
+      bookIndex: number,
+      chapterIndex: number,
+      verseStart: number,
+      verseEnd = verseStart,
+    ) => {
+      openChapterReferenceWithDestination(
+        bookIndex,
+        chapterIndex,
+        verseStart,
+        verseEnd,
+        referenceLinkOpenTarget,
+      );
+    },
+    [openChapterReferenceWithDestination, referenceLinkOpenTarget],
+  );
+
+  const runReferenceCommandAction = useCallback(
+    (
+      actionId: ReferenceCommandAction["id"],
+      targets: ReferenceCommandTarget[],
+    ) => {
+      const navigationTargets = targets.map((target) => target.target);
+      const firstTarget = navigationTargets[0];
+      if (!firstTarget) {
+        return;
+      }
+
+      if (actionId === "single-new-tab") {
+        openReaderTarget(firstTarget, "new-tab");
+        return;
+      }
+
+      if (actionId === "single-new-panel") {
+        openReaderTarget(firstTarget, "new-panel");
+        return;
+      }
+
+      if (actionId === "multiple-new-tabs") {
+        navigationTargets.forEach((target) => {
+          openReaderTarget(target, "new-tab");
+        });
+        return;
+      }
+
+      if (actionId === "multiple-single-tab") {
+        openReaderTargetsInSingleNewTab(navigationTargets);
+        return;
+      }
+
+      if (!activeTabId) {
+        openReaderTargetsInSingleNewTab(navigationTargets);
+        return;
+      }
+
+      navigationTargets.forEach((target) => {
+        openReaderTarget(target, "new-panel");
+      });
+    },
+    [activeTabId, openReaderTarget, openReaderTargetsInSingleNewTab],
+  );
+
   return {
     openReaderTarget,
     openReaderTargetsInSingleNewTab,
     openBookmarkTarget,
     openSearchResultTarget,
     openChapterReference,
+    runReferenceCommandAction,
   };
 }
