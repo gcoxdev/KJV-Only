@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
 import { parseBibleReference } from "@/lib/references";
+import { preloadSearchPage } from "@/lib/search-page-loader";
 import {
   loadDailyScriptureTopics,
   type DailyScriptureTopicsPayload,
@@ -267,7 +268,13 @@ export function WelcomeHomePage({
               <CompassIcon />
               Take the Tour
             </Button>
-            <Button type="button" variant="outline" onClick={onOpenSearch}>
+            <Button
+              type="button"
+              variant="outline"
+              onMouseEnter={preloadSearchPage}
+              onFocus={preloadSearchPage}
+              onClick={onOpenSearch}
+            >
               <SearchIcon />
               Open Search
             </Button>

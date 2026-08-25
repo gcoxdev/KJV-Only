@@ -1,4 +1,12 @@
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  startTransition,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   CircleHelpIcon,
   ChevronDownIcon,
@@ -21,8 +29,9 @@ import {
   getSmartHighlightWords,
   isSmartSearchCandidate,
   isSmartSearchStopWord,
-  matchSelectedWords,
+  matchPreparedSelectedWords,
   prepareSmartSearch,
+  prepareSelectedWordSearch,
   scorePreparedSmartSearch,
   suggestConcordanceWords,
   suggestSmartCorrections,
@@ -127,6 +136,170 @@ const SEARCH_HELP_ITEMS: Array<{
 const MAX_CONCORDANCE_SUGGESTIONS = 40;
 const SEARCH_RESULTS_PAGE_SIZE = 50;
 const SEARCH_RESULTS_CAP = 500;
+const SEARCH_PROGRESS_INTERVAL_MS = 100;
+const pendingSearchTasks: Array<() => void> = [];
+let searchTaskChannel: MessageChannel | null = null;
+
+function scheduleSearchTask(task: () => void) {
+  if (typeof MessageChannel === "undefined") {
+    window.setTimeout(task, 0);
+    return;
+  }
+
+  pendingSearchTasks.push(task);
+  if (!searchTaskChannel) {
+    searchTaskChannel = new MessageChannel();
+    searchTaskChannel.port1.addEventListener("message", () => {
+      pendingSearchTasks.shift()?.();
+    });
+    searchTaskChannel.port1.start();
+  }
+  searchTaskChannel.port2.postMessage(undefined);
+}
+
+type SmartVocabulary = {
+  words: string[];
+  wordSet: Set<string>;
+  prefix3Buckets: Map<string, string[]>;
+  prefix5Buckets: Map<string, string[]>;
+  phoneticBuckets: Map<string, string[]>;
+  initialBuckets: Map<string, string[]>;
+};
+
+type SearchResultHighlight = {
+  mode: SearchMode | null;
+  phrase: string;
+  selectedWords: string[];
+};
+
+const smartVocabularyCache = new WeakMap<
+  VerseSearchIndexEntry[],
+  SmartVocabulary
+>();
+
+function getSmartVocabulary(verseIndex: VerseSearchIndexEntry[]) {
+  const cached = smartVocabularyCache.get(verseIndex);
+  if (cached) {
+    return cached;
+  }
+
+  const values = new Set<string>();
+  const prefix3Buckets = new Map<string, string[]>();
+  const prefix5Buckets = new Map<string, string[]>();
+  const phoneticBuckets = new Map<string, string[]>();
+  const initialBuckets = new Map<string, string[]>();
+
+  const addToBucket = (map: Map<string, string[]>, key: string, word: string) => {
+    if (!key) {
+      return;
+    }
+    const bucket = map.get(key);
+    if (bucket) {
+      bucket.push(word);
+    } else {
+      map.set(key, [word]);
+    }
+  };
+
+  for (const entry of verseIndex) {
+    for (const word of entry.searchWordsLower) {
+      if (values.has(word)) {
+        continue;
+      }
+      values.add(word);
+      addToBucket(prefix3Buckets, word.slice(0, 3), word);
+      addToBucket(prefix5Buckets, word.slice(0, 5), word);
+      addToBucket(phoneticBuckets, getSmartPhoneticCode(word), word);
+      addToBucket(initialBuckets, word.slice(0, 1), word);
+    }
+  }
+
+  const vocabulary = {
+    words: Array.from(values),
+    wordSet: values,
+    prefix3Buckets,
+    prefix5Buckets,
+    phoneticBuckets,
+    initialBuckets,
+  } satisfies SmartVocabulary;
+  smartVocabularyCache.set(verseIndex, vocabulary);
+  return vocabulary;
+}
+
+function renderSearchResultText(
+  match: SearchMatch,
+  highlight: SearchResultHighlight,
+) {
+  const keyPrefix = `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`;
+  if (highlight.mode === "smart") {
+    const words = match.text.split(/\s+/);
+    const smartTerms = getSmartHighlightWords(
+      {
+        searchWords: words,
+        searchWordsLower: words
+          .map((word) =>
+            word.toLowerCase().replace(/^[^a-z0-9']+|[^a-z0-9']+$/gi, ""),
+          )
+          .filter(Boolean),
+      },
+      highlight.phrase.trim(),
+      false,
+    );
+    return renderHighlightedTerms(match.text, smartTerms, keyPrefix);
+  }
+
+  if (highlight.mode === "contains-any" || highlight.mode === "contains-all") {
+    return renderHighlightedTerms(match.text, highlight.selectedWords, keyPrefix);
+  }
+
+  if (highlight.mode === "regex") {
+    return renderHighlightedText(match.text, highlight.phrase.trim(), keyPrefix);
+  }
+
+  return match.text;
+}
+
+const SearchResultRow = memo(
+  function SearchResultRow({
+    match,
+    highlight,
+    onOpenResult,
+  }: {
+    match: SearchMatch;
+    highlight: SearchResultHighlight;
+    onOpenResult: SearchPageProps["onOpenResult"];
+  }) {
+    return (
+      <button
+        type="button"
+        className="group block w-full px-3 py-2 text-left [contain-intrinsic-size:0_76px] [content-visibility:auto] hover:bg-reference-tint/60"
+        onClick={() =>
+          onOpenResult(
+            match.bookIndex,
+            match.chapterIndex,
+            match.verseNumber,
+            match.verseNumber,
+          )
+        }
+      >
+        <p className="tabular-data text-sm font-medium text-foreground">
+          {`${match.bookName} ${match.chapterIndex + 1}:${match.verseNumber}`}
+        </p>
+        <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground group-hover:text-foreground/90">
+          {renderSearchResultText(match, highlight)}
+        </p>
+      </button>
+    );
+  },
+  (previous, next) =>
+    previous.highlight === next.highlight &&
+    previous.onOpenResult === next.onOpenResult &&
+    previous.match.bookIndex === next.match.bookIndex &&
+    previous.match.chapterIndex === next.match.chapterIndex &&
+    previous.match.verseNumber === next.match.verseNumber &&
+    previous.match.bookName === next.match.bookName &&
+    previous.match.text === next.match.text,
+);
 
 function clampGroupIndices(indices: number[], max: number) {
   return indices.filter((value) => value >= 0 && value < max);
@@ -274,47 +447,10 @@ export function SearchPage({
     );
   }, [concordanceWords, deferredChipInput, selectedWords]);
 
-  const smartVocabulary = useMemo(() => {
-    const values = new Set<string>();
-    const prefix3Buckets = new Map<string, string[]>();
-    const prefix5Buckets = new Map<string, string[]>();
-    const phoneticBuckets = new Map<string, string[]>();
-    const initialBuckets = new Map<string, string[]>();
-
-    const addToBucket = (map: Map<string, string[]>, key: string, word: string) => {
-      if (!key) {
-        return;
-      }
-      const bucket = map.get(key);
-      if (bucket) {
-        bucket.push(word);
-      } else {
-        map.set(key, [word]);
-      }
-    };
-
-    for (const entry of verseIndex) {
-      entry.searchWordsLower.forEach((word) => {
-        if (values.has(word)) {
-          return;
-        }
-        values.add(word);
-        addToBucket(prefix3Buckets, word.slice(0, 3), word);
-        addToBucket(prefix5Buckets, word.slice(0, 5), word);
-        addToBucket(phoneticBuckets, getSmartPhoneticCode(word), word);
-        addToBucket(initialBuckets, word.slice(0, 1), word);
-      });
-    }
-
-    return {
-      words: Array.from(values),
-      wordSet: values,
-      prefix3Buckets,
-      prefix5Buckets,
-      phoneticBuckets,
-      initialBuckets,
-    };
-  }, [verseIndex]);
+  const smartVocabulary = useMemo(
+    () => getSmartVocabulary(verseIndex),
+    [verseIndex],
+  );
 
   const smartSuggestions = useMemo(() => {
     if (searchMode !== "smart") {
@@ -500,7 +636,9 @@ export function SearchPage({
     onStateChange({ error: null });
     regexWorkerRef.current?.terminate();
     regexWorkerRef.current = null;
-    let matcher: ((entry: VerseSearchIndexEntry) => boolean) | null = null;
+    let selectedWordSearch: ReturnType<
+      typeof prepareSelectedWordSearch
+    > = null;
     let smartQuery: string | null = null;
     let regexPattern: string | null = null;
     const nextSearchRunId = searchRunIdRef.current + 1;
@@ -523,26 +661,18 @@ export function SearchPage({
         });
         return;
       }
-      const needles = caseSensitive
-        ? selectedWords.map((word) => word.trim()).filter(Boolean)
-        : selectedWords.map((word) => word.trim().toLowerCase()).filter(Boolean);
-      if (needles.length === 0) {
+      selectedWordSearch = prepareSelectedWordSearch(
+        selectedWords,
+        searchMode,
+        caseSensitive,
+      );
+      if (!selectedWordSearch) {
         onStateChange({
           error: "Select at least one word for this search mode.",
           results: [],
         });
         return;
       }
-      matcher =
-        searchMode === "contains-any" || searchMode === "contains-all"
-          ? (entry) =>
-              matchSelectedWords(
-                entry,
-                needles,
-                searchMode,
-                caseSensitive,
-              )
-          : null;
     }
 
     if (searchMode === "regex") {
@@ -570,27 +700,49 @@ export function SearchPage({
       }
     }
 
-    if (!matcher && !smartQuery && !regexPattern) {
+    if (!selectedWordSearch && !smartQuery && !regexPattern) {
       onStateChange({ results: [] });
       return;
     }
 
     setIsSearching(true);
     setSearchProgress(null);
+    const completedSearchState = {
+      chipInput: chipInputDraft,
+      phraseInput: phraseInputDraft,
+      currentPage: 1,
+      isControlsCollapsed: true,
+      lastSearchMode: searchMode,
+      lastSearchCaseSensitive: caseSensitive,
+      lastSearchPhraseInput: phraseInputDraft.trim(),
+      lastSearchSelectedWords: [...selectedWords],
+    } satisfies Partial<SearchPageState>;
+    let lastProgressUpdate = 0;
+
+    const publishProgress = (
+      processed: number,
+      total: number,
+      force = false,
+    ) => {
+      const now = performance.now();
+      if (!force && now - lastProgressUpdate < SEARCH_PROGRESS_INTERVAL_MS) {
+        return;
+      }
+      lastProgressUpdate = now;
+      startTransition(() => {
+        if (searchRunIdRef.current === nextSearchRunId) {
+          setSearchProgress({ processed, total });
+        }
+      });
+    };
+
     const commitSearch = (matches: SearchMatch[]) => {
       if (searchRunIdRef.current !== nextSearchRunId) {
         return;
       }
       onStateChange({
-        chipInput: chipInputDraft,
-        phraseInput: phraseInputDraft,
+        ...completedSearchState,
         results: matches,
-        currentPage: 1,
-        isControlsCollapsed: true,
-        lastSearchMode: searchMode,
-        lastSearchCaseSensitive: caseSensitive,
-        lastSearchPhraseInput: phraseInputDraft.trim(),
-        lastSearchSelectedWords: [...selectedWords],
       });
       setIsSearching(false);
       setSearchProgress(null);
@@ -611,26 +763,34 @@ export function SearchPage({
         setIsSearching(false);
         return;
       }
-      const candidates = verseIndex.filter(
-        (entry) =>
-          selected.has(entry.bookIndex) &&
-          isSmartSearchCandidate(entry, preparedSmartSearch),
-      );
       const scored: Array<{
         entry: VerseSearchIndexEntry;
         index: number;
         score: number;
       }> = [];
       const similarityCache = new Map<string, number>();
-      const batchSize = 500;
+      let batchSize = 250;
       let startIndex = 0;
       let batchesSincePublish = 0;
       let publishedInitialPage = false;
 
+      const compareScores = (
+        left: (typeof scored)[number],
+        right: (typeof scored)[number],
+      ) => right.score - left.score || left.index - right.index;
+
+      const pruneScores = () => {
+        if (scored.length < SEARCH_RESULTS_CAP * 2) {
+          return;
+        }
+        scored.sort(compareScores);
+        scored.length = SEARCH_RESULTS_CAP;
+      };
+
       const buildMatches = () =>
         scored
           .slice()
-          .sort((a, b) => b.score - a.score || a.index - b.index)
+          .sort(compareScores)
           .slice(0, SEARCH_RESULTS_CAP)
           .map(({ entry }) => ({
             bookIndex: entry.bookIndex,
@@ -640,20 +800,24 @@ export function SearchPage({
             text: entry.text,
           }));
 
-      const publishPartial = () => {
+      const publishPartial = (isInitialPage: boolean) => {
         if (searchRunIdRef.current !== nextSearchRunId || scored.length === 0) {
           return;
         }
-        onStateChange({
-          chipInput: chipInputDraft,
-          phraseInput: phraseInputDraft,
-          results: buildMatches(),
-          currentPage: 1,
-          isControlsCollapsed: true,
-          lastSearchMode: searchMode,
-          lastSearchCaseSensitive: caseSensitive,
-          lastSearchPhraseInput: phraseInputDraft.trim(),
-          lastSearchSelectedWords: [...selectedWords],
+        const matches = buildMatches();
+        const patch = {
+          ...completedSearchState,
+          results: matches,
+        };
+        if (isInitialPage) {
+          onStateChange(patch);
+          return;
+        }
+        startTransition(() => {
+          if (searchRunIdRef.current !== nextSearchRunId) {
+            return;
+          }
+          onStateChange(patch);
         });
       };
 
@@ -662,9 +826,15 @@ export function SearchPage({
           return;
         }
 
-        const endIndex = Math.min(startIndex + batchSize, candidates.length);
+        const endIndex = Math.min(startIndex + batchSize, verseIndex.length);
         for (let index = startIndex; index < endIndex; index += 1) {
-          const entry = candidates[index];
+          const entry = verseIndex[index];
+          if (
+            !selected.has(entry.bookIndex) ||
+            !isSmartSearchCandidate(entry, preparedSmartSearch)
+          ) {
+            continue;
+          }
           const score = scorePreparedSmartSearch(
             entry,
             preparedSmartSearch,
@@ -674,33 +844,39 @@ export function SearchPage({
             scored.push({ entry, index, score });
           }
         }
+        pruneScores();
 
         startIndex = endIndex;
         batchesSincePublish += 1;
-        setSearchProgress({
-          processed: startIndex,
-          total: candidates.length,
-        });
+        publishProgress(startIndex, verseIndex.length);
+        const shouldPublishInitialPage =
+          !publishedInitialPage &&
+          (scored.length >= SEARCH_RESULTS_PAGE_SIZE ||
+            startIndex >= verseIndex.length ||
+            startIndex >= Math.min(verseIndex.length, batchSize * 2));
         if (
-          (!publishedInitialPage &&
-            (scored.length >= SEARCH_RESULTS_PAGE_SIZE ||
-              startIndex >= candidates.length ||
-              startIndex >= Math.min(candidates.length, batchSize * 2))) ||
-          batchesSincePublish >= 4
+          shouldPublishInitialPage ||
+          (publishedInitialPage && batchesSincePublish >= 8)
         ) {
-          publishPartial();
+          publishPartial(shouldPublishInitialPage);
           publishedInitialPage = true;
+          batchSize = 500;
           batchesSincePublish = 0;
         }
-        if (startIndex < candidates.length) {
-          window.setTimeout(processBatch, 0);
+        if (startIndex < verseIndex.length) {
+          if (shouldPublishInitialPage) {
+            window.requestAnimationFrame(() => scheduleSearchTask(processBatch));
+          } else {
+            scheduleSearchTask(processBatch);
+          }
           return;
         }
 
+        publishProgress(verseIndex.length, verseIndex.length, true);
         commitSearch(buildMatches());
       };
 
-      window.setTimeout(processBatch, 0);
+      scheduleSearchTask(processBatch);
       return;
     }
 
@@ -756,6 +932,12 @@ export function SearchPage({
       return;
     }
 
+    const preparedSelectedWordSearch = selectedWordSearch;
+    if (!preparedSelectedWordSearch) {
+      commitSearch([]);
+      return;
+    }
+
     const matches: SearchMatch[] = [];
     const batchSize = 1_000;
     let startIndex = 0;
@@ -767,7 +949,10 @@ export function SearchPage({
       const endIndex = Math.min(startIndex + batchSize, verseIndex.length);
       for (let index = startIndex; index < endIndex; index += 1) {
         const entry = verseIndex[index];
-        if (!selected.has(entry.bookIndex) || !matcher?.(entry)) {
+        if (
+          !selected.has(entry.bookIndex) ||
+          !matchPreparedSelectedWords(entry, preparedSelectedWordSearch)
+        ) {
           continue;
         }
         const { bookIndex, chapterIndex, verseNumber, bookName, text } = entry;
@@ -783,17 +968,18 @@ export function SearchPage({
         }
       }
       startIndex = endIndex;
-      setSearchProgress({ processed: startIndex, total: verseIndex.length });
+      publishProgress(startIndex, verseIndex.length);
       if (
         startIndex < verseIndex.length &&
         matches.length < SEARCH_RESULTS_CAP
       ) {
-        window.setTimeout(processMatchBatch, 0);
+        scheduleSearchTask(processMatchBatch);
         return;
       }
+      publishProgress(verseIndex.length, verseIndex.length, true);
       commitSearch(matches);
     };
-    window.setTimeout(processMatchBatch, 0);
+    scheduleSearchTask(processMatchBatch);
   };
 
   const stopSearch = () => {
@@ -814,50 +1000,6 @@ export function SearchPage({
       error: null,
     });
   };
-
-  const renderResultText = useCallback(
-    (match: SearchMatch) => {
-      if (lastSearchMode === "smart") {
-        const smartTerms = getSmartHighlightWords(
-          {
-            searchWords: match.text.split(/\s+/),
-            searchWordsLower: match.text
-              .split(/\s+/)
-              .map((word) =>
-                word.toLowerCase().replace(/^[^a-z0-9']+|[^a-z0-9']+$/gi, ""),
-              )
-              .filter(Boolean),
-          },
-          lastSearchPhraseInput.trim(),
-          false,
-        );
-        return renderHighlightedTerms(
-          match.text,
-          smartTerms,
-          `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
-        );
-      }
-
-      if (lastSearchMode === "contains-any" || lastSearchMode === "contains-all") {
-        return renderHighlightedTerms(
-          match.text,
-          lastSearchSelectedWords,
-          `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
-        );
-      }
-
-      if (lastSearchMode === "regex") {
-        return renderHighlightedText(
-          match.text,
-          lastSearchPhraseInput.trim(),
-          `${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`,
-        );
-      }
-
-      return match.text;
-    },
-    [lastSearchMode, lastSearchPhraseInput, lastSearchSelectedWords],
-  );
 
   const searchSummary = useMemo(() => {
     const summaryMode = lastSearchMode ?? searchMode;
@@ -896,44 +1038,38 @@ export function SearchPage({
     selectedWords,
   ]);
 
-  const renderedResults = useMemo(
-    () =>
-      results.map((match) => (
-        <button
-          key={`${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`}
-          type="button"
-          className="group block w-full px-3 py-2 text-left hover:bg-reference-tint/60"
-          onClick={() =>
-            onOpenResult(
-              match.bookIndex,
-              match.chapterIndex,
-              match.verseNumber,
-              match.verseNumber,
-            )
-          }
-        >
-          <p className="tabular-data text-sm font-medium text-foreground">
-            {`${match.bookName} ${match.chapterIndex + 1}:${match.verseNumber}`}
-          </p>
-          <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground group-hover:text-foreground/90">
-            {renderResultText(match)}
-          </p>
-        </button>
-      )),
-    [onOpenResult, renderResultText, results],
-  );
   const totalPages = Math.max(
     1,
     Math.ceil(results.length / SEARCH_RESULTS_PAGE_SIZE),
   );
   const activePage = Math.min(Math.max(currentPage, 1), totalPages);
-  const pagedRenderedResults = useMemo(() => {
+  const visibleResults = useMemo(() => {
     const startIndex = (activePage - 1) * SEARCH_RESULTS_PAGE_SIZE;
-    return renderedResults.slice(
+    return results.slice(
       startIndex,
       startIndex + SEARCH_RESULTS_PAGE_SIZE,
     );
-  }, [activePage, renderedResults]);
+  }, [activePage, results]);
+  const resultHighlight = useMemo(
+    () => ({
+      mode: lastSearchMode,
+      phrase: lastSearchPhraseInput,
+      selectedWords: lastSearchSelectedWords,
+    }),
+    [lastSearchMode, lastSearchPhraseInput, lastSearchSelectedWords],
+  );
+  const pagedRenderedResults = useMemo(
+    () =>
+      visibleResults.map((match) => (
+        <SearchResultRow
+          key={`${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`}
+          match={match}
+          highlight={resultHighlight}
+          onOpenResult={onOpenResult}
+        />
+      )),
+    [onOpenResult, resultHighlight, visibleResults],
+  );
 
   useEffect(() => {
     const viewport = resultsScrollRef.current?.querySelector<HTMLElement>(

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { STATIC_PAGES } from "@/lib/static-pages";
 import type { StaticPageId } from "@/types/reader";
+import { preloadSearchPage } from "@/lib/search-page-loader";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -153,6 +154,8 @@ export function ReaderTopBar({
           variant="ghost"
           size="icon"
           aria-label="Open search"
+          onMouseEnter={preloadSearchPage}
+          onFocus={preloadSearchPage}
           onClick={onOpenSearch}
           data-tour="search-button"
         >

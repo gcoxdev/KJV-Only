@@ -7,7 +7,10 @@ export {
   buildVerseSearchIndex,
   createSearchableVerseEntry,
   extractSearchWords,
+  matchPreparedSelectedWords,
   matchSelectedWords,
+  prepareSelectedWordSearch,
+  type PreparedSelectedWordSearch,
   type SearchableVerseEntry,
   type VerseSearchIndexEntry,
 } from "@/lib/verse-search-index";

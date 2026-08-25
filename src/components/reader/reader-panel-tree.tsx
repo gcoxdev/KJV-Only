@@ -114,6 +114,7 @@ import type {
   NotesTabState,
   ReaderNote,
 } from "@/types/notes";
+import { loadSearchPage, preloadSearchPage } from "@/lib/search-page-loader";
 
 type ExistingTabTarget = {
   id: string;
@@ -122,7 +123,7 @@ type ExistingTabTarget = {
 };
 
 const LazySearchPage = lazy(async () => {
-  const module = await import("@/components/reader/search-page");
+  const module = await loadSearchPage();
   return { default: module.SearchPage };
 });
 
@@ -1722,6 +1723,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   variant="outline"
                   size="sm"
                   className="justify-center"
+                  onMouseEnter={preloadSearchPage}
+                  onFocus={preloadSearchPage}
                   onClick={() => updateLeafLocation(leaf.id, { view: "search" })}
                 >
                   <SearchIcon />
