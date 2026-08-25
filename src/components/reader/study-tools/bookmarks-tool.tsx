@@ -31,7 +31,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-type BookmarksToolProps = {
+export type BookmarksToolProps = {
   books: Book[];
   bookmarks: ReaderBookmark[];
   onOpenBookmark: (bookmark: ReaderBookmark) => void;
