@@ -56,7 +56,7 @@ export function NoteLinkAutoLinkPlugin({
       }
 
       const href = buildNoteLinkHref(match.target);
-      let matchedNode: TextNode | null = null;
+      let matchedNode: TextNode;
       if (match.index === 0 && match.length === text.length) {
         matchedNode = node;
       } else if (match.index === 0) {
@@ -65,10 +65,6 @@ export function NoteLinkAutoLinkPlugin({
         [, matchedNode] = node.splitText(match.index);
       } else {
         [, matchedNode] = node.splitText(match.index, match.index + match.length);
-      }
-
-      if (!matchedNode) {
-        return;
       }
 
       const linkNode = $createKjvInternalLinkNode(href);

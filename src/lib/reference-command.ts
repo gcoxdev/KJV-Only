@@ -129,7 +129,9 @@ function createReferenceParser() {
   const parser = new bcv_parser(bibleReferenceLanguage);
   parser.set_options({
     consecutive_combination_strategy: "separate",
-    book_alone_strategy: "include",
+    // Parser v4 renamed the old "include" behavior. A bare book still opens
+    // its first chapter, preserving the existing command behavior.
+    book_alone_strategy: "first_chapter",
     book_sequence_strategy: "include",
   });
   return parser;

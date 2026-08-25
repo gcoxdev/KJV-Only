@@ -88,8 +88,8 @@ export function runtimeAssetRequestPath(requestUrl: string | undefined) {
 }
 
 function runtimePublicAssets(): Plugin {
-  let outputDirectory = path.resolve(__dirname, "dist")
-  const publicDirectory = path.resolve(__dirname, "public")
+  let outputDirectory = path.resolve(import.meta.dirname, "dist")
+  const publicDirectory = path.resolve(import.meta.dirname, "public")
   const serveRuntimeAssets = sirv(publicDirectory, {
     dev: true,
     etag: true,
@@ -278,7 +278,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
 })

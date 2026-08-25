@@ -645,9 +645,8 @@ export function tokenizeStrongsDerivation(input: string): StrongsDerivationToken
   const tokens: StrongsDerivationToken[] = [];
   const pattern = /\b([GH]\d{4})\b/g;
   let lastIndex = 0;
-  let match: RegExpExecArray | null = null;
 
-  while ((match = pattern.exec(input)) !== null) {
+  for (const match of input.matchAll(pattern)) {
     if (match.index > lastIndex) {
       tokens.push({
         type: "text",

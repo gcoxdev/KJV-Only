@@ -164,7 +164,7 @@ export function buildNoteLinkHref(target: NoteLinkTarget): string {
 }
 
 export function parseNoteLinkHref(href: string): NoteLinkTarget | null {
-  let path = "";
+  let path: string;
   if (href.startsWith(NOTE_LINK_PROTOCOL)) {
     path = href.slice(NOTE_LINK_PROTOCOL.length);
   } else if (href.startsWith(`${NOTE_LINK_WEB_ORIGIN}/`)) {
