@@ -309,6 +309,61 @@ test("imports notes through the worker and persists the result", async ({ page }
     .toBe(true)
 })
 
+test("preserves guided-tour navigation", async ({ page }) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page.getByRole("button", { name: "Welcome Home", exact: true }).click()
+  await page.getByRole("button", { name: "Take the Tour", exact: true }).click()
+  await expect(page.getByText("Tour Step 1 of 11", { exact: true })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Main Menu" })).toBeVisible()
+
+  await page.getByRole("button", { name: "Next", exact: true }).click()
+  await expect(page.getByText("Tour Step 2 of 11", { exact: true })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Quick Open" })).toBeVisible()
+
+  await page.getByRole("button", { name: "Back", exact: true }).click()
+  await expect(page.getByText("Tour Step 1 of 11", { exact: true })).toBeVisible()
+  await page.getByRole("button", { name: "Skip Tour", exact: true }).click()
+  await expect(page.getByText("Tour Step 1 of 11", { exact: true })).toBeHidden()
+})
+
+test("preserves deferred PWA installation", async ({ page }) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page.evaluate(() => {
+    const installPrompt = new Event("beforeinstallprompt")
+    Object.defineProperties(installPrompt, {
+      prompt: {
+        value: async () => {
+          ;(window as typeof window & { installPromptCalled?: boolean })
+            .installPromptCalled = true
+        },
+      },
+      userChoice: {
+        value: Promise.resolve({ outcome: "accepted", platform: "web" }),
+      },
+    })
+    window.dispatchEvent(installPrompt)
+  })
+
+  await page.getByLabel("Open menu").click()
+  await page.getByRole("menuitem", { name: "Download", exact: true }).click()
+  await expect(page.getByText("Ready to install", { exact: true })).toBeVisible()
+  await page.getByRole("button", { name: "Install App", exact: true }).click()
+  await expect(page.getByText("Installed", { exact: true })).toBeVisible()
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as typeof window & { installPromptCalled?: boolean })
+            .installPromptCalled,
+      ),
+    )
+    .toBe(true)
+})
+
 test("returns keyboard focus when the main menu closes", async ({ page }) => {
   await page.goto("/")
   await expectReaderReady(page)

@@ -1,3 +1,6 @@
+import type { Book } from "@/types/bible";
+import { bookCodeForIndex } from "@/lib/reader-view";
+
 const FALLBACK_CACHE_CONFIG = {
   cachePrefix: "kjv-only-cache-",
   cacheName: "kjv-only-cache-v6",
@@ -27,6 +30,29 @@ export const CORE_OFFLINE_URLS = [
   "/references/phrases.json",
   "/references/units.json",
 ] as const;
+
+export function buildAudioUrls(books: Book[], range: "old" | "new") {
+  const startIndex = range === "old" ? 0 : 39;
+  const endIndex = range === "old" ? Math.min(39, books.length) : books.length;
+  const urls: string[] = [];
+
+  for (let bookIndex = startIndex; bookIndex < endIndex; bookIndex += 1) {
+    const book = books[bookIndex];
+    if (!book) {
+      continue;
+    }
+    const code = bookCodeForIndex(bookIndex);
+    for (
+      let chapterIndex = 0;
+      chapterIndex < book.chapters.length;
+      chapterIndex += 1
+    ) {
+      urls.push(`/audio/${code}.${chapterIndex + 1}.mp3`);
+    }
+  }
+
+  return urls;
+}
 
 export function normalizeOfflineAssetUrl(url: string) {
   const resolved = new URL(url, window.location.origin);

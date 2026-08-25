@@ -68,6 +68,14 @@ export function usePanelTransfer({
     );
   }, [readerBookmarks]);
 
+  const requestNotesImport = useCallback(() => {
+    notesImportInputRef.current?.click();
+  }, []);
+
+  const requestBookmarksImport = useCallback(() => {
+    bookmarksImportInputRef.current?.click();
+  }, []);
+
   const handleImportNotesFile = useCallback(
     async (file: File | null) => {
       if (!file) {
@@ -177,6 +185,8 @@ export function usePanelTransfer({
     bookmarksImportInputRef,
     exportNotes,
     exportBookmarks,
+    requestNotesImport,
+    requestBookmarksImport,
     handleImportNotesFile,
     handleImportBookmarksFile,
   };
