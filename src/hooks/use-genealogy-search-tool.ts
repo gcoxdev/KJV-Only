@@ -135,6 +135,13 @@ export function useGenealogySearchTool() {
     [ensureGenealogyLoaded],
   );
 
+  const resetTransientState = useCallback(() => {
+    setGenealogyError(null);
+    setIsGenealogyLoading(false);
+    setIsGenealogySearching(false);
+    setSelectedGenealogyIds([]);
+  }, []);
+
   return {
     genealogy,
     genealogySearchTerm,
@@ -151,5 +158,6 @@ export function useGenealogySearchTool() {
     setSelectedGenealogyIds,
     ensureGenealogyLoaded,
     applyGenealogySearch,
+    resetTransientState,
   };
 }

@@ -126,6 +126,13 @@ export function useDictionarySearchTool<
     [ensureLoaded],
   );
 
+  const resetTransientState = useCallback(() => {
+    setError(null);
+    setIsLoading(false);
+    setIsSearching(false);
+    setSelectedResult(null);
+  }, []);
+
   return {
     payload,
     searchTerm,
@@ -141,5 +148,6 @@ export function useDictionarySearchTool<
     setSelectedResult,
     ensureLoaded,
     applySearch,
+    resetTransientState,
   };
 }

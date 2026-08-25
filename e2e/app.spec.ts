@@ -149,6 +149,43 @@ test("loads study-word tools progressively without blocking the reader", async (
   expect(measures.allTools).toBeLessThan(15_000)
 })
 
+test("clears transient study selections when read mode closes the tools", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page
+    .getByRole("button", { name: "Details for beginning", exact: true })
+    .first()
+    .click()
+  await expect(
+    page
+      .getByRole("button", { name: "beginning", exact: true })
+      .filter({ visible: true }),
+  ).toBeVisible()
+
+  await page.getByLabel("Switch to read mode").click()
+  await expect(page.getByLabel("Switch to study mode")).toBeVisible()
+  await page.getByLabel("Switch to study mode").click()
+  await page.getByRole("button", { name: "Toggle Sidebar" }).click()
+
+  await page
+    .getByRole("button", { name: "Concordance", exact: true })
+    .filter({ visible: true })
+    .click()
+  await expect(
+    page.getByText("Click a word in the text or search concordance.", {
+      exact: true,
+    }),
+  ).toBeVisible()
+  await expect(
+    page
+      .getByRole("button", { name: "beginning", exact: true })
+      .filter({ visible: true }),
+  ).toHaveCount(0)
+})
+
 test("loads auxiliary reader panels on demand", async ({ page }) => {
   await page.goto("/")
   await expectReaderReady(page)

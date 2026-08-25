@@ -18,11 +18,6 @@ import {
   loadUnits,
   loadWebsters,
 } from "@/lib/reader-data";
-import { beginPerformanceMeasure } from "@/lib/performance";
-import {
-  consumeLocalStorageIssueKeys,
-  LOCAL_STORAGE_ISSUE_EVENT,
-} from "@/lib/local-storage";
 import { resolveAIDictionaryKey } from "@/lib/references";
 import {
   deriveTokenAccordionState,
@@ -32,10 +27,6 @@ import {
   readableHighlightTextColor,
 } from "@/lib/highlight-color";
 import { chapterProgressKey, panelViewportElement } from "@/lib/reader-view";
-import {
-  prunePendingReaderScrollTargets,
-} from "@/lib/reader-scroll-targets";
-import { clearSingleLeafReferenceIfMissing } from "@/lib/leaf-state";
 import {
   collectLeafIds,
   findLeafNode,
@@ -110,6 +101,12 @@ import { useVerseHighlights } from "@/hooks/use-verse-highlights";
 import { useReaderShellState } from "@/hooks/use-reader-shell-state";
 import { useReaderController } from "@/hooks/use-reader-controller";
 import { useStudyWorkspaceState } from "@/hooks/use-study-workspace-state";
+import { useStudyModeLifecycle } from "@/hooks/use-study-mode-lifecycle";
+import { useReaderStorageWarning } from "@/hooks/use-reader-storage-warning";
+import { useFirstReaderReadyMeasure } from "@/hooks/use-first-reader-ready-measure";
+import { useTokenPopupDismissal } from "@/hooks/use-token-popup-dismissal";
+import { useReaderLeafCleanup } from "@/hooks/use-reader-leaf-cleanup";
+import { useTopicsPreload } from "@/hooks/use-topics-preload";
 import { TabsStrip } from "@/components/reader/tabs-strip";
 import { TokenPopupCard } from "@/components/reader/token-popup-card";
 import { ReaderTopBar } from "@/components/reader/reader-top-bar";
@@ -156,7 +153,6 @@ export function KJVReader() {
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [sidebarCloseRequestKey, setSidebarCloseRequestKey] = useState(0);
   const [isReferenceCommandOpen, setIsReferenceCommandOpen] = useState(false);
-  const finishFirstReaderReadyMeasureRef = useRef<(() => void) | null>(null);
   const hasOpenSearchView = useMemo(
     () => tabs.some((tab) => panelNodeContainsView(tab.root, "search")),
     [tabs],
@@ -229,23 +225,7 @@ export function KJVReader() {
   const wordVerseSelectionTargetRef =
     useRef<WordVerseSelectionTarget>(wordVerseSelectionTarget);
 
-  useEffect(() => {
-    let lastNotifiedAt = 0;
-    const notify = () => {
-      const issueKeys = consumeLocalStorageIssueKeys();
-      if (issueKeys.length === 0 || Date.now() - lastNotifiedAt < 1_000) {
-        return;
-      }
-      lastNotifiedAt = Date.now();
-      toast.warning("Some saved reader data could not be used.", {
-        description:
-          "The reader recovered safely. Export important notes/bookmarks before clearing site data if the warning continues.",
-      });
-    };
-    notify();
-    window.addEventListener(LOCAL_STORAGE_ISSUE_EVENT, notify);
-    return () => window.removeEventListener(LOCAL_STORAGE_ISSUE_EVENT, notify);
-  }, []);
+  useReaderStorageWarning();
   const [activeSettingsTab, setActiveSettingsTab] = useState<
     "visual" | "targeting" | "other"
   >("visual");
@@ -339,47 +319,13 @@ export function KJVReader() {
     setTargetedPanelLeafId,
   });
 
-  useEffect(() => {
-    const finishMeasure = beginPerformanceMeasure("kjv:first-reader-ready");
-    finishFirstReaderReadyMeasureRef.current = finishMeasure;
-    return () => {
-      if (finishFirstReaderReadyMeasureRef.current === finishMeasure) {
-        finishMeasure();
-        finishFirstReaderReadyMeasureRef.current = null;
-      }
-    };
-  }, []);
+  const finishFirstReaderReadyMeasureRef = useFirstReaderReadyMeasure();
 
   useEffect(() => {
     wordVerseSelectionTargetRef.current = wordVerseSelectionTarget;
   }, [wordVerseSelectionTarget]);
 
-  useEffect(() => {
-    if (!tokenPopup) {
-      return;
-    }
-
-    function onPointerDown(event: PointerEvent) {
-      const target = event.target as HTMLElement | null;
-      if (target?.closest("[data-token-popup]")) {
-        return;
-      }
-      setTokenPopup(null);
-    }
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setTokenPopup(null);
-      }
-    }
-
-    window.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [tokenPopup]);
+  useTokenPopupDismissal(Boolean(tokenPopup), setTokenPopup);
 
   useReaderStartup({
     isLoaded,
@@ -548,24 +494,15 @@ export function KJVReader() {
     [],
   );
 
-  useEffect(() => {
-    pruneNotesTabState(activeLeafIds);
-    pruneSearchPageState(activeLeafIds);
-    pruneHighlightModeForLeaves(activeLeafIds);
-    pruneLeafHighlights(activeLeafIds);
-    setActiveReaderWordHighlight((current) =>
-      clearSingleLeafReferenceIfMissing(current, activeLeafIds),
-    );
-    setPendingReaderScrollTargets((current) =>
-      prunePendingReaderScrollTargets(current, activeLeafIds),
-    );
-  }, [
+  useReaderLeafCleanup({
     activeLeafIds,
     pruneHighlightModeForLeaves,
     pruneLeafHighlights,
     pruneNotesTabState,
     pruneSearchPageState,
-  ]);
+    setActiveReaderWordHighlight,
+    setPendingReaderScrollTargets,
+  });
   const mapOldEnglishResult = useCallback(
     (key: string, definitions: string[]) => ({ key, definitions }),
     [],
@@ -604,6 +541,7 @@ export function KJVReader() {
     ensureConcordanceLoaded,
     ensureCrossRefsLoaded,
     applyConcordanceSearch: applyConcordanceSearchRaw,
+    resetTransientState: resetConcordanceTransientState,
   } = useConcordanceCrossRefsTool();
 
   const applyConcordanceSearch = useCallback(
@@ -658,12 +596,10 @@ export function KJVReader() {
     error: webstersError,
     results: webstersSearchResults,
     setSearchTerm: setWebstersSearchTerm,
-    setIsSearching: setIsWebstersSearching,
-    setIsLoading: setIsWebstersLoading,
-    setError: setWebstersError,
     setSelectedResult: setSelectedWebstersEntry,
     ensureLoaded: ensureWebstersLoaded,
     applySearch: applyWebstersSearchRaw,
+    resetTransientState: resetWebstersTransientState,
   } = useDictionarySearchTool<
     WebstersPayload,
     WebstersEntry,
@@ -756,12 +692,10 @@ export function KJVReader() {
     error: hitchcocksError,
     results: hitchcocksSearchResults,
     setSearchTerm: setHitchcocksSearchTerm,
-    setIsSearching: setIsHitchcocksSearching,
-    setIsLoading: setIsHitchcocksLoading,
-    setError: setHitchcocksError,
     setSelectedResult: setSelectedHitchcocksEntry,
     ensureLoaded: ensureHitchcocksLoaded,
     applySearch: applyHitchcocksSearch,
+    resetTransientState: resetHitchcocksTransientState,
   } = useDictionarySearchTool<
     HitchcocksPayload,
     string,
@@ -780,12 +714,10 @@ export function KJVReader() {
     error: oldEnglishError,
     results: oldEnglishSearchResults,
     setSearchTerm: setOldEnglishSearchTerm,
-    setIsSearching: setIsOldEnglishSearching,
-    setIsLoading: setIsOldEnglishLoading,
-    setError: setOldEnglishError,
     setSelectedResult: setSelectedOldEnglishEntry,
     ensureLoaded: ensureOldEnglishLoaded,
     applySearch: applyOldEnglishSearch,
+    resetTransientState: resetOldEnglishTransientState,
   } = useDictionarySearchTool<
     OldEnglishPayload,
     string[],
@@ -804,12 +736,10 @@ export function KJVReader() {
     error: bibleWordBookError,
     results: bibleWordBookSearchResults,
     setSearchTerm: setBibleWordBookSearchTerm,
-    setIsSearching: setIsBibleWordBookSearching,
-    setIsLoading: setIsBibleWordBookLoading,
-    setError: setBibleWordBookError,
     setSelectedResult: setSelectedBibleWordBookEntry,
     ensureLoaded: ensureBibleWordBookLoaded,
     applySearch: applyBibleWordBookSearchRaw,
+    resetTransientState: resetBibleWordBookTransientState,
   } = useDictionarySearchTool<
     BibleWordBookPayload,
     BibleWordBookEntry,
@@ -896,6 +826,7 @@ export function KJVReader() {
     setSelectedStrongsEntry,
     ensureStrongsLoaded,
     applyStrongsSearch: applyStrongsSearchRaw,
+    resetTransientState: resetStrongsTransientState,
   } = useStrongsSearchTool();
 
   const applyStrongsSearch = useCallback(
@@ -915,12 +846,10 @@ export function KJVReader() {
     genealogyById,
     genealogySearchResults,
     setGenealogySearchTerm,
-    setIsGenealogySearching,
-    setIsGenealogyLoading,
-    setGenealogyError,
     setSelectedGenealogyIds,
     ensureGenealogyLoaded,
     applyGenealogySearch,
+    resetTransientState: resetGenealogyTransientState,
   } = useGenealogySearchTool();
 
   const {
@@ -932,12 +861,10 @@ export function KJVReader() {
     mapsSearchResults,
     mapsDisplayEntries,
     setMapsSearchTerm,
-    setIsMapsSearching,
-    setIsMapsLoading,
-    setMapsError,
     setSelectedMapsEntries,
     ensureAncientMapsLoaded,
     applyMapsSearch: applyMapsSearchRaw,
+    resetTransientState: resetMapsTransientState,
   } = useMapsSearchTool();
 
   const applyMapsSearch = useCallback(
@@ -947,91 +874,35 @@ export function KJVReader() {
     [applyMapsSearchRaw],
   );
 
-  useEffect(() => {
-    if (isStudyMode) {
-      return;
-    }
-    setIsRightSidebarOpen(false);
+  const resetStudyToolAccordions = useCallback(() => {
     setConcordanceAccordionValue([]);
-    setSelectedCrossReferences(null);
-    setCrossRefsError(null);
-    setIsCrossRefsLoading(false);
-    setSelectedConcordanceWord(null);
-    setConcordanceError(null);
-    setIsConcordanceLoading(false);
-    setWebstersError(null);
-    setIsWebstersLoading(false);
-    setIsWebstersSearching(false);
     setWebstersWordAccordionValue([]);
-    setSelectedWebstersEntry(null);
-    setHitchcocksError(null);
-    setIsHitchcocksLoading(false);
-    setIsHitchcocksSearching(false);
-    setSelectedHitchcocksEntry(null);
-    setBibleWordBookError(null);
-    setIsBibleWordBookLoading(false);
-    setIsBibleWordBookSearching(false);
     setBibleWordBookWordAccordionValue([]);
-    setSelectedBibleWordBookEntry(null);
-    setOldEnglishError(null);
-    setIsOldEnglishLoading(false);
-    setIsOldEnglishSearching(false);
-    setSelectedOldEnglishEntry(null);
-    setGenealogyError(null);
-    setIsGenealogyLoading(false);
-    setIsGenealogySearching(false);
-    setSelectedGenealogyIds([]);
-    setStrongsError(null);
-    setIsStrongsLoading(false);
-    setIsStrongsSearching(false);
     setStrongsWordAccordionValue([]);
-    setSelectedStrongsEntry(null);
-    setMapsError(null);
-    setIsMapsLoading(false);
-    setIsMapsSearching(false);
-    setSelectedMapsEntries([]);
-    resetMapDialogState();
   }, [
-    isStudyMode,
-    resetMapDialogState,
     setConcordanceAccordionValue,
-    setConcordanceError,
-    setCrossRefsError,
-    setBibleWordBookError,
-    setGenealogyError,
-    setHitchcocksError,
-    setIsConcordanceLoading,
-    setIsCrossRefsLoading,
-    setIsBibleWordBookLoading,
-    setIsBibleWordBookSearching,
-    setIsGenealogyLoading,
-    setIsGenealogySearching,
-    setIsHitchcocksLoading,
-    setIsHitchcocksSearching,
-    setIsMapsLoading,
-    setIsMapsSearching,
-    setIsOldEnglishLoading,
-    setIsOldEnglishSearching,
-    setIsRightSidebarOpen,
-    setIsStrongsLoading,
-    setIsStrongsSearching,
-    setIsWebstersLoading,
-    setIsWebstersSearching,
-    setMapsError,
-    setOldEnglishError,
-    setSelectedBibleWordBookEntry,
-    setSelectedConcordanceWord,
-    setSelectedCrossReferences,
-    setSelectedGenealogyIds,
-    setSelectedHitchcocksEntry,
-    setSelectedMapsEntries,
-    setSelectedOldEnglishEntry,
-    setSelectedStrongsEntry,
-    setSelectedWebstersEntry,
-    setStrongsError,
-    setWebstersError,
     setBibleWordBookWordAccordionValue,
+    setStrongsWordAccordionValue,
+    setWebstersWordAccordionValue,
   ]);
+
+  const closeStudySidebar = useCallback(() => {
+    setIsRightSidebarOpen(false);
+  }, [setIsRightSidebarOpen]);
+
+  useStudyModeLifecycle(isStudyMode, {
+    closeSidebar: closeStudySidebar,
+    resetAccordions: resetStudyToolAccordions,
+    resetConcordance: resetConcordanceTransientState,
+    resetWebsters: resetWebstersTransientState,
+    resetHitchcocks: resetHitchcocksTransientState,
+    resetBibleWordBook: resetBibleWordBookTransientState,
+    resetOldEnglish: resetOldEnglishTransientState,
+    resetGenealogy: resetGenealogyTransientState,
+    resetStrongs: resetStrongsTransientState,
+    resetMaps: resetMapsTransientState,
+    resetMapDialog: resetMapDialogState,
+  });
 
   const updateActiveTab = useCallback(
     (updater: (tab: ReaderTab) => ReaderTab) => {
@@ -1819,32 +1690,7 @@ export function KJVReader() {
     setActiveTabId,
   });
 
-  useEffect(() => {
-    const hasTopicsLeaf = tabs.some((tab) => {
-      const stack = [tab.root];
-      while (stack.length > 0) {
-        const node = stack.pop();
-        if (!node) {
-          continue;
-        }
-        if (node.type === "leaf") {
-          if (node.view === "topics") {
-            return true;
-          }
-          continue;
-        }
-        stack.push(node.first, node.second);
-      }
-      return false;
-    });
-
-    if (studyWorkspaceTab !== "topics" && !hasTopicsLeaf) {
-      return;
-    }
-    void ensureTopicsLoaded().catch(() => {
-      // Error state is set by ensureTopicsLoaded.
-    });
-  }, [ensureTopicsLoaded, studyWorkspaceTab, tabs]);
+  useTopicsPreload({ tabs, studyWorkspaceTab, ensureTopicsLoaded });
 
   const {
     allStudyAccordionsOpen,

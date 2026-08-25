@@ -10,8 +10,42 @@ import {
   deriveStrongsSearchResults,
   type StrongsSearchResult,
 } from "@/hooks/use-strongs-search-tool";
+import { runStudyModeTeardown } from "@/hooks/use-study-mode-lifecycle";
 
 describe("study tool reset behavior", () => {
+  it("runs the complete study-mode teardown contract in order", () => {
+    const calls: string[] = [];
+    const record = (name: string) => () => calls.push(name);
+
+    runStudyModeTeardown({
+      closeSidebar: record("close sidebar"),
+      resetAccordions: record("reset accordions"),
+      resetConcordance: record("reset concordance"),
+      resetWebsters: record("reset websters"),
+      resetHitchcocks: record("reset hitchcocks"),
+      resetBibleWordBook: record("reset bible word book"),
+      resetOldEnglish: record("reset old english"),
+      resetGenealogy: record("reset genealogy"),
+      resetStrongs: record("reset strongs"),
+      resetMaps: record("reset maps"),
+      resetMapDialog: record("reset map dialog"),
+    });
+
+    expect(calls).toEqual([
+      "close sidebar",
+      "reset accordions",
+      "reset concordance",
+      "reset websters",
+      "reset hitchcocks",
+      "reset bible word book",
+      "reset old english",
+      "reset genealogy",
+      "reset strongs",
+      "reset maps",
+      "reset map dialog",
+    ]);
+  });
+
   it("dictionary results fall back to the selected entry when the search is cleared", () => {
     const selectedResult = { key: "grace", value: "favor" };
     const indexedEntries = [

@@ -132,6 +132,15 @@ export function useConcordanceCrossRefsTool() {
     [ensureConcordanceLoaded],
   );
 
+  const resetTransientState = useCallback(() => {
+    setSelectedCrossReferences(null);
+    setCrossRefsError(null);
+    setIsCrossRefsLoading(false);
+    setSelectedConcordanceWord(null);
+    setConcordanceError(null);
+    setIsConcordanceLoading(false);
+  }, []);
+
   return {
     concordance,
     crossRefs,
@@ -155,5 +164,6 @@ export function useConcordanceCrossRefsTool() {
     ensureConcordanceLoaded,
     ensureCrossRefsLoaded,
     applyConcordanceSearch,
+    resetTransientState,
   };
 }

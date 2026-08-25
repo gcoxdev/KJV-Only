@@ -130,6 +130,13 @@ export function useStrongsSearchTool() {
     [ensureStrongsLoaded],
   );
 
+  const resetTransientState = useCallback(() => {
+    setStrongsError(null);
+    setIsStrongsLoading(false);
+    setIsStrongsSearching(false);
+    setSelectedStrongsEntry(null);
+  }, []);
+
   return {
     strongsGreek,
     strongsHebrew,
@@ -146,5 +153,6 @@ export function useStrongsSearchTool() {
     setSelectedStrongsEntry,
     ensureStrongsLoaded,
     applyStrongsSearch,
+    resetTransientState,
   };
 }
