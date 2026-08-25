@@ -17,6 +17,12 @@ export type VerseSearchIndexEntry = SearchableVerseEntry & {
   bookName: string
 }
 
+export type PreparedSelectedWordSearch = {
+  needles: string[]
+  mode: Extract<SearchMode, "contains-any" | "contains-all">
+  caseSensitive: boolean
+}
+
 function phoneticCode(value: string) {
   const normalized = value.toUpperCase().replace(/[^A-Z]/g, "")
   if (!normalized) return ""
@@ -119,8 +125,7 @@ export function buildVerseSearchIndex(books: Book[]): VerseSearchIndexEntry[] {
   return indexed
 }
 
-export function matchSelectedWords(
-  entry: Pick<SearchableVerseEntry, "searchWords" | "searchWordsLower">,
+export function prepareSelectedWordSearch(
   selectedWords: string[],
   mode: Extract<SearchMode, "contains-any" | "contains-all">,
   caseSensitive: boolean,
@@ -128,15 +133,39 @@ export function matchSelectedWords(
   const normalizedNeedles = selectedWords
     .map((word) => normalizeConcordanceWord(word.trim()))
     .filter(Boolean)
-  if (normalizedNeedles.length === 0) return false
+  if (normalizedNeedles.length === 0) return null
 
-  const haystack = new Set(
-    caseSensitive ? entry.searchWords : entry.searchWordsLower,
+  return {
+    needles: caseSensitive
+      ? normalizedNeedles
+      : normalizedNeedles.map((word) => word.toLowerCase()),
+    mode,
+    caseSensitive,
+  } satisfies PreparedSelectedWordSearch
+}
+
+export function matchPreparedSelectedWords(
+  entry: Pick<SearchableVerseEntry, "searchWords" | "searchWordsLower">,
+  prepared: PreparedSelectedWordSearch,
+) {
+  const haystack = prepared.caseSensitive
+    ? entry.searchWords
+    : entry.searchWordsLower
+  return prepared.mode === "contains-any"
+    ? prepared.needles.some((needle) => haystack.includes(needle))
+    : prepared.needles.every((needle) => haystack.includes(needle))
+}
+
+export function matchSelectedWords(
+  entry: Pick<SearchableVerseEntry, "searchWords" | "searchWordsLower">,
+  selectedWords: string[],
+  mode: Extract<SearchMode, "contains-any" | "contains-all">,
+  caseSensitive: boolean,
+) {
+  const prepared = prepareSelectedWordSearch(
+    selectedWords,
+    mode,
+    caseSensitive,
   )
-  const needles = caseSensitive
-    ? normalizedNeedles
-    : normalizedNeedles.map((word) => word.toLowerCase())
-  return mode === "contains-any"
-    ? needles.some((needle) => haystack.has(needle))
-    : needles.every((needle) => haystack.has(needle))
+  return prepared ? matchPreparedSelectedWords(entry, prepared) : false
 }

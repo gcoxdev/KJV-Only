@@ -5,7 +5,9 @@ import {
   buildRegexMatcher,
   createSearchableVerseEntry,
   extractSearchWords,
+  matchPreparedSelectedWords,
   matchSelectedWords,
+  prepareSelectedWordSearch,
   scoreSmartSearch,
   suggestConcordanceWords,
   suggestSmartCorrections,
@@ -91,6 +93,32 @@ describe("search helpers", () => {
     expect(matchSelectedWords(entry, ["lord"], "contains-any", false)).toBe(true);
     expect(matchSelectedWords(entry, ["lord"], "contains-any", true)).toBe(true);
     expect(matchSelectedWords(entry, ["LoRd"], "contains-any", true)).toBe(false);
+  });
+
+  it("reuses prepared token searches across verse candidates", () => {
+    const prepared = prepareSelectedWordSearch(
+      ["Faith", "hope"],
+      "contains-all",
+      false,
+    );
+
+    expect(prepared).not.toBeNull();
+    if (!prepared) {
+      throw new Error("Expected a prepared token search");
+    }
+    expect(
+      matchPreparedSelectedWords(
+        createSearchableVerseEntry("faith, hope, and charity"),
+        prepared,
+      ),
+    ).toBe(true);
+    expect(
+      matchPreparedSelectedWords(
+        createSearchableVerseEntry("faith without works"),
+        prepared,
+      ),
+    ).toBe(false);
+    expect(prepareSelectedWordSearch(["  "], "contains-any", false)).toBeNull();
   });
 
   it("builds regex matchers without global state", () => {
