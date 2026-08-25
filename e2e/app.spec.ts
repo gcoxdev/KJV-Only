@@ -207,6 +207,31 @@ test("preserves panel split, preview, move, and close behavior", async ({
   await expect(panels.first()).toContainText(FIRST_VERSE)
 })
 
+test("opens multiple reference-command targets in the current tab", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page.getByLabel("Open reference command").click()
+  await page
+    .getByPlaceholder("Type references like John 3:16; Romans 8:1-2")
+    .fill("John 3:16; Romans 8:1-2")
+  await page
+    .getByText("Open All as New Panels in Current Tab", { exact: true })
+    .click()
+
+  await expect(page.locator("[data-panel-leaf-id]:visible")).toHaveCount(3)
+  await expect(
+    page.getByText("For God so loved the world", { exact: false }),
+  ).toBeVisible()
+  await expect(
+    page.getByText("There is therefore now no condemnation", {
+      exact: false,
+    }),
+  ).toBeVisible()
+})
+
 test("imports notes through the worker and persists the result", async ({ page }) => {
   await page.goto("/")
   await expectReaderReady(page)

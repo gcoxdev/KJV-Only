@@ -3,11 +3,11 @@
 **Assessment date:** 2026-08-24
 **Committed baseline:** `cb46f04` (`refactor(reader): harden corpus lifecycle`)
 **Scope:** Reduce `KJVReader` orchestration risk and improve study-word responsiveness without changing product behavior.
-**Status:** Phase 1 is committed as `8879054`; Phase 2 is committed as `ee6689b`; Phase 4 is implemented and verified locally but remains uncommitted. Phase 3 remains intentionally deferred. Nothing has been pushed.
+**Status:** Phase 1 is committed as `8879054`; Phase 2 is committed as `ee6689b`; Phase 4 is committed as `975039c`; Phase 5 is implemented and verified locally but remains uncommitted. Phase 3 remains intentionally deferred. Nothing has been pushed.
 
 ## Executive result
 
-`KJVReader` was 4,601 lines at the original committed baseline. Phase 1 moved the asynchronous word-study fan-out into `useWordStudyCoordinator`, removed duplicated work, and reduced the component to 4,259 lines. Phase 2 moved the remaining word-study matching algorithms into `word-study-selection.ts`, reducing `KJVReader` to 3,977 lines. Phase 4 now moves panel preview, adjacency, split, move, group insertion, orientation, and close orchestration into `usePanelInteractionController`, reducing `KJVReader` to 3,578 lines. The composition root is 1,023 lines smaller than the baseline without changing its public behavior.
+`KJVReader` was 4,601 lines at the original committed baseline. Phase 1 moved the asynchronous word-study fan-out into `useWordStudyCoordinator`, removed duplicated work, and reduced the component to 4,259 lines. Phase 2 moved the remaining word-study matching algorithms into `word-study-selection.ts`, reducing `KJVReader` to 3,977 lines. Phase 4 moved panel preview, adjacency, split, move, group insertion, orientation, and close orchestration into `usePanelInteractionController`, reducing `KJVReader` to 3,578 lines. Phase 5 now moves tab/tool orchestration and pending reader scrolling into focused hooks while retaining the tested destination engine in `usePanelRouting`, reducing `KJVReader` to 2,949 lines. The composition root is 1,652 lines (35.9%) smaller than the baseline without changing its public behavior.
 
 The cold-path delay was mainly CPU scheduling, not network transfer. In the initial local Chromium trace, all 13 study responses arrived in about 0.28 seconds, but the click was blocked for about 4.18 seconds and the aggregate loaders took about 5.29 seconds. Genealogy enrichment alone used about 2.30 seconds, and loading each payload caused several search tools to eagerly construct indexes that a word selection did not need.
 
@@ -25,17 +25,27 @@ These are development-machine diagnostics, not universal device guarantees. The 
 
 ## Graphify architecture map
 
-Graphify was refreshed after Phase 4. The current graph contains **3,157 nodes, 6,342 edges, and 206 communities**. `KJVReader()` remains the principal composition node with degree 58. `usePanelInteractionController()` has degree 20 and Graphify places it, `reader-layout.ts`, `reader-neighbors.ts`, and the new neighbor characterization tests in the same layout community. This makes the new boundary visible in the graph instead of leaving imperative panel behavior embedded in the composition root.
+Graphify was refreshed after Phase 5. The current graph contains **3,170 nodes, 6,401 edges, and 204 communities**. `KJVReader()` remains the principal composition node, but its degree has fallen from 58 after Phase 4 to 53. The new boundaries are individually visible: `useWorkspaceNavigation()` has degree 11, `usePanelRouting()` has degree 11, and `usePendingReaderScroll()` has degree 8. Graph traversal places workspace helpers and tests with the navigation hook, destination construction and targeting with panel routing, and queue/dequeue/calculation helpers with pending scrolling. The split therefore follows existing responsibility communities rather than merely relocating a contiguous block of code.
 
 ```mermaid
 flowchart TD
     App[App / KJVReader] --> Controller[useReaderController]
-    App --> Workspace[Tabs, panels, routing, history]
+    App --> Workspace[useWorkspaceNavigation]
+    App --> Routing[usePanelRouting]
+    App --> PendingScroll[usePendingReaderScroll]
+    App --> History[Leaf history]
     App --> PanelController[Panel interaction controller]
     App --> StudyHooks[Study data/search hooks]
     App --> Navigation[useWordStudyNavigation]
     App --> Coordinator[useWordStudyCoordinator]
     App --> Selection[Pure word-study selection]
+
+    Workspace --> LayoutCommands[Tab and leaf layout commands]
+    Workspace --> StaticPages[Static page and tool tab creation]
+    Routing --> Destination[Destination policy and targeted routing]
+    Routing --> ReferenceCommands[Reference-command execution]
+    PendingScroll --> ScrollQueue[Pending target queue/dequeue]
+    PendingScroll --> Viewport[Panel viewport and verse geometry]
 
     Navigation --> CrossRefs[Cross-reference selection]
     Navigation --> Coordinator
@@ -99,14 +109,13 @@ Approximate current regions after the completed structural extractions:
 
 | Region | Approximate lines | Ownership concern |
 |---|---:|---|
-| Shell, startup, persistence/controller composition | 310–950 | Many lifecycle effects and installation/tour state remain in the root component |
-| Study data/search hook composition | 950–1,400 | Large adapter surface; each tool exposes many individual setters |
-| Panel interaction boundary | 1,450–1,520 | Root now supplies state-domain adapters to one controller instead of implementing the commands inline |
-| Tab, reader navigation, routing and target selection | 1,520–2,270 | Broad workspace command surface with several destination policies |
-| Progress and tab actions | 2,270–2,400 | Smaller, coherent extraction candidate |
-| Study orchestration adapters | 2,400–2,650 | Explicit boundaries exist, but the state-setter argument surface remains wide |
-| Shell actions and final derived props | 2,650–3,250 | Fullscreen, tour, view-model, and panel prop assembly remain mixed |
-| Render composition | 3,250–3,578 | Large prop surfaces still obscure view boundaries |
+| Shell, startup, persistence/controller composition | 280–830 | Many lifecycle effects and installation/tour state remain in the root component |
+| Study data/search hook composition | 830–1,335 | Large adapter surface; each tool exposes many individual setters |
+| Tab/panel controller composition | 1,335–1,525 | Root supplies adapters to panel interaction, pending scrolling, workspace navigation, and panel routing rather than implementing those commands inline |
+| Study orchestration and selection adapters | 1,525–2,100 | Explicit boundaries exist, but the state-setter and callback argument surfaces remain wide |
+| Guided tour and shell actions | 2,100–2,270 | Tour, installation, completion, and shell lifecycle concerns remain in the root |
+| View-model/prop assembly | 2,270–2,560 | Large inline prop objects remain the next coherent structural boundary |
+| Render composition | 2,560–2,949 | Tab-panel mapping and dialog/sidebar composition still make the root sensitive to many domains |
 
 The line count is a symptom. The more important issue is that a change to one workflow can still touch layout state, routing, tool state, derived props, and render composition in the same component.
 
@@ -157,7 +166,7 @@ Exit evidence: exact payload-equivalence tests, genealogy-name E2E coverage, no 
 
 ### Phase 4 — panel interaction controller
 
-**Status: implemented and verified locally; awaiting review/commit approval.**
+**Status: committed as `975039c`.**
 
 The preview/move/add/orientation/split/close region now lives in `usePanelInteractionController`.
 
@@ -175,9 +184,20 @@ Phase result: 399 additional lines removed from `KJVReader` (3,578 lines current
 
 ### Phase 5 — workspace navigation controller
 
-Extract tab opening, targeted-panel routing, chapter/reference navigation, scroll targeting, and destination-policy handling into a workspace controller façade. Preserve every current destination (`new-tab`, `new-panel`, `targeted-panel`, and sidebar behavior) and URL hash format.
+**Status: implemented and verified locally; awaiting review/commit approval.**
 
-Expected `KJVReader` reduction: 500–650 lines.
+The tab/tool command surface now lives in `useWorkspaceNavigation`. It owns:
+
+- active-tab focus and deferred tool-tab activation;
+- chapter movement and reader/search/static/notes tab creation;
+- targeted study-tool panel creation and reuse;
+- the existing new-tab/new-panel/targeted-panel destination branches.
+
+`usePendingReaderScroll` separately owns the DOM-specific verse/chapter scroll retry lifecycle. `usePanelRouting` remains the destination engine; Phase 5 binds the configured bookmark, search-result, reference-link, and reference-command policies at that boundary instead of rebuilding them in `KJVReader`. Small pure helpers for dedicated tab detection and search-tab titles live in `workspace-navigation.ts` with direct tests.
+
+No tab model, layout hash, destination setting, public URL, sidebar rule, or reference-command action was changed. A browser journey characterizes a two-reference command opening both targets as panels in the current tab.
+
+Phase result: 629 additional lines removed from `KJVReader` (2,949 lines current). Typecheck, lint, all 228 unit tests, 10 development-browser tests plus one production-only skip, all 11 production-preview browser tests, the production build/distribution checks, and `git diff --check` pass. The unchanged 600,000-byte entry-script budget also passes at 599,860 bytes.
 
 ### Phase 6 — view-model and render boundaries
 
@@ -229,4 +249,4 @@ Commits and pushes remain approval-gated. Related phases should be batched into 
 
 ## Immediate next recommendation
 
-Review Phase 4 as one cohesive compatibility-preserving change and commit it only after approval. The next structural reader extraction should be Phase 5's workspace navigation controller: tab opening, targeted-panel routing, scroll targeting, and destination policy still form the largest coherent command cluster in `KJVReader`. The deferred corpus-enrichment work can remain independent of that structural refactor.
+Review Phase 5 as one cohesive compatibility-preserving change and commit it only after approval. The next structural reader extraction should be Phase 6's view-model boundary: the large inline study-tool, settings, bookmark, and progress prop objects now form the clearest remaining cluster, followed by the tab-panel render composition. The deferred corpus-enrichment work can remain independent of that structural refactor.
