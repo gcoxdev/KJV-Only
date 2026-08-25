@@ -1,12 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildSmartSearchLookup,
   buildVerseSearchIndex,
   buildRegexMatcher,
   createSearchableVerseEntry,
   extractSearchWords,
+  getExactSmartSearchCandidateIndexes,
+  getIndexedSmartSearchCandidateIndexes,
+  isSmartSearchCandidate,
   matchPreparedSelectedWords,
   matchSelectedWords,
+  prepareSmartSearch,
   prepareSelectedWordSearch,
   scoreSmartSearch,
   suggestConcordanceWords,
@@ -220,6 +225,69 @@ describe("search helpers", () => {
     expect(scoreSmartSearch(exact, "god loved", false)).toBeGreaterThan(
       scoreSmartSearch(fuzzy, "god loved", false) ?? 0,
     );
+  });
+
+  it("indexes every Smart candidate without changing candidate semantics", () => {
+    const entries = [
+      "And we know that all things work together for good",
+      "So built we the wall for the people had a mind to work",
+      "Righteousness exalteth a nation",
+      "Mathusala begat Lamech",
+      "The kingdom of heaven is at hand",
+      "LORD Lord lord",
+    ].map((text, index) => ({
+      ...createSearchableVerseEntry(text),
+      bookIndex: index,
+      chapterIndex: 0,
+      verseNumber: 1,
+      bookName: `Book ${index + 1}`,
+    }));
+    const lookup = buildSmartSearchLookup(entries);
+
+    for (const [query, caseSensitive] of [
+      ["work together", false],
+      ["righteosness", false],
+      ["methuzalu", false],
+      ["king heaven hand", false],
+      ["LORD", true],
+    ] as const) {
+      const prepared = prepareSmartSearch(query, caseSensitive);
+      expect(prepared).not.toBeNull();
+      if (!prepared) continue;
+      const indexed = getIndexedSmartSearchCandidateIndexes(lookup, prepared);
+      const filteredIndexed = indexed.filter((index) =>
+        isSmartSearchCandidate(entries[index], prepared),
+      );
+      const scanned = entries.flatMap((entry, index) =>
+        isSmartSearchCandidate(entry, prepared) ? [index] : [],
+      );
+
+      expect(filteredIndexed).toEqual(scanned);
+    }
+  });
+
+  it("prioritizes verses containing every exact Smart query word", () => {
+    const entries = [
+      "They work while it is day",
+      "And we know that all things work together for good",
+      "They gathered themselves together",
+    ].map((text, index) => ({
+      ...createSearchableVerseEntry(text),
+      bookIndex: index,
+      chapterIndex: 0,
+      verseNumber: 1,
+      bookName: `Book ${index + 1}`,
+    }));
+    const prepared = prepareSmartSearch("work together", false);
+    expect(prepared).not.toBeNull();
+    if (!prepared) return;
+
+    expect(
+      getExactSmartSearchCandidateIndexes(
+        buildSmartSearchLookup(entries),
+        prepared,
+      ),
+    ).toEqual([1]);
   });
 
   it("suggests likely Bible-name completions before short generic words", () => {

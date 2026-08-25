@@ -216,6 +216,7 @@ export function KJVReader() {
       isBuilding: isVerseSearchIndexBuilding,
       isReady: isVerseSearchIndexReady,
       error: verseSearchIndexError,
+      runSmartSearch: runSmartVerseSearch,
     },
   } = useReaderController({
     tabsOrientation,
@@ -2038,6 +2039,7 @@ export function KJVReader() {
         isVerseSearchIndexBuilding,
         isVerseSearchIndexReady,
         verseSearchIndexError,
+        runSmartVerseSearch,
         ensureConcordanceWordsLoaded: ensureConcordanceLoaded,
         onOpenSearchResult: openSearchResultTarget,
         notes: readerNotes,

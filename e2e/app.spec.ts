@@ -91,6 +91,20 @@ test("builds the lazy search index and returns the expected verse", async ({ pag
   expect(indexBuildDuration).toBeLessThan(15_000)
 })
 
+test("prioritizes exact multiword Smart Search results", async ({ page }) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page.getByLabel("Open search").click()
+  await expect(page.getByRole("heading", { name: "Search" })).toBeVisible()
+  await page.getByLabel("Word or phrase").fill("work together")
+  await page.getByLabel("Run Bible search").click()
+
+  await expect(page.locator("p.tabular-data").first()).toHaveText("Romans 8:28")
+  await expect(page.getByText(/\d+ matching verses loaded/)).toBeVisible()
+  await expect(page.locator("p.tabular-data").first()).toHaveText("Romans 8:28")
+})
+
 test("loads study-word tools progressively without blocking the reader", async ({
   page,
 }) => {

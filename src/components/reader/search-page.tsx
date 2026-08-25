@@ -23,6 +23,7 @@ import {
 import type { Book } from "@/types/bible";
 import type { SearchMatch, SearchMode, SearchPageState } from "@/types/reader";
 import { bookCodeForIndex, iconPath, renderHighlightedTerms, renderHighlightedText } from "@/lib/reader-view";
+import type { RunSmartVerseSearch } from "@/lib/smart-search-worker";
 import {
   buildRegexMatcher,
   getSmartPhoneticCode,
@@ -65,6 +66,7 @@ type SearchPageProps = {
   isVerseIndexBuilding: boolean;
   isVerseIndexReady: boolean;
   verseIndexError: string | null;
+  runSmartSearch: RunSmartVerseSearch;
   ensureConcordanceWordsLoaded: () => Promise<unknown>;
   state: SearchPageState;
   onStateChange: (patch: Partial<SearchPageState>) => void;
@@ -335,6 +337,7 @@ export function SearchPage({
   isVerseIndexBuilding,
   isVerseIndexReady,
   verseIndexError,
+  runSmartSearch,
   ensureConcordanceWordsLoaded,
   state,
   onStateChange,
@@ -348,11 +351,13 @@ export function SearchPage({
   } | null>(null);
   const searchRunIdRef = useRef(0);
   const regexWorkerRef = useRef<Worker | null>(null);
+  const smartSearchCancelRef = useRef<(() => void) | null>(null);
   const resultsScrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     return () => {
       regexWorkerRef.current?.terminate();
+      smartSearchCancelRef.current?.();
     };
   }, []);
 
@@ -636,6 +641,8 @@ export function SearchPage({
     onStateChange({ error: null });
     regexWorkerRef.current?.terminate();
     regexWorkerRef.current = null;
+    smartSearchCancelRef.current?.();
+    smartSearchCancelRef.current = null;
     let selectedWordSearch: ReturnType<
       typeof prepareSelectedWordSearch
     > = null;
@@ -763,6 +770,58 @@ export function SearchPage({
         setIsSearching(false);
         return;
       }
+      let receivedWorkerUpdate = false;
+      const cancelWorkerSearch = runSmartSearch(
+        {
+          query: smartQuery,
+          caseSensitive,
+          selectedBookIndexes: Array.from(selectedBookIndexes),
+          resultLimit: SEARCH_RESULTS_CAP,
+        },
+        {
+          onUpdate: (update) => {
+            if (searchRunIdRef.current !== nextSearchRunId) {
+              return;
+            }
+            publishProgress(update.processed, update.total, update.isComplete);
+            if (update.isComplete) {
+              smartSearchCancelRef.current = null;
+              commitSearch(update.matches);
+              return;
+            }
+            if (update.matches.length === 0) {
+              return;
+            }
+            const patch = {
+              ...completedSearchState,
+              results: update.matches,
+            };
+            if (!receivedWorkerUpdate) {
+              receivedWorkerUpdate = true;
+              onStateChange(patch);
+              return;
+            }
+            startTransition(() => {
+              if (searchRunIdRef.current === nextSearchRunId) {
+                onStateChange(patch);
+              }
+            });
+          },
+          onError: (message) => {
+            if (searchRunIdRef.current !== nextSearchRunId) {
+              return;
+            }
+            smartSearchCancelRef.current = null;
+            onStateChange({ error: message, results: [] });
+            cancelSearch();
+          },
+        },
+      );
+      if (cancelWorkerSearch) {
+        smartSearchCancelRef.current = cancelWorkerSearch;
+        return;
+      }
+
       const scored: Array<{
         entry: VerseSearchIndexEntry;
         index: number;
@@ -986,6 +1045,8 @@ export function SearchPage({
     searchRunIdRef.current += 1;
     regexWorkerRef.current?.terminate();
     regexWorkerRef.current = null;
+    smartSearchCancelRef.current?.();
+    smartSearchCancelRef.current = null;
     setIsSearching(false);
     setSearchProgress(null);
   };

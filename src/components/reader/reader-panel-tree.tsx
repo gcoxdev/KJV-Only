@@ -69,6 +69,7 @@ import {
   panelViewportElement,
 } from "@/lib/reader-view";
 import type { VerseSearchIndexEntry } from "@/lib/search";
+import type { RunSmartVerseSearch } from "@/lib/smart-search-worker";
 import type { BookmarkScope } from "@/types/bookmarks";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 import { StaticPage } from "@/components/reader/static-page";
@@ -244,6 +245,7 @@ export type ReaderPanelTreeProps = {
   isVerseSearchIndexBuilding: boolean;
   isVerseSearchIndexReady: boolean;
   verseSearchIndexError: string | null;
+  runSmartVerseSearch: RunSmartVerseSearch;
   ensureConcordanceWordsLoaded: () => Promise<unknown>;
   onOpenSearchResult: (
     bookIndex: number,
@@ -376,6 +378,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   isVerseSearchIndexBuilding,
   isVerseSearchIndexReady,
   verseSearchIndexError,
+  runSmartVerseSearch,
   ensureConcordanceWordsLoaded,
   onOpenSearchResult,
   notes,
@@ -1571,6 +1574,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 isVerseIndexBuilding={isVerseSearchIndexBuilding}
                 isVerseIndexReady={isVerseSearchIndexReady}
                 verseIndexError={verseSearchIndexError}
+                runSmartSearch={runSmartVerseSearch}
                 ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
                 state={
                   searchPageStateByLeafId[leaf.id] ?? {
@@ -1842,6 +1846,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   isVerseSearchIndexBuilding,
   isVerseSearchIndexReady,
   verseSearchIndexError,
+  runSmartVerseSearch,
   ensureConcordanceWordsLoaded,
   onOpenSearchResult,
   notes,
@@ -1937,6 +1942,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       isVerseSearchIndexBuilding={isVerseSearchIndexBuilding}
       isVerseSearchIndexReady={isVerseSearchIndexReady}
       verseSearchIndexError={verseSearchIndexError}
+      runSmartVerseSearch={runSmartVerseSearch}
       ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
       onOpenSearchResult={onOpenSearchResult}
       notes={notes}
