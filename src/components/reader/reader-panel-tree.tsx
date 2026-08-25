@@ -3,7 +3,6 @@ import {
   lazy,
   memo,
   Suspense,
-  type ComponentProps,
   type ReactNode,
   type RefObject,
   useEffect,
@@ -73,10 +72,10 @@ import type { VerseSearchIndexEntry } from "@/lib/search";
 import type { BookmarkScope } from "@/types/bookmarks";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 import { StaticPage } from "@/components/reader/static-page";
-import { SettingsPanelContent } from "@/components/reader/settings-dialog";
-import { ProgressPanelContent } from "@/components/reader/progress-dialog";
-import { StudyToolsPanel } from "@/components/reader/study-tools-panel";
-import { TopicsPanel } from "@/components/reader/study-tools/topics-tool";
+import type { SettingsPanelContentProps } from "@/components/reader/settings-dialog";
+import type { ProgressPanelContentProps } from "@/components/reader/progress-dialog";
+import type { StudyToolsPanelProps } from "@/components/reader/study-tools-panel";
+import type { TopicsPanelProps } from "@/components/reader/study-tools/topics-tool";
 import { getStaticPage } from "@/lib/static-pages";
 import {
   DropdownMenu,
@@ -95,7 +94,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ChapterTextContent } from "@/components/reader/chapter-text-content";
-import { BookmarksTool } from "@/components/reader/study-tools/bookmarks-tool";
+import type { BookmarksToolProps } from "@/components/reader/study-tools/bookmarks-tool";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -132,6 +131,37 @@ const LazyNotesPage = lazy(async () => {
   return { default: module.NotesPage };
 });
 
+const LazyStudyToolsPanel = lazy(async () => {
+  const module = await import("@/components/reader/study-tools-panel");
+  return { default: module.StudyToolsPanel };
+});
+
+const LazyTopicsPanel = lazy(async () => {
+  const module = await import("@/components/reader/study-tools/topics-tool");
+  return { default: module.TopicsPanel };
+});
+
+const LazyBookmarksTool = lazy(async () => {
+  const module = await import("@/components/reader/study-tools/bookmarks-tool");
+  return { default: module.BookmarksTool };
+});
+
+const LazySettingsPanelContent = lazy(async () => {
+  const module = await import("@/components/reader/settings-dialog");
+  return { default: module.SettingsPanelContent };
+});
+
+const LazyProgressPanelContent = lazy(async () => {
+  const module = await import("@/components/reader/progress-dialog");
+  return { default: module.ProgressPanelContent };
+});
+
+const AUXILIARY_PANEL_FALLBACK = (
+  <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+    Loading panel...
+  </div>
+);
+
 const AUDIO_PLAYBACK_RATE_OPTIONS = Array.from({ length: 10 }, (_, index) => {
   const value = (index + 1) * 0.25;
   return {
@@ -147,7 +177,7 @@ type LeafLocationPatch = Partial<
   >
 >;
 
-type ReaderPanelTreeProps = {
+export type ReaderPanelTreeProps = {
   root: PanelNode;
   books: Book[];
   activeRoot: PanelNode | null;
@@ -269,11 +299,11 @@ type ReaderPanelTreeProps = {
   onClearLeafHighlights: (leafId: string) => void;
   onToggleHighlightMode: (leafId: string) => void;
   onBookmarkLeafSelection: (leafId: string) => void;
-  studyToolsPanelProps: ComponentProps<typeof StudyToolsPanel>;
-  topicsPanelProps: ComponentProps<typeof TopicsPanel>;
-  bookmarksPanelProps: ComponentProps<typeof BookmarksTool>;
-  settingsPanelProps: ComponentProps<typeof SettingsPanelContent>;
-  progressPanelProps: ComponentProps<typeof ProgressPanelContent>;
+  studyToolsPanelProps: StudyToolsPanelProps;
+  topicsPanelProps: TopicsPanelProps;
+  bookmarksPanelProps: BookmarksToolProps;
+  settingsPanelProps: SettingsPanelContentProps;
+  progressPanelProps: ProgressPanelContentProps;
   canInstallPwa: boolean;
   isPwaInstalled: boolean;
   onInstallPwa: () => void | Promise<void>;
@@ -1591,25 +1621,35 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
           </CardContent>
         ) : leaf.view === "tools" ? (
           <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
-            <StudyToolsPanel {...studyToolsPanelProps} />
+            <Suspense fallback={AUXILIARY_PANEL_FALLBACK}>
+              <LazyStudyToolsPanel {...studyToolsPanelProps} />
+            </Suspense>
           </CardContent>
         ) : leaf.view === "topics" ? (
           <CardContent className="min-h-0 flex-1 overflow-hidden p-2">
-            <TopicsPanel {...topicsPanelProps} />
+            <Suspense fallback={AUXILIARY_PANEL_FALLBACK}>
+              <LazyTopicsPanel {...topicsPanelProps} />
+            </Suspense>
           </CardContent>
         ) : leaf.view === "bookmarks" ? (
           <CardContent className="min-h-0 flex-1 overflow-hidden p-2">
-            <BookmarksTool {...bookmarksPanelProps} />
+            <Suspense fallback={AUXILIARY_PANEL_FALLBACK}>
+              <LazyBookmarksTool {...bookmarksPanelProps} />
+            </Suspense>
           </CardContent>
         ) : leaf.view === "page" ? (
           <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
             {leaf.pageId === "settings" ? (
               <div className="h-full overflow-y-auto p-4">
-                <SettingsPanelContent {...settingsPanelProps} />
+                <Suspense fallback={AUXILIARY_PANEL_FALLBACK}>
+                  <LazySettingsPanelContent {...settingsPanelProps} />
+                </Suspense>
               </div>
             ) : leaf.pageId === "progress" ? (
               <div className="h-full overflow-y-auto p-4">
-                <ProgressPanelContent {...progressPanelProps} />
+                <Suspense fallback={AUXILIARY_PANEL_FALLBACK}>
+                  <LazyProgressPanelContent {...progressPanelProps} />
+                </Suspense>
               </div>
             ) : (
               <StaticPage

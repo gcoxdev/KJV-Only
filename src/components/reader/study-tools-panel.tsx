@@ -5,7 +5,7 @@ import { CopyMinusIcon, CopyPlusIcon } from "lucide-react";
 
 import { ReaderStudyToolsContent, type ReaderStudyToolsContentProps } from "@/components/reader/reader-study-tools-content";
 
-type StudyToolsPanelProps = {
+export type StudyToolsPanelProps = {
   accordionValue: string[];
   onAccordionValueChange: (value: string[]) => void;
   onExpandAll: () => void;

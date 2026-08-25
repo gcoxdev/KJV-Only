@@ -29,8 +29,6 @@ import {
   type TokenAccordionOptions,
 } from "@/lib/word-study-selection";
 import {
-  defaultHighlightColor,
-  normalizeHighlightColor,
   readableHighlightTextColor,
 } from "@/lib/highlight-color";
 import { chapterProgressKey, panelViewportElement } from "@/lib/reader-view";
@@ -47,7 +45,6 @@ import {
   updateSameOrientationGroupLayout,
   updateSplitRatio,
 } from "@/lib/reader-layout";
-import type { LeafNeighbors } from "@/lib/reader-neighbors";
 import { panelNodeContainsView } from "@/lib/workspace-navigation";
 import { useLayoutHashSync } from "@/hooks/use-layout-hash-sync";
 import type {
@@ -106,14 +103,17 @@ import { usePanelTargeting } from "@/hooks/use-panel-targeting";
 import { usePanelRouting } from "@/hooks/use-panel-routing";
 import { usePanelInteractionController } from "@/hooks/use-panel-interaction-controller";
 import { usePendingReaderScroll } from "@/hooks/use-pending-reader-scroll";
+import {
+  useBookmarksViewModel,
+  useNotesSidebarViewModel,
+  useProgressViewModel,
+  useSettingsViewModel,
+  useStudyToolsViewModel,
+} from "@/hooks/use-reader-view-models";
 import { useWorkspaceNavigation } from "@/hooks/use-workspace-navigation";
 import { useWordStudyNavigation } from "@/hooks/use-word-study-navigation";
 import { useWordStudyCoordinator } from "@/hooks/use-word-study-coordinator";
 import { useVerseHighlights } from "@/hooks/use-verse-highlights";
-import {
-  STUDY_ACCORDION_ITEMS,
-  deriveStudySidebarState,
-} from "@/hooks/use-study-sidebar-state";
 import { useReaderShellState } from "@/hooks/use-reader-shell-state";
 import { useReaderController } from "@/hooks/use-reader-controller";
 import { useStudyWorkspaceState } from "@/hooks/use-study-workspace-state";
@@ -123,7 +123,7 @@ import { ReaderTopBar } from "@/components/reader/reader-top-bar";
 import { ReferenceCommandDialog } from "@/components/reader/reference-command-dialog";
 import { TabsWorkspace } from "@/components/reader/tabs-workspace";
 import { ReaderStatusScreen } from "@/components/reader/reader-status-screen";
-import { ReaderPanelTree } from "@/components/reader/reader-panel-tree";
+import { ReaderWorkspacePanels } from "@/components/reader/reader-workspace-panels";
 import { CompletionCelebration } from "@/components/reader/completion-celebration";
 import {
   GuidedTour,
@@ -134,8 +134,6 @@ const LazyReaderStudySidebar = lazy(async () => {
   const module = await import("@/components/reader/reader-study-sidebar");
   return { default: module.ReaderStudySidebar };
 });
-
-const EMPTY_LEAF_NEIGHBORS = new Map<string, LeafNeighbors>();
 
 const LazyMapAndPhotoDialogs = lazy(async () => {
   const module = await import("@/components/reader/map-and-photo-dialogs");
@@ -2252,6 +2250,266 @@ export function KJVReader() {
     });
   }, [ensureTopicsLoaded, studyWorkspaceTab, tabs]);
 
+  const {
+    allStudyAccordionsOpen,
+    sharedStudyToolsProps,
+    studyToolsPanelProps,
+    topicsPanelProps,
+    onExpandAll: expandAllStudyTools,
+    onCollapseAll: collapseAllStudyTools,
+  } = useStudyToolsViewModel({
+    accordionValue: concordanceAccordionValue,
+    onAccordionValueChange: setConcordanceAccordionValue,
+    infoCounts: {
+      crossRefs: selectedCrossReferences?.references.length ?? 0,
+      concordance: concordanceSearchResults.length,
+      websters: webstersSearchResults.length,
+      aiDictionary: aiDictionarySearchResults.length,
+      strongs: strongsSearchResults.length,
+      bibleWordBook: bibleWordBookSearchResults.length,
+      kjvWordsPhrases:
+        oldEnglishSearchResults.length +
+        phrasesSearchResults.length +
+        unitsSearchResults.length,
+      maps: mapsSearchResults.length,
+      hitchcocks: hitchcocksSearchResults.length,
+      genealogy: genealogySearchResults.length,
+    },
+    crossRefsProps: {
+      isLoading: isCrossRefsLoading,
+      error: crossRefsError,
+      selected: selectedCrossReferences,
+      books,
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+    concordanceProps: {
+      isLoading: isConcordanceLoading,
+      isSearching: isConcordanceSearching,
+      error: concordanceError,
+      searchTerm: concordanceSearchTerm,
+      results: concordanceSearchResults,
+      wordAccordionValue: concordanceWordAccordionValue,
+      onWordAccordionValueChange: setConcordanceWordAccordionValue,
+      onSearch: applyConcordanceSearch,
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+    webstersProps: {
+      isLoading: isWebstersLoading,
+      isSearching: isWebstersSearching,
+      error: webstersError,
+      searchTerm: webstersSearchTerm,
+      results: webstersSearchResults,
+      wordAccordionValue: webstersWordAccordionValue,
+      onWordAccordionValueChange: setWebstersWordAccordionValue,
+      onSearch: applyWebstersSearch,
+    },
+    aiDictionaryProps: {
+      isLoading: isAIDictionaryLoading,
+      isSearching: isAIDictionarySearching,
+      error: aiDictionaryError,
+      searchTerm: aiDictionarySearchTerm,
+      results: aiDictionarySearchResults,
+      wordAccordionValue: aiDictionaryWordAccordionValue,
+      onWordAccordionValueChange: setAIDictionaryWordAccordionValue,
+      resolveEntryTarget: resolveAIDictionaryEntryTarget,
+      onOpenEntry: openAIDictionaryEntry,
+      onSearch: applyAIDictionarySearch,
+    },
+    strongsProps: {
+      isLoading: isStrongsLoading,
+      isSearching: isStrongsSearching,
+      error: strongsError,
+      searchTerm: strongsSearchTerm,
+      results: strongsSearchResults,
+      wordAccordionValue: strongsWordAccordionValue,
+      onWordAccordionValueChange: setStrongsWordAccordionValue,
+      onSearch: applyStrongsSearch,
+      onOpenLinkedStrongsEntry: openLinkedStrongsEntry,
+      inputRef: strongsSearchInputRef,
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+    kjvWordsPhrasesProps: {
+      oldEnglish: {
+        isLoading: isOldEnglishLoading,
+        isSearching: isOldEnglishSearching,
+        error: oldEnglishError,
+        searchTerm: oldEnglishSearchTerm,
+        results: oldEnglishSearchResults,
+      },
+      phrases: {
+        isLoading: isPhrasesLoading,
+        isSearching: isPhrasesSearching,
+        error: phrasesError,
+        searchTerm: phrasesSearchTerm,
+        results: phrasesSearchResults,
+      },
+      units: {
+        isLoading: isUnitsLoading,
+        isSearching: isUnitsSearching,
+        error: unitsError,
+        searchTerm: unitsSearchTerm,
+        results: unitsSearchResults,
+      },
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+    onOldEnglishSearch: applyOldEnglishSearch,
+    onPhrasesSearch: applyPhrasesSearch,
+    onUnitsSearch: applyUnitsSearch,
+    bibleWordBookProps: {
+      isLoading: isBibleWordBookLoading,
+      isSearching: isBibleWordBookSearching,
+      error: bibleWordBookError,
+      searchTerm: bibleWordBookSearchTerm,
+      results: bibleWordBookSearchResults,
+      wordAccordionValue: bibleWordBookWordAccordionValue,
+      onWordAccordionValueChange: setBibleWordBookWordAccordionValue,
+      onSearch: applyBibleWordBookSearch,
+    },
+    mapsProps: {
+      isLoading: isMapsLoading,
+      isSearching: isMapsSearching,
+      error: mapsError,
+      searchTerm: mapsSearchTerm,
+      resultsLength: mapsSearchResults.length,
+      displayEntries: mapsDisplayEntries,
+      onSearch: applyMapsSearch,
+      onOpenMapDialog: openMapDialog,
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+    genealogyProps: {
+      isLoading: isGenealogyLoading,
+      isSearching: isGenealogySearching,
+      error: genealogyError,
+      searchTerm: genealogySearchTerm,
+      results: genealogySearchResults,
+      onSearch: applyGenealogySearch,
+      renderPersonDetails: renderGenealogyPersonDetails,
+    },
+    hitchcocksProps: {
+      isLoading: isHitchcocksLoading,
+      isSearching: isHitchcocksSearching,
+      error: hitchcocksError,
+      searchTerm: hitchcocksSearchTerm,
+      results: hitchcocksSearchResults,
+      onSearch: applyHitchcocksSearch,
+    },
+    topicsPanelProps: {
+      isLoading: isTopicsLoading,
+      isSearching: isTopicsSearching,
+      error: topicsError,
+      searchTerm: topicsSearchTerm,
+      selectedLetters: topicsSelectedLetters,
+      availableLetters: topicsAvailableLetters,
+      results: topicsResults,
+      topicAccordionValue: topicsAccordionValue,
+      onTopicAccordionValueChange: setTopicsAccordionValue,
+      onSearch: applyTopicsFilter,
+      onSelectLetter: selectTopicsLetterFilter,
+      renderPreview: referencePreviewContent,
+      onOpenReference: openConcordanceReference,
+      onCloseSidebar: closeRightSidebarForMobile,
+    },
+  });
+
+  const bookmarksPanelProps = useBookmarksViewModel({
+    books,
+    bookmarks: readerBookmarks,
+    onOpenBookmark: openBookmarkTarget,
+    onUpdateBookmark: updateBookmark,
+    onDeleteBookmark: deleteBookmark,
+  });
+
+  const settingsPanelProps = useSettingsViewModel({
+    activeTab: activeSettingsTab,
+    onActiveTabChange: setActiveSettingsTab,
+    theme,
+    onThemeChange: setTheme,
+    readerColorTheme,
+    onReaderColorThemeChange: setReaderColorTheme,
+    fontSize,
+    setFontSize,
+    lightHighlightColor,
+    setLightHighlightColor,
+    darkHighlightColor,
+    setDarkHighlightColor,
+    verseSpacing,
+    onVerseSpacingChange: setVerseSpacing,
+    hideReadModeVerseNumbers,
+    onHideReadModeVerseNumbersChange: setHideReadModeVerseNumbers,
+    readModeParagraphIndent,
+    onReadModeParagraphIndentChange: setReadModeParagraphIndent,
+    flowVersesByParagraph,
+    onFlowVersesByParagraphChange: setFlowVersesByParagraph,
+    tabsOrientation,
+    onTabsOrientationChange: setTabsOrientation,
+    wordVerseSelectionTarget,
+    onWordVerseSelectionTargetChange: setWordVerseSelectionTarget,
+    notesLinkOpenTarget,
+    onNotesLinkOpenTargetChange: setNotesLinkOpenTarget,
+    searchResultOpenTarget,
+    onSearchResultOpenTargetChange: setSearchResultOpenTarget,
+    bookmarkOpenTarget,
+    onBookmarkOpenTargetChange: setBookmarkOpenTarget,
+    referenceLinkOpenTarget,
+    onReferenceLinkOpenTargetChange: setReferenceLinkOpenTarget,
+    showWelcomeHomeAtStartup,
+    onShowWelcomeHomeAtStartupChange: setShowWelcomeHomeAtStartup,
+  });
+
+  const progressPanelProps = useProgressViewModel({
+    totalProgressPercent,
+    progressByTestament,
+    onSetAllTestamentChaptersRead: setAllTestamentChaptersRead,
+    onSetAllBookChaptersRead: setAllBookChaptersRead,
+    onOpenChapterInNewTab: openChapterInNewTab,
+    onToggleChapterRead: toggleChapterRead,
+    onResetAllProgress: resetAllProgress,
+  });
+
+  const notesSidebarProps = useNotesSidebarViewModel({
+    books,
+    generalNotes,
+    contextNotes,
+    notesContext,
+    openNotesTab,
+    closeRightSidebarForMobile,
+    createGeneralNote,
+    createContextNote,
+    setNotesContext,
+  });
+
+  const canGoLeafHistoryBack = useCallback(
+    (leafId: string) => (leafHistoryByLeafId[leafId]?.index ?? 0) > 0,
+    [leafHistoryByLeafId],
+  );
+  const canGoLeafHistoryForward = useCallback(
+    (leafId: string) => {
+      const history = leafHistoryByLeafId[leafId];
+      return Boolean(
+        history && history.index < history.entries.length - 1,
+      );
+    },
+    [leafHistoryByLeafId],
+  );
+  const goLeafHistoryBack = useCallback(
+    (leafId: string) => navigateLeafHistory(leafId, -1),
+    [navigateLeafHistory],
+  );
+  const goLeafHistoryForward = useCallback(
+    (leafId: string) => navigateLeafHistory(leafId, 1),
+    [navigateLeafHistory],
+  );
+
   if (!isLoaded) {
     return <ReaderStatusScreen message="Loading Bible data..." />;
   }
@@ -2289,399 +2547,103 @@ export function KJVReader() {
     />
   );
 
-  const {
-    allStudyAccordionsOpen,
-    isCrossRefsSectionOpen,
-    isConcordanceSectionOpen,
-    isWebstersSectionOpen,
-    isAIDictionarySectionOpen,
-    isStrongsSectionOpen,
-    isBibleWordBookSectionOpen,
-    isKjvWordsPhrasesSectionOpen,
-    isMapsSectionOpen,
-    isGenealogySectionOpen,
-    isHitchcocksSectionOpen,
-    hasCrossRefsInfo,
-    hasConcordanceInfo,
-    hasWebstersInfo,
-    hasAIDictionaryInfo,
-    hasStrongsInfo,
-    hasBibleWordBookInfo,
-    hasKjvWordsPhrasesInfo,
-    hasMapsInfo,
-    hasHitchcocksInfo,
-    hasGenealogyInfo,
-  } = deriveStudySidebarState({
-    accordionValue: concordanceAccordionValue,
-    crossRefsCount: selectedCrossReferences?.references.length ?? 0,
-    concordanceCount: concordanceSearchResults.length,
-    webstersCount: webstersSearchResults.length,
-    aiDictionaryCount: aiDictionarySearchResults.length,
-    strongsCount: strongsSearchResults.length,
-    bibleWordBookCount: bibleWordBookSearchResults.length,
-    kjvWordsPhrasesCount:
-      oldEnglishSearchResults.length +
-      phrasesSearchResults.length +
-      unitsSearchResults.length,
-    mapsCount: mapsSearchResults.length,
-    hitchcocksCount: hitchcocksSearchResults.length,
-    genealogyCount: genealogySearchResults.length,
-  });
-
-  const sharedStudyToolsProps = {
-    crossRefsProps: {
-      hasInfo: hasCrossRefsInfo,
-      isOpen: isCrossRefsSectionOpen,
-      isLoading: isCrossRefsLoading,
-      error: crossRefsError,
-      selected: selectedCrossReferences,
-      books,
-      renderPreview: referencePreviewContent,
-      onOpenReference: openConcordanceReference,
-      onCloseSidebar: closeRightSidebarForMobile,
-    },
-    concordanceProps: {
-      hasInfo: hasConcordanceInfo,
-      isOpen: isConcordanceSectionOpen,
-      isLoading: isConcordanceLoading,
-      isSearching: isConcordanceSearching,
-      error: concordanceError,
-      searchTerm: concordanceSearchTerm,
-      results: concordanceSearchResults,
-      wordAccordionValue: concordanceWordAccordionValue,
-      onWordAccordionValueChange: setConcordanceWordAccordionValue,
-      onSearch: applyConcordanceSearch,
-      renderPreview: referencePreviewContent,
-      onOpenReference: openConcordanceReference,
-      onCloseSidebar: closeRightSidebarForMobile,
-    },
-    webstersProps: {
-      hasInfo: hasWebstersInfo,
-      isOpen: isWebstersSectionOpen,
-      isLoading: isWebstersLoading,
-      isSearching: isWebstersSearching,
-      error: webstersError,
-      searchTerm: webstersSearchTerm,
-      results: webstersSearchResults,
-      wordAccordionValue: webstersWordAccordionValue,
-      onWordAccordionValueChange: setWebstersWordAccordionValue,
-      onSearch: applyWebstersSearch,
-    },
-    aiDictionaryProps: {
-      hasInfo: hasAIDictionaryInfo,
-      isOpen: isAIDictionarySectionOpen,
-      isLoading: isAIDictionaryLoading,
-      isSearching: isAIDictionarySearching,
-      error: aiDictionaryError,
-      searchTerm: aiDictionarySearchTerm,
-      results: aiDictionarySearchResults,
-      wordAccordionValue: aiDictionaryWordAccordionValue,
-      onWordAccordionValueChange: setAIDictionaryWordAccordionValue,
-      resolveEntryTarget: resolveAIDictionaryEntryTarget,
-      onOpenEntry: openAIDictionaryEntry,
-      onSearch: applyAIDictionarySearch,
-    },
-    strongsProps: {
-      hasInfo: hasStrongsInfo,
-      isOpen: isStrongsSectionOpen,
-      isLoading: isStrongsLoading,
-      isSearching: isStrongsSearching,
-      error: strongsError,
-      searchTerm: strongsSearchTerm,
-      results: strongsSearchResults,
-      wordAccordionValue: strongsWordAccordionValue,
-      onWordAccordionValueChange: setStrongsWordAccordionValue,
-      onSearch: applyStrongsSearch,
-      onOpenLinkedStrongsEntry: openLinkedStrongsEntry,
-      inputRef: strongsSearchInputRef,
-      renderPreview: referencePreviewContent,
-      onOpenReference: openConcordanceReference,
-      onCloseSidebar: closeRightSidebarForMobile,
-    },
-    kjvWordsPhrasesProps: {
-      hasInfo: hasKjvWordsPhrasesInfo,
-      isOpen: isKjvWordsPhrasesSectionOpen,
-      oldEnglish: {
-        isLoading: isOldEnglishLoading,
-        isSearching: isOldEnglishSearching,
-        error: oldEnglishError,
-        searchTerm: oldEnglishSearchTerm,
-        results: oldEnglishSearchResults,
-      },
-      phrases: {
-        isLoading: isPhrasesLoading,
-        isSearching: isPhrasesSearching,
-        error: phrasesError,
-        searchTerm: phrasesSearchTerm,
-        results: phrasesSearchResults,
-      },
-      units: {
-        isLoading: isUnitsLoading,
-        isSearching: isUnitsSearching,
-        error: unitsError,
-        searchTerm: unitsSearchTerm,
-        results: unitsSearchResults,
-      },
-      onSearch: (term: string) => {
-        applyOldEnglishSearch(term);
-        applyPhrasesSearch(term);
-        applyUnitsSearch(term);
-      },
-      renderPreview: referencePreviewContent,
-      onOpenReference: openConcordanceReference,
-      onCloseSidebar: closeRightSidebarForMobile,
-    },
-    bibleWordBookProps: {
-      hasInfo: hasBibleWordBookInfo,
-      isOpen: isBibleWordBookSectionOpen,
-      isLoading: isBibleWordBookLoading,
-      isSearching: isBibleWordBookSearching,
-      error: bibleWordBookError,
-      searchTerm: bibleWordBookSearchTerm,
-      results: bibleWordBookSearchResults,
-      wordAccordionValue: bibleWordBookWordAccordionValue,
-      onWordAccordionValueChange: setBibleWordBookWordAccordionValue,
-      onSearch: applyBibleWordBookSearch,
-    },
-    mapsProps: {
-      hasInfo: hasMapsInfo,
-      isOpen: isMapsSectionOpen,
-      isLoading: isMapsLoading,
-      isSearching: isMapsSearching,
-      error: mapsError,
-      searchTerm: mapsSearchTerm,
-      resultsLength: mapsSearchResults.length,
-      displayEntries: mapsDisplayEntries,
-      onSearch: applyMapsSearch,
-      onOpenMapDialog: openMapDialog,
-      renderPreview: referencePreviewContent,
-      onOpenReference: openConcordanceReference,
-      onCloseSidebar: closeRightSidebarForMobile,
-    },
-    genealogyProps: {
-      hasInfo: hasGenealogyInfo,
-      isOpen: isGenealogySectionOpen,
-      isLoading: isGenealogyLoading,
-      isSearching: isGenealogySearching,
-      error: genealogyError,
-      searchTerm: genealogySearchTerm,
-      results: genealogySearchResults,
-      onSearch: applyGenealogySearch,
-      renderPersonDetails: renderGenealogyPersonDetails,
-    },
-    hitchcocksProps: {
-      hasInfo: hasHitchcocksInfo,
-      isOpen: isHitchcocksSectionOpen,
-      isLoading: isHitchcocksLoading,
-      isSearching: isHitchcocksSearching,
-      error: hitchcocksError,
-      searchTerm: hitchcocksSearchTerm,
-      results: hitchcocksSearchResults,
-      onSearch: applyHitchcocksSearch,
-    },
-  };
-
-  const topicsPanelProps = {
-    isLoading: isTopicsLoading,
-    isSearching: isTopicsSearching,
-    error: topicsError,
-    searchTerm: topicsSearchTerm,
-    selectedLetters: topicsSelectedLetters,
-    availableLetters: topicsAvailableLetters,
-    results: topicsResults,
-    topicAccordionValue: topicsAccordionValue,
-    onTopicAccordionValueChange: setTopicsAccordionValue,
-    onSearch: applyTopicsFilter,
-    onSelectLetter: selectTopicsLetterFilter,
-    renderPreview: referencePreviewContent,
-    onOpenReference: openConcordanceReference,
-    onCloseSidebar: closeRightSidebarForMobile,
-  };
-
-  const sharedBookmarksProps = {
-    books,
-    bookmarks: readerBookmarks,
-    onOpenBookmark: openBookmarkTarget,
-    onUpdateBookmark: updateBookmark,
-    onDeleteBookmark: deleteBookmark,
-  };
-  const settingsPanelProps = {
-    activeTab: activeSettingsTab,
-    onActiveTabChange: setActiveSettingsTab,
-    theme,
-    onThemeChange: setTheme,
-    readerColorTheme,
-    onReaderColorThemeChange: setReaderColorTheme,
-    fontSize,
-    onIncreaseFontSize: () => setFontSize((current) => current + 4),
-    onDecreaseFontSize: () => setFontSize((current) => Math.max(8, current - 4)),
-    onResetFontSize: () => setFontSize(16),
-    lightHighlightColor,
-    onLightHighlightColorChange: (value: string) =>
-      setLightHighlightColor(normalizeHighlightColor(value)),
-    onResetLightHighlightColor: () =>
-      setLightHighlightColor(defaultHighlightColor()),
-    darkHighlightColor,
-    onDarkHighlightColorChange: (value: string) =>
-      setDarkHighlightColor(normalizeHighlightColor(value)),
-    onResetDarkHighlightColor: () =>
-      setDarkHighlightColor(defaultHighlightColor()),
-    verseSpacing,
-    onVerseSpacingChange: setVerseSpacing,
-    hideReadModeVerseNumbers,
-    onHideReadModeVerseNumbersChange: setHideReadModeVerseNumbers,
-    readModeParagraphIndent,
-    onReadModeParagraphIndentChange: setReadModeParagraphIndent,
-    flowVersesByParagraph,
-    onFlowVersesByParagraphChange: setFlowVersesByParagraph,
-    tabsOrientation,
-    onTabsOrientationChange: setTabsOrientation,
-    wordVerseSelectionTarget,
-    onWordVerseSelectionTargetChange: setWordVerseSelectionTarget,
-    notesLinkOpenTarget,
-    onNotesLinkOpenTargetChange: setNotesLinkOpenTarget,
-    searchResultOpenTarget,
-    onSearchResultOpenTargetChange: setSearchResultOpenTarget,
-    bookmarkOpenTarget,
-    onBookmarkOpenTargetChange: setBookmarkOpenTarget,
-    referenceLinkOpenTarget,
-    onReferenceLinkOpenTargetChange: setReferenceLinkOpenTarget,
-    showWelcomeHomeAtStartup,
-    onShowWelcomeHomeAtStartupChange: setShowWelcomeHomeAtStartup,
-  };
-  const progressPanelProps = {
-    totalProgressPercent,
-    progressByTestament,
-    onSetAllTestamentChaptersRead: setAllTestamentChaptersRead,
-    onSetAllBookChaptersRead: setAllBookChaptersRead,
-    onOpenChapterInNewTab: openChapterInNewTab,
-    onToggleChapterRead: toggleChapterRead,
-    onResetAllProgress: resetAllProgress,
-  };
-
-  const mountedTabPanels = tabs.map((tab) => {
-    const isActive = tab.id === activeTabId;
-    return (
-      <div
-        key={tab.id}
-        className={isActive ? "absolute inset-0 min-h-0 min-w-0" : "hidden"}
-        inert={!isActive}
-      >
-        <ReaderPanelTree
-          root={tab.root}
-          books={books}
-          activeRoot={tab.root}
-          chapterRefIndex={chapterRefIndex}
-          chapterRefCount={chapterRefs.length}
-          readChapters={readChapters}
-          readChapterCountByBook={readChapterCountByBook}
-          hideReadModeVerseNumbers={hideReadModeVerseNumbers}
-          panelMenuOpenLeafId={panelMenuOpenLeafId}
-          setPanelMenuOpenLeafId={setPanelMenuOpenLeafId}
-          modelLeafNeighbors={
-            isActive ? modelLeafNeighbors : EMPTY_LEAF_NEIGHBORS
-          }
-          neighborsForLeaf={neighborsForLeaf}
-          fullscreenLeafId={fullscreenLeafId}
-          panelElementRefs={panelElementRefs}
-          clearAllPanelPreviews={clearAllPanelPreviews}
-          updateLeafLocation={updateLeafLocation}
-          toggleFullscreenLeaf={toggleFullscreenLeaf}
-          toggleParentGroupOrientation={toggleParentGroupOrientation}
-          setOrientationPreviewTarget={setOrientationPreviewTarget}
-          clearOrientationPreview={clearOrientationPreview}
-          moveLeaf={moveLeaf}
-          setMovePreviewTarget={setMovePreviewTarget}
-          clearMovePreview={clearMovePreview}
-          splitLeaf={splitLeaf}
-          setAddPreviewTarget={setAddPreviewTarget}
-          clearAddPreview={clearAddPreview}
-          insertPanelInGroup={insertPanelInGroup}
-          setGroupInsertPreviewTarget={setGroupInsertPreviewTarget}
-          addAroundGroup={addAroundGroup}
-          setAroundGroupPreviewTarget={setAroundGroupPreviewTarget}
-          existingTabTargets={existingTabTargets}
-          moveLeafToExistingTab={moveLeafToExistingTab}
-          moveLeafToNewTab={moveLeafToNewTab}
-          closeLeaf={closeLeaf}
-          flowVersesByParagraph={flowVersesByParagraph}
-          readModeParagraphIndent={readModeParagraphIndent}
-          isStudyMode={isStudyMode}
-          fontSize={fontSize}
-          verseSpacing={verseSpacing}
-          onOpenTokenDetails={openTokenDetailsFromElement}
-          onSelectVerse={handleVerseSelection}
-          concordanceWords={concordanceWords}
-          verseSearchIndex={verseSearchIndex}
-          isVerseSearchIndexBuilding={isVerseSearchIndexBuilding}
-          isVerseSearchIndexReady={isVerseSearchIndexReady}
-          verseSearchIndexError={verseSearchIndexError}
-          ensureConcordanceWordsLoaded={ensureConcordanceLoaded}
-                onOpenSearchResult={openSearchResultTarget}
-          notes={readerNotes}
-          notesContext={notesContext}
-          activeReaderWordHighlight={activeReaderWordHighlight}
-          notesTabStateByLeafId={notesTabStateByLeafId}
-          onChangeNotesTabState={changeNotesTabState}
-          searchPageStateByLeafId={searchPageStateByLeafId}
-          onChangeSearchPageState={changeSearchPageState}
-          onCreateGeneralNote={createGeneralNote}
-          onCreateContextNote={createContextNote}
-          onUpdateNote={updateNote}
-          onDeleteNote={deleteNote}
-          onOpenNoteLink={openNoteLinkTarget}
-          selectedHighlightScope={notesHighlightScope}
-          showTargetedPanelToggle={showTargetedPanelToggle}
-          targetedPanelLeafId={targetedPanelLeafId}
-          onToggleTargetedPanel={toggleTargetedPanel}
-          canGoLeafHistoryBack={(leafId) =>
-            (leafHistoryByLeafId[leafId]?.index ?? 0) > 0
-          }
-          canGoLeafHistoryForward={(leafId) => {
-            const history = leafHistoryByLeafId[leafId];
-            if (!history) {
-              return false;
-            }
-            return history.index < history.entries.length - 1;
-          }}
-          onGoLeafHistoryBack={(leafId) => navigateLeafHistory(leafId, -1)}
-          onGoLeafHistoryForward={(leafId) => navigateLeafHistory(leafId, 1)}
-          moveLeafChapter={moveLeafChapter}
-          toggleChapterRead={toggleChapterRead}
-          updateSplitSize={updateSplitSize}
-          updateSplitGroupLayout={updateSplitGroupLayout}
-          highlightModeEnabledByLeafId={highlightModeEnabledByLeafId}
-          highlightedVerseRangesByLeafId={highlightedVerseRangesByLeafId}
-          onClearLeafHighlights={handleClearLeafHighlights}
-          onToggleHighlightMode={toggleHighlightModeForLeaf}
-          onBookmarkLeafSelection={bookmarkLeafSelection}
-          studyToolsPanelProps={{
-            accordionValue: concordanceAccordionValue,
-            onAccordionValueChange: setConcordanceAccordionValue,
-            onExpandAll: () =>
-              setConcordanceAccordionValue([...STUDY_ACCORDION_ITEMS]),
-            onCollapseAll: () => setConcordanceAccordionValue([]),
-            canExpand: !allStudyAccordionsOpen,
-            canCollapse: concordanceAccordionValue.length > 0,
-            ...sharedStudyToolsProps,
-          }}
-          topicsPanelProps={topicsPanelProps}
-          bookmarksPanelProps={sharedBookmarksProps}
-          settingsPanelProps={settingsPanelProps}
-          progressPanelProps={progressPanelProps}
-          canInstallPwa={deferredInstallPrompt !== null}
-          isPwaInstalled={isPwaInstalled}
-          onInstallPwa={installPwa}
-          renderReferencePreview={referencePreviewContent}
-          onOpenReference={openConcordanceReference}
-          onCloseSidebar={closeRightSidebarForMobile}
-          onStartTour={startGuidedTour}
-          onOpenSearchTab={openSearchTab}
-          onOpenStaticPageTab={openStaticPageTab}
-        />
-      </div>
-    );
-  });
+  const mountedTabPanels = (
+    <ReaderWorkspacePanels
+      tabs={tabs}
+      activeTabId={activeTabId}
+      modelLeafNeighbors={modelLeafNeighbors}
+      panelTreeProps={{
+        books,
+        chapterRefIndex,
+        chapterRefCount: chapterRefs.length,
+        readChapters,
+        readChapterCountByBook,
+        hideReadModeVerseNumbers,
+        panelMenuOpenLeafId,
+        setPanelMenuOpenLeafId,
+        neighborsForLeaf,
+        fullscreenLeafId,
+        panelElementRefs,
+        clearAllPanelPreviews,
+        updateLeafLocation,
+        toggleFullscreenLeaf,
+        toggleParentGroupOrientation,
+        setOrientationPreviewTarget,
+        clearOrientationPreview,
+        moveLeaf,
+        setMovePreviewTarget,
+        clearMovePreview,
+        splitLeaf,
+        setAddPreviewTarget,
+        clearAddPreview,
+        insertPanelInGroup,
+        setGroupInsertPreviewTarget,
+        addAroundGroup,
+        setAroundGroupPreviewTarget,
+        existingTabTargets,
+        moveLeafToExistingTab,
+        moveLeafToNewTab,
+        closeLeaf,
+        flowVersesByParagraph,
+        readModeParagraphIndent,
+        isStudyMode,
+        fontSize,
+        verseSpacing,
+        onOpenTokenDetails: openTokenDetailsFromElement,
+        onSelectVerse: handleVerseSelection,
+        concordanceWords,
+        verseSearchIndex,
+        isVerseSearchIndexBuilding,
+        isVerseSearchIndexReady,
+        verseSearchIndexError,
+        ensureConcordanceWordsLoaded: ensureConcordanceLoaded,
+        onOpenSearchResult: openSearchResultTarget,
+        notes: readerNotes,
+        notesContext,
+        activeReaderWordHighlight,
+        notesTabStateByLeafId,
+        onChangeNotesTabState: changeNotesTabState,
+        searchPageStateByLeafId,
+        onChangeSearchPageState: changeSearchPageState,
+        onCreateGeneralNote: createGeneralNote,
+        onCreateContextNote: createContextNote,
+        onUpdateNote: updateNote,
+        onDeleteNote: deleteNote,
+        onOpenNoteLink: openNoteLinkTarget,
+        selectedHighlightScope: notesHighlightScope,
+        showTargetedPanelToggle,
+        targetedPanelLeafId,
+        onToggleTargetedPanel: toggleTargetedPanel,
+        canGoLeafHistoryBack,
+        canGoLeafHistoryForward,
+        onGoLeafHistoryBack: goLeafHistoryBack,
+        onGoLeafHistoryForward: goLeafHistoryForward,
+        moveLeafChapter,
+        toggleChapterRead,
+        updateSplitSize,
+        updateSplitGroupLayout,
+        highlightModeEnabledByLeafId,
+        highlightedVerseRangesByLeafId,
+        onClearLeafHighlights: handleClearLeafHighlights,
+        onToggleHighlightMode: toggleHighlightModeForLeaf,
+        onBookmarkLeafSelection: bookmarkLeafSelection,
+        studyToolsPanelProps,
+        topicsPanelProps,
+        bookmarksPanelProps,
+        settingsPanelProps,
+        progressPanelProps,
+        canInstallPwa: deferredInstallPrompt !== null,
+        isPwaInstalled,
+        onInstallPwa: installPwa,
+        renderReferencePreview: referencePreviewContent,
+        onOpenReference: openConcordanceReference,
+        onCloseSidebar: closeRightSidebarForMobile,
+        onStartTour: startGuidedTour,
+        onOpenSearchTab: openSearchTab,
+        onOpenStaticPageTab: openStaticPageTab,
+      }}
+    />
+  );
   return (
     <main
       className="reader-shell h-screen w-full overflow-hidden bg-background"
@@ -2833,46 +2795,14 @@ export function KJVReader() {
               accordionValue={concordanceAccordionValue}
               onAccordionValueChange={setConcordanceAccordionValue}
               onActiveTabChange={setStudyWorkspaceTab}
-              onExpandAll={() =>
-                setConcordanceAccordionValue([...STUDY_ACCORDION_ITEMS])
-              }
-              onCollapseAll={() => setConcordanceAccordionValue([])}
+              onExpandAll={expandAllStudyTools}
+              onCollapseAll={collapseAllStudyTools}
               canExpand={!allStudyAccordionsOpen}
               canCollapse={concordanceAccordionValue.length > 0}
               {...sharedStudyToolsProps}
               topicsProps={topicsPanelProps}
-              notesProps={{
-                books,
-                generalNotes,
-                contextNotes,
-                context: notesContext,
-                onOpenNotesTab: (noteId) => {
-                  openNotesTab(noteId);
-                  closeRightSidebarForMobile();
-                },
-                onCreateGeneralNote: () => {
-                  const noteId = createGeneralNote();
-                  openNotesTab(noteId);
-                  closeRightSidebarForMobile();
-                },
-                onCreateContextNote: () => {
-                  const noteId = createContextNote(notesContext);
-                  if (noteId) {
-                    openNotesTab(noteId);
-                    closeRightSidebarForMobile();
-                  }
-                },
-                onSetChapterContext: () => {
-                  setNotesContext((current) => {
-                    if (!current) return current;
-                    return {
-                      bookIndex: current.bookIndex,
-                      chapterIndex: current.chapterIndex,
-                    };
-                  });
-                },
-              }}
-              bookmarksProps={sharedBookmarksProps}
+              notesProps={notesSidebarProps}
+              bookmarksProps={bookmarksPanelProps}
             />
           </Suspense>
         ) : null}

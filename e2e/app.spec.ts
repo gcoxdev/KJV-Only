@@ -149,6 +149,53 @@ test("loads study-word tools progressively without blocking the reader", async (
   expect(measures.allTools).toBeLessThan(15_000)
 })
 
+test("loads auxiliary reader panels on demand", async ({ page }) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  const openPanelHome = async () => {
+    await page.getByLabel("Panel options").filter({ visible: true }).first().click()
+    await page.getByRole("menuitem", { name: "Home", exact: true }).click()
+    await expect(page.getByText("Panel Home", { exact: true })).toBeVisible()
+  }
+
+  await openPanelHome()
+  await page
+    .getByRole("button", { name: "Tools", exact: true })
+    .filter({ visible: true })
+    .first()
+    .click()
+  await expect(
+    page.getByRole("button", { name: "Concordance", exact: true }),
+  ).toBeVisible()
+
+  await openPanelHome()
+  await page
+    .getByRole("button", { name: "Topics", exact: true })
+    .filter({ visible: true })
+    .first()
+    .click()
+  await expect(page.getByLabel("Filter topics")).toBeVisible()
+
+  await openPanelHome()
+  await page
+    .getByRole("button", { name: "Bookmarks", exact: true })
+    .filter({ visible: true })
+    .first()
+    .click()
+  await expect(page.getByText("No bookmarks yet.", { exact: true })).toBeVisible()
+
+  await page.getByLabel("Open menu").click()
+  await page.getByRole("menuitem", { name: "Settings", exact: true }).click()
+  await expect(page.getByRole("tab", { name: "Visual", exact: true })).toBeVisible()
+
+  await page.getByLabel("Open menu").click()
+  await page
+    .getByRole("menuitem", { name: "Reading Progress", exact: true })
+    .click()
+  await expect(page.getByText("Whole Bible", { exact: true })).toBeVisible()
+})
+
 test("restores a shared chapter layout after reload", async ({ page }) => {
   await page.goto("/")
   await expectReaderReady(page)

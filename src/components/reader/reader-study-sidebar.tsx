@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import { memo, type ComponentProps } from "react";
 
 import { NotesTool } from "@/components/reader/study-tools/notes-tool";
 import { BookmarksTool } from "@/components/reader/study-tools/bookmarks-tool";
@@ -9,6 +9,7 @@ import {
 } from "@/components/reader/reader-study-tools-content";
 import { StudyToolsSidebar } from "@/components/reader/study-tools-sidebar";
 import type { StudyWorkspaceTab } from "@/types/reader";
+import { areReaderViewModelsEqual } from "@/lib/reader-view-model";
 
 type ReaderStudySidebarProps = {
   visible: boolean;
@@ -25,7 +26,7 @@ type ReaderStudySidebarProps = {
   bookmarksProps: ComponentProps<typeof BookmarksTool>;
 } & ReaderStudyToolsContentProps;
 
-export function ReaderStudySidebar({
+export const ReaderStudySidebar = memo(function ReaderStudySidebar({
   visible,
   activeTab,
   accordionValue,
@@ -59,4 +60,4 @@ export function ReaderStudySidebar({
       />
     </div>
   );
-}
+}, areReaderViewModelsEqual);
