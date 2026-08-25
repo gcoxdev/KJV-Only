@@ -44,9 +44,7 @@ function inspectDataset(datasetName, payload) {
       continue;
     }
 
-    STRONGS_REF_PATTERN.lastIndex = 0;
-    let match = null;
-    while ((match = STRONGS_REF_PATTERN.exec(derivation)) !== null) {
+    for (const match of derivation.matchAll(STRONGS_REF_PATTERN)) {
       const [, prefix, rawDigits] = match;
       const compactRaw = `${prefix}${rawDigits}`;
       const exactExists = allKeys.has(compactRaw);

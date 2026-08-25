@@ -118,8 +118,8 @@ function neighborForDirection(
       continue;
     }
 
-    let distance = Number.POSITIVE_INFINITY;
-    let overlap = 0;
+    let distance: number;
+    let overlap: number;
 
     if (direction === "left") {
       if (rect.x + rect.width > source.x + epsilon) {
