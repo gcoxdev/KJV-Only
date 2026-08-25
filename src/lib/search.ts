@@ -1,6 +1,7 @@
 import {
   extractSearchWords,
   type SearchableVerseEntry,
+  type VerseSearchIndexEntry,
 } from "@/lib/verse-search-index";
 
 export {
@@ -327,7 +328,7 @@ function longestCommonSubsequenceLength(a: string, b: string) {
   return dp[a.length][b.length];
 }
 
-type PreparedSmartSearch = {
+export type PreparedSmartSearch = {
   rawQuery: string;
   queryWords: string[];
   significantQueryWords: string[];
@@ -335,6 +336,157 @@ type PreparedSmartSearch = {
   exactPhrases: string[];
   caseSensitive: boolean;
 };
+
+type SmartSearchLookupWord = {
+  word: string;
+  phonetic: string;
+  verseIndexes: number[];
+};
+
+export type SmartSearchLookup = {
+  words: SmartSearchLookupWord[];
+  wordMap: Map<string, SmartSearchLookupWord>;
+};
+
+export function buildSmartSearchLookup(entries: VerseSearchIndexEntry[]) {
+  const words: SmartSearchLookupWord[] = [];
+  const wordMap = new Map<string, SmartSearchLookupWord>();
+
+  entries.forEach((entry, entryIndex) => {
+    for (const word of entry.searchWordsLower) {
+      let lookupWord = wordMap.get(word);
+      if (!lookupWord) {
+        lookupWord = {
+          word,
+          phonetic: phoneticCode(word),
+          verseIndexes: [],
+        };
+        wordMap.set(word, lookupWord);
+        words.push(lookupWord);
+      }
+      const verseIndexes = lookupWord.verseIndexes;
+      if (verseIndexes[verseIndexes.length - 1] !== entryIndex) {
+        verseIndexes.push(entryIndex);
+      }
+    }
+  });
+
+  return { words, wordMap } satisfies SmartSearchLookup;
+}
+
+function isSmartSearchTokenCandidate(
+  queryWord: string,
+  queryPhonetic: string,
+  verseWord: string,
+  versePhonetic: string,
+  allowFuzzyMatch: boolean,
+) {
+  if (queryWord === verseWord) {
+    return true;
+  }
+  const shorterLength = Math.min(queryWord.length, verseWord.length);
+  if (
+    shorterLength >= 3 &&
+    (queryWord.startsWith(verseWord) || verseWord.startsWith(queryWord))
+  ) {
+    return true;
+  }
+  if (
+    queryWord.length >= 4 &&
+    verseWord.length >= 4 &&
+    queryPhonetic &&
+    queryPhonetic === versePhonetic
+  ) {
+    return true;
+  }
+  return (
+    allowFuzzyMatch &&
+    shorterLength >= 4 &&
+    trigramSimilarity(queryWord, verseWord) >= 0.5
+  );
+}
+
+function getPreparedCandidateWords(prepared: PreparedSmartSearch) {
+  return prepared.significantQueryWords.length > 0
+    ? prepared.significantQueryWords
+    : prepared.queryWords;
+}
+
+export function getIndexedSmartSearchCandidateIndexes(
+  lookup: SmartSearchLookup,
+  prepared: PreparedSmartSearch,
+) {
+  const candidateIndexes = new Set<number>();
+  const candidateWords = getPreparedCandidateWords(prepared);
+
+  candidateWords.forEach((queryWord, queryWordIndex) => {
+    const indexedQueryWord = queryWord.toLowerCase();
+    const preparedWordIndex = prepared.queryWords.indexOf(queryWord);
+    const queryPhonetic =
+      prepared.queryWordPhonetics[preparedWordIndex] ??
+      phoneticCode(indexedQueryWord);
+    for (const lookupWord of lookup.words) {
+      if (
+        !isSmartSearchTokenCandidate(
+          indexedQueryWord,
+          queryPhonetic,
+          lookupWord.word,
+          lookupWord.phonetic,
+          queryWordIndex === 0,
+        )
+      ) {
+        continue;
+      }
+      for (const verseIndex of lookupWord.verseIndexes) {
+        candidateIndexes.add(verseIndex);
+      }
+    }
+  });
+
+  return Array.from(candidateIndexes).sort((left, right) => left - right);
+}
+
+export function getExactSmartSearchCandidateIndexes(
+  lookup: SmartSearchLookup,
+  prepared: PreparedSmartSearch,
+) {
+  const queryWords = Array.from(
+    new Set(prepared.queryWords.map((word) => word.toLowerCase())),
+  );
+  const indexLists = queryWords
+    .map((word) => lookup.wordMap.get(word)?.verseIndexes)
+    .filter((indexes): indexes is number[] => Boolean(indexes))
+    .sort((left, right) => left.length - right.length);
+  if (indexLists.length !== queryWords.length || indexLists.length === 0) {
+    return [];
+  }
+
+  let intersection = indexLists[0].slice();
+  for (let listIndex = 1; listIndex < indexLists.length; listIndex += 1) {
+    const nextList = indexLists[listIndex];
+    const nextIntersection: number[] = [];
+    let leftIndex = 0;
+    let rightIndex = 0;
+    while (leftIndex < intersection.length && rightIndex < nextList.length) {
+      const left = intersection[leftIndex];
+      const right = nextList[rightIndex];
+      if (left === right) {
+        nextIntersection.push(left);
+        leftIndex += 1;
+        rightIndex += 1;
+      } else if (left < right) {
+        leftIndex += 1;
+      } else {
+        rightIndex += 1;
+      }
+    }
+    intersection = nextIntersection;
+    if (intersection.length === 0) {
+      break;
+    }
+  }
+  return intersection;
+}
 
 type SmartSimilarityCache = Map<string, number>;
 
@@ -635,28 +787,15 @@ export function isSmartSearchCandidate(
       ] ?? phoneticCode(queryWord);
     let matchedThisWord = false;
     for (const [wordIndex, verseWord] of haystackWords.entries()) {
-      if (queryWord === verseWord) {
-        matchedThisWord = true;
-        break;
-      }
-      const shorterLength = Math.min(queryWord.length, verseWord.length);
       if (
-        shorterLength >= 3 &&
-        (queryWord.startsWith(verseWord) || verseWord.startsWith(queryWord))
+        isSmartSearchTokenCandidate(
+          queryWord,
+          queryPhonetic,
+          verseWord,
+          entry.searchWordPhonetics[wordIndex],
+          index === 0,
+        )
       ) {
-        matchedThisWord = true;
-        break;
-      }
-      if (
-        queryWord.length >= 4 &&
-        verseWord.length >= 4 &&
-        queryPhonetic &&
-        queryPhonetic === entry.searchWordPhonetics[wordIndex]
-      ) {
-        matchedThisWord = true;
-        break;
-      }
-      if (index === 0 && shorterLength >= 4 && trigramSimilarity(queryWord, verseWord) >= 0.5) {
         matchedThisWord = true;
         break;
       }
