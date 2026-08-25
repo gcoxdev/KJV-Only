@@ -38,8 +38,6 @@ import {
 import { clearSingleLeafReferenceIfMissing } from "@/lib/leaf-state";
 import {
   collectLeafIds,
-  createId,
-  createLeaf,
   findLeafNode,
   updateLeafNode,
   updateSameOrientationGroupLayout,
@@ -72,15 +70,6 @@ import type {
 import type { BookmarkScope } from "@/types/bookmarks";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { SidebarOpenRequestSync } from "@/components/reader/sidebar-open-request-sync";
 import { SidebarCloseRequestSync } from "@/components/reader/sidebar-close-request-sync";
@@ -103,6 +92,10 @@ import { usePanelTargeting } from "@/hooks/use-panel-targeting";
 import { usePanelRouting } from "@/hooks/use-panel-routing";
 import { usePanelInteractionController } from "@/hooks/use-panel-interaction-controller";
 import { usePendingReaderScroll } from "@/hooks/use-pending-reader-scroll";
+import { usePwaInstallation } from "@/hooks/use-pwa-installation";
+import { useGuidedTourController } from "@/hooks/use-guided-tour-controller";
+import { useCompletionCelebration } from "@/hooks/use-completion-celebration";
+import { useReaderStartup } from "@/hooks/use-reader-startup";
 import {
   useBookmarksViewModel,
   useNotesSidebarViewModel,
@@ -124,11 +117,9 @@ import { ReferenceCommandDialog } from "@/components/reader/reference-command-di
 import { TabsWorkspace } from "@/components/reader/tabs-workspace";
 import { ReaderStatusScreen } from "@/components/reader/reader-status-screen";
 import { ReaderWorkspacePanels } from "@/components/reader/reader-workspace-panels";
+import { ReaderImportControls } from "@/components/reader/reader-import-controls";
 import { CompletionCelebration } from "@/components/reader/completion-celebration";
-import {
-  GuidedTour,
-  type GuidedTourStep,
-} from "@/components/reader/guided-tour";
+import { GuidedTour } from "@/components/reader/guided-tour";
 
 const LazyReaderStudySidebar = lazy(async () => {
   const module = await import("@/components/reader/reader-study-sidebar");
@@ -145,136 +136,10 @@ const LazyRenameTabDialog = lazy(async () => {
   return { default: module.RenameTabDialog };
 });
 
-const COMPLETION_CELEBRATION_VERSES = [
-  {
-    reference: "2 Chronicles 15:7",
-    text: "Be ye strong therefore, and let not your hands be weak: for your work shall be rewarded.",
-  },
-  {
-    reference: "Psalm 55:22",
-    text: "Cast thy burden upon the Lord, and he shall sustain thee: he shall never suffer the righteous to be moved.",
-  },
-  {
-    reference: "Proverbs 3:5",
-    text: "Trust in the Lord with all thine heart; and lean not unto thine own understanding.",
-  },
-  {
-    reference: "Proverbs 3:6",
-    text: "In all thy ways acknowledge him, and he shall direct thy paths.",
-  },
-  {
-    reference: "Proverbs 16:3",
-    text: "Commit thy works unto the Lord, and thy thoughts shall be established.",
-  },
-  {
-    reference: "Ecclesiastes 9:10",
-    text: "Whatsoever thy hand findeth to do, do it with thy might; for there is no work, nor device, nor knowledge, nor wisdom, in the grave, whither thou goest.",
-  },
-  {
-    reference: "Isaiah 40:31",
-    text: "But they that wait upon the Lord shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint.",
-  },
-  {
-    reference: "Isaiah 41:10",
-    text: "Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness.",
-  },
-  {
-    reference: "Matthew 11:28",
-    text: "Come unto me, all ye that labour and are heavy laden, and I will give you rest.",
-  },
-  {
-    reference: "Matthew 19:26",
-    text: "But Jesus beheld them, and said unto them, With men this is impossible; but with God all things are possible.",
-  },
-  {
-    reference: "Luke 1:37",
-    text: "For with God nothing shall be impossible.",
-  },
-  {
-    reference: "Romans 8:28",
-    text: "And we know that all things work together for good to them that love God, to them who are the called according to his purpose.",
-  },
-  {
-    reference: "Romans 12:11",
-    text: "Not slothful in business; fervent in spirit; serving the Lord;",
-  },
-  {
-    reference: "1 Corinthians 9:24",
-    text: "Know ye not that they which run in a race run all, but one receiveth the prize? So run, that ye may obtain.",
-  },
-  {
-    reference: "1 Corinthians 15:58",
-    text: "Therefore, my beloved brethren, be ye stedfast, unmoveable, always abounding in the work of the Lord, forasmuch as ye know that your labour is not in vain in the Lord.",
-  },
-  {
-    reference: "2 Timothy 4:7",
-    text: "I have fought a good fight, I have finished my course, I have kept the faith:",
-  },
-  {
-    reference: "Ephesians 6:10",
-    text: "Finally, my brethren, be strong in the Lord, and in the power of his might.",
-  },
-  {
-    reference: "Philippians 3:14",
-    text: "I press toward the mark for the prize of the high calling of God in Christ Jesus.",
-  },
-  {
-    reference: "Philippians 4:13",
-    text: "I can do all things through Christ which strengtheneth me.",
-  },
-  {
-    reference: "Colossians 3:23",
-    text: "And whatsoever ye do, do it heartily, as to the Lord, and not unto men;",
-  },
-  {
-    reference: "2 Thessalonians 3:13",
-    text: "But ye, brethren, be not weary in well doing.",
-  },
-  {
-    reference: "Hebrews 10:23",
-    text: "Let us hold fast the profession of our faith without wavering; ( for he is faithful that promised;)",
-  },
-  {
-    reference: "Hebrews 12:1",
-    text: "Wherefore seeing we also are compassed about with so great a cloud of witnesses, let us lay aside every weight, and the sin which doth so easily beset us, and let us run with patience the race that is set before us,",
-  },
-  {
-    reference: "Galatians 6:9",
-    text: "And let us not be weary in well doing: for in due season we shall reap, if we faint not.",
-  },
-] satisfies ReadonlyArray<{ reference: string; text: string }>;
-
 const LazyGenealogyTreeDialog = lazy(async () => {
   const module = await import("@/components/reader/genealogy-tree-dialog");
   return { default: module.GenealogyTreeDialog };
 });
-
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{
-    outcome: "accepted" | "dismissed";
-    platform: string;
-  }>;
-};
-
-function createWelcomeHomeTab(): ReaderTab {
-  return {
-    id: createId(),
-    title: "Welcome Home",
-    root: {
-      ...createLeaf(0, 0, "page"),
-      pageId: "welcome-home",
-    },
-  };
-}
-
-function createGenesisReaderTab(): ReaderTab {
-  return {
-    id: createId(),
-    title: "Genesis 1",
-    root: createLeaf(0, 0, "reader"),
-  };
-}
 
 export function KJVReader() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -290,21 +155,7 @@ export function KJVReader() {
   >([]);
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [sidebarCloseRequestKey, setSidebarCloseRequestKey] = useState(0);
-  const [isCompletionCelebrationOpen, setIsCompletionCelebrationOpen] =
-    useState(false);
-  const [showCompletionConfetti, setShowCompletionConfetti] = useState(false);
-  const [completionCelebrationVerse, setCompletionCelebrationVerse] = useState(
-    COMPLETION_CELEBRATION_VERSES[0],
-  );
-  const [isGuidedTourOpen, setIsGuidedTourOpen] = useState(false);
-  const [guidedTourStepIndex, setGuidedTourStepIndex] = useState(0);
   const [isReferenceCommandOpen, setIsReferenceCommandOpen] = useState(false);
-  const [deferredInstallPrompt, setDeferredInstallPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
-  const [isPwaInstalled, setIsPwaInstalled] = useState(false);
-  const previousBibleCompletionRef = useRef(false);
-  const didApplyStartupWelcomeHomeRef = useRef(false);
-  const didInitializeReaderRef = useRef(false);
   const finishFirstReaderReadyMeasureRef = useRef<(() => void) | null>(null);
   const hasOpenSearchView = useMemo(
     () => tabs.some((tab) => panelNodeContainsView(tab.root, "search")),
@@ -447,69 +298,8 @@ export function KJVReader() {
   const strongsSearchInputRef = useRef<HTMLInputElement | null>(null);
   const panelElementRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const fullscreenRequestedLeafIdRef = useRef<string | null>(null);
+  const { canInstallPwa, isPwaInstalled, installPwa } = usePwaInstallation();
 
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const mediaQuery =
-      typeof window.matchMedia === "function"
-        ? window.matchMedia("(display-mode: standalone)")
-        : null;
-
-    const computeInstalled = () =>
-      mediaQuery?.matches === true ||
-      (
-        window.navigator as Navigator & {
-          standalone?: boolean;
-        }
-      ).standalone === true;
-
-    const handleInstalledStateChange = () => {
-      setIsPwaInstalled(computeInstalled());
-    };
-
-    const handleBeforeInstallPrompt = (event: Event) => {
-      setDeferredInstallPrompt(event as BeforeInstallPromptEvent);
-    };
-
-    const handleAppInstalled = () => {
-      setDeferredInstallPrompt(null);
-      setIsPwaInstalled(true);
-    };
-
-    handleInstalledStateChange();
-    window.addEventListener(
-      "beforeinstallprompt",
-      handleBeforeInstallPrompt as EventListener,
-    );
-    window.addEventListener("appinstalled", handleAppInstalled);
-    mediaQuery?.addEventListener?.("change", handleInstalledStateChange);
-
-    return () => {
-      window.removeEventListener(
-        "beforeinstallprompt",
-        handleBeforeInstallPrompt as EventListener,
-      );
-      window.removeEventListener("appinstalled", handleAppInstalled);
-      mediaQuery?.removeEventListener?.("change", handleInstalledStateChange);
-    };
-  }, []);
-
-  const installPwa = useCallback(async () => {
-    if (!deferredInstallPrompt) {
-      return;
-    }
-
-    const promptEvent = deferredInstallPrompt;
-    setDeferredInstallPrompt(null);
-    await promptEvent.prompt();
-    const userChoice = await promptEvent.userChoice;
-    if (userChoice.outcome === "accepted") {
-      setIsPwaInstalled(true);
-    }
-  }, [deferredInstallPrompt]);
   const {
     activeTab: studyWorkspaceTab,
     accordionValue: concordanceAccordionValue,
@@ -591,85 +381,19 @@ export function KJVReader() {
     };
   }, [tokenPopup]);
 
-  useEffect(() => {
-    if (didInitializeReaderRef.current) {
-      return;
-    }
-
-    const parsedLayout = parseCurrentLayoutHash();
-    if (loadError) {
-      didInitializeReaderRef.current = true;
-      setIsLoaded(true);
-      finishFirstReaderReadyMeasureRef.current?.();
-      finishFirstReaderReadyMeasureRef.current = null;
-      return;
-    }
-    if (books.length === 0 || (parsedLayout && !isCorpusLoaded)) {
-      return;
-    }
-
-    didInitializeReaderRef.current = true;
-    if (parsedLayout && parsedLayout.tabs.length > 0) {
-      applyParsedLayout(parsedLayout);
-    } else {
-      const readerTab = createGenesisReaderTab();
-      const initialTabs = showWelcomeHomeAtStartup
-        ? [readerTab, createWelcomeHomeTab()]
-        : [readerTab];
-      setTabs(initialTabs);
-      setActiveTabId(initialTabs[initialTabs.length - 1]?.id ?? readerTab.id);
-    }
-    setIsLoaded(true);
-    finishFirstReaderReadyMeasureRef.current?.();
-    finishFirstReaderReadyMeasureRef.current = null;
-  }, [
-    applyParsedLayout,
-    books,
+  useReaderStartup({
+    isLoaded,
+    bookCount: books.length,
     isCorpusLoaded,
     loadError,
-    parseCurrentLayoutHash,
     showWelcomeHomeAtStartup,
-  ]);
-
-  useEffect(() => {
-    if (!isLoaded || didApplyStartupWelcomeHomeRef.current) {
-      return;
-    }
-    didApplyStartupWelcomeHomeRef.current = true;
-    setTabs((currentTabs) => {
-      if (currentTabs.length === 0) {
-        return currentTabs;
-      }
-      const existingWelcomeTab = currentTabs.find(
-        (tab) =>
-          tab.root.type === "leaf" &&
-          tab.root.view === "page" &&
-          tab.root.pageId === "welcome-home",
-      );
-      const otherTabs = currentTabs.filter(
-        (tab) =>
-          !(
-            tab.root.type === "leaf" &&
-            tab.root.view === "page" &&
-            tab.root.pageId === "welcome-home"
-          ),
-      );
-      const nextTabs =
-        showWelcomeHomeAtStartup
-          ? [...otherTabs, existingWelcomeTab ?? createWelcomeHomeTab()]
-          : currentTabs;
-      const welcomeTab = nextTabs.find(
-        (tab) =>
-          tab.root.type === "leaf" &&
-          tab.root.view === "page" &&
-          tab.root.pageId === "welcome-home",
-      );
-      if (welcomeTab) {
-        setActiveTabId(welcomeTab.id);
-      }
-      return nextTabs;
-    });
-  }, [isLoaded, setTabs, showWelcomeHomeAtStartup, tabs]);
+    parseCurrentLayoutHash,
+    applyParsedLayout,
+    setIsLoaded,
+    setTabs,
+    setActiveTabId,
+    finishFirstReaderReadyMeasureRef,
+  });
 
   const {
     chapterRefs,
@@ -687,33 +411,10 @@ export function KJVReader() {
     readChapters,
   });
 
-  useEffect(() => {
-    const isComplete =
-      progressByTestament.total.total > 0 &&
-      progressByTestament.total.read === progressByTestament.total.total;
-    const wasComplete = previousBibleCompletionRef.current;
-    previousBibleCompletionRef.current = isComplete;
-
-    if (!isComplete || wasComplete) {
-      return;
-    }
-
-    setCompletionCelebrationVerse(
-      COMPLETION_CELEBRATION_VERSES[
-        Math.floor(Math.random() * COMPLETION_CELEBRATION_VERSES.length)
-      ],
-    );
-    setIsCompletionCelebrationOpen(true);
-    setShowCompletionConfetti(true);
-
-    const timeoutId = window.setTimeout(() => {
-      setShowCompletionConfetti(false);
-    }, 4200);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [progressByTestament.total.total, progressByTestament.total.read]);
+  const completionCelebrationProps = useCompletionCelebration({
+    totalChapters: progressByTestament.total.total,
+    readChapters: progressByTestament.total.read,
+  });
 
   const {
     readerNotes,
@@ -759,6 +460,8 @@ export function KJVReader() {
     bookmarksImportInputRef,
     exportNotes,
     exportBookmarks,
+    requestNotesImport,
+    requestBookmarksImport,
     handleImportNotesFile,
     handleImportBookmarksFile,
   } = usePanelTransfer({
@@ -1618,8 +1321,7 @@ export function KJVReader() {
 
   function resetAllProgress() {
     setReadChapters(new Set());
-    setIsCompletionCelebrationOpen(false);
-    setShowCompletionConfetti(false);
+    completionCelebrationProps.onOpenChange(false);
   }
 
   const {
@@ -2112,116 +1814,10 @@ export function KJVReader() {
       tabs.find((tab) => panelNodeContainsView(tab.root, "reader"))?.id ?? null,
     [tabs],
   );
-
-  const guidedTourSteps = useMemo<GuidedTourStep[]>(
-    () => [
-      {
-        id: "main-menu",
-        title: "Main Menu",
-        description:
-          "Use the menu to open pages such as Settings, Reading Progress, Download, Help, and more.",
-        selector: "[data-tour='main-menu']",
-      },
-      {
-        id: "reference-command-button",
-        title: "Quick Open",
-        description:
-          "Use Quick Open to type Bible references such as John 3:16 or several passages at once, then choose whether to open them in tabs or panels.",
-        selector: "[data-tour='reference-command-button']",
-      },
-      {
-        id: "search-button",
-        title: "Search",
-        description:
-          "Open the search workspace from here to run phrase, word, and regex searches across the Bible.",
-        selector: "[data-tour='search-button']",
-      },
-      {
-        id: "mode-toggle",
-        title: "Read and Study Modes",
-        description:
-          "Switch between simpler reading and full study mode here. Study mode enables the sidebar and broader tool workflow.",
-        selector: "[data-tour='mode-toggle']",
-      },
-      {
-        id: "tabs-strip",
-        title: "Tabs",
-        description:
-          "Your layouts live in tabs, making it easy to organize different reading, study, and page setups.",
-        selector: "[data-tour='tabs-strip']",
-      },
-      {
-        id: "add-tab",
-        title: "Add Tabs",
-        description:
-          "Use this button to create another tab for a separate reading layout, page, or study workspace.",
-        selector: "[data-tour='add-tab']",
-      },
-      {
-        id: "tab-options",
-        title: "Tab Options",
-        description:
-          "Each tab has its own options menu for relabeling, reordering, and closing that tab.",
-        selector: "[data-tour='tab-options']",
-      },
-      {
-        id: "sidebar",
-        title: "Study Sidebar",
-        description:
-          "In study mode, the sidebar gives quick access to tools, notes, and bookmarks alongside the Bible text.",
-        selector: "[data-tour='sidebar']",
-      },
-      {
-        id: "reader-panel",
-        title: "Reader Panel",
-        description:
-          "This is the main Bible reading workspace. From here you can read, split panels, highlight verses, and open study tools.",
-        selector: "[data-tour='reader-panel']",
-      },
-      {
-        id: "panel-menu",
-        title: "Panel Options",
-        description:
-          "Each panel has its own menu for history, fullscreen, home, splitting, moving, and other panel-specific actions.",
-        selector: "[data-tour='panel-menu']",
-      },
-      {
-        id: "panel-bottom-bar",
-        title: "Panel Bottom Bar",
-        description:
-          "The bottom bar gives quick access to chapter audio, chapter progress updates, and chapter navigation.",
-        selector: "[data-tour='panel-bottom-bar']",
-      },
-    ],
-    [],
-  );
-
-  const goToGuidedTourStep = useCallback(
-    (nextIndex: number) => {
-      const clampedIndex = Math.max(
-        0,
-        Math.min(nextIndex, guidedTourSteps.length - 1),
-      );
-      const step = guidedTourSteps[clampedIndex];
-      if (
-        (step.id === "reader-panel" || step.id === "panel-menu") &&
-        firstReaderTabId
-      ) {
-        setActiveTabId(firstReaderTabId);
-      }
-      setGuidedTourStepIndex(clampedIndex);
-    },
-    [firstReaderTabId, guidedTourSteps],
-  );
-
-  const startGuidedTour = useCallback(() => {
-    setIsGuidedTourOpen(true);
-    goToGuidedTourStep(0);
-  }, [goToGuidedTourStep]);
-
-  const closeGuidedTour = useCallback(() => {
-    setIsGuidedTourOpen(false);
-  }, []);
+  const { startGuidedTour, guidedTourProps } = useGuidedTourController({
+    firstReaderTabId,
+    setActiveTabId,
+  });
 
   useEffect(() => {
     const hasTopicsLeaf = tabs.some((tab) => {
@@ -2632,7 +2228,7 @@ export function KJVReader() {
         bookmarksPanelProps,
         settingsPanelProps,
         progressPanelProps,
-        canInstallPwa: deferredInstallPrompt !== null,
+        canInstallPwa,
         isPwaInstalled,
         onInstallPwa: installPwa,
         renderReferencePreview: referencePreviewContent,
@@ -2690,9 +2286,9 @@ export function KJVReader() {
             onOpenSettings={() => openStaticPageTab("settings")}
             onOpenPage={openStaticPageTab}
             onExportNotes={exportNotes}
-            onImportNotes={() => notesImportInputRef.current?.click()}
+            onImportNotes={requestNotesImport}
             onExportBookmarks={exportBookmarks}
-            onImportBookmarks={() => bookmarksImportInputRef.current?.click()}
+            onImportBookmarks={requestBookmarksImport}
           />
           <ReferenceCommandDialog
             books={books}
@@ -2700,65 +2296,14 @@ export function KJVReader() {
             onOpenChange={setIsReferenceCommandOpen}
             onRunAction={runReferenceCommandAction}
           />
-          <input
-            ref={notesImportInputRef}
-            type="file"
-            accept="application/json,.json"
-            className="hidden"
-            onChange={(event) => {
-              const file = event.target.files?.[0] ?? null;
-              event.currentTarget.value = "";
-              void handleImportNotesFile(file);
-            }}
+          <ReaderImportControls
+            importSummary={importSummary}
+            notesImportInputRef={notesImportInputRef}
+            bookmarksImportInputRef={bookmarksImportInputRef}
+            onImportNotesFile={handleImportNotesFile}
+            onImportBookmarksFile={handleImportBookmarksFile}
+            onCloseImportSummary={closeImportSummary}
           />
-          <input
-            ref={bookmarksImportInputRef}
-            type="file"
-            accept="application/json,.json"
-            className="hidden"
-            onChange={(event) => {
-              const file = event.target.files?.[0] ?? null;
-              event.currentTarget.value = "";
-              void handleImportBookmarksFile(file);
-            }}
-          />
-          <AlertDialog
-            open={importSummary !== null}
-            onOpenChange={(open) => {
-              if (!open) {
-                closeImportSummary();
-              }
-            }}
-          >
-            <AlertDialogContent size="sm">
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  {importSummary?.isError
-                    ? `Import ${importSummary?.kind === "bookmarks" ? "Bookmarks" : "Notes"} Failed`
-                    : `${importSummary?.kind === "bookmarks" ? "Bookmarks" : "Notes"} Imported`}
-                </AlertDialogTitle>
-                <AlertDialogDescription className="flex flex-col gap-2">
-                  <span className="block">{importSummary?.message}</span>
-                  {importSummary && !importSummary.isError ? (
-                    <>
-                      <span className="block">
-                        Imported: {importSummary.importedCount}
-                      </span>
-                      <span className="block">
-                        Replaced existing: {importSummary.replacedCount}
-                      </span>
-                      <span className="block">
-                        Skipped invalid: {importSummary.skippedCount}
-                      </span>
-                    </>
-                  ) : null}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogAction onClick={closeImportSummary}>OK</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
 
           <TabsWorkspace
             tabsOrientation={tabsOrientation}
@@ -2769,22 +2314,7 @@ export function KJVReader() {
               </div>
             }
           />
-          <GuidedTour
-            open={isGuidedTourOpen}
-            stepIndex={guidedTourStepIndex}
-            steps={guidedTourSteps}
-            onNext={() => {
-              if (guidedTourStepIndex >= guidedTourSteps.length - 1) {
-                closeGuidedTour();
-                return;
-              }
-              goToGuidedTourStep(guidedTourStepIndex + 1);
-            }}
-            onPrevious={() => {
-              goToGuidedTourStep(guidedTourStepIndex - 1);
-            }}
-            onClose={closeGuidedTour}
-          />
+          <GuidedTour {...guidedTourProps} />
         </SidebarInset>
 
         {sidebarAvailable ? (
@@ -2840,17 +2370,7 @@ export function KJVReader() {
         </Suspense>
       ) : null}
 
-      <CompletionCelebration
-        open={isCompletionCelebrationOpen}
-        showConfetti={showCompletionConfetti}
-        verse={completionCelebrationVerse}
-        onOpenChange={(open) => {
-          setIsCompletionCelebrationOpen(open);
-          if (!open) {
-            setShowCompletionConfetti(false);
-          }
-        }}
-      />
+      <CompletionCelebration {...completionCelebrationProps} />
 
       {isGenealogyTreeOpen ? (
         <Suspense fallback={null}>

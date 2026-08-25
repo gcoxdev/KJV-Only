@@ -23,7 +23,6 @@ import {
   Progress,
   ProgressLabel,
 } from "@/components/ui/progress";
-import { bookCodeForIndex } from "@/lib/reader-view";
 import {
   GENEALOGY_ASSET_VERSION,
   STRONGS_ASSET_VERSION,
@@ -31,6 +30,7 @@ import {
 } from "@/lib/reader-data";
 import {
   CORE_OFFLINE_URLS,
+  buildAudioUrls,
   deleteOfflineAssetBatch,
   downloadOfflineAssetBatch,
   formatOfflineBytes,
@@ -87,22 +87,6 @@ function bundleStatusLabel(status: BundleStatus) {
     return "Fully cached";
   }
   return "Partially cached";
-}
-
-function buildAudioUrls(books: Book[], range: "old" | "new") {
-  const startIndex = range === "old" ? 0 : 39;
-  const endIndex = range === "old" ? 39 : books.length;
-  const urls: string[] = [];
-
-  for (let bookIndex = startIndex; bookIndex < endIndex; bookIndex += 1) {
-    const book = books[bookIndex];
-    const code = bookCodeForIndex(bookIndex);
-    for (let chapterIndex = 0; chapterIndex < book.chapters.length; chapterIndex += 1) {
-      urls.push(`/audio/${code}.${chapterIndex + 1}.mp3`);
-    }
-  }
-
-  return urls;
 }
 
 export function DownloadPage({
