@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  augmentConcordanceWithNormalizedWordForms,
   isGenealogyCandidateWord,
 } from "@/lib/reader-data";
+import { augmentConcordanceWithNormalizedWordForms } from "@/lib/concordance-enrichment";
 import type { Book } from "@/types/bible";
 import type {
   ConcordancePayload,
