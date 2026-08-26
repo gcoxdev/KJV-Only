@@ -64,7 +64,7 @@ type BundleStatus = {
   error: string | null;
 };
 
-const CORE_SIZE_LABEL = "~91 MB";
+const CORE_SIZE_LABEL = "~93 MB";
 const MAPS_SIZE_LABEL = "~97 MB";
 const OT_AUDIO_SIZE_LABEL = "~559 MB";
 const NT_AUDIO_SIZE_LABEL = "~174 MB";
