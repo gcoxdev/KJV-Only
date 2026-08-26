@@ -43,6 +43,8 @@ export const CORE_OFFLINE_URLS = [
   "/references/old-english.json",
   "/references/phrases.json",
   "/references/units.json",
+  "/topics/daily-scripture-topics.json",
+  "/topics/topics-index.json",
 ] as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {

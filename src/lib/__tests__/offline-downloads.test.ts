@@ -144,6 +144,11 @@ describe("app-shell offline manifest", () => {
     });
   });
 
+  it("includes topic data in the core offline package", () => {
+    expect(CORE_OFFLINE_URLS).toContain("/topics/daily-scripture-topics.json");
+    expect(CORE_OFFLINE_URLS).toContain("/topics/topics-index.json");
+  });
+
   it("fails closed when the production manifest is unavailable", async () => {
     vi.stubGlobal(
       "fetch",

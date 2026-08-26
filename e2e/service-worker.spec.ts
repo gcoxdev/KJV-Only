@@ -16,7 +16,21 @@ test.skip(
   "Service-worker upgrade checks require the production preview",
 )
 
-test("refreshes stale manifests and keeps book icons usable offline", async ({
+test("shows a recovery screen instead of going blank when a chunk fails", async ({
+  page,
+}) => {
+  await page.route(/\/assets\/reader-study-sidebar-[^/]+\.js$/, (route) =>
+    route.abort(),
+  )
+
+  await page.goto("/")
+
+  await expect(
+    page.getByText("The application could not finish loading. Reload to try again."),
+  ).toBeVisible()
+})
+
+test("refreshes manifests and keeps the complete app shell usable offline", async ({
   page,
   context,
 }) => {
@@ -49,6 +63,12 @@ test("refreshes stale manifests and keeps book icons usable offline", async ({
     }
     const iconAssets = manifest.offlineIconAssets ?? []
     const cache = await caches.open(currentCacheName)
+    const missingAssets: string[] = []
+    for (const url of manifest.assets) {
+      if (!(await cache.match(url, { ignoreVary: true }))) {
+        missingAssets.push(url)
+      }
+    }
     const missingIcons: string[] = []
     for (const url of iconAssets) {
       if (!(await cache.match(url, { ignoreVary: true }))) {
@@ -74,6 +94,7 @@ test("refreshes stale manifests and keeps book icons usable offline", async ({
 
     return {
       manifestIconCount: iconAssets.length,
+      missingAssets,
       missingIcons,
       refreshedManifestIconCount:
         refreshedManifest.offlineIconAssets?.length ?? 0,
@@ -82,9 +103,24 @@ test("refreshes stale manifests and keeps book icons usable offline", async ({
   }, APP_CACHE)
 
   expect(cacheState.manifestIconCount).toBe(165)
+  expect(cacheState.missingAssets).toEqual([])
   expect(cacheState.missingIcons).toEqual([])
   expect(cacheState.refreshedManifestIconCount).toBe(165)
   expect(cacheState.cachedManifestIconCount).toBe(165)
+
+  await page.evaluate(async () => {
+    for (const url of [
+      "/data/kjv-manifest.json",
+      "/data/kjv-bootstrap.json",
+      "/data/kjv.json",
+    ]) {
+      const response = await fetch(url, { cache: "no-cache" })
+      if (!response.ok) {
+        throw new Error(`Could not prepare offline reader data: ${url}`)
+      }
+      await response.arrayBuffer()
+    }
+  })
 
   await context.setOffline(true)
   const offlineIcons = await page.evaluate(async () => {
@@ -105,6 +141,9 @@ test("refreshes stale manifests and keeps book icons usable offline", async ({
   expect(offlineIcons.cached.contentType).toBe("image/png")
   expect(offlineIcons.fallback.ok).toBe(true)
   expect(offlineIcons.fallback.contentType).toBe("image/svg+xml")
+
+  await page.reload()
+  await expect(page.getByRole("button", { name: "Genesis 1", exact: true })).toBeVisible()
 
   await page.getByRole("button", { name: "Welcome Home", exact: true }).click()
   await expect(

@@ -17,7 +17,10 @@ const APP_SHELL = [
   "/manifest.webmanifest",
   "/app-cache-config.js",
   "/app-shell-assets.json",
+  "/data/kjv-manifest.json",
+  "/data/kjv-bootstrap.json",
   "/icons/app-icon.svg",
+  "/topics/daily-scripture-topics.json",
 ]
 const APP_SHELL_ASSET_URL_PATTERN =
   /^\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*(?:\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/
@@ -90,7 +93,7 @@ async function cacheAppShell() {
     throw new Error("Invalid app-shell startup asset")
   }
   await cache.addAll(
-    Array.from(new Set([...manifest.startupAssets, ...offlineIconAssets]))
+    Array.from(new Set([...manifest.assets, ...offlineIconAssets]))
   )
 }
 

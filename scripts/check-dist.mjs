@@ -15,6 +15,8 @@ const REQUIRED_PATHS = [
   "data/kjv.json",
   "data/kjv-manifest.json",
   "icons/app-icon.svg",
+  "topics/daily-scripture-topics.json",
+  "topics/topics-index.json",
 ];
 const FORBIDDEN_PATHS = [
   "delete",
