@@ -52,11 +52,34 @@ describe("app-shell offline manifest", () => {
         schemaVersion: 1,
         startupAssets: ["/assets/index-abc.js"],
         assets: ["/assets/index-abc.js", "/assets/chunks/tool-def.css"],
+        offlineIconAssets: [
+          "/icons/bw/GEN.png",
+          "/icons/color/GEN.png",
+        ],
       }),
     ).toEqual({
       schemaVersion: 1,
       startupAssets: ["/assets/index-abc.js"],
       assets: ["/assets/index-abc.js", "/assets/chunks/tool-def.css"],
+      offlineIconAssets: [
+        "/icons/bw/GEN.png",
+        "/icons/color/GEN.png",
+      ],
+    });
+  });
+
+  it("keeps older manifests valid while treating their icon list as empty", () => {
+    expect(
+      parseAppShellAssetManifest({
+        schemaVersion: 1,
+        startupAssets: ["/assets/index-abc.js"],
+        assets: ["/assets/index-abc.js"],
+      }),
+    ).toEqual({
+      schemaVersion: 1,
+      startupAssets: ["/assets/index-abc.js"],
+      assets: ["/assets/index-abc.js"],
+      offlineIconAssets: [],
     });
   });
 
@@ -82,6 +105,14 @@ describe("app-shell offline manifest", () => {
         assets: ["/assets/lazy.js"],
       }),
     ).toThrow("Invalid app-shell startup asset");
+    expect(() =>
+      parseAppShellAssetManifest({
+        schemaVersion: 1,
+        startupAssets: [],
+        assets: [],
+        offlineIconAssets: ["/icons/color/../private.png"],
+      }),
+    ).toThrow("Invalid app-shell asset manifest");
   });
 
   it("expands the core package with every generated asset", async () => {
@@ -91,6 +122,10 @@ describe("app-shell offline manifest", () => {
           schemaVersion: 1,
           startupAssets: ["/assets/index-abc.js"],
           assets: ["/assets/index-abc.js", "/assets/index-def.css"],
+          offlineIconAssets: [
+            "/icons/bw/GEN.png",
+            "/icons/color/GEN.png",
+          ],
         }),
         { status: 200, headers: { "content-type": "application/json" } },
       ),
@@ -101,6 +136,8 @@ describe("app-shell offline manifest", () => {
       ...CORE_OFFLINE_URLS,
       "/assets/index-abc.js",
       "/assets/index-def.css",
+      "/icons/bw/GEN.png",
+      "/icons/color/GEN.png",
     ]);
     expect(fetchMock).toHaveBeenCalledWith("/app-shell-assets.json", {
       cache: "no-cache",

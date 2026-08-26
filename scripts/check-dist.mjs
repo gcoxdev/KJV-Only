@@ -120,6 +120,10 @@ try {
     .map((file) => `/${path.relative(DIST_DIR, file.path).split(path.sep).join("/")}`)
     .filter((url) => url.startsWith("/assets/"))
     .sort();
+  const offlineIconUrls = files
+    .map((file) => `/${path.relative(DIST_DIR, file.path).split(path.sep).join("/")}`)
+    .filter((url) => /^\/icons\/(?:bw|color)\/[^/]+\.png$/.test(url))
+    .sort();
   const assetUrlPattern =
     /^\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*(?:\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/;
   if (
@@ -129,15 +133,25 @@ try {
     manifest.schemaVersion !== 1 ||
     !Array.isArray(manifest.assets) ||
     !Array.isArray(manifest.startupAssets) ||
+    !Array.isArray(manifest.offlineIconAssets) ||
     new Set(manifest.assets).size !== manifest.assets.length ||
     new Set(manifest.startupAssets).size !== manifest.startupAssets.length ||
+    new Set(manifest.offlineIconAssets).size !==
+      manifest.offlineIconAssets.length ||
     !manifest.assets.every(
       (url) => typeof url === "string" && assetUrlPattern.test(url),
     ) ||
     !manifest.startupAssets.every(
       (url) => typeof url === "string" && assetUrlPattern.test(url),
     ) ||
+    !manifest.offlineIconAssets.every(
+      (url) =>
+        typeof url === "string" &&
+        /^\/icons\/(?:bw|color)\/[A-Za-z0-9][A-Za-z0-9._-]{0,99}\.png$/.test(url),
+    ) ||
     JSON.stringify(manifest.assets) !== JSON.stringify(assetUrls) ||
+    JSON.stringify(manifest.offlineIconAssets) !==
+      JSON.stringify(offlineIconUrls) ||
     manifest.startupAssets.length === 0 ||
     !manifest.startupAssets.every((url) => assetUrls.includes(url))
   ) {

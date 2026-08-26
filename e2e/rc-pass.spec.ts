@@ -37,6 +37,39 @@ async function openMainMenuItem(page: Page, name: string) {
   await page.getByRole("menuitem", { name, exact: true }).click()
 }
 
+test("uses the icon-only brand whenever the header is constrained", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "kjv-display-settings-v1",
+      JSON.stringify({ tabsOrientation: "vertical" }),
+    )
+  })
+  await page.setViewportSize({ width: 375, height: 667 })
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  const brandLabel = page.locator("header").first().getByText("KJV Only", {
+    exact: true,
+  })
+  await expect(brandLabel).toHaveCSS("display", "none")
+
+  await page.setViewportSize({ width: 768, height: 1024 })
+  const desktopSidebar = page.locator(
+    'div[data-slot="sidebar"][data-side="right"]',
+  )
+  await expect(desktopSidebar).toHaveAttribute("data-state", "expanded")
+  await expect(
+    page.locator('[data-slot="sidebar-container"][data-side="right"]'),
+  ).toBeVisible()
+  await expect(brandLabel).toHaveCSS("display", "none")
+
+  await page.getByRole("button", { name: "Toggle Sidebar" }).click()
+  await expect(desktopSidebar).toHaveAttribute("data-state", "collapsed")
+  await expect(brandLabel).toHaveCSS("display", "block")
+})
+
 test("round-trips a created note and chapter bookmark", async ({ page }) => {
   await page.goto("/")
   await expectReaderReady(page)
@@ -305,10 +338,15 @@ test("downloads, uses, and clears the core offline package", async ({
     ).KJV_ONLY_CACHE_CONFIG
     const manifest = (await (
       await fetch("/app-shell-assets.json", { cache: "no-cache" })
-    ).json()) as { assets?: string[] }
+    ).json()) as { assets?: string[]; offlineIconAssets?: string[] }
     const cacheName = config?.cacheName ?? ""
     const cache = await caches.open(cacheName)
-    const required = ["/", "/index.html", ...(manifest.assets ?? [])]
+    const required = [
+      "/",
+      "/index.html",
+      ...(manifest.assets ?? []),
+      ...(manifest.offlineIconAssets ?? []),
+    ]
     const missing: string[] = []
     for (const url of required) {
       if (!(await cache.match(url, { ignoreVary: true }))) {
@@ -329,8 +367,12 @@ test("downloads, uses, and clears the core offline package", async ({
   const offlineFetches = await page.evaluate(async () => {
     const manifest = (await (
       await fetch("/app-shell-assets.json")
-    ).json()) as { startupAssets?: string[] }
-    const urls = ["/app-cache-config.js", ...(manifest.startupAssets ?? [])]
+    ).json()) as { startupAssets?: string[]; offlineIconAssets?: string[] }
+    const urls = [
+      "/app-cache-config.js",
+      ...(manifest.startupAssets ?? []),
+      ...(manifest.offlineIconAssets ?? []),
+    ]
     return Promise.all(
       urls.map(async (url) => {
         try {

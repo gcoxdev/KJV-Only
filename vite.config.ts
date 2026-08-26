@@ -47,6 +47,9 @@ const EXACT_RUNTIME_ASSETS = new Set([
   "topics/topics-index.json",
 ])
 
+const OFFLINE_ICON_ASSET_URL_PATTERN =
+  /^\/icons\/(?:bw|color)\/[A-Za-z0-9][A-Za-z0-9._-]{0,99}\.png$/
+
 export function isAllowedRuntimeFile(relative: string) {
   return (
     EXACT_RUNTIME_ASSETS.has(relative) ||
@@ -111,14 +114,32 @@ function runtimePublicAssets(): Plugin {
   }
 
   function installDevelopmentManifestMiddleware(middlewares: Connect.Server) {
+    const offlineIconAssetsPromise = collectGeneratedAssetUrls(
+      path.join(publicDirectory, "icons"),
+      publicDirectory,
+    ).then((urls) =>
+      urls.filter((url) => OFFLINE_ICON_ASSET_URL_PATTERN.test(url)).sort(),
+    )
+
     middlewares.use((request, response, next) => {
       if (request.url?.split(/[?#]/, 1)[0] !== "/app-shell-assets.json") {
         next()
         return
       }
-      response.statusCode = 200
-      response.setHeader("content-type", "application/json; charset=utf-8")
-      response.end('{"schemaVersion":1,"startupAssets":[],"assets":[]}\n')
+      void offlineIconAssetsPromise
+        .then((offlineIconAssets) => {
+          response.statusCode = 200
+          response.setHeader("content-type", "application/json; charset=utf-8")
+          response.end(
+            `${JSON.stringify({
+              schemaVersion: 1,
+              startupAssets: [],
+              assets: [],
+              offlineIconAssets,
+            })}\n`,
+          )
+        })
+        .catch(next)
     })
   }
 
@@ -183,14 +204,19 @@ function runtimePublicAssets(): Plugin {
     )
   }
 
-  async function collectGeneratedAssetUrls(directory: string): Promise<string[]> {
+  async function collectGeneratedAssetUrls(
+    directory: string,
+    rootDirectory = outputDirectory,
+  ): Promise<string[]> {
     const urls: string[] = []
     for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
       const absolute = path.join(directory, entry.name)
       if (entry.isDirectory()) {
-        urls.push(...(await collectGeneratedAssetUrls(absolute)))
+        urls.push(...(await collectGeneratedAssetUrls(absolute, rootDirectory)))
       } else if (entry.isFile()) {
-        urls.push(`/${path.relative(outputDirectory, absolute).split(path.sep).join("/")}`)
+        urls.push(
+          `/${path.relative(rootDirectory, absolute).split(path.sep).join("/")}`,
+        )
       }
     }
     return urls
@@ -198,6 +224,11 @@ function runtimePublicAssets(): Plugin {
 
   async function writeAppShellAssetManifest() {
     const assets = (await collectGeneratedAssetUrls(path.join(outputDirectory, "assets")))
+      .sort()
+    const offlineIconAssets = (
+      await collectGeneratedAssetUrls(path.join(outputDirectory, "icons"))
+    )
+      .filter((url) => OFFLINE_ICON_ASSET_URL_PATTERN.test(url))
       .sort()
     const indexHtml = await fs.readFile(path.join(outputDirectory, "index.html"), "utf8")
     const assetSet = new Set(assets)
@@ -213,7 +244,12 @@ function runtimePublicAssets(): Plugin {
     const temporaryPath = `${manifestPath}.tmp`
     await fs.writeFile(
       temporaryPath,
-      `${JSON.stringify({ schemaVersion: 1, startupAssets, assets })}\n`,
+      `${JSON.stringify({
+        schemaVersion: 1,
+        startupAssets,
+        assets,
+        offlineIconAssets,
+      })}\n`,
       "utf8",
     )
     await fs.rename(temporaryPath, manifestPath)

@@ -57,7 +57,7 @@ export function ReaderTopBar({
   onImportBookmarks,
 }: ReaderTopBarProps) {
   return (
-    <header className="z-20 flex shrink-0 items-center justify-between border-b border-subtle-divider/80 bg-workspace-chrome/90 px-3 py-2 backdrop-blur">
+    <header className="@container/topbar z-20 flex shrink-0 items-center justify-between border-b border-subtle-divider/80 bg-workspace-chrome/90 px-3 py-2 backdrop-blur">
       <div className="flex min-w-0 items-center gap-3">
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -130,9 +130,9 @@ export function ReaderTopBar({
             alt="KJV Only icon"
             width={24}
             height={24}
-            className="size-6"
+            className="size-6 shrink-0"
           />
-          <p className="workspace-heading truncate pb-px pr-px text-lg font-semibold leading-tight">
+          <p className="workspace-heading hidden truncate pb-px pr-px text-lg font-semibold leading-tight @md/topbar:block">
             KJV Only
           </p>
         </div>
