@@ -17,13 +17,23 @@ const APP_SHELL = [
   "/manifest.webmanifest",
   "/app-cache-config.js",
   "/app-shell-assets.json",
+  "/icons/app-icon.svg",
 ]
 const APP_SHELL_ASSET_URL_PATTERN =
   /^\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*(?:\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/
+const OFFLINE_ICON_ASSET_URL_PATTERN =
+  /^\/icons\/(?:bw|color)\/[A-Za-z0-9][A-Za-z0-9._-]{0,99}\.png$/
 const LIVE_DATA_PREFIXES = ["/references/", "/data/", "/maps/"]
+const NETWORK_FIRST_PATHS = new Set([
+  "/app-cache-config.js",
+  "/app-shell-assets.json",
+])
 
 function shouldUseNetworkFirst(requestUrl) {
-  return LIVE_DATA_PREFIXES.some((prefix) => requestUrl.pathname.startsWith(prefix))
+  return (
+    NETWORK_FIRST_PATHS.has(requestUrl.pathname) ||
+    LIVE_DATA_PREFIXES.some((prefix) => requestUrl.pathname.startsWith(prefix))
+  )
 }
 
 function isRangedRequest(request) {
@@ -46,6 +56,18 @@ function isAssetList(value) {
   )
 }
 
+function isOfflineIconAssetList(value) {
+  return (
+    Array.isArray(value) &&
+    value.length <= 250 &&
+    value.every(
+      (url) =>
+        typeof url === "string" && OFFLINE_ICON_ASSET_URL_PATTERN.test(url)
+    ) &&
+    new Set(value).size === value.length
+  )
+}
+
 async function cacheAppShell() {
   const cache = await caches.open(APP_CACHE)
   await cache.addAll(APP_SHELL)
@@ -59,11 +81,17 @@ async function cacheAppShell() {
   ) {
     throw new Error("Invalid app-shell asset manifest")
   }
+  const offlineIconAssets = manifest.offlineIconAssets ?? []
+  if (!isOfflineIconAssetList(offlineIconAssets)) {
+    throw new Error("Invalid offline icon asset manifest")
+  }
   const assetSet = new Set(manifest.assets)
   if (!manifest.startupAssets.every((url) => assetSet.has(url))) {
     throw new Error("Invalid app-shell startup asset")
   }
-  await cache.addAll(manifest.startupAssets)
+  await cache.addAll(
+    Array.from(new Set([...manifest.startupAssets, ...offlineIconAssets]))
+  )
 }
 
 async function networkFirst(request) {
@@ -87,14 +115,27 @@ async function networkFirst(request) {
   return response
 }
 
-async function cacheFirst(request) {
+async function cacheFirst(request, requestUrl) {
   const cache = await caches.open(APP_CACHE)
   const cached = await cache.match(request, { ignoreVary: true })
   if (cached) {
     return cached
   }
 
-  const response = await fetch(request)
+  let response
+  try {
+    response = await fetch(request)
+  } catch {
+    if (OFFLINE_ICON_ASSET_URL_PATTERN.test(requestUrl.pathname)) {
+      const fallback = await cache.match("/icons/app-icon.svg", {
+        ignoreVary: true,
+      })
+      if (fallback) {
+        return fallback
+      }
+    }
+    return Response.error()
+  }
   if (shouldCacheResponse(response)) {
     try {
       await cache.put(request, response.clone())
@@ -162,5 +203,5 @@ self.addEventListener("fetch", (event) => {
     return
   }
 
-  event.respondWith(cacheFirst(event.request))
+  event.respondWith(cacheFirst(event.request, requestUrl))
 })

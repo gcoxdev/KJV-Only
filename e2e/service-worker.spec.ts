@@ -16,6 +16,111 @@ test.skip(
   "Service-worker upgrade checks require the production preview",
 )
 
+test("refreshes stale manifests and keeps book icons usable offline", async ({
+  page,
+  context,
+}) => {
+  const consoleErrors: string[] = []
+  page.on("console", (message) => {
+    if (message.type() === "error") {
+      consoleErrors.push(message.text())
+    }
+  })
+  page.on("pageerror", (error) => consoleErrors.push(error.message))
+
+  await page.goto("/")
+  await expect(page.getByRole("button", { name: "Genesis 1", exact: true })).toBeVisible()
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready
+  })
+  await expect
+    .poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)))
+    .toBe(true)
+
+  const cacheState = await page.evaluate(async (currentCacheName) => {
+    const manifestResponse = await fetch("/app-shell-assets.json", {
+      cache: "no-cache",
+    })
+    const manifest = (await manifestResponse.json()) as {
+      schemaVersion: number
+      startupAssets: string[]
+      assets: string[]
+      offlineIconAssets?: string[]
+    }
+    const iconAssets = manifest.offlineIconAssets ?? []
+    const cache = await caches.open(currentCacheName)
+    const missingIcons: string[] = []
+    for (const url of iconAssets) {
+      if (!(await cache.match(url, { ignoreVary: true }))) {
+        missingIcons.push(url)
+      }
+    }
+
+    const staleManifest = { ...manifest }
+    delete staleManifest.offlineIconAssets
+    await cache.put(
+      "/app-shell-assets.json",
+      new Response(JSON.stringify(staleManifest), {
+        headers: { "content-type": "application/json" },
+      }),
+    )
+
+    const refreshedManifest = (await (
+      await fetch("/app-shell-assets.json", { cache: "no-cache" })
+    ).json()) as { offlineIconAssets?: string[] }
+    const cachedManifest = (await (
+      await cache.match("/app-shell-assets.json")
+    )?.json()) as { offlineIconAssets?: string[] } | undefined
+
+    return {
+      manifestIconCount: iconAssets.length,
+      missingIcons,
+      refreshedManifestIconCount:
+        refreshedManifest.offlineIconAssets?.length ?? 0,
+      cachedManifestIconCount: cachedManifest?.offlineIconAssets?.length ?? 0,
+    }
+  }, APP_CACHE)
+
+  expect(cacheState.manifestIconCount).toBe(165)
+  expect(cacheState.missingIcons).toEqual([])
+  expect(cacheState.refreshedManifestIconCount).toBe(165)
+  expect(cacheState.cachedManifestIconCount).toBe(165)
+
+  await context.setOffline(true)
+  const offlineIcons = await page.evaluate(async () => {
+    const cachedBookIcon = await fetch("/icons/bw/LEV.png")
+    const missingBookIcon = await fetch("/icons/bw/MISSING.png")
+    return {
+      cached: {
+        ok: cachedBookIcon.ok,
+        contentType: cachedBookIcon.headers.get("content-type"),
+      },
+      fallback: {
+        ok: missingBookIcon.ok,
+        contentType: missingBookIcon.headers.get("content-type"),
+      },
+    }
+  })
+  expect(offlineIcons.cached.ok).toBe(true)
+  expect(offlineIcons.cached.contentType).toBe("image/png")
+  expect(offlineIcons.fallback.ok).toBe(true)
+  expect(offlineIcons.fallback.contentType).toBe("image/svg+xml")
+
+  await page.getByRole("button", { name: "Welcome Home", exact: true }).click()
+  await expect(
+    page.getByRole("heading", { name: "Welcome Home", exact: true }),
+  ).toBeVisible()
+  await page.getByRole("button", { name: "Genesis 1", exact: true }).click()
+  await expect(
+    page
+      .getByText("In the beginning God created the heaven and the earth.", {
+        exact: false,
+      })
+      .filter({ visible: true }),
+  ).toBeVisible()
+  expect(consoleErrors).toEqual([])
+})
+
 test("upgrades and reads only application-owned caches", async ({ page, context }) => {
   await page.goto("/")
   await expect(page.getByRole("button", { name: "Genesis 1", exact: true })).toBeVisible()

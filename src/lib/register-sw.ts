@@ -68,8 +68,13 @@ export function registerServiceWorker() {
     if (!config) {
       return
     }
-    void navigator.serviceWorker.register(
-      buildServiceWorkerScriptUrl(window.location.origin, config),
-    )
+    void navigator.serviceWorker
+      .register(buildServiceWorkerScriptUrl(window.location.origin, config), {
+        updateViaCache: "none",
+      })
+      .then((registration) => registration.update())
+      .catch(() => {
+        // A previously installed worker can continue serving an offline visit.
+      })
   })
 }

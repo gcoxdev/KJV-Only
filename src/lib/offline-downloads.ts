@@ -9,11 +9,14 @@ const FALLBACK_CACHE_CONFIG = {
 const APP_SHELL_ASSET_MANIFEST_URL = "/app-shell-assets.json";
 const APP_SHELL_ASSET_URL_PATTERN =
   /^\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*(?:\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/;
+const OFFLINE_ICON_ASSET_URL_PATTERN =
+  /^\/icons\/(?:bw|color)\/[A-Za-z0-9][A-Za-z0-9._-]{0,99}\.png$/;
 
 type AppShellAssetManifest = {
   schemaVersion: 1;
   startupAssets: string[];
   assets: string[];
+  offlineIconAssets: string[];
 };
 
 function getAppCacheConfig() {
@@ -57,6 +60,18 @@ function isAppShellAssetList(value: unknown): value is string[] {
   );
 }
 
+function isOfflineIconAssetList(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.length <= 250 &&
+    value.every(
+      (url) =>
+        typeof url === "string" && OFFLINE_ICON_ASSET_URL_PATTERN.test(url),
+    ) &&
+    new Set(value).size === value.length
+  );
+}
+
 export function parseAppShellAssetManifest(value: unknown): AppShellAssetManifest {
   if (
     !isRecord(value) ||
@@ -64,6 +79,12 @@ export function parseAppShellAssetManifest(value: unknown): AppShellAssetManifes
     !isAppShellAssetList(value.startupAssets) ||
     !isAppShellAssetList(value.assets)
   ) {
+    throw new Error("Invalid app-shell asset manifest");
+  }
+
+  const offlineIconAssets =
+    value.offlineIconAssets === undefined ? [] : value.offlineIconAssets;
+  if (!isOfflineIconAssetList(offlineIconAssets)) {
     throw new Error("Invalid app-shell asset manifest");
   }
 
@@ -76,6 +97,7 @@ export function parseAppShellAssetManifest(value: unknown): AppShellAssetManifes
     schemaVersion: 1,
     startupAssets: value.startupAssets,
     assets: value.assets,
+    offlineIconAssets,
   };
 }
 
@@ -87,7 +109,13 @@ export async function loadCoreOfflineUrls() {
     throw new Error(`Could not load app-shell assets (HTTP ${response.status})`);
   }
   const manifest = parseAppShellAssetManifest(await response.json());
-  return Array.from(new Set([...CORE_OFFLINE_URLS, ...manifest.assets]));
+  return Array.from(
+    new Set([
+      ...CORE_OFFLINE_URLS,
+      ...manifest.assets,
+      ...manifest.offlineIconAssets,
+    ]),
+  );
 }
 
 export function buildAudioUrls(books: Book[], range: "old" | "new") {
