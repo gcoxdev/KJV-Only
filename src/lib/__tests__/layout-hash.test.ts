@@ -225,4 +225,48 @@ describe("layout hash", () => {
       "topics",
     );
   });
+
+  it("shares validated search configuration without results or history", () => {
+    const tabs: ReaderTab[] = [
+      {
+        id: "tab-search",
+        title: "Search 1",
+        root: {
+          id: "leaf-search",
+          type: "leaf",
+          view: "search",
+          bookIndex: 0,
+          chapterIndex: 0,
+          pickerTestament: null,
+          pickerBookIndex: null,
+          pageId: null,
+        },
+      },
+    ];
+    const definition = {
+      searchMode: "smart" as const,
+      caseSensitive: false,
+      phraseInput: "work together",
+      selectedWords: [],
+      selectedBookIndexes: [44],
+      resultSort: "canonical" as const,
+      showResultContext: true,
+    };
+    const hash = serializeLayoutHash({
+      tabs,
+      activeTabId: "tab-search",
+      tabsOrientation: "horizontal",
+      searchPageStateByLeafId: { "leaf-search": definition },
+    });
+
+    expect(hash).toContain("&search=");
+    expect(hash).not.toContain("results");
+    expect(hash).not.toContain("history");
+
+    const parsed = parseLayoutHash(hash);
+    expect(parsed?.tabs[0]?.root.type).toBe("leaf");
+    const parsedLeafId =
+      parsed?.tabs[0]?.root.type === "leaf" ? parsed.tabs[0].root.id : "";
+    expect(parsed?.searchPageDefinitionsByLeafId[parsedLeafId]).toEqual(definition);
+  });
 });

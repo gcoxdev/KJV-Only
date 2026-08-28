@@ -21,9 +21,24 @@ import {
 } from "lucide-react";
 
 import type { Book } from "@/types/bible";
-import type { SearchMatch, SearchMode, SearchPageState } from "@/types/reader";
+import type {
+  SearchDefinition,
+  SearchMatch,
+  SearchMode,
+  SearchPageState,
+} from "@/types/reader";
 import { bookCodeForIndex, iconPath, renderHighlightedTerms, renderHighlightedText } from "@/lib/reader-view";
-import type { RunSmartVerseSearch } from "@/lib/smart-search-worker";
+import type {
+  RunSearchResultAnalysis,
+  RunSmartVerseSearch,
+} from "@/lib/smart-search-worker";
+import {
+  buildSearchFacets,
+  createSearchDefinition,
+  searchDefinitionToStatePatch,
+  searchMatchKey,
+  type SearchResultContext,
+} from "@/lib/search-features";
 import {
   buildRegexMatcher,
   getSmartPhoneticCode,
@@ -58,6 +73,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { SearchLibraryControls } from "@/components/reader/search-library-controls";
+import { SearchResultTools } from "@/components/reader/search-result-tools";
+import { useSearchLibrary } from "@/hooks/use-search-library";
+import { useSearchResultPresentation } from "@/hooks/use-search-result-presentation";
+import { cn } from "@/lib/utils";
 
 type SearchPageProps = {
   books: Book[];
@@ -67,6 +87,7 @@ type SearchPageProps = {
   isVerseIndexReady: boolean;
   verseIndexError: string | null;
   runSmartSearch: RunSmartVerseSearch;
+  runSearchResultAnalysis: RunSearchResultAnalysis;
   ensureConcordanceWordsLoaded: () => Promise<unknown>;
   state: SearchPageState;
   onStateChange: (patch: Partial<SearchPageState>) => void;
@@ -264,17 +285,24 @@ function renderSearchResultText(
 const SearchResultRow = memo(
   function SearchResultRow({
     match,
+    context,
     highlight,
     onOpenResult,
   }: {
     match: SearchMatch;
+    context: SearchResultContext | null;
     highlight: SearchResultHighlight;
     onOpenResult: SearchPageProps["onOpenResult"];
   }) {
     return (
       <button
         type="button"
-        className="group block w-full px-3 py-2 text-left [contain-intrinsic-size:0_76px] [content-visibility:auto] hover:bg-reference-tint/60"
+        className={cn(
+          "group block w-full px-3 py-2 text-left [content-visibility:auto] hover:bg-reference-tint/60",
+          context
+            ? "[contain-intrinsic-size:0_148px]"
+            : "[contain-intrinsic-size:0_76px]",
+        )}
         onClick={() =>
           onOpenResult(
             match.bookIndex,
@@ -290,11 +318,32 @@ const SearchResultRow = memo(
         <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground group-hover:text-foreground/90">
           {renderSearchResultText(match, highlight)}
         </p>
+        {context ? (
+          <div className="mt-2 flex flex-col gap-1 border-l-2 border-subtle-divider pl-2 text-xs leading-relaxed text-muted-foreground">
+            {context.previous ? (
+              <p>
+                <span className="mr-1 font-medium text-foreground/75">
+                  {context.previous.verseNumber}
+                </span>
+                {context.previous.text}
+              </p>
+            ) : null}
+            {context.next ? (
+              <p>
+                <span className="mr-1 font-medium text-foreground/75">
+                  {context.next.verseNumber}
+                </span>
+                {context.next.text}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
       </button>
     );
   },
   (previous, next) =>
     previous.highlight === next.highlight &&
+    previous.context === next.context &&
     previous.onOpenResult === next.onOpenResult &&
     previous.match.bookIndex === next.match.bookIndex &&
     previous.match.chapterIndex === next.match.chapterIndex &&
@@ -338,6 +387,7 @@ export function SearchPage({
   isVerseIndexReady,
   verseIndexError,
   runSmartSearch,
+  runSearchResultAnalysis,
   ensureConcordanceWordsLoaded,
   state,
   onStateChange,
@@ -352,12 +402,21 @@ export function SearchPage({
   const searchRunIdRef = useRef(0);
   const regexWorkerRef = useRef<Worker | null>(null);
   const smartSearchCancelRef = useRef<(() => void) | null>(null);
+  const resultAnalysisCancelRef = useRef<(() => void) | null>(null);
   const resultsScrollRef = useRef<HTMLDivElement | null>(null);
+  const {
+    library: searchLibrary,
+    recordRecent,
+    save: saveSearch,
+    removeSaved: removeSavedSearch,
+    clearRecent: clearRecentSearches,
+  } = useSearchLibrary();
 
   useEffect(() => {
     return () => {
       regexWorkerRef.current?.terminate();
       smartSearchCancelRef.current?.();
+      resultAnalysisCancelRef.current?.();
     };
   }, []);
 
@@ -372,6 +431,9 @@ export function SearchPage({
     lastSearchSelectedWords,
     isControlsCollapsed,
     selectedWords,
+    resultSort,
+    showResultContext,
+    resultFacets,
     currentPage,
     results,
     error,
@@ -384,6 +446,27 @@ export function SearchPage({
   const [phraseInputDraft, setPhraseInputDraft] = useState(phraseInput);
   const deferredChipInput = useDeferredValue(chipInputDraft);
   const deferredPhraseInput = useDeferredValue(phraseInputDraft);
+  const currentSearchDefinition = useMemo(
+    () =>
+      createSearchDefinition({
+        searchMode,
+        caseSensitive,
+        phraseInput: phraseInputDraft,
+        selectedWords,
+        selectedBookIndexes: state.selectedBookIndexes,
+        resultSort,
+        showResultContext,
+      }),
+    [
+      caseSensitive,
+      phraseInputDraft,
+      resultSort,
+      searchMode,
+      selectedWords,
+      showResultContext,
+      state.selectedBookIndexes,
+    ],
+  );
 
   useEffect(() => {
     setChipInputDraft(chipInput);
@@ -638,11 +721,13 @@ export function SearchPage({
     if (!isVerseIndexReady) {
       return;
     }
-    onStateChange({ error: null });
+    onStateChange({ error: null, resultFacets: null });
     regexWorkerRef.current?.terminate();
     regexWorkerRef.current = null;
     smartSearchCancelRef.current?.();
     smartSearchCancelRef.current = null;
+    resultAnalysisCancelRef.current?.();
+    resultAnalysisCancelRef.current = null;
     let selectedWordSearch: ReturnType<
       typeof prepareSelectedWordSearch
     > = null;
@@ -723,7 +808,17 @@ export function SearchPage({
       lastSearchCaseSensitive: caseSensitive,
       lastSearchPhraseInput: phraseInputDraft.trim(),
       lastSearchSelectedWords: [...selectedWords],
+      resultFacets: null,
     } satisfies Partial<SearchPageState>;
+    const completedSearchDefinition = createSearchDefinition({
+      searchMode,
+      caseSensitive,
+      phraseInput: phraseInputDraft,
+      selectedWords,
+      selectedBookIndexes: Array.from(selectedBookIndexes),
+      resultSort,
+      showResultContext,
+    });
     let lastProgressUpdate = 0;
 
     const publishProgress = (
@@ -743,16 +838,39 @@ export function SearchPage({
       });
     };
 
+    const finishSearch = (
+      matches: SearchMatch[],
+      facets: SearchPageState["resultFacets"],
+    ) => {
+      if (searchRunIdRef.current !== nextSearchRunId) {
+        return;
+      }
+      resultAnalysisCancelRef.current = null;
+      onStateChange({
+        ...completedSearchState,
+        results: matches,
+        resultFacets: facets,
+      });
+      if (completedSearchDefinition) {
+        recordRecent(completedSearchDefinition);
+      }
+      setIsSearching(false);
+      setSearchProgress(null);
+    };
+
     const commitSearch = (matches: SearchMatch[]) => {
       if (searchRunIdRef.current !== nextSearchRunId) {
         return;
       }
-      onStateChange({
-        ...completedSearchState,
-        results: matches,
+      const cancelAnalysis = runSearchResultAnalysis(matches, {
+        onResult: (facets) => finishSearch(matches, facets),
+        onError: () => finishSearch(matches, buildSearchFacets(matches)),
       });
-      setIsSearching(false);
-      setSearchProgress(null);
+      if (cancelAnalysis) {
+        resultAnalysisCancelRef.current = cancelAnalysis;
+        return;
+      }
+      finishSearch(matches, buildSearchFacets(matches));
     };
 
     const cancelSearch = () => {
@@ -795,6 +913,7 @@ export function SearchPage({
             const patch = {
               ...completedSearchState,
               results: update.matches,
+              resultFacets: null,
             };
             if (!receivedWorkerUpdate) {
               receivedWorkerUpdate = true;
@@ -867,6 +986,7 @@ export function SearchPage({
         const patch = {
           ...completedSearchState,
           results: matches,
+          resultFacets: null,
         };
         if (isInitialPage) {
           onStateChange(patch);
@@ -1047,6 +1167,8 @@ export function SearchPage({
     regexWorkerRef.current = null;
     smartSearchCancelRef.current?.();
     smartSearchCancelRef.current = null;
+    resultAnalysisCancelRef.current?.();
+    resultAnalysisCancelRef.current = null;
     setIsSearching(false);
     setSearchProgress(null);
   };
@@ -1059,7 +1181,24 @@ export function SearchPage({
       results: [],
       currentPage: 1,
       error: null,
+      resultFacets: null,
     });
+  };
+
+  const loadSearchDefinition = (definition: SearchDefinition) => {
+    const selectedBookIndexes = definition.selectedBookIndexes.filter(
+      (bookIndex) => bookIndex >= 0 && bookIndex < books.length,
+    );
+    const normalizedDefinition = {
+      ...definition,
+      selectedBookIndexes:
+        selectedBookIndexes.length > 0
+          ? selectedBookIndexes
+          : books.map((_, index) => index),
+    };
+    setChipInputDraft("");
+    setPhraseInputDraft(normalizedDefinition.phraseInput);
+    onStateChange(searchDefinitionToStatePatch(normalizedDefinition));
   };
 
   const searchSummary = useMemo(() => {
@@ -1099,18 +1238,31 @@ export function SearchPage({
     selectedWords,
   ]);
 
+  const {
+    orderedResults,
+    contextByMatchKey,
+    copyResults,
+    exportResults,
+  } = useSearchResultPresentation({
+    results,
+    resultSort,
+    showResultContext,
+    verseIndex,
+    searchSummary,
+  });
+
   const totalPages = Math.max(
     1,
-    Math.ceil(results.length / SEARCH_RESULTS_PAGE_SIZE),
+    Math.ceil(orderedResults.length / SEARCH_RESULTS_PAGE_SIZE),
   );
   const activePage = Math.min(Math.max(currentPage, 1), totalPages);
   const visibleResults = useMemo(() => {
     const startIndex = (activePage - 1) * SEARCH_RESULTS_PAGE_SIZE;
-    return results.slice(
+    return orderedResults.slice(
       startIndex,
       startIndex + SEARCH_RESULTS_PAGE_SIZE,
     );
-  }, [activePage, results]);
+  }, [activePage, orderedResults]);
   const resultHighlight = useMemo(
     () => ({
       mode: lastSearchMode,
@@ -1125,11 +1277,12 @@ export function SearchPage({
         <SearchResultRow
           key={`${match.bookIndex}-${match.chapterIndex}-${match.verseNumber}`}
           match={match}
+          context={contextByMatchKey.get(searchMatchKey(match)) ?? null}
           highlight={resultHighlight}
           onOpenResult={onOpenResult}
         />
       )),
-    [onOpenResult, resultHighlight, visibleResults],
+    [contextByMatchKey, onOpenResult, resultHighlight, visibleResults],
   );
 
   useEffect(() => {
@@ -1142,7 +1295,7 @@ export function SearchPage({
   return (
     <div className="flex h-full min-h-0 flex-col gap-1.5 p-2">
       <div className="workspace-panel-elevated flex flex-col gap-2 rounded-2xl border p-3">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <div className="flex items-center gap-2">
               <h2 className="workspace-heading text-xl font-semibold">Search</h2>
@@ -1210,26 +1363,37 @@ export function SearchPage({
               <p className="text-sm text-muted-foreground">{searchSummary}</p>
             ) : null}
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              onStateChange({ isControlsCollapsed: !isControlsCollapsed })
-            }
-          >
-            {isControlsCollapsed ? (
-              <>
-                <ChevronRightIcon />
-                Show
-              </>
-            ) : (
-              <>
-                <ChevronDownIcon />
-                Hide
-              </>
-            )}
-          </Button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <SearchLibraryControls
+              currentDefinition={currentSearchDefinition}
+              saved={searchLibrary.saved}
+              recent={searchLibrary.recent}
+              onLoad={loadSearchDefinition}
+              onSave={saveSearch}
+              onRemoveSaved={removeSavedSearch}
+              onClearRecent={clearRecentSearches}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                onStateChange({ isControlsCollapsed: !isControlsCollapsed })
+              }
+            >
+              {isControlsCollapsed ? (
+                <>
+                  <ChevronRightIcon data-icon="inline-start" />
+                  Show
+                </>
+              ) : (
+                <>
+                  <ChevronDownIcon data-icon="inline-start" />
+                  Hide
+                </>
+              )}
+            </Button>
+          </div>
         </div>
 
         {!isControlsCollapsed ? (
@@ -1476,6 +1640,21 @@ export function SearchPage({
             ) : null}
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2">
+            {results.length > 0 && !isSearching ? (
+              <SearchResultTools
+                facets={resultFacets}
+                resultSort={resultSort}
+                showContext={showResultContext}
+                onSortChange={(nextSort) =>
+                  onStateChange({ resultSort: nextSort, currentPage: 1 })
+                }
+                onShowContextChange={(show) =>
+                  onStateChange({ showResultContext: show })
+                }
+                onCopy={() => void copyResults()}
+                onExport={exportResults}
+              />
+            ) : null}
             {results.length > SEARCH_RESULTS_PAGE_SIZE ? (
               <>
                 <Button

@@ -13,6 +13,9 @@ describe("createDefaultSearchPageState", () => {
     expect(createDefaultSearchPageState(books)).toMatchObject({
       searchMode: "smart",
       selectedBookIndexes: [0, 1],
+      resultSort: "relevance",
+      showResultContext: false,
+      resultFacets: null,
       results: [],
       error: null,
     })

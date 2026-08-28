@@ -148,12 +148,35 @@ export type SearchMode =
   | "contains-all"
   | "regex";
 
+export type SearchResultSort = "relevance" | "canonical";
+
+export type SearchDefinition = {
+  searchMode: SearchMode;
+  caseSensitive: boolean;
+  phraseInput: string;
+  selectedWords: string[];
+  selectedBookIndexes: number[];
+  resultSort: SearchResultSort;
+  showResultContext: boolean;
+};
+
 export type SearchMatch = {
   bookIndex: number;
   chapterIndex: number;
   verseNumber: number;
   bookName: string;
   text: string;
+};
+
+export type SearchFacets = {
+  total: number;
+  oldTestament: number;
+  newTestament: number;
+  books: Array<{
+    bookIndex: number;
+    bookName: string;
+    count: number;
+  }>;
 };
 
 export type SearchPageState = {
@@ -169,6 +192,9 @@ export type SearchPageState = {
   selectedWords: string[];
   expandedBookTree: string[];
   selectedBookIndexes: number[];
+  resultSort: SearchResultSort;
+  showResultContext: boolean;
+  resultFacets: SearchFacets | null;
   currentPage: number;
   results: SearchMatch[];
   error: string | null;

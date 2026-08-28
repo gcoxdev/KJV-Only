@@ -1,9 +1,14 @@
 import { BOOK_ICON_CODES } from "@/lib/references";
 import { createId } from "@/lib/reader-layout";
 import {
+  createSearchDefinition,
+  parseSearchDefinition,
+} from "@/lib/search-features";
+import {
   type LeafNode,
   type PanelNode,
   type ReaderTab,
+  type SearchDefinition,
   type TabsOrientation,
 } from "@/types/reader";
 
@@ -19,6 +24,7 @@ export const LAYOUT_HASH_LIMITS = {
   maxTitleLength: 200,
   maxVerseRanges: 256,
   maxNumericDigits: 6,
+  maxSearchStateLength: 32 * 1024,
 } as const;
 
 type ParseBudget = {
@@ -35,7 +41,13 @@ export type ParsedLayoutHash = {
   tabsOrientation: TabsOrientation;
   tabs: ReaderTab[];
   highlightedVerseRangesByLeafId: Record<string, SerializedVerseRange[]>;
+  searchPageDefinitionsByLeafId: Record<string, SearchDefinition>;
   targetedPanelLeafId: string | null;
+};
+
+type SerializedSearchDefinitions = {
+  version: 1;
+  definitions: Array<SearchDefinition | null>;
 };
 
 function normalizeVerseRanges(ranges: SerializedVerseRange[]) {
@@ -161,6 +173,88 @@ function serializeNode(
   const orientation = node.orientation === "horizontal" ? "h" : "v";
   const ratio = Math.max(1, Math.min(99, Math.round(node.ratio)));
   return `${orientation}${ratio}(${serializeNode(node.first, highlightedVerseRangesByLeafId, targetedPanelLeafId)};${serializeNode(node.second, highlightedVerseRangesByLeafId, targetedPanelLeafId)})`;
+}
+
+function collectSearchLeafIds(node: PanelNode, ids: string[]) {
+  if (node.type === "leaf") {
+    if (node.view === "search") {
+      ids.push(node.id);
+    }
+    return;
+  }
+  collectSearchLeafIds(node.first, ids);
+  collectSearchLeafIds(node.second, ids);
+}
+
+function getSearchLeafIds(tabs: ReaderTab[]) {
+  const ids: string[] = [];
+  for (const tab of tabs) {
+    collectSearchLeafIds(tab.root, ids);
+  }
+  return ids;
+}
+
+function serializeSearchDefinitions(
+  tabs: ReaderTab[],
+  stateByLeafId: Record<string, SearchDefinition> | undefined,
+) {
+  if (!stateByLeafId) {
+    return null;
+  }
+  const definitions = getSearchLeafIds(tabs).map((leafId) => {
+    const state = stateByLeafId[leafId];
+    return state ? createSearchDefinition(state) : null;
+  });
+  if (definitions.length === 0 || definitions.every((value) => value === null)) {
+    return null;
+  }
+  const serialized = JSON.stringify({
+    version: 1,
+    definitions,
+  } satisfies SerializedSearchDefinitions);
+  return serialized.length <= LAYOUT_HASH_LIMITS.maxSearchStateLength
+    ? serialized
+    : null;
+}
+
+function parseSearchDefinitions(
+  value: string | null,
+  tabs: ReaderTab[],
+) {
+  const result: Record<string, SearchDefinition> = {};
+  if (!value || value.length > LAYOUT_HASH_LIMITS.maxSearchStateLength) {
+    return result;
+  }
+
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (
+      typeof parsed !== "object" ||
+      parsed === null ||
+      Array.isArray(parsed) ||
+      (parsed as { version?: unknown }).version !== 1 ||
+      !Array.isArray((parsed as { definitions?: unknown }).definitions)
+    ) {
+      return result;
+    }
+    const definitions = (parsed as SerializedSearchDefinitions).definitions;
+    const leafIds = getSearchLeafIds(tabs);
+    if (definitions.length !== leafIds.length) {
+      return result;
+    }
+    definitions.forEach((definition, index) => {
+      if (definition === null) {
+        return;
+      }
+      const normalized = parseSearchDefinition(definition);
+      if (normalized) {
+        result[leafIds[index]] = normalized;
+      }
+    });
+  } catch {
+    return {};
+  }
+  return result;
 }
 
 function parseLeafToken(
@@ -312,6 +406,7 @@ export function serializeLayoutHash(args: {
   activeTabId: string | null;
   tabsOrientation: TabsOrientation;
   highlightedVerseRangesByLeafId?: Record<string, SerializedVerseRange[]>;
+  searchPageStateByLeafId?: Record<string, SearchDefinition>;
   targetedPanelLeafId?: string | null;
 }) {
   const activeTabIndex = Math.max(
@@ -328,7 +423,15 @@ export function serializeLayoutHash(args: {
       targetedPanelLeafId,
     )}`;
   });
-  return `#tab=${activeTabIndex}&tabs=${args.tabsOrientation === "vertical" ? "v" : "h"}&layout=${tabSegments.join("|")}`;
+  const searchDefinitions = serializeSearchDefinitions(
+    args.tabs,
+    args.searchPageStateByLeafId,
+  );
+  return `#tab=${activeTabIndex}&tabs=${args.tabsOrientation === "vertical" ? "v" : "h"}&layout=${tabSegments.join("|")}${
+    searchDefinitions
+      ? `&search=${encodeURIComponent(searchDefinitions)}`
+      : ""
+  }`;
 }
 
 export function parseLayoutHash(hash: string): ParsedLayoutHash | null {
@@ -396,12 +499,17 @@ export function parseLayoutHash(hash: string): ParsedLayoutHash | null {
     Math.min(tabs.length - 1, Number(params.get("tab") ?? 0) || 0),
   );
   const tabsOrientation = params.get("tabs") === "v" ? "vertical" : "horizontal";
+  const searchPageDefinitionsByLeafId = parseSearchDefinitions(
+    params.get("search"),
+    tabs,
+  );
 
   return {
     activeTabIndex,
     tabsOrientation,
     tabs,
     highlightedVerseRangesByLeafId,
+    searchPageDefinitionsByLeafId,
     targetedPanelLeafId: targetedPanelLeafIdRef.current,
   };
 }

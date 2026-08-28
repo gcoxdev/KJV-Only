@@ -2,7 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { beginPerformanceMeasure } from "@/lib/performance"
 import type {
+  RunSearchResultAnalysis,
   RunSmartVerseSearch,
+  SearchResultAnalysisCallbacks,
   SmartVerseSearchCallbacks,
   VerseSearchWorkerRequest,
   VerseSearchWorkerResponse,
@@ -33,6 +35,9 @@ export function useVerseSearchIndex(books: Book[], enabled: boolean) {
   const nextRequestIdRef = useRef(0)
   const searchCallbacksRef = useRef(
     new Map<number, SmartVerseSearchCallbacks>(),
+  )
+  const analysisCallbacksRef = useRef(
+    new Map<number, SearchResultAnalysisCallbacks>(),
   )
 
   const runSmartSearch = useCallback<RunSmartVerseSearch>(
@@ -67,11 +72,39 @@ export function useVerseSearchIndex(books: Book[], enabled: boolean) {
     [],
   )
 
+  const runSearchResultAnalysis = useCallback<RunSearchResultAnalysis>(
+    (matches, callbacks) => {
+      const worker = workerRef.current
+      if (!worker) return null
+
+      const requestId = nextRequestIdRef.current + 1
+      nextRequestIdRef.current = requestId
+      analysisCallbacksRef.current.set(requestId, callbacks)
+      try {
+        worker.postMessage({
+          type: "analyze-search-results",
+          requestId,
+          matches,
+        } satisfies VerseSearchWorkerRequest)
+      } catch {
+        analysisCallbacksRef.current.delete(requestId)
+        return null
+      }
+
+      return () => {
+        analysisCallbacksRef.current.delete(requestId)
+      }
+    },
+    [],
+  )
+
   useEffect(() => {
     const searchCallbacks = searchCallbacksRef.current
+    const analysisCallbacks = analysisCallbacksRef.current
     if (!enabled || books.length === 0) {
       workerRef.current = null
       searchCallbacks.clear()
+      analysisCallbacks.clear()
       setState(EMPTY_STATE)
       return
     }
@@ -148,6 +181,21 @@ export function useVerseSearchIndex(books: Book[], enabled: boolean) {
             return
           }
 
+          if (
+            response.type === "search-result-analysis" ||
+            response.type === "search-result-analysis-error"
+          ) {
+            const callbacks = analysisCallbacks.get(response.requestId)
+            if (!callbacks) return
+            analysisCallbacks.delete(response.requestId)
+            if (response.type === "search-result-analysis") {
+              callbacks.onResult(response.facets)
+            } else {
+              callbacks.onError(response.message)
+            }
+            return
+          }
+
           const callbacks = searchCallbacks.get(response.requestId)
           if (!callbacks) return
           if (response.type === "smart-search-error") {
@@ -175,6 +223,10 @@ export function useVerseSearchIndex(books: Book[], enabled: boolean) {
             callbacks.onError("The Smart Search worker failed.")
           }
           searchCallbacks.clear()
+          for (const callbacks of analysisCallbacks.values()) {
+            callbacks.onError("The search analysis worker failed.")
+          }
+          analysisCallbacks.clear()
         },
         { once: true },
       )
@@ -191,10 +243,11 @@ export function useVerseSearchIndex(books: Book[], enabled: boolean) {
         workerRef.current = null
       }
       searchCallbacks.clear()
+      analysisCallbacks.clear()
       if (fallbackTimer !== null) clearTimeout(fallbackTimer)
       finishOnce()
     }
   }, [books, enabled])
 
-  return { ...state, runSmartSearch }
+  return { ...state, runSmartSearch, runSearchResultAnalysis }
 }

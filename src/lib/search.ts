@@ -288,6 +288,32 @@ function tokenSimilarity(queryWord: string, verseWord: string) {
   return blended >= 0.38 ? blended : 0;
 }
 
+const SINGLE_WORD_MIN_EDIT_SIMILARITY = 0.6;
+
+function isCloseSingleWordMatch(queryWord: string, verseWord: string) {
+  if (queryWord === verseWord) {
+    return true;
+  }
+
+  const shorterLength = Math.min(queryWord.length, verseWord.length);
+  if (
+    shorterLength >= 3 &&
+    (queryWord.startsWith(verseWord) || verseWord.startsWith(queryWord))
+  ) {
+    return true;
+  }
+
+  const maxLength = Math.max(queryWord.length, verseWord.length);
+  if (maxLength < 3) {
+    return false;
+  }
+
+  return (
+    1 - levenshteinDistance(queryWord, verseWord) / maxLength >=
+    SINGLE_WORD_MIN_EDIT_SIMILARITY
+  );
+}
+
 function sharedPrefixLength(a: string, b: string) {
   const limit = Math.min(a.length, b.length);
   let index = 0;
@@ -380,6 +406,7 @@ function isSmartSearchTokenCandidate(
   verseWord: string,
   versePhonetic: string,
   allowFuzzyMatch: boolean,
+  requireCloseSpelling: boolean,
 ) {
   if (queryWord === verseWord) {
     return true;
@@ -397,12 +424,15 @@ function isSmartSearchTokenCandidate(
     queryPhonetic &&
     queryPhonetic === versePhonetic
   ) {
-    return true;
+    return (
+      !requireCloseSpelling || isCloseSingleWordMatch(queryWord, verseWord)
+    );
   }
   return (
     allowFuzzyMatch &&
     shorterLength >= 4 &&
-    trigramSimilarity(queryWord, verseWord) >= 0.5
+    trigramSimilarity(queryWord, verseWord) >= 0.5 &&
+    (!requireCloseSpelling || isCloseSingleWordMatch(queryWord, verseWord))
   );
 }
 
@@ -433,6 +463,7 @@ export function getIndexedSmartSearchCandidateIndexes(
           lookupWord.word,
           lookupWord.phonetic,
           queryWordIndex === 0,
+          prepared.queryWords.length === 1,
         )
       ) {
         continue;
@@ -794,6 +825,7 @@ export function isSmartSearchCandidate(
           verseWord,
           entry.searchWordPhonetics[wordIndex],
           index === 0,
+          prepared.queryWords.length === 1,
         )
       ) {
         matchedThisWord = true;
@@ -829,6 +861,7 @@ export function scorePreparedSmartSearch(
   const significantQueryWords = prepared.significantQueryWords;
   const text = prepared.caseSensitive ? entry.text : entry.textLower;
   const rawNeedle = prepared.rawQuery;
+  const requireCloseSpelling = queryWords.length === 1;
 
   let score = 0;
   let weakMatches = 0;
@@ -842,6 +875,12 @@ export function scorePreparedSmartSearch(
     let best = 0;
     let bestIndex = -1;
     for (const [verseIndex, verseWord] of haystackWords.entries()) {
+      if (
+        requireCloseSpelling &&
+        !isCloseSingleWordMatch(queryWord, verseWord)
+      ) {
+        continue;
+      }
       const cacheKey = `${queryWord}|${verseWord}`;
       let similarity = similarityCache.get(cacheKey);
       if (similarity === undefined) {

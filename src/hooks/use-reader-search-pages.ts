@@ -3,6 +3,8 @@ import { useCallback, useState } from "react"
 import { filterRecordEntries, swapRecordEntries } from "@/lib/leaf-state"
 import type { Book } from "@/types/bible"
 import type { SearchPageState } from "@/types/reader"
+import { searchDefinitionToStatePatch } from "@/lib/search-features"
+import type { SearchDefinition } from "@/types/reader"
 
 export function createDefaultSearchPageState(books: Book[]): SearchPageState {
   return {
@@ -18,6 +20,9 @@ export function createDefaultSearchPageState(books: Book[]): SearchPageState {
     selectedWords: [],
     expandedBookTree: ["entire", "old", "new"],
     selectedBookIndexes: books.map((_, index) => index),
+    resultSort: "relevance",
+    showResultContext: false,
+    resultFacets: null,
     currentPage: 1,
     results: [],
     error: null,
@@ -70,11 +75,29 @@ export function useReaderSearchPages(books: Book[]) {
     )
   }, [])
 
+  const restoreDefinitions = useCallback(
+    (definitionsByLeafId: Record<string, SearchDefinition>) => {
+      setStateByLeafId(
+        Object.fromEntries(
+          Object.entries(definitionsByLeafId).map(([leafId, definition]) => [
+            leafId,
+            {
+              ...createDefaultState(),
+              ...searchDefinitionToStatePatch(definition),
+            },
+          ]),
+        ),
+      )
+    },
+    [createDefaultState],
+  )
+
   return {
     stateByLeafId,
     changeState,
     initializeState,
     pruneState,
     swapState,
+    restoreDefinitions,
   }
 }

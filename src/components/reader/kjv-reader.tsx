@@ -210,6 +210,7 @@ export function KJVReader() {
       initializeState: initializeSearchPageState,
       pruneState: pruneSearchPageState,
       swapState: swapSearchPageState,
+      restoreDefinitions: restoreSearchPageDefinitions,
     },
     verseSearch: {
       index: verseSearchIndex,
@@ -217,6 +218,7 @@ export function KJVReader() {
       isReady: isVerseSearchIndexReady,
       error: verseSearchIndexError,
       runSmartSearch: runSmartVerseSearch,
+      runSearchResultAnalysis,
     },
   } = useReaderController({
     tabsOrientation,
@@ -310,6 +312,7 @@ export function KJVReader() {
     activeTabId,
     tabsOrientation,
     highlightedVerseRangesByLeafId,
+    searchPageStateByLeafId,
     targetedPanelLeafId,
     showTargetedPanelToggle,
     setTabs,
@@ -318,6 +321,7 @@ export function KJVReader() {
     setVerseHighlights,
     queueVerseHighlights,
     setTargetedPanelLeafId,
+    restoreSearchPageDefinitions,
   });
 
   const finishFirstReaderReadyMeasureRef = useFirstReaderReadyMeasure();
@@ -2040,6 +2044,7 @@ export function KJVReader() {
         isVerseSearchIndexReady,
         verseSearchIndexError,
         runSmartVerseSearch,
+        runSearchResultAnalysis,
         ensureConcordanceWordsLoaded: ensureConcordanceLoaded,
         onOpenSearchResult: openSearchResultTarget,
         notes: readerNotes,

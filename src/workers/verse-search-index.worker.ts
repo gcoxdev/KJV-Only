@@ -9,6 +9,7 @@ import {
   scorePreparedSmartSearch,
   type SmartSearchLookup,
 } from "@/lib/search";
+import { buildSearchFacets } from "@/lib/search-features";
 import type {
   VerseSearchWorkerRequest,
   VerseSearchWorkerResponse,
@@ -187,6 +188,25 @@ self.addEventListener(
     }
     if (request.type === "smart-search") {
       startSmartSearch(request);
+      return;
+    }
+    if (request.type === "analyze-search-results") {
+      try {
+        postResponse({
+          type: "search-result-analysis",
+          requestId: request.requestId,
+          facets: buildSearchFacets(request.matches),
+        });
+      } catch (error) {
+        postResponse({
+          type: "search-result-analysis-error",
+          requestId: request.requestId,
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not analyze the search results.",
+        });
+      }
       return;
     }
 
