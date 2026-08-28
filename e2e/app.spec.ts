@@ -68,6 +68,7 @@ test("recovers from corrupt persisted records", async ({ page }) => {
     localStorage.setItem("kjv-reader-notes-v1", "{broken")
     localStorage.setItem("kjv-reader-bookmarks-v1", "not-json")
     localStorage.setItem("kjv-display-settings-v1", "[]")
+    localStorage.setItem("kjv-search-library-v1", "{broken")
   })
 
   await page.goto("/")
@@ -103,6 +104,107 @@ test("prioritizes exact multiword Smart Search results", async ({ page }) => {
   await expect(page.locator("p.tabular-data").first()).toHaveText("Romans 8:28")
   await expect(page.getByText(/\d+ matching verses loaded/)).toBeVisible()
   await expect(page.locator("p.tabular-data").first()).toHaveText("Romans 8:28")
+})
+
+test("keeps single-word Smart Search close to the requested spelling", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page.getByLabel("Open search").click()
+  await expect(page.getByRole("heading", { name: "Search" })).toBeVisible()
+  await page.getByLabel("Word or phrase").fill("predestinate")
+  await page.getByLabel("Run Bible search").click()
+
+  await expect(
+    page.getByText("4 matching verses loaded", { exact: true }),
+  ).toBeVisible()
+  for (const reference of [
+    "Romans 8:29",
+    "Romans 8:30",
+    "Ephesians 1:5",
+    "Ephesians 1:11",
+  ]) {
+    await expect(page.getByText(reference, { exact: true })).toBeVisible()
+  }
+})
+
+test("provides search facets, context, sorting, copy/export, and local reuse", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"])
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page.getByLabel("Open search").click()
+  await page.getByLabel("Word or phrase").fill('"In the beginning"')
+  await page.getByLabel("Run Bible search").click()
+  await expect(page.getByText("Genesis 1:1", { exact: true })).toBeVisible()
+  await expect(page.getByText(/\d+ matching verses loaded/)).toBeVisible()
+
+  await page.getByRole("button", { name: "Facets" }).click()
+  await expect(page.getByText("Loaded Result Counts")).toBeVisible()
+  await expect(page.getByText(/Old Testament \d+/)).toBeVisible()
+  await page.keyboard.press("Escape")
+
+  await page.getByText("Context", { exact: true }).click()
+  await expect(
+    page.getByText(/And the earth was without form/).filter({ visible: true }),
+  ).toBeVisible()
+
+  await page.getByLabel("Sort search results").click()
+  await page.getByRole("option", { name: "Bible order" }).click()
+  await expect(page.getByLabel("Sort search results")).toContainText("Bible order")
+
+  await page.getByRole("button", { name: "Result Tools" }).click()
+  await page.getByRole("menuitem", { name: "Copy as Text" }).click()
+  await expect
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .toContain("Genesis 1:1")
+
+  await page.getByRole("button", { name: "Result Tools" }).click()
+  const downloadPromise = page.waitForEvent("download")
+  await page.getByRole("menuitem", { name: "Export .txt" }).click()
+  const download = await downloadPromise
+  expect(download.suggestedFilename()).toBe("kjv-search-results.txt")
+
+  await page.getByRole("button", { name: "Save Search" }).click()
+  await page.getByLabel("Name").fill("Creation opening")
+  await page.getByRole("button", { name: "Save", exact: true }).click()
+  await page.getByRole("button", { name: "Saved & Recent" }).click()
+  await expect(page.getByText("Creation opening", { exact: true })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Recent Searches" })).toBeVisible()
+
+  const storedLibrary = await page.evaluate(() =>
+    localStorage.getItem("kjv-search-library-v1"),
+  )
+  expect(storedLibrary).toContain('"version":1')
+  expect(storedLibrary).not.toContain('"results"')
+})
+
+test("restores shareable search configuration without embedding results", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page.getByLabel("Open search").click()
+  await page.getByLabel("Word or phrase").fill("work together")
+  await page.getByLabel("Word or phrase").blur()
+
+  await expect
+    .poll(() => new URL(page.url()).hash)
+    .toContain("&search=")
+  const sharedUrl = page.url()
+  expect(decodeURIComponent(new URL(sharedUrl).hash)).not.toContain("results")
+  expect(decodeURIComponent(new URL(sharedUrl).hash)).not.toContain("history")
+
+  await page.reload()
+  await expect(page.getByRole("heading", { name: "Search" })).toBeVisible()
+  await expect(page.getByLabel("Word or phrase")).toHaveValue("work together")
+  await expect(page.getByText("No verses loaded yet")).toBeVisible()
 })
 
 test("loads study-word tools progressively without blocking the reader", async ({

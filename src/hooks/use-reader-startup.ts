@@ -54,6 +54,7 @@ export function useReaderStartup({
 }: UseReaderStartupParams) {
   const didInitializeReaderRef = useRef(false);
   const didApplyStartupWelcomeHomeRef = useRef(false);
+  const didRestoreLayoutRef = useRef(false);
 
   useEffect(() => {
     if (didInitializeReaderRef.current) {
@@ -74,6 +75,7 @@ export function useReaderStartup({
 
     didInitializeReaderRef.current = true;
     if (parsedLayout && parsedLayout.tabs.length > 0) {
+      didRestoreLayoutRef.current = true;
       applyParsedLayout(parsedLayout);
     } else {
       const readerTab = createGenesisReaderTab();
@@ -104,6 +106,9 @@ export function useReaderStartup({
       return;
     }
     didApplyStartupWelcomeHomeRef.current = true;
+    if (didRestoreLayoutRef.current) {
+      return;
+    }
     setTabs((currentTabs) => {
       if (currentTabs.length === 0) {
         return currentTabs;

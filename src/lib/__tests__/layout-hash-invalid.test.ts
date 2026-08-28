@@ -47,4 +47,13 @@ describe("layout hash invalid cases", () => {
   it("rejects an invalid tab atomically instead of applying a partial layout", () => {
     expect(parseLayoutHash("#layout=Reader:GEN.1|Broken:broken(")).toBeNull();
   });
+
+  it("ignores malformed optional search state while preserving the layout", () => {
+    const parsed = parseLayoutHash(
+      "#tab=0&tabs=h&layout=Search:search&search=%7B%22version%22%3A2%7D",
+    );
+
+    expect(parsed?.tabs[0]?.root.type).toBe("leaf");
+    expect(parsed?.searchPageDefinitionsByLeafId).toEqual({});
+  });
 });

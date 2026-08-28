@@ -6,7 +6,12 @@ import {
   type ParsedLayoutHash,
   type SerializedVerseRange,
 } from "@/lib/layout-hash";
-import type { ReaderTab, TabsOrientation } from "@/types/reader";
+import type {
+  ReaderTab,
+  SearchDefinition,
+  SearchPageState,
+  TabsOrientation,
+} from "@/types/reader";
 
 type UseLayoutHashSyncParams = {
   isLoaded: boolean;
@@ -14,6 +19,7 @@ type UseLayoutHashSyncParams = {
   activeTabId: string | null;
   tabsOrientation: TabsOrientation;
   highlightedVerseRangesByLeafId: Record<string, SerializedVerseRange[]>;
+  searchPageStateByLeafId: Record<string, SearchPageState>;
   targetedPanelLeafId: string | null;
   showTargetedPanelToggle: boolean;
   setTabs: (tabs: ReaderTab[]) => void;
@@ -27,6 +33,9 @@ type UseLayoutHashSyncParams = {
     ranges: SerializedVerseRange[],
   ) => void;
   setTargetedPanelLeafId: (leafId: string | null) => void;
+  restoreSearchPageDefinitions: (
+    definitionsByLeafId: Record<string, SearchDefinition>,
+  ) => void;
 };
 
 export function useLayoutHashSync({
@@ -35,6 +44,7 @@ export function useLayoutHashSync({
   activeTabId,
   tabsOrientation,
   highlightedVerseRangesByLeafId,
+  searchPageStateByLeafId,
   targetedPanelLeafId,
   showTargetedPanelToggle,
   setTabs,
@@ -43,6 +53,7 @@ export function useLayoutHashSync({
   setVerseHighlights,
   queueVerseHighlights,
   setTargetedPanelLeafId,
+  restoreSearchPageDefinitions,
 }: UseLayoutHashSyncParams) {
   const syncedLayoutHashRef = useRef("");
 
@@ -54,6 +65,7 @@ export function useLayoutHashSync({
           parsed.tabs[parsed.activeTabIndex]?.id ?? parsed.tabs[0]?.id ?? null,
         tabsOrientation: parsed.tabsOrientation,
         highlightedVerseRangesByLeafId: parsed.highlightedVerseRangesByLeafId,
+        searchPageStateByLeafId: parsed.searchPageDefinitionsByLeafId,
         targetedPanelLeafId: parsed.targetedPanelLeafId,
       });
       syncedLayoutHashRef.current = nextHash;
@@ -64,6 +76,7 @@ export function useLayoutHashSync({
       setTargetedPanelLeafId(parsed.targetedPanelLeafId);
       setTabsOrientation(parsed.tabsOrientation);
       setVerseHighlights(parsed.highlightedVerseRangesByLeafId);
+      restoreSearchPageDefinitions(parsed.searchPageDefinitionsByLeafId);
       for (const [leafId, ranges] of Object.entries(
         parsed.highlightedVerseRangesByLeafId,
       )) {
@@ -72,6 +85,7 @@ export function useLayoutHashSync({
     },
     [
       queueVerseHighlights,
+      restoreSearchPageDefinitions,
       setActiveTabId,
       setTabs,
       setTabsOrientation,
@@ -94,6 +108,7 @@ export function useLayoutHashSync({
       activeTabId,
       tabsOrientation,
       highlightedVerseRangesByLeafId,
+      searchPageStateByLeafId,
       targetedPanelLeafId: showTargetedPanelToggle ? targetedPanelLeafId : null,
     });
     if (
@@ -110,6 +125,7 @@ export function useLayoutHashSync({
     highlightedVerseRangesByLeafId,
     isLoaded,
     showTargetedPanelToggle,
+    searchPageStateByLeafId,
     tabs,
     tabsOrientation,
     targetedPanelLeafId,

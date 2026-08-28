@@ -156,6 +156,26 @@ describe("search helpers", () => {
     expect(scoreSmartSearch(entry, "righteosness", false)).toBeGreaterThan(0);
   });
 
+  it("keeps single-word fuzzy matches close to the requested spelling", () => {
+    const expectedMatches = [
+      createSearchableVerseEntry("Whom he did predestinate"),
+      createSearchableVerseEntry("Having predestinated us unto adoption"),
+    ];
+    const phoneticLookalikes = [
+      "They protest against the decree",
+      "A place of protection",
+      "The people protested and continued protesting",
+      "Thou pouredst out thy wrath",
+    ].map(createSearchableVerseEntry);
+
+    for (const entry of expectedMatches) {
+      expect(scoreSmartSearch(entry, "predestinate", false)).toBeGreaterThan(0);
+    }
+    for (const entry of phoneticLookalikes) {
+      expect(scoreSmartSearch(entry, "predestinate", false)).toBeNull();
+    }
+  });
+
   it("prefers verses where remembered words stay close together", () => {
     const close = createSearchableVerseEntry("Faith cometh by hearing");
     const scattered = createSearchableVerseEntry(
@@ -264,6 +284,33 @@ describe("search helpers", () => {
 
       expect(filteredIndexed).toEqual(scanned);
     }
+  });
+
+  it("does not index distant phonetic lookalikes for a single-word query", () => {
+    const entries = [
+      "Whom he did predestinate",
+      "Having predestinated us unto adoption",
+      "They protest against the decree",
+      "A place of protection",
+      "The people protested and continued protesting",
+      "Thou pouredst out thy wrath",
+    ].map((text, index) => ({
+      ...createSearchableVerseEntry(text),
+      bookIndex: index,
+      chapterIndex: 0,
+      verseNumber: 1,
+      bookName: `Book ${index + 1}`,
+    }));
+    const prepared = prepareSmartSearch("predestinate", false);
+    expect(prepared).not.toBeNull();
+    if (!prepared) return;
+
+    expect(
+      getIndexedSmartSearchCandidateIndexes(
+        buildSmartSearchLookup(entries),
+        prepared,
+      ),
+    ).toEqual([0, 1]);
   });
 
   it("prioritizes verses containing every exact Smart query word", () => {

@@ -69,7 +69,10 @@ import {
   panelViewportElement,
 } from "@/lib/reader-view";
 import type { VerseSearchIndexEntry } from "@/lib/search";
-import type { RunSmartVerseSearch } from "@/lib/smart-search-worker";
+import type {
+  RunSearchResultAnalysis,
+  RunSmartVerseSearch,
+} from "@/lib/smart-search-worker";
 import type { BookmarkScope } from "@/types/bookmarks";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
 import { StaticPage } from "@/components/reader/static-page";
@@ -246,6 +249,7 @@ export type ReaderPanelTreeProps = {
   isVerseSearchIndexReady: boolean;
   verseSearchIndexError: string | null;
   runSmartVerseSearch: RunSmartVerseSearch;
+  runSearchResultAnalysis: RunSearchResultAnalysis;
   ensureConcordanceWordsLoaded: () => Promise<unknown>;
   onOpenSearchResult: (
     bookIndex: number,
@@ -379,6 +383,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   isVerseSearchIndexReady,
   verseSearchIndexError,
   runSmartVerseSearch,
+  runSearchResultAnalysis,
   ensureConcordanceWordsLoaded,
   onOpenSearchResult,
   notes,
@@ -1575,6 +1580,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 isVerseIndexReady={isVerseSearchIndexReady}
                 verseIndexError={verseSearchIndexError}
                 runSmartSearch={runSmartVerseSearch}
+                runSearchResultAnalysis={runSearchResultAnalysis}
                 ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
                 state={
                   searchPageStateByLeafId[leaf.id] ?? {
@@ -1590,6 +1596,9 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                     selectedWords: [],
                     expandedBookTree: ["entire", "old", "new"],
                     selectedBookIndexes: [],
+                    resultSort: "relevance",
+                    showResultContext: false,
+                    resultFacets: null,
                     currentPage: 1,
                     results: [],
                     error: null,
@@ -1847,6 +1856,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   isVerseSearchIndexReady,
   verseSearchIndexError,
   runSmartVerseSearch,
+  runSearchResultAnalysis,
   ensureConcordanceWordsLoaded,
   onOpenSearchResult,
   notes,
@@ -1943,6 +1953,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       isVerseSearchIndexReady={isVerseSearchIndexReady}
       verseSearchIndexError={verseSearchIndexError}
       runSmartVerseSearch={runSmartVerseSearch}
+      runSearchResultAnalysis={runSearchResultAnalysis}
       ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
       onOpenSearchResult={onOpenSearchResult}
       notes={notes}
