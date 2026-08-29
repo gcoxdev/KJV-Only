@@ -24,6 +24,10 @@ export type ReaderStudyToolsContentProps = {
   hitchcocksProps: ComponentProps<typeof HitchcocksTool>;
 };
 
+type ReaderStudyToolsContentComponentProps = ReaderStudyToolsContentProps & {
+  openSections?: readonly string[];
+};
+
 export function ReaderStudyToolsContent({
   crossRefsProps,
   concordanceProps,
@@ -35,19 +39,62 @@ export function ReaderStudyToolsContent({
   mapsProps,
   genealogyProps,
   hitchcocksProps,
-}: ReaderStudyToolsContentProps) {
+  openSections,
+}: ReaderStudyToolsContentComponentProps) {
+  const isSectionOpen = (section: string, fallback: boolean) =>
+    openSections ? openSections.includes(section) : fallback;
+
   return (
     <>
-      <CrossRefsTool {...crossRefsProps} />
-      <ConcordanceTool {...concordanceProps} />
-      <WebstersTool {...webstersProps} />
-      <StrongsTool {...strongsProps} />
-      <KJVWordsPhrasesTool {...kjvWordsPhrasesProps} />
-      <BibleWordBookTool {...bibleWordBookProps} />
-      <HitchcocksTool {...hitchcocksProps} />
-      <AIDictionaryTool {...aiDictionaryProps} />
-      <GenealogyTool {...genealogyProps} />
-      <MapsTool {...mapsProps} />
+      <CrossRefsTool
+        {...crossRefsProps}
+        isOpen={isSectionOpen("cross-refs", crossRefsProps.isOpen)}
+      />
+      <ConcordanceTool
+        {...concordanceProps}
+        isOpen={isSectionOpen("concordance", concordanceProps.isOpen)}
+      />
+      <WebstersTool
+        {...webstersProps}
+        isOpen={isSectionOpen("websters", webstersProps.isOpen)}
+      />
+      <StrongsTool
+        {...strongsProps}
+        isOpen={isSectionOpen("strongs", strongsProps.isOpen)}
+      />
+      <KJVWordsPhrasesTool
+        {...kjvWordsPhrasesProps}
+        isOpen={isSectionOpen(
+          "kjv-words-phrases",
+          kjvWordsPhrasesProps.isOpen,
+        )}
+      />
+      <BibleWordBookTool
+        {...bibleWordBookProps}
+        isOpen={isSectionOpen(
+          "bible-word-book",
+          bibleWordBookProps.isOpen,
+        )}
+      />
+      <HitchcocksTool
+        {...hitchcocksProps}
+        isOpen={isSectionOpen("hitchcocks", hitchcocksProps.isOpen)}
+      />
+      <AIDictionaryTool
+        {...aiDictionaryProps}
+        isOpen={isSectionOpen(
+          "ai-dictionary",
+          aiDictionaryProps.isOpen,
+        )}
+      />
+      <GenealogyTool
+        {...genealogyProps}
+        isOpen={isSectionOpen("genealogy", genealogyProps.isOpen)}
+      />
+      <MapsTool
+        {...mapsProps}
+        isOpen={isSectionOpen("maps", mapsProps.isOpen)}
+      />
     </>
   );
 }

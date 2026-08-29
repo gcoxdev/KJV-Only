@@ -404,6 +404,166 @@ test("loads auxiliary reader panels on demand", async ({ page }) => {
   await expect(page.getByText("Whole Bible", { exact: true })).toBeVisible()
 })
 
+test("keeps Tools and Topics accordion expansion scoped to each surface", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  const panels = page.locator("[data-panel-leaf-id]:visible")
+  await panels
+    .first()
+    .getByLabel("Panel options")
+    .click()
+  await page.getByRole("menuitem", { name: "Split Right", exact: true }).click()
+  await expect(panels).toHaveCount(2)
+
+  const auxiliaryPanel = panels.nth(1)
+  await auxiliaryPanel
+    .getByRole("button", { name: "Tools", exact: true })
+    .click()
+
+  const sidebar = page.locator('[data-tour="sidebar"]')
+  const panelConcordance = auxiliaryPanel.getByRole("button", {
+    name: "Concordance",
+    exact: true,
+  })
+  const sidebarConcordance = sidebar.getByRole("button", {
+    name: "Concordance",
+    exact: true,
+  })
+
+  await auxiliaryPanel
+    .getByRole("button", { name: "Expand All", exact: true })
+    .click()
+  await expect(panelConcordance).toHaveAttribute("aria-expanded", "true")
+  await expect(sidebarConcordance).toHaveAttribute("aria-expanded", "false")
+  await expect(
+    sidebar.getByRole("button", { name: "Collapse All", exact: true }),
+  ).toBeDisabled()
+
+  const panelConcordanceSearch = auxiliaryPanel.getByPlaceholder(
+    "Search concordance...",
+  )
+  await panelConcordanceSearch.fill("faith")
+  await auxiliaryPanel.getByLabel("Search concordance").click()
+  await expect(panelConcordanceSearch).toHaveValue("faith")
+
+  await sidebarConcordance.click()
+  const sidebarConcordanceSearch = sidebar.getByPlaceholder(
+    "Search concordance...",
+  )
+  await expect(sidebarConcordanceSearch).toHaveValue("")
+  await sidebarConcordanceSearch.fill("love")
+  await sidebar.getByLabel("Search concordance").click()
+  await expect(sidebarConcordanceSearch).toHaveValue("love")
+  await expect(panelConcordanceSearch).toHaveValue("faith")
+
+  await panels
+    .first()
+    .getByRole("button", { name: "Details for beginning", exact: true })
+    .click()
+  await expect(
+    sidebar.getByRole("button", { name: "beginning", exact: true }),
+  ).toBeVisible()
+  await expect(panelConcordanceSearch).toHaveValue("faith")
+
+  await auxiliaryPanel.getByLabel("Panel options").click()
+  await page.getByRole("menuitem", { name: "Home", exact: true }).click()
+  await auxiliaryPanel
+    .getByRole("button", { name: "Topics", exact: true })
+    .click()
+  await sidebar
+    .getByRole("button", { name: "Topics", exact: true })
+    .click()
+
+  const topicLetter = auxiliaryPanel.getByRole("button", {
+    name: "A",
+    exact: true,
+  })
+  await expect(topicLetter).toBeEnabled()
+  await topicLetter.click()
+  await expect(
+    auxiliaryPanel.getByText("Showing topics that begin with A.", {
+      exact: true,
+    }),
+  ).toBeVisible()
+  await expect(
+    sidebar.getByText(
+      "Choose one or more letters to browse topics, or start typing to filter them.",
+      { exact: true },
+    ),
+  ).toBeVisible()
+
+  await sidebar.getByRole("button", { name: "A", exact: true }).click()
+
+  const panelTopic = auxiliaryPanel
+    .locator('[data-slot="accordion-trigger"]')
+    .first()
+  const sidebarTopic = sidebar
+    .locator('[data-slot="accordion-trigger"]')
+    .first()
+  await expect(panelTopic).toBeVisible()
+  await expect(sidebarTopic).toBeVisible()
+  await panelTopic.click()
+
+  await expect(panelTopic).toHaveAttribute("aria-expanded", "true")
+  await expect(sidebarTopic).toHaveAttribute("aria-expanded", "false")
+
+  const panelTopicsFilter = auxiliaryPanel.getByPlaceholder("Filter topics...")
+  const sidebarTopicsFilter = sidebar.getByPlaceholder("Filter topics...")
+  await panelTopicsFilter.fill("Ab")
+  await expect(panelTopicsFilter).toHaveValue("Ab")
+  await expect(sidebarTopicsFilter).toHaveValue("")
+  await sidebarTopicsFilter.fill("Faith")
+  await expect(sidebarTopicsFilter).toHaveValue("Faith")
+  await expect(panelTopicsFilter).toHaveValue("Ab")
+})
+
+test("routes word selections only to the configured Tools panel session", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page.getByLabel("Open menu").click()
+  await page.getByRole("menuitem", { name: "Settings", exact: true }).click()
+  await page.getByRole("tab", { name: "Targeting", exact: true }).click()
+  await page.getByLabel("Word / Verse Selection Target").click()
+  await page.getByRole("option", { name: "New Panel", exact: true }).click()
+
+  const sidebar = page.locator('[data-tour="sidebar"]')
+  const sidebarToggle = page.locator('[data-tour="sidebar-toggle"]')
+  await expect(sidebar).toBeVisible()
+  await expect(sidebarToggle).toBeVisible()
+  await sidebarToggle.click()
+  await expect(sidebar).not.toBeVisible()
+  await sidebarToggle.click()
+  await expect(sidebar).toBeVisible()
+
+  await page
+    .getByRole("button", { name: "Genesis 1", exact: true })
+    .filter({ visible: true })
+    .first()
+    .click()
+  await page
+    .getByRole("button", { name: "Details for beginning", exact: true })
+    .click()
+
+  const panels = page.locator("[data-panel-leaf-id]:visible")
+  await expect(panels).toHaveCount(2)
+  const toolsPanel = panels.nth(1)
+  await expect(
+    toolsPanel.getByRole("button", { name: "beginning", exact: true }),
+  ).toBeVisible()
+  await expect(
+    sidebar.getByRole("button", { name: "beginning", exact: true }),
+  ).toHaveCount(0)
+
+  await sidebar.getByRole("button", { name: "Topics", exact: true }).click()
+  await expect(sidebar.getByPlaceholder("Filter topics...")).toBeVisible()
+})
+
 test("restores a shared chapter layout after reload", async ({ page }) => {
   await page.goto("/")
   await expectReaderReady(page)

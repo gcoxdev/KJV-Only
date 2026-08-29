@@ -16,7 +16,6 @@ import {
 import {
   isDedicatedLeafViewTab,
   nextSearchTabTitle,
-  panelNodeContainsView,
 } from "@/lib/workspace-navigation";
 import { getStaticPage } from "@/lib/static-pages";
 import type { NotesContext, NotesTabState, ReaderNote } from "@/types/notes";
@@ -25,10 +24,24 @@ import type {
   PanelNode,
   ReaderTab,
   StaticPageId,
+  StudyToolsDestination,
   StudyWorkspaceTool,
   TabsOrientation,
   WordVerseSelectionTarget,
 } from "@/types/reader";
+
+function findFirstLeafWithView(
+  node: PanelNode,
+  view: LeafNode["view"],
+): LeafNode | null {
+  if (node.type === "leaf") {
+    return node.view === view ? node : null;
+  }
+  return (
+    findFirstLeafWithView(node.first, view) ??
+    findFirstLeafWithView(node.second, view)
+  );
+}
 
 type ChapterRef = {
   bookIndex: number;
@@ -296,22 +309,28 @@ export function useWorkspaceNavigation({
     [],
   );
 
-  const ensureToolsPanelInActiveTab = useCallback(() => {
-    if (!activeTabId) {
-      return;
-    }
+  const ensureToolsPanelInActiveTab = useCallback(
+    (sourceLeafId?: string | null) => {
+      const sourceTabId = sourceLeafId
+        ? findTabContainingLeafId(sourceLeafId)?.id ?? activeTabId
+        : activeTabId;
+      if (!sourceTabId) {
+        return null;
+      }
 
-    setTabs((currentTabs) => {
+      const currentTabs = tabsRef.current;
       const activeIndex = currentTabs.findIndex(
-        (tab) => tab.id === activeTabId,
+        (tab) => tab.id === sourceTabId,
       );
       if (activeIndex < 0) {
-        return currentTabs;
+        return null;
       }
 
       const active = currentTabs[activeIndex];
-      if (panelNodeContainsView(active.root, "tools")) {
-        return currentTabs;
+      const existingToolsLeaf = findFirstLeafWithView(active.root, "tools");
+      if (existingToolsLeaf) {
+        showTabById(sourceTabId);
+        return existingToolsLeaf.id;
       }
 
       const nextLeaf = createLeaf(0, 0, "tools");
@@ -326,53 +345,71 @@ export function useWorkspaceNavigation({
 
       const nextTabs = [...currentTabs];
       nextTabs[activeIndex] = { ...active, root: nextRoot };
-      return nextTabs;
-    });
-  }, [activeTabId, setTabs]);
+      tabsRef.current = nextTabs;
+      setTabs(nextTabs);
+      showTabById(sourceTabId);
+      return nextLeaf.id;
+    },
+    [activeTabId, findTabContainingLeafId, setTabs, showTabById],
+  );
 
-  const createTargetedToolsPanelInActiveTab = useCallback(() => {
-    if (!activeTabId) {
-      return false;
-    }
+  const createTargetedToolsPanelInActiveTab = useCallback(
+    (sourceLeafId?: string | null) => {
+      const sourceTabId = sourceLeafId
+        ? findTabContainingLeafId(sourceLeafId)?.id ?? activeTabId
+        : activeTabId;
+      if (!sourceTabId) {
+        return null;
+      }
 
-    const currentTabs = tabsRef.current;
-    const activeIndex = currentTabs.findIndex(
-      (tab) => tab.id === activeTabId,
-    );
-    if (activeIndex < 0) {
-      return false;
-    }
+      const currentTabs = tabsRef.current;
+      const activeIndex = currentTabs.findIndex(
+        (tab) => tab.id === sourceTabId,
+      );
+      if (activeIndex < 0) {
+        return null;
+      }
 
-    const active = currentTabs[activeIndex];
-    const nextLeaf = createLeaf(0, 0, "tools");
-    const nextRoot: PanelNode = {
-      id: createId(),
-      type: "split",
-      orientation: "horizontal",
-      ratio: 68,
-      first: active.root,
-      second: nextLeaf,
-    };
+      const active = currentTabs[activeIndex];
+      const nextLeaf = createLeaf(0, 0, "tools");
+      const nextRoot: PanelNode = {
+        id: createId(),
+        type: "split",
+        orientation: "horizontal",
+        ratio: 68,
+        first: active.root,
+        second: nextLeaf,
+      };
 
-    const nextTabs = [...currentTabs];
-    nextTabs[activeIndex] = { ...active, root: nextRoot };
-    tabsRef.current = nextTabs;
-    setTabs(nextTabs);
+      const nextTabs = [...currentTabs];
+      nextTabs[activeIndex] = { ...active, root: nextRoot };
+      tabsRef.current = nextTabs;
+      setTabs(nextTabs);
 
-    setTargetedPanelLeafId(nextLeaf.id);
-    showTabById(activeTabId);
-    return true;
-  }, [activeTabId, setTabs, setTargetedPanelLeafId, showTabById]);
+      targetedPanelLeafIdRef.current = nextLeaf.id;
+      setTargetedPanelLeafId(nextLeaf.id);
+      showTabById(sourceTabId);
+      return nextLeaf.id;
+    },
+    [
+      activeTabId,
+      findTabContainingLeafId,
+      setTabs,
+      setTargetedPanelLeafId,
+      showTabById,
+      targetedPanelLeafIdRef,
+    ],
+  );
 
   const openToolsInTargetedPanel = useCallback(() => {
     const currentTargetedPanelLeafId = targetedPanelLeafIdRef.current;
     if (!currentTargetedPanelLeafId) {
-      return false;
+      return null;
     }
 
     const targetTab = findTabContainingLeafId(currentTargetedPanelLeafId);
     if (!targetTab) {
-      return true;
+      return null;
     }
 
     setTabs((currentTabs) =>
@@ -390,7 +427,7 @@ export function useWorkspaceNavigation({
       ),
     );
     showTabById(targetTab.id);
-    return true;
+    return currentTargetedPanelLeafId;
   }, [
     findTabContainingLeafId,
     setTabs,
@@ -403,7 +440,12 @@ export function useWorkspaceNavigation({
     if (pendingToolsTabId) {
       pendingActiveTabIdRef.current = pendingToolsTabId;
       setActiveTabId(pendingToolsTabId);
-      return;
+      const pendingTab = tabsRef.current.find(
+        (tab) => tab.id === pendingToolsTabId,
+      );
+      return pendingTab
+        ? findFirstLeafWithView(pendingTab.root, "tools")?.id ?? null
+        : null;
     }
 
     const existingToolsTab = tabsRef.current.find((tab) =>
@@ -414,7 +456,7 @@ export function useWorkspaceNavigation({
       pendingToolsTabScrollRef.current = false;
       pendingToolsTabIdRef.current = null;
       setActiveTabId(existingToolsTab.id);
-      return;
+      return findFirstLeafWithView(existingToolsTab.root, "tools")?.id ?? null;
     }
 
     const nextTabId = createId();
@@ -423,18 +465,27 @@ export function useWorkspaceNavigation({
     pendingToolsTabScrollRef.current = true;
     pendingToolsTabIdRef.current = nextTabId;
 
-    setTabs((currentTabs) => [
-      ...currentTabs,
+    const nextTabs = [
+      ...tabsRef.current,
       {
         id: nextTabId,
         title: "Tools",
         root: nextLeaf,
       },
-    ]);
+    ];
+    tabsRef.current = nextTabs;
+    setTabs(nextTabs);
+    return nextLeaf.id;
   }, [setActiveTabId, setTabs]);
 
   const openStudyTool = useCallback(
-    (tool: StudyWorkspaceTool, options?: { openSidebar?: boolean }) => {
+    (
+      tool: StudyWorkspaceTool,
+      options?: {
+        openSidebar?: boolean;
+        sourceLeafId?: string | null;
+      },
+    ): StudyToolsDestination | null => {
       const destination =
         options?.openSidebar === false
           ? "new-panel"
@@ -443,16 +494,21 @@ export function useWorkspaceNavigation({
       if (destination === "sidebar") {
         setIsRightSidebarOpen(true);
         setSidebarOpenRequestKey((current) => current + 1);
-      } else if (destination === "targeted-panel") {
-        if (!openToolsInTargetedPanel()) {
-          createTargetedToolsPanelInActiveTab();
-        }
-      } else if (destination === "new-panel") {
-        ensureToolsPanelInActiveTab();
-      } else {
-        openToolsTab();
+        showStudyTool(tool);
+        return { type: "sidebar" };
       }
-      showStudyTool(tool);
+
+      let leafId: string | null;
+      if (destination === "targeted-panel") {
+        leafId =
+          openToolsInTargetedPanel() ??
+          createTargetedToolsPanelInActiveTab(options?.sourceLeafId);
+      } else if (destination === "new-panel") {
+        leafId = ensureToolsPanelInActiveTab(options?.sourceLeafId);
+      } else {
+        leafId = openToolsTab();
+      }
+      return leafId ? { type: "panel", leafId } : null;
     },
     [
       createTargetedToolsPanelInActiveTab,
