@@ -115,6 +115,7 @@ import { TabsWorkspace } from "@/components/reader/tabs-workspace";
 import { ReaderStatusScreen } from "@/components/reader/reader-status-screen";
 import { ReaderWorkspacePanels } from "@/components/reader/reader-workspace-panels";
 import { ReaderImportControls } from "@/components/reader/reader-import-controls";
+import { PwaUpdateNotice } from "@/components/reader/pwa-update-notice";
 import { CompletionCelebration } from "@/components/reader/completion-celebration";
 import { GuidedTour } from "@/components/reader/guided-tour";
 
@@ -2084,6 +2085,8 @@ export function KJVReader() {
         canInstallPwa,
         isPwaInstalled,
         onInstallPwa: installPwa,
+        onExportNotes: exportNotes,
+        onExportBookmarks: exportBookmarks,
         renderReferencePreview: referencePreviewContent,
         onOpenReference: openConcordanceReference,
         onCloseSidebar: closeRightSidebarForMobile,
@@ -2142,6 +2145,9 @@ export function KJVReader() {
             onImportNotes={requestNotesImport}
             onExportBookmarks={exportBookmarks}
             onImportBookmarks={requestBookmarksImport}
+          />
+          <PwaUpdateNotice
+            onOpenDetails={() => openStaticPageTab("download")}
           />
           <ReferenceCommandDialog
             books={books}

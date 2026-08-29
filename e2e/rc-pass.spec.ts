@@ -360,7 +360,7 @@ test("downloads, uses, and clears the core offline package", async ({
     }
   })
   expect(offlineReadiness.controlled).toBe(true)
-  expect(offlineReadiness.cacheName).toBe("kjv-only-cache-v7")
+  expect(offlineReadiness.cacheName).toBe("kjv-only-cache-v8")
   expect(offlineReadiness.missing).toEqual([])
 
   await context.setOffline(true)

@@ -16,6 +16,8 @@ type StaticPageProps = {
   canInstallPwa?: boolean;
   isPwaInstalled?: boolean;
   onInstallPwa?: () => void | Promise<void>;
+  onExportNotes?: () => void;
+  onExportBookmarks?: () => void;
   renderPreview?: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference?: (reference: string) => void;
   onCloseSidebar?: () => void;
@@ -32,6 +34,8 @@ export function StaticPage({
   canInstallPwa = false,
   isPwaInstalled = false,
   onInstallPwa,
+  onExportNotes,
+  onExportBookmarks,
   renderPreview,
   onOpenReference,
   onCloseSidebar,
@@ -119,6 +123,8 @@ export function StaticPage({
               canInstallPwa={canInstallPwa}
               isPwaInstalled={isPwaInstalled}
               onInstallPwa={onInstallPwa}
+              onExportNotes={onExportNotes}
+              onExportBookmarks={onExportBookmarks}
             />
           ) : null}
           {page.id === "help" ? <HelpPage /> : null}

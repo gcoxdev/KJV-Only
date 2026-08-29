@@ -96,6 +96,42 @@ for (const forbiddenPath of FORBIDDEN_PATHS) {
   }
 }
 
+try {
+  const serviceWorkerSource = await fs.readFile(
+    path.join(DIST_DIR, "sw.js"),
+    "utf8",
+  );
+  const installStart = serviceWorkerSource.indexOf(
+    'self.addEventListener("install"',
+  );
+  const activateStart = serviceWorkerSource.indexOf(
+    'self.addEventListener("activate"',
+  );
+  const messageStart = serviceWorkerSource.indexOf(
+    'self.addEventListener("message"',
+  );
+  const installHandler = serviceWorkerSource.slice(installStart, messageStart);
+  const messageHandler = serviceWorkerSource.slice(messageStart, activateStart);
+  if (
+    installStart < 0 ||
+    messageStart <= installStart ||
+    activateStart <= installStart ||
+    !installHandler.includes("event.waitUntil(cacheAppShell())") ||
+    installHandler.includes("skipWaiting") ||
+    !messageHandler.includes("KJV_ONLY_SKIP_WAITING") ||
+    !messageHandler.includes(".then(() => self.skipWaiting())") ||
+    !serviceWorkerSource.includes("KJV_ONLY_UPDATE_ACTIVATING") ||
+    !serviceWorkerSource.includes("MessageChannel") ||
+    !messageHandler.includes("includeUncontrolled: true")
+  ) {
+    failures.push("Invalid controlled service-worker update lifecycle");
+  }
+} catch (error) {
+  failures.push(
+    `Could not validate the service-worker update lifecycle: ${error instanceof Error ? error.message : String(error)}`,
+  );
+}
+
 const files = await collectFiles(DIST_DIR);
 for (const file of files) {
   const relative = path.relative(DIST_DIR, file.path).split(path.sep).join("/");

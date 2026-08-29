@@ -149,9 +149,39 @@ async function cacheFirst(request, requestUrl) {
   return response
 }
 
+function prepareClientForUpdate(client) {
+  return new Promise((resolve) => {
+    const channel = new MessageChannel()
+    const finish = () => {
+      clearTimeout(timeoutId)
+      channel.port1.close()
+      resolve()
+    }
+    const timeoutId = setTimeout(finish, 1500)
+    channel.port1.onmessage = finish
+    client.postMessage(
+      { type: "KJV_ONLY_UPDATE_ACTIVATING" },
+      [channel.port2]
+    )
+  })
+}
+
 self.addEventListener("install", (event) => {
+  event.waitUntil(cacheAppShell())
+})
+
+self.addEventListener("message", (event) => {
+  if (
+    !event.data ||
+    typeof event.data !== "object" ||
+    event.data.type !== "KJV_ONLY_SKIP_WAITING"
+  ) {
+    return
+  }
   event.waitUntil(
-    cacheAppShell()
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clients) => Promise.all(clients.map(prepareClientForUpdate)))
       .then(() => self.skipWaiting())
   )
 })

@@ -25,7 +25,7 @@ Do not create commits or push this repository without explicit maintainer approv
 
 ## Manual smoke test
 
-Verify a fresh load and an upgrade from the previous deployed version. Open Genesis, navigate chapters, switch study/read modes, open search, create and edit a note, add a bookmark, export/import both, share and reopen a multi-panel layout, open each study-tool family, download/clear an offline package, reload offline, and confirm keyboard focus returns after dialogs and menus. Repeat at a narrow viewport and 200% zoom.
+Verify a fresh load and an upgrade from the previous deployed version. During the upgrade, confirm the old session remains usable, the update-ready notice appears, choosing Later does not reload, and choosing Update reloads every open KJV Only tab once into the new shell. Open Genesis, navigate chapters, switch study/read modes, open search, create and edit a note, add a bookmark, export/import both, share and reopen a multi-panel layout, open each study-tool family, download/clear an offline package, reload offline, and confirm keyboard focus returns after dialogs and menus. Repeat at a narrow viewport and 200% zoom.
 
 ## Data and asset review
 
@@ -33,6 +33,6 @@ Inspect the `npm run build` budget report. Confirm `dist/delete`, SQLite, and OS
 
 ## Rollback and recovery
 
-Keep the preceding deploy and cache version available until smoke tests pass. Roll back application and cache configuration together. Never resolve a bad release by deleting all origin caches or all service-worker registrations; cleanup is application-prefix and scope specific.
+Keep the preceding deploy and cache version available until smoke tests pass. Roll back application and cache configuration together. Never resolve a bad release by deleting all origin caches or all service-worker registrations; cleanup is application-prefix and scope specific. The in-app repair action must remain unavailable offline and must continue to target only the same-origin `/sw.js` registration and `kjv-only-cache-*` entries.
 
 Malformed local records are filtered by the storage validators. If a user reports persistence trouble, preserve an export before clearing data, identify the failing record without collecting unrelated personal content, and test the recovery against the same schema version. Import replacement is atomic, so a rejected file must leave current notes/bookmarks intact.
