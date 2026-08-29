@@ -59,7 +59,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to start using the app",
         body:
-          "On a fresh open, the app starts with Welcome Home in the first tab and Genesis 1 in the second tab. You can begin reading immediately, open search, or take the guided tour first.",
+          "On a fresh open, the app creates a Genesis 1 reader tab and, by default, an active Welcome Home tab. Start reading, open Search or Quick Open, or take the guided tour. You can turn the startup Welcome Home tab off under Settings > Other.",
         keywords: ["start", "getting started", "first open", "welcome"],
       },
       {
@@ -79,6 +79,12 @@ const HELP_SECTIONS: HelpSection[] = [
     keywords: ["how to", "common tasks", "quick help", "instructions"],
     items: [
       {
+        label: "How to open one or more Bible references quickly",
+        body:
+          "Use the compass button in the top bar to open Quick Open. Type a reference such as John 3:16, or separate several references with semicolons, then choose whether to open them in new tabs, a new panel, or panels in one tab.",
+        keywords: ["quick open", "open references", "compass", "multiple passages", "reference command"],
+      },
+      {
         label: "How to add a new tab",
         body:
           "Use the add-tab button in the tab strip. This creates a new tab with its own panel workspace, separate from the current tab.",
@@ -91,6 +97,12 @@ const HELP_SECTIONS: HelpSection[] = [
         keywords: ["relabel tab", "rename tab", "tab options"],
       },
       {
+        label: "How to reorder tabs",
+        body:
+          "Drag a tab to a new position with a mouse, use Move Left or Move Right from its options menu, or long-press and drag it on a touch screen. With vertical tabs, the menu actions become Move Up and Move Down.",
+        keywords: ["reorder tabs", "drag tab", "move tab", "long press"],
+      },
+      {
         label: "How to split a panel",
         body:
           "Open the panel options menu, then choose Split Left, Right, Up, or Down. This creates a second panel inside the same tab so you can compare content side by side.",
@@ -99,8 +111,8 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to move a panel",
         body:
-          "Open the panel options menu and use Move Left, Right, Up, or Down. The app swaps the panel state so the content and panel-local behavior move together.",
-        keywords: ["move panel", "rearrange panel"],
+          "Open the panel options menu and use Move Left, Right, Up, or Down to rearrange the current layout. The same menu can move a panel into an existing tab or into a new tab, while keeping its content and panel-local state together.",
+        keywords: ["move panel", "rearrange panel", "move to tab", "new tab"],
       },
       {
         label: "How to return a panel to panel home",
@@ -147,8 +159,20 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to download content for offline use",
         body:
-          "Open the Download page and download the bundle you want, such as Core Bible Data, Maps, Old Testament Audio, or New Testament Audio. Offline use is an explicit download step, not automatic on install.",
+          "While online, open Download and cache the bundle you need: Core Bible Data, Maps, Old Testament Audio, or New Testament Audio. Core includes the production app shell, Bible and study data, and book icons. Installing the app does not automatically download these optional offline bundles.",
         keywords: ["offline", "download bundle", "cache"],
+      },
+      {
+        label: "How to apply an app update",
+        body:
+          "When a complete new version is ready, a notice appears with Details, Later, and Update Now. Later keeps the current version running. Update Now activates the cached version and reloads every open KJV Only tab once so all tabs use matching files.",
+        keywords: ["app update", "update now", "later", "new version", "reload tabs"],
+      },
+      {
+        label: "How to repair the offline app cache",
+        body:
+          "While online, open Download > App Updates and Recovery, export notes and bookmarks if needed, then choose Repair App Cache. Repair removes only KJV Only's service worker and app-owned caches, reloads the app, and requires offline bundles to be downloaded again.",
+        keywords: ["repair app cache", "recovery", "service worker", "offline error", "reset cache"],
       },
       {
         label: "How to export notes or bookmarks",
@@ -187,7 +211,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What panel home is for",
         body:
-          "Panel home is the launch point for what a panel should show next. From panel home you can open the Bible reader, notes, bookmarks, search, tools, or static pages such as Help and Download.",
+          "Panel Home is the launch point for a panel. From there you can choose a Bible book and chapter or open Tools, Topics, Notes, Bookmarks, or Search. Informational pages such as Help and Download are opened from the main menu or Welcome Home.",
         keywords: ["panel home", "picker", "launch panel"],
       },
       {
@@ -195,6 +219,12 @@ const HELP_SECTIONS: HelpSection[] = [
         body:
           "Each panel keeps its own back and forward history. That history covers reader navigation and panel-home destinations inside that panel, not the whole tab at once.",
         keywords: ["back", "forward", "history"],
+      },
+      {
+        label: "How advanced panel layouts work",
+        body:
+          "Panel options can rotate the parent split, insert a panel beside the current panel within its group, or add a panel around the whole group. Hovering an available layout action previews where the panel will go before you select it.",
+        keywords: ["rotate split", "insert in group", "add around group", "layout preview", "advanced panels"],
       },
       {
         label: "What the targeted panel is for",
@@ -213,6 +243,12 @@ const HELP_SECTIONS: HelpSection[] = [
         body:
           "Use the panel options menu to enter fullscreen when you want one panel to fill the screen temporarily. Exiting fullscreen returns you to the normal layout.",
         keywords: ["fullscreen", "maximize panel"],
+      },
+      {
+        label: "What a shared layout includes",
+        body:
+          "A layout link preserves tab names and order, panel structure and destinations, tab orientation, the targeted panel, verse highlight ranges, and each Search panel's query, mode, book scope, case setting, sort, and context setting. Search result lists are not placed in the URL; run the restored search to rebuild them.",
+        keywords: ["shared layout", "url", "search in url", "layout link", "search criteria"],
       },
     ],
   },
@@ -233,25 +269,25 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to study a word",
         body:
-          "Click a word in the text. That can update cross references, concordance, Strong's, dictionaries, genealogy, and other tools depending on what data is available for that token.",
+          "Switch to Study mode, then click a word in the text or focus it and press Enter or Space. The selection can update cross references, concordance, Strong's, dictionaries, genealogy, maps, and other tools according to the data available for that token.",
         keywords: ["click word", "word study", "strongs", "concordance"],
       },
       {
         label: "How to study a verse",
         body:
-          "Click a verse number or verse target to open verse-based context. This is useful for cross references, notes, bookmarks, and verse-linked navigation.",
+          "In Study mode, click a verse to select its verse-based context. This is useful for cross references, notes, bookmarks, and verse-linked navigation. In Highlight mode, verse clicks instead build the highlighted selection.",
         keywords: ["click verse", "verse context"],
       },
       {
         label: "How to use highlight mode",
         body:
-          "Turn on highlight mode for a panel, then use the verse checkboxes to mark a range. Those selected verses can be bookmarked or cleared and remain readable across themes.",
+          "Open a reader panel's options and turn Highlight Mode on, then use the verse checkboxes to select verses or ranges. From the same menu you can bookmark the highlighted selection or clear its highlights. Layout links preserve the selected ranges.",
         keywords: ["highlight mode", "verse checkbox", "select verses"],
       },
       {
         label: "How to use chapter audio",
         body:
-          "Use the audio control in the panel bottom bar to open or control chapter audio. Audio is chapter-based and can also be downloaded for offline use from the Download page.",
+          "Use Show Audio in the panel bottom bar for chapter playback. The player supports play/pause, seeking, playback speed, mute, volume, and optional automatic playback of the next chapter. Download Old or New Testament Audio from Download if you need playback offline.",
         keywords: ["audio", "play chapter", "audio player"],
       },
       {
@@ -263,8 +299,8 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to move to the next or previous chapter",
         body:
-          "Use the chapter navigation controls in the panel bottom bar. This lets you move through the text without reopening the picker.",
-        keywords: ["next chapter", "previous chapter", "chapter navigation"],
+          "Use Prev and Next in the panel bottom bar. On a touch screen in Read mode, you can also swipe horizontally across the chapter; Study mode leaves horizontal gestures available for study interactions instead.",
+        keywords: ["next chapter", "previous chapter", "chapter navigation", "swipe"],
       },
     ],
   },
@@ -273,8 +309,8 @@ const HELP_SECTIONS: HelpSection[] = [
     title: "Study and Read Mode",
     icon: SidebarIcon,
     summary:
-      "The application can emphasize reading or studying, and the sidebar organizes tools, notes, and bookmarks around the current context.",
-    keywords: ["sidebar", "study mode", "read mode", "tools", "notes", "bookmarks", "accordion"],
+      "The application can emphasize reading or studying, and the sidebar organizes tools, topics, notes, and bookmarks around the current context.",
+    keywords: ["sidebar", "study mode", "read mode", "tools", "topics", "notes", "bookmarks", "accordion"],
     items: [
       {
         label: "How to switch between read mode and study mode",
@@ -285,14 +321,14 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What the sidebar tabs are for",
         body:
-          "The sidebar is organized into Tools, Notes, and Bookmarks. Each area follows the current context differently, depending on whether you clicked a word, a verse, or a broader passage.",
-        keywords: ["sidebar tabs", "tools tab", "notes tab", "bookmarks tab"],
+          "The sidebar is organized into Tools, Topics, Notes, and Bookmarks. Tools follow word and verse selections; Topics can be browsed by letter or filtered by name; Notes can follow the active context; and Bookmarks reopen saved passages.",
+        keywords: ["sidebar tabs", "tools tab", "topics tab", "notes tab", "bookmarks tab"],
       },
       {
         label: "How tool accordions behave",
         body:
-          "Most study tools use accordion sections. Clicking words or verses in the reader can automatically expand the most relevant section and load a matching entry.",
-        keywords: ["accordion", "expand tools", "auto open"],
+          "Study tools use accordion sections, with Expand All and Collapse All controls. Clicking a word or verse can automatically open relevant sections and load matching entries; tools still allow their own manual searches.",
+        keywords: ["accordion", "expand tools", "collapse all", "auto open", "manual search"],
       },
     ],
   },
@@ -313,6 +349,7 @@ const HELP_SECTIONS: HelpSection[] = [
       "hitchcocks",
       "genealogy",
       "maps",
+      "topics",
     ],
     items: [
       {
@@ -334,10 +371,22 @@ const HELP_SECTIONS: HelpSection[] = [
         keywords: ["websters", "bible word-book", "archaic words"],
       },
       {
+        label: "How to use KJV Words & Phrases and AI Dictionary",
+        body:
+          "KJV Words & Phrases combines archaic-word, phrase, and biblical-unit material. AI Dictionary provides additional prepared explanations for harder KJV words. Click a word or search either tool directly when the automatic match is not the entry you need.",
+        keywords: ["kjv words phrases", "old english", "archaic", "units", "ai dictionary"],
+      },
+      {
         label: "How to use Strong's",
         body:
           "Strong's is available when the selected token has Strong's data. Clicking a word with attached Strong's information will load the corresponding entry and references.",
         keywords: ["strongs", "greek", "hebrew"],
+      },
+      {
+        label: "How to use Hitchcock's Bible Names",
+        body:
+          "Use Hitchcock's for concise name meanings. It can respond to a selected Bible name or to a name entered in the tool's own search box.",
+        keywords: ["hitchcocks", "bible names", "name meaning"],
       },
       {
         label: "How to use Genealogy",
@@ -348,8 +397,14 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to use Maps",
         body:
-          "Maps provide place and geography context. Open the Maps tool when a place is relevant and use the associated map data to understand locations and travel.",
+          "Maps provide place and geography context. Select or search for a place, open its interactive map, review linked places, and follow its Scripture references. Download the Maps bundle before going offline.",
         keywords: ["maps", "places", "geography"],
+      },
+      {
+        label: "How to browse Topics",
+        body:
+          "Open Topics in the Study sidebar or Panel Home. Choose one or more starting letters or type in Filter Topics, then expand a topic to preview and open its Scripture references.",
+        keywords: ["topics", "topic scriptures", "browse topics", "filter topics"],
       },
     ],
   },
@@ -358,14 +413,20 @@ const HELP_SECTIONS: HelpSection[] = [
     title: "Search Page",
     icon: FileSearchIcon,
     summary:
-      "The search page supports smart search, contains-any, contains-all, and regular expression search.",
-    keywords: ["search", "smart", "contains any", "contains all", "regex", "chips", "results", "book filter"],
+      "Search supports four query modes, per-panel criteria, saved and recent searches, book scope, sorting, context, result counts, copying, and text export.",
+    keywords: ["search", "smart", "exact phrase", "contains any", "contains all", "regex", "chips", "results", "book filter", "saved search", "history", "facets", "context", "export"],
     items: [
       {
         label: "How to use Smart search",
         body:
-          "Smart search is best for remembered fragments, misspellings, Bible names, and loose phrases. It is the best first choice when you know the idea but not the exact wording.",
-        keywords: ["smart search", "fuzzy search"],
+          "Smart is the best first choice for remembered fragments, misspellings, Bible names, and loose phrases. Single-word searches favor close forms of that word, while multi-word searches tolerate more variation. If a term appears misspelled, Did You Mean suggestions can replace it before you search again.",
+        keywords: ["smart search", "fuzzy search", "misspelling", "did you mean", "single word"],
+      },
+      {
+        label: "How to require an exact phrase",
+        body:
+          "In Smart mode, put quotation marks around the words that must appear together, such as \"loved the world\". You can combine quoted phrases with unquoted terms. Use the Case-sensitive option when capitalization must also match.",
+        keywords: ["exact phrase", "quotes", "quoted search", "case sensitive"],
       },
       {
         label: "How to use Contains Any and Contains All",
@@ -388,14 +449,44 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to limit search to certain books",
         body:
-          "Open the search page's book filter and select only the books you want included. This is useful for narrowing searches to a testament, a small group of books, or a single book.",
+          "Open Scope and select the entire Bible, a testament, a book group, or individual books. Parent checkboxes select or clear their descendants, and the tree can be expanded only as far as you need.",
         keywords: ["book filter", "limit search", "search by book"],
+      },
+      {
+        label: "How to save or reopen a search",
+        body:
+          "After entering a valid query, choose Save Search and give it a name. Saved & Recent restores the query, mode, selected books, case sensitivity, result sort, and context setting. Saved searches and the most recent completed searches stay only in this browser and are not part of notes or bookmarks exports.",
+        keywords: ["save search", "saved recent", "search history", "load search", "local search"],
+      },
+      {
+        label: "How to sort and inspect search results",
+        body:
+          "Sort results by Relevance or Bible order. Context adds the preceding and following verse around each match. Facets shows Old Testament, New Testament, and per-book counts for the currently loaded result set; it reports counts rather than changing the book scope.",
+        keywords: ["sort results", "relevance", "bible order", "context", "facets", "result counts"],
+      },
+      {
+        label: "How to copy or export search results",
+        body:
+          "Open Result Tools and choose Copy as Text or Export .txt. Both actions use all currently loaded results, not only the visible page, and include adjacent verses when Context is enabled.",
+        keywords: ["copy results", "export results", "text file", "result tools"],
+      },
+      {
+        label: "What happens during a long search",
+        body:
+          "The first Search open may prepare the Bible index in the background. Smart search can show useful matches while the remaining candidates are still being checked, and Stop cancels the active run. A search loads up to 500 matches and displays them 50 at a time for responsiveness.",
+        keywords: ["search slow", "preparing index", "search progress", "stop search", "pagination", "50 results"],
       },
       {
         label: "How search results open",
         body:
           "Search results can open in a new tab, new panel, or targeted panel based on your targeting settings. This lets you control whether results replace the current reading flow or open beside it.",
         keywords: ["search results", "open result target"],
+      },
+      {
+        label: "How Search panels are represented in a shared URL",
+        body:
+          "Each Search panel contributes its current definition to the layout URL: mode, case setting, query or chips, selected books, sort, and Context choice. The loaded verses, facets, page number, errors, saved-search library, and recent history are not encoded. A reopened link restores the controls so the search can be run again.",
+        keywords: ["search url", "share search", "encoded search", "layout hash", "search state"],
       },
     ],
   },
@@ -416,8 +507,14 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to create a context note",
         body:
-          "First select the relevant chapter, verse, or word in the reader, then create the note from the current context. Context notes reappear when that same context is active.",
+          "First activate the relevant chapter, verse, word, or highlighted selection in the reader, then choose New Context in Notes. Context notes can be filtered for the active location, and an existing note can be converted between General and Context or broadened to chapter scope while editing.",
         keywords: ["context note", "word note", "verse note", "chapter note"],
+      },
+      {
+        label: "How to edit and format notes",
+        body:
+          "Select a note, choose Edit, and use the rich-text toolbar for formatting. The note editor can hide its tools, fill the screen, or show the stored source for advanced troubleshooting. Save commits the draft; Cancel restores the last saved version.",
+        keywords: ["edit note", "rich text", "note toolbar", "fullscreen editor", "note source"],
       },
       {
         label: "How to create a bookmark",
@@ -428,8 +525,8 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How internal note links work",
         body:
-          "Notes can link back into the Bible using the app's internal link format. Those links can reopen chapters, verses, selections, ranges, and words directly inside the reader.",
-        keywords: ["internal links", "note links", "kjv://"],
+          "While editing a note, typed Bible references such as John 3:16 are recognized as internal links. Those links can reopen chapters, verses, selections, ranges, and words inside the reader using the destination selected under Settings > Targeting.",
+        keywords: ["internal links", "note links", "kjv://", "automatic bible links", "typed reference"],
       },
       {
         label: "How import and export work",
@@ -450,8 +547,8 @@ const HELP_SECTIONS: HelpSection[] = [
     title: "Settings and Targeting",
     icon: Settings2Icon,
     summary:
-      "Settings are divided into visual settings and targeting settings so appearance and opening behavior can be controlled separately.",
-    keywords: ["settings", "visual", "targeting", "theme", "dark mode", "font", "line spacing", "reference target"],
+      "Settings are divided into Visual, Targeting, and Other tabs so appearance, opening behavior, and startup behavior can be controlled separately.",
+    keywords: ["settings", "visual", "targeting", "other", "theme", "dark mode", "font", "line spacing", "reference target", "welcome home"],
     items: [
       {
         label: "How to open Settings",
@@ -472,10 +569,22 @@ const HELP_SECTIONS: HelpSection[] = [
         keywords: ["targeting tab", "open target", "new tab", "new panel", "targeted panel"],
       },
       {
+        label: "What the Other tab controls",
+        body:
+          "The Other tab controls whether Welcome Home opens as the active tab when the app starts without a shared layout. Genesis 1 remains available as the reader tab either way.",
+        keywords: ["other tab", "welcome home startup", "startup tab", "genesis"],
+      },
+      {
         label: "How to change highlight colors",
         body:
           "Open Settings, then Visual, then set Light Highlight Color and Dark Highlight Color separately if needed. This helps keep selections readable in both modes.",
         keywords: ["highlight color", "light highlight", "dark highlight"],
+      },
+      {
+        label: "How to manage Reading Progress",
+        body:
+          "Open Reading Progress from the main menu to view completion for the whole Bible, each testament, book, and chapter. You can open a chapter in a new tab, toggle one chapter, mark a whole book or testament complete or incomplete, or reset all progress after confirmation.",
+        keywords: ["reading progress", "complete book", "complete testament", "reset progress", "open chapter"],
       },
     ],
   },
@@ -484,20 +593,26 @@ const HELP_SECTIONS: HelpSection[] = [
     title: "Sharing, Install, and Offline Use",
     icon: Share2Icon,
     summary:
-      "The app supports shareable layouts, browser installation, and explicit offline bundle downloads.",
-    keywords: ["share", "layout", "install", "pwa", "offline", "download", "refresh bundle", "clear bundle"],
+      "The app supports shareable layouts, browser installation, explicit offline bundles, controlled updates, and app-specific cache recovery.",
+    keywords: ["share", "layout", "install", "pwa", "offline", "download", "update", "recovery", "service worker", "refresh bundle", "clear bundle"],
     items: [
       {
         label: "How to share a layout",
         body:
-          "Use the Share action in the top bar to create a layout link. That link can be reopened later or sent to friends, family, or a congregation so they can open the same arrangement.",
+          "Choose Share Current Layout in the main menu to copy the current layout URL to the clipboard. The link can be reopened later or sent to someone else so the same tabs, panels, locations, and supported panel state can be reconstructed.",
         keywords: ["share layout", "share link"],
       },
       {
         label: "How to install the app",
         body:
-          "Use the Download page's Install App action when the browser exposes install support. Browser behavior varies, so some browsers may also require their own menu-based install flow.",
+          "Use Download > Install App when the browser exposes an install prompt. If it says Prompt unavailable, use the browser menu's Install app or Add to Home screen action when available. Installation is optional and is separate from downloading offline content.",
         keywords: ["install app", "pwa", "browser install"],
+      },
+      {
+        label: "How app updates work",
+        body:
+          "An update is offered only after the new production shell has been cached completely. Choosing Later leaves the active session alone; choosing Update Now activates the waiting version and reloads all open KJV Only tabs once. Download > App Updates and Recovery can also check manually and show active, configured, and waiting cache versions.",
+        keywords: ["app update", "update notice", "waiting version", "cache version", "check for updates"],
       },
       {
         label: "How to refresh or clear offline bundles",
@@ -510,6 +625,24 @@ const HELP_SECTIONS: HelpSection[] = [
         body:
           "The Download page shows bundle status, cached file counts, sizes, and storage estimates so you can see what has been downloaded and what still needs to be cached.",
         keywords: ["offline status", "cached files", "storage"],
+      },
+      {
+        label: "How to test offline mode",
+        body:
+          "Use a deployed build or run npm run build followed by npm run preview, open the app online, and fully download Core Bible Data before switching the browser network to Offline and reloading. The npm run dev server intentionally disables the service worker, so it cannot verify offline startup.",
+        keywords: ["test offline", "localhost", "preview", "development server", "service worker disabled", "core bible data"],
+      },
+      {
+        label: "What to do when offline content is missing",
+        body:
+          "Reconnect first. Use Check for Missing Files on the affected bundle to fill gaps, or Refresh Bundle to replace its cached files. If the shell itself is inconsistent after an update, use Refresh Core Files; reserve Repair App Cache for recovery after exporting local notes and bookmarks.",
+        keywords: ["offline missing", "failed to fetch", "white screen", "missing files", "refresh core", "repair cache"],
+      },
+      {
+        label: "What Repair App Cache removes",
+        body:
+          "Repair is available only while online. It unregisters only this app's same-origin service worker and deletes only caches whose names begin with the KJV Only cache prefix. It does not target notes or bookmarks, but it does remove downloaded Core, Maps, and Audio bundles, which must then be downloaded again.",
+        keywords: ["repair cache", "what is removed", "notes safe", "bookmarks safe", "redownload bundles"],
       },
     ],
   },
@@ -524,7 +657,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What Welcome Home is for",
         body:
-          "Welcome Home is the default first tab on a fresh open. It gives a short orientation to the app and offers quick actions like Take the Tour, Open Search, Offline Download, and Reading Progress.",
+          "Welcome Home is the active startup tab by default on a fresh open. It gives a short orientation and quick actions such as Take the Tour, Open Search, Offline Download, and Reading Progress. Settings > Other can disable opening it at startup.",
         keywords: ["welcome home", "start page"],
       },
       {
@@ -536,7 +669,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What the static pages are for",
         body:
-          "Pages such as Help, How to Get Saved, Why KJV Only?, Download, Settings, and Reading Progress are part of the same panel system and can be opened like other panel views.",
+          "Welcome Home, How to Get Saved, Why KJV Only?, Resources, Local Churches, Download, Donate, Credits, Contact, Help, Settings, and Reading Progress all open inside the same tab-and-panel workspace. Use the main menu to reach them.",
         keywords: ["static pages", "help page", "saved page", "kjv only page"],
       },
     ],
@@ -564,14 +697,14 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "Export local data periodically",
         body:
-          "Because notes and bookmarks are local-first, exporting them periodically is the safest way to keep a portable backup.",
+          "Because notes and bookmarks are local-first, export them periodically and before browser-storage troubleshooting. The exports do not include reading progress, preferences, saved searches, recent searches, or downloaded offline bundles.",
         keywords: ["backup tip", "export"],
       },
       {
-        label: "Keep this page current with the app",
+        label: "Use Help search with task phrases",
         body:
-          "When the application changes, this help page should be revised at the same time so it continues to answer real user questions accurately.",
-        keywords: ["maintain help", "documentation upkeep"],
+          "Search this page with a task such as repair app cache, exact phrase, move panel, saved search, Quick Open, context note, or autoplay audio. Matches are ranked by topic title, answer text, and related keywords.",
+        keywords: ["search help", "task phrase", "find help", "help topics"],
       },
     ],
   },
@@ -681,6 +814,7 @@ export function HelpPage() {
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
+              aria-label="Search application help"
               placeholder="Search for a task, feature, setting, or workflow..."
               className="h-10 pl-9 pr-10"
             />
@@ -691,14 +825,16 @@ export function HelpPage() {
                 size="icon-sm"
                 className="absolute top-1/2 right-1 -translate-y-1/2"
                 onClick={() => setQuery("")}
+                aria-label="Clear help search"
               >
                 <XIcon />
               </Button>
             ) : null}
           </div>
           <p className="text-xs leading-6 text-muted-foreground">
-            Try searches like: how to add a tab, dark mode, targeted panel, export
-            notes, install app, split panel, mark chapter read, or regex search.
+            Try searches like: Quick Open, exact phrase, saved search, move panel,
+            targeted panel, autoplay audio, export notes, test offline, or repair app
+            cache.
           </p>
         </CardContent>
       </Card>
@@ -718,7 +854,7 @@ export function HelpPage() {
                 </CardTitle>
                 <CardDescription>{section.summary}</CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col gap-3">
+              <CardContent className="flex flex-col gap-3 pt-2">
                 {section.items.map((item) => (
                   <div
                     key={`${section.id}-${item.label}`}
@@ -763,9 +899,9 @@ export function HelpPage() {
             <CardTitle>No matching help topics</CardTitle>
             <CardDescription>
               Try a broader task-based query such as <span className="text-foreground">add a tab</span>,
-              <span className="text-foreground"> dark mode</span>,
+              <span className="text-foreground"> saved search</span>,
               <span className="text-foreground"> targeted panel</span>, or
-              <span className="text-foreground"> export notes</span>.
+              <span className="text-foreground"> test offline</span>.
             </CardDescription>
           </CardHeader>
         </Card>
