@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from "react";
+import { Fragment, type ReactNode, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,14 +12,14 @@ import { BookTextIcon, LoaderCircleIcon } from "lucide-react";
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
 import { StudySearchForm } from "@/components/reader/study-search-form";
 import { cn } from "@/lib/utils";
-import { TOPIC_LETTERS } from "@/hooks/use-topics-tool";
+import { TOPIC_LETTERS, useTopicsTool } from "@/hooks/use-topics-tool";
 
 type TopicEntry = {
   topic: string;
   references: string[];
 };
 
-type TopicsContentProps = {
+export type TopicsContentProps = {
   isLoading: boolean;
   isSearching: boolean;
   error: string | null;
@@ -27,8 +27,6 @@ type TopicsContentProps = {
   selectedLetters: string[];
   availableLetters: string[];
   results: TopicEntry[];
-  topicAccordionValue: string[];
-  onTopicAccordionValueChange: (value: string[]) => void;
   onSearch: (term: string) => void;
   onSelectLetter: (letter: string) => void;
   renderPreview: (reference: string, highlightWord: string) => ReactNode;
@@ -44,14 +42,13 @@ export function TopicsContent({
   selectedLetters,
   availableLetters,
   results,
-  topicAccordionValue,
-  onTopicAccordionValueChange,
   onSearch,
   onSelectLetter,
   renderPreview,
   onOpenReference,
   onCloseSidebar,
 }: TopicsContentProps) {
+  const [topicAccordionValue, setTopicAccordionValue] = useState<string[]>([]);
   const availableLetterSet = new Set(availableLetters);
   const selectedLetterSet = new Set(selectedLetters);
   const isFiltering = searchTerm.trim().length > 0;
@@ -65,7 +62,10 @@ export function TopicsContent({
         loading={isLoading || isSearching}
         value={searchTerm}
         liveSearch
-        onSearch={onSearch}
+        onSearch={(term) => {
+          setTopicAccordionValue([]);
+          onSearch(term);
+        }}
       />
       <div className="grid grid-cols-6 gap-1 sm:grid-cols-9">
         {TOPIC_LETTERS.map((letter) => {
@@ -78,7 +78,10 @@ export function TopicsContent({
               variant={selectedLetterSet.has(letter) ? "default" : "outline"}
               className="h-8 px-0"
               disabled={disabled}
-              onClick={() => onSelectLetter(letter)}
+              onClick={() => {
+                setTopicAccordionValue([]);
+                onSelectLetter(letter);
+              }}
             >
               {letter}
             </Button>
@@ -115,7 +118,7 @@ export function TopicsContent({
           multiple
           value={topicAccordionValue}
           onValueChange={(value) =>
-            onTopicAccordionValueChange(value.filter(Boolean) as string[])
+            setTopicAccordionValue(value.filter(Boolean) as string[])
           }
         >
           {results.map((entry) => (
@@ -174,12 +177,51 @@ export function TopicsTool({ hasInfo, isOpen, ...props }: TopicsToolProps) {
   );
 }
 
-export type TopicsPanelProps = TopicsContentProps;
+export type TopicsPanelProps = Pick<
+  TopicsContentProps,
+  "renderPreview" | "onOpenReference" | "onCloseSidebar"
+>;
 
-export function TopicsPanel(props: TopicsPanelProps) {
+export function TopicsPanel({
+  renderPreview,
+  onOpenReference,
+  onCloseSidebar,
+}: TopicsPanelProps) {
+  const {
+    searchTerm,
+    selectedLetters,
+    isLoading,
+    isSearching,
+    error,
+    results,
+    availableLetters,
+    ensureTopicsLoaded,
+    applySearch,
+    selectLetter,
+  } = useTopicsTool();
+
+  useEffect(() => {
+    void ensureTopicsLoaded().catch(() => {
+      // Error state is set by ensureTopicsLoaded.
+    });
+  }, [ensureTopicsLoaded]);
+
   return (
     <div className="flex h-full min-h-0 min-w-0 w-full max-w-full flex-col overflow-x-hidden overflow-y-auto [contain:inline-size]">
-      <TopicsContent {...props} />
+      <TopicsContent
+        isLoading={isLoading}
+        isSearching={isSearching}
+        error={error}
+        searchTerm={searchTerm}
+        selectedLetters={selectedLetters}
+        availableLetters={availableLetters}
+        results={results}
+        onSearch={applySearch}
+        onSelectLetter={selectLetter}
+        renderPreview={renderPreview}
+        onOpenReference={onOpenReference}
+        onCloseSidebar={onCloseSidebar}
+      />
     </div>
   );
 }

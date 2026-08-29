@@ -49,6 +49,7 @@ import type {
   PhrasesPayload,
   ReaderTab,
   SplitOrientation,
+  StudyToolsSelectionCommand,
   StrongsPayload,
   TokenPopupState,
   UnitsEntry,
@@ -96,7 +97,10 @@ import {
 } from "@/hooks/use-reader-view-models";
 import { useWorkspaceNavigation } from "@/hooks/use-workspace-navigation";
 import { useWordStudyNavigation } from "@/hooks/use-word-study-navigation";
-import { useWordStudyCoordinator } from "@/hooks/use-word-study-coordinator";
+import {
+  useWordStudyCoordinator,
+  type OpenWordInStudyToolsArgs,
+} from "@/hooks/use-word-study-coordinator";
 import { useVerseHighlights } from "@/hooks/use-verse-highlights";
 import { useReaderShellState } from "@/hooks/use-reader-shell-state";
 import { useReaderController } from "@/hooks/use-reader-controller";
@@ -118,6 +122,12 @@ import { ReaderImportControls } from "@/components/reader/reader-import-controls
 import { PwaUpdateNotice } from "@/components/reader/pwa-update-notice";
 import { CompletionCelebration } from "@/components/reader/completion-celebration";
 import { GuidedTour } from "@/components/reader/guided-tour";
+import type { StudyToolsPanelProps } from "@/components/reader/study-tools-panel";
+import type {
+  TopicsContentProps,
+  TopicsPanelProps,
+} from "@/components/reader/study-tools/topics-tool";
+import { filterRecordEntries } from "@/lib/leaf-state";
 
 const LazyReaderStudySidebar = lazy(async () => {
   const module = await import("@/components/reader/reader-study-sidebar");
@@ -240,7 +250,6 @@ export function KJVReader() {
   );
   const [concordanceWordAccordionValue, setConcordanceWordAccordionValue] =
     useState<string[]>([]);
-  const [topicsAccordionValue, setTopicsAccordionValue] = useState<string[]>([]);
   const [webstersWordAccordionValue, setWebstersWordAccordionValue] = useState<
     string[]
   >([]);
@@ -251,6 +260,44 @@ export function KJVReader() {
   const [strongsWordAccordionValue, setStrongsWordAccordionValue] = useState<
     string[]
   >([]);
+  const [studyToolsSelectionCommandsByLeafId, setStudyToolsSelectionCommands] =
+    useState<Record<string, StudyToolsSelectionCommand>>({});
+  const nextStudyToolsSelectionCommandIdRef = useRef(0);
+  const queuePanelVerseSelection = useCallback(
+    (
+      leafId: string,
+      selection: {
+        bookIndex: number;
+        chapterIndex: number;
+        verseNumber: number;
+      },
+    ) => {
+      const command: StudyToolsSelectionCommand = {
+        id: ++nextStudyToolsSelectionCommandIdRef.current,
+        type: "verse",
+        ...selection,
+      };
+      setStudyToolsSelectionCommands((current) => ({
+        ...current,
+        [leafId]: command,
+      }));
+    },
+    [],
+  );
+  const queuePanelWordSelection = useCallback(
+    (leafId: string, selection: OpenWordInStudyToolsArgs) => {
+      const command: StudyToolsSelectionCommand = {
+        id: ++nextStudyToolsSelectionCommandIdRef.current,
+        type: "word",
+        ...selection,
+      };
+      setStudyToolsSelectionCommands((current) => ({
+        ...current,
+        [leafId]: command,
+      }));
+    },
+    [],
+  );
   const {
     targetedPanelLeafId,
     targetedPanelLeafIdRef,
@@ -479,13 +526,7 @@ export function KJVReader() {
     return null;
   }, [activeTab, highlightedVerseRangesByLeafId, selectedHighlightScope]);
 
-  const sidebarAvailable = isStudyMode && wordVerseSelectionTarget === "sidebar";
-
-  useEffect(() => {
-    if (wordVerseSelectionTarget !== "sidebar" && isRightSidebarOpen) {
-      setIsRightSidebarOpen(false);
-    }
-  }, [isRightSidebarOpen, setIsRightSidebarOpen, wordVerseSelectionTarget]);
+  const sidebarAvailable = isStudyMode;
 
   const mapWebstersResult = useCallback(
     (key: string, entry: WebstersEntry) => ({ key, entry }),
@@ -509,6 +550,11 @@ export function KJVReader() {
     setActiveReaderWordHighlight,
     setPendingReaderScrollTargets,
   });
+  useEffect(() => {
+    setStudyToolsSelectionCommands((current) =>
+      filterRecordEntries(current, activeLeafIds),
+    );
+  }, [activeLeafIds]);
   const mapOldEnglishResult = useCallback(
     (key: string, definitions: string[]) => ({ key, definitions }),
     [],
@@ -577,22 +623,6 @@ export function KJVReader() {
     applySearch: applyTopicsSearch,
     selectLetter: selectTopicsLetter,
   } = useTopicsTool();
-
-  const applyTopicsFilter = useCallback(
-    (rawValue?: string) => {
-      setTopicsAccordionValue([]);
-      applyTopicsSearch(rawValue);
-    },
-    [applyTopicsSearch],
-  );
-
-  const selectTopicsLetterFilter = useCallback(
-    (letter: string) => {
-      setTopicsAccordionValue([]);
-      selectTopicsLetter(letter);
-    },
-    [selectTopicsLetter],
-  );
 
   const {
     payload: websters,
@@ -1287,7 +1317,7 @@ export function KJVReader() {
           testament: code.startsWith("G") ? "greek" : "hebrew",
           entry,
         });
-        openStudyTool("strongs");
+        showStudyTool("strongs");
       };
 
       if (strongsGreek && strongsHebrew) {
@@ -1314,7 +1344,7 @@ export function KJVReader() {
     },
     [
       ensureStrongsLoaded,
-      openStudyTool,
+      showStudyTool,
       setIsStrongsLoading,
       setIsStrongsSearching,
       setSelectedStrongsEntry,
@@ -1351,6 +1381,7 @@ export function KJVReader() {
     ensureAncientMapsLoaded,
     ensureStrongsLoaded,
     openStudyTool,
+    onPanelWordSelection: queuePanelWordSelection,
     setNotesContext,
     setConcordanceAccordionValue,
     setConcordanceError,
@@ -1397,6 +1428,7 @@ export function KJVReader() {
     crossRefs,
     ensureCrossRefsLoaded,
     openStudyTool,
+    onPanelVerseSelection: queuePanelVerseSelection,
     setCrossRefsError,
     setIsCrossRefsLoading,
     setSelectedCrossReferences,
@@ -1421,7 +1453,12 @@ export function KJVReader() {
       );
       if (!highlightModeEnabled) {
         setActiveReaderWordHighlight(null);
-        openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
+        openCrossReferencesForVerse(
+          bookIndex,
+          chapterIndex,
+          verseNumber,
+          leafId,
+        );
         return;
       }
 
@@ -1701,8 +1738,6 @@ export function KJVReader() {
   const {
     allStudyAccordionsOpen,
     sharedStudyToolsProps,
-    studyToolsPanelProps,
-    topicsPanelProps,
     onExpandAll: expandAllStudyTools,
     onCollapseAll: collapseAllStudyTools,
   } = useStudyToolsViewModel({
@@ -1851,23 +1886,35 @@ export function KJVReader() {
       results: hitchcocksSearchResults,
       onSearch: applyHitchcocksSearch,
     },
-    topicsPanelProps: {
-      isLoading: isTopicsLoading,
-      isSearching: isTopicsSearching,
-      error: topicsError,
-      searchTerm: topicsSearchTerm,
-      selectedLetters: topicsSelectedLetters,
-      availableLetters: topicsAvailableLetters,
-      results: topicsResults,
-      topicAccordionValue: topicsAccordionValue,
-      onTopicAccordionValueChange: setTopicsAccordionValue,
-      onSearch: applyTopicsFilter,
-      onSelectLetter: selectTopicsLetterFilter,
-      renderPreview: referencePreviewContent,
-      onOpenReference: openConcordanceReference,
-      onCloseSidebar: closeRightSidebarForMobile,
-    },
   });
+
+  const studyToolsPanelProps: StudyToolsPanelProps = {
+    books,
+    renderPreview: referencePreviewContent,
+    onOpenReference: openConcordanceReference,
+    onCloseSidebar: closeRightSidebarForMobile,
+    onOpenMapDialog: openMapDialog,
+    onSetNotesContext: setNotesContext,
+  };
+  const topicsPanelProps: TopicsPanelProps = {
+    renderPreview: referencePreviewContent,
+    onOpenReference: openConcordanceReference,
+    onCloseSidebar: closeRightSidebarForMobile,
+  };
+  const topicsSidebarProps: TopicsContentProps = {
+    isLoading: isTopicsLoading,
+    isSearching: isTopicsSearching,
+    error: topicsError,
+    searchTerm: topicsSearchTerm,
+    selectedLetters: topicsSelectedLetters,
+    availableLetters: topicsAvailableLetters,
+    results: topicsResults,
+    onSearch: applyTopicsSearch,
+    onSelectLetter: selectTopicsLetter,
+    renderPreview: referencePreviewContent,
+    onOpenReference: openConcordanceReference,
+    onCloseSidebar: closeRightSidebarForMobile,
+  };
 
   const bookmarksPanelProps = useBookmarksViewModel({
     books,
@@ -2078,6 +2125,7 @@ export function KJVReader() {
         onToggleHighlightMode: toggleHighlightModeForLeaf,
         onBookmarkLeafSelection: bookmarkLeafSelection,
         studyToolsPanelProps,
+        studyToolsSelectionCommandsByLeafId,
         topicsPanelProps,
         bookmarksPanelProps,
         settingsPanelProps,
@@ -2189,7 +2237,7 @@ export function KJVReader() {
               canExpand={!allStudyAccordionsOpen}
               canCollapse={concordanceAccordionValue.length > 0}
               {...sharedStudyToolsProps}
-              topicsProps={topicsPanelProps}
+              topicsProps={topicsSidebarProps}
               notesProps={notesSidebarProps}
               bookmarksProps={bookmarksPanelProps}
             />

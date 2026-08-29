@@ -2,7 +2,10 @@ import { useCallback, useRef } from "react";
 
 import { chapterVerseKey, normalizeConcordanceWord, normalizeStrongsCode } from "@/lib/references";
 import { resolveWordTokenAtLocation } from "@/lib/word-study-selection";
-import type { CrossRefsPayload } from "@/types/reader";
+import type {
+  CrossRefsPayload,
+  StudyToolsDestination,
+} from "@/types/reader";
 import type { NotesContext, NoteLinkTarget } from "@/types/notes";
 import type { Book, VerseToken } from "@/types/bible";
 
@@ -47,7 +50,18 @@ type UseWordStudyNavigationParams = {
   books: Book[];
   crossRefs: CrossRefsPayload | null;
   ensureCrossRefsLoaded: () => Promise<CrossRefsPayload>;
-  openStudyTool: (tool: "cross-refs" | "concordance") => void;
+  openStudyTool: (
+    tool: "cross-refs" | "concordance",
+    options?: { sourceLeafId?: string | null },
+  ) => StudyToolsDestination | null;
+  onPanelVerseSelection: (
+    leafId: string,
+    selection: {
+      bookIndex: number;
+      chapterIndex: number;
+      verseNumber: number;
+    },
+  ) => void;
   setCrossRefsError: (value: string | null) => void;
   setIsCrossRefsLoading: (value: boolean) => void;
   setSelectedCrossReferences: (value: {
@@ -74,7 +88,8 @@ type UseWordStudyNavigationParams = {
     verseNumber: number | null;
     tokenIndex: number | null;
     strongCode: string | null;
-  }) => void;
+    sourceLeafId: string | null;
+  }) => StudyToolsDestination | void;
   setTokenPopup: (value: { token: VerseToken; x: number; y: number } | null) => void;
 };
 
@@ -118,6 +133,7 @@ export function useWordStudyNavigation({
   crossRefs,
   ensureCrossRefsLoaded,
   openStudyTool,
+  onPanelVerseSelection,
   setCrossRefsError,
   setIsCrossRefsLoading,
   setSelectedCrossReferences,
@@ -132,7 +148,12 @@ export function useWordStudyNavigation({
   const crossRefsRequestIdRef = useRef(0);
 
   const openCrossReferencesForVerse = useCallback(
-    (bookIndex: number, chapterIndex: number, verseNumber: number) => {
+    (
+      bookIndex: number,
+      chapterIndex: number,
+      verseNumber: number,
+      sourceLeafId?: string | null,
+    ) => {
       const requestId = ++crossRefsRequestIdRef.current;
       setNotesContext({
         bookIndex,
@@ -141,7 +162,15 @@ export function useWordStudyNavigation({
       });
       const key = chapterVerseKey(bookIndex, chapterIndex, verseNumber);
 
-      openStudyTool("cross-refs");
+      const selectionTarget = openStudyTool("cross-refs", { sourceLeafId });
+      if (selectionTarget?.type === "panel") {
+        onPanelVerseSelection(selectionTarget.leafId, {
+          bookIndex,
+          chapterIndex,
+          verseNumber,
+        });
+        return selectionTarget;
+      }
       setCrossRefsError(null);
       setIsCrossRefsLoading(true);
 
@@ -158,7 +187,7 @@ export function useWordStudyNavigation({
 
       if (crossRefs) {
         applyCrossRefsSelection(crossRefs);
-        return;
+        return selectionTarget ?? undefined;
       }
 
       void ensureCrossRefsLoaded()
@@ -176,10 +205,12 @@ export function useWordStudyNavigation({
           setCrossRefsError(message);
           setIsCrossRefsLoading(false);
         });
+      return selectionTarget ?? undefined;
     },
     [
       crossRefs,
       ensureCrossRefsLoaded,
+      onPanelVerseSelection,
       openStudyTool,
       setCrossRefsError,
       setIsCrossRefsLoading,
@@ -221,8 +252,9 @@ export function useWordStudyNavigation({
           target.bookIndex,
           target.chapterIndex,
           target.verseNumber,
+          leafId,
         );
-        openWordInStudyTools({
+        const studyToolsTarget = openWordInStudyTools({
           rawWord,
           bookIndex: target.bookIndex,
           chapterIndex: target.chapterIndex,
@@ -231,15 +263,18 @@ export function useWordStudyNavigation({
           strongCode: matchedToken?.token.strong
             ? normalizeStrongsCode(matchedToken.token.strong)
             : null,
+          sourceLeafId: leafId,
         });
-        syncTokenAccordionState(rawWord, {
-          bookIndex: target.bookIndex,
-          chapterIndex: target.chapterIndex,
-          verseNumber: target.verseNumber,
-          strongCode: matchedToken?.token.strong
-            ? normalizeStrongsCode(matchedToken.token.strong)
-            : null,
-        });
+        if (studyToolsTarget?.type !== "panel") {
+          syncTokenAccordionState(rawWord, {
+            bookIndex: target.bookIndex,
+            chapterIndex: target.chapterIndex,
+            verseNumber: target.verseNumber,
+            strongCode: matchedToken?.token.strong
+              ? normalizeStrongsCode(matchedToken.token.strong)
+              : null,
+          });
+        }
         return;
       }
 
@@ -286,7 +321,12 @@ export function useWordStudyNavigation({
 
       const rawWord = normalizeConcordanceWord(token.text);
       if (Number.isFinite(verseNumber) && verseNumber > 0) {
-        openCrossReferencesForVerse(bookIndex, chapterIndex, verseNumber);
+        openCrossReferencesForVerse(
+          bookIndex,
+          chapterIndex,
+          verseNumber,
+          leafId,
+        );
         if (rawWord) {
           setActiveReaderWordHighlight({
             leafId,
@@ -328,6 +368,7 @@ export function useWordStudyNavigation({
           Number.isFinite(verseNumber) && verseNumber > 0 ? verseNumber : null,
         tokenIndex,
         strongCode: normalizedCode,
+        sourceLeafId: leafId,
       });
     },
     [

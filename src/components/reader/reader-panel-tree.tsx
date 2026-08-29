@@ -59,6 +59,7 @@ import type {
   PanelNode,
   SearchPageState,
   StaticPageId,
+  StudyToolsSelectionCommand,
 } from "@/types/reader";
 import { cn } from "@/lib/utils";
 import { countLeaves, findParentSplitForLeaf } from "@/lib/reader-layout";
@@ -307,6 +308,10 @@ export type ReaderPanelTreeProps = {
   onToggleHighlightMode: (leafId: string) => void;
   onBookmarkLeafSelection: (leafId: string) => void;
   studyToolsPanelProps: StudyToolsPanelProps;
+  studyToolsSelectionCommandsByLeafId: Record<
+    string,
+    StudyToolsSelectionCommand
+  >;
   topicsPanelProps: TopicsPanelProps;
   bookmarksPanelProps: BookmarksToolProps;
   settingsPanelProps: SettingsPanelContentProps;
@@ -416,6 +421,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   onToggleHighlightMode,
   onBookmarkLeafSelection,
   studyToolsPanelProps,
+  studyToolsSelectionCommandsByLeafId,
   topicsPanelProps,
   bookmarksPanelProps,
   settingsPanelProps,
@@ -1640,7 +1646,12 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
         ) : leaf.view === "tools" ? (
           <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
             <Suspense fallback={AUXILIARY_PANEL_FALLBACK}>
-              <LazyStudyToolsPanel {...studyToolsPanelProps} />
+              <LazyStudyToolsPanel
+                {...studyToolsPanelProps}
+                selectionCommand={
+                  studyToolsSelectionCommandsByLeafId[leaf.id]
+                }
+              />
             </Suspense>
           </CardContent>
         ) : leaf.view === "topics" ? (
@@ -1895,6 +1906,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   onToggleHighlightMode,
   onBookmarkLeafSelection,
   studyToolsPanelProps,
+  studyToolsSelectionCommandsByLeafId,
   topicsPanelProps,
   bookmarksPanelProps,
   settingsPanelProps,
@@ -1994,6 +2006,9 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       onToggleHighlightMode={onToggleHighlightMode}
       onBookmarkLeafSelection={onBookmarkLeafSelection}
       studyToolsPanelProps={studyToolsPanelProps}
+      studyToolsSelectionCommandsByLeafId={
+        studyToolsSelectionCommandsByLeafId
+      }
       topicsPanelProps={topicsPanelProps}
       bookmarksPanelProps={bookmarksPanelProps}
       settingsPanelProps={settingsPanelProps}

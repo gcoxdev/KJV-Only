@@ -35,6 +35,7 @@ import type {
   PhraseEntry,
   PhrasesPayload,
   StrongsPayload,
+  StudyToolsDestination,
   StudyWorkspaceTool,
   UnitsEntry,
   UnitsPayload,
@@ -73,7 +74,14 @@ type WordStudyCoordinatorParams = {
     greek: StrongsPayload;
     hebrew: StrongsPayload;
   }>;
-  openStudyTool: (tool: StudyWorkspaceTool) => void;
+  openStudyTool: (
+    tool: StudyWorkspaceTool,
+    options?: { sourceLeafId?: string | null },
+  ) => StudyToolsDestination | null | void;
+  onPanelWordSelection?: (
+    leafId: string,
+    selection: OpenWordInStudyToolsArgs,
+  ) => void;
   setNotesContext: Setter<NotesContext | null>;
   setConcordanceAccordionValue: Setter<string[]>;
   setConcordanceError: Setter<string | null>;
@@ -142,6 +150,7 @@ export type OpenWordInStudyToolsArgs = {
   verseNumber: number | null;
   tokenIndex: number | null;
   strongCode: string | null;
+  sourceLeafId: string | null;
 };
 
 export function useWordStudyCoordinator({
@@ -170,6 +179,7 @@ export function useWordStudyCoordinator({
   ensureAncientMapsLoaded,
   ensureStrongsLoaded,
   openStudyTool,
+  onPanelWordSelection,
   setNotesContext,
   setConcordanceAccordionValue,
   setConcordanceError,
@@ -208,14 +218,28 @@ export function useWordStudyCoordinator({
 }: WordStudyCoordinatorParams) {
   const requestIdRef = useRef(0);
 
-  function openWordInStudyTools({
-    rawWord,
-    bookIndex,
-    chapterIndex,
-    verseNumber,
-    tokenIndex,
-    strongCode,
-  }: OpenWordInStudyToolsArgs) {
+  function openWordInStudyTools(selection: OpenWordInStudyToolsArgs) {
+    const {
+      rawWord,
+      bookIndex,
+      chapterIndex,
+      verseNumber,
+      tokenIndex,
+      strongCode,
+      sourceLeafId,
+    } = selection;
+    setNotesContext(
+      verseNumber !== null
+        ? { bookIndex, chapterIndex, verseNumber, word: rawWord }
+        : { bookIndex, chapterIndex, word: rawWord },
+    );
+
+    const selectionTarget = openStudyTool("concordance", { sourceLeafId });
+    if (selectionTarget?.type === "panel") {
+      onPanelWordSelection?.(selectionTarget.leafId, selection);
+      return selectionTarget;
+    }
+
     const requestId = ++requestIdRef.current;
     const isCurrentRequest = () => requestIdRef.current === requestId;
     const finishConcordanceMeasure = beginPerformanceMeasure(
@@ -251,13 +275,6 @@ export function useWordStudyCoordinator({
       );
     };
 
-    setNotesContext(
-      verseNumber !== null
-        ? { bookIndex, chapterIndex, verseNumber, word: rawWord }
-        : { bookIndex, chapterIndex, word: rawWord },
-    );
-
-    openStudyTool("concordance");
     setConcordanceError(null);
     setIsConcordanceLoading(true);
     setConcordanceSearchTerm("");
@@ -552,6 +569,7 @@ export function useWordStudyCoordinator({
         setIsStrongsLoading(false);
       }
     });
+    return selectionTarget ?? undefined;
   }
 
   return { openWordInStudyTools };

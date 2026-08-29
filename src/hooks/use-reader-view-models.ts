@@ -8,10 +8,8 @@ import {
 import type { ProgressPanelContentProps } from "@/components/reader/progress-dialog";
 import type { ReaderStudyToolsContentProps } from "@/components/reader/reader-study-tools-content";
 import type { SettingsPanelContentProps } from "@/components/reader/settings-dialog";
-import type { StudyToolsPanelProps } from "@/components/reader/study-tools-panel";
 import type { BookmarksToolProps } from "@/components/reader/study-tools/bookmarks-tool";
 import type { NotesTool } from "@/components/reader/study-tools/notes-tool";
-import type { TopicsPanelProps } from "@/components/reader/study-tools/topics-tool";
 import {
   STUDY_ACCORDION_ITEMS,
   deriveStudySidebarState,
@@ -62,7 +60,6 @@ type UseStudyToolsViewModelParams = {
   mapsProps: StudyToolInput<"mapsProps">;
   genealogyProps: StudyToolInput<"genealogyProps">;
   hitchcocksProps: StudyToolInput<"hitchcocksProps">;
-  topicsPanelProps: TopicsPanelProps;
 };
 
 export function useStudyToolsViewModel({
@@ -82,7 +79,6 @@ export function useStudyToolsViewModel({
   mapsProps,
   genealogyProps,
   hitchcocksProps,
-  topicsPanelProps,
 }: UseStudyToolsViewModelParams) {
   const sidebarState = deriveStudySidebarState({
     accordionValue,
@@ -167,21 +163,9 @@ export function useStudyToolsViewModel({
     },
   };
 
-  const studyToolsPanelProps: StudyToolsPanelProps = {
-    accordionValue,
-    onAccordionValueChange,
-    onExpandAll,
-    onCollapseAll,
-    canExpand: !sidebarState.allStudyAccordionsOpen,
-    canCollapse: accordionValue.length > 0,
-    ...sharedStudyToolsProps,
-  };
-
   return {
     allStudyAccordionsOpen: sidebarState.allStudyAccordionsOpen,
     sharedStudyToolsProps,
-    studyToolsPanelProps,
-    topicsPanelProps,
     onExpandAll,
     onCollapseAll,
   };

@@ -238,6 +238,28 @@ export type StudyWorkspaceTool =
   | "maps"
   | "genealogy"
   | "hitchcocks";
+export type StudyToolsDestination =
+  | { type: "sidebar" }
+  | { type: "panel"; leafId: string };
+export type StudyToolsSelectionCommand =
+  | {
+      id: number;
+      type: "verse";
+      bookIndex: number;
+      chapterIndex: number;
+      verseNumber: number;
+    }
+  | {
+      id: number;
+      type: "word";
+      rawWord: string;
+      bookIndex: number;
+      chapterIndex: number;
+      verseNumber: number | null;
+      tokenIndex: number | null;
+      strongCode: string | null;
+      sourceLeafId: string | null;
+    };
 export type WordVerseSelectionTarget =
   | "sidebar"
   | "new-tab"

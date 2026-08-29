@@ -178,7 +178,6 @@ describe("reader view-model adapters", () => {
       mapsProps: marker,
       genealogyProps: marker,
       hitchcocksProps: marker,
-      topicsPanelProps: marker,
     } as unknown as Parameters<typeof useStudyToolsViewModel>[0];
 
     const model = useStudyToolsViewModel(params);
@@ -187,8 +186,6 @@ describe("reader view-model adapters", () => {
     model.onExpandAll();
 
     expect(model.allStudyAccordionsOpen).toBe(true);
-    expect(model.studyToolsPanelProps.canExpand).toBe(false);
-    expect(model.studyToolsPanelProps.canCollapse).toBe(true);
     expect(model.sharedStudyToolsProps.crossRefsProps).toMatchObject({
       hasInfo: true,
       isOpen: true,
@@ -238,13 +235,11 @@ describe("reader view-model adapters", () => {
       mapsProps: marker,
       genealogyProps: marker,
       hitchcocksProps: marker,
-      topicsPanelProps: marker,
     } as unknown as Parameters<typeof useStudyToolsViewModel>[0]);
 
     expect(model.allStudyAccordionsOpen).toBe(false);
     expect(model.sharedStudyToolsProps.kjvWordsPhrasesProps.isOpen).toBe(true);
     expect(model.sharedStudyToolsProps.kjvWordsPhrasesProps.hasInfo).toBe(false);
-    expect(model.studyToolsPanelProps.canExpand).toBe(true);
   });
 
   it("adapts settings actions without changing their public values", () => {
