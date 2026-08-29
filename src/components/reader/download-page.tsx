@@ -23,6 +23,7 @@ import {
   Progress,
   ProgressLabel,
 } from "@/components/ui/progress";
+import { PwaRecoveryPanel } from "@/components/reader/pwa-recovery-panel";
 import {
   GENEALOGY_ASSET_VERSION,
   STRONGS_ASSET_VERSION,
@@ -42,6 +43,8 @@ type DownloadPageProps = {
   canInstallPwa?: boolean;
   isPwaInstalled?: boolean;
   onInstallPwa?: () => void | Promise<void>;
+  onExportNotes?: () => void;
+  onExportBookmarks?: () => void;
 };
 
 type BundleId = "core" | "maps" | "audio-ot" | "audio-nt";
@@ -95,6 +98,8 @@ export function DownloadPage({
   canInstallPwa = false,
   isPwaInstalled = false,
   onInstallPwa,
+  onExportNotes,
+  onExportBookmarks,
 }: DownloadPageProps) {
   const [coreUrls, setCoreUrls] = useState<string[] | null>(null);
   const [corePreparationError, setCorePreparationError] = useState<string | null>(
@@ -333,6 +338,14 @@ export function DownloadPage({
     }
   }, [activeBundleId, clearingBundleId, refreshBundleStatuses, refreshStorageEstimate]);
 
+  const coreBundle = bundleDefinitions.find((bundle) => bundle.id === "core") ?? null;
+  const refreshCoreBundle = useCallback(async () => {
+    if (!coreBundle) {
+      return;
+    }
+    await runBundleDownload(coreBundle, true);
+  }, [coreBundle, runBundleDownload]);
+
   return (
     <div className="flex flex-col gap-6">
       <Card className="border-border/70 bg-card/70 shadow-sm">
@@ -373,6 +386,20 @@ export function DownloadPage({
           </p>
         </CardContent>
       </Card>
+
+      <PwaRecoveryPanel
+        canRefreshCore={
+          coreBundle !== null &&
+          coreBundle.urls.length > 0 &&
+          !coreBundle.preparationError &&
+          activeBundleId === null &&
+          clearingBundleId === null
+        }
+        isRefreshingCore={activeBundleId === "core"}
+        onRefreshCore={refreshCoreBundle}
+        onExportNotes={onExportNotes}
+        onExportBookmarks={onExportBookmarks}
+      />
 
       <Card className="border-border/70 bg-card/70 shadow-sm">
         <CardHeader>

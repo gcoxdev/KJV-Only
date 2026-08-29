@@ -160,6 +160,120 @@ test("refreshes manifests and keeps the complete app shell usable offline", asyn
   expect(consoleErrors).toEqual([])
 })
 
+test("offers a controlled update and reloads only after confirmation", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/")
+  await expect(page.getByRole("button", { name: "Genesis 1", exact: true })).toBeVisible()
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready
+  })
+  await expect
+    .poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)))
+    .toBe(true)
+
+  const secondPage = await context.newPage()
+  await secondPage.goto("/")
+  await expect(
+    secondPage.getByRole("button", { name: "Genesis 1", exact: true }),
+  ).toBeVisible()
+  await expect
+    .poll(() =>
+      secondPage.evaluate(() => Boolean(navigator.serviceWorker.controller)),
+    )
+    .toBe(true)
+
+  await page.evaluate(async () => {
+    const config = (
+      globalThis as typeof globalThis & {
+        KJV_ONLY_CACHE_CONFIG?: {
+          cacheName: string
+          cachePrefix: string
+        }
+      }
+    ).KJV_ONLY_CACHE_CONFIG
+    if (!config) {
+      throw new Error("Missing application cache configuration")
+    }
+    const workerUrl = new URL("/sw.js", window.location.origin)
+    workerUrl.searchParams.set("cacheName", config.cacheName)
+    workerUrl.searchParams.set("cachePrefix", config.cachePrefix)
+    workerUrl.searchParams.set("notification-test", "1")
+    await navigator.serviceWorker.register(workerUrl.href, {
+      updateViaCache: "none",
+    })
+  })
+
+  await expect(
+    page.getByText("A new version is ready.", { exact: true }),
+  ).toBeVisible({ timeout: 30_000 })
+  const updateNotice = page.getByRole("region", { name: "Application update" })
+  await page.getByRole("button", { name: "Details", exact: true }).click()
+  await expect(
+    page.getByRole("heading", { name: "Download", exact: true }),
+  ).toBeVisible()
+
+  const recoveryCard = page
+    .getByText("App Updates and Recovery", { exact: true })
+    .locator('xpath=ancestor::*[@data-slot="card"][1]')
+  await expect(recoveryCard.getByText("Update ready", { exact: true })).toBeVisible()
+  await updateNotice.getByRole("button", { name: "Later", exact: true }).click()
+  await expect(updateNotice).toHaveCount(0)
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const controllerUrl = navigator.serviceWorker.controller?.scriptURL
+        return controllerUrl
+          ? new URL(controllerUrl).searchParams.get("notification-test")
+          : null
+      }),
+    )
+    .toBeNull()
+  await expect
+    .poll(() =>
+      secondPage.evaluate(() => {
+        const controllerUrl = navigator.serviceWorker.controller?.scriptURL
+        return controllerUrl
+          ? new URL(controllerUrl).searchParams.get("notification-test")
+          : null
+      }),
+    )
+    .toBeNull()
+
+  await Promise.all([
+    page.waitForEvent("load"),
+    secondPage.waitForEvent("load"),
+    recoveryCard
+      .getByRole("button", { name: "Update and Reload", exact: true })
+      .click(),
+  ])
+  await expect(page.getByRole("button", { name: "Genesis 1", exact: true })).toBeVisible()
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const controllerUrl = navigator.serviceWorker.controller?.scriptURL
+        return controllerUrl
+          ? new URL(controllerUrl).searchParams.get("notification-test")
+          : null
+      }),
+    )
+    .toBe("1")
+  await expect(
+    secondPage.getByRole("button", { name: "Genesis 1", exact: true }),
+  ).toBeVisible()
+  await expect
+    .poll(() =>
+      secondPage.evaluate(() => {
+        const controllerUrl = navigator.serviceWorker.controller?.scriptURL
+        return controllerUrl
+          ? new URL(controllerUrl).searchParams.get("notification-test")
+          : null
+      }),
+    )
+    .toBe("1")
+})
+
 test("upgrades and reads only application-owned caches", async ({ page, context }) => {
   await page.goto("/")
   await expect(page.getByRole("button", { name: "Genesis 1", exact: true })).toBeVisible()
@@ -180,12 +294,49 @@ test("upgrades and reads only application-owned caches", async ({ page, context 
     workerUrl.searchParams.set("cacheName", config.cacheName)
     workerUrl.searchParams.set("cachePrefix", config.cachePrefix)
     workerUrl.searchParams.set("upgrade-test", "1")
-    const registration = await navigator.serviceWorker.ready
-    await registration.unregister()
+    const readyRegistration = await navigator.serviceWorker.ready
+    await readyRegistration.unregister()
     await caches.open("kjv-only-cache-obsolete-test")
     await caches.open("unrelated-application-cache")
-    await navigator.serviceWorker.register(workerUrl.href)
+    const registration = await navigator.serviceWorker.register(workerUrl.href, {
+      updateViaCache: "none",
+    })
+    const installingWorker = registration.installing
+    if (installingWorker && installingWorker.state !== "installed") {
+      await new Promise<void>((resolve, reject) => {
+        const timeoutId = window.setTimeout(
+          () => reject(new Error("Timed out waiting for the upgrade worker")),
+          30_000,
+        )
+        installingWorker.addEventListener("statechange", () => {
+          if (installingWorker.state === "installed") {
+            window.clearTimeout(timeoutId)
+            resolve()
+          } else if (installingWorker.state === "redundant") {
+            window.clearTimeout(timeoutId)
+            reject(new Error("The upgrade worker became redundant"))
+          }
+        })
+      })
+    }
+    if (!registration.waiting) {
+      throw new Error("The upgrade worker did not wait for confirmation")
+    }
   })
+
+  await Promise.all([
+    page.waitForEvent("load"),
+    page.evaluate(async () => {
+      const registrations = await navigator.serviceWorker.getRegistrations()
+      const waitingWorker = registrations.find(
+        (registration) => registration.waiting,
+      )?.waiting
+      if (!waitingWorker) {
+        throw new Error("The upgrade worker is no longer waiting")
+      }
+      waitingWorker.postMessage({ type: "KJV_ONLY_SKIP_WAITING" })
+    }),
+  ])
 
   await expect
     .poll(

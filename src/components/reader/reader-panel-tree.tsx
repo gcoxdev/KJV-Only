@@ -314,6 +314,8 @@ export type ReaderPanelTreeProps = {
   canInstallPwa: boolean;
   isPwaInstalled: boolean;
   onInstallPwa: () => void | Promise<void>;
+  onExportNotes: () => void;
+  onExportBookmarks: () => void;
   renderReferencePreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
   onCloseSidebar: () => void;
@@ -421,6 +423,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   canInstallPwa,
   isPwaInstalled,
   onInstallPwa,
+  onExportNotes,
+  onExportBookmarks,
   renderReferencePreview,
   onOpenReference,
   onCloseSidebar,
@@ -1672,6 +1676,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 canInstallPwa={canInstallPwa}
                 isPwaInstalled={isPwaInstalled}
                 onInstallPwa={onInstallPwa}
+                onExportNotes={onExportNotes}
+                onExportBookmarks={onExportBookmarks}
                 renderPreview={renderReferencePreview}
                 onOpenReference={onOpenReference}
                 onCloseSidebar={onCloseSidebar}
@@ -1896,6 +1902,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   canInstallPwa,
   isPwaInstalled,
   onInstallPwa,
+  onExportNotes,
+  onExportBookmarks,
   renderReferencePreview,
   onOpenReference,
   onCloseSidebar,
@@ -1993,6 +2001,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       canInstallPwa={canInstallPwa}
       isPwaInstalled={isPwaInstalled}
       onInstallPwa={onInstallPwa}
+      onExportNotes={onExportNotes}
+      onExportBookmarks={onExportBookmarks}
       renderReferencePreview={renderReferencePreview}
       onOpenReference={onOpenReference}
       onCloseSidebar={onCloseSidebar}

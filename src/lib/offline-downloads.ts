@@ -3,7 +3,7 @@ import { bookCodeForIndex } from "@/lib/reader-view";
 
 const FALLBACK_CACHE_CONFIG = {
   cachePrefix: "kjv-only-cache-",
-  cacheName: "kjv-only-cache-v7",
+  cacheName: "kjv-only-cache-v8",
 } as const;
 
 const APP_SHELL_ASSET_MANIFEST_URL = "/app-shell-assets.json";
