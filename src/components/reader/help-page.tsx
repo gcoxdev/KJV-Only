@@ -359,6 +359,12 @@ const HELP_SECTIONS: HelpSection[] = [
         keywords: ["cross refs", "cross references"],
       },
       {
+        label: "How to preview context around a tool reference",
+        body:
+          "Hover, focus, or tap a Scripture reference in a study tool to preview it. Choose Context in the preview to include the surrounding verses, or Open to navigate to the reference. Settings > Other controls how many verses are shown before and after both tool references and Search results.",
+        keywords: ["reference preview", "popover", "context", "surrounding verses", "open reference"],
+      },
+      {
         label: "How to use Concordance",
         body:
           "Concordance is best for tracing repeated Bible vocabulary. Clicking a word in the text or selecting a concordance result will show matching references for that term.",
@@ -461,7 +467,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to sort and inspect search results",
         body:
-          "Sort results by Relevance or Bible order. Context adds the preceding and following verse around each match. Facets shows Old Testament, New Testament, and per-book counts for the currently loaded result set; it reports counts rather than changing the book scope.",
+          "Sort results by Relevance or Bible order. Context adds the configured number of verses before and after each match without crossing a chapter boundary; change the amount under Settings > Other. Facets shows Old Testament, New Testament, and per-book counts for the currently loaded result set; it reports counts rather than changing the book scope.",
         keywords: ["sort results", "relevance", "bible order", "context", "facets", "result counts"],
       },
       {
@@ -571,8 +577,8 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What the Other tab controls",
         body:
-          "The Other tab controls whether Welcome Home opens as the active tab when the app starts without a shared layout. Genesis 1 remains available as the reader tab either way.",
-        keywords: ["other tab", "welcome home startup", "startup tab", "genesis"],
+          "The Other tab controls how many surrounding verses Search Context and reference previews show before and after a match. It also controls whether Welcome Home opens as the active tab when the app starts without a shared layout. Genesis 1 remains available as the reader tab either way.",
+        keywords: ["other tab", "context verses", "surrounding verses", "welcome home startup", "startup tab", "genesis"],
       },
       {
         label: "How to change highlight colors",

@@ -1,4 +1,8 @@
 import { defaultHighlightColor, normalizeHighlightColor } from "@/lib/highlight-color"
+import {
+  MAX_CONTEXT_VERSE_COUNT,
+  MIN_CONTEXT_VERSE_COUNT,
+} from "@/lib/context-verses"
 import type {
   BookmarkOpenTarget,
   NotesLinkOpenTarget,
@@ -41,6 +45,7 @@ export type ReaderDisplaySettings = {
   lightHighlightColor: string
   darkHighlightColor: string
   verseSpacing: number
+  contextVerseCount: number
   hideReadModeVerseNumbers: boolean
   readModeParagraphIndent: boolean
   flowVersesByParagraph: boolean
@@ -90,6 +95,7 @@ export function defaultReaderDisplaySettings(): ReaderDisplaySettings {
     lightHighlightColor: highlightColor,
     darkHighlightColor: highlightColor,
     verseSpacing: 0,
+    contextVerseCount: 1,
     hideReadModeVerseNumbers: false,
     readModeParagraphIndent: false,
     flowVersesByParagraph: false,
@@ -142,6 +148,12 @@ export function parseReaderDisplaySettings(
       defaults.verseSpacing,
       0,
       24,
+    ),
+    contextVerseCount: finiteClampedInteger(
+      value.contextVerseCount,
+      defaults.contextVerseCount,
+      MIN_CONTEXT_VERSE_COUNT,
+      MAX_CONTEXT_VERSE_COUNT,
     ),
     hideReadModeVerseNumbers:
       typeof value.hideReadModeVerseNumbers === "boolean"

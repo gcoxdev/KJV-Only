@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 
+import { clampContextVerseCount } from "@/lib/context-verses";
 import {
   compareSearchMatchesCanonically,
   formatSearchResultsText,
@@ -14,6 +15,7 @@ type UseSearchResultPresentationOptions = {
   results: SearchMatch[];
   resultSort: SearchResultSort;
   showResultContext: boolean;
+  contextVerseCount: number;
   verseIndex: VerseSearchIndexEntry[];
   searchSummary: string;
 };
@@ -23,6 +25,7 @@ export function useSearchResultPresentation({
   results,
   resultSort,
   showResultContext,
+  contextVerseCount,
   verseIndex,
   searchSummary,
 }: UseSearchResultPresentationOptions) {
@@ -39,6 +42,7 @@ export function useSearchResultPresentation({
     if (!showResultContext || results.length === 0) {
       return contexts;
     }
+    const perSideCount = clampContextVerseCount(contextVerseCount);
     const indexByKey = new Map<string, number>();
     verseIndex.forEach((entry, index) => {
       indexByKey.set(searchMatchKey(entry), index);
@@ -55,26 +59,28 @@ export function useSearchResultPresentation({
       if (index === undefined) {
         continue;
       }
-      const previousEntry = verseIndex[index - 1];
-      const nextEntry = verseIndex[index + 1];
-      const previous =
-        previousEntry &&
-        previousEntry.bookIndex === match.bookIndex &&
-        previousEntry.chapterIndex === match.chapterIndex
-          ? toMatch(previousEntry)
-          : null;
-      const next =
-        nextEntry &&
-        nextEntry.bookIndex === match.bookIndex &&
-        nextEntry.chapterIndex === match.chapterIndex
-          ? toMatch(nextEntry)
-          : null;
-      if (previous || next) {
-        contexts.set(searchMatchKey(match), { previous, next });
+      const before = verseIndex
+        .slice(Math.max(0, index - perSideCount), index)
+        .filter(
+          (entry) =>
+            entry.bookIndex === match.bookIndex &&
+            entry.chapterIndex === match.chapterIndex,
+        )
+        .map(toMatch);
+      const after = verseIndex
+        .slice(index + 1, index + perSideCount + 1)
+        .filter(
+          (entry) =>
+            entry.bookIndex === match.bookIndex &&
+            entry.chapterIndex === match.chapterIndex,
+        )
+        .map(toMatch);
+      if (before.length > 0 || after.length > 0) {
+        contexts.set(searchMatchKey(match), { before, after });
       }
     }
     return contexts;
-  }, [results, showResultContext, verseIndex]);
+  }, [contextVerseCount, results, showResultContext, verseIndex]);
 
   const getExportText = useCallback(
     () =>

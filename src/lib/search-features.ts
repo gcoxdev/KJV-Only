@@ -237,8 +237,8 @@ export function searchMatchKey(
 }
 
 export type SearchResultContext = {
-  previous: SearchMatch | null;
-  next: SearchMatch | null;
+  before: SearchMatch[];
+  after: SearchMatch[];
 };
 
 export function formatSearchResultsText(args: {
@@ -255,14 +255,12 @@ export function formatSearchResultsText(args: {
   for (const match of args.results) {
     const reference = `${match.bookName} ${match.chapterIndex + 1}:${match.verseNumber}`;
     const context = args.contextByMatchKey?.get(searchMatchKey(match));
-    if (context?.previous) {
-      lines.push(
-        `  Before (${context.previous.verseNumber}) ${context.previous.text}`,
-      );
+    for (const before of context?.before ?? []) {
+      lines.push(`  Before (${before.verseNumber}) ${before.text}`);
     }
     lines.push(`${reference} — ${match.text}`);
-    if (context?.next) {
-      lines.push(`  After (${context.next.verseNumber}) ${context.next.text}`);
+    for (const after of context?.after ?? []) {
+      lines.push(`  After (${after.verseNumber}) ${after.text}`);
     }
     lines.push("");
   }
