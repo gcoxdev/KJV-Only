@@ -2156,7 +2156,10 @@ export function KJVReader() {
     />
   );
   return (
-    <ToolReferenceDisplayModeProvider mode={toolReferenceDisplayMode}>
+    <ToolReferenceDisplayModeProvider
+      mode={toolReferenceDisplayMode}
+      books={books}
+    >
       <main
         className="reader-shell h-screen w-full overflow-hidden bg-background"
         style={

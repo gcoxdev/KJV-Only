@@ -252,6 +252,52 @@ test("uses context and reference display preferences across Search and tools", a
     .click()
   const sidebar = page.locator('[data-tour="sidebar"]')
   await sidebar.getByRole("button", { name: /^References \d+$/ }).click()
+  const referenceButtons = sidebar
+    .locator('[data-tool-reference-display="buttons"]')
+    .first()
+  await expect(referenceButtons.locator(":scope > button").first()).toHaveText(
+    "EXO.20.11",
+  )
+
+  const referenceFilter = sidebar.locator("[data-tool-reference-filter]").first()
+  await expect(referenceFilter).toContainText("62 references in Bible order")
+  await referenceFilter.getByRole("button", { name: "Filters" }).click()
+  const filterPopover = page
+    .locator('[data-slot="popover-content"]')
+    .filter({ hasText: "Filter References" })
+  const oldTestamentFilter = filterPopover.getByRole("checkbox", {
+    name: "Old Testament",
+    exact: true,
+  })
+  const newTestamentFilter = filterPopover.getByRole("checkbox", {
+    name: "New Testament",
+    exact: true,
+  })
+  await expect(oldTestamentFilter).toBeChecked()
+  await expect(newTestamentFilter).toBeChecked()
+  await filterPopover.getByText("Old Testament", { exact: true }).click()
+  await expect(oldTestamentFilter).not.toBeChecked()
+  await expect(newTestamentFilter).toBeChecked()
+  await expect(referenceFilter).toContainText(/Showing \d+ of 62 references/)
+  await expect(
+    referenceButtons.getByRole("button", { name: "EXO.20.11", exact: true }),
+  ).toHaveCount(0)
+  await expect(
+    referenceButtons.getByRole("button", { name: "HEB.11.3", exact: true }),
+  ).toBeVisible()
+
+  await filterPopover.getByText("Hebrews", { exact: true }).click()
+  await expect(
+    referenceButtons.getByRole("button", { name: "HEB.11.3", exact: true }),
+  ).toHaveCount(0)
+  await filterPopover
+    .getByRole("button", { name: "Show all references" })
+    .click()
+  await expect(oldTestamentFilter).toBeChecked()
+  await expect(newTestamentFilter).toBeChecked()
+  await expect(referenceFilter).toContainText("62 references in Bible order")
+  await page.keyboard.press("Escape")
+
   const referenceButton = sidebar.getByRole("button", {
     name: "HEB.11.3",
     exact: true,
@@ -353,9 +399,11 @@ test("uses context and reference display preferences across Search and tools", a
     scrollWidth: container.scrollWidth,
   }))
   expect(tableWidths.scrollWidth).toBeLessThanOrEqual(tableWidths.clientWidth + 1)
-  await expect(
-    referenceTable.getByRole("button", { name: /Show more \(\d+ remaining\)/ }),
-  ).toBeVisible()
+  const showMoreReferences = referenceTable.getByRole("button", {
+    name: /Show more \(\d+ remaining\)/,
+  })
+  await expect(showMoreReferences).toBeVisible()
+  await showMoreReferences.click()
   const hebrewsRow = referenceTable
     .getByRole("row")
     .filter({ hasText: "Hebrews 11:3" })
