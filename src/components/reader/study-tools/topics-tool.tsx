@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { BookTextIcon, LoaderCircleIcon } from "lucide-react";
 
-import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
+import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 import { StudySearchForm } from "@/components/reader/study-search-form";
 import { cn } from "@/lib/utils";
 import { TOPIC_LETTERS, useTopicsTool } from "@/hooks/use-topics-tool";
@@ -134,19 +134,13 @@ export function TopicsContent({
                 </span>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="flex flex-wrap gap-2">
-                  {entry.references.map((reference, index) => (
-                    <Fragment key={`${entry.topic}-${reference}-${index}`}>
-                      <ConcordanceReferencePopover
-                        reference={reference}
-                        highlightWord=""
-                        renderPreview={renderPreview}
-                        onOpenReference={onOpenReference}
-                        onCloseSidebar={onCloseSidebar}
-                      />
-                    </Fragment>
-                  ))}
-                </div>
+                <ToolReferenceList
+                  references={entry.references}
+                  highlightWord=""
+                  renderPreview={renderPreview}
+                  onOpenReference={onOpenReference}
+                  onCloseSidebar={onCloseSidebar}
+                />
               </AccordionContent>
             </AccordionItem>
           ))}

@@ -120,6 +120,7 @@ import { ReaderStatusScreen } from "@/components/reader/reader-status-screen";
 import { ReaderWorkspacePanels } from "@/components/reader/reader-workspace-panels";
 import { ReaderImportControls } from "@/components/reader/reader-import-controls";
 import { PwaUpdateNotice } from "@/components/reader/pwa-update-notice";
+import { ToolReferenceDisplayModeProvider } from "@/components/reader/tool-reference-list";
 import { CompletionCelebration } from "@/components/reader/completion-celebration";
 import { GuidedTour } from "@/components/reader/guided-tour";
 import type { StudyToolsPanelProps } from "@/components/reader/study-tools-panel";
@@ -196,6 +197,8 @@ export function KJVReader() {
       setVerseSpacing,
       contextVerseCount,
       setContextVerseCount,
+      toolReferenceDisplayMode,
+      setToolReferenceDisplayMode,
       hideReadModeVerseNumbers,
       setHideReadModeVerseNumbers,
       readModeParagraphIndent,
@@ -1944,6 +1947,8 @@ export function KJVReader() {
     onVerseSpacingChange: setVerseSpacing,
     contextVerseCount,
     onContextVerseCountChange: setContextVerseCount,
+    toolReferenceDisplayMode,
+    onToolReferenceDisplayModeChange: setToolReferenceDisplayMode,
     hideReadModeVerseNumbers,
     onHideReadModeVerseNumbersChange: setHideReadModeVerseNumbers,
     readModeParagraphIndent,
@@ -2151,16 +2156,17 @@ export function KJVReader() {
     />
   );
   return (
-    <main
-      className="reader-shell h-screen w-full overflow-hidden bg-background"
-      style={
-        {
-          "--verse-highlight-bg": activeHighlightColor,
-          "--verse-highlight-fg": highlightTextColor,
-          "--verse-highlight-checkbox-fg": highlightCheckboxColor,
-        } as React.CSSProperties
-      }
-    >
+    <ToolReferenceDisplayModeProvider mode={toolReferenceDisplayMode}>
+      <main
+        className="reader-shell h-screen w-full overflow-hidden bg-background"
+        style={
+          {
+            "--verse-highlight-bg": activeHighlightColor,
+            "--verse-highlight-fg": highlightTextColor,
+            "--verse-highlight-checkbox-fg": highlightCheckboxColor,
+          } as React.CSSProperties
+        }
+      >
       <SidebarProvider
         open={sidebarAvailable ? isRightSidebarOpen : false}
         onOpenChange={(open) => {
@@ -2307,6 +2313,7 @@ export function KJVReader() {
           />
         </Suspense>
       ) : null}
-    </main>
+      </main>
+    </ToolReferenceDisplayModeProvider>
   );
 }

@@ -16,6 +16,7 @@ describe("reader persistence schemas", () => {
       studyToolOpenTarget: "panel",
       tabsOrientation: "vertical",
       contextVerseCount: 4,
+      toolReferenceDisplayMode: "table",
     })
 
     expect(parsed.readerColorTheme).toBe("forest")
@@ -25,6 +26,7 @@ describe("reader persistence schemas", () => {
     expect(parsed.wordVerseSelectionTarget).toBe("new-panel")
     expect(parsed.tabsOrientation).toBe("vertical")
     expect(parsed.contextVerseCount).toBe(4)
+    expect(parsed.toolReferenceDisplayMode).toBe("table")
   })
 
   it("bounds non-finite and extreme display values", () => {
@@ -42,6 +44,11 @@ describe("reader persistence schemas", () => {
 
     expect(parseReaderDisplaySettings({ contextVerseCount: 0 }).contextVerseCount).toBe(1)
     expect(parseReaderDisplaySettings({}).contextVerseCount).toBe(1)
+    expect(
+      parseReaderDisplaySettings({ toolReferenceDisplayMode: "cards" })
+        .toolReferenceDisplayMode,
+    ).toBe("buttons")
+    expect(parseReaderDisplaySettings({}).toolReferenceDisplayMode).toBe("buttons")
   })
 
   it("filters malformed progress without discarding valid entries", () => {

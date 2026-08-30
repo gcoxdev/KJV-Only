@@ -184,7 +184,7 @@ test("provides search facets, context, sorting, copy/export, and local reuse", a
   expect(storedLibrary).not.toContain('"results"')
 })
 
-test("uses the context verse preference in Search and tool reference previews", async ({
+test("uses context and reference display preferences across Search and tools", async ({
   page,
 }) => {
   await page.goto("/")
@@ -312,6 +312,91 @@ test("uses the context verse preference in Search and tool reference previews", 
       .locator('[data-context-primary="true"]')
       .evaluate((line) => line.closest("[data-context-section]") === null),
   ).toBe(true)
+  const popoverVerseFontSize = await popoverContext
+    .locator('[data-context-primary="true"]')
+    .evaluate((line) => getComputedStyle(line).fontSize)
+
+  await page.getByRole("button", { name: "Settings", exact: true }).click()
+  await page.getByRole("tab", { name: "Other", exact: true }).click()
+  const referenceDisplayOptions = page.getByRole("button", {
+    name: /Reference (table|buttons)/,
+  })
+  expect(
+    await referenceDisplayOptions.evaluateAll((options) =>
+      options.map((option) => option.getAttribute("aria-label")),
+    ),
+  ).toEqual(["Reference table", "Reference buttons"])
+  await referenceDisplayOptions.filter({ hasText: "Table" }).click()
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        JSON.parse(localStorage.getItem("kjv-display-settings-v1") ?? "null"),
+      ),
+    )
+    .toMatchObject({ toolReferenceDisplayMode: "table" })
+
+  const referenceTable = sidebar
+    .locator('[data-tool-reference-display="table"]')
+    .first()
+  await expect(referenceTable).toBeVisible()
+  await expect(referenceTable).toHaveAttribute("data-slot", "scroll-area")
+  const tableContainer = referenceTable.locator('[data-slot="table-container"]')
+  await expect
+    .poll(() =>
+      tableContainer.evaluate(
+        (container) => container.scrollWidth <= container.clientWidth + 1,
+      ),
+    )
+    .toBe(true)
+  const tableWidths = await tableContainer.evaluate((container) => ({
+    clientWidth: container.clientWidth,
+    scrollWidth: container.scrollWidth,
+  }))
+  expect(tableWidths.scrollWidth).toBeLessThanOrEqual(tableWidths.clientWidth + 1)
+  await expect(
+    referenceTable.getByRole("button", { name: /Show more \(\d+ remaining\)/ }),
+  ).toBeVisible()
+  const hebrewsRow = referenceTable
+    .getByRole("row")
+    .filter({ hasText: "Hebrews 11:3" })
+  await expect(hebrewsRow).toContainText(
+    "Through faith we understand that the worlds were framed",
+  )
+  const referenceHeading = hebrewsRow.locator("[data-reference-heading]")
+  await expect(referenceHeading).toContainText("Hebrews 11:3")
+  await expect(
+    referenceHeading.getByRole("button", { name: "Open", exact: true }),
+  ).toBeVisible()
+  const rowContextButton = hebrewsRow.getByRole("button", {
+    name: "Context",
+    exact: true,
+  })
+  await expect(referenceHeading.getByRole("button", { name: "Context" })).toBeVisible()
+  const tablePrimaryLine = hebrewsRow.locator('[data-context-primary="true"]')
+  const tableTextSizes = await tablePrimaryLine.evaluate((line) => {
+    const spans = line.querySelectorAll("span")
+    return {
+      line: getComputedStyle(line).fontSize,
+      verseLabel: getComputedStyle(spans[0]).fontSize,
+      verseText: getComputedStyle(spans[1]).fontSize,
+    }
+  })
+  expect(tableTextSizes).toEqual({
+    line: popoverVerseFontSize,
+    verseLabel: popoverVerseFontSize,
+    verseText: popoverVerseFontSize,
+  })
+  await expect(rowContextButton).toHaveAttribute("aria-expanded", "false")
+  await rowContextButton.click()
+  await expect(hebrewsRow.getByRole("button", { name: "Hide" })).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  )
+  await expect(hebrewsRow).toContainText("For by it the elders obtained a good report")
+  await expect(hebrewsRow).toContainText("By faith Abel offered unto God")
+  await expect(hebrewsRow.locator('[data-context-primary="true"]')).toHaveClass(
+    /font-semibold/,
+  )
 })
 
 test("restores shareable search configuration without embedding results", async ({
