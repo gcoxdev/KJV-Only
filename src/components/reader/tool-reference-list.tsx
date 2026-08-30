@@ -4,11 +4,13 @@ import {
   type ReactNode,
   useContext,
   useId,
+  useMemo,
   useState,
 } from "react";
 import { ExternalLinkIcon, ListTreeIcon } from "lucide-react";
 
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
+import { ToolReferenceFilter } from "@/components/reader/tool-reference-filter";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -20,6 +22,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useOptionalSidebar } from "@/components/ui/sidebar";
+import { orderToolReferences } from "@/lib/tool-references";
+import type { Book } from "@/types/bible";
 import type { ToolReferenceDisplayMode } from "@/types/reader";
 
 type ReferencePreviewRenderer = (
@@ -43,18 +47,30 @@ type ToolReferenceListProps = {
 const SCROLLABLE_REFERENCE_COUNT = 6;
 const INITIAL_REFERENCE_ROWS = 50;
 const REFERENCE_ROW_BATCH_SIZE = 50;
+const EMPTY_BOOKS: Book[] = [];
+const EMPTY_BOOK_INDEXES = new Set<number>();
+type ToolReferenceDisplayContextValue = {
+  mode: ToolReferenceDisplayMode;
+  books: Book[];
+};
 const ToolReferenceDisplayModeContext =
-  createContext<ToolReferenceDisplayMode>("buttons");
+  createContext<ToolReferenceDisplayContextValue>({
+    mode: "buttons",
+    books: EMPTY_BOOKS,
+  });
 
 export function ToolReferenceDisplayModeProvider({
   mode,
+  books,
   children,
 }: {
   mode: ToolReferenceDisplayMode;
+  books: Book[];
   children: ReactNode;
 }) {
+  const value = useMemo(() => ({ mode, books }), [books, mode]);
   return (
-    <ToolReferenceDisplayModeContext.Provider value={mode}>
+    <ToolReferenceDisplayModeContext.Provider value={value}>
       {children}
     </ToolReferenceDisplayModeContext.Provider>
   );
@@ -71,9 +87,37 @@ export const ToolReferenceList = memo(function ToolReferenceList({
   onOpenReference,
   onCloseSidebar,
 }: ToolReferenceListProps) {
-  const displayMode = useToolReferenceDisplayMode();
+  const { mode: displayMode, books } = useToolReferenceDisplayMode();
   const sidebar = useOptionalSidebar();
   const listId = useId().replace(/[^a-zA-Z0-9_-]/g, "-");
+  const referenceSignature = useMemo(
+    () => references.join("\u0000"),
+    [references],
+  );
+  const orderedReferences = useMemo(
+    () => orderToolReferences(references),
+    [references],
+  );
+  const [bookFilterState, setBookFilterState] = useState<{
+    referenceSignature: string;
+    excludedBookIndexes: Set<number>;
+  }>(() => ({
+    referenceSignature,
+    excludedBookIndexes: new Set(),
+  }));
+  const excludedBookIndexes =
+    bookFilterState.referenceSignature === referenceSignature
+      ? bookFilterState.excludedBookIndexes
+      : EMPTY_BOOK_INDEXES;
+  const filteredReferences = useMemo(
+    () =>
+      orderedReferences.filter(
+        (entry) =>
+          !entry.location ||
+          !excludedBookIndexes.has(entry.location.bookIndex),
+      ),
+    [excludedBookIndexes, orderedReferences],
+  );
   const [expandedRows, setExpandedRows] = useState<Set<string>>(
     () => new Set(),
   );
@@ -81,25 +125,32 @@ export const ToolReferenceList = memo(function ToolReferenceList({
     INITIAL_REFERENCE_ROWS,
   );
 
-  if (displayMode === "buttons") {
-    return (
-      <div
-        data-tool-reference-display="buttons"
-        className="flex flex-wrap gap-1.5"
-      >
-        {references.map((reference, index) => (
-          <ConcordanceReferencePopover
-            key={`${reference}-${index}`}
-            reference={reference}
-            highlightWord={highlightWord}
-            renderPreview={renderPreview}
-            onOpenReference={onOpenReference}
-            onCloseSidebar={onCloseSidebar}
-          />
-        ))}
-      </div>
-    );
-  }
+  const setBooksIncluded = (bookIndexes: number[], checked: boolean) => {
+    setVisibleReferenceCount(INITIAL_REFERENCE_ROWS);
+    setBookFilterState((current) => {
+      const next = new Set(
+        current.referenceSignature === referenceSignature
+          ? current.excludedBookIndexes
+          : EMPTY_BOOK_INDEXES,
+      );
+      for (const bookIndex of bookIndexes) {
+        if (checked) {
+          next.delete(bookIndex);
+        } else {
+          next.add(bookIndex);
+        }
+      }
+      return { referenceSignature, excludedBookIndexes: next };
+    });
+  };
+
+  const showAllReferences = () => {
+    setVisibleReferenceCount(INITIAL_REFERENCE_ROWS);
+    setBookFilterState({
+      referenceSignature,
+      excludedBookIndexes: new Set(),
+    });
+  };
 
   const openReference = (reference: string) => {
     onOpenReference(reference);
@@ -112,15 +163,17 @@ export const ToolReferenceList = memo(function ToolReferenceList({
     }
   };
 
-  const visibleReferences = references.slice(0, visibleReferenceCount);
-  const remainingReferenceCount = references.length - visibleReferences.length;
+  const visibleReferences = filteredReferences.slice(0, visibleReferenceCount);
+  const remainingReferenceCount =
+    filteredReferences.length - visibleReferences.length;
 
-  const table = (
+  const table = displayMode === "table" ? (
     <Table className="table-fixed">
       <TableCaption className="sr-only">Scripture references</TableCaption>
       <TableBody>
-        {visibleReferences.map((reference, index) => {
-          const rowKey = `${reference}-${index}`;
+        {visibleReferences.map((entry) => {
+          const { reference, originalIndex } = entry;
+          const rowKey = `${reference}-${originalIndex}`;
           const isExpanded = expandedRows.has(rowKey);
           const contextId = `tool-reference-context-${listId}-${rowKey.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
           const citationActions = (
@@ -185,7 +238,7 @@ export const ToolReferenceList = memo(function ToolReferenceList({
                 onClick={() =>
                   setVisibleReferenceCount((current) =>
                     Math.min(
-                      references.length,
+                      filteredReferences.length,
                       current + REFERENCE_ROW_BATCH_SIZE,
                     ),
                   )
@@ -198,21 +251,75 @@ export const ToolReferenceList = memo(function ToolReferenceList({
         </TableFooter>
       ) : null}
     </Table>
-  );
+  ) : null;
 
-  return references.length > SCROLLABLE_REFERENCE_COUNT ? (
-    <ScrollArea
-      data-tool-reference-display="table"
-      className="h-[min(24rem,60vh)] w-full min-w-0 max-w-full rounded-md border"
-    >
-      {table}
-    </ScrollArea>
-  ) : (
-    <div
-      data-tool-reference-display="table"
-      className="w-full min-w-0 max-w-full rounded-md border"
-    >
-      {table}
+  const referenceContent = (() => {
+    if (filteredReferences.length === 0) {
+      return (
+        <div className="flex flex-col items-start gap-2 rounded-md border p-3">
+          <p className="text-sm text-muted-foreground">
+            No references match the current filters.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="xs"
+            onClick={showAllReferences}
+          >
+            Show all references
+          </Button>
+        </div>
+      );
+    }
+
+    if (displayMode === "buttons") {
+      return (
+        <div
+          data-tool-reference-display="buttons"
+          className="flex flex-wrap gap-1.5"
+        >
+          {filteredReferences.map(({ reference, originalIndex }) => (
+            <ConcordanceReferencePopover
+              key={`${reference}-${originalIndex}`}
+              reference={reference}
+              highlightWord={highlightWord}
+              renderPreview={renderPreview}
+              onOpenReference={onOpenReference}
+              onCloseSidebar={onCloseSidebar}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    return filteredReferences.length > SCROLLABLE_REFERENCE_COUNT ? (
+      <ScrollArea
+        data-tool-reference-display="table"
+        className="h-[min(24rem,60vh)] w-full min-w-0 max-w-full rounded-md border"
+      >
+        {table}
+      </ScrollArea>
+    ) : (
+      <div
+        data-tool-reference-display="table"
+        className="w-full min-w-0 max-w-full rounded-md border"
+      >
+        {table}
+      </div>
+    );
+  })();
+
+  return (
+    <div className="flex min-w-0 flex-col gap-2">
+      <ToolReferenceFilter
+        orderedReferences={orderedReferences}
+        books={books}
+        excludedBookIndexes={excludedBookIndexes}
+        visibleCount={filteredReferences.length}
+        onBooksChange={setBooksIncluded}
+        onShowAll={showAllReferences}
+      />
+      {referenceContent}
     </div>
   );
 });

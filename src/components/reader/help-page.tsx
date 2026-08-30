@@ -361,8 +361,8 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to view and preview tool references",
         body:
-          "Settings > Other can show study-tool references as compact buttons or as a scrollable verse table. Button mode previews a reference when you hover, focus, or tap it. Table mode shows each referenced verse directly with independent Open and Context controls. The context-verse setting controls how many surrounding verses both modes and Search results display.",
-        keywords: ["reference preview", "popover", "table", "buttons", "context", "surrounding verses", "open reference"],
+          "Study-tool references appear in Bible-book, chapter, and verse order. Longer lists include Filters for including or excluding the Old Testament, New Testament, or any relevant book. Settings > Other can show references as compact preview buttons or a scrollable verse table. Table rows have independent Open and Context controls, and the context-verse setting controls how many surrounding verses both modes and Search results display.",
+        keywords: ["reference preview", "popover", "table", "buttons", "filter references", "Bible order", "Old Testament", "New Testament", "books", "context", "surrounding verses", "open reference"],
       },
       {
         label: "How to use Concordance",
