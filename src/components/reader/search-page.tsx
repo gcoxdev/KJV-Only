@@ -89,6 +89,7 @@ type SearchPageProps = {
   runSmartSearch: RunSmartVerseSearch;
   runSearchResultAnalysis: RunSearchResultAnalysis;
   ensureConcordanceWordsLoaded: () => Promise<unknown>;
+  contextVerseCount: number;
   state: SearchPageState;
   onStateChange: (patch: Partial<SearchPageState>) => void;
   onOpenResult: (
@@ -315,29 +316,67 @@ const SearchResultRow = memo(
         <p className="tabular-data text-sm font-medium text-foreground">
           {`${match.bookName} ${match.chapterIndex + 1}:${match.verseNumber}`}
         </p>
-        <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground group-hover:text-foreground/90">
-          {renderSearchResultText(match, highlight)}
-        </p>
         {context ? (
-          <div className="mt-2 flex flex-col gap-1 border-l-2 border-subtle-divider pl-2 text-xs leading-relaxed text-muted-foreground">
-            {context.previous ? (
-              <p>
-                <span className="mr-1 font-medium text-foreground/75">
-                  {context.previous.verseNumber}
-                </span>
-                {context.previous.text}
-              </p>
+          <div
+            data-verse-context="true"
+            className="mt-1 flex flex-col gap-1 leading-relaxed"
+          >
+            {context.before.length > 0 ? (
+              <div
+                data-context-section="before"
+                className="flex flex-col gap-1 border-l-2 border-subtle-divider pl-2"
+              >
+                {context.before.map((before) => (
+                  <p
+                    key={`before-${before.verseNumber}`}
+                    data-context-line="surrounding"
+                    data-context-verse={before.verseNumber}
+                    className="text-xs font-normal text-muted-foreground"
+                  >
+                    <span className="mr-1 font-medium text-foreground/75">
+                      {before.verseNumber}
+                    </span>
+                    {before.text}
+                  </p>
+                ))}
+              </div>
             ) : null}
-            {context.next ? (
-              <p>
-                <span className="mr-1 font-medium text-foreground/75">
-                  {context.next.verseNumber}
-                </span>
-                {context.next.text}
-              </p>
+            <p
+              data-context-primary="true"
+              data-context-line="referenced"
+              data-context-verse={match.verseNumber}
+              className="text-sm font-semibold text-foreground"
+            >
+              <span className="sr-only">Matched verse: </span>
+              <span className="mr-1">{match.verseNumber}</span>
+              {renderSearchResultText(match, highlight)}
+            </p>
+            {context.after.length > 0 ? (
+              <div
+                data-context-section="after"
+                className="flex flex-col gap-1 border-l-2 border-subtle-divider pl-2"
+              >
+                {context.after.map((after) => (
+                  <p
+                    key={`after-${after.verseNumber}`}
+                    data-context-line="surrounding"
+                    data-context-verse={after.verseNumber}
+                    className="text-xs font-normal text-muted-foreground"
+                  >
+                    <span className="mr-1 font-medium text-foreground/75">
+                      {after.verseNumber}
+                    </span>
+                    {after.text}
+                  </p>
+                ))}
+              </div>
             ) : null}
           </div>
-        ) : null}
+        ) : (
+          <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground group-hover:text-foreground/90">
+            {renderSearchResultText(match, highlight)}
+          </p>
+        )}
       </button>
     );
   },
@@ -389,6 +428,7 @@ export function SearchPage({
   runSmartSearch,
   runSearchResultAnalysis,
   ensureConcordanceWordsLoaded,
+  contextVerseCount,
   state,
   onStateChange,
   onOpenResult,
@@ -1247,6 +1287,7 @@ export function SearchPage({
     results,
     resultSort,
     showResultContext,
+    contextVerseCount,
     verseIndex,
     searchSummary,
   });

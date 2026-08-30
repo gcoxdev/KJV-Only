@@ -194,6 +194,8 @@ export function KJVReader() {
       setDarkHighlightColor,
       verseSpacing,
       setVerseSpacing,
+      contextVerseCount,
+      setContextVerseCount,
       hideReadModeVerseNumbers,
       setHideReadModeVerseNumbers,
       readModeParagraphIndent,
@@ -1611,6 +1613,7 @@ export function KJVReader() {
   } = useReferencePreview({
     books,
     openChapterReference,
+    contextVerseCount,
   });
 
   const selectGenealogyPerson = useCallback(
@@ -1939,6 +1942,8 @@ export function KJVReader() {
     setDarkHighlightColor,
     verseSpacing,
     onVerseSpacingChange: setVerseSpacing,
+    contextVerseCount,
+    onContextVerseCountChange: setContextVerseCount,
     hideReadModeVerseNumbers,
     onHideReadModeVerseNumbersChange: setHideReadModeVerseNumbers,
     readModeParagraphIndent,
@@ -2101,6 +2106,7 @@ export function KJVReader() {
         notesTabStateByLeafId,
         onChangeNotesTabState: changeNotesTabState,
         searchPageStateByLeafId,
+        contextVerseCount,
         onChangeSearchPageState: changeSearchPageState,
         onCreateGeneralNote: createGeneralNote,
         onCreateContextNote: createContextNote,

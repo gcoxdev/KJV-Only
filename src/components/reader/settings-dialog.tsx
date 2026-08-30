@@ -42,6 +42,11 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  clampContextVerseCount,
+  MAX_CONTEXT_VERSE_COUNT,
+  MIN_CONTEXT_VERSE_COUNT,
+} from "@/lib/context-verses";
 
 export type SettingsPanelContentProps = {
   activeTab: "visual" | "targeting" | "other";
@@ -62,6 +67,8 @@ export type SettingsPanelContentProps = {
   onResetDarkHighlightColor: () => void;
   verseSpacing: number;
   onVerseSpacingChange: (value: number) => void;
+  contextVerseCount: number;
+  onContextVerseCountChange: (value: number) => void;
   hideReadModeVerseNumbers: boolean;
   onHideReadModeVerseNumbersChange: (checked: boolean) => void;
   readModeParagraphIndent: boolean;
@@ -108,6 +115,8 @@ export function SettingsPanelContent({
   onResetDarkHighlightColor,
   verseSpacing,
   onVerseSpacingChange,
+  contextVerseCount,
+  onContextVerseCountChange,
   hideReadModeVerseNumbers,
   onHideReadModeVerseNumbersChange,
   readModeParagraphIndent,
@@ -613,6 +622,32 @@ export function SettingsPanelContent({
               checked={showWelcomeHomeAtStartup}
               onCheckedChange={onShowWelcomeHomeAtStartupChange}
             />
+          </div>
+          <div className="flex flex-col gap-2 border-t pt-3">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <Label htmlFor="context-verse-count">
+                Context Verses Before/After
+              </Label>
+              <span className="text-xs text-muted-foreground">
+                {contextVerseCount} {contextVerseCount === 1 ? "verse" : "verses"} each side
+              </span>
+            </div>
+            <Slider
+              id="context-verse-count"
+              aria-label="Context verses before and after"
+              thumbAriaLabel="Context verses before and after"
+              min={MIN_CONTEXT_VERSE_COUNT}
+              max={MAX_CONTEXT_VERSE_COUNT}
+              step={1}
+              value={[contextVerseCount]}
+              onValueChange={(value) => {
+                const nextValue = Array.isArray(value) ? value[0] : value;
+                onContextVerseCountChange(clampContextVerseCount(nextValue ?? MIN_CONTEXT_VERSE_COUNT));
+              }}
+            />
+            <p className="text-xs text-muted-foreground">
+              Used by Search Context and reference popover Context.
+            </p>
           </div>
         </div>
       </TabsContent>

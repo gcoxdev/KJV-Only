@@ -1,5 +1,5 @@
 import { memo, type ReactNode, useEffect, useRef, useState } from "react";
-import { ExternalLinkIcon } from "lucide-react";
+import { ExternalLinkIcon, ListTreeIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -9,10 +9,23 @@ import { cn } from "@/lib/utils";
 type ConcordanceReferencePopoverProps = {
   reference: string;
   highlightWord: string;
-  renderPreview: (reference: string, highlightWord: string) => ReactNode;
+  renderPreview: (
+    reference: string,
+    highlightWord: string,
+    options?: { includeContext?: boolean },
+  ) => ReactNode;
   onOpenReference: (reference: string) => void;
   onCloseSidebar: () => void;
 };
+
+type PopoverSide =
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "inline-start"
+  | "inline-end";
+type PopoverAlign = "start" | "center" | "end";
 
 export const ConcordanceReferencePopover = memo(function ConcordanceReferencePopover({
   reference,
@@ -25,6 +38,10 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
   const [isTouchPopoverOpen, setIsTouchPopoverOpen] = useState(false);
   const [isHoverPopoverOpen, setIsHoverPopoverOpen] = useState(false);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [showContext, setShowContext] = useState(false);
+  const [lockedSide, setLockedSide] = useState<PopoverSide | null>(null);
+  const [lockedAlign, setLockedAlign] = useState<PopoverAlign | null>(null);
+  const [contextPopoverHeight, setContextPopoverHeight] = useState<number | null>(null);
   const [supportsHover, setSupportsHover] = useState(() => {
     if (typeof window === "undefined" || !window.matchMedia) {
       return false;
@@ -32,6 +49,7 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
     return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   });
   const closeTimerRef = useRef<number | null>(null);
+  const layoutGuardTimerRef = useRef<number | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
@@ -48,6 +66,9 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
       if (closeTimerRef.current !== null) {
         window.clearTimeout(closeTimerRef.current);
       }
+      if (layoutGuardTimerRef.current !== null) {
+        window.clearTimeout(layoutGuardTimerRef.current);
+      }
     };
   }, []);
 
@@ -55,6 +76,13 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
     if (closeTimerRef.current !== null) {
       window.clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
+    }
+  };
+
+  const clearLayoutGuard = () => {
+    if (layoutGuardTimerRef.current !== null) {
+      window.clearTimeout(layoutGuardTimerRef.current);
+      layoutGuardTimerRef.current = null;
     }
   };
 
@@ -80,15 +108,23 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
       cancelScheduledClose();
       return;
     }
+    if (layoutGuardTimerRef.current !== null) {
+      cancelScheduledClose();
+      return;
+    }
     cancelScheduledClose();
     closeTimerRef.current = window.setTimeout(() => {
       setIsHoverPopoverOpen(false);
       setIsKeyboardOpen(false);
+      setLockedSide(null);
+      setLockedAlign(null);
+      setContextPopoverHeight(null);
       closeTimerRef.current = null;
     }, 120);
   };
 
   const openReference = () => {
+    clearLayoutGuard();
     onOpenReference(reference);
     if (!supportsHover) {
       sidebar?.setOpenMobile(false);
@@ -97,12 +133,60 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
     setIsTouchPopoverOpen(false);
     setIsHoverPopoverOpen(false);
     setIsKeyboardOpen(false);
+    setLockedSide(null);
+    setLockedAlign(null);
+    setContextPopoverHeight(null);
+  };
+
+  const toggleContext = () => {
+    cancelScheduledClose();
+    if (!showContext) {
+      const renderedSide = contentRef.current?.dataset.side;
+      const renderedAlign = contentRef.current?.dataset.align;
+      if (
+        renderedSide === "top" ||
+        renderedSide === "bottom" ||
+        renderedSide === "left" ||
+        renderedSide === "right" ||
+        renderedSide === "inline-start" ||
+        renderedSide === "inline-end"
+      ) {
+        setLockedSide(renderedSide);
+      }
+      if (
+        renderedAlign === "start" ||
+        renderedAlign === "center" ||
+        renderedAlign === "end"
+      ) {
+        setLockedAlign(renderedAlign);
+      }
+      setContextPopoverHeight(contentRef.current?.getBoundingClientRect().height ?? null);
+    } else {
+      setContextPopoverHeight(null);
+    }
+    if (supportsHover) {
+      setIsHoverPopoverOpen(true);
+      setIsKeyboardOpen(true);
+      if (layoutGuardTimerRef.current !== null) {
+        window.clearTimeout(layoutGuardTimerRef.current);
+      }
+      layoutGuardTimerRef.current = window.setTimeout(() => {
+        layoutGuardTimerRef.current = null;
+      }, 400);
+    }
+    setShowContext((current) => !current);
   };
 
   return (
     <Popover
       open={isPopoverOpen}
       onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          clearLayoutGuard();
+          setLockedSide(null);
+          setLockedAlign(null);
+          setContextPopoverHeight(null);
+        }
         if (supportsHover) {
           if (!nextOpen) {
             setIsHoverPopoverOpen(false);
@@ -159,8 +243,14 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
       </PopoverTrigger>
       <PopoverContent
         ref={contentRef}
-        side="top"
-        align="start"
+        side={lockedSide ?? "top"}
+        align={lockedAlign ?? "start"}
+        collisionAvoidance={
+          lockedSide
+            ? { side: "none", align: "none", fallbackAxisSide: "none" }
+            : undefined
+        }
+        style={contextPopoverHeight ? { height: contextPopoverHeight } : undefined}
         className="w-80 max-w-[calc(100vw-2rem)] flex flex-col gap-2"
         onMouseEnter={() => {
           cancelScheduledClose();
@@ -172,8 +262,10 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
           scheduleClose(event.relatedTarget);
         }}
       >
-        <div className="max-h-[min(24rem,60vh)] overflow-y-auto pr-1 text-xs leading-relaxed">
-          {renderPreview(reference, highlightWord)}
+        <div className="min-h-0 flex-1 max-h-[min(24rem,60vh)] overflow-y-auto pr-1 text-xs leading-relaxed">
+          {renderPreview(reference, highlightWord, {
+            includeContext: showContext,
+          })}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button
@@ -183,8 +275,19 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
             className="h-7 px-2 text-xs"
             onClick={openReference}
           >
-            <ExternalLinkIcon />
+            <ExternalLinkIcon data-icon="inline-start" />
             Open
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={showContext ? "secondary" : "outline"}
+            className="h-7 px-2 text-xs"
+            aria-pressed={showContext}
+            onClick={toggleContext}
+          >
+            <ListTreeIcon data-icon="inline-start" />
+            Context
           </Button>
         </div>
       </PopoverContent>

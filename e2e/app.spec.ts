@@ -184,6 +184,136 @@ test("provides search facets, context, sorting, copy/export, and local reuse", a
   expect(storedLibrary).not.toContain('"results"')
 })
 
+test("uses the context verse preference in Search and tool reference previews", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page.getByLabel("Open menu").click()
+  await page.getByRole("menuitem", { name: "Settings", exact: true }).click()
+  await page.getByRole("tab", { name: "Other", exact: true }).click()
+
+  const contextVerseSlider = page.getByRole("slider", {
+    name: "Context verses before and after",
+  })
+  await contextVerseSlider.press("Home")
+  await contextVerseSlider.press("ArrowRight")
+  await expect(page.getByText("2 verses each side", { exact: true })).toBeVisible()
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        JSON.parse(localStorage.getItem("kjv-display-settings-v1") ?? "null"),
+      ),
+    )
+    .toMatchObject({ contextVerseCount: 2 })
+
+  await page.getByLabel("Open search").click()
+  await page.getByLabel("Word or phrase").fill("work together")
+  await page.getByLabel("Run Bible search").click()
+  await expect(page.locator("p.tabular-data").first()).toHaveText("Romans 8:28")
+  await page.getByText("Context", { exact: true }).click()
+  await expect(
+    page.getByText(/Likewise the Spirit also helpeth our infirmities/),
+  ).toBeVisible()
+  await expect(
+    page.getByText(/Moreover whom he did predestinate/),
+  ).toBeVisible()
+  const searchContext = page
+    .locator("p.tabular-data")
+    .first()
+    .locator("..")
+    .locator('[data-verse-context="true"]')
+  await expect(searchContext).not.toHaveClass(/border-l-2/)
+  await expect(searchContext.locator('[data-context-section="before"]')).toHaveClass(
+    /border-l-2/,
+  )
+  await expect(searchContext.locator('[data-context-section="after"]')).toHaveClass(
+    /border-l-2/,
+  )
+  expect(
+    await searchContext.locator("[data-context-line]").evaluateAll((lines) =>
+      lines.map((line) => line.getAttribute("data-context-verse")),
+    ),
+  ).toEqual(["26", "27", "28", "29", "30"])
+  await expect(searchContext.locator('[data-context-primary="true"]')).toHaveClass(
+    /font-semibold/,
+  )
+  expect(
+    await searchContext
+      .locator('[data-context-primary="true"]')
+      .evaluate((line) => line.closest("[data-context-section]") === null),
+  ).toBe(true)
+
+  await page.getByRole("button", { name: "Genesis 1", exact: true }).click()
+  await page
+    .getByRole("button", { name: "Details for beginning", exact: true })
+    .first()
+    .click()
+  const sidebar = page.locator('[data-tour="sidebar"]')
+  await sidebar.getByRole("button", { name: /^References \d+$/ }).click()
+  const referenceButton = sidebar.getByRole("button", {
+    name: "HEB.11.3",
+    exact: true,
+  })
+  await expect(referenceButton).toBeVisible()
+  await referenceButton.hover()
+
+  const referencePopover = page.getByRole("dialog")
+  await expect(
+    referencePopover.getByText(/Through faith we understand that the worlds were framed/),
+  ).toBeVisible()
+  const contextButton = referencePopover.getByRole("button", {
+    name: "Context",
+    exact: true,
+  })
+  const sideBeforeContext = await referencePopover.getAttribute("data-side")
+  const contextButtonBefore = await contextButton.boundingBox()
+  if (!contextButtonBefore) {
+    throw new Error("Context button did not have a measurable position")
+  }
+  await contextButton.click()
+  await expect(
+    referencePopover.getByText(/For by it the elders obtained a good report/),
+  ).toBeVisible()
+  await expect(
+    referencePopover.getByText(/By faith Abel offered unto God/),
+  ).toBeVisible()
+  await expect(referencePopover).toHaveAttribute("data-side", sideBeforeContext ?? "top")
+  const contextButtonAfter = await contextButton.boundingBox()
+  if (!contextButtonAfter) {
+    throw new Error("Context button moved outside the rendered popover")
+  }
+  expect(Math.abs(contextButtonAfter.x - contextButtonBefore.x)).toBeLessThan(3)
+  expect(Math.abs(contextButtonAfter.y - contextButtonBefore.y)).toBeLessThan(3)
+  await page.mouse.move(
+    contextButtonBefore.x + contextButtonBefore.width / 2 + 4,
+    contextButtonBefore.y + contextButtonBefore.height / 2,
+  )
+  await page.waitForTimeout(450)
+  await expect(referencePopover).toBeVisible()
+  const popoverContext = referencePopover.locator('[data-verse-context="true"]')
+  await expect(popoverContext).not.toHaveClass(/border-l-2/)
+  await expect(popoverContext.locator('[data-context-section="before"]')).toHaveClass(
+    /border-l-2/,
+  )
+  await expect(popoverContext.locator('[data-context-section="after"]')).toHaveClass(
+    /border-l-2/,
+  )
+  await expect(popoverContext.locator('[data-context-primary="true"]')).toHaveCount(1)
+  await expect(
+    popoverContext.locator('[data-context-primary="true"]').first(),
+  ).toHaveClass(/font-semibold/)
+  await expect(
+    popoverContext.locator('[data-context-line="surrounding"]').first(),
+  ).toHaveClass(/font-normal/)
+  expect(
+    await popoverContext
+      .locator('[data-context-primary="true"]')
+      .evaluate((line) => line.closest("[data-context-section]") === null),
+  ).toBe(true)
+})
+
 test("restores shareable search configuration without embedding results", async ({
   page,
 }) => {

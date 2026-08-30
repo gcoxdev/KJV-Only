@@ -52,6 +52,9 @@ export function useReaderPreferences({
     initialSettings.darkHighlightColor,
   )
   const [verseSpacing, setVerseSpacing] = useState(initialSettings.verseSpacing)
+  const [contextVerseCount, setContextVerseCount] = useState(
+    initialSettings.contextVerseCount,
+  )
   const [hideReadModeVerseNumbers, setHideReadModeVerseNumbers] = useState(
     initialSettings.hideReadModeVerseNumbers,
   )
@@ -107,6 +110,7 @@ export function useReaderPreferences({
       lightHighlightColor,
       darkHighlightColor,
       verseSpacing,
+      contextVerseCount,
       hideReadModeVerseNumbers,
       readModeParagraphIndent,
       flowVersesByParagraph,
@@ -124,6 +128,7 @@ export function useReaderPreferences({
     lightHighlightColor,
     darkHighlightColor,
     verseSpacing,
+    contextVerseCount,
     hideReadModeVerseNumbers,
     readModeParagraphIndent,
     flowVersesByParagraph,
@@ -149,6 +154,8 @@ export function useReaderPreferences({
     setDarkHighlightColor,
     verseSpacing,
     setVerseSpacing,
+    contextVerseCount,
+    setContextVerseCount,
     hideReadModeVerseNumbers,
     setHideReadModeVerseNumbers,
     readModeParagraphIndent,

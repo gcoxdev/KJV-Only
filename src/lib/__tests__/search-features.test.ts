@@ -92,12 +92,19 @@ describe("search feature helpers", () => {
         [
           searchMatchKey(matches[0]),
           {
-            previous: null,
-            next: {
-              ...matches[0],
-              verseNumber: 29,
-              text: "For whom he did foreknow.",
-            },
+            before: [],
+            after: [
+              {
+                ...matches[0],
+                verseNumber: 29,
+                text: "For whom he did foreknow.",
+              },
+              {
+                ...matches[0],
+                verseNumber: 30,
+                text: "Moreover whom he did predestinate.",
+              },
+            ],
           },
         ],
       ]),
@@ -105,5 +112,6 @@ describe("search feature helpers", () => {
 
     expect(text).toContain("Romans 8:28 — All things work together for good.");
     expect(text).toContain("After (29) For whom he did foreknow.");
+    expect(text).toContain("After (30) Moreover whom he did predestinate.");
   });
 });

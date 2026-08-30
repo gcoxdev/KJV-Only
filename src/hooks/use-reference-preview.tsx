@@ -7,10 +7,12 @@ import {
   formatDisplayTokenText,
   isPunctuationToken,
 } from "@/components/reader/chapter-text-content";
+import { clampContextVerseCount } from "@/lib/context-verses";
+import { cn } from "@/lib/utils";
 
 type ReferencePreviewData = {
   citation: string;
-  verseLines: Array<{ label: string; text: string }>;
+  verseLines: Array<{ label: string; text: string; isContext: boolean }>;
 };
 
 type UseReferencePreviewParams = {
@@ -21,7 +23,19 @@ type UseReferencePreviewParams = {
     startVerse: number,
     endVerse: number,
   ) => void;
+  contextVerseCount: number;
 };
+
+const MAX_REFERENCE_PREVIEW_VERSES = 24;
+
+function verseText(verse: Book["chapters"][number]["verses"][number]) {
+  return verse.tokens
+    .map((token, index) => {
+      const leadingSpace = index > 0 && !isPunctuationToken(token.text);
+      return `${leadingSpace ? " " : ""}${formatDisplayTokenText(token)}`;
+    })
+    .join("");
+}
 
 export function formatReferenceCitation(
   bookName: string,
@@ -43,6 +57,7 @@ export function formatReferenceCitation(
 export function useReferencePreview({
   books,
   openChapterReference,
+  contextVerseCount,
 }: UseReferencePreviewParams) {
   const referencePreviewCacheRef = useRef<Map<string, ReferencePreviewData>>(
     new Map(),
@@ -50,7 +65,7 @@ export function useReferencePreview({
 
   useEffect(() => {
     referencePreviewCacheRef.current.clear();
-  }, [books]);
+  }, [books, contextVerseCount]);
 
   const openReference = useCallback(
     (reference: string) => {
@@ -76,8 +91,9 @@ export function useReferencePreview({
   );
 
   const referencePreviewData = useCallback(
-    (reference: string) => {
-      const cached = referencePreviewCacheRef.current.get(reference);
+    (reference: string, includeContext: boolean) => {
+      const cacheKey = `${includeContext ? "context" : "reference"}:${reference}`;
+      const cached = referencePreviewCacheRef.current.get(cacheKey);
       if (cached) {
         return cached;
       }
@@ -86,9 +102,9 @@ export function useReferencePreview({
       if (!parsed) {
         const fallback = {
           citation: reference,
-          verseLines: [] as Array<{ label: string; text: string }>,
+          verseLines: [] as ReferencePreviewData["verseLines"],
         };
-        referencePreviewCacheRef.current.set(reference, fallback);
+        referencePreviewCacheRef.current.set(cacheKey, fallback);
         return fallback;
       }
 
@@ -101,14 +117,37 @@ export function useReferencePreview({
       ) {
         const fallback = {
           citation: reference,
-          verseLines: [] as Array<{ label: string; text: string }>,
+          verseLines: [] as ReferencePreviewData["verseLines"],
         };
-        referencePreviewCacheRef.current.set(reference, fallback);
+        referencePreviewCacheRef.current.set(cacheKey, fallback);
         return fallback;
       }
 
-      const MAX_PREVIEW_VERSES = 24;
-      const verseLines: Array<{ label: string; text: string }> = [];
+      const verseLines: ReferencePreviewData["verseLines"] = [];
+      const addVerseLine = (
+        chapter: Book["chapters"][number],
+        verse: Book["chapters"][number]["verses"][number],
+        isContext: boolean,
+      ) => {
+        verseLines.push({
+          label: `${chapter.chapter}:${verse.verse}`,
+          text: verseText(verse),
+          isContext,
+        });
+      };
+
+      const perSideCount = clampContextVerseCount(contextVerseCount);
+      if (includeContext) {
+        const startChapter = chapters[parsed.startChapterIndex];
+        const precedingVerses = startChapter.verses
+          .filter((verse) => verse.verse < parsed.startVerse)
+          .slice(-perSideCount);
+        for (const verse of precedingVerses) {
+          addVerseLine(startChapter, verse, true);
+        }
+      }
+
+      let referenceVerseCount = 0;
       for (
         let chapterIndex = parsed.startChapterIndex;
         chapterIndex <= parsed.endChapterIndex;
@@ -130,22 +169,25 @@ export function useReferencePreview({
         );
 
         for (const verse of verses) {
-          verseLines.push({
-            label: `${chapter.chapter}:${verse.verse}`,
-            text: verse.tokens
-              .map((token, index) => {
-                const leadingSpace = index > 0 && !isPunctuationToken(token.text);
-                return `${leadingSpace ? " " : ""}${formatDisplayTokenText(token)}`;
-              })
-              .join(""),
-          });
-          if (verseLines.length >= MAX_PREVIEW_VERSES) {
+          addVerseLine(chapter, verse, false);
+          referenceVerseCount += 1;
+          if (referenceVerseCount >= MAX_REFERENCE_PREVIEW_VERSES) {
             break;
           }
         }
 
-        if (verseLines.length >= MAX_PREVIEW_VERSES) {
+        if (referenceVerseCount >= MAX_REFERENCE_PREVIEW_VERSES) {
           break;
+        }
+      }
+
+      if (includeContext) {
+        const endChapter = chapters[parsed.endChapterIndex];
+        const followingVerses = endChapter.verses
+          .filter((verse) => verse.verse > parsed.endVerse)
+          .slice(0, perSideCount);
+        for (const verse of followingVerses) {
+          addVerseLine(endChapter, verse, true);
         }
       }
 
@@ -159,15 +201,23 @@ export function useReferencePreview({
         ),
         verseLines,
       };
-      referencePreviewCacheRef.current.set(reference, computed);
+      referencePreviewCacheRef.current.set(cacheKey, computed);
       return computed;
     },
-    [books],
+    [books, contextVerseCount],
   );
 
   const renderPreview = useCallback(
-    (reference: string, highlightWord: string): ReactNode => {
-      const { citation, verseLines } = referencePreviewData(reference);
+    (
+      reference: string,
+      highlightWord: string,
+      options?: { includeContext?: boolean },
+    ): ReactNode => {
+      const includeContext = options?.includeContext === true;
+      const { citation, verseLines } = referencePreviewData(
+        reference,
+        includeContext,
+      );
       const needle = normalizeConcordanceWord(highlightWord);
 
       if (verseLines.length === 0) {
@@ -179,24 +229,92 @@ export function useReferencePreview({
         );
       }
 
+      const foundFirstReferencedIndex = includeContext
+        ? verseLines.findIndex((line) => !line.isContext)
+        : 0;
+      const hasReferencedLines = foundFirstReferencedIndex >= 0;
+      const firstReferencedIndex = hasReferencedLines
+        ? foundFirstReferencedIndex
+        : verseLines.length;
+      let lastReferencedIndex = hasReferencedLines
+        ? firstReferencedIndex
+        : verseLines.length - 1;
+      if (includeContext && hasReferencedLines) {
+        for (let index = verseLines.length - 1; index >= 0; index -= 1) {
+          if (!verseLines[index].isContext) {
+            lastReferencedIndex = index;
+            break;
+          }
+        }
+      }
+      const beforeLines = includeContext
+        ? verseLines.slice(0, firstReferencedIndex)
+        : [];
+      const referencedLines = includeContext
+        ? hasReferencedLines
+          ? verseLines.slice(firstReferencedIndex, lastReferencedIndex + 1)
+          : []
+        : verseLines;
+      const afterLines = includeContext && hasReferencedLines
+        ? verseLines.slice(lastReferencedIndex + 1)
+        : [];
+
+      const renderVerseLine = (
+        line: ReferencePreviewData["verseLines"][number],
+      ) => (
+        <p
+          key={`${reference}-line-${line.label}`}
+          data-context-primary={!line.isContext ? "true" : undefined}
+          data-context-line={line.isContext ? "surrounding" : "referenced"}
+          data-context-verse={line.label}
+          className={cn(
+            line.isContext && "font-normal text-muted-foreground",
+            includeContext &&
+              !line.isContext &&
+              "font-semibold text-foreground",
+          )}
+        >
+          <span
+            className={cn(
+              "mr-1 text-xs text-muted-foreground",
+              line.isContext ? "font-normal" : "font-semibold",
+            )}
+          >
+            {line.label}
+          </span>
+          <span>
+            {renderHighlightedText(
+              line.text,
+              needle,
+              `${reference}-${line.label}`,
+            )}
+          </span>
+        </p>
+      );
+
+      const renderContextSection = (
+        lines: ReferencePreviewData["verseLines"],
+        position: "before" | "after",
+      ) =>
+        lines.length > 0 ? (
+          <div
+            data-context-section={position}
+            className="flex flex-col gap-1 border-l-2 border-subtle-divider pl-2"
+          >
+            {lines.map(renderVerseLine)}
+          </div>
+        ) : null;
+
       return (
         <div className="flex flex-col gap-1">
           <p className="font-semibold">{citation}</p>
-          <div className="flex flex-col gap-1">
-            {verseLines.map((line) => (
-              <p key={`${reference}-line-${line.label}`}>
-                <span className="mr-1 text-xs font-semibold text-muted-foreground">
-                  {line.label}
-                </span>
-                <span>
-                  {renderHighlightedText(
-                    line.text,
-                    needle,
-                    `${reference}-${line.label}`,
-                  )}
-                </span>
-              </p>
-            ))}
+          <div
+            data-verse-context={includeContext ? "true" : undefined}
+            className="flex flex-col gap-1 leading-relaxed"
+          >
+            {renderContextSection(beforeLines, "before")}
+            {referencedLines.map(renderVerseLine)}
+            {renderContextSection(afterLines, "after")}
           </div>
         </div>
       );

@@ -300,6 +300,7 @@ export type ReaderPanelTreeProps = {
     Array<{ start: number; end: number }>
   >;
   searchPageStateByLeafId: Record<string, SearchPageState>;
+  contextVerseCount: number;
   onChangeSearchPageState: (
     leafId: string,
     patch: Partial<SearchPageState>,
@@ -399,6 +400,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   notesTabStateByLeafId,
   onChangeNotesTabState,
   searchPageStateByLeafId,
+  contextVerseCount,
   onChangeSearchPageState,
   onCreateGeneralNote,
   onCreateContextNote,
@@ -1592,6 +1594,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 runSmartSearch={runSmartVerseSearch}
                 runSearchResultAnalysis={runSearchResultAnalysis}
                 ensureConcordanceWordsLoaded={ensureConcordanceWordsLoaded}
+                contextVerseCount={contextVerseCount}
                 state={
                   searchPageStateByLeafId[leaf.id] ?? {
                     searchMode: "smart",
@@ -1882,6 +1885,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   notesTabStateByLeafId,
   onChangeNotesTabState,
   searchPageStateByLeafId,
+  contextVerseCount,
   onChangeSearchPageState,
   onCreateGeneralNote,
   onCreateContextNote,
@@ -1982,6 +1986,7 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       notesTabStateByLeafId={notesTabStateByLeafId}
       onChangeNotesTabState={onChangeNotesTabState}
       searchPageStateByLeafId={searchPageStateByLeafId}
+      contextVerseCount={contextVerseCount}
       onChangeSearchPageState={onChangeSearchPageState}
       onCreateGeneralNote={onCreateGeneralNote}
       onCreateContextNote={onCreateContextNote}
