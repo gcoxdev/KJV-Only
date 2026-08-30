@@ -9,7 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
+import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 import type { GenealogyPerson } from "@/types/reader";
 
 type GenealogyPersonDetailsProps = {
@@ -95,19 +95,13 @@ export function GenealogyPersonDetails({
                   </span>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="flex flex-wrap gap-2">
-                    {entry.verses.map((reference, index) => (
-                      <Fragment key={`${person.id}-${entry.name}-${reference}-${index}`}>
-                        <ConcordanceReferencePopover
-                          reference={reference}
-                          highlightWord={entry.name}
-                          renderPreview={renderReferencePreview}
-                          onOpenReference={onOpenReference}
-                          onCloseSidebar={onCloseSidebar}
-                        />
-                      </Fragment>
-                    ))}
-                  </div>
+                  <ToolReferenceList
+                    references={entry.verses}
+                    highlightWord={entry.name}
+                    renderPreview={renderReferencePreview}
+                    onOpenReference={onOpenReference}
+                    onCloseSidebar={onCloseSidebar}
+                  />
                 </AccordionContent>
               </AccordionItem>
             ))}

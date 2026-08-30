@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { LoaderCircleIcon, MapIcon } from "lucide-react";
 
 import { type AncientMapEntry } from "@/lib/maps";
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
+import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 import { StudySearchForm } from "@/components/reader/study-search-form";
 
 type MapsDisplayEntry = {
@@ -205,19 +205,13 @@ export function MapsTool({
                         </span>
                       </AccordionTrigger>
                       <AccordionContent>
-                        <div className="flex flex-wrap gap-2">
-                          {references.map((reference) => (
-                            <Fragment key={reference}>
-                              <ConcordanceReferencePopover
-                                reference={reference}
-                                highlightWord={previewWord}
-                                renderPreview={renderPreview}
-                                onOpenReference={onOpenReference}
-                                onCloseSidebar={onCloseSidebar}
-                              />
-                            </Fragment>
-                          ))}
-                        </div>
+                        <ToolReferenceList
+                          references={references}
+                          highlightWord={previewWord}
+                          renderPreview={renderPreview}
+                          onOpenReference={onOpenReference}
+                          onCloseSidebar={onCloseSidebar}
+                        />
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>

@@ -211,20 +211,34 @@ export function useReferencePreview({
     (
       reference: string,
       highlightWord: string,
-      options?: { includeContext?: boolean },
+      options?: {
+        includeContext?: boolean;
+        citationActions?: ReactNode;
+        contextId?: string;
+      },
     ): ReactNode => {
       const includeContext = options?.includeContext === true;
+      const citationActions = options?.citationActions;
       const { citation, verseLines } = referencePreviewData(
         reference,
         includeContext,
       );
       const needle = normalizeConcordanceWord(highlightWord);
+      const citationHeading = (
+        <div
+          data-reference-heading
+          className="flex min-w-0 items-start justify-between gap-2"
+        >
+          <p className="min-w-0 break-words font-semibold">{citation}</p>
+          {citationActions}
+        </div>
+      );
 
       if (verseLines.length === 0) {
         return (
           <div className="flex flex-col gap-1">
-            <p className="font-semibold">{citation}</p>
-            <p>{reference}</p>
+            {citationHeading}
+            <p id={options?.contextId}>{reference}</p>
           </div>
         );
       }
@@ -307,8 +321,9 @@ export function useReferencePreview({
 
       return (
         <div className="flex flex-col gap-1">
-          <p className="font-semibold">{citation}</p>
+          {citationHeading}
           <div
+            id={options?.contextId}
             data-verse-context={includeContext ? "true" : undefined}
             className="flex flex-col gap-1 leading-relaxed"
           >

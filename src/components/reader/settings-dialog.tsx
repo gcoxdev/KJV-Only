@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldTitle,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@/components/ui/toggle-group";
 import {
   Select,
   SelectContent,
@@ -16,7 +25,9 @@ import {
 import {
   AArrowDownIcon,
   AArrowUpIcon,
+  ListIcon,
   RotateCcwIcon,
+  Table2Icon,
 } from "lucide-react";
 import type {
   BookmarkOpenTarget,
@@ -25,6 +36,7 @@ import type {
   ReferenceLinkOpenTarget,
   SearchResultOpenTarget,
   TabsOrientation,
+  ToolReferenceDisplayMode,
   WordVerseSelectionTarget,
 } from "@/types/reader";
 import {
@@ -69,6 +81,8 @@ export type SettingsPanelContentProps = {
   onVerseSpacingChange: (value: number) => void;
   contextVerseCount: number;
   onContextVerseCountChange: (value: number) => void;
+  toolReferenceDisplayMode: ToolReferenceDisplayMode;
+  onToolReferenceDisplayModeChange: (mode: ToolReferenceDisplayMode) => void;
   hideReadModeVerseNumbers: boolean;
   onHideReadModeVerseNumbersChange: (checked: boolean) => void;
   readModeParagraphIndent: boolean;
@@ -117,6 +131,8 @@ export function SettingsPanelContent({
   onVerseSpacingChange,
   contextVerseCount,
   onContextVerseCountChange,
+  toolReferenceDisplayMode,
+  onToolReferenceDisplayModeChange,
   hideReadModeVerseNumbers,
   onHideReadModeVerseNumbersChange,
   readModeParagraphIndent,
@@ -624,6 +640,38 @@ export function SettingsPanelContent({
             />
           </div>
           <div className="flex flex-col gap-2 border-t pt-3">
+            <Field orientation="responsive">
+              <FieldTitle id="tool-reference-display-label">
+                Tool Reference Display
+              </FieldTitle>
+              <ToggleGroup
+                aria-labelledby="tool-reference-display-label"
+                variant="outline"
+                size="sm"
+                value={[toolReferenceDisplayMode]}
+                onValueChange={(value) => {
+                  const nextMode = value[0];
+                  if (nextMode === "buttons" || nextMode === "table") {
+                    onToolReferenceDisplayModeChange(nextMode);
+                  }
+                }}
+              >
+                <ToggleGroupItem value="table" aria-label="Reference table">
+                  <Table2Icon data-icon="inline-start" />
+                  Table
+                </ToggleGroupItem>
+                <ToggleGroupItem value="buttons" aria-label="Reference buttons">
+                  <ListIcon data-icon="inline-start" />
+                  Buttons
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </Field>
+            <FieldDescription className="text-xs">
+              Show tool references as compact preview buttons or as verse rows with
+              expandable context.
+            </FieldDescription>
+          </div>
+          <div className="flex flex-col gap-2 border-t pt-3">
             <div className="flex min-w-0 items-center justify-between gap-3">
               <Label htmlFor="context-verse-count">
                 Context Verses Before/After
@@ -646,7 +694,7 @@ export function SettingsPanelContent({
               }}
             />
             <p className="text-xs text-muted-foreground">
-              Used by Search Context and reference popover Context.
+              Used by Search Context and tool reference Context.
             </p>
           </div>
         </div>

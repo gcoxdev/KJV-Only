@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { BookSearchIcon, LoaderCircleIcon } from "lucide-react";
 
 import type { Book } from "@/types/bible";
@@ -10,7 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
+import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 import { Badge } from "@/components/ui/badge";
 
 type CrossRefsToolProps = {
@@ -91,19 +91,13 @@ export function CrossRefsTool({
                       </span>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="flex flex-wrap gap-2">
-                        {selected.references.map((reference, index) => (
-                          <Fragment key={`${selected.key}-${reference}-${index}`}>
-                            <ConcordanceReferencePopover
-                              reference={reference}
-                              highlightWord=""
-                              renderPreview={renderPreview}
-                              onOpenReference={onOpenReference}
-                              onCloseSidebar={onCloseSidebar}
-                            />
-                          </Fragment>
-                        ))}
-                      </div>
+                      <ToolReferenceList
+                        references={selected.references}
+                        highlightWord=""
+                        renderPreview={renderPreview}
+                        onOpenReference={onOpenReference}
+                        onCloseSidebar={onCloseSidebar}
+                      />
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

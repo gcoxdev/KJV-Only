@@ -10,6 +10,7 @@ import type {
   ReferenceLinkOpenTarget,
   SearchResultOpenTarget,
   TabsOrientation,
+  ToolReferenceDisplayMode,
   WordVerseSelectionTarget,
 } from "@/types/reader"
 
@@ -38,6 +39,10 @@ const REFERENCE_TARGETS = new Set<ReferenceLinkOpenTarget>([
   "new-panel",
   "targeted-panel",
 ])
+const TOOL_REFERENCE_DISPLAY_MODES = new Set<ToolReferenceDisplayMode>([
+  "buttons",
+  "table",
+])
 
 export type ReaderDisplaySettings = {
   readerColorTheme: ReaderColorTheme
@@ -46,6 +51,7 @@ export type ReaderDisplaySettings = {
   darkHighlightColor: string
   verseSpacing: number
   contextVerseCount: number
+  toolReferenceDisplayMode: ToolReferenceDisplayMode
   hideReadModeVerseNumbers: boolean
   readModeParagraphIndent: boolean
   flowVersesByParagraph: boolean
@@ -96,6 +102,7 @@ export function defaultReaderDisplaySettings(): ReaderDisplaySettings {
     darkHighlightColor: highlightColor,
     verseSpacing: 0,
     contextVerseCount: 1,
+    toolReferenceDisplayMode: "buttons",
     hideReadModeVerseNumbers: false,
     readModeParagraphIndent: false,
     flowVersesByParagraph: false,
@@ -155,6 +162,12 @@ export function parseReaderDisplaySettings(
       MIN_CONTEXT_VERSE_COUNT,
       MAX_CONTEXT_VERSE_COUNT,
     ),
+    toolReferenceDisplayMode: isOneOf(
+      value.toolReferenceDisplayMode,
+      TOOL_REFERENCE_DISPLAY_MODES,
+    )
+      ? value.toolReferenceDisplayMode
+      : defaults.toolReferenceDisplayMode,
     hideReadModeVerseNumbers:
       typeof value.hideReadModeVerseNumbers === "boolean"
         ? value.hideReadModeVerseNumbers

@@ -359,10 +359,10 @@ const HELP_SECTIONS: HelpSection[] = [
         keywords: ["cross refs", "cross references"],
       },
       {
-        label: "How to preview context around a tool reference",
+        label: "How to view and preview tool references",
         body:
-          "Hover, focus, or tap a Scripture reference in a study tool to preview it. Choose Context in the preview to include the surrounding verses, or Open to navigate to the reference. Settings > Other controls how many verses are shown before and after both tool references and Search results.",
-        keywords: ["reference preview", "popover", "context", "surrounding verses", "open reference"],
+          "Settings > Other can show study-tool references as compact buttons or as a scrollable verse table. Button mode previews a reference when you hover, focus, or tap it. Table mode shows each referenced verse directly with independent Open and Context controls. The context-verse setting controls how many surrounding verses both modes and Search results display.",
+        keywords: ["reference preview", "popover", "table", "buttons", "context", "surrounding verses", "open reference"],
       },
       {
         label: "How to use Concordance",
@@ -577,8 +577,8 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What the Other tab controls",
         body:
-          "The Other tab controls how many surrounding verses Search Context and reference previews show before and after a match. It also controls whether Welcome Home opens as the active tab when the app starts without a shared layout. Genesis 1 remains available as the reader tab either way.",
-        keywords: ["other tab", "context verses", "surrounding verses", "welcome home startup", "startup tab", "genesis"],
+          "The Other tab controls whether tool references use preview buttons or a verse table, how many surrounding verses Search Context and tool references show, and whether Welcome Home opens as the active tab when the app starts without a shared layout. Genesis 1 remains available as the reader tab either way.",
+        keywords: ["other tab", "reference display", "reference table", "reference buttons", "context verses", "surrounding verses", "welcome home startup", "startup tab", "genesis"],
       },
       {
         label: "How to change highlight colors",

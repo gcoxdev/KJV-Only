@@ -10,7 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
+import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 import { StudySearchForm } from "@/components/reader/study-search-form";
 import { Badge } from "@/components/ui/badge";
 
@@ -128,19 +128,13 @@ export function StrongsTool({
                                   </span>
                                 </AccordionTrigger>
                                 <AccordionContent>
-                                  <div className="flex flex-wrap gap-2">
-                                    {references.map((reference, index) => (
-                                      <Fragment key={`${code}-${word}-${reference}-${index}`}>
-                                        <ConcordanceReferencePopover
-                                          reference={reference}
-                                          highlightWord={word}
-                                          renderPreview={renderPreview}
-                                          onOpenReference={onOpenReference}
-                                          onCloseSidebar={onCloseSidebar}
-                                        />
-                                      </Fragment>
-                                    ))}
-                                  </div>
+                                  <ToolReferenceList
+                                    references={references}
+                                    highlightWord={word}
+                                    renderPreview={renderPreview}
+                                    onOpenReference={onOpenReference}
+                                    onCloseSidebar={onCloseSidebar}
+                                  />
                                 </AccordionContent>
                               </AccordionItem>
                             ))}

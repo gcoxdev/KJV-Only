@@ -55,6 +55,9 @@ export function useReaderPreferences({
   const [contextVerseCount, setContextVerseCount] = useState(
     initialSettings.contextVerseCount,
   )
+  const [toolReferenceDisplayMode, setToolReferenceDisplayMode] = useState(
+    initialSettings.toolReferenceDisplayMode,
+  )
   const [hideReadModeVerseNumbers, setHideReadModeVerseNumbers] = useState(
     initialSettings.hideReadModeVerseNumbers,
   )
@@ -111,6 +114,7 @@ export function useReaderPreferences({
       darkHighlightColor,
       verseSpacing,
       contextVerseCount,
+      toolReferenceDisplayMode,
       hideReadModeVerseNumbers,
       readModeParagraphIndent,
       flowVersesByParagraph,
@@ -129,6 +133,7 @@ export function useReaderPreferences({
     darkHighlightColor,
     verseSpacing,
     contextVerseCount,
+    toolReferenceDisplayMode,
     hideReadModeVerseNumbers,
     readModeParagraphIndent,
     flowVersesByParagraph,
@@ -156,6 +161,8 @@ export function useReaderPreferences({
     setVerseSpacing,
     contextVerseCount,
     setContextVerseCount,
+    toolReferenceDisplayMode,
+    setToolReferenceDisplayMode,
     hideReadModeVerseNumbers,
     setHideReadModeVerseNumbers,
     readModeParagraphIndent,

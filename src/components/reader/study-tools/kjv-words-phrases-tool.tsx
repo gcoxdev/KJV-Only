@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import {
   BadgeInfoIcon,
   BookCheckIcon,
@@ -14,7 +14,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
+import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 import { StudySearchForm } from "@/components/reader/study-search-form";
 import type { PhraseEntry, UnitsEntry } from "@/types/reader";
 
@@ -145,18 +145,14 @@ export function KJVWordsPhrasesTool({
                             </p>
                           ) : null}
                           {entry.references?.length ? (
-                            <div className="mt-2 flex flex-wrap gap-2">
-                              {entry.references.map((reference) => (
-                                <Fragment key={reference}>
-                                  <ConcordanceReferencePopover
-                                    reference={reference}
-                                    highlightWord={key}
-                                    renderPreview={renderPreview}
-                                    onOpenReference={onOpenReference}
-                                    onCloseSidebar={onCloseSidebar}
-                                  />
-                                </Fragment>
-                              ))}
+                            <div className="mt-2">
+                              <ToolReferenceList
+                                references={entry.references}
+                                highlightWord={key}
+                                renderPreview={renderPreview}
+                                onOpenReference={onOpenReference}
+                                onCloseSidebar={onCloseSidebar}
+                              />
                             </div>
                           ) : null}
                           {entry.note ? (
@@ -219,18 +215,14 @@ export function KJVWordsPhrasesTool({
                             </p>
                           ) : null}
                           {entry.references?.length ? (
-                            <div className="mt-2 flex flex-wrap gap-2">
-                              {entry.references.map((reference) => (
-                                <Fragment key={reference}>
-                                  <ConcordanceReferencePopover
-                                    reference={reference}
-                                    highlightWord={key}
-                                    renderPreview={renderPreview}
-                                    onOpenReference={onOpenReference}
-                                    onCloseSidebar={onCloseSidebar}
-                                  />
-                                </Fragment>
-                              ))}
+                            <div className="mt-2">
+                              <ToolReferenceList
+                                references={entry.references}
+                                highlightWord={key}
+                                renderPreview={renderPreview}
+                                onOpenReference={onOpenReference}
+                                onCloseSidebar={onCloseSidebar}
+                              />
                             </div>
                           ) : null}
                           {entry.note ? (

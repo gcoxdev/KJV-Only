@@ -203,7 +203,7 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
             ref={triggerRef}
             type="button"
             className={cn(
-              "inline-flex items-center rounded-md border border-border px-2 py-0.5 text-xs font-medium text-foreground transition-colors",
+              "inline-flex items-center rounded-md border border-border px-1.5 py-px text-xs font-medium text-foreground transition-colors",
               "hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
             )}
             onMouseEnter={() => {
@@ -270,9 +270,8 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
         <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
-            size="sm"
+            size="xs"
             variant="outline"
-            className="h-7 px-2 text-xs"
             onClick={openReference}
           >
             <ExternalLinkIcon data-icon="inline-start" />
@@ -280,9 +279,8 @@ export const ConcordanceReferencePopover = memo(function ConcordanceReferencePop
           </Button>
           <Button
             type="button"
-            size="sm"
+            size="xs"
             variant={showContext ? "secondary" : "outline"}
-            className="h-7 px-2 text-xs"
             aria-pressed={showContext}
             onClick={toggleContext}
           >

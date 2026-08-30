@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -28,7 +28,7 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/ui/card";
-import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
+import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
@@ -203,27 +203,21 @@ function GenealogyNode({
                 {byNameReferences.map((entry) => (
                   <div key={`${person?.id ?? title}-${entry.name}`} className="text-xs">
                     <div className="mb-1 font-medium text-foreground/80">{entry.name}:</div>
-                    <div className="flex flex-wrap gap-2">
-                      {entry.verses.map((reference, index) => (
-                        <Fragment key={`${entry.name}-${reference}-${index}`}>
-                          <ConcordanceReferencePopover
-                            reference={reference}
-                            highlightWord={entry.name}
-                            renderPreview={renderReferencePreview}
-                            onOpenReference={onOpenReference}
-                            onCloseSidebar={onCloseSidebar}
-                          />
-                        </Fragment>
-                      ))}
-                    </div>
+                    <ToolReferenceList
+                      references={entry.verses}
+                      highlightWord={entry.name}
+                      renderPreview={renderReferencePreview}
+                      onOpenReference={onOpenReference}
+                      onCloseSidebar={onCloseSidebar}
+                    />
                   </div>
                 ))}
               </div>
             ) : firstReference ? (
-              <div className="leading-6">
-                <span className="font-medium text-foreground/80">Refs:</span>{" "}
-                <ConcordanceReferencePopover
-                  reference={firstReference}
+              <div className="flex flex-col gap-1 leading-6">
+                <span className="font-medium text-foreground/80">Refs:</span>
+                <ToolReferenceList
+                  references={[firstReference]}
                   highlightWord={title}
                   renderPreview={renderReferencePreview}
                   onOpenReference={onOpenReference}

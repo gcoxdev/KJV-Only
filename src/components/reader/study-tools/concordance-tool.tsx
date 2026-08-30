@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { BookAIcon, LoaderCircleIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
+import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 import { StudySearchForm } from "@/components/reader/study-search-form";
 
 type ConcordanceEntry = { key: string; references: string[] };
@@ -103,19 +103,13 @@ export function ConcordanceTool({
                       {entry.references.length === 0 ? (
                         <p className="text-sm text-muted-foreground">No references found.</p>
                       ) : (
-                        <div className="flex flex-wrap gap-2">
-                          {entry.references.map((reference, index) => (
-                            <Fragment key={`${entry.key}-${reference}-${index}`}>
-                              <ConcordanceReferencePopover
-                                reference={reference}
-                                highlightWord={entry.key}
-                                renderPreview={renderPreview}
-                                onOpenReference={onOpenReference}
-                                onCloseSidebar={onCloseSidebar}
-                              />
-                            </Fragment>
-                          ))}
-                        </div>
+                        <ToolReferenceList
+                          references={entry.references}
+                          highlightWord={entry.key}
+                          renderPreview={renderPreview}
+                          onOpenReference={onOpenReference}
+                          onCloseSidebar={onCloseSidebar}
+                        />
                       )}
                     </AccordionContent>
                   </AccordionItem>
