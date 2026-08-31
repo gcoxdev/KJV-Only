@@ -305,7 +305,10 @@ export default defineConfig({
             id.includes("/node_modules/leaflet/") ||
             id.includes("/node_modules/react-leaflet/")
           ) {
-            return "maps-vendor"
+            return "leaflet-vendor"
+          }
+          if (id.includes("/node_modules/maplibre-gl/")) {
+            return "maplibre-vendor"
           }
           return undefined
         },

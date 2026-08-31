@@ -3,10 +3,19 @@ import { describe, expect, it } from "vitest";
 import {
   boundsForGeoJson,
   cleanMapMarkup,
+  mapGeoJsonForDisplay,
   mapEntrySearchableText,
   matchesMapWord,
   parseJsonl,
 } from "@/lib/maps";
+import {
+  containsMapNameField,
+  DEFAULT_MAP_RENDERER,
+  ENGLISH_MAP_NAME_EXPRESSION,
+  isMapRenderer,
+  normalizeOpenFreeMapStyle,
+  readSessionMapRenderer,
+} from "@/lib/map-renderers";
 
 describe("maps helpers", () => {
   it("cleans markup and matches normalized words", () => {
@@ -70,6 +79,110 @@ describe("maps helpers", () => {
     ).toEqual([
       [20, 10],
       [40, 30],
+    ]);
+  });
+
+  it("uses detailed geometry once and keeps points for point-only maps", () => {
+    const preciseFeature = {
+      geometry: { type: "LineString", coordinates: [[1, 2], [3, 4]] },
+      properties: { id: "river.geometry" },
+    };
+    expect(
+      mapGeoJsonForDisplay({
+        bbox: [0, 0, 100, 100],
+        features: [
+          preciseFeature,
+          {
+            geometry: { type: "LineString", coordinates: [[1, 2]] },
+            properties: { id: "river.simplified" },
+          },
+          {
+            geometry: { type: "Point", coordinates: [1, 2] },
+            properties: { id: "river.point" },
+          },
+        ],
+      }),
+    ).toEqual({ bbox: undefined, features: [preciseFeature] });
+
+    const pointOnlyPayload = {
+      features: [
+        {
+          geometry: { type: "Point", coordinates: [1, 2] },
+          properties: { id: "place.point" },
+        },
+      ],
+    };
+    expect(mapGeoJsonForDisplay(pointOnlyPayload)).toBe(pointOnlyPayload);
+  });
+
+  it("defaults to OpenFreeMap and recognizes supported renderers", () => {
+    expect(DEFAULT_MAP_RENDERER).toBe("open-free-map");
+    expect(isMapRenderer("open-free-map")).toBe(true);
+    expect(isMapRenderer("leaflet")).toBe(true);
+    expect(isMapRenderer("unknown")).toBe(false);
+    expect(readSessionMapRenderer()).toBe("open-free-map");
+  });
+
+  it("identifies name label expressions without changing road shields", () => {
+    expect(
+      containsMapNameField([
+        "case",
+        ["has", "name:nonlatin"],
+        ["get", "name:latin"],
+        ["get", "name_en"],
+      ]),
+    ).toBe(true);
+    expect(containsMapNameField(["to-string", ["get", "ref"]])).toBe(false);
+    expect(ENGLISH_MAP_NAME_EXPRESSION).toEqual([
+      "coalesce",
+      ["get", "name_en"],
+      ["get", "name:en"],
+      ["get", "name:latin"],
+      ["get", "name"],
+    ]);
+  });
+
+  it("makes OpenFreeMap ordered numeric filters null-safe", () => {
+    const style = normalizeOpenFreeMapStyle({
+      version: 8,
+      sources: {},
+      layers: [
+        {
+          id: "road_shield_us",
+          type: "symbol",
+          source: "roads",
+          "source-layer": "transportation_name",
+          filter: ["<=", ["get", "ref_length"], 6],
+        },
+        {
+          id: "unchanged",
+          type: "symbol",
+          source: "roads",
+          "source-layer": "transportation_name",
+          filter: ["==", ["get", "class"], "motorway"],
+        },
+      ],
+    });
+
+    const roadShieldLayer = style.layers[0];
+    const unchangedLayer = style.layers[1];
+    expect(
+      roadShieldLayer && "filter" in roadShieldLayer
+        ? roadShieldLayer.filter
+        : undefined,
+    ).toEqual([
+      "<=",
+      ["coalesce", ["get", "ref_length"], 9999],
+      6,
+    ]);
+    expect(
+      unchangedLayer && "filter" in unchangedLayer
+        ? unchangedLayer.filter
+        : undefined,
+    ).toEqual([
+      "==",
+      ["get", "class"],
+      "motorway",
     ]);
   });
 });

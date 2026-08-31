@@ -403,8 +403,8 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to use Maps",
         body:
-          "Maps provide place and geography context. Select or search for a place, open its interactive map, review linked places, and follow its Scripture references. Download the Maps bundle before going offline.",
-        keywords: ["maps", "places", "geography"],
+          "Maps provide place and geography context. Select or search for a place, open its interactive map, review linked places, and follow its Scripture references. OpenFreeMap is the default English-first view; use the Map selector at the top right to switch to the Leaflet view with local-language OpenStreetMap labels. The Maps download stores the place index and geometry for offline lookup, but both background maps still require a connection.",
+        keywords: ["maps", "places", "geography", "openfreemap", "leaflet", "english labels", "local labels"],
       },
       {
         label: "How to browse Topics",

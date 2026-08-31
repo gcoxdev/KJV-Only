@@ -1,4 +1,4 @@
-import { memo, useEffect } from "react";
+import { memo, useEffect, useMemo } from "react";
 import L from "leaflet";
 import {
   GeoJSON as LeafletGeoJSON,
@@ -7,7 +7,11 @@ import {
   useMap,
 } from "react-leaflet";
 
-import { boundsForGeoJson, type MapGeoJsonPayload } from "@/lib/maps";
+import {
+  boundsForGeoJson,
+  mapGeoJsonForDisplay,
+  type MapGeoJsonPayload,
+} from "@/lib/maps";
 
 const MapBoundsSync = memo(function MapBoundsSync({
   geojson,
@@ -34,14 +38,24 @@ export function MapGeoJsonView({
   geojson: MapGeoJsonPayload;
   className?: string;
 }) {
+  const displayGeoJson = useMemo(
+    () => mapGeoJsonForDisplay(geojson),
+    [geojson],
+  );
+
   return (
-    <MapContainer center={[31.5, 35]} zoom={6} className={className} scrollWheelZoom>
+    <MapContainer
+      center={[31.5, 35]}
+      zoom={6}
+      className={className}
+      scrollWheelZoom
+    >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <LeafletGeoJSON
-        data={geojson as never}
+        data={displayGeoJson as never}
         style={() => ({
           color: "#2563eb",
           weight: 2,
@@ -59,7 +73,7 @@ export function MapGeoJsonView({
           })
         }
       />
-      <MapBoundsSync geojson={geojson} />
+      <MapBoundsSync geojson={displayGeoJson} />
     </MapContainer>
   );
 }

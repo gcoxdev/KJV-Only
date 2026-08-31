@@ -528,6 +528,64 @@ test("loads study-word tools progressively without blocking the reader", async (
   expect(measures.allTools).toBeLessThan(15_000)
 })
 
+test("loads the MapLibre worker and switches map renderers", async ({ page }) => {
+  await page.route("https://tiles.openfreemap.org/styles/bright", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        version: 8,
+        sources: {
+          workerCheck: {
+            type: "geojson",
+            data: {
+              type: "FeatureCollection",
+              features: [
+                {
+                  type: "Feature",
+                  properties: {},
+                  geometry: { type: "Point", coordinates: [35, 31.5] },
+                },
+              ],
+            },
+          },
+        },
+        layers: [
+          {
+            id: "worker-check",
+            type: "circle",
+            source: "workerCheck",
+            paint: { "circle-radius": 2 },
+          },
+        ],
+      }),
+    })
+  })
+
+  await page.goto("/")
+  await expectReaderReady(page)
+  await page
+    .getByRole("button", { name: "Details for beginning", exact: true })
+    .first()
+    .click()
+
+  const mapsTrigger = page
+    .getByRole("button", { name: "Maps", exact: true })
+    .filter({ visible: true })
+  await expect(mapsTrigger).toBeVisible()
+  if ((await mapsTrigger.getAttribute("aria-expanded")) !== "true") {
+    await mapsTrigger.click()
+  }
+
+  await page.getByRole("textbox", { name: "Search maps" }).fill("Jerusalem")
+  await page.getByRole("textbox", { name: "Search maps" }).press("Enter")
+  await page.getByRole("button", { name: "Open Map" }).first().click()
+
+  await expect(page.getByText("Loading English map...")).toBeHidden()
+  await expect(page.locator(".maplibregl-canvas")).toBeVisible()
+  await page.getByRole("button", { name: "Leaflet", exact: true }).click()
+  await expect(page.locator(".leaflet-container")).toBeVisible()
+})
+
 test.describe("study-data corpus isolation", () => {
   test.use({ serviceWorkers: "block" })
 

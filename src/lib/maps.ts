@@ -13,6 +13,7 @@ export type MapGeoJsonPayload = {
   bbox?: number[];
   features?: Array<{
     type?: string;
+    properties?: Record<string, unknown>;
     geometry?: {
       type?: string;
       coordinates?: unknown;
@@ -134,6 +135,59 @@ export function boundsForGeoJson(payload: MapGeoJsonPayload) {
     [bounds.minLat, bounds.minLng],
     [bounds.maxLat, bounds.maxLng],
   ] as [[number, number], [number, number]];
+}
+
+function mapFeatureId(
+  feature: NonNullable<MapGeoJsonPayload["features"]>[number],
+) {
+  const id = feature.properties?.id;
+  return typeof id === "string" ? id : null;
+}
+
+function isPointGeometry(type: string | undefined) {
+  return type === "Point" || type === "MultiPoint";
+}
+
+/**
+ * Removes display-only duplicates from the source map data without changing the
+ * stored corpus. Detailed geometry and its simplified fallback frequently ship
+ * together, while representative points accompany paths and areas for indexing.
+ */
+export function mapGeoJsonForDisplay(
+  payload: MapGeoJsonPayload,
+): MapGeoJsonPayload {
+  const features = payload.features;
+  if (!features?.length) {
+    return payload;
+  }
+
+  const featureIds = new Set(
+    features.map(mapFeatureId).filter((id): id is string => id !== null),
+  );
+  const withoutSimplifiedDuplicates = features.filter((feature) => {
+    const id = mapFeatureId(feature);
+    if (!id?.endsWith(".simplified")) {
+      return true;
+    }
+
+    return !featureIds.has(`${id.slice(0, -".simplified".length)}.geometry`);
+  });
+  const hasNonPointGeometry = withoutSimplifiedDuplicates.some(
+    (feature) =>
+      Boolean(feature.geometry?.type) &&
+      !isPointGeometry(feature.geometry?.type),
+  );
+  const displayFeatures = hasNonPointGeometry
+    ? withoutSimplifiedDuplicates.filter(
+        (feature) => !isPointGeometry(feature.geometry?.type),
+      )
+    : withoutSimplifiedDuplicates;
+
+  if (displayFeatures.length === features.length) {
+    return payload;
+  }
+
+  return { ...payload, bbox: undefined, features: displayFeatures };
 }
 
 export function parseJsonl<T>(text: string) {
