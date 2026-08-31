@@ -58,6 +58,7 @@ export function ReaderTopBar({
 }: ReaderTopBarProps) {
   return (
     <header className="@container/topbar z-20 flex shrink-0 items-center justify-between border-b border-subtle-divider/80 bg-workspace-chrome/90 px-3 py-2 backdrop-blur">
+      <h1 className="sr-only">KJV Only Bible Reader</h1>
       <div className="flex min-w-0 items-center gap-3">
         <DropdownMenu>
           <DropdownMenuTrigger

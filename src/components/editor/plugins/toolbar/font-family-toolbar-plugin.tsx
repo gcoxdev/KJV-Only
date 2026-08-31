@@ -66,10 +66,9 @@ export function FontFamilyToolbarPlugin() {
         setFontFamily(value)
         handleClick(value)
       }}
-      aria-label={buttonAriaLabel}
     >
-      <SelectTrigger className="!h-8 w-min gap-1">
-        <TypeIcon className="size-4" />
+      <SelectTrigger className="!h-8 w-min gap-1" aria-label={buttonAriaLabel}>
+        <TypeIcon className="size-4" aria-hidden="true" />
         <span style={{ fontFamily }}>{fontFamily}</span>
       </SelectTrigger>
       <SelectContent>

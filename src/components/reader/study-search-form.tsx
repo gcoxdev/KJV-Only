@@ -65,11 +65,12 @@ export function StudySearchForm({
         onSearch(draftValue);
       }}
     >
-      <InputGroup className="bg-workspace-panel-elevated">
+      <InputGroup className="bg-workspace-panel-elevated has-disabled:opacity-100">
         <InputGroupInput
           ref={inputRef}
           name={name}
           placeholder={placeholder}
+          aria-label={`${ariaLabel} term`}
           className="bg-transparent"
           value={draftValue}
           onChange={(event) => {

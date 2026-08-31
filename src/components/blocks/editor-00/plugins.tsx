@@ -154,7 +154,11 @@ export function Plugins({
       {showToolbar ? (
         <ToolbarPlugin>
           {() => (
-            <div className="flex flex-wrap items-center gap-1 border-b p-2">
+            <div
+              className="flex flex-wrap items-center gap-1 border-b p-2"
+              role="toolbar"
+              aria-label="Note formatting"
+            >
               <HistoryToolbarPlugin />
               <Separator orientation="vertical" className="h-6" />
 

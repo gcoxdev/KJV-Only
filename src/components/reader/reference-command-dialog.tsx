@@ -62,6 +62,7 @@ export function ReferenceCommandDialog({
     () => buildReferenceCommandActions(parsed.targets),
     [parsed.targets],
   );
+  const hasCommandItems = actions.length > 0 || parsed.targets.length > 0;
 
   const handleOpenChange = useCallback(
     (nextOpen: boolean) => {
@@ -101,62 +102,74 @@ export function ReferenceCommandDialog({
         />
         <CommandList className="max-h-[24rem] px-1 pb-1">
           {!query.trim() ? (
-            <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-              Type a book, chapter, verse, or range to open it quickly.
-            </div>
-          ) : null}
-
-          {query.trim() && actions.length === 0 ? (
-            <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-              No recognizable references yet.
-            </div>
-          ) : null}
-
-          {actions.length > 0 ? (
-            <CommandGroup heading="Open">
-              {actions.map((action: ReferenceCommandAction) => {
-                const Icon = actionIcon(action.id);
-
-                return (
-                  <CommandItem
-                    key={action.id}
-                    value={action.label}
-                    onSelect={() => runAction(action.id)}
-                    className="items-start gap-3"
-                  >
-                    <Icon className="mt-0.5" aria-hidden="true" />
-                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="font-medium">{action.label}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {action.description}
-                      </span>
-                    </div>
-                  </CommandItem>
-                );
-              })}
+            <CommandGroup>
+              <CommandItem
+                value="Reference input instructions"
+                disabled
+                className="justify-center px-3 py-6 text-center text-sm font-normal text-muted-foreground data-[disabled=true]:opacity-100"
+              >
+                Type a book, chapter, verse, or range to open it quickly.
+              </CommandItem>
             </CommandGroup>
           ) : null}
 
-          {parsed.targets.length > 0 ? (
-            <>
-              <CommandSeparator />
-              <CommandGroup heading={`References (${parsed.targets.length})`}>
-                {parsed.targets.map((target) => (
-                  <CommandItem
-                    key={target.label}
-                    value={target.label}
-                    disabled
-                    className="items-start gap-3 data-[disabled=true]:opacity-100"
-                  >
-                    <BookOpenIcon className="mt-0.5" aria-hidden="true" />
-                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="font-medium">{target.label}</span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </>
+          {query.trim() && !hasCommandItems ? (
+            <CommandGroup>
+              <CommandItem
+                value="No recognizable references"
+                disabled
+                className="justify-center px-3 py-6 text-center text-sm font-normal text-muted-foreground data-[disabled=true]:opacity-100"
+              >
+                No recognizable references yet.
+              </CommandItem>
+            </CommandGroup>
           ) : null}
+
+            {actions.length > 0 ? (
+              <CommandGroup heading="Open">
+                {actions.map((action: ReferenceCommandAction) => {
+                  const Icon = actionIcon(action.id);
+
+                  return (
+                    <CommandItem
+                      key={action.id}
+                      value={action.label}
+                      onSelect={() => runAction(action.id)}
+                      className="items-start gap-3"
+                    >
+                      <Icon className="mt-0.5" aria-hidden="true" />
+                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                        <span className="font-medium">{action.label}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {action.description}
+                        </span>
+                      </div>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            ) : null}
+
+            {parsed.targets.length > 0 ? (
+              <>
+                <CommandSeparator />
+                <CommandGroup heading={`References (${parsed.targets.length})`}>
+                  {parsed.targets.map((target) => (
+                    <CommandItem
+                      key={target.label}
+                      value={target.label}
+                      disabled
+                      className="items-start gap-3 data-[disabled=true]:opacity-100"
+                    >
+                      <BookOpenIcon className="mt-0.5" aria-hidden="true" />
+                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                        <span className="font-medium">{target.label}</span>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
+            ) : null}
         </CommandList>
       </Command>
     </CommandDialog>

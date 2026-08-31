@@ -49,6 +49,7 @@ function renderToken(
     <span
       role="button"
       tabIndex={0}
+      data-inline-study-token="true"
       className="cursor-pointer rounded-sm px-0.5 py-0.5 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring/60"
       aria-label={`Details for ${displayText}`}
       onClick={(event) => {
