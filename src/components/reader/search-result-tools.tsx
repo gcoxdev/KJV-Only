@@ -83,21 +83,23 @@ export function SearchResultTools({
                   <Badge variant="secondary">Old Testament {facets.oldTestament}</Badge>
                   <Badge variant="secondary">New Testament {facets.newTestament}</Badge>
                 </div>
-                <div
-                  className="max-h-64 overflow-y-auto rounded-lg border p-1"
-                  role="region"
-                  aria-label="Book result counts"
-                  tabIndex={0}
-                >
-                  {facets.books.map((book) => (
-                    <div
-                      key={book.bookIndex}
-                      className="flex items-center justify-between gap-3 rounded-md px-2 py-1 text-sm"
-                    >
-                      <span className="truncate">{book.bookName}</span>
-                      <Badge variant="outline">{book.count}</Badge>
-                    </div>
-                  ))}
+                <div className="overflow-hidden rounded-lg border">
+                  <div
+                    className="max-h-64 overflow-y-auto p-1 [scrollbar-gutter:stable]"
+                    role="region"
+                    aria-label="Book result counts"
+                    tabIndex={0}
+                  >
+                    {facets.books.map((book) => (
+                      <div
+                        key={book.bookIndex}
+                        className="flex items-center justify-between gap-3 rounded-md px-2 py-1 text-sm"
+                      >
+                        <span className="truncate">{book.bookName}</span>
+                        <Badge variant="outline">{book.count}</Badge>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </>
             ) : (
