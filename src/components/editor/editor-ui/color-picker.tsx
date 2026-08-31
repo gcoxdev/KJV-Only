@@ -998,8 +998,12 @@ function ColorPickerTrigger(props: ColorPickerTriggerProps) {
   )
 }
 
-type ColorPickerContentProps = React.ComponentProps<typeof PopoverContent> & {
+type ColorPickerContentProps = Omit<
+  React.ComponentProps<typeof PopoverContent>,
+  "style"
+> & {
   asChild?: boolean
+  style?: React.CSSProperties
 }
 
 function ColorPickerContent(props: ColorPickerContentProps) {

@@ -60,8 +60,9 @@ export function FontSizeToolbarPlugin() {
         className="!size-8"
         onClick={() => updateFontSize(fontSize - 1)}
         disabled={fontSize <= MIN_FONT_SIZE}
+        aria-label="Decrease font size"
       >
-        <Minus className="size-3" />
+        <Minus className="size-3" aria-hidden="true" />
       </Button>
       <Input
         value={fontSize}
@@ -69,6 +70,8 @@ export function FontSizeToolbarPlugin() {
           updateFontSize(parseInt(e.target.value) || DEFAULT_FONT_SIZE)
         }
         className="!h-8 w-12 text-center"
+        aria-label="Font size"
+        inputMode="numeric"
         min={MIN_FONT_SIZE}
         max={MAX_FONT_SIZE}
       />
@@ -78,8 +81,9 @@ export function FontSizeToolbarPlugin() {
         className="!size-8"
         onClick={() => updateFontSize(fontSize + 1)}
         disabled={fontSize >= MAX_FONT_SIZE}
+        aria-label="Increase font size"
       >
-        <Plus className="size-3" />
+        <Plus className="size-3" aria-hidden="true" />
       </Button>
     </ButtonGroup>
   )

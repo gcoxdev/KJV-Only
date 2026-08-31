@@ -3,12 +3,14 @@ import { ContentEditable as LexicalContentEditable } from "@lexical/react/Lexica
 
 type Props = {
   placeholder: string
+  ariaLabel?: string
   className?: string
   placeholderClassName?: string
 }
 
 export function ContentEditable({
   placeholder,
+  ariaLabel = "Note body",
   className,
   placeholderClassName,
 }: Props): JSX.Element {
@@ -18,6 +20,7 @@ export function ContentEditable({
         className ??
         `ContentEditable__root relative block h-full min-h-0 overflow-auto px-8 py-4 focus:outline-none`
       }
+      aria-label={ariaLabel}
       aria-placeholder={placeholder}
       placeholder={
         <div

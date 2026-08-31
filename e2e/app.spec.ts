@@ -704,7 +704,9 @@ test("loads auxiliary reader panels on demand", async ({ page }) => {
     .filter({ visible: true })
     .first()
     .click()
-  await expect(page.getByLabel("Filter topics")).toBeVisible()
+  await expect(
+    page.getByRole("button", { name: "Filter topics", exact: true }),
+  ).toBeVisible()
 
   await openPanelHome()
   await page
@@ -767,7 +769,9 @@ test("keeps Tools and Topics accordion expansion scoped to each surface", async 
     "Search concordance...",
   )
   await panelConcordanceSearch.fill("faith")
-  await auxiliaryPanel.getByLabel("Search concordance").click()
+  await auxiliaryPanel
+    .getByRole("button", { name: "Search concordance", exact: true })
+    .click()
   await expect(panelConcordanceSearch).toHaveValue("faith")
 
   await sidebarConcordance.click()
@@ -776,7 +780,9 @@ test("keeps Tools and Topics accordion expansion scoped to each surface", async 
   )
   await expect(sidebarConcordanceSearch).toHaveValue("")
   await sidebarConcordanceSearch.fill("love")
-  await sidebar.getByLabel("Search concordance").click()
+  await sidebar
+    .getByRole("button", { name: "Search concordance", exact: true })
+    .click()
   await expect(sidebarConcordanceSearch).toHaveValue("love")
   await expect(panelConcordanceSearch).toHaveValue("faith")
 

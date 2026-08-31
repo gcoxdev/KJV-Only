@@ -333,8 +333,9 @@ export function SettingsPanelContent({
                     size="sm"
                     className="w-full"
                     onClick={onDecreaseFontSize}
+                    aria-label="Decrease font size"
                   >
-                    <AArrowDownIcon className="size-5" />
+                    <AArrowDownIcon className="size-5" aria-hidden="true" />
                   </Button>
                   <Button
                     type="button"
@@ -342,8 +343,9 @@ export function SettingsPanelContent({
                     size="sm"
                     className="w-full"
                     onClick={onResetFontSize}
+                    aria-label="Reset font size"
                   >
-                    <RotateCcwIcon />
+                    <RotateCcwIcon aria-hidden="true" />
                   </Button>
                   <Button
                     type="button"
@@ -351,8 +353,9 @@ export function SettingsPanelContent({
                     size="sm"
                     className="w-full"
                     onClick={onIncreaseFontSize}
+                    aria-label="Increase font size"
                   >
-                    <AArrowUpIcon className="size-5" />
+                    <AArrowUpIcon className="size-5" aria-hidden="true" />
                   </Button>
                 </div>
               </div>
@@ -419,6 +422,8 @@ export function SettingsPanelContent({
                 </div>
                 <Slider
                   id="verse-spacing"
+                  aria-label="Line spacing"
+                  thumbAriaLabel="Line spacing"
                   min={0}
                   max={24}
                   step={1}

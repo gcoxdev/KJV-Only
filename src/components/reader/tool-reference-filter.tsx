@@ -171,7 +171,6 @@ export function ToolReferenceFilter({
                       <Field orientation="horizontal">
                         <FieldLabel className="min-w-0 font-medium">
                           <Checkbox
-                            aria-label={testament.label}
                             checked={selectedBookCount === bookIndexes.length}
                             indeterminate={
                               selectedBookCount > 0 &&
@@ -190,7 +189,6 @@ export function ToolReferenceFilter({
                           <Field key={book.bookIndex} orientation="horizontal">
                             <FieldLabel className="min-w-0 font-normal">
                               <Checkbox
-                                aria-label={book.bookName}
                                 checked={
                                   !excludedBookIndexes.has(book.bookIndex)
                                 }

@@ -22,6 +22,9 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import {
   Popover,
   PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
@@ -68,19 +71,24 @@ export function SearchResultTools({
         />
         <PopoverContent align="end" className="w-72 p-3">
           <div className="flex flex-col gap-3">
-            <div>
-              <p className="font-medium text-foreground">Loaded Result Counts</p>
-              <p className="text-xs text-muted-foreground">
+            <PopoverHeader>
+              <PopoverTitle>Loaded Result Counts</PopoverTitle>
+              <PopoverDescription className="text-xs">
                 Counts reflect the currently loaded result set.
-              </p>
-            </div>
+              </PopoverDescription>
+            </PopoverHeader>
             {facets ? (
               <>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="secondary">Old Testament {facets.oldTestament}</Badge>
                   <Badge variant="secondary">New Testament {facets.newTestament}</Badge>
                 </div>
-                <div className="max-h-64 overflow-y-auto rounded-lg border p-1">
+                <div
+                  className="max-h-64 overflow-y-auto rounded-lg border p-1"
+                  role="region"
+                  aria-label="Book result counts"
+                  tabIndex={0}
+                >
                   {facets.books.map((book) => (
                     <div
                       key={book.bookIndex}
