@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -28,6 +28,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  shortcutBindingStartsWith,
+  shortcutStrokeFromKeyboardEvent,
+  type ShortcutBinding,
+} from "@/lib/keyboard-shortcut-runtime";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -63,6 +68,8 @@ type NotesPageProps = {
   ) => void;
   onDeleteNote: (noteId: string) => void;
   onOpenNoteLink: (target: NoteLinkTarget) => void;
+  saveShortcut: ShortcutBinding;
+  shortcutsActive: boolean;
 };
 
 function createPlainTextSerializedState(text: string): SerializedEditorState {
@@ -201,6 +208,8 @@ export function NotesPage({
   onUpdateNote,
   onDeleteNote,
   onOpenNoteLink,
+  saveShortcut,
+  shortcutsActive,
 }: NotesPageProps) {
   const filter: NotesTabFilter = tabState?.filter ?? "all";
   const selectedNoteId = tabState?.selectedNoteId ?? null;
@@ -290,7 +299,7 @@ export function NotesPage({
 
   const sourceModeButtonLabel = isSourceMode ? "Show rich text editor" : "Show note source";
 
-  const saveCurrentNote = () => {
+  const saveCurrentNote = useCallback(() => {
     if (!selectedNote) {
       return;
     }
@@ -302,7 +311,50 @@ export function NotesPage({
     });
     setIsEditing(false);
     setIsSourceMode(false);
-  };
+  }, [draftSourceBody, draftTitle, isSourceMode, onUpdateNote, selectedNote, serializedDraftBody]);
+
+  useEffect(() => {
+    if (!shortcutsActive || !saveShortcut) {
+      return;
+    }
+    let pending: string[] = [];
+    let timeoutId: number | null = null;
+    const clearPending = () => {
+      pending = [];
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+      timeoutId = null;
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.isComposing || !isEditing) return;
+      const stroke = shortcutStrokeFromKeyboardEvent(event);
+      if (!stroke) return;
+      let sequence = [...pending, stroke];
+      if (!shortcutBindingStartsWith(saveShortcut, sequence)) {
+        clearPending();
+        sequence = [stroke];
+      }
+      if (!shortcutBindingStartsWith(saveShortcut, sequence)) return;
+      event.preventDefault();
+      if (sequence.length === saveShortcut.length) {
+        clearPending();
+        if (hasDraftChanges) saveCurrentNote();
+        return;
+      }
+      pending = sequence;
+      timeoutId = window.setTimeout(clearPending, 1_200);
+    };
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown, true);
+      clearPending();
+    };
+  }, [
+    hasDraftChanges,
+    isEditing,
+    saveCurrentNote,
+    saveShortcut,
+    shortcutsActive,
+  ]);
 
   const cancelEditing = () => {
     if (!selectedNote) {

@@ -25,6 +25,7 @@ export const READER_STORAGE_KEYS = {
   notes: "kjv-reader-notes-v1",
   bookmarks: "kjv-reader-bookmarks-v1",
   searchLibrary: "kjv-search-library-v1",
+  shortcuts: "kjv-keyboard-shortcuts-v1",
 } as const;
 
 function resolveStorage(storage?: StorageLike): StorageLike | null {

@@ -225,6 +225,10 @@ export function useSettingsViewModel({
   onReferenceLinkOpenTargetChange,
   showWelcomeHomeAtStartup,
   onShowWelcomeHomeAtStartupChange,
+  shortcutBindings,
+  onShortcutBindingChange,
+  onResetShortcutBinding,
+  onResetAllShortcutBindings,
 }: UseSettingsViewModelParams) {
   const onIncreaseFontSize = useCallback(() => {
     setFontSize((current) => current + 4);
@@ -297,6 +301,10 @@ export function useSettingsViewModel({
     onReferenceLinkOpenTargetChange,
     showWelcomeHomeAtStartup,
     onShowWelcomeHomeAtStartupChange,
+    shortcutBindings,
+    onShortcutBindingChange,
+    onResetShortcutBinding,
+    onResetAllShortcutBindings,
   } satisfies SettingsPanelContentProps;
 }
 
