@@ -1,11 +1,4 @@
 - Make a lot of the settings per panel (base font size in settings, individual font size in panel)
-- Store previous search queries
-- Map with english tiles
-
 - Maybe make infinite scrolling for chapters possible, always have loaded prev, current, next
-
 * make sidebar override on mobile setting option
-* make selections targeted / not shared
-
-* make panel targeting tab context first then other tabs secondarily
 * how to get saved page - have a way to submit whether they've accepted Jesus today, possibly have some kind of counter, collect email / anonymous, possibly separate testimony page

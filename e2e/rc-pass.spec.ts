@@ -211,7 +211,14 @@ test.describe("constrained mobile study matrix", () => {
     await openAccordion(mapsTrigger)
     await page.getByRole("textbox", { name: "Search maps" }).fill("Jerusalem")
     await page.getByRole("textbox", { name: "Search maps" }).press("Enter")
-    await expect(page.getByRole("button", { name: "Open Map" }).first()).toBeVisible()
+    const openMapButton = page.getByRole("button", { name: "Open Map" }).first()
+    await expect(openMapButton).toBeVisible()
+    await openMapButton.click()
+    await expect(page.getByRole("group", { name: "Map renderer" })).toBeVisible()
+    await expect(page.locator('[data-map-renderer="open-free-map"]')).toBeVisible()
+    await page.getByRole("button", { name: "Leaflet", exact: true }).click()
+    await expect(page.locator(".leaflet-container")).toBeVisible()
+    await page.getByRole("button", { name: "Close", exact: true }).click()
 
     const genealogyTrigger = page
       .getByRole("button", { name: "Genealogy", exact: true })
