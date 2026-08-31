@@ -298,6 +298,9 @@ export default defineConfig({
           ) {
             return "ui-vendor"
           }
+          if (id.endsWith("/src/lib/keyboard-shortcut-runtime.ts")) {
+            return "keyboard-shortcuts"
+          }
           if (id.includes("/node_modules/@lexical/") || id.includes("/node_modules/lexical/")) {
             return "editor-vendor"
           }

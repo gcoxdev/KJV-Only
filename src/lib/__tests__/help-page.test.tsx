@@ -19,7 +19,10 @@ describe("HelpPage", () => {
 
     expect(markup).toContain("an active Welcome Home tab");
     expect(markup).toContain("Tools, Topics, Notes, and Bookmarks");
-    expect(markup).toContain("Visual, Targeting, and Other tabs");
+    expect(markup).toContain("Visual, Targeting, Shortcuts, and Other tabs");
+    expect(markup).toContain("What the Shortcuts tab controls");
+    expect(markup).toContain("How to tell which panel is active");
+    expect(markup).toContain("Alt plus an arrow key");
     expect(markup).not.toContain("Welcome Home in the first tab and Genesis 1 in the second tab");
   });
 });

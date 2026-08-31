@@ -92,6 +92,8 @@ test("major reader and overlay states meet automated WCAG checks", async ({
   states.push(await auditState(page, "settings visual"))
   await page.getByRole("tab", { name: "Targeting", exact: true }).click()
   states.push(await auditState(page, "settings targeting"))
+  await page.getByRole("tab", { name: "Shortcuts", exact: true }).click()
+  states.push(await auditState(page, "settings shortcuts"))
   await page.getByRole("tab", { name: "Other", exact: true }).click()
   states.push(await auditState(page, "settings other"))
 

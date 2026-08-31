@@ -328,6 +328,8 @@ export type ReaderPanelTreeProps = {
   onStartTour: () => void;
   onOpenSearchTab: () => void;
   onOpenStaticPageTab: (pageId: StaticPageId) => void;
+  activePanelLeafId: string | null;
+  onActivePanelChange: (leafId: string) => void;
 };
 
 type ReaderLeafPanelProps = Omit<ReaderPanelTreeProps, "root"> & {
@@ -439,6 +441,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   onStartTour,
   onOpenSearchTab,
   onOpenStaticPageTab,
+  activePanelLeafId,
+  onActivePanelChange,
 }: ReaderLeafPanelProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -767,19 +771,34 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
         );
       })()
     ) : null;
+  const isActivePanel = activePanelLeafId === leaf.id;
   const isTargetedPanel = targetedPanelLeafId === leaf.id;
   const canHistoryBack = canGoLeafHistoryBack(leaf.id);
   const canHistoryForward = canGoLeafHistoryForward(leaf.id);
+  const panelAccessibleName =
+    leaf.view === "reader"
+      ? `${book?.name ?? "Bible"} ${chapter?.chapter ?? leaf.chapterIndex + 1}`
+      : leaf.view === "picker"
+        ? "Panel Home"
+        : leaf.view === "page"
+          ? (getStaticPage(leaf.pageId)?.title ?? "Page")
+          : leaf.view.charAt(0).toUpperCase() + leaf.view.slice(1);
 
   return (
     <div
       data-panel-leaf-id={leaf.id}
+      data-active-panel={isActivePanel ? "true" : undefined}
+      role="region"
+      aria-label={`${panelAccessibleName} panel`}
+      tabIndex={-1}
+      onPointerDownCapture={() => onActivePanelChange(leaf.id)}
+      onFocusCapture={() => onActivePanelChange(leaf.id)}
       ref={(element) => {
         panelRef.current = element;
         panelElementRefs.current[leaf.id] = element;
       }}
       className={cn(
-        "h-full w-full min-w-0 bg-background",
+        "h-full w-full min-w-0 bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
         isFullscreenLeaf && "fixed inset-0 z-40 h-screen w-screen",
       )}
     >
@@ -787,7 +806,14 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
         className="flex h-full min-h-0 w-full min-w-0 flex-col rounded-none py-0"
         data-tour={leaf.view === "reader" ? "reader-panel" : undefined}
       >
-        <CardHeader className="border-b p-2!">
+        <CardHeader
+          data-active-panel-header={isActivePanel ? "true" : undefined}
+          className={cn(
+            "border-b p-2! transition-colors",
+            isActivePanel &&
+              "border-primary! bg-primary/18! [&>div>p]:text-foreground! [&>div>svg]:text-foreground!",
+          )}
+        >
           <div className="flex flex-wrap items-center gap-2">
             {showTargetedPanelToggle ? (
               <Button
@@ -1585,6 +1611,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
               }
             >
               <LazySearchPage
+                autoFocusInput={isActivePanel}
                 books={books}
                 concordanceWords={concordanceWords}
                 verseIndex={verseSearchIndex}
@@ -1643,6 +1670,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 onUpdateNote={onUpdateNote}
                 onDeleteNote={onDeleteNote}
                 onOpenNoteLink={onOpenNoteLink}
+                saveShortcut={settingsPanelProps.shortcutBindings["general.saveNote"]}
+                shortcutsActive={activePanelLeafId === leaf.id}
               />
             </Suspense>
           </CardContent>
@@ -1926,6 +1955,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
   onStartTour,
   onOpenSearchTab,
   onOpenStaticPageTab,
+  activePanelLeafId,
+  onActivePanelChange,
 }: ReaderPanelTreeProps) {
   const renderLeaf = (leaf: LeafNode) => (
     <ReaderLeafPanel
@@ -2029,6 +2060,8 @@ export const ReaderPanelTree = memo(function ReaderPanelTree({
       onStartTour={onStartTour}
       onOpenSearchTab={onOpenSearchTab}
       onOpenStaticPageTab={onOpenStaticPageTab}
+      activePanelLeafId={activePanelLeafId}
+      onActivePanelChange={onActivePanelChange}
     />
   );
 

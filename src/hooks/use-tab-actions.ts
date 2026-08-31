@@ -48,42 +48,32 @@ export function useTabActions({
         return;
       }
 
-      const nextTabId = createId();
-      let shouldActivate = false;
-
-      setTabs((currentTabs) => {
-        const activeIndex = currentTabs.findIndex(
-          (tab) => tab.id === activeTabId,
-        );
-        if (activeIndex < 0) {
-          return currentTabs;
-        }
-
-        const active = currentTabs[activeIndex];
-        const result = extractLeafNode(active.root, leafId);
-        if (!result.extracted) {
-          return currentTabs;
-        }
-
-        const sourceRoot = result.next ?? createLeaf();
-        const newTab: ReaderTab = {
-          id: nextTabId,
-          title: `Tab ${currentTabs.length + 1}`,
-          root: result.extracted,
-        };
-
-        const nextTabs = [...currentTabs];
-        nextTabs[activeIndex] = { ...active, root: sourceRoot };
-        nextTabs.push(newTab);
-        shouldActivate = true;
-        return nextTabs;
-      });
-
-      if (shouldActivate) {
-        setActiveTabId(nextTabId);
-        clearAllPanelPreviews();
-        scrollTabsEndIntoView();
+      const activeIndex = tabs.findIndex((tab) => tab.id === activeTabId);
+      if (activeIndex < 0) {
+        return;
       }
+
+      const active = tabs[activeIndex];
+      const result = extractLeafNode(active.root, leafId);
+      if (!result.extracted) {
+        return;
+      }
+
+      const nextTabId = createId();
+      const sourceRoot = result.next ?? createLeaf();
+      const newTab: ReaderTab = {
+        id: nextTabId,
+        title: `Tab ${tabs.length + 1}`,
+        root: result.extracted,
+      };
+      const nextTabs = [...tabs];
+      nextTabs[activeIndex] = { ...active, root: sourceRoot };
+      nextTabs.push(newTab);
+
+      setTabs(() => nextTabs);
+      setActiveTabId(nextTabId);
+      clearAllPanelPreviews();
+      scrollTabsEndIntoView();
     },
     [
       activeTabId,
@@ -91,50 +81,46 @@ export function useTabActions({
       scrollTabsEndIntoView,
       setActiveTabId,
       setTabs,
+      tabs,
     ],
   );
 
   const addTab = useCallback(() => {
-    let nextTabId: string | null = null;
+    const nextTabId = createId();
     setTabs((currentTabs) => {
-      const nextTab = createInitialTab(currentTabs.length + 1, "picker");
-      nextTabId = nextTab.id;
+      const nextTab = {
+        ...createInitialTab(currentTabs.length + 1, "picker"),
+        id: nextTabId,
+      };
       return [...currentTabs, nextTab];
     });
 
-    if (nextTabId) {
-      setActiveTabId(nextTabId);
-      scrollTabsEndIntoView();
-    }
+    setActiveTabId(nextTabId);
+    scrollTabsEndIntoView();
   }, [scrollTabsEndIntoView, setActiveTabId, setTabs]);
 
   const closeTab = useCallback(
     (tabId: string) => {
-      let nextActiveTabId: string | null | undefined;
-      setTabs((currentTabs) => {
-        if (currentTabs.length <= 1) {
-          return currentTabs;
-        }
-
-        const closingIndex = currentTabs.findIndex((tab) => tab.id === tabId);
-        if (closingIndex < 0) {
-          return currentTabs;
-        }
-
-        const nextTabs = currentTabs.filter((tab) => tab.id !== tabId);
-        if (tabId === activeTabId) {
-          const fallbackTab =
-            nextTabs[Math.max(0, closingIndex - 1)] ?? nextTabs[0] ?? null;
-          nextActiveTabId = fallbackTab?.id ?? null;
-        }
-        return nextTabs;
-      });
-
-      if (nextActiveTabId !== undefined) {
-        setActiveTabId(nextActiveTabId);
+      if (tabs.length <= 1) {
+        return;
       }
+
+      const closingIndex = tabs.findIndex((tab) => tab.id === tabId);
+      if (closingIndex < 0) {
+        return;
+      }
+
+      const nextTabs = tabs.filter((tab) => tab.id !== tabId);
+      setTabs(() => nextTabs);
+      if (tabId !== activeTabId) {
+        return;
+      }
+
+      const fallbackTab =
+        nextTabs[Math.max(0, closingIndex - 1)] ?? nextTabs[0] ?? null;
+      setActiveTabId(fallbackTab?.id ?? null);
     },
-    [activeTabId, setActiveTabId, setTabs],
+    [activeTabId, setActiveTabId, setTabs, tabs],
   );
 
   const moveTab = useCallback(

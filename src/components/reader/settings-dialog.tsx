@@ -59,10 +59,18 @@ import {
   MAX_CONTEXT_VERSE_COUNT,
   MIN_CONTEXT_VERSE_COUNT,
 } from "@/lib/context-verses";
+import { ShortcutsSettings } from "@/components/reader/shortcuts-settings";
+import type {
+  ShortcutActionId,
+  ShortcutBinding,
+  ShortcutBindings,
+} from "@/lib/keyboard-shortcut-runtime";
+
+export type SettingsTab = "visual" | "targeting" | "shortcuts" | "other";
 
 export type SettingsPanelContentProps = {
-  activeTab: "visual" | "targeting" | "other";
-  onActiveTabChange: (tab: "visual" | "targeting" | "other") => void;
+  activeTab: SettingsTab;
+  onActiveTabChange: (tab: SettingsTab) => void;
   theme: "light" | "dark";
   onThemeChange: (theme: "light" | "dark") => void;
   readerColorTheme: ReaderColorTheme;
@@ -103,6 +111,13 @@ export type SettingsPanelContentProps = {
   onReferenceLinkOpenTargetChange: (target: ReferenceLinkOpenTarget) => void;
   showWelcomeHomeAtStartup: boolean;
   onShowWelcomeHomeAtStartupChange: (checked: boolean) => void;
+  shortcutBindings: ShortcutBindings;
+  onShortcutBindingChange: (
+    actionId: ShortcutActionId,
+    binding: ShortcutBinding,
+  ) => void;
+  onResetShortcutBinding: (actionId: ShortcutActionId) => void;
+  onResetAllShortcutBindings: () => void;
 };
 
 type SettingsDialogProps = SettingsPanelContentProps & {
@@ -153,6 +168,10 @@ export function SettingsPanelContent({
   onReferenceLinkOpenTargetChange,
   showWelcomeHomeAtStartup,
   onShowWelcomeHomeAtStartupChange,
+  shortcutBindings,
+  onShortcutBindingChange,
+  onResetShortcutBinding,
+  onResetAllShortcutBindings,
 }: SettingsPanelContentProps) {
   const readerColorThemeLabels: Record<ReaderColorTheme, string> = {
     brown: "Brown",
@@ -253,15 +272,21 @@ export function SettingsPanelContent({
     <Tabs
       value={activeTab}
       onValueChange={(value) => {
-        if (value === "visual" || value === "targeting" || value === "other") {
+        if (
+          value === "visual" ||
+          value === "targeting" ||
+          value === "shortcuts" ||
+          value === "other"
+        ) {
           onActiveTabChange(value);
         }
       }}
       className="flex h-full min-h-0 flex-col overflow-hidden"
     >
-      <TabsList className="grid w-full grid-cols-3">
+      <TabsList className="grid w-full grid-cols-4">
         <TabsTrigger value="visual">Visual</TabsTrigger>
         <TabsTrigger value="targeting">Targeting</TabsTrigger>
+        <TabsTrigger value="shortcuts">Shortcuts</TabsTrigger>
         <TabsTrigger value="other">Other</TabsTrigger>
       </TabsList>
       <TabsContent
@@ -471,6 +496,17 @@ export function SettingsPanelContent({
                 />
               </div>
             </div>
+      </TabsContent>
+      <TabsContent
+        value="shortcuts"
+        className="mt-3 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-2"
+      >
+        <ShortcutsSettings
+          bindings={shortcutBindings}
+          onBindingChange={onShortcutBindingChange}
+          onResetBinding={onResetShortcutBinding}
+          onResetAllBindings={onResetAllShortcutBindings}
+        />
       </TabsContent>
       <TabsContent
         value="targeting"

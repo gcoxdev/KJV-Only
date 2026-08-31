@@ -129,6 +129,9 @@ import type {
   TopicsPanelProps,
 } from "@/components/reader/study-tools/topics-tool";
 import { filterRecordEntries } from "@/lib/leaf-state";
+import { useShortcutPreferences } from "@/hooks/use-keyboard-shortcuts";
+import { useReaderShortcuts } from "@/hooks/use-reader-shortcuts";
+import type { SettingsTab } from "@/components/reader/settings-dialog";
 
 const LazyReaderStudySidebar = lazy(async () => {
   const module = await import("@/components/reader/reader-study-sidebar");
@@ -165,6 +168,13 @@ export function KJVReader() {
   const [sidebarOpenRequestKey, setSidebarOpenRequestKey] = useState(0);
   const [sidebarCloseRequestKey, setSidebarCloseRequestKey] = useState(0);
   const [isReferenceCommandOpen, setIsReferenceCommandOpen] = useState(false);
+  const [activePanelLeafId, setActivePanelLeafId] = useState<string | null>(null);
+  const {
+    bindings: shortcutBindings,
+    setBinding: setShortcutBinding,
+    resetBinding: resetShortcutBinding,
+    resetAllBindings: resetAllShortcutBindings,
+  } = useShortcutPreferences();
   const hasOpenSearchView = useMemo(
     () => tabs.some((tab) => panelNodeContainsView(tab.root, "search")),
     [tabs],
@@ -245,9 +255,8 @@ export function KJVReader() {
     useRef<WordVerseSelectionTarget>(wordVerseSelectionTarget);
 
   useReaderStorageWarning();
-  const [activeSettingsTab, setActiveSettingsTab] = useState<
-    "visual" | "targeting" | "other"
-  >("visual");
+  const [activeSettingsTab, setActiveSettingsTab] =
+    useState<SettingsTab>("visual");
   const [tokenPopup, setTokenPopup] = useState<TokenPopupState | null>(null);
   const [fullscreenLeafId, setFullscreenLeafId] = useState<string | null>(null);
   const [panelMenuOpenLeafId, setPanelMenuOpenLeafId] = useState<string | null>(
@@ -1969,6 +1978,10 @@ export function KJVReader() {
     onReferenceLinkOpenTargetChange: setReferenceLinkOpenTarget,
     showWelcomeHomeAtStartup,
     onShowWelcomeHomeAtStartupChange: setShowWelcomeHomeAtStartup,
+    shortcutBindings,
+    onShortcutBindingChange: setShortcutBinding,
+    onResetShortcutBinding: resetShortcutBinding,
+    onResetAllShortcutBindings: resetAllShortcutBindings,
   });
 
   const progressPanelProps = useProgressViewModel({
@@ -2014,6 +2027,59 @@ export function KJVReader() {
     (leafId: string) => navigateLeafHistory(leafId, 1),
     [navigateLeafHistory],
   );
+
+  const openShortcutSettings = useCallback(() => {
+    setActiveSettingsTab("shortcuts");
+    openStaticPageTab("settings");
+  }, [openStaticPageTab]);
+
+  const focusPanel = useCallback((leafId: string) => {
+    setActivePanelLeafId(leafId);
+    requestAnimationFrame(() => {
+      panelElementRefs.current[leafId]?.focus({ preventScroll: true });
+    });
+  }, []);
+
+  const shortcutPanelLeafId = useReaderShortcuts({
+    bindings: shortcutBindings,
+    tabs,
+    activeTab,
+    activeTabId,
+    activePanelLeafId,
+    setActiveTabId,
+    onOpenReference: () => setIsReferenceCommandOpen(true),
+    onOpenSearch: openSearchTab,
+    sidebarAvailable,
+    isSidebarOpen: isRightSidebarOpen,
+    onSidebarOpenChange: setIsRightSidebarOpen,
+    onOpenShortcutSettings: openShortcutSettings,
+    onAddTab: addTab,
+    onCloseTab: closeTab,
+    onRenameTab: openRenameDialog,
+    onMoveTab: moveTab,
+    onMoveChapter: moveLeafChapter,
+    onUpdateLeafLocation: updateLeafLocation,
+    onSplitLeaf: splitLeaf,
+    onCloseLeaf: closeLeaf,
+    onToggleFullscreenLeaf: toggleFullscreenLeaf,
+    canGoHistoryBack: canGoLeafHistoryBack,
+    canGoHistoryForward: canGoLeafHistoryForward,
+    onGoHistoryBack: goLeafHistoryBack,
+    onGoHistoryForward: goLeafHistoryForward,
+    onToggleGroupOrientation: toggleParentGroupOrientation,
+    onOpenPanelMenu: setPanelMenuOpenLeafId,
+    onMoveLeafToNewTab: moveLeafToNewTab,
+    panelNeighborsForLeaf: neighborsForLeaf,
+    onFocusPanel: focusPanel,
+    onMoveLeaf: moveLeaf,
+    onInsertPanelInGroup: insertPanelInGroup,
+    onAddAroundGroup: addAroundGroup,
+    onToggleHighlightMode: toggleHighlightModeForLeaf,
+    onClearHighlights: handleClearLeafHighlights,
+    onBookmarkChapter: createChapterBookmark,
+    onBookmarkSelection: bookmarkLeafSelection,
+    highlightedVerseRangesByLeafId,
+  });
 
   if (!isLoaded) {
     return <ReaderStatusScreen message="Loading Bible data..." />;
@@ -2152,6 +2218,8 @@ export function KJVReader() {
         onStartTour: startGuidedTour,
         onOpenSearchTab: openSearchTab,
         onOpenStaticPageTab: openStaticPageTab,
+        activePanelLeafId: shortcutPanelLeafId,
+        onActivePanelChange: setActivePanelLeafId,
       }}
     />
   );

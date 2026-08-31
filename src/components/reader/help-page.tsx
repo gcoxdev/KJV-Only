@@ -97,6 +97,12 @@ const HELP_SECTIONS: HelpSection[] = [
         keywords: ["relabel tab", "rename tab", "tab options"],
       },
       {
+        label: "How to use or change keyboard shortcuts",
+        body:
+          "Open Settings > Shortcuts to see every available action and its current binding. Click a binding to replace it with one key combination or a sequence of up to three steps. You can clear an action, restore one default, or restore all defaults; press ? outside a text field to open the shortcut list directly.",
+        keywords: ["keyboard shortcuts", "hotkeys", "key bindings", "remap", "chords", "defaults"],
+      },
+      {
         label: "How to reorder tabs",
         body:
           "Drag a tab to a new position with a mouse, use Move Left or Move Right from its options menu, or long-press and drag it on a touch screen. With vertical tabs, the menu actions become Move Up and Move Down.",
@@ -213,6 +219,12 @@ const HELP_SECTIONS: HelpSection[] = [
         body:
           "Panel Home is the launch point for a panel. From there you can choose a Bible book and chapter or open Tools, Topics, Notes, Bookmarks, or Search. Informational pages such as Help and Download are opened from the main menu or Welcome Home.",
         keywords: ["panel home", "picker", "launch panel"],
+      },
+      {
+        label: "How to tell which panel is active",
+        body:
+          "The active panel uses the same accent-colored header treatment as the active tab. Click or focus anything in a panel to make it active, or use Alt plus an arrow key to move to the neighboring panel in that direction. These directional shortcuts can be changed under Settings > Shortcuts.",
+        keywords: ["active panel", "panel focus", "alt arrow", "keyboard navigation", "panel header"],
       },
       {
         label: "How panel history works",
@@ -553,8 +565,8 @@ const HELP_SECTIONS: HelpSection[] = [
     title: "Settings and Targeting",
     icon: Settings2Icon,
     summary:
-      "Settings are divided into Visual, Targeting, and Other tabs so appearance, opening behavior, and startup behavior can be controlled separately.",
-    keywords: ["settings", "visual", "targeting", "other", "theme", "dark mode", "font", "line spacing", "reference target", "welcome home"],
+      "Settings are divided into Visual, Targeting, Shortcuts, and Other tabs so appearance, opening behavior, keyboard controls, and startup behavior can be controlled separately.",
+    keywords: ["settings", "visual", "targeting", "shortcuts", "other", "theme", "dark mode", "font", "line spacing", "reference target", "welcome home"],
     items: [
       {
         label: "How to open Settings",
@@ -573,6 +585,12 @@ const HELP_SECTIONS: HelpSection[] = [
         body:
           "The Targeting tab controls where actions open. Word and verse selection, note links, search results, bookmarks, and reference links can each use their own destination behavior.",
         keywords: ["targeting tab", "open target", "new tab", "new panel", "targeted panel"],
+      },
+      {
+        label: "What the Shortcuts tab controls",
+        body:
+          "The Shortcuts tab lists configurable general, tab, panel, layout, and reader-panel actions. Defaults include Ctrl or Command combinations, Alt plus an arrow key to focus a neighboring panel, and sequential chords such as T then N. Plain-key shortcuts pause briefly for the next step and do not run while you type in a field or note editor; Save active note remains available in the active note editor.",
+        keywords: ["shortcuts tab", "keyboard", "ctrl", "command", "chord", "save note", "customize shortcuts"],
       },
       {
         label: "What the Other tab controls",

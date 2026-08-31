@@ -80,6 +80,7 @@ import { useSearchResultPresentation } from "@/hooks/use-search-result-presentat
 import { cn } from "@/lib/utils";
 
 type SearchPageProps = {
+  autoFocusInput?: boolean;
   books: Book[];
   concordanceWords: string[];
   verseIndex: VerseSearchIndexEntry[];
@@ -419,6 +420,7 @@ function normalizeSearchMode(mode: SearchMode | string | null | undefined): Sear
 }
 
 export function SearchPage({
+  autoFocusInput = false,
   books,
   concordanceWords,
   verseIndex,
@@ -1528,6 +1530,7 @@ export function SearchPage({
                   ))}
                 </div>
                 <Input
+                  autoFocus={autoFocusInput}
                   id="search-chip-input"
                   value={chipInputDraft}
                   onChange={(event) =>
@@ -1584,6 +1587,7 @@ export function SearchPage({
                     : "Phrase"}
               </Label>
               <Input
+                autoFocus={autoFocusInput}
                 id="search-phrase-input"
                 value={phraseInputDraft}
                 onChange={(event) =>

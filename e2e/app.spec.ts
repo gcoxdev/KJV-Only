@@ -69,10 +69,110 @@ test("recovers from corrupt persisted records", async ({ page }) => {
     localStorage.setItem("kjv-reader-bookmarks-v1", "not-json")
     localStorage.setItem("kjv-display-settings-v1", "[]")
     localStorage.setItem("kjv-search-library-v1", "{broken")
+    localStorage.setItem("kjv-keyboard-shortcuts-v1", "{broken")
   })
 
   await page.goto("/")
   await expectReaderReady(page)
+})
+
+test("lists, remaps, persists, and runs keyboard shortcuts", async ({ page }) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page.getByLabel("Open menu").click()
+  await page.getByRole("menuitem", { name: "Settings", exact: true }).click()
+  await page.getByRole("tab", { name: "Shortcuts", exact: true }).click()
+
+  const searchShortcut = page.getByRole("button", {
+    name: "Change shortcut for Open Search",
+  })
+  await expect(searchShortcut).toContainText("/")
+  await searchShortcut.click()
+  await page.keyboard.press("Control+Shift+F")
+  await expect(page.getByRole("dialog")).toContainText("Ctrl+Shift+F")
+  await page.getByRole("button", { name: "Save shortcut" }).click()
+
+  await page.keyboard.press("Control+Shift+F")
+  await expect(page.getByRole("heading", { name: "Search" })).toBeVisible()
+  await expect(page.getByLabel("Word or phrase")).toBeFocused()
+  await expect
+    .poll(() =>
+      page.evaluate(() => localStorage.getItem("kjv-keyboard-shortcuts-v1")),
+    )
+    .toContain('"general.search":["Mod+Shift+F"]')
+
+  const tabOptions = page.getByLabel(/^Tab options for /)
+  const tabCount = await tabOptions.count()
+  const searchInput = page.getByLabel("Word or phrase")
+  await searchInput.fill("")
+  await searchInput.pressSequentially("tn")
+  await expect(searchInput).toHaveValue("tn")
+  await expect(tabOptions).toHaveCount(tabCount)
+  await searchInput.blur()
+  await page.keyboard.press("t")
+  await page.keyboard.press("n")
+  await expect(tabOptions).toHaveCount(tabCount + 1)
+  await page.keyboard.press("t")
+  await page.keyboard.press("c")
+  await expect(tabOptions).toHaveCount(tabCount)
+  await expect(
+    page.getByText("No Bible data available. Run npm run build:data."),
+  ).toHaveCount(0)
+})
+
+test("shows and moves active panel focus and autofocuses panel Search", async ({
+  page,
+}) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  const panels = page.locator("[data-panel-leaf-id]:visible")
+  const firstPanel = panels.nth(0)
+  await firstPanel.getByLabel("Panel options").click()
+  await page.getByRole("menuitem", { name: "Split Right", exact: true }).click()
+  await expect(panels).toHaveCount(2)
+
+  const secondPanel = panels.nth(1)
+  await expect(firstPanel).toHaveAttribute("data-active-panel", "true")
+  await expect(
+    firstPanel.locator('[data-active-panel-header="true"]'),
+  ).toBeVisible()
+
+  await page.keyboard.press("Alt+ArrowRight")
+  await expect(secondPanel).toHaveAttribute("data-active-panel", "true")
+  await expect(secondPanel).toBeFocused()
+
+  await page.keyboard.press("Alt+ArrowLeft")
+  await expect(firstPanel).toHaveAttribute("data-active-panel", "true")
+  await expect(firstPanel).toBeFocused()
+
+  await secondPanel
+    .getByRole("button", { name: "Search", exact: true })
+    .click()
+  await expect(secondPanel.getByLabel("Word or phrase")).toBeFocused()
+})
+
+test("saves the active note with its keyboard shortcut", async ({ page }) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+
+  await page.getByLabel("Panel options").filter({ visible: true }).first().click()
+  await page.getByRole("menuitem", { name: "Home", exact: true }).click()
+  await page
+    .getByRole("button", { name: "Notes", exact: true })
+    .filter({ visible: true })
+    .first()
+    .click()
+  await page.getByRole("button", { name: "New General", exact: true }).click()
+  await page.getByPlaceholder("Note title").fill("Shortcut note")
+  await page.getByRole("textbox", { name: "Note body" }).fill("Saved from the keyboard")
+  await page.keyboard.press("Control+Enter")
+
+  await expect(page.getByRole("button", { name: "Edit note" })).toBeVisible()
+  await expect(
+    page.getByText("Shortcut note", { exact: true }).filter({ visible: true }),
+  ).toBeVisible()
 })
 
 test("builds the lazy search index and returns the expected verse", async ({ page }) => {
@@ -81,6 +181,7 @@ test("builds the lazy search index and returns the expected verse", async ({ pag
 
   await page.getByLabel("Open search").click()
   await expect(page.getByRole("heading", { name: "Search" })).toBeVisible()
+  await expect(page.getByLabel("Word or phrase")).toBeFocused()
   await page.getByLabel("Word or phrase").fill('"In the beginning"')
   await page.getByLabel("Run Bible search").click()
   await expect(page.getByText("Genesis 1:1", { exact: true })).toBeVisible()
