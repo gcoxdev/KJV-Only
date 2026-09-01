@@ -5,8 +5,15 @@ import { normalizeConcordanceWord } from "@/lib/references";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
+const ATTACHES_TO_PREVIOUS_TOKEN_PATTERN = /^[,.;:!?)]/;
+const STANDALONE_PUNCTUATION_PATTERN = /^\p{P}+$/u;
+
 export function isPunctuationToken(tokenText: string) {
-  return /^[,.;:!?)]/.test(tokenText);
+  return ATTACHES_TO_PREVIOUS_TOKEN_PATTERN.test(tokenText);
+}
+
+export function isStandalonePunctuationToken(tokenText: string) {
+  return STANDALONE_PUNCTUATION_PATTERN.test(tokenText);
 }
 
 export function formatDisplayTokenText(token: VerseToken) {
@@ -41,7 +48,7 @@ function renderToken(
   );
   const displayText = formatDisplayTokenText(token);
 
-  if (!isStudyMode) {
+  if (!isStudyMode || isStandalonePunctuationToken(token.text)) {
     return <span className={tokenClassName}>{displayText}</span>;
   }
 
