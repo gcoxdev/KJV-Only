@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { bookCodeForIndex, iconPath } from "@/lib/reader-view";
+import type { ReadingContinuation } from "@/lib/reading-progress";
 
 type ProgressChapter = {
   chapterIndex: number;
@@ -52,9 +53,12 @@ type ProgressByTestament = {
 export type ProgressPanelContentProps = {
   totalProgressPercent: number;
   progressByTestament: ProgressByTestament;
+  readingContinuation: ReadingContinuation | null;
+  isReadingProgressReady: boolean;
   onSetAllTestamentChaptersRead: (testament: "old" | "new", read: boolean) => void;
   onSetAllBookChaptersRead: (bookIndex: number, read: boolean) => void;
   onOpenChapterInNewTab: (bookIndex: number, chapterIndex: number) => void;
+  onContinueReading: (bookIndex: number, chapterIndex: number) => void;
   onToggleChapterRead: (bookIndex: number, chapterIndex: number) => void;
   onResetAllProgress: () => void;
 };
@@ -67,12 +71,19 @@ type ProgressDialogProps = ProgressPanelContentProps & {
 export function ProgressPanelContent({
   totalProgressPercent,
   progressByTestament,
+  readingContinuation,
+  isReadingProgressReady,
   onSetAllTestamentChaptersRead,
   onSetAllBookChaptersRead,
   onOpenChapterInNewTab,
+  onContinueReading,
   onToggleChapterRead,
   onResetAllProgress,
 }: ProgressPanelContentProps) {
+  const continuationLabel = readingContinuation
+    ? `${readingContinuation.bookName} ${readingContinuation.chapterNumber}`
+    : null;
+
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="min-h-0 flex-1 flex flex-col gap-3 overflow-auto pr-1 text-sm">
@@ -84,6 +95,50 @@ export function ProgressPanelContent({
             }
           </ProgressValue>
         </Progress>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border/70 bg-card/70 p-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Up next
+            </p>
+            <p className="mt-1 font-semibold text-foreground" aria-live="polite">
+              {!isReadingProgressReady
+                ? "Preparing reading progress..."
+                : continuationLabel ?? "Reading complete"}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              {!isReadingProgressReady
+                ? "The full chapter list is still loading."
+                : continuationLabel
+                  ? "Continue with the next unread chapter after your most recently marked chapter."
+                  : "Every chapter in the Bible is marked as read."}
+            </p>
+          </div>
+          <Button
+            type="button"
+            disabled={!isReadingProgressReady || !readingContinuation}
+            aria-label={
+              continuationLabel
+                ? `Continue reading at ${continuationLabel}`
+                : "Reading complete"
+            }
+            onClick={() => {
+              if (readingContinuation) {
+                onContinueReading(
+                  readingContinuation.bookIndex,
+                  readingContinuation.chapterIndex,
+                );
+              }
+            }}
+          >
+            <BookOpenIcon data-icon="inline-start" />
+            {isReadingProgressReady && readingContinuation
+              ? "Continue Reading"
+              : isReadingProgressReady
+                ? "Bible Complete"
+                : "Preparing..."}
+          </Button>
+        </div>
 
         <Accordion className="w-full rounded-md border px-3" multiple defaultValue={[]}>
           {[progressByTestament.old, progressByTestament.new].map((testament) => {

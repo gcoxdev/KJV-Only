@@ -1,14 +1,19 @@
 import { DonatePage } from "@/components/reader/donate-page";
 import { DownloadPage } from "@/components/reader/download-page";
-import { HelpPage } from "@/components/reader/help-page";
 import { HowToGetSavedPage } from "@/components/reader/how-to-get-saved-page";
 import { ResourcesPage } from "@/components/reader/resources-page";
 import { WelcomeHomePage } from "@/components/reader/welcome-home-page";
 import { WhyKJVOnlyPage } from "@/components/reader/why-kjv-only-page";
 import { getStaticPage } from "@/lib/static-pages";
+import type { ReadingContinuation } from "@/lib/reading-progress";
 import type { Book } from "@/types/bible";
 import type { StaticPageId } from "@/types/reader";
-import type { ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
+
+const LazyHelpPage = lazy(async () => {
+  const module = await import("@/components/reader/help-page");
+  return { default: module.HelpPage };
+});
 
 type StaticPageProps = {
   books: Book[];
@@ -24,6 +29,9 @@ type StaticPageProps = {
   onStartTour?: () => void;
   onOpenSearch?: () => void;
   onOpenPage?: (pageId: StaticPageId) => void;
+  readingContinuation?: ReadingContinuation | null;
+  isReadingProgressReady?: boolean;
+  onContinueReading?: (bookIndex: number, chapterIndex: number) => void;
   showWelcomeHomeAtStartup?: boolean;
   onShowWelcomeHomeAtStartupChange?: (checked: boolean) => void;
 };
@@ -42,6 +50,9 @@ export function StaticPage({
   onStartTour,
   onOpenSearch,
   onOpenPage,
+  readingContinuation = null,
+  isReadingProgressReady = false,
+  onContinueReading,
   showWelcomeHomeAtStartup = true,
   onShowWelcomeHomeAtStartupChange,
 }: StaticPageProps) {
@@ -83,6 +94,7 @@ export function StaticPage({
           onStartTour &&
           onOpenSearch &&
           onOpenPage &&
+          onContinueReading &&
           renderPreview &&
           onOpenReference &&
           onCloseSidebar &&
@@ -92,6 +104,9 @@ export function StaticPage({
               onStartTour={onStartTour}
               onOpenSearch={onOpenSearch}
               onOpenPage={onOpenPage}
+              readingContinuation={readingContinuation}
+              isReadingProgressReady={isReadingProgressReady}
+              onContinueReading={onContinueReading}
               renderPreview={renderPreview}
               onOpenReference={onOpenReference}
               onCloseSidebar={onCloseSidebar}
@@ -127,7 +142,17 @@ export function StaticPage({
               onExportBookmarks={onExportBookmarks}
             />
           ) : null}
-          {page.id === "help" ? <HelpPage /> : null}
+          {page.id === "help" ? (
+            <Suspense
+              fallback={
+                <div className="flex min-h-40 items-center justify-center text-sm text-muted-foreground">
+                  Loading Help...
+                </div>
+              }
+            >
+              <LazyHelpPage />
+            </Suspense>
+          ) : null}
           {page.id === "resources" ? <ResourcesPage /> : null}
           {page.id === "donate" && renderPreview && onOpenReference && onCloseSidebar ? (
             <DonatePage

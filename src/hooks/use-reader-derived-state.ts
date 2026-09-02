@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import type { Book } from "@/types/bible";
 import { chapterProgressKey } from "@/lib/reader-view";
 import { buildLeafNeighborMap, type LeafNeighbors } from "@/lib/reader-neighbors";
+import { getReadingContinuation } from "@/lib/reading-progress";
 import type { ReaderTab } from "@/types/reader";
 
 type UseReaderDerivedStateArgs = {
@@ -131,6 +132,11 @@ export function useReaderDerivedState({
     return counts;
   }, [books, readChapters]);
 
+  const readingContinuation = useMemo(
+    () => getReadingContinuation(books, readChapters),
+    [books, readChapters],
+  );
+
   const totalProgressPercent =
     progressByTestament.total.total > 0
       ? Math.round(
@@ -147,6 +153,7 @@ export function useReaderDerivedState({
     existingTabTargets,
     progressByTestament,
     readChapterCountByBook,
+    readingContinuation,
     totalProgressPercent,
   };
 }

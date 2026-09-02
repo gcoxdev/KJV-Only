@@ -78,6 +78,7 @@ type UseWorkspaceNavigationParams = {
         | "view"
         | "pickerTestament"
         | "pickerBookIndex"
+        | "pageId"
       >
     >,
   ) => void;

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import {
   BookOpenIcon,
-  ChartBarIcon,
   CompassIcon,
   DownloadIcon,
   HouseIcon,
@@ -12,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { ConcordanceReferencePopover } from "@/components/reader/concordance-reference-popover";
+import { ReadingContinuationCard } from "@/components/reader/reading-continuation-card";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,6 +30,7 @@ import {
   type DailyScriptureTopicsPayload,
 } from "@/lib/reader-data";
 import type { Book } from "@/types/bible";
+import type { ReadingContinuation } from "@/lib/reading-progress";
 import type { StaticPageId } from "@/types/reader";
 
 type WelcomeHomePageProps = {
@@ -37,6 +38,9 @@ type WelcomeHomePageProps = {
   onStartTour: () => void;
   onOpenSearch: () => void;
   onOpenPage: (pageId: StaticPageId) => void;
+  readingContinuation: ReadingContinuation | null;
+  isReadingProgressReady: boolean;
+  onContinueReading: (bookIndex: number, chapterIndex: number) => void;
   renderPreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
   onCloseSidebar: () => void;
@@ -84,6 +88,9 @@ export function WelcomeHomePage({
   onStartTour,
   onOpenSearch,
   onOpenPage,
+  readingContinuation,
+  isReadingProgressReady,
+  onContinueReading,
   renderPreview,
   onOpenReference,
   onCloseSidebar,
@@ -253,6 +260,13 @@ export function WelcomeHomePage({
             A Genesis 1 reading tab is already open beside this page, so you
             can begin immediately, open search, or take the guided tour first.
           </p>
+          <ReadingContinuationCard
+            readingContinuation={readingContinuation}
+            isReadingProgressReady={isReadingProgressReady}
+            onContinueReading={onContinueReading}
+            onOpenProgress={() => onOpenPage("progress")}
+            className="bg-background/55"
+          />
           <div className="flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-background/55 px-3 py-2">
             <Label htmlFor="welcome-home-startup-card">
               Open Welcome Home Tab At Startup
@@ -263,9 +277,9 @@ export function WelcomeHomePage({
               onCheckedChange={onShowAtStartupChange}
             />
           </div>
-          <div className="grid gap-3 pt-1 sm:grid-cols-2 xl:grid-cols-4">
-            <Button type="button" onClick={onStartTour}>
-              <CompassIcon />
+          <div className="grid gap-3 pt-1 sm:grid-cols-2 xl:grid-cols-3">
+            <Button type="button" variant="outline" onClick={onStartTour}>
+              <CompassIcon data-icon="inline-start" />
               Take the Tour
             </Button>
             <Button
@@ -281,10 +295,6 @@ export function WelcomeHomePage({
             <Button type="button" variant="outline" onClick={() => onOpenPage("download")}>
               <DownloadIcon />
               Offline Download
-            </Button>
-            <Button type="button" variant="outline" onClick={() => onOpenPage("progress")}>
-              <ChartBarIcon />
-              Reading Progress
             </Button>
           </div>
         </CardContent>

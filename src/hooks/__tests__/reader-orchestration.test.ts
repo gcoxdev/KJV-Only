@@ -125,6 +125,12 @@ describe("reader-derived state", () => {
     expect(result.progressByTestament.total).toEqual({ read: 2, total: 41 });
     expect(result.readChapterCountByBook.get(0)).toBe(1);
     expect(result.readChapterCountByBook.get(1)).toBe(0);
+    expect(result.readingContinuation).toEqual({
+      bookIndex: 0,
+      chapterIndex: 1,
+      bookName: "Book 1",
+      chapterNumber: 2,
+    });
     expect(result.totalProgressPercent).toBe(5);
   });
 
@@ -139,6 +145,7 @@ describe("reader-derived state", () => {
     expect(result.activeTab).toBeNull();
     expect(result.modelLeafNeighbors.size).toBe(0);
     expect(result.progressByTestament.total).toEqual({ read: 0, total: 0 });
+    expect(result.readingContinuation).toBeNull();
     expect(result.totalProgressPercent).toBe(0);
   });
 });

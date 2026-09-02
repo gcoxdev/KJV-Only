@@ -416,6 +416,7 @@ export function KJVReader() {
     existingTabTargets,
     progressByTestament,
     readChapterCountByBook,
+    readingContinuation,
     totalProgressPercent,
   } = useReaderDerivedState({
     books,
@@ -425,8 +426,8 @@ export function KJVReader() {
   });
 
   const completionCelebrationProps = useCompletionCelebration({
-    totalChapters: progressByTestament.total.total,
-    readChapters: progressByTestament.total.read,
+    totalChapters: isCorpusLoaded ? progressByTestament.total.total : 0,
+    readChapters: isCorpusLoaded ? progressByTestament.total.read : 0,
   });
 
   const {
@@ -979,6 +980,7 @@ export function KJVReader() {
         | "view"
         | "pickerTestament"
         | "pickerBookIndex"
+        | "pageId"
       >
     >,
   ) => {
@@ -1987,9 +1989,12 @@ export function KJVReader() {
   const progressPanelProps = useProgressViewModel({
     totalProgressPercent,
     progressByTestament,
+    readingContinuation,
+    isReadingProgressReady: isCorpusLoaded,
     onSetAllTestamentChaptersRead: setAllTestamentChaptersRead,
     onSetAllBookChaptersRead: setAllBookChaptersRead,
     onOpenChapterInNewTab: openChapterInNewTab,
+    onContinueReading: openChapterInNewTab,
     onToggleChapterRead: toggleChapterRead,
     onResetAllProgress: resetAllProgress,
   });
