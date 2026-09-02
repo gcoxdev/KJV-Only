@@ -240,15 +240,19 @@ function FloatingLinkEditor({
               setIsLink(false)
             }}
             className="shrink-0"
+            aria-label="Cancel link editing"
+            title="Cancel link editing"
           >
-            <X data-icon="inline-start" />
+            <X />
           </Button>
           <Button
             size="icon"
             onClick={handleLinkSubmission}
             className="shrink-0"
+            aria-label="Apply link"
+            title="Apply link"
           >
-            <Check data-icon="inline-start" />
+            <Check />
           </Button>
         </div>
       ) : (
@@ -269,8 +273,10 @@ function FloatingLinkEditor({
                 setEditedLinkUrl(linkUrl)
                 setIsLinkEditMode(true)
               }}
+              aria-label="Edit link"
+              title="Edit link"
             >
-              <Pencil data-icon="inline-start" />
+              <Pencil />
             </Button>
             <Button
               size="icon"
@@ -278,8 +284,10 @@ function FloatingLinkEditor({
               onClick={() => {
                 editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
               }}
+              aria-label="Remove link"
+              title="Remove link"
             >
-              <Trash data-icon="inline-start" />
+              <Trash />
             </Button>
           </div>
         </div>

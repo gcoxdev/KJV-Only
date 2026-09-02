@@ -65,6 +65,7 @@ export function FontFormatToolbarPlugin() {
           key={format}
           value={format}
           aria-label={label}
+          title={label}
           onClick={() => {
             activeEditor.dispatchCommand(
               FORMAT_TEXT_COMMAND,

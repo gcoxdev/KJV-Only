@@ -77,7 +77,12 @@ export function FontColorToolbarPlugin() {
 
   return (
     <div className="flex items-center gap-1">
-      <Button variant="outline" size="icon-sm" aria-label="Font color">
+      <Button
+        variant="outline"
+        size="icon-sm"
+        aria-label="Font color"
+        title="Font color"
+      >
         <BaselineIcon className="size-4" />
       </Button>
       <Input

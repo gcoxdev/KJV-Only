@@ -175,6 +175,178 @@ test("saves the active note with its keyboard shortcut", async ({ page }) => {
   ).toBeVisible()
 })
 
+test("keeps stacked note lists and note content evenly sized", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const timestamp = Date.UTC(2026, 0, 1)
+    localStorage.setItem(
+      "kjv-reader-notes-v1",
+      JSON.stringify(
+        Array.from({ length: 24 }, (_, index) => ({
+          id: `layout-note-${index + 1}`,
+          title: `Saved note ${index + 1}`,
+          body: `Body for saved note ${index + 1}`,
+          scope: { type: "general" },
+          createdAt: timestamp + index,
+          updatedAt: timestamp + index,
+        })),
+      ),
+    )
+  })
+
+  await page.goto("/")
+  await expectReaderReady(page)
+  await page.getByLabel("Panel options").filter({ visible: true }).first().click()
+  await page.getByRole("menuitem", { name: "Home", exact: true }).click()
+  await page
+    .getByRole("button", { name: "Notes", exact: true })
+    .filter({ visible: true })
+    .first()
+    .click()
+
+  const notesPanel = page.locator(
+    '[data-active-panel="true"][aria-label="Notes panel"]',
+  )
+  const showListButton = notesPanel.getByRole("button", {
+    name: "Show List",
+    exact: true,
+  })
+  const expectIconTooltip = async (label: string) => {
+    await page.mouse.move(0, 0)
+    const button = notesPanel.getByRole("button", { name: label, exact: true })
+    await expect(button).toBeVisible()
+    await button
+      .locator(
+        'xpath=ancestor-or-self::*[@data-slot="tooltip-trigger"][1]',
+      )
+      .hover()
+    await expect(
+      page
+        .locator('[data-slot="tooltip-content"]')
+        .filter({ hasText: label, visible: true }),
+    ).toBeVisible({ timeout: 5_000 })
+  }
+  await expect(notesPanel.getByRole("button", { name: "Hide List" })).toBeVisible()
+  await expect(showListButton).toHaveCount(0)
+
+  await notesPanel.getByRole("button", { name: "Hide List" }).click()
+  await expect(showListButton).toBeVisible()
+  await showListButton.click()
+  await expect(showListButton).toHaveCount(0)
+
+  await notesPanel.getByText("Saved note 1", { exact: true }).click()
+  await notesPanel.getByLabel("Show notes list").click()
+
+  const listBox = await notesPanel.locator("[data-notes-list]").boundingBox()
+  const contentBox = await notesPanel.locator("[data-note-content]").boundingBox()
+  expect(listBox).not.toBeNull()
+  expect(contentBox).not.toBeNull()
+  expect(Math.abs(listBox!.height - contentBox!.height)).toBeLessThanOrEqual(1)
+
+  const resizeHandle = notesPanel.getByRole("separator", {
+    name: "Resize note list and note content",
+  })
+  const resizeHandleBox = await resizeHandle.boundingBox()
+  expect(resizeHandleBox).not.toBeNull()
+  await page.mouse.move(
+    resizeHandleBox!.x + resizeHandleBox!.width / 2,
+    resizeHandleBox!.y + resizeHandleBox!.height / 2,
+  )
+  await page.mouse.down()
+  await page.mouse.move(
+    resizeHandleBox!.x + resizeHandleBox!.width / 2,
+    resizeHandleBox!.y + resizeHandleBox!.height / 2 - 60,
+    { steps: 5 },
+  )
+  await page.mouse.up()
+
+  const resizedListBox = await notesPanel
+    .locator("[data-notes-list]")
+    .boundingBox()
+  const resizedContentBox = await notesPanel
+    .locator("[data-note-content]")
+    .boundingBox()
+  expect(resizedListBox).not.toBeNull()
+  expect(resizedContentBox).not.toBeNull()
+  expect(resizedListBox!.height).toBeLessThan(listBox!.height - 30)
+  expect(resizedContentBox!.height).toBeGreaterThan(contentBox!.height + 30)
+
+  const contextBox = await notesPanel
+    .locator("[data-notes-context-label]")
+    .boundingBox()
+  expect(contextBox).not.toBeNull()
+  expect(
+    Math.abs(
+      contextBox!.x + contextBox!.width / 2 -
+        (listBox!.x + listBox!.width / 2),
+    ),
+  ).toBeLessThanOrEqual(2)
+
+  const allFilterBox = await notesPanel
+    .getByRole("button", { name: "All", exact: true })
+    .boundingBox()
+  const newGeneralBox = await notesPanel
+    .getByRole("button", { name: "New General", exact: true })
+    .boundingBox()
+  expect(allFilterBox).not.toBeNull()
+  expect(newGeneralBox).not.toBeNull()
+  expect(Math.abs(allFilterBox!.y - newGeneralBox!.y)).toBeLessThanOrEqual(1)
+
+  await expectIconTooltip("Hide notes list")
+  await expectIconTooltip("Show note source")
+  await expectIconTooltip("Enter fullscreen note editor")
+  await expectIconTooltip("Edit note")
+  await expectIconTooltip("Delete note")
+
+  await notesPanel.getByRole("button", { name: "Show note source" }).click()
+  await expectIconTooltip("Show rich text editor")
+  await notesPanel.getByRole("button", { name: "Show rich text editor" }).click()
+  await notesPanel.getByRole("button", { name: "Edit note" }).click()
+
+  await expectIconTooltip("Hide rich text tools")
+  await expectIconTooltip("Enter fullscreen note editor")
+  await expectIconTooltip("Save note")
+  await expectIconTooltip("Cancel editing")
+  await expectIconTooltip("Delete note")
+  await expectIconTooltip("Insert Bible link")
+
+  const titledEditorControls = [
+    "Decrease font size",
+    "Increase font size",
+    "Bold",
+    "Italic",
+    "Underline",
+    "Strikethrough",
+    "Toggle subscript",
+    "Toggle superscript",
+    "Font color",
+    "Clear formatting",
+    "Left Align",
+    "Center Align",
+    "Right Align",
+    "Justify Align",
+    "Outdent",
+    "Indent",
+    "Toggle link",
+  ]
+  for (const label of titledEditorControls) {
+    await expect(
+      notesPanel.getByRole("button", { name: label, exact: true }),
+    ).toHaveAttribute("title", label, { timeout: 5_000 })
+  }
+
+  await notesPanel.getByRole("button", { name: "Insert Bible link" }).click()
+  await expect(page.getByRole("menuitem", { name: "Current Chapter" })).toBeVisible()
+  await expect(page.getByRole("menuitem", { name: "Current Verse" })).toBeVisible()
+  await expect(page.getByRole("menuitem", { name: "Selected Word" })).toBeVisible()
+  await expect(page.getByRole("menuitem", { name: "Selected Verses" })).toBeVisible()
+  await page.keyboard.press("Escape")
+
+  await notesPanel.getByRole("button", { name: "Hide rich text tools" }).click()
+  await expectIconTooltip("Show rich text tools")
+})
+
 test("builds the lazy search index and returns the expected verse", async ({ page }) => {
   await page.goto("/")
   await expectReaderReady(page)
