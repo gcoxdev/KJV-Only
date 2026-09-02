@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Children,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -34,7 +42,22 @@ import {
   type ShortcutBinding,
 } from "@/lib/keyboard-shortcut-runtime";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@/components/ui/toggle-group";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Book } from "@/types/bible";
 import type { BookmarkScope } from "@/types/bookmarks";
@@ -71,6 +94,106 @@ type NotesPageProps = {
   saveShortcut: ShortcutBinding;
   shortcutsActive: boolean;
 };
+
+type NotesIconButtonProps = Omit<
+  ComponentProps<typeof Button>,
+  "aria-label"
+> & {
+  children: ReactNode;
+  tooltip: string;
+};
+
+function NotesIconButton({
+  children,
+  disabled,
+  tooltip,
+  ...buttonProps
+}: NotesIconButtonProps) {
+  return (
+    <Tooltip>
+      {disabled ? (
+        <TooltipTrigger render={<span className="inline-flex" />}>
+          <Button {...buttonProps} aria-label={tooltip} disabled>
+            {children}
+          </Button>
+        </TooltipTrigger>
+      ) : (
+        <TooltipTrigger
+          render={<Button {...buttonProps} aria-label={tooltip} />}
+        >
+          {children}
+        </TooltipTrigger>
+      )}
+      <TooltipContent>{tooltip}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+function NotesPanelLayout({
+  children,
+  isCompactLayout,
+  isNotesListCollapsed,
+}: {
+  children: ReactNode;
+  isCompactLayout: boolean;
+  isNotesListCollapsed: boolean;
+}) {
+  const [compactListSize, setCompactListSize] = useState(50);
+  const [notesList, noteContent] = Children.toArray(children);
+
+  if (isCompactLayout && !isNotesListCollapsed) {
+    return (
+      <ResizablePanelGroup
+        orientation="vertical"
+        onLayoutChanged={(layout, meta) => {
+          if (!meta.isUserInteraction) {
+            return;
+          }
+          const nextListSize = layout["notes-list-section"];
+          if (typeof nextListSize === "number") {
+            setCompactListSize(nextListSize);
+          }
+        }}
+      >
+        <ResizablePanel
+          id="notes-list-section"
+          defaultSize={`${compactListSize}%`}
+          minSize="20%"
+          className="min-h-0"
+        >
+          {notesList}
+        </ResizablePanel>
+        <ResizableHandle
+          withHandle
+          className="my-1.5"
+          aria-label="Resize note list and note content"
+        />
+        <ResizablePanel
+          id="note-content-section"
+          defaultSize={`${100 - compactListSize}%`}
+          minSize="20%"
+          className="min-h-0"
+        >
+          {noteContent}
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "grid h-full min-h-0 gap-3",
+        isCompactLayout
+          ? "grid-cols-1 grid-rows-[minmax(0,1fr)]"
+          : "grid-cols-[22rem_minmax(0,1fr)] grid-rows-[minmax(0,1fr)]",
+      )}
+    >
+      {notesList}
+      {noteContent}
+    </div>
+  );
+}
 
 function createPlainTextSerializedState(text: string): SerializedEditorState {
   return {
@@ -214,6 +337,7 @@ export function NotesPage({
   const filter: NotesTabFilter = tabState?.filter ?? "all";
   const selectedNoteId = tabState?.selectedNoteId ?? null;
   const pageContext = context ?? tabState?.context ?? null;
+  const pageContextLabel = contextLabel(pageContext, books);
 
   const filteredNotes = useMemo(() => {
     if (filter === "general") {
@@ -384,83 +508,94 @@ export function NotesPage({
   return (
     <div
       ref={setPageElement}
-      className={cn(
-        "grid h-full min-h-0 gap-3 p-2",
-        isCompactLayout ? "grid-cols-1" : "grid-cols-[22rem_minmax(0,1fr)]",
-      )}
+      className="h-full min-h-0 p-2"
     >
-      <div
-        className={cn(
-          "flex min-h-0 flex-col rounded-md border",
-          isNotesListCollapsed && "hidden",
-          !isCompactLayout && "flex",
-        )}
+      <NotesPanelLayout
+        isCompactLayout={isCompactLayout}
+        isNotesListCollapsed={isNotesListCollapsed}
       >
+        <div
+          data-notes-list
+          className={cn(
+            "flex h-full min-h-0 flex-col rounded-md border",
+            isNotesListCollapsed && "hidden",
+            !isCompactLayout && "flex",
+          )}
+        >
         <div className="flex flex-col gap-2 border-b p-2">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold">Notes</p>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className={cn(!isCompactLayout && "hidden")}
-              onClick={() => setIsNotesListCollapsed(true)}
+          <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)] items-center gap-2">
+            <p className="justify-self-start text-sm font-semibold">Notes</p>
+            <p
+              data-notes-context-label
+              className="truncate text-center text-xs text-muted-foreground"
+              title={pageContextLabel}
             >
-              Hide List
-              <ChevronUpIcon />
-            </Button>
+              {pageContextLabel}
+            </p>
+            <div className="flex justify-end">
+              {isCompactLayout ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsNotesListCollapsed(true)}
+                >
+                  Hide List
+                  <ChevronUpIcon data-icon="inline-end" />
+                </Button>
+              ) : null}
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground">{contextLabel(pageContext, books)}</p>
-          <div className="flex flex-wrap gap-1">
-            <Button
-              size="sm"
-              variant={filter === "all" ? "default" : "outline"}
-              onClick={() => onTabStateChange({ filter: "all" })}
-            >
-              All
-            </Button>
-            <Button
-              size="sm"
-              variant={filter === "general" ? "default" : "outline"}
-              onClick={() => onTabStateChange({ filter: "general" })}
-            >
-              General
-            </Button>
-            <Button
-              size="sm"
-              variant={filter === "context" ? "default" : "outline"}
-              onClick={() => onTabStateChange({ filter: "context" })}
-            >
-              Context
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-1">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                const noteId = onCreateGeneralNote();
-                onTabStateChange({ selectedNoteId: noteId, filter: "general" });
-              }}
-            >
-              <PlusIcon />
-              New General
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                const noteId = onCreateContextNote(pageContext);
-                if (!noteId) {
-                  return;
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <ToggleGroup
+              value={[filter]}
+              onValueChange={(value) => {
+                const nextFilter = value[0];
+                if (
+                  nextFilter === "all" ||
+                  nextFilter === "general" ||
+                  nextFilter === "context"
+                ) {
+                  onTabStateChange({ filter: nextFilter });
                 }
-                onTabStateChange({ selectedNoteId: noteId, filter: "context" });
               }}
-              disabled={!pageContext}
+              variant="outline"
+              size="sm"
+              spacing={0}
+              aria-label="Filter notes"
             >
-              <PlusIcon />
-              New Context
-            </Button>
+              <ToggleGroupItem value="all">All</ToggleGroupItem>
+              <ToggleGroupItem value="general">General</ToggleGroupItem>
+              <ToggleGroupItem value="context">Context</ToggleGroupItem>
+            </ToggleGroup>
+            <div className="ml-auto flex flex-wrap justify-end gap-1">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  const noteId = onCreateGeneralNote();
+                  onTabStateChange({ selectedNoteId: noteId, filter: "general" });
+                }}
+              >
+                <PlusIcon data-icon="inline-start" />
+                New General
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  const noteId = onCreateContextNote(pageContext);
+                  if (!noteId) {
+                    return;
+                  }
+                  onTabStateChange({ selectedNoteId: noteId, filter: "context" });
+                }}
+                disabled={!pageContext}
+              >
+                <PlusIcon data-icon="inline-start" />
+                New Context
+              </Button>
+            </div>
           </div>
         </div>
         <ScrollArea className="min-h-0 flex-1">
@@ -499,144 +634,196 @@ export function NotesPage({
             )}
           </div>
         </ScrollArea>
-      </div>
+        </div>
 
-      <div
-        className={cn(
-          "flex min-h-0 flex-col rounded-md border",
-          isEditorFullscreen &&
-            "fixed inset-2 z-50 rounded-xl border bg-background shadow-2xl",
-        )}
-      >
+        <div
+          data-note-content
+          className={cn(
+            "flex h-full min-h-0 flex-col rounded-md border",
+            isEditorFullscreen &&
+              "fixed inset-2 z-50 rounded-xl border bg-background shadow-2xl",
+          )}
+        >
         {selectedNote ? (
           <>
             <div className="border-b p-2">
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon-sm"
-                  className={cn(!isCompactLayout && "hidden")}
-                  onClick={() => setIsNotesListCollapsed((current) => !current)}
-                  aria-label={isNotesListCollapsed ? "Show notes list" : "Hide notes list"}
-                >
-                  {isNotesListCollapsed ? <ChevronDownIcon /> : <ChevronUpIcon />}
-                </Button>
-                {isEditing ? (
-                  <Input
-                    value={draftTitle}
-                    onChange={(event) => setDraftTitle(event.currentTarget.value)}
-                    placeholder="Note title"
-                  />
-                ) : (
-                  <div className="min-w-0 flex-1 truncate rounded-md border px-3 py-2 text-sm">
-                    {selectedNote.title || "Untitled note"}
-                  </div>
-                )}
-                <Button
-                  type="button"
-                  variant={isSourceMode ? "default" : "outline"}
-                  size="icon-sm"
-                  onClick={toggleSourceMode}
-                  aria-label={sourceModeButtonLabel}
-                  title={sourceModeButtonLabel}
-                >
-                  <Code2Icon />
-                </Button>
-                {isEditing ? (
-                  <>
-                    <Button
-                      type="button"
-                      variant={showEditorTools ? "default" : "outline"}
-                      size="icon-sm"
-                      onClick={() => setShowEditorTools((current) => !current)}
-                      aria-label={showEditorTools ? "Hide rich text tools" : "Show rich text tools"}
-                    >
-                      <PanelTopIcon />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-sm"
-                      onClick={() => setIsEditorFullscreen((current) => !current)}
-                      aria-label={isEditorFullscreen ? "Exit fullscreen note editor" : "Enter fullscreen note editor"}
-                    >
-                      {isEditorFullscreen ? <MinimizeIcon /> : <ExpandIcon />}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-sm"
-                      onClick={saveCurrentNote}
-                      disabled={!hasDraftChanges}
-                      aria-label="Save note"
-                    >
-                      <SaveIcon />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-sm"
-                      onClick={cancelEditing}
-                      aria-label="Cancel editing"
-                    >
-                      <XIcon />
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-sm"
-                      onClick={() => setIsEditorFullscreen((current) => !current)}
-                      aria-label={isEditorFullscreen ? "Exit fullscreen note editor" : "Enter fullscreen note editor"}
-                    >
-                      {isEditorFullscreen ? <MinimizeIcon /> : <ExpandIcon />}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-sm"
-                      onClick={() => {
-                        setIsEditing(true);
-                        setDraftSourceBody(selectedNote.body);
-                        setShowEditorTools(true);
-                      }}
-                      aria-label="Edit note"
-                    >
-                      <PencilIcon />
-                    </Button>
-                  </>
-                )}
-                <AlertDialog>
-                  <AlertDialogTrigger
-                    render={<Button type="button" variant="outline" size="icon-sm" aria-label="Delete note" />}
+              <TooltipProvider>
+                <div className="flex items-center gap-2">
+                  <NotesIconButton
+                    type="button"
+                    variant="outline"
+                    size="icon-sm"
+                    className={cn(!isCompactLayout && "hidden")}
+                    onClick={() =>
+                      setIsNotesListCollapsed((current) => !current)
+                    }
+                    tooltip={
+                      isNotesListCollapsed
+                        ? "Show notes list"
+                        : "Hide notes list"
+                    }
                   >
-                    <Trash2Icon />
-                  </AlertDialogTrigger>
-                  <AlertDialogContent size="sm">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Note?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        variant="destructive"
-                        onClick={() => {
-                          onDeleteNote(selectedNote.id);
-                          onTabStateChange({ selectedNoteId: null });
-                        }}
+                    {isNotesListCollapsed ? (
+                      <ChevronDownIcon />
+                    ) : (
+                      <ChevronUpIcon />
+                    )}
+                  </NotesIconButton>
+                  {isEditing ? (
+                    <Input
+                      value={draftTitle}
+                      onChange={(event) =>
+                        setDraftTitle(event.currentTarget.value)
+                      }
+                      placeholder="Note title"
+                    />
+                  ) : (
+                    <div className="min-w-0 flex-1 truncate rounded-md border px-3 py-2 text-sm">
+                      {selectedNote.title || "Untitled note"}
+                    </div>
+                  )}
+                  <NotesIconButton
+                    type="button"
+                    variant={isSourceMode ? "default" : "outline"}
+                    size="icon-sm"
+                    onClick={toggleSourceMode}
+                    tooltip={sourceModeButtonLabel}
+                  >
+                    <Code2Icon />
+                  </NotesIconButton>
+                  {isEditing ? (
+                    <>
+                      <NotesIconButton
+                        type="button"
+                        variant={showEditorTools ? "default" : "outline"}
+                        size="icon-sm"
+                        onClick={() =>
+                          setShowEditorTools((current) => !current)
+                        }
+                        tooltip={
+                          showEditorTools
+                            ? "Hide rich text tools"
+                            : "Show rich text tools"
+                        }
                       >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+                        <PanelTopIcon />
+                      </NotesIconButton>
+                      <NotesIconButton
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        onClick={() =>
+                          setIsEditorFullscreen((current) => !current)
+                        }
+                        tooltip={
+                          isEditorFullscreen
+                            ? "Exit fullscreen note editor"
+                            : "Enter fullscreen note editor"
+                        }
+                      >
+                        {isEditorFullscreen ? (
+                          <MinimizeIcon />
+                        ) : (
+                          <ExpandIcon />
+                        )}
+                      </NotesIconButton>
+                      <NotesIconButton
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        onClick={saveCurrentNote}
+                        disabled={!hasDraftChanges}
+                        tooltip="Save note"
+                      >
+                        <SaveIcon />
+                      </NotesIconButton>
+                      <NotesIconButton
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        onClick={cancelEditing}
+                        tooltip="Cancel editing"
+                      >
+                        <XIcon />
+                      </NotesIconButton>
+                    </>
+                  ) : (
+                    <>
+                      <NotesIconButton
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        onClick={() =>
+                          setIsEditorFullscreen((current) => !current)
+                        }
+                        tooltip={
+                          isEditorFullscreen
+                            ? "Exit fullscreen note editor"
+                            : "Enter fullscreen note editor"
+                        }
+                      >
+                        {isEditorFullscreen ? (
+                          <MinimizeIcon />
+                        ) : (
+                          <ExpandIcon />
+                        )}
+                      </NotesIconButton>
+                      <NotesIconButton
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        onClick={() => {
+                          setIsEditing(true);
+                          setDraftSourceBody(selectedNote.body);
+                          setShowEditorTools(true);
+                        }}
+                        tooltip="Edit note"
+                      >
+                        <PencilIcon />
+                      </NotesIconButton>
+                    </>
+                  )}
+                  <AlertDialog>
+                    <Tooltip>
+                      <TooltipTrigger render={<span className="inline-flex" />}>
+                        <AlertDialogTrigger
+                          render={
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon-sm"
+                              aria-label="Delete note"
+                            />
+                          }
+                        >
+                          <Trash2Icon />
+                        </AlertDialogTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete note</TooltipContent>
+                    </Tooltip>
+                    <AlertDialogContent size="sm">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Note?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          variant="destructive"
+                          onClick={() => {
+                            onDeleteNote(selectedNote.id);
+                            onTabStateChange({ selectedNoteId: null });
+                          }}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </TooltipProvider>
               <div className="mt-2 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
                 <p>
                   <span className="font-medium text-foreground">Type:</span>{" "}
@@ -744,19 +931,21 @@ export function NotesPage({
         ) : (
           <div className="flex items-center justify-between gap-2 p-3 text-sm text-muted-foreground">
             <span>Select a note or create one.</span>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className={cn(!isCompactLayout && "hidden")}
-              onClick={() => setIsNotesListCollapsed(false)}
-            >
-              Show List
-              <ChevronDownIcon />
-            </Button>
+            {isCompactLayout && isNotesListCollapsed ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsNotesListCollapsed(false)}
+              >
+                Show List
+                <ChevronDownIcon data-icon="inline-end" />
+              </Button>
+            ) : null}
           </div>
         )}
-      </div>
+        </div>
+      </NotesPanelLayout>
     </div>
   );
 }

@@ -61,6 +61,7 @@ export function FontSizeToolbarPlugin() {
         onClick={() => updateFontSize(fontSize - 1)}
         disabled={fontSize <= MIN_FONT_SIZE}
         aria-label="Decrease font size"
+        title="Decrease font size"
       >
         <Minus className="size-3" aria-hidden="true" />
       </Button>
@@ -82,6 +83,7 @@ export function FontSizeToolbarPlugin() {
         onClick={() => updateFontSize(fontSize + 1)}
         disabled={fontSize >= MAX_FONT_SIZE}
         aria-label="Increase font size"
+        title="Increase font size"
       >
         <Plus className="size-3" aria-hidden="true" />
       </Button>

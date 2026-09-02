@@ -37,6 +37,7 @@ export function SubSuperToolbarPlugin() {
         value="subscript"
         size="sm"
         aria-label="Toggle subscript"
+        title="Toggle subscript"
         onClick={() => {
           activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript")
         }}
@@ -48,6 +49,7 @@ export function SubSuperToolbarPlugin() {
         value="superscript"
         size="sm"
         aria-label="Toggle superscript"
+        title="Toggle superscript"
         onClick={() => {
           activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript")
         }}
