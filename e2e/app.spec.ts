@@ -828,6 +828,90 @@ test("loads auxiliary reader panels on demand", async ({ page }) => {
   await expect(page.getByText("Whole Bible", { exact: true })).toBeVisible()
 })
 
+test("continues reading from Welcome Home and Reading Progress", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("kjv-read-chapters-v1", JSON.stringify(["0:0"]))
+  })
+
+  await page.goto("/")
+  await expect(
+    page.getByRole("button", { name: "Genesis 1", exact: true }),
+  ).toBeVisible()
+
+  const homeContinue = page.getByRole("button", {
+    name: "Continue reading at Genesis 2",
+    exact: true,
+  })
+  await expect(homeContinue).toBeVisible()
+  await homeContinue.click()
+  await expect(
+    page.getByRole("button", { name: "Genesis 2", exact: true }),
+  ).toBeVisible()
+
+  await page.getByLabel("Open menu").click()
+  await page.getByRole("menuitem", { name: "Welcome Home", exact: true }).click()
+  await page
+    .getByRole("button", { name: "Reading Progress", exact: true })
+    .click()
+
+  const progressPanel = page.getByLabel("Reading Progress panel")
+  await expect(progressPanel.getByText("Up next", { exact: true })).toBeVisible()
+  await expect(progressPanel.getByText("Genesis 2", { exact: true })).toBeVisible()
+
+  await progressPanel
+    .getByRole("button", {
+      name: "Continue reading at Genesis 2",
+      exact: true,
+    })
+    .click()
+  await expect(progressPanel).not.toBeVisible()
+  await expect(
+    page.locator('[data-active-panel="true"][aria-label="Genesis 2 panel"]'),
+  ).toBeVisible()
+
+  await page
+    .locator('[data-active-panel="true"]')
+    .getByLabel("Panel options")
+    .click()
+  await page.getByRole("menuitem", { name: "Home", exact: true }).click()
+
+  let panelHome = page.locator(
+    '[data-active-panel="true"][aria-label="Panel Home panel"]',
+  )
+  await expect(panelHome.getByText("Next: Genesis 2", { exact: true })).toBeVisible()
+  await expect(
+    panelHome.getByRole("button", { name: "Reading Progress", exact: true }),
+  ).toBeVisible()
+  await panelHome
+    .getByRole("button", { name: "Reading Progress", exact: true })
+    .click()
+  await expect(
+    page.locator(
+      '[data-active-panel="true"][aria-label="Reading Progress panel"]',
+    ),
+  ).toBeVisible()
+
+  await page
+    .locator('[data-active-panel="true"]')
+    .getByLabel("Panel options")
+    .click()
+  await page.getByRole("menuitem", { name: "Home", exact: true }).click()
+  panelHome = page.locator(
+    '[data-active-panel="true"][aria-label="Panel Home panel"]',
+  )
+  await panelHome
+    .getByRole("button", {
+      name: "Continue reading at Genesis 2",
+      exact: true,
+    })
+    .click()
+  await expect(
+    page.locator('[data-active-panel="true"][aria-label="Genesis 2 panel"]'),
+  ).toBeVisible()
+})
+
 test("keeps Tools and Topics accordion expansion scoped to each surface", async ({
   page,
 }) => {

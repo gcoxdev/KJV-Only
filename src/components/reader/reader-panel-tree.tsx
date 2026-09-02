@@ -76,6 +76,7 @@ import type {
 } from "@/lib/smart-search-worker";
 import type { BookmarkScope } from "@/types/bookmarks";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
+import { ReadingContinuationCard } from "@/components/reader/reading-continuation-card";
 import { StaticPage } from "@/components/reader/static-page";
 import type { SettingsPanelContentProps } from "@/components/reader/settings-dialog";
 import type { ProgressPanelContentProps } from "@/components/reader/progress-dialog";
@@ -179,7 +180,12 @@ const AUDIO_PLAYBACK_RATE_OPTIONS = Array.from({ length: 10 }, (_, index) => {
 type LeafLocationPatch = Partial<
   Pick<
     LeafNode,
-    "bookIndex" | "chapterIndex" | "view" | "pickerTestament" | "pickerBookIndex"
+    | "bookIndex"
+    | "chapterIndex"
+    | "view"
+    | "pickerTestament"
+    | "pickerBookIndex"
+    | "pageId"
   >
 >;
 
@@ -1727,6 +1733,9 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 onStartTour={onStartTour}
                 onOpenSearch={onOpenSearchTab}
                 onOpenPage={onOpenStaticPageTab}
+                readingContinuation={progressPanelProps.readingContinuation}
+                isReadingProgressReady={progressPanelProps.isReadingProgressReady}
+                onContinueReading={progressPanelProps.onContinueReading}
                 showWelcomeHomeAtStartup={settingsPanelProps.showWelcomeHomeAtStartup}
                 onShowWelcomeHomeAtStartupChange={
                   settingsPanelProps.onShowWelcomeHomeAtStartupChange
@@ -1737,6 +1746,26 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
         ) : (
           <CardContent className="min-h-0 flex-1 overflow-auto p-2">
             <div className="flex flex-col gap-3">
+              <ReadingContinuationCard
+                readingContinuation={progressPanelProps.readingContinuation}
+                isReadingProgressReady={progressPanelProps.isReadingProgressReady}
+                onContinueReading={(bookIndex, chapterIndex) =>
+                  updateLeafLocation(leaf.id, {
+                    view: "reader",
+                    bookIndex,
+                    chapterIndex,
+                    pickerTestament: null,
+                    pickerBookIndex: null,
+                  })
+                }
+                onOpenProgress={() =>
+                  updateLeafLocation(leaf.id, {
+                    view: "page",
+                    pageId: "progress",
+                  })
+                }
+                className="bg-card/70"
+              />
               <div className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr))]">
                 <Button
                   type="button"

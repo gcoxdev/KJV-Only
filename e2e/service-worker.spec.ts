@@ -149,6 +149,11 @@ test("refreshes manifests and keeps the complete app shell usable offline", asyn
   await expect(
     page.getByRole("heading", { name: "Welcome Home", exact: true }),
   ).toBeVisible()
+  await page.getByLabel("Open menu").click()
+  await page.getByRole("menuitem", { name: "Help", exact: true }).click()
+  await expect(
+    page.getByRole("heading", { name: "Help", exact: true }),
+  ).toBeVisible()
   await page.getByRole("button", { name: "Genesis 1", exact: true }).click()
   await expect(
     page

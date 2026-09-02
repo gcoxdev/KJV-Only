@@ -275,8 +275,8 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to open a book and chapter",
         body:
-          "Use the panel home picker or the reader's book and chapter control. Existing reader panels preserve current context better than a brand-new panel does.",
-        keywords: ["open chapter", "book picker", "chapter picker"],
+          "Use Continue on Panel Home to open your next unread chapter, or choose any location with the panel home picker or the reader's book and chapter control. Existing reader panels preserve current context better than a brand-new panel does.",
+        keywords: ["open chapter", "continue reading", "panel home", "book picker", "chapter picker"],
       },
       {
         label: "How to study a word",
@@ -607,8 +607,8 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to manage Reading Progress",
         body:
-          "Open Reading Progress from the main menu to view completion for the whole Bible, each testament, book, and chapter. You can open a chapter in a new tab, toggle one chapter, mark a whole book or testament complete or incomplete, or reset all progress after confirmation.",
-        keywords: ["reading progress", "complete book", "complete testament", "reset progress", "open chapter"],
+          "Open Reading Progress from the main menu, Welcome Home, or Panel Home to view completion for the whole Bible, each testament, book, and chapter. The Up Next card shows where to continue and opens the next unread chapter after the chapter you most recently marked. You can also open any chapter in a new tab, toggle one chapter, mark a whole book or testament complete or incomplete, or reset all progress after confirmation.",
+        keywords: ["reading progress", "continue reading", "panel home", "complete book", "complete testament", "reset progress", "open chapter"],
       },
     ],
   },
@@ -681,7 +681,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What Welcome Home is for",
         body:
-          "Welcome Home is the active startup tab by default on a fresh open. It gives a short orientation and quick actions such as Take the Tour, Open Search, Offline Download, and Reading Progress. Settings > Other can disable opening it at startup.",
+          "Welcome Home is the active startup tab by default on a fresh open. It gives a short orientation and quick actions for continuing at your next unread chapter, reviewing Reading Progress, taking the tour, opening Search, and managing offline downloads. Settings > Other can disable opening it at startup.",
         keywords: ["welcome home", "start page"],
       },
       {
