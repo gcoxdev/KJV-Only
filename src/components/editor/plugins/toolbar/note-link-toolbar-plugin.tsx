@@ -14,11 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import type { Book } from "@/types/bible";
 
 function applyInternalLink(
@@ -84,24 +79,20 @@ export function NoteLinkToolbarPlugin({
 
   return (
     <DropdownMenu>
-      <Tooltip>
-        <TooltipTrigger render={<span className="inline-flex" />}>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                type="button"
-                variant="outline"
-                size="icon-sm"
-                aria-label="Insert Bible link"
-                onMouseDown={cacheSelection}
-              />
-            }
-          >
-            <Link2Icon />
-          </DropdownMenuTrigger>
-        </TooltipTrigger>
-        <TooltipContent>Insert Bible link</TooltipContent>
-      </Tooltip>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            aria-label="Insert Bible link"
+            onMouseDown={cacheSelection}
+          />
+        }
+      >
+        <Link2Icon data-icon="inline-start" />
+        Bible Link
+      </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         <DropdownMenuGroup>
           {options.map((option) => (

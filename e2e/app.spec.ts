@@ -309,7 +309,15 @@ test("keeps stacked note lists and note content evenly sized", async ({
   await expectIconTooltip("Save note")
   await expectIconTooltip("Cancel editing")
   await expectIconTooltip("Delete note")
-  await expectIconTooltip("Insert Bible link")
+  const bibleLinkButton = notesPanel.getByRole("button", {
+    name: "Insert Bible link",
+  })
+  await expect(bibleLinkButton).toHaveText("Bible Link")
+  await expect(
+    bibleLinkButton.locator(
+      'xpath=ancestor-or-self::*[@data-slot="tooltip-trigger"][1]',
+    ),
+  ).toHaveCount(0)
 
   const titledEditorControls = [
     "Decrease font size",
