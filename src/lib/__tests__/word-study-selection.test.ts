@@ -208,7 +208,7 @@ describe("word-study payload matching", () => {
         webstersData: { Adam: { definitions: [] } },
         aiDictionaryData: { Adam: { definitions: ["A man."] } },
         bibleWordBookData: { Adam: { meaning: "Man", body: "A man." } },
-        strongCode: "G0001",
+        strongCodes: ["G0001"],
         strongsGreekData: { G0001: { lemma: "alpha" } },
         strongsHebrewData: {},
         ancientMapsData: [mapEntry],

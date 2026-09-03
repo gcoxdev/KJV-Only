@@ -163,7 +163,7 @@ BOOK_INDEX = {code: i + 1 for i, code in enumerate(BOOK_ORDER)}
 @dataclass
 class Token:
     text: str
-    strong: str | None
+    strongs: list[str]
     lemma: str | None
     morph: str | None
     added: bool
@@ -182,17 +182,20 @@ def parse_int_suffix(value: str) -> int | None:
     return int(match.group(1)) if match else None
 
 
-def extract_strong(value: str | None) -> str | None:
+def extract_strongs(value: str | None) -> list[str]:
     if not value:
-        return None
+        return []
     normalized = value.replace("strong:", "").replace("x-Strongs:", "")
-    match = re.search(r"([HG]\d{1,5})", normalized, flags=re.IGNORECASE)
-    if not match:
-        return None
-    strong = match.group(1).upper()
-    if strong[1:].isdigit():
-        return f"{strong[0]}{int(strong[1:])}"
-    return strong
+    strongs: list[str] = []
+    seen: set[str] = set()
+    for match in re.finditer(r"([HG]\d{1,5})", normalized, flags=re.IGNORECASE):
+        strong = match.group(1).upper()
+        if strong[1:].isdigit():
+            strong = f"{strong[0]}{int(strong[1:])}"
+        if strong not in seen:
+            seen.add(strong)
+            strongs.append(strong)
+    return strongs
 
 
 def normalize_ref_value(value: str | None) -> str | None:
@@ -247,7 +250,7 @@ def is_red_quote(elem: ET.Element) -> bool:
 
 def tokenize(
     text: str | None,
-    strong: str | None,
+    strongs: list[str],
     lemma: str | None,
     morph: str | None,
     added: bool,
@@ -263,7 +266,7 @@ def tokenize(
         tokens.append(
             Token(
                 text=part,
-                strong=strong,
+                strongs=strongs,
                 lemma=lemma,
                 morph=morph,
                 added=added,
@@ -306,7 +309,7 @@ def collect_chapter_tokens(
 
     def push_text(
         text: str | None,
-        strong: str | None,
+        strongs: list[str],
         lemma: str | None,
         morph: str | None,
         added: bool,
@@ -317,13 +320,13 @@ def collect_chapter_tokens(
         if current_verse is None:
             return
         verse_data = ensure_verse(current_verse)
-        for token in tokenize(text, strong, lemma, morph, added, divine_name, red):
+        for token in tokenize(text, strongs, lemma, morph, added, divine_name, red):
             verse_data["tokens"].append(token)
 
     def visit(
         elem: ET.Element,
         red_context: bool,
-        strong_hint: str | None,
+        strongs_hint: list[str],
         lemma_hint: str | None,
         morph_hint: str | None,
         added_context: bool,
@@ -381,7 +384,7 @@ def collect_chapter_tokens(
                         container_verse = not has_sid or has_direct_text or has_children
 
         current_red = red_context or is_red_quote(elem)
-        current_strong = strong_hint
+        current_strongs = strongs_hint
         current_lemma = lemma_hint
         current_morph = morph_hint
         current_added = added_context
@@ -390,14 +393,14 @@ def collect_chapter_tokens(
         if tag == "w":
             lemma_value = normalize_ref_value(elem.attrib.get("lemma"))
             current_lemma = lemma_value
-            current_strong = extract_strong(lemma_value)
+            current_strongs = extract_strongs(lemma_value)
             current_morph = normalize_ref_value(elem.attrib.get("morph"))
         elif tag == "transChange" and (elem.attrib.get("type") or "").lower() == "added":
             current_added = True
 
         push_text(
             elem.text,
-            current_strong,
+            current_strongs,
             current_lemma,
             current_morph,
             current_added,
@@ -409,7 +412,7 @@ def collect_chapter_tokens(
             visit(
                 child,
                 current_red,
-                current_strong,
+                current_strongs,
                 current_lemma,
                 current_morph,
                 current_added,
@@ -417,7 +420,7 @@ def collect_chapter_tokens(
             )
             push_text(
                 child.tail,
-                current_strong,
+                current_strongs,
                 current_lemma,
                 current_morph,
                 current_added,
@@ -428,7 +431,7 @@ def collect_chapter_tokens(
         if container_verse:
             state["current_verse"] = restore_verse
 
-    visit(chapter_elem, False, None, None, None, False, False)
+    visit(chapter_elem, False, [], None, None, False, False)
     return verses
 
 
@@ -479,7 +482,8 @@ def parse_osis(input_path: Path) -> list[dict[str, Any]]:
                     "tokens": [
                         {
                             "text": token.text,
-                            **({"strong": token.strong} if token.strong else {}),
+                            **({"strong": token.strongs[0]} if token.strongs else {}),
+                            **({"strongs": token.strongs} if len(token.strongs) > 1 else {}),
                             **({"lemma": token.lemma} if token.lemma else {}),
                             **({"morph": token.morph} if token.morph else {}),
                             **({"added": True} if token.added else {}),
@@ -491,7 +495,8 @@ def parse_osis(input_path: Path) -> list[dict[str, Any]]:
                     "tokenRows": [
                         {
                             "text": token.text,
-                            "strong": token.strong,
+                            "strong": token.strongs[0] if token.strongs else None,
+                            "strongs": token.strongs,
                             "lemma": token.lemma,
                             "morph": token.morph,
                             "added": token.added,
@@ -535,6 +540,7 @@ def write_sqlite(db_path: Path, books: list[dict[str, Any]]) -> None:
         """
         DROP TABLE IF EXISTS verse_fts;
         DROP TABLE IF EXISTS verse_notes;
+        DROP TABLE IF EXISTS token_strongs;
         DROP TABLE IF EXISTS tokens;
         DROP TABLE IF EXISTS verses;
         DROP TABLE IF EXISTS chapters;
@@ -579,6 +585,14 @@ def write_sqlite(db_path: Path, books: list[dict[str, Any]]) -> None:
           red_letter INTEGER NOT NULL DEFAULT 0
         );
 
+        CREATE TABLE token_strongs (
+          token_id INTEGER NOT NULL REFERENCES tokens(id) ON DELETE CASCADE,
+          position INTEGER NOT NULL,
+          strong TEXT NOT NULL,
+          PRIMARY KEY(token_id, position),
+          UNIQUE(token_id, strong)
+        );
+
         CREATE TABLE verse_notes (
           id INTEGER PRIMARY KEY,
           verse_id INTEGER NOT NULL REFERENCES verses(id) ON DELETE CASCADE,
@@ -599,6 +613,7 @@ def write_sqlite(db_path: Path, books: list[dict[str, Any]]) -> None:
         CREATE INDEX idx_verses_chapter_verse ON verses(chapter_id, verse_num);
         CREATE INDEX idx_tokens_verse_token ON tokens(verse_id, token_index);
         CREATE INDEX idx_tokens_strong ON tokens(strong);
+        CREATE INDEX idx_token_strongs_strong ON token_strongs(strong);
         CREATE INDEX idx_tokens_divine_name ON tokens(divine_name);
         CREATE INDEX idx_notes_verse ON verse_notes(verse_id, note_index);
         """
@@ -649,7 +664,7 @@ def write_sqlite(db_path: Path, books: list[dict[str, Any]]) -> None:
                 )
 
                 for token_idx, token in enumerate(verse["tokenRows"]):
-                    conn.execute(
+                    token_cur = conn.execute(
                         """
                         INSERT INTO tokens (
                           verse_id,
@@ -675,6 +690,17 @@ def write_sqlite(db_path: Path, books: list[dict[str, Any]]) -> None:
                             1 if token["divineName"] else 0,
                             1 if token["redLetter"] else 0,
                         ),
+                    )
+                    token_id = int(token_cur.lastrowid)
+                    conn.executemany(
+                        """
+                        INSERT INTO token_strongs (token_id, position, strong)
+                        VALUES (?, ?, ?)
+                        """,
+                        [
+                            (token_id, position, strong)
+                            for position, strong in enumerate(token["strongs"])
+                        ],
                     )
 
                 for note_idx, note in enumerate(verse.get("notes", [])):

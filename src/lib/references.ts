@@ -631,6 +631,28 @@ export function normalizeStrongsCode(value: string) {
   return `${prefix}${numeric.padStart(4, "0")}`;
 }
 
+export function normalizeStrongsCodes(values: readonly string[]) {
+  const normalizedCodes: string[] = [];
+  const seen = new Set<string>();
+  for (const value of values) {
+    const normalized = normalizeStrongsCode(value);
+    if (normalized && !seen.has(normalized)) {
+      seen.add(normalized);
+      normalizedCodes.push(normalized);
+    }
+  }
+  return normalizedCodes;
+}
+
+export function resolveTokenStrongsCodes(
+  token: Pick<VerseToken, "strong" | "strongs">,
+) {
+  return normalizeStrongsCodes([
+    ...(token.strongs ?? []),
+    ...(token.strong ? [token.strong] : []),
+  ]);
+}
+
 export type StrongsDerivationToken =
   | {
       type: "text";

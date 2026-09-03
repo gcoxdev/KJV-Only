@@ -809,6 +809,72 @@ test("loads study-word tools progressively without blocking the reader", async (
   expect(measures.allTools).toBeLessThan(15_000)
 })
 
+test.describe("multi-code Strong's selection", () => {
+  test.use({ serviceWorkers: "block" })
+
+  test("opens every clicked-word Strong's entry in sidebar and panel targets", async ({
+    page,
+  }) => {
+    test.setTimeout(180_000)
+    await page.goto("/#tab=0&tabs=h&layout=Matthew%2016:MAT.16")
+    const readerPanel = page.getByLabel("Matthew 16 panel")
+    await expect(
+      readerPanel.getByRole("button", { name: "Matthew 16", exact: true }),
+    ).toBeVisible()
+
+    const churchToken = readerPanel.getByRole("button", {
+      name: "Details for church",
+      exact: true,
+    })
+    await churchToken.dispatchEvent("click")
+
+    const sidebar = page.locator('[data-tour="sidebar"]')
+    const strongsTrigger = sidebar.getByRole("button", {
+      name: "Strong's Dictionary",
+      exact: true,
+    })
+    await expect(strongsTrigger).toHaveClass(/text-success/)
+    if ((await strongsTrigger.getAttribute("aria-expanded")) !== "true") {
+      await strongsTrigger.click()
+    }
+
+    for (const code of ["G3588", "G1577"]) {
+      await expect(
+        sidebar.getByRole("button", { name: `${code} (greek)`, exact: true }),
+      ).toHaveAttribute("aria-expanded", "false")
+    }
+
+    await page.getByLabel("Open menu").click()
+    await page.getByRole("menuitem", { name: "Settings", exact: true }).click()
+    await page.getByRole("tab", { name: "Targeting", exact: true }).click()
+    await page.getByLabel("Word / Verse Selection Target").click()
+    await page.getByRole("option", { name: "New Panel", exact: true }).click()
+    await page
+      .getByRole("button", { name: "Matthew 16", exact: true })
+      .filter({ visible: true })
+      .click()
+
+    await churchToken.dispatchEvent("click")
+
+    const toolsPanel = page.getByLabel("Tools panel")
+    await expect(toolsPanel).toBeVisible()
+    const panelStrongsTrigger = toolsPanel.getByRole("button", {
+      name: "Strong's Dictionary",
+      exact: true,
+    })
+    await expect(panelStrongsTrigger).toHaveClass(/text-success/)
+    if ((await panelStrongsTrigger.getAttribute("aria-expanded")) !== "true") {
+      await panelStrongsTrigger.click()
+    }
+
+    for (const code of ["G3588", "G1577"]) {
+      await expect(
+        toolsPanel.getByRole("button", { name: `${code} (greek)`, exact: true }),
+      ).toHaveAttribute("aria-expanded", "false")
+    }
+  })
+})
+
 test("loads the MapLibre worker and switches map renderers", async ({ page }) => {
   await page.route("https://tiles.openfreemap.org/styles/bright", async (route) => {
     await route.fulfill({

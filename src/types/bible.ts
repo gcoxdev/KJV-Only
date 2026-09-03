@@ -1,6 +1,7 @@
 export type VerseToken = {
   text: string
   strong?: string
+  strongs?: string[]
   lemma?: string
   morph?: string
   added?: boolean

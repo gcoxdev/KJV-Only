@@ -8,6 +8,7 @@ import {
 } from "@/hooks/use-concordance-crossrefs-tool";
 import {
   deriveStrongsSearchResults,
+  resolveStrongsEntries,
   type StrongsSearchResult,
 } from "@/hooks/use-strongs-search-tool";
 import { runStudyModeTeardown } from "@/hooks/use-study-mode-lifecycle";
@@ -98,7 +99,7 @@ describe("study tool reset behavior", () => {
     ).toEqual([selectedWord]);
   });
 
-  it("strongs results fall back to the selected entry when the search is cleared", () => {
+  it("strongs results fall back to every selected entry when the search is cleared", () => {
     const selectedEntry: StrongsSearchResult = {
       code: "G5485",
       testament: "greek",
@@ -125,7 +126,7 @@ describe("study tool reset behavior", () => {
       },
     ];
 
-    expect(deriveStrongsSearchResults(indexedEntries, selectedEntry, "mer")).toEqual([
+    expect(deriveStrongsSearchResults(indexedEntries, [selectedEntry], "mer")).toEqual([
       {
         code: "G1656",
         testament: "greek",
@@ -136,8 +137,32 @@ describe("study tool reset behavior", () => {
       },
     ]);
 
-    expect(deriveStrongsSearchResults(indexedEntries, selectedEntry, "")).toEqual([
+    expect(deriveStrongsSearchResults(indexedEntries, [selectedEntry], "")).toEqual([
       selectedEntry,
+    ]);
+  });
+
+  it("resolves every ordered Strong's code attached to a clicked word", () => {
+    expect(
+      resolveStrongsEntries(
+        ["G3588", "G1577", "G3588", "invalid"],
+        {
+          G3588: { kjv_def: "the, this, that" },
+          G1577: { kjv_def: "assembly, church" },
+        },
+        {},
+      ),
+    ).toEqual([
+      {
+        code: "G3588",
+        testament: "greek",
+        entry: { kjv_def: "the, this, that" },
+      },
+      {
+        code: "G1577",
+        testament: "greek",
+        entry: { kjv_def: "assembly, church" },
+      },
     ]);
   });
 });

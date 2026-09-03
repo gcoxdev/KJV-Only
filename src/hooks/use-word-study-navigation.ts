@@ -1,6 +1,10 @@
 import { useCallback, useRef } from "react";
 
-import { chapterVerseKey, normalizeConcordanceWord, normalizeStrongsCode } from "@/lib/references";
+import {
+  chapterVerseKey,
+  normalizeConcordanceWord,
+  resolveTokenStrongsCodes,
+} from "@/lib/references";
 import { resolveWordTokenAtLocation } from "@/lib/word-study-selection";
 import type {
   CrossRefsPayload,
@@ -78,7 +82,7 @@ type UseWordStudyNavigationParams = {
       verseNumber?: number | null;
       bookIndex?: number;
       chapterIndex?: number;
-      strongCode?: string | null;
+      strongCodes?: string[];
     },
   ) => void;
   openWordInStudyTools: (args: {
@@ -87,7 +91,7 @@ type UseWordStudyNavigationParams = {
     chapterIndex: number;
     verseNumber: number | null;
     tokenIndex: number | null;
-    strongCode: string | null;
+    strongCodes: string[];
     sourceLeafId: string | null;
   }) => StudyToolsDestination | void;
   setTokenPopup: (value: { token: VerseToken; x: number; y: number } | null) => void;
@@ -232,6 +236,9 @@ export function useWordStudyNavigation({
           target.verseNumber,
           rawWord,
         );
+        const strongCodes = matchedToken
+          ? resolveTokenStrongsCodes(matchedToken.token)
+          : [];
         const leafId = openReaderTarget(
           {
             type: "verse",
@@ -260,9 +267,7 @@ export function useWordStudyNavigation({
           chapterIndex: target.chapterIndex,
           verseNumber: target.verseNumber,
           tokenIndex: matchedToken?.tokenIndex ?? null,
-          strongCode: matchedToken?.token.strong
-            ? normalizeStrongsCode(matchedToken.token.strong)
-            : null,
+          strongCodes,
           sourceLeafId: leafId,
         });
         if (studyToolsTarget?.type !== "panel") {
@@ -270,9 +275,7 @@ export function useWordStudyNavigation({
             bookIndex: target.bookIndex,
             chapterIndex: target.chapterIndex,
             verseNumber: target.verseNumber,
-            strongCode: matchedToken?.token.strong
-              ? normalizeStrongsCode(matchedToken.token.strong)
-              : null,
+            strongCodes,
           });
         }
         return;
@@ -302,7 +305,8 @@ export function useWordStudyNavigation({
       verseNumber: number,
       tokenIndex: number,
     ) => {
-      if (!token.strong && !token.added) {
+      const strongCodes = resolveTokenStrongsCodes(token);
+      if (strongCodes.length === 0 && !token.added) {
         const rect = element.getBoundingClientRect();
         const popupWidth = 280;
         const safeX = Math.max(
@@ -357,9 +361,6 @@ export function useWordStudyNavigation({
         return;
       }
 
-      const normalizedCode = token.strong
-        ? normalizeStrongsCode(token.strong)
-        : null;
       openWordInStudyTools({
         rawWord,
         bookIndex,
@@ -367,7 +368,7 @@ export function useWordStudyNavigation({
         verseNumber:
           Number.isFinite(verseNumber) && verseNumber > 0 ? verseNumber : null,
         tokenIndex,
-        strongCode: normalizedCode,
+        strongCodes,
         sourceLeafId: leafId,
       });
     },

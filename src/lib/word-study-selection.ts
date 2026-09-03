@@ -11,6 +11,7 @@ import {
   resolveHitchcocksKey,
   resolveOldEnglishKey,
   resolvePhraseKeyForToken,
+  resolveTokenStrongsCodes,
   resolveUnitsKey,
   resolveWebstersKey,
 } from "@/lib/references";
@@ -49,7 +50,7 @@ export type TokenAccordionOptions = {
   verseNumber?: number | null;
   bookIndex?: number;
   chapterIndex?: number;
-  strongCode?: string | null;
+  strongCodes?: string[];
   concordanceData?: ConcordancePayload | null;
   webstersData?: WebstersPayload | null;
   aiDictionaryData?: AIDictionaryPayload | null;
@@ -242,7 +243,7 @@ export function resolveWordTokenAtLocation(
     }
 
     const match = { token, tokenIndex };
-    if (token.strong) {
+    if (resolveTokenStrongsCodes(token).length > 0) {
       return match;
     }
     fallbackMatch ??= match;
@@ -383,15 +384,16 @@ export function deriveTokenAccordionState(
     nextAccordion.push("bible-word-book");
   }
 
-  if (
-    options.strongCode &&
-    options.strongsGreekData &&
-    options.strongsHebrewData
-  ) {
-    const source = options.strongCode.startsWith("G")
-      ? options.strongsGreekData
-      : options.strongsHebrewData;
-    if (source[options.strongCode]) {
+  const strongsGreekData = options.strongsGreekData;
+  const strongsHebrewData = options.strongsHebrewData;
+  if (strongsGreekData && strongsHebrewData) {
+    const hasStrongsEntry = (options.strongCodes ?? []).some((strongCode) => {
+      const source = strongCode.startsWith("G")
+        ? strongsGreekData
+        : strongsHebrewData;
+      return Boolean(source[strongCode]);
+    });
+    if (hasStrongsEntry) {
       nextAccordion.push("strongs");
     }
   }

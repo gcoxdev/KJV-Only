@@ -4,8 +4,10 @@ import {
   chapterVerseKey,
   escapeRegExp,
   normalizeStrongsCode,
+  normalizeStrongsCodes,
   parseBibleReference,
   tokenizeStrongsDerivation,
+  resolveTokenStrongsCodes,
 } from "@/lib/references";
 
 describe("reference parsing helpers", () => {
@@ -13,6 +15,20 @@ describe("reference parsing helpers", () => {
     expect(normalizeStrongsCode("g25")).toBe("G0025");
     expect(normalizeStrongsCode(" H 430 ")).toBe("H0430");
     expect(normalizeStrongsCode("abc")).toBeNull();
+  });
+
+  it("preserves ordered, unique Strong's codes from new and legacy tokens", () => {
+    expect(normalizeStrongsCodes(["g3588", "G1577", "G3588", "bad"])).toEqual([
+      "G3588",
+      "G1577",
+    ]);
+    expect(
+      resolveTokenStrongsCodes({
+        strong: "G3588",
+        strongs: ["G3588", "G1577"],
+      }),
+    ).toEqual(["G3588", "G1577"]);
+    expect(resolveTokenStrongsCodes({ strong: "g25" })).toEqual(["G0025"]);
   });
 
   it("parses single-chapter and cross-chapter references", () => {
