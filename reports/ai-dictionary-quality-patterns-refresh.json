@@ -1,39 +1,32 @@
 {
-  "generatedAt": "2026-03-17T07:10:00.000Z",
+  "generatedAt": "2026-09-03T04:07:03.836Z",
   "schema": {
     "definitions": "array<string>",
     "partOfSpeech": "string",
-    "classification": "string"
+    "classification": "string",
+    "confidence": "high | medium | low"
   },
   "counts": {
-    "total": 12880,
-    "missingDefinitionsArray": 0,
-    "emptyDefinitions": 0,
-    "nonStringDefinitions": 0,
-    "mediumConfidence": 5751,
-    "withFormOf": 3972,
-    "selfSufficientFormOf": 3971,
-    "unresolvedFormOf": 0,
-    "variantLanguage": 0,
-    "repeatedNameFormula": 0,
-    "genericWording": 0,
-    "thinPlace": 0,
-    "pronounEntries": 64,
-    "multiDefinitionEntries": 785
+    "total": 12903,
+    "high": 12903,
+    "medium": 0,
+    "low": 0,
+    "unspecified": 0,
+    "withFormOf": 4163,
+    "unresolvedSeeTargets": 0,
+    "malformedNessEntries": 0,
+    "selfReferentialSeeEntries": 0,
+    "genericEntries": 0
   },
   "samples": {
-    "missingDefinitionsArray": [],
-    "emptyDefinitions": [],
-    "nonStringDefinitions": [],
-    "unresolvedFormOf": [],
-    "variantLanguage": [],
-    "repeatedNameFormula": [],
-    "genericWording": [],
-    "thinPlace": []
+    "unresolvedSeeTargets": [],
+    "malformedNessEntries": [],
+    "selfReferentialSeeEntries": [],
+    "genericEntries": []
   },
   "notes": [
-    "Assessment is heuristic and tuned to the cleanup seams used in this project.",
-    "unresolvedFormOf tracks inflected-form wording that still lacks an explicit See-link to the root entry.",
-    "mediumConfidence is not itself an error bucket; it marks entries that may still have room for nuance improvement."
+    "Confidence is assigned to the accuracy of the explanation, including explanations that responsibly state historical or identification uncertainty.",
+    "unresolvedSeeTargets is a quality gate: AI Dictionary See-references must resolve to another AI Dictionary headword.",
+    "The confidence review used direct headword evidence, KJV/Strong's rendering evidence, named-entity datasets, morphology, and manual contextual review."
   ]
 }
