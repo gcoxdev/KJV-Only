@@ -874,7 +874,7 @@ export function KJVReader() {
     setIsStrongsSearching,
     setIsStrongsLoading,
     setStrongsError,
-    setSelectedStrongsEntry,
+    setSelectedStrongsEntries,
     ensureStrongsLoaded,
     applyStrongsSearch: applyStrongsSearchRaw,
     resetTransientState: resetStrongsTransientState,
@@ -1324,15 +1324,17 @@ export function KJVReader() {
         const source = code.startsWith("G") ? greek : hebrew;
         const entry = source[code];
         if (!entry) {
-          setSelectedStrongsEntry(null);
+          setSelectedStrongsEntries([]);
           return;
         }
 
-        setSelectedStrongsEntry({
-          code,
-          testament: code.startsWith("G") ? "greek" : "hebrew",
-          entry,
-        });
+        setSelectedStrongsEntries([
+          {
+            code,
+            testament: code.startsWith("G") ? "greek" : "hebrew",
+            entry,
+          },
+        ]);
         showStudyTool("strongs");
       };
 
@@ -1352,7 +1354,7 @@ export function KJVReader() {
               ? error.message
               : "Failed to load Strong's data";
           setStrongsError(message);
-          setSelectedStrongsEntry(null);
+          setSelectedStrongsEntries([]);
         })
         .finally(() => {
           setIsStrongsLoading(false);
@@ -1363,7 +1365,7 @@ export function KJVReader() {
       showStudyTool,
       setIsStrongsLoading,
       setIsStrongsSearching,
-      setSelectedStrongsEntry,
+      setSelectedStrongsEntries,
       setStrongsError,
       setStrongsSearchTerm,
       strongsGreek,
@@ -1431,7 +1433,7 @@ export function KJVReader() {
     setStrongsSearchTerm,
     setIsStrongsSearching,
     setStrongsWordAccordionValue,
-    setSelectedStrongsEntry,
+    setSelectedStrongsEntries,
     strongsSearchInputRef,
   });
 

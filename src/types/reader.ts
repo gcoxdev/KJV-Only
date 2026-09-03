@@ -257,7 +257,7 @@ export type StudyToolsSelectionCommand =
       chapterIndex: number;
       verseNumber: number | null;
       tokenIndex: number | null;
-      strongCode: string | null;
+      strongCodes: string[];
       sourceLeafId: string | null;
     };
 export type WordVerseSelectionTarget =

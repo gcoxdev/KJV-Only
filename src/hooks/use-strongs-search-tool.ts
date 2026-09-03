@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { loadStrongsGreek, loadStrongsHebrew } from "@/lib/reader-data";
+import { normalizeStrongsCodes } from "@/lib/references";
 import type { StrongsEntry, StrongsPayload } from "@/types/reader";
 
 export type StrongsSearchResult = {
@@ -9,6 +10,18 @@ export type StrongsSearchResult = {
   entry: StrongsEntry;
 };
 
+export function resolveStrongsEntries(
+  strongCodes: readonly string[],
+  greek: StrongsPayload,
+  hebrew: StrongsPayload,
+) {
+  return normalizeStrongsCodes(strongCodes).flatMap<StrongsSearchResult>((code) => {
+    const testament = code.startsWith("G") ? "greek" : "hebrew";
+    const entry = (testament === "greek" ? greek : hebrew)[code];
+    return entry ? [{ code, testament, entry }] : [];
+  });
+}
+
 export function deriveStrongsSearchResults(
   indexedStrongsEntries: Array<{
     code: string;
@@ -16,12 +29,12 @@ export function deriveStrongsSearchResults(
     entry: StrongsEntry;
     haystackLower: string;
   }>,
-  selectedStrongsEntry: StrongsSearchResult | null,
+  selectedStrongsEntries: StrongsSearchResult[],
   strongsSearchTerm: string,
 ) {
   const term = strongsSearchTerm.trim().toLowerCase();
   if (!term) {
-    return selectedStrongsEntry ? [selectedStrongsEntry] : [];
+    return selectedStrongsEntries;
   }
   return indexedStrongsEntries
     .filter((item) => item.haystackLower.includes(term))
@@ -35,8 +48,9 @@ export function useStrongsSearchTool() {
   const [isStrongsSearching, setIsStrongsSearching] = useState(false);
   const [isStrongsLoading, setIsStrongsLoading] = useState(false);
   const [strongsError, setStrongsError] = useState<string | null>(null);
-  const [selectedStrongsEntry, setSelectedStrongsEntry] =
-    useState<StrongsSearchResult | null>(null);
+  const [selectedStrongsEntries, setSelectedStrongsEntries] = useState<
+    StrongsSearchResult[]
+  >([]);
 
   const ensureStrongsLoaded = useCallback(async () => {
     if (strongsGreek && strongsHebrew) {
@@ -103,10 +117,10 @@ export function useStrongsSearchTool() {
   const strongsSearchResults = useMemo(() => {
     return deriveStrongsSearchResults(
       indexedStrongsEntries,
-      selectedStrongsEntry,
+      selectedStrongsEntries,
       strongsSearchTerm,
     );
-  }, [indexedStrongsEntries, selectedStrongsEntry, strongsSearchTerm]);
+  }, [indexedStrongsEntries, selectedStrongsEntries, strongsSearchTerm]);
 
   const applyStrongsSearch = useCallback(
     (rawValue?: string) => {
@@ -134,7 +148,7 @@ export function useStrongsSearchTool() {
     setStrongsError(null);
     setIsStrongsLoading(false);
     setIsStrongsSearching(false);
-    setSelectedStrongsEntry(null);
+    setSelectedStrongsEntries([]);
   }, []);
 
   return {
@@ -144,13 +158,13 @@ export function useStrongsSearchTool() {
     isStrongsSearching,
     isStrongsLoading,
     strongsError,
-    selectedStrongsEntry,
+    selectedStrongsEntries,
     strongsSearchResults,
     setStrongsSearchTerm,
     setIsStrongsSearching,
     setIsStrongsLoading,
     setStrongsError,
-    setSelectedStrongsEntry,
+    setSelectedStrongsEntries,
     ensureStrongsLoaded,
     applyStrongsSearch,
     resetTransientState,

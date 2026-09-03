@@ -330,7 +330,7 @@ export function useStudyToolsSession({
     setIsStrongsSearching,
     setIsStrongsLoading,
     setStrongsError,
-    setSelectedStrongsEntry,
+    setSelectedStrongsEntries,
     ensureStrongsLoaded,
     applyStrongsSearch: applyStrongsSearchRaw,
   } = useStrongsSearchTool();
@@ -457,14 +457,16 @@ export function useStudyToolsSession({
         const source = code.startsWith("G") ? greek : hebrew;
         const entry = source[code];
         if (!entry) {
-          setSelectedStrongsEntry(null);
+          setSelectedStrongsEntries([]);
           return;
         }
-        setSelectedStrongsEntry({
-          code,
-          testament: code.startsWith("G") ? "greek" : "hebrew",
-          entry,
-        });
+        setSelectedStrongsEntries([
+          {
+            code,
+            testament: code.startsWith("G") ? "greek" : "hebrew",
+            entry,
+          },
+        ]);
         openStudyTool("strongs");
       };
 
@@ -482,7 +484,7 @@ export function useStudyToolsSession({
               ? error.message
               : "Failed to load Strong's data",
           );
-          setSelectedStrongsEntry(null);
+          setSelectedStrongsEntries([]);
         })
         .finally(() => setIsStrongsLoading(false));
     },
@@ -491,7 +493,7 @@ export function useStudyToolsSession({
       openStudyTool,
       setIsStrongsLoading,
       setIsStrongsSearching,
-      setSelectedStrongsEntry,
+      setSelectedStrongsEntries,
       setStrongsError,
       setStrongsSearchTerm,
       strongsGreek,
@@ -635,7 +637,7 @@ export function useStudyToolsSession({
     setStrongsSearchTerm,
     setIsStrongsSearching,
     setStrongsWordAccordionValue,
-    setSelectedStrongsEntry,
+    setSelectedStrongsEntries,
     strongsSearchInputRef,
   });
 

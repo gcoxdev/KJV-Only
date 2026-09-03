@@ -1,6 +1,7 @@
 import type { VerseToken } from "@/types/bible";
 import { formatDisplayTokenText } from "@/components/reader/chapter-text-content";
 import { Card, CardContent } from "@/components/ui/card";
+import { resolveTokenStrongsCodes } from "@/lib/references";
 
 type TokenPopupCardProps = {
   token: VerseToken;
@@ -9,6 +10,7 @@ type TokenPopupCardProps = {
 };
 
 export function TokenPopupCard({ token, x, y }: TokenPopupCardProps) {
+  const strongCodes = resolveTokenStrongsCodes(token);
   return (
     <Card
       data-token-popup
@@ -22,10 +24,10 @@ export function TokenPopupCard({ token, x, y }: TokenPopupCardProps) {
             Added word (italic in KJV typography)
           </p>
         ) : null}
-        {token.strong ? (
+        {strongCodes.length > 0 ? (
           <p>
             <span className="text-muted-foreground">Strong&apos;s:</span>{" "}
-            <span className="font-mono">{token.strong}</span>
+            <span className="font-mono">{strongCodes.join(", ")}</span>
           </p>
         ) : null}
         {token.lemma ? (

@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "corpusVersion": "sha256-f005a068b799ac20",
+  "corpusVersion": "sha256-c044a070df4a71dd",
   "bootstrap": {
     "url": "/data/kjv-bootstrap.json",
-    "sha256": "c6194987e0a89503e21cf183ae98ca7a6d9578b1d098b3afd51e069c7817e041",
-    "bytes": 53644,
+    "sha256": "7d18755408165ed6295212eb5b280164155ca37128bee3f6142a016b6100abbe",
+    "bytes": 53752,
     "bookCount": 1,
     "chapterCount": 1,
     "verseCount": 31
   },
   "full": {
     "url": "/data/kjv.json",
-    "sha256": "f005a068b799ac200c570c955e3a87117fc4f52e83aff418dc4652bbe8299158",
-    "bytes": 73576521,
+    "sha256": "c044a070df4a71dd1e87e1cf3a516440dba5d7c697d1e80682acfc0e0545dbf1",
+    "bytes": 74541909,
     "bookCount": 66,
     "chapterCount": 1189,
     "verseCount": 31102

@@ -7,6 +7,7 @@ import { mayHaveGenealogyMatch } from "@/lib/reader-data";
 import {
   chapterVerseKey,
   decodeConcordanceReferences,
+  normalizeStrongsCodes,
   resolveAIDictionaryKey,
   resolveBibleWordBookKey,
   resolveConcordanceKey,
@@ -42,7 +43,10 @@ import type {
   WebstersEntry,
   WebstersPayload,
 } from "@/types/reader";
-import type { StrongsSearchResult } from "@/hooks/use-strongs-search-tool";
+import {
+  resolveStrongsEntries,
+  type StrongsSearchResult,
+} from "@/hooks/use-strongs-search-tool";
 
 type Setter<T> = (value: T) => void;
 
@@ -139,7 +143,7 @@ type WordStudyCoordinatorParams = {
   setStrongsSearchTerm: Setter<string>;
   setIsStrongsSearching: Setter<boolean>;
   setStrongsWordAccordionValue: Setter<string[]>;
-  setSelectedStrongsEntry: Setter<StrongsSearchResult | null>;
+  setSelectedStrongsEntries: Setter<StrongsSearchResult[]>;
   strongsSearchInputRef: RefObject<HTMLInputElement | null>;
 };
 
@@ -149,7 +153,7 @@ export type OpenWordInStudyToolsArgs = {
   chapterIndex: number;
   verseNumber: number | null;
   tokenIndex: number | null;
-  strongCode: string | null;
+  strongCodes: string[];
   sourceLeafId: string | null;
 };
 
@@ -213,7 +217,7 @@ export function useWordStudyCoordinator({
   setStrongsSearchTerm,
   setIsStrongsSearching,
   setStrongsWordAccordionValue,
-  setSelectedStrongsEntry,
+  setSelectedStrongsEntries,
   strongsSearchInputRef,
 }: WordStudyCoordinatorParams) {
   const requestIdRef = useRef(0);
@@ -225,9 +229,10 @@ export function useWordStudyCoordinator({
       chapterIndex,
       verseNumber,
       tokenIndex,
-      strongCode,
+      strongCodes,
       sourceLeafId,
     } = selection;
+    const normalizedStrongCodes = normalizeStrongsCodes(strongCodes);
     setNotesContext(
       verseNumber !== null
         ? { bookIndex, chapterIndex, verseNumber, word: rawWord }
@@ -300,9 +305,7 @@ export function useWordStudyCoordinator({
     setSelectedGenealogyIds([]);
     setSelectedMapsEntries([]);
     setStrongsWordAccordionValue([]);
-    if (!strongCode) {
-      setSelectedStrongsEntry(null);
-    }
+    setSelectedStrongsEntries([]);
 
     const applyConcordanceSelection = (data: ConcordancePayload) => {
       if (!isCurrentRequest()) {
@@ -345,7 +348,7 @@ export function useWordStudyCoordinator({
     let strongsPromise:
       | Promise<{ greek: StrongsPayload; hebrew: StrongsPayload } | null>
       | null = null;
-    if (strongCode) {
+    if (normalizedStrongCodes.length > 0) {
       setStrongsError(null);
       setIsStrongsLoading(true);
       setStrongsSearchTerm("");
@@ -538,22 +541,17 @@ export function useWordStudyCoordinator({
       if (matches.length > 0) finishFirstToolsMeasure();
     });
 
-    if (strongCode && strongsPromise) {
+    if (normalizedStrongCodes.length > 0 && strongsPromise) {
       void strongsPromise.then((data) => {
         if (!data || !isCurrentRequest()) return;
-        const source = strongCode.startsWith("G") ? data.greek : data.hebrew;
-        const entry = source[strongCode];
-        setSelectedStrongsEntry(
-          entry
-            ? {
-                code: strongCode,
-                testament: strongCode.startsWith("G") ? "greek" : "hebrew",
-                entry,
-              }
-            : null,
+        const entries = resolveStrongsEntries(
+          normalizedStrongCodes,
+          data.greek,
+          data.hebrew,
         );
-        updateAccordionMatch("strongs", Boolean(entry));
-        if (entry) finishFirstToolsMeasure();
+        setSelectedStrongsEntries(entries);
+        updateAccordionMatch("strongs", entries.length > 0);
+        if (entries.length > 0) finishFirstToolsMeasure();
       });
     }
 
@@ -565,7 +563,7 @@ export function useWordStudyCoordinator({
       finishConcordanceMeasure();
       finishFirstToolsMeasure();
       finishAllToolsMeasure();
-      if (strongCode && isCurrentRequest()) {
+      if (normalizedStrongCodes.length > 0 && isCurrentRequest()) {
         setIsStrongsLoading(false);
       }
     });
