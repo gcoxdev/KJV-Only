@@ -28,6 +28,7 @@ pnpm-debug.log*
 coverage/
 playwright-report/
 test-results/
+reports/
 
 # quarantine for public assets under review
 public/delete/
