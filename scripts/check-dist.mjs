@@ -15,6 +15,12 @@ const REQUIRED_PATHS = [
   "data/kjv.json",
   "data/kjv-manifest.json",
   "icons/app-icon.svg",
+  "icons/app-icon.png",
+  "icons/app-logo.png",
+  "icons/app-icon-512.png",
+  "icons/app-icon-maskable.png",
+  "icons/apple-touch-icon.png",
+  "icons/favicon.png",
   "topics/daily-scripture-topics.json",
   "topics/topics-index.json",
 ];

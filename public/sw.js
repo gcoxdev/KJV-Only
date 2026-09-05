@@ -20,6 +20,12 @@ const APP_SHELL = [
   "/data/kjv-manifest.json",
   "/data/kjv-bootstrap.json",
   "/icons/app-icon.svg",
+  "/icons/app-icon.png",
+  "/icons/app-logo.png",
+  "/icons/app-icon-512.png",
+  "/icons/app-icon-maskable.png",
+  "/icons/apple-touch-icon.png",
+  "/icons/favicon.png",
   "/topics/daily-scripture-topics.json",
 ]
 const APP_SHELL_ASSET_URL_PATTERN =

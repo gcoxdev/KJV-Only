@@ -11,9 +11,9 @@ export function ReaderStatusScreen({ message }: ReaderStatusScreenProps) {
         <CardHeader>
           <div className="flex items-center gap-4">
             <img
-              src="/icons/app-icon.svg"
+              src="/icons/app-logo.png"
               alt="KJV Only app icon"
-              className="size-16 object-contain"
+              className="h-16 w-auto object-contain"
             />
             <div className="flex flex-col gap-1">
               <CardTitle className="text-xl">KJV Only</CardTitle>
