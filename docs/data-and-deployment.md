@@ -2,7 +2,7 @@
 
 ## Asset classes
 
-Vite's default public-directory copying is disabled. The `runtimePublicAssets` plugin in `vite.config.ts` exposes and builds only exact browser data files plus narrowly matched audio, book-icon, GeoJSON, and map-thumbnail files. The same file-level allowlist is used by the loopback development and preview servers. The tracked OSIS input lives in `data-sources/`; the generated SQLite database lives in ignored `.generated/`; only browser-ready JSON lives under `public/data/`.
+Vite's default public-directory copying is disabled. The `runtimePublicAssets` plugin in `vite.config.ts` exposes and builds only exact browser data files plus narrowly matched audio, book-icon, and GeoJSON files. Map thumbnails remain in `public/maps/thumbnails/` as source assets but are excluded from builds and runtime serving while photos are deferred. The distribution guard rejects them if they are accidentally reintroduced. The same file-level allowlist is used by the loopback development and preview servers. The tracked OSIS input lives in `data-sources/`; the generated SQLite database lives in ignored `.generated/`; only browser-ready JSON lives under `public/data/`.
 
 `public/delete/` is quarantine, never a runtime source. Raw OSIS, SQLite, JSONL/KML, backups, and other generator inputs must remain outside the deploy allowlist. Adding a new public runtime path requires updating the allowlist and the build-artifact check deliberately.
 

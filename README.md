@@ -17,9 +17,9 @@ The application currently includes:
 - Desktop-friendly and mobile-friendly interface
 - Installable PWA behavior and offline download bundles
 
-In Topics, everyday phrases such as `feeling afraid`, `need direction`, and `how to forgive` link to curated existing topics. Related matches are labeled with the phrase that found them. Genealogy search results show recorded family relationships and a name reference; references are name matches and can include different people with the same name.
+In Topics, everyday phrases such as `feeling afraid`, `need direction`, and `how to forgive` link to curated existing topics. Related matches are labeled with the phrase that found them; **Clear letter filters** removes letter restrictions while keeping your search. Genealogy search results show recorded family relationships and a name reference; references are name matches and can include different people with the same name.
 
-Map dialogs offer **Search this area** in both renderers. Results use the local geometry bounds and can open a place or linked passage. Hide the results to explore the full map, then search again after moving or zooming. Bounds are approximate and can include areas whose outline extends beyond the view; entries without usable geometry are excluded. Run `npm run build:maps` after updating the map sources or geometry to regenerate the bounds index.
+Map dialogs offer **Search this area** in both renderers. Results use the local geometry bounds and can open a place or linked passage. Filter the results by place name (including alternate names) and recorded place type; **Clear filters** restores all results in the searched area. Hide the results to explore the full map, then search again after moving or zooming. Bounds are approximate and can include areas whose outline extends beyond the view; entries without usable geometry are excluded. Run `npm run build:maps` after updating the map sources or geometry to regenerate the bounds index.
 
 ## Tech Stack
 

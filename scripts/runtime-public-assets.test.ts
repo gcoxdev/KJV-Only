@@ -13,7 +13,6 @@ describe("runtime public asset policy", () => {
     "audio/GEN.1.mp3",
     "icons/color/Genesis.png",
     "maps/geometry/ancient-world.geojson",
-    "maps/thumbnails/ancient-world.webp",
   ])("allows an intended runtime asset: %s", (relative) => {
     expect(isAllowedRuntimeFile(relative)).toBe(true)
   })
@@ -23,6 +22,9 @@ describe("runtime public asset policy", () => {
     "data/kjv.osis.xml",
     "../public/data/kjv.json",
     "maps/schemas/map.schema.json",
+    "maps/thumbnails/ancient-world.webp",
+    "maps/thumbnails/ancient-world.jpg",
+    "maps/thumbnails/ancient-world.png",
     "audio/GEN.0.mp3",
     "icons/color/bad name.png",
   ])("rejects a non-runtime asset: %s", (relative) => {
