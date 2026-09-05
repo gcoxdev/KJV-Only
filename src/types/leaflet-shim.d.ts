@@ -17,5 +17,7 @@ declare module "react-leaflet" {
   export const GeoJSON: ComponentType<Record<string, unknown>>;
   export function useMap(): {
     fitBounds: (bounds: unknown, options?: unknown) => void;
+    invalidateSize: (options?: { pan?: boolean }) => void;
+    getContainer: () => HTMLElement;
   };
 }

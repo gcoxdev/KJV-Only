@@ -295,11 +295,9 @@ function isCloseSingleWordMatch(queryWord: string, verseWord: string) {
     return true;
   }
 
-  const shorterLength = Math.min(queryWord.length, verseWord.length);
-  if (
-    shorterLength >= 3 &&
-    (queryWord.startsWith(verseWord) || verseWord.startsWith(queryWord))
-  ) {
+  // Complete a typed prefix, but require spelling similarity when the verse
+  // word is shorter: "she" must not outrank "shepherd" for "sheperd".
+  if (queryWord.length >= 3 && verseWord.startsWith(queryWord)) {
     return true;
   }
 
@@ -416,7 +414,7 @@ function isSmartSearchTokenCandidate(
     shorterLength >= 3 &&
     (queryWord.startsWith(verseWord) || verseWord.startsWith(queryWord))
   ) {
-    return true;
+    return !requireCloseSpelling || isCloseSingleWordMatch(queryWord, verseWord);
   }
   if (
     queryWord.length >= 4 &&
@@ -786,6 +784,21 @@ export function prepareSmartSearch(query: string, caseSensitive: boolean) {
   } satisfies PreparedSmartSearch;
 }
 
+function containsWholePhrase(text: string, phrase: string) {
+  let start = text.indexOf(phrase);
+  while (start !== -1) {
+    const end = start + phrase.length;
+    const joinsWord = (index: number, direction: number) => {
+      const character = text[index] ?? "";
+      return /[a-z0-9]/i.test(character) ||
+        (/[’'-]/.test(character) && /[a-z]/i.test(text[index + direction] ?? ""));
+    };
+    if (!joinsWord(start - 1, -1) && !joinsWord(end, 1)) return true;
+    start = text.indexOf(phrase, start + 1);
+  }
+  return false;
+}
+
 export function isSmartSearchCandidate(
   entry: Pick<
     SearchableVerseEntry,
@@ -794,7 +807,7 @@ export function isSmartSearchCandidate(
   prepared: PreparedSmartSearch,
 ) {
   const haystackText = prepared.caseSensitive ? entry.text : entry.textLower;
-  if (prepared.exactPhrases.some((phrase) => !haystackText.includes(phrase))) {
+  if (prepared.exactPhrases.some((phrase) => !containsWholePhrase(haystackText, phrase))) {
     return false;
   }
 
@@ -918,7 +931,7 @@ export function scorePreparedSmartSearch(
 
   if (prepared.exactPhrases.length > 0) {
     for (const phrase of prepared.exactPhrases) {
-      if (text.includes(phrase)) {
+      if (containsWholePhrase(text, phrase)) {
         score += 60;
       } else {
         return null;

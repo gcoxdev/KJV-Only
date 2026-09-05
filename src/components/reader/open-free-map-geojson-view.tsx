@@ -25,7 +25,6 @@ import {
 
 const OPEN_FREE_MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/bright";
 const GEOJSON_SOURCE_ID = "kjv-map-geometry";
-const GEOJSON_FILL_LAYER_ID = "kjv-map-geometry-fill";
 const GEOJSON_LINE_LAYER_ID = "kjv-map-geometry-line";
 
 setWorkerUrl(mapLibreWorkerUrl);
@@ -81,17 +80,6 @@ function addGeoJsonLayers(map: MapLibreMap, geojson: MapGeoJsonPayload) {
   map.addSource(GEOJSON_SOURCE_ID, {
     type: "geojson",
     data: geojson as GeoJSONSourceSpecification["data"],
-  });
-
-  map.addLayer({
-    id: GEOJSON_FILL_LAYER_ID,
-    type: "fill",
-    source: GEOJSON_SOURCE_ID,
-    filter: ["==", ["geometry-type"], "Polygon"],
-    paint: {
-      "fill-color": "#60a5fa",
-      "fill-opacity": 0.25,
-    },
   });
 
   map.addLayer({
@@ -167,6 +155,7 @@ export function OpenFreeMapGeoJsonView({
     let disposed = false;
     let styleLoaded = false;
     let map: MapLibreMap | null = null;
+    let resizeObserver: ResizeObserver | null = null;
     const abortController = new AbortController();
     const displayGeoJson = mapGeoJsonForDisplay(geojson);
 
@@ -216,6 +205,12 @@ export function OpenFreeMapGeoJsonView({
             applyEnglishLabels(map);
             addGeoJsonLayers(map, displayGeoJson);
             fitGeoJsonBounds(map, displayGeoJson);
+            resizeObserver = new ResizeObserver(() => {
+              if (!map || disposed) return;
+              map.resize();
+              fitGeoJsonBounds(map, displayGeoJson);
+            });
+            resizeObserver.observe(container);
             styleLoaded = true;
             setStatus({ state: "ready" });
           } catch (error) {
@@ -237,6 +232,7 @@ export function OpenFreeMapGeoJsonView({
     return () => {
       disposed = true;
       abortController.abort();
+      resizeObserver?.disconnect();
       map?.remove();
     };
   }, [geojson]);

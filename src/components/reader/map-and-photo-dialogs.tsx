@@ -98,8 +98,8 @@ export function MapAndPhotoDialogs({
 
   return (
     <AlertDialog open={isMapDialogOpen} onOpenChange={onMapDialogOpenChange}>
-      <AlertDialogContent className="h-[min(86vh,900px)] w-[min(98vw,1700px)]! max-w-none!">
-        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <AlertDialogContent className="flex h-[min(86vh,900px)] w-[min(98vw,1700px)]! max-w-none! flex-col">
+        <div className="flex min-w-0 shrink-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <AlertDialogHeader className="min-w-0 flex-1 sm:place-items-start sm:text-left">
             <AlertDialogTitle>
               {activeMapDialogEntry
@@ -169,7 +169,7 @@ export function MapAndPhotoDialogs({
                 <MapView
                   key={activeMapDialogEntry?.geojson_file}
                   geojson={mapDialogGeoJson}
-                  className="h-[calc(min(86vh,900px)-12rem)] min-h-96 w-full rounded-md border"
+                  className="h-full w-full rounded-md border"
                 />
               </Suspense>
             </MapRendererErrorBoundary>

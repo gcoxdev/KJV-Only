@@ -1,3 +1,4 @@
+import { ReaderControlTooltip } from "@/components/reader/reader-control-tooltip";
 import {
   Fragment,
   lazy,
@@ -1397,24 +1398,26 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                       <div className="@container/audio">
                         <div className="flex flex-col gap-2 @md/audio:flex-row @md/audio:items-center">
                           <div className="flex w-full min-w-0 items-center gap-2 @md/audio:w-1/2 @lg/audio:w-7/12">
-                            <Button
-                              variant="outline"
-                              size="icon-sm"
-                              onClick={() => {
-                                const audio = audioRef.current;
-                                if (!audio) {
-                                  return;
-                                }
-                                if (audio.paused) {
-                                  void audio.play().catch(() => {});
-                                } else {
-                                  audio.pause();
-                                }
-                              }}
-                              aria-label={audioPlaying ? "Pause audio" : "Play audio"}
-                            >
-                              {audioPlaying ? <PauseIcon /> : <PlayIcon />}
-                            </Button>
+                            <ReaderControlTooltip label={audioPlaying ? "Pause audio" : "Play audio"}>
+                              <Button
+                                variant="outline"
+                                size="icon-sm"
+                                onClick={() => {
+                                  const audio = audioRef.current;
+                                  if (!audio) {
+                                    return;
+                                  }
+                                  if (audio.paused) {
+                                    void audio.play().catch(() => {});
+                                  } else {
+                                    audio.pause();
+                                  }
+                                }}
+                                aria-label={audioPlaying ? "Pause audio" : "Play audio"}
+                              >
+                                {audioPlaying ? <PauseIcon /> : <PlayIcon />}
+                              </Button>
+                            </ReaderControlTooltip>
                             <div className="flex min-w-0 flex-1 items-center gap-2">
                               <span className="w-16 shrink-0 text-[10px] text-muted-foreground tabular-nums">
                                 {formatAudioTime(audioCurrentTime)}/{formatAudioTime(audioDuration)}
@@ -1456,9 +1459,11 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                                 }
                               }}
                             >
-                              <SelectTrigger size="sm" className="h-7 w-20 shrink-0 px-2 text-xs tabular-nums">
-                                <SelectValue />
-                              </SelectTrigger>
+                              <ReaderControlTooltip label="Audio playback speed">
+                                <SelectTrigger aria-label="Audio playback speed" size="sm" className="h-7 w-20 shrink-0 px-2 text-xs tabular-nums">
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </ReaderControlTooltip>
                               <SelectContent className="w-20 min-w-0">
                                 <SelectGroup>
                                   {AUDIO_PLAYBACK_RATE_OPTIONS.map((option) => (
@@ -1474,27 +1479,29 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                               </SelectContent>
                             </Select>
                             <div className="flex min-w-0 flex-1 items-center gap-1.5">
-                              <Button
-                                variant="outline"
-                                size="icon-sm"
-                                onClick={() => {
-                                  const nextMuted = !audioMuted;
-                                  setAudioMuted(nextMuted);
-                                  const audio = audioRef.current;
-                                  if (audio) {
-                                    audio.muted = nextMuted;
-                                  }
-                                }}
-                                aria-label={audioMuted ? "Unmute audio" : "Mute audio"}
-                              >
-                                {effectiveVolume <= 0 ? (
-                                  <VolumeXIcon />
-                                ) : effectiveVolume < 0.5 ? (
-                                  <Volume1Icon />
-                                ) : (
-                                  <Volume2Icon />
-                                )}
-                              </Button>
+                              <ReaderControlTooltip label={audioMuted ? "Unmute audio" : "Mute audio"}>
+                                <Button
+                                  variant="outline"
+                                  size="icon-sm"
+                                  onClick={() => {
+                                    const nextMuted = !audioMuted;
+                                    setAudioMuted(nextMuted);
+                                    const audio = audioRef.current;
+                                    if (audio) {
+                                      audio.muted = nextMuted;
+                                    }
+                                  }}
+                                  aria-label={audioMuted ? "Unmute audio" : "Mute audio"}
+                                >
+                                  {effectiveVolume <= 0 ? (
+                                    <VolumeXIcon />
+                                  ) : effectiveVolume < 0.5 ? (
+                                    <Volume1Icon />
+                                  ) : (
+                                    <Volume2Icon />
+                                  )}
+                                </Button>
+                              </ReaderControlTooltip>
                               <div className="min-w-14 flex-1">
                                 <Slider
                                   className="w-full"
@@ -1516,14 +1523,16 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                             </div>
                             <div className="flex shrink-0 items-center gap-1.5">
                               <span className="text-[11px] whitespace-nowrap text-muted-foreground">Auto</span>
-                              <Switch
-                                checked={audioAutoPlay}
-                                onCheckedChange={(checked) => {
-                                  setAudioAutoPlay(checked === true);
-                                }}
-                                size="sm"
-                                aria-label="Toggle auto-play next chapter"
-                              />
+                              <ReaderControlTooltip label="Automatically play the next chapter">
+                                <Switch
+                                  checked={audioAutoPlay}
+                                  onCheckedChange={(checked) => {
+                                    setAudioAutoPlay(checked === true);
+                                  }}
+                                  size="sm"
+                                  aria-label="Toggle auto-play next chapter"
+                                />
+                              </ReaderControlTooltip>
                             </div>
                           </div>
                         </div>
@@ -1545,64 +1554,72 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 className="@container/toolbar flex items-center justify-between p-2"
                 data-tour="panel-bottom-bar"
               >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  aria-label={audioVisible ? "Hide audio" : "Show audio"}
-                  onClick={() =>
-                    setAudioVisible((current) => {
-                      const nextVisible = !current;
-                      if (!nextVisible) {
-                        const audio = audioRef.current;
-                        if (audio) {
-                          audio.pause();
-                          setAudioCurrentTime(audio.currentTime);
-                        }
-                        setAudioPlaying(false);
-                      }
-                      return nextVisible;
-                    })
-                  }
-                >
-                  <AudioLinesIcon />
-                  <span className="hidden @md/toolbar:inline">
-                    {audioVisible ? "Hide Audio" : "Show Audio"}
-                  </span>
-                </Button>
-                <div className="flex items-center gap-2">
+                <ReaderControlTooltip label={audioVisible ? "Hide audio" : "Show audio"}>
                   <Button
-                    variant={isChapterRead ? "default" : "outline"}
+                    variant="outline"
                     size="sm"
-                    aria-label={isChapterRead ? "Mark chapter unread" : "Mark chapter read"}
+                    aria-label={audioVisible ? "Hide audio" : "Show audio"}
                     onClick={() =>
-                      toggleChapterRead(leaf.bookIndex, leaf.chapterIndex)
+                      setAudioVisible((current) => {
+                        const nextVisible = !current;
+                        if (!nextVisible) {
+                          const audio = audioRef.current;
+                          if (audio) {
+                            audio.pause();
+                            setAudioCurrentTime(audio.currentTime);
+                          }
+                          setAudioPlaying(false);
+                        }
+                        return nextVisible;
+                      })
                     }
                   >
-                    {isChapterRead ? <BookOpenCheckIcon /> : <BookOpenIcon />}
+                    <AudioLinesIcon />
                     <span className="hidden @md/toolbar:inline">
-                      {isChapterRead ? "Read" : "Mark Read"}
+                      {audioVisible ? "Hide Audio" : "Show Audio"}
                     </span>
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    aria-label="Previous chapter"
-                    onClick={() => moveLeafChapter(leaf.id, -1)}
-                    disabled={!hasPrev}
-                  >
-                    <ChevronLeftIcon />
-                    <span className="hidden @md/toolbar:inline">Prev</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    aria-label="Next chapter"
-                    onClick={() => moveLeafChapter(leaf.id, 1)}
-                    disabled={!hasNext}
-                  >
-                    <ChevronRightIcon />
-                    <span className="hidden @md/toolbar:inline">Next</span>
-                  </Button>
+                </ReaderControlTooltip>
+                <div className="flex items-center gap-2">
+                  <ReaderControlTooltip label={isChapterRead ? "Mark chapter unread" : "Mark chapter read"}>
+                    <Button
+                      variant={isChapterRead ? "default" : "outline"}
+                      size="sm"
+                      aria-label={isChapterRead ? "Mark chapter unread" : "Mark chapter read"}
+                      onClick={() =>
+                        toggleChapterRead(leaf.bookIndex, leaf.chapterIndex)
+                      }
+                    >
+                      {isChapterRead ? <BookOpenCheckIcon /> : <BookOpenIcon />}
+                      <span className="hidden @md/toolbar:inline">
+                        {isChapterRead ? "Read" : "Mark Read"}
+                      </span>
+                    </Button>
+                  </ReaderControlTooltip>
+                  <ReaderControlTooltip label="Previous chapter" disabled={!hasPrev}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      aria-label="Previous chapter"
+                      onClick={() => moveLeafChapter(leaf.id, -1)}
+                      disabled={!hasPrev}
+                    >
+                      <ChevronLeftIcon />
+                      <span className="hidden @md/toolbar:inline">Prev</span>
+                    </Button>
+                  </ReaderControlTooltip>
+                  <ReaderControlTooltip label="Next chapter" disabled={!hasNext}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      aria-label="Next chapter"
+                      onClick={() => moveLeafChapter(leaf.id, 1)}
+                      disabled={!hasNext}
+                    >
+                      <ChevronRightIcon />
+                      <span className="hidden @md/toolbar:inline">Next</span>
+                    </Button>
+                  </ReaderControlTooltip>
                 </div>
               </div>
             </div>
