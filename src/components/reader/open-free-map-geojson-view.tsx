@@ -1,3 +1,4 @@
+import type { MapAreaBounds } from "@/lib/map-area";
 import { useEffect, useRef, useState } from "react";
 import {
   GPUInitializationError,
@@ -139,9 +140,11 @@ function fitGeoJsonBounds(map: MapLibreMap, geojson: MapGeoJsonPayload) {
 export function OpenFreeMapGeoJsonView({
   geojson,
   className,
+  onBoundsChange,
 }: {
   geojson: MapGeoJsonPayload;
   className?: string;
+  onBoundsChange?: (bounds: MapAreaBounds) => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [status, setStatus] = useState<MapStatus>({ state: "loading" });
@@ -202,6 +205,12 @@ export function OpenFreeMapGeoJsonView({
           }
 
           try {
+            const reportBounds = () => {
+              if (!map || disposed) return;
+              const bounds = map.getBounds();
+              onBoundsChange?.([bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()]);
+            };
+            map.on("moveend", reportBounds);
             applyEnglishLabels(map);
             addGeoJsonLayers(map, displayGeoJson);
             fitGeoJsonBounds(map, displayGeoJson);
@@ -211,6 +220,7 @@ export function OpenFreeMapGeoJsonView({
               fitGeoJsonBounds(map, displayGeoJson);
             });
             resizeObserver.observe(container);
+            reportBounds();
             styleLoaded = true;
             setStatus({ state: "ready" });
           } catch (error) {
@@ -235,7 +245,7 @@ export function OpenFreeMapGeoJsonView({
       resizeObserver?.disconnect();
       map?.remove();
     };
-  }, [geojson]);
+  }, [geojson, onBoundsChange]);
 
   return (
     <div

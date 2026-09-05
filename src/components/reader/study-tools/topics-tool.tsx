@@ -16,6 +16,7 @@ import { TOPIC_LETTERS, useTopicsTool } from "@/hooks/use-topics-tool";
 
 type TopicEntry = {
   topic: string;
+  matchedAlias?: string;
   references: string[];
 };
 
@@ -57,7 +58,7 @@ export function TopicsContent({
     <div className="flex min-w-0 flex-col gap-3 overflow-x-hidden px-1 py-1">
       <StudySearchForm
         name="topics-search"
-        placeholder="Filter topics..."
+        placeholder="Topic or phrase, e.g. feeling afraid..."
         ariaLabel="Filter topics"
         loading={isLoading || isSearching}
         value={searchTerm}
@@ -127,6 +128,11 @@ export function TopicsContent({
                 <span className="flex min-w-0 flex-1 items-start gap-2">
                   <span className="min-w-0 flex-1 break-words text-left">
                     {entry.topic}
+                    {entry.matchedAlias ? (
+                      <span className="block text-xs font-normal text-muted-foreground">
+                        Related to “{entry.matchedAlias}”
+                      </span>
+                    ) : null}
                   </span>
                   <Badge variant="outline" className="shrink-0">
                     {entry.references.length}

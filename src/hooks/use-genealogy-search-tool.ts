@@ -1,3 +1,4 @@
+import { genealogyFamilyKey } from "@/lib/genealogy-result-context";
 import { useCallback, useMemo, useState } from "react";
 
 import { loadGenealogy } from "@/lib/reader-data";
@@ -66,6 +67,7 @@ export function useGenealogySearchTool() {
       .join("||");
     return [
       person.names.join("|"),
+      genealogyFamilyKey(person),
       person.verses?.first ?? "",
       person.verses?.totalOccurrences ?? 0,
       person.verses?.totalVerses ?? 0,

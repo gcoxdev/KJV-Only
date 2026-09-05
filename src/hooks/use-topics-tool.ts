@@ -1,3 +1,4 @@
+import { topicsForAlias } from "@/lib/topic-aliases";
 import { useCallback, useDeferredValue, useMemo, useState } from "react";
 
 import { loadTopicsIndex, type TopicsIndexPayload } from "@/lib/reader-data";
@@ -70,6 +71,7 @@ export function useTopicsTool() {
         .map((item) => item.entry);
     }
 
+    const aliasTopics = new Set(topicsForAlias(term));
     const ranked = preparedEntries
       .map((item) => {
         if (selectedLetterSet && !selectedLetterSet.has(item.firstLetter)) {
@@ -78,13 +80,14 @@ export function useTopicsTool() {
         const startsWith = item.topicLower.startsWith(term);
         const wordBoundary = item.topicLower.includes(` ${term}`);
         const includes = item.topicLower.includes(term);
-        if (!includes) {
+        const aliasMatch = aliasTopics.has(item.entry.topic);
+        if (!includes && !aliasMatch) {
           return null;
         }
-        const rank = startsWith ? 0 : wordBoundary ? 1 : 2;
-        return { entry: item.entry, rank };
+        const rank = startsWith ? 0 : wordBoundary ? 1 : includes ? 2 : 3;
+        return { entry: { ...item.entry, matchedAlias: aliasMatch && !includes ? deferredSearchTerm.trim() : undefined }, rank };
       })
-      .filter((value): value is { entry: TopicsToolEntry; rank: number } => value !== null)
+      .filter((value): value is { entry: TopicsToolEntry & { matchedAlias: string | undefined }; rank: number } => value !== null)
       .sort((left, right) => left.rank - right.rank || left.entry.topic.localeCompare(right.entry.topic));
 
     return ranked.map(({ entry }) => entry);

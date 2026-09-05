@@ -1,4 +1,7 @@
+import type { MapAreaBounds } from "./map-area.ts";
+
 export type AncientMapEntry = {
+  bounds?: MapAreaBounds[];
   verses: string[];
   translations: string[];
   types: string[];
