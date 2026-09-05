@@ -33,9 +33,18 @@ for (const width of [375, 1280]) {
 
     await page.getByRole("button", { name: "Topics", exact: true }).filter({ visible: true }).click();
     const topicsSearch = page.getByRole("textbox", { name: "Filter topics" });
+    await page.getByRole("button", { name: "A", exact: true }).filter({ visible: true }).click();
     await topicsSearch.fill("feeling afraid");
+    await page.getByRole("button", { name: "Clear letter filters", exact: true }).click();
+    await expect(topicsSearch).toHaveValue("feeling afraid");
+    await expect(page.getByRole("button", { name: "Clear letter filters", exact: true })).toHaveCount(0);
     const fear = page.getByRole("button", { name: /^Fear Related to/ });
     await expect(fear).toBeVisible();
+    await expect(page.getByText("Related to “feeling afraid”", { exact: true })).toHaveCount(3);
+    await page.getByRole("button", { name: "F", exact: true }).filter({ visible: true }).click();
+    await expect(page.getByText("Related to “feeling afraid”", { exact: true })).toHaveCount(1);
+    await page.getByRole("button", { name: "Clear letter filters", exact: true }).click();
+    await expect(topicsSearch).toHaveValue("feeling afraid");
     await expect(page.getByText("Related to “feeling afraid”", { exact: true })).toHaveCount(3);
     await fear.click();
     await expect(page.locator('[data-tool-reference-display="buttons"]').filter({ visible: true }).first()).toBeVisible();
@@ -55,7 +64,7 @@ for (const width of [375, 1280]) {
       await page.route("https://*.tile.openstreetmap.org/**", route => route.abort());
       await page.route("**/maps/data/map.json", route => route.fulfill({ json: [
         { geojson_file: "selected.geojson", translations: ["Selected"], types: ["region"], verses: ["GEN.1.1"], modern_names: [], bounds: [[34, 31, 36, 33]] },
-        { geojson_file: "nearby.geojson", translations: ["Nearby"], types: ["city"], verses: ["GEN.1.2"], modern_names: [], bounds: [[35, 32, 35, 32]] },
+        { geojson_file: "nearby.geojson", translations: ["Nearby"], types: ["city", "settlement"], verses: ["GEN.1.2"], modern_names: ["Closeby"], bounds: [[35, 32, 35, 32]] },
         { geojson_file: "far.geojson", translations: ["Far Away"], types: ["city"], verses: ["GEN.1.3"], modern_names: [], bounds: [[0, 0, 0, 0]] },
       ] }));
       await page.route("**/maps/geometry/selected.geojson", route => route.fulfill({ json: {
@@ -85,6 +94,22 @@ for (const width of [375, 1280]) {
       expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
       const accessibility = await new AxeBuilder({ page }).include('[role="alertdialog"]').analyze();
       expect(accessibility.violations.filter(violation => ["serious", "critical"].includes(violation.impact ?? ""))).toEqual([]);
+      const nameFilter = results.getByRole("textbox", { name: "Place name", exact: true });
+      const typeFilter = results.getByRole("combobox", { name: "Place type", exact: true });
+      await nameFilter.fill("  CLOSEBY  ");
+      await expect(results.getByRole("status")).toHaveText("Showing 1 of 2 places in the searched area.");
+      await typeFilter.click();
+      await page.getByRole("option", { name: "Region", exact: true }).click();
+      await expect(results.getByText("No places match these filters.", { exact: false })).toBeVisible();
+      await results.getByRole("button", { name: "Clear filters", exact: true }).click();
+      await expect(results.getByRole("status")).toHaveText("Showing 2 of 2 places in the searched area.");
+      await nameFilter.fill("Far Away");
+      await expect(results.getByRole("status")).toHaveText("Showing 0 of 2 places in the searched area.");
+      await nameFilter.fill("");
+      await typeFilter.click();
+      await page.getByRole("option", { name: "Settlement", exact: true }).click();
+      await expect(results.getByRole("status")).toHaveText("Showing 1 of 2 places in the searched area.");
+      await expect(results.getByRole("button", { name: "Selected", exact: true })).toHaveCount(0);
       await results.getByRole("button", { name: "Nearby", exact: true }).click();
       await results.getByRole("button", { name: "Open map", exact: true }).click();
       await expect(dialog.getByRole("heading", { name: "Nearby", exact: true })).toBeVisible();

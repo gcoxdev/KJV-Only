@@ -120,6 +120,8 @@ export function useTopicsTool() {
     [ensureTopicsLoaded],
   );
 
+  const clearLetters = useCallback(() => setSelectedLetters([]), []);
+
   return {
     payload,
     searchTerm,
@@ -132,5 +134,6 @@ export function useTopicsTool() {
     ensureTopicsLoaded,
     applySearch,
     selectLetter,
+    clearLetters,
   };
 }

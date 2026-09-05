@@ -34,6 +34,7 @@ const FORBIDDEN_FILE_PATTERNS = [
   { pattern: /\.jsonl$/i, label: "JSONL generator input" },
   { pattern: /\.zip$/i, label: "source archive" },
   { pattern: /^maps\/schemas\//, label: "map schema" },
+  { pattern: /^maps\/thumbnails\//, label: "unused map thumbnail" },
   { pattern: /^maps\/data\/(?!map\.json$)/, label: "non-runtime map data" },
   { pattern: /^references\/ancient_map\.json$/, label: "legacy map source" },
 ];

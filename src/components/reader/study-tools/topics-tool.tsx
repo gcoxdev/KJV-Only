@@ -30,6 +30,7 @@ export type TopicsContentProps = {
   results: TopicEntry[];
   onSearch: (term: string) => void;
   onSelectLetter: (letter: string) => void;
+  onClearLetters: () => void;
   renderPreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
   onCloseSidebar: () => void;
@@ -45,6 +46,7 @@ export function TopicsContent({
   results,
   onSearch,
   onSelectLetter,
+  onClearLetters,
   renderPreview,
   onOpenReference,
   onCloseSidebar,
@@ -58,16 +60,20 @@ export function TopicsContent({
     <div className="flex min-w-0 flex-col gap-3 overflow-x-hidden px-1 py-1">
       <StudySearchForm
         name="topics-search"
-        placeholder="Topic or phrase, e.g. feeling afraid..."
+        placeholder="Search topics or phrases..."
         ariaLabel="Filter topics"
         loading={isLoading || isSearching}
         value={searchTerm}
         liveSearch
+        allowReset
         onSearch={(term) => {
           setTopicAccordionValue([]);
           onSearch(term);
         }}
       />
+      <p className="text-xs text-muted-foreground">
+        Search a topic name or an everyday phrase to find related topics and passages.
+      </p>
       <div className="grid grid-cols-6 gap-1 sm:grid-cols-9">
         {TOPIC_LETTERS.map((letter) => {
           const disabled = !availableLetterSet.has(letter);
@@ -77,6 +83,7 @@ export function TopicsContent({
               type="button"
               size="sm"
               variant={selectedLetterSet.has(letter) ? "default" : "outline"}
+              aria-pressed={selectedLetterSet.has(letter)}
               className="h-8 px-0"
               disabled={disabled}
               onClick={() => {
@@ -93,10 +100,17 @@ export function TopicsContent({
         <p className="text-sm text-muted-foreground">
           Showing topics similar to <span className="font-medium text-foreground">{searchTerm.trim()}</span>.
         </p>
-      ) : selectedLetters.length > 0 ? (
+      ) : null}
+      {selectedLetters.length > 0 ? (
+        <div className="flex flex-col items-start gap-1">
         <p className="text-sm text-muted-foreground">
           Showing topics that begin with <span className="font-medium text-foreground">{selectedLetters.join(", ")}</span>.
         </p>
+        <Button type="button" size="xs" variant="outline" onClick={() => {
+          setTopicAccordionValue([]);
+          onClearLetters();
+        }}>Clear letter filters</Button>
+        </div>
       ) : null}
       {isLoading || isSearching ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -198,6 +212,7 @@ export function TopicsPanel({
     ensureTopicsLoaded,
     applySearch,
     selectLetter,
+    clearLetters,
   } = useTopicsTool();
 
   useEffect(() => {
@@ -218,6 +233,7 @@ export function TopicsPanel({
         results={results}
         onSearch={applySearch}
         onSelectLetter={selectLetter}
+        onClearLetters={clearLetters}
         renderPreview={renderPreview}
         onOpenReference={onOpenReference}
         onCloseSidebar={onCloseSidebar}

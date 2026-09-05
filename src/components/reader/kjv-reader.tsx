@@ -637,6 +637,7 @@ export function KJVReader() {
     ensureTopicsLoaded,
     applySearch: applyTopicsSearch,
     selectLetter: selectTopicsLetter,
+    clearLetters: clearTopicsLetters,
   } = useTopicsTool();
 
   const {
@@ -1930,6 +1931,7 @@ export function KJVReader() {
     results: topicsResults,
     onSearch: applyTopicsSearch,
     onSelectLetter: selectTopicsLetter,
+    onClearLetters: clearTopicsLetters,
     renderPreview: referencePreviewContent,
     onOpenReference: openConcordanceReference,
     onCloseSidebar: closeRightSidebarForMobile,

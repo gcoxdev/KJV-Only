@@ -65,9 +65,6 @@ export function isAllowedRuntimeFile(relative: string) {
     ) ||
     /^maps\/geometry\/[A-Za-z0-9][A-Za-z0-9._-]{0,199}\.geojson$/.test(
       relative,
-    ) ||
-    /^maps\/thumbnails\/[A-Za-z0-9][A-Za-z0-9._-]{0,199}\.(?:jpe?g|png|webp)$/i.test(
-      relative,
     )
   )
 }
