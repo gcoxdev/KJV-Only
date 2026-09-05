@@ -1,3 +1,4 @@
+import { genealogyPersonContext } from "@/lib/genealogy-result-context";
 import { Fragment, type ReactNode } from "react";
 import { LoaderCircleIcon, UserSearchIcon } from "lucide-react";
 
@@ -88,6 +89,9 @@ export function GenealogyTool({
                       <span className="flex min-w-0 flex-1 items-start gap-2">
                         <span className="min-w-0 flex-1 break-words text-left">
                           {person.names[0] ?? person.id}
+                          <span className="block text-xs font-normal text-muted-foreground">
+                            {genealogyPersonContext(person)}
+                          </span>
                         </span>
                         <Badge variant="outline" className="shrink-0">
                           {referenceCountForPerson(person)}

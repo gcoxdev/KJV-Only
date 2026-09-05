@@ -2,12 +2,13 @@
   "counts": {
     "ancientEntries": 1342,
     "modernEntries": 1596,
-    "compactEntries": 1285
+    "compactEntries": 1285,
+    "entriesWithBounds": 1278
   },
   "size": {
-    "outputBytes": 744245,
+    "outputBytes": 1050254,
     "legacyBytes": 1163993,
-    "bytesSaved": 419748
+    "bytesSaved": 113739
   },
   "sample": {
     "geojson_file": "aea17b7.geojson",
@@ -23,6 +24,14 @@
     ],
     "modern_names": [
       "Barada River"
+    ],
+    "bounds": [
+      [
+        36.238471,
+        33.494785,
+        36.363717,
+        33.540154
+      ]
     ]
   }
 }

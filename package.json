@@ -17,7 +17,7 @@
     "build:genealogy": "node scripts/build-genealogy-compact.mjs && node --experimental-strip-types scripts/build-study-enrichment.ts --genealogy",
     "build:study-enrichment": "node --experimental-strip-types scripts/build-study-enrichment.ts",
     "build:map-photos": "node scripts/fetch-map-photos.mjs",
-    "build:maps": "node scripts/build-map-json.mjs",
+    "build:maps": "node --experimental-strip-types scripts/build-map-json.mjs",
     "build:strongs": "node scripts/build-strongs-compact.mjs",
     "build:topics": "node scripts/build-topic-scriptures.mjs",
     "build:topics-index": "node scripts/build-topics-index.mjs",

@@ -1280,8 +1280,8 @@ test("keeps Tools and Topics accordion expansion scoped to each surface", async 
   await expect(panelTopic).toHaveAttribute("aria-expanded", "true")
   await expect(sidebarTopic).toHaveAttribute("aria-expanded", "false")
 
-  const panelTopicsFilter = auxiliaryPanel.getByPlaceholder("Filter topics...")
-  const sidebarTopicsFilter = sidebar.getByPlaceholder("Filter topics...")
+  const panelTopicsFilter = auxiliaryPanel.getByRole("textbox", { name: "Filter topics" })
+  const sidebarTopicsFilter = sidebar.getByRole("textbox", { name: "Filter topics" })
   await panelTopicsFilter.fill("Ab")
   await expect(panelTopicsFilter).toHaveValue("Ab")
   await expect(sidebarTopicsFilter).toHaveValue("")
@@ -1331,7 +1331,7 @@ test("routes word selections only to the configured Tools panel session", async 
   ).toHaveCount(0)
 
   await sidebar.getByRole("button", { name: "Topics", exact: true }).click()
-  await expect(sidebar.getByPlaceholder("Filter topics...")).toBeVisible()
+  await expect(sidebar.getByRole("textbox", { name: "Filter topics" })).toBeVisible()
 })
 
 test("restores a shared chapter layout after reload", async ({ page }) => {

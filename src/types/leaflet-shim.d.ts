@@ -19,5 +19,8 @@ declare module "react-leaflet" {
     fitBounds: (bounds: unknown, options?: unknown) => void;
     invalidateSize: (options?: { pan?: boolean }) => void;
     getContainer: () => HTMLElement;
+    getBounds: () => { getWest: () => number; getSouth: () => number; getEast: () => number; getNorth: () => number };
+    on: (event: string, listener: () => void) => void;
+    off: (event: string, listener: () => void) => void;
   };
 }

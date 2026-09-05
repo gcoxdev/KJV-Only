@@ -2,6 +2,7 @@ import {
   Component,
   lazy,
   Suspense,
+  useCallback,
   useState,
   type ReactNode,
 } from "react";
@@ -9,6 +10,10 @@ import { LoaderCircleIcon } from "lucide-react";
 
 import type { AncientMapEntry, MapGeoJsonPayload } from "@/lib/maps";
 import { mapEntryLabel } from "@/lib/maps";
+import { loadAncientMap } from "@/lib/reader-data";
+import { findMapsInArea, mapAreaKey, type MapAreaBounds } from "@/lib/map-area";
+import { Button } from "@/components/ui/button";
+import { MapAreaResults } from "@/components/reader/map-area-results";
 import {
   DEFAULT_MAP_RENDERER,
   isMapRenderer,
@@ -75,6 +80,9 @@ type MapAndPhotoDialogsProps = {
   mapDialogGeoJson: MapGeoJsonPayload | null;
   onMapDialogOpenChange: (open: boolean) => void;
   onCloseMapDialog: () => void;
+  onOpenMap: (entry: AncientMapEntry) => void;
+  onOpenReference: (reference: string) => void;
+  renderReferencePreview: (reference: string, highlightWord: string) => ReactNode;
 };
 
 export function MapAndPhotoDialogs({
@@ -85,6 +93,9 @@ export function MapAndPhotoDialogs({
   mapDialogGeoJson,
   onMapDialogOpenChange,
   onCloseMapDialog,
+  onOpenMap,
+  onOpenReference,
+  renderReferencePreview,
 }: MapAndPhotoDialogsProps) {
   const [mapRenderer, setMapRenderer] = useState<MapRenderer>(() =>
     typeof window === "undefined"
@@ -95,6 +106,33 @@ export function MapAndPhotoDialogs({
     mapRenderer === "open-free-map"
       ? LazyOpenFreeMapGeoJsonView
       : LazyLeafletMapGeoJsonView;
+  const viewKey = `${mapRenderer}:${activeMapDialogEntry?.geojson_file ?? ""}`;
+  const [viewport, setViewport] = useState<{ key: string; bounds: MapAreaBounds } | null>(null);
+  const onBoundsChange = useCallback((bounds: MapAreaBounds) => {
+    setViewport({ key: viewKey, bounds });
+  }, [viewKey]);
+  const [areaSearch, setAreaSearch] = useState<{ bounds: MapAreaBounds; entries: AncientMapEntry[] } | null>(null);
+  const [showAreaResults, setShowAreaResults] = useState(false);
+  const [areaBusy, setAreaBusy] = useState(false);
+  const [areaError, setAreaError] = useState<string | null>(null);
+  const currentBounds = viewport?.key === viewKey ? viewport.bounds : null;
+  const searchArea = async () => {
+    if (!currentBounds || areaBusy) return;
+    setAreaBusy(true);
+    setAreaError(null);
+    try {
+      const entries = await loadAncientMap();
+      if (!entries.some(entry => entry.bounds?.length)) {
+        throw new Error("Area search data is unavailable. Reload the app to update it.");
+      }
+      setAreaSearch({ bounds: currentBounds, entries: findMapsInArea(entries, currentBounds) });
+      setShowAreaResults(true);
+    } catch (error) {
+      setAreaError(error instanceof Error ? error.message : "Could not search this area. Try again.");
+    } finally {
+      setAreaBusy(false);
+    }
+  };
 
   return (
     <AlertDialog open={isMapDialogOpen} onOpenChange={onMapDialogOpenChange}>
@@ -145,7 +183,7 @@ export function MapAndPhotoDialogs({
             </ToggleGroup>
           </div>
         </div>
-        <div className="min-h-0 flex-1">
+        <div className="relative isolate min-h-0 flex-1">
           {isMapDialogLoading ? (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <LoaderCircleIcon className="size-4 animate-spin" />
@@ -169,15 +207,32 @@ export function MapAndPhotoDialogs({
                 <MapView
                   key={activeMapDialogEntry?.geojson_file}
                   geojson={mapDialogGeoJson}
-                  className="h-full w-full rounded-md border"
+                  onBoundsChange={onBoundsChange}
+                  className="relative z-0 h-full w-full rounded-md border"
                 />
               </Suspense>
             </MapRendererErrorBoundary>
           ) : (
             <p className="text-sm text-muted-foreground">No map data found.</p>
           )}
+          {showAreaResults && areaSearch ? (
+            <MapAreaResults
+              key={mapAreaKey(areaSearch.bounds)}
+              entries={areaSearch.entries}
+              viewChanged={!currentBounds || mapAreaKey(currentBounds) !== mapAreaKey(areaSearch.bounds)}
+              onHide={() => setShowAreaResults(false)}
+              onOpenMap={(entry) => { setShowAreaResults(false); onOpenMap(entry); }}
+              onOpenReference={onOpenReference}
+              renderPreview={renderReferencePreview}
+            />
+          ) : null}
         </div>
-        <AlertDialogFooter className="shrink-0 items-center justify-end py-3 sm:flex sm:justify-end">
+        {areaError ? <p role="alert" className="text-sm text-destructive">{areaError}</p> : null}
+        <AlertDialogFooter className="shrink-0 flex-row flex-wrap items-center justify-end py-3 sm:flex sm:justify-end">
+          <Button variant="outline" size="sm" onClick={() => void searchArea()} disabled={areaBusy || isMapDialogLoading || !!mapDialogError || !currentBounds}>
+            {areaBusy ? "Searching area..." : "Search this area"}
+          </Button>
+          {areaSearch && !showAreaResults ? <Button variant="ghost" size="sm" onClick={() => setShowAreaResults(true)}>Results ({areaSearch.entries.length})</Button> : null}
           <AlertDialogAction onClick={onCloseMapDialog} className="w-auto">
             Close
           </AlertDialogAction>

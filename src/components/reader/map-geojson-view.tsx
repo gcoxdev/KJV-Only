@@ -1,3 +1,4 @@
+import type { MapAreaBounds } from "@/lib/map-area";
 import { memo, useEffect, useMemo } from "react";
 import L from "leaflet";
 import {
@@ -15,10 +16,22 @@ import {
 
 const MapBoundsSync = memo(function MapBoundsSync({
   geojson,
+  onBoundsChange,
 }: {
   geojson: MapGeoJsonPayload;
+  onBoundsChange?: (bounds: MapAreaBounds) => void;
 }) {
   const map = useMap();
+
+  useEffect(() => {
+    const reportBounds = () => {
+      const bounds = map.getBounds();
+      onBoundsChange?.([bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()]);
+    };
+    map.on("moveend", reportBounds);
+    reportBounds();
+    return () => { map.off("moveend", reportBounds); };
+  }, [map, onBoundsChange]);
 
   useEffect(() => {
     const bounds = boundsForGeoJson(geojson);
@@ -41,9 +54,11 @@ const MapBoundsSync = memo(function MapBoundsSync({
 export function MapGeoJsonView({
   geojson,
   className,
+  onBoundsChange,
 }: {
   geojson: MapGeoJsonPayload;
   className?: string;
+  onBoundsChange?: (bounds: MapAreaBounds) => void;
 }) {
   const displayGeoJson = useMemo(
     () => mapGeoJsonForDisplay(geojson),
@@ -83,7 +98,7 @@ export function MapGeoJsonView({
           })
         }
       />
-      <MapBoundsSync geojson={displayGeoJson} />
+      <MapBoundsSync geojson={displayGeoJson} onBoundsChange={onBoundsChange} />
     </MapContainer>
   );
 }

@@ -2349,6 +2349,12 @@ export function KJVReader() {
             mapDialogGeoJson={mapDialogGeoJson}
             onMapDialogOpenChange={onMapDialogOpenChange}
             onCloseMapDialog={onCloseMapDialog}
+            onOpenMap={openMapDialog}
+            onOpenReference={(reference) => {
+              onCloseMapDialog();
+              openConcordanceReference(reference);
+            }}
+            renderReferencePreview={referencePreviewContent}
           />
         </Suspense>
       ) : null}

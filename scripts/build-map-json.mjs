@@ -2,7 +2,9 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import { boundsForGeoJson, mapGeoJsonForDisplay } from "../src/lib/maps.ts";
 
+const DEFAULT_GEOMETRY_PATH = "public/maps/geometry";
 const DEFAULT_ANCIENT_PATH = "public/maps/data/ancient.jsonl";
 const DEFAULT_MODERN_PATH = "public/maps/data/modern.jsonl";
 const DEFAULT_OUTPUT_PATH = "public/maps/data/map.json";
@@ -12,6 +14,7 @@ const DEFAULT_LEGACY_PATH = "public/maps/data/ancient_map.json";
 function parseArgs(argv) {
   const options = {
     ancientPath: DEFAULT_ANCIENT_PATH,
+    geometryPath: DEFAULT_GEOMETRY_PATH,
     modernPath: DEFAULT_MODERN_PATH,
     outputPath: DEFAULT_OUTPUT_PATH,
     reportPath: DEFAULT_REPORT_PATH,
@@ -21,6 +24,9 @@ function parseArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     switch (arg) {
+      case "--geometry":
+        options.geometryPath = argv[++index];
+        break;
       case "--ancient":
         options.ancientPath = argv[++index];
         break;
@@ -54,6 +60,7 @@ function printUsage() {
 Builds a compact map.json file from the raw maps jsonl sources.
 
 Options:
+  --geometry <path>  GeoJSON directory (default: ${DEFAULT_GEOMETRY_PATH})
   --ancient <path>   Ancient jsonl input (default: ${DEFAULT_ANCIENT_PATH})
   --modern <path>    Modern jsonl input (default: ${DEFAULT_MODERN_PATH})
   --output <path>    Output JSON path (default: ${DEFAULT_OUTPUT_PATH})
@@ -250,6 +257,22 @@ async function main() {
     }))
     .sort((left, right) => left.translations[0].localeCompare(right.translations[0]));
 
+  for (const entry of compactEntries) {
+    const geometry = JSON.parse(await fs.readFile(path.join(options.geometryPath, entry.geojson_file), "utf8"));
+    const uniqueBounds = new Map();
+    for (const feature of mapGeoJsonForDisplay(geometry).features ?? []) {
+      const bounds = boundsForGeoJson({ features: [feature] });
+      if (!bounds) continue;
+      const [[south, west], [north, east]] = bounds;
+      if (south < -90 || north > 90 || west < -180 || east > 180) {
+        throw new Error(`Invalid coordinates in ${entry.geojson_file}`);
+      }
+      const area = [west, south, east, north];
+      uniqueBounds.set(JSON.stringify(area), area);
+    }
+    entry.bounds = [...uniqueBounds.values()];
+  }
+
   await fs.mkdir(path.dirname(options.outputPath), { recursive: true });
   await fs.mkdir(path.dirname(options.reportPath), { recursive: true });
 
@@ -266,6 +289,7 @@ async function main() {
       ancientEntries: ancientEntries.length,
       modernEntries: modernEntries.length,
       compactEntries: compactEntries.length,
+      entriesWithBounds: compactEntries.filter(entry => entry.bounds.length > 0).length,
     },
     size: {
       outputBytes: outputStat?.size ?? null,
