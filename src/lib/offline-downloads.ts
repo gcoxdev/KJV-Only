@@ -3,7 +3,7 @@ import { bookCodeForIndex } from "@/lib/reader-view";
 
 const FALLBACK_CACHE_CONFIG = {
   cachePrefix: "kjv-only-cache-",
-  cacheName: "kjv-only-cache-v8",
+  cacheName: "kjv-only-cache-v10",
 } as const;
 
 const APP_SHELL_ASSET_MANIFEST_URL = "/app-shell-assets.json";
@@ -31,6 +31,12 @@ export const CORE_OFFLINE_URLS = [
   "/app-cache-config.js",
   APP_SHELL_ASSET_MANIFEST_URL,
   "/icons/app-icon.svg",
+  "/icons/app-icon.png",
+  "/icons/app-logo.png",
+  "/icons/app-icon-512.png",
+  "/icons/app-icon-maskable.png",
+  "/icons/apple-touch-icon.png",
+  "/icons/favicon.png",
   "/data/kjv-manifest.json",
   "/data/kjv-bootstrap.json",
   "/data/kjv.json",

@@ -127,11 +127,11 @@ export function ReaderTopBar({
         </DropdownMenu>
         <div className="flex min-w-0 items-center gap-3">
           <img
-            src="/icons/app-icon.svg"
+            src="/icons/app-logo.png"
             alt="KJV Only icon"
-            width={24}
+            width={18}
             height={24}
-            className="size-6 shrink-0"
+            className="h-6 w-auto shrink-0"
           />
           <p className="workspace-heading hidden truncate pb-px pr-px text-lg font-semibold leading-tight @md/topbar:block">
             KJV Only

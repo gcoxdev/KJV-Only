@@ -1787,11 +1787,11 @@ export function SearchPage({
                       }
                     />
                     <img
-                      src="/icons/app-icon.svg"
+                      src="/icons/app-logo.png"
                       alt="Entire Bible icon"
-                      width={20}
+                      width={15}
                       height={20}
-                      className="size-5 rounded-sm"
+                      className="h-5 w-auto rounded-sm"
                     />
                     <span className="font-medium">Entire Bible</span>
                   </div>
