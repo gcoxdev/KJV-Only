@@ -1738,6 +1738,23 @@ export function SearchPage({
             ) : null}
           </div>
         </div>
+        {!isSearching && results.length >= SEARCH_RESULTS_CAP ? (
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-1">
+            <p className="min-w-0 flex-1 text-xs text-muted-foreground" role="status">
+              {`Search limit reached: ${SEARCH_RESULTS_CAP} verses loaded. More matches may exist. Narrow the book scope or make your search more specific.`}
+            </p>
+            {isControlsCollapsed ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onStateChange({ isControlsCollapsed: false })}
+              >
+                Refine search
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
         <ScrollArea
           ref={resultsScrollRef}
           className="min-h-0 flex-1 rounded-2xl border border-subtle-divider/80 bg-workspace-panel-elevated"
