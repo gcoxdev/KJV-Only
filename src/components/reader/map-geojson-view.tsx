@@ -25,7 +25,14 @@ const MapBoundsSync = memo(function MapBoundsSync({
     if (!bounds) {
       return;
     }
-    map.fitBounds(bounds, { padding: [24, 24], maxZoom: 12 });
+    const fitBounds = () => map.fitBounds(bounds, { padding: [24, 24], maxZoom: 12, animate: false });
+    fitBounds();
+    const observer = new ResizeObserver(() => {
+      map.invalidateSize({ pan: false });
+      fitBounds();
+    });
+    observer.observe(map.getContainer());
+    return () => observer.disconnect();
   }, [geojson, map]);
 
   return null;
@@ -56,10 +63,13 @@ export function MapGeoJsonView({
       />
       <LeafletGeoJSON
         data={displayGeoJson as never}
-        style={() => ({
+        style={(feature?: { geometry?: { type?: string } }) => ({
           color: "#2563eb",
           weight: 2,
           opacity: 0.9,
+          ...(feature?.geometry?.type === "Polygon" || feature?.geometry?.type === "MultiPolygon"
+            ? { fill: false }
+            : {}),
           fillColor: "#60a5fa",
           fillOpacity: 0.25,
         })}

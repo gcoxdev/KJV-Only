@@ -387,6 +387,18 @@ test("prioritizes exact multiword Smart Search results", async ({ page }) => {
   await expect(page.locator("p.tabular-data").first()).toHaveText("Romans 8:28")
 })
 
+test("finds Psalms 23:1 for sheperd without short prefixes crowding it out", async ({ page }) => {
+  await page.goto("/")
+  await expectReaderReady(page)
+  await page.getByLabel("Open search").click()
+  await page.getByLabel("Word or phrase").fill("sheperd")
+  await page.getByLabel("Run Bible search").click()
+
+  await expect(page.getByText(/\d+ matching verses loaded/)).toBeVisible()
+  await expect(page.getByText("Psalms 23:1", { exact: true })).toBeVisible()
+  await expect(page.getByText("Genesis 3:20", { exact: true })).toHaveCount(0)
+})
+
 test("keeps single-word Smart Search close to the requested spelling", async ({
   page,
 }) => {

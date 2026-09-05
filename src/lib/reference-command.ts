@@ -78,6 +78,7 @@ const OSIS_BOOK_CODES = [
 
 type ParsedEntity = {
   type: string;
+  absolute_indices?: [number, number];
   entities?: ParsedEntity[];
   start?: {
     b?: string;
@@ -471,7 +472,19 @@ export function parseReferenceCommandInput(input: string, books: Book[]) {
 
   const parser = createReferenceParser();
   const parsed = parser.parse(trimmed).parsed_entities() as ParsedEntity[];
-  const units = flattenParsedEntities(parsed)
+  const entities = flattenParsedEntities(parsed);
+  // The passage extractor can ignore an invalid book number ("4 John" → John).
+  // Commands must not silently navigate elsewhere. Valid numbered books include
+  // the numeral in their parsed span; verse lists end in punctuation instead.
+  if (entities.some((entity) => {
+    const start = entity.absolute_indices?.[0];
+    if (start === undefined || !/[a-z]/i.test(trimmed[start] ?? "")) return false;
+    const beforeBook = trimmed.slice(0, start);
+    return /(?:^|[;,])\s*(?:\d+|[ivx]+)\.?\s*$/i.test(beforeBook);
+  })) {
+    return { targets: [] as ReferenceCommandTarget[] };
+  }
+  const units = entities
     .map((entity: ParsedEntity) => normalizeParsedEntity(entity, books))
     .filter((value): value is ReferenceUnit => value !== null);
 

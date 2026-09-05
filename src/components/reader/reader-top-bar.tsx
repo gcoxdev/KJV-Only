@@ -1,3 +1,4 @@
+import { ReaderControlTooltip } from "@/components/reader/reader-control-tooltip";
 import {
   ChartBarIcon,
   CompassIcon,
@@ -61,18 +62,20 @@ export function ReaderTopBar({
       <h1 className="sr-only">KJV Only Bible Reader</h1>
       <div className="flex min-w-0 items-center gap-3">
         <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Open menu"
-                data-tour="main-menu"
-              />
-            }
-          >
-            <MenuIcon aria-hidden="true" />
-          </DropdownMenuTrigger>
+          <ReaderControlTooltip label="Open menu" side="bottom">
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Open menu"
+                  data-tour="main-menu"
+                />
+              }
+            >
+              <MenuIcon aria-hidden="true" />
+            </DropdownMenuTrigger>
+          </ReaderControlTooltip>
           <DropdownMenuContent align="start" className="w-56">
             <DropdownMenuItem onClick={onOpenProgress}>
               <ChartBarIcon />
@@ -140,28 +143,32 @@ export function ReaderTopBar({
       </div>
 
       <div className="flex items-center gap-2">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="Open reference command"
-          onClick={onOpenReferenceCommand}
-          data-tour="reference-command-button"
-        >
-          <CompassIcon aria-hidden="true" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="Open search"
-          onMouseEnter={preloadSearchPage}
-          onFocus={preloadSearchPage}
-          onClick={onOpenSearch}
-          data-tour="search-button"
-        >
-          <SearchIcon aria-hidden="true" />
-        </Button>
+        <ReaderControlTooltip label="Open references" side="bottom">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label="Open reference command"
+            onClick={onOpenReferenceCommand}
+            data-tour="reference-command-button"
+          >
+            <CompassIcon aria-hidden="true" />
+          </Button>
+        </ReaderControlTooltip>
+        <ReaderControlTooltip label="Search" side="bottom">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label="Open search"
+            onMouseEnter={preloadSearchPage}
+            onFocus={preloadSearchPage}
+            onClick={onOpenSearch}
+            data-tour="search-button"
+          >
+            <SearchIcon aria-hidden="true" />
+          </Button>
+        </ReaderControlTooltip>
         <div className="flex items-center gap-2" data-tour="mode-toggle">
           <span className="tabular-data text-sm font-medium">
             {isStudyMode ? "Study" : "Read"}
@@ -174,10 +181,12 @@ export function ReaderTopBar({
           />
         </div>
         {isStudyMode && showSidebarToggle ? (
-          <SidebarTrigger
-            className="border border-subtle-divider/70 bg-workspace-panel"
-            data-tour="sidebar-toggle"
-          />
+          <ReaderControlTooltip label="Toggle sidebar" side="bottom">
+            <SidebarTrigger
+              className="border border-subtle-divider/70 bg-workspace-panel"
+              data-tour="sidebar-toggle"
+            />
+          </ReaderControlTooltip>
         ) : null}
       </div>
     </header>
