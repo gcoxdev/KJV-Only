@@ -16,12 +16,12 @@ type StudyToolsSidebarProps = {
 };
 
 export function StudyToolsSidebar({ visible, title, icon: Icon, isHome, onHome, onActivate, children }: StudyToolsSidebarProps) {
-  const { isMobile, setOpenMobile } = useSidebar();
+  const { isMobile, open, openMobile, setOpenMobile } = useSidebar();
   if (!visible) return null;
 
   return (
     <Sidebar side="right" className="h-screen min-w-0 border-l border-sidebar-border/80 bg-sidebar/95 backdrop-blur-sm">
-      <section aria-label="Study sidebar" className="flex h-full min-h-0 min-w-0 flex-col"
+      <section aria-label="Study sidebar" inert={!(isMobile ? openMobile : open)} className="flex h-full min-h-0 min-w-0 flex-col"
         onFocusCapture={onActivate} onPointerDownCapture={onActivate}>
         <SidebarHeader className="border-b border-sidebar-border/70 p-2">
           <div className="flex min-w-0 items-center gap-2">

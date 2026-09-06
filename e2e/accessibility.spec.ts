@@ -142,7 +142,9 @@ test("expanded study tools meet automated WCAG checks", async ({ page }) => {
   await page.goto("/")
   await expectReaderReady(page)
 
-  const expandAll = page
+  const sidebar = page.getByRole("region", { name: "Study sidebar", exact: true })
+  await sidebar.getByRole("button", { name: "Tools", exact: true }).click()
+  const expandAll = sidebar
     .getByRole("button", { name: "Expand All", exact: true })
     .filter({ visible: true })
     .first()

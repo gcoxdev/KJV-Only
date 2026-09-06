@@ -6,6 +6,52 @@ async function ready(page: Page) {
   await expect(page.getByLabel('Show audio').first()).toBeVisible();
 }
 
+for (const closeWith of ['toggle', 'shortcut', 'read mode', 'mobile close', 'mobile Escape'] as const) {
+  test(`closing the sidebar with ${closeWith} releases note shortcuts`, async ({ page }) => {
+    const mobile = closeWith.startsWith('mobile');
+    if (mobile) await page.setViewportSize({ width: 390, height: 844 });
+    await ready(page);
+    const toggle = page.getByRole('button', { name: 'Toggle Sidebar', exact: true });
+    if (mobile) await toggle.click();
+    const sidebar = page.getByRole('region', { name: 'Study sidebar', exact: true });
+    await sidebar.getByRole('button', { name: 'Notes', exact: true }).click();
+    await sidebar.getByRole('button', { name: 'New General', exact: true }).click();
+    await sidebar.getByPlaceholder('Note title').fill('Unsaved sidebar draft');
+    const savedTitles = () => page.evaluate(() => JSON.parse(localStorage.getItem('kjv-reader-notes-v1') ?? '[]').map((note: { title: string }) => note.title));
+    await expect.poll(savedTitles).toEqual(['General note']);
+
+    if (closeWith === 'toggle') await toggle.click();
+    else if (closeWith === 'shortcut') {
+      await toggle.focus();
+      await page.keyboard.press('Control+Backslash');
+    }
+    else if (closeWith === 'read mode') await page.getByLabel('Switch to read mode').click();
+    else if (closeWith === 'mobile close') await sidebar.getByRole('button', { name: 'Close Sidebar', exact: true }).click();
+    else await page.keyboard.press('Escape');
+
+    if (!mobile && closeWith !== 'read mode') {
+      await expect(page.locator('[data-slot="sidebar"][data-state]')).toHaveAttribute('data-state', 'collapsed');
+      await expect(sidebar).not.toBeInViewport();
+      await expect(sidebar).toHaveAttribute('inert', '');
+    } else {
+      await expect(sidebar).not.toBeVisible();
+    }
+    await expect(page.locator('[data-active-panel="true"][aria-label="Genesis 1 panel"]')).toBeVisible();
+    await page.keyboard.press('Control+Enter');
+    expect(await savedTitles()).toEqual(['General note']);
+
+    // The desktop offcanvas sidebar retains its unsaved editor for later use.
+    if (!mobile && closeWith !== 'read mode') {
+      await toggle.click();
+      const title = sidebar.getByPlaceholder('Note title');
+      await expect(title).toHaveValue('Unsaved sidebar draft');
+      await title.click();
+      await page.keyboard.press('Control+Enter');
+      await expect.poll(savedTitles).toEqual(['Unsaved sidebar draft']);
+    }
+  });
+}
+
 test('sidebar shares Home actions and edits notes, searches, and returns Home', async ({ page }) => {
   await ready(page);
   const sidebar = page.getByRole('region', { name: 'Study sidebar', exact: true });

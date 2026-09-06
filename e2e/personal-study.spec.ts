@@ -188,6 +188,7 @@ test('bookmark labels and locations edit independently, with shadcn folder choic
   await page.getByLabel('Bookmark location', { exact: true }).fill('John 3:16');
   await expect(page.getByText('Opens John 3:16.', { exact: true })).toBeVisible();
   const folder = page.getByRole('combobox', { name: 'Folder', exact: true });
+  await expect(page.getByRole('button', { name: 'Choose folder', exact: true })).toBeVisible();
   await expect(page.locator('datalist')).toHaveCount(0);
   await folder.fill('');
   await folder.press('ArrowDown');

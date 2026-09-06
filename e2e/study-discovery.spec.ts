@@ -31,7 +31,9 @@ for (const width of [375, 1280]) {
     await joseph.click();
     await expect(page.getByRole("button", { name: "View Tree", exact: true })).toBeVisible();
 
-    await page.getByRole("button", { name: "Topics", exact: true }).filter({ visible: true }).click();
+    const sidebar = page.getByRole("region", { name: "Study sidebar", exact: true });
+    await sidebar.getByRole("button", { name: "Sidebar Home", exact: true }).click();
+    await sidebar.getByRole("button", { name: "Topics", exact: true }).click();
     const topicsSearch = page.getByRole("textbox", { name: "Filter topics" });
     await page.getByRole("button", { name: "A", exact: true }).filter({ visible: true }).click();
     await topicsSearch.fill("feeling afraid");
