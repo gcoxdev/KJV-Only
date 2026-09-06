@@ -31,7 +31,7 @@ export function ReadingContinuationCard({
         className,
       )}
     >
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-[1_1_12rem] break-words">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
           Reading progress
         </p>
@@ -43,7 +43,7 @@ export function ReadingContinuationCard({
               : "Reading complete"}
         </p>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex max-w-full flex-wrap gap-2">
         <Button
           type="button"
           size="sm"

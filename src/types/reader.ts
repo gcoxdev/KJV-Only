@@ -225,7 +225,8 @@ export type StaticPageId =
   | "contact"
   | "help";
 
-export type StudyWorkspaceTab = "tools" | "topics" | "notes" | "bookmarks";
+export type PanelHomeDestination = Exclude<LeafNode["view"], "reader" | "picker" | "page"> | "progress";
+export type StudyWorkspaceTab = "home" | PanelHomeDestination;
 export type StudyWorkspaceTool =
   | "cross-refs"
   | "concordance"

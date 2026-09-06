@@ -90,7 +90,6 @@ import { useCompletionCelebration } from "@/hooks/use-completion-celebration";
 import { useReaderStartup } from "@/hooks/use-reader-startup";
 import {
   useBookmarksViewModel,
-  useNotesSidebarViewModel,
   useProgressViewModel,
   useSettingsViewModel,
   useStudyToolsViewModel,
@@ -175,6 +174,16 @@ export function KJVReader() {
     resetBinding: resetShortcutBinding,
     resetAllBindings: resetAllShortcutBindings,
   } = useShortcutPreferences();
+  const {
+    activeTab: studyWorkspaceTab,
+    accordionValue: concordanceAccordionValue,
+    setActiveTab: setStudyWorkspaceTab,
+    showTool: showStudyTool,
+    setAccordionValue: setConcordanceAccordionValue,
+  } = useStudyWorkspaceState({
+    initialAccordionValue: [],
+  });
+  const [isSidebarActive, setIsSidebarActive] = useState(false);
   const hasOpenSearchView = useMemo(
     () => tabs.some((tab) => panelNodeContainsView(tab.root, "search")),
     [tabs],
@@ -249,7 +258,7 @@ export function KJVReader() {
   } = useReaderController({
     tabsOrientation,
     setTabsOrientation,
-    searchEnabled: hasOpenSearchView,
+    searchEnabled: hasOpenSearchView || studyWorkspaceTab === "search",
   });
   const wordVerseSelectionTargetRef =
     useRef<WordVerseSelectionTarget>(wordVerseSelectionTarget);
@@ -346,16 +355,6 @@ export function KJVReader() {
   const { canInstallPwa, isPwaInstalled, installPwa } = usePwaInstallation();
 
   const {
-    activeTab: studyWorkspaceTab,
-    accordionValue: concordanceAccordionValue,
-    setActiveTab: setStudyWorkspaceTab,
-    showTool: showStudyTool,
-    setAccordionValue: setConcordanceAccordionValue,
-  } = useStudyWorkspaceState({
-    initialAccordionValue: [],
-  });
-
-  const {
     highlightedVerseRangesByLeafId,
     clearLeafHighlights,
     setLeafHighlights,
@@ -444,8 +443,6 @@ export function KJVReader() {
     initializeNotesTabState,
     swapNotesTabState,
     pruneNotesTabState,
-    generalNotes,
-    contextNotes,
   } = useReaderNotes({
     activeTab,
   });
@@ -1085,7 +1082,6 @@ export function KJVReader() {
     openChapterInNewTab,
     openSearchTab,
     openStaticPageTab,
-    openNotesTab,
     openStudyTool,
   } = useWorkspaceNavigation({
     tabs,
@@ -2003,17 +1999,42 @@ export function KJVReader() {
     onResetAllProgress: resetAllProgress,
   });
 
-  const notesSidebarProps = useNotesSidebarViewModel({
+  const notesSidebarProps = {
     books,
-    generalNotes,
-    contextNotes,
-    notesContext,
-    openNotesTab,
-    closeRightSidebarForMobile,
-    createGeneralNote,
-    createContextNote,
-    setNotesContext,
-  });
+    notes: readerNotes,
+    context: notesContext,
+    selectedHighlightScope: notesHighlightScope,
+    onCreateGeneralNote: createGeneralNote,
+    onCreateContextNote: createContextNote,
+    onUpdateNote: updateNote,
+    onDeleteNote: deleteNote,
+    onOpenNoteLink: openNoteLinkTarget,
+    saveShortcut: shortcutBindings["general.saveNote"],
+    shortcutsActive: isSidebarActive,
+  };
+  const searchSidebarProps = {
+    books,
+    concordanceWords,
+    verseIndex: verseSearchIndex,
+    isVerseIndexBuilding: isVerseSearchIndexBuilding,
+    isVerseIndexReady: isVerseSearchIndexReady,
+    verseIndexError: verseSearchIndexError,
+    runSmartSearch: runSmartVerseSearch,
+    runSearchResultAnalysis,
+    ensureConcordanceWordsLoaded: ensureConcordanceLoaded,
+    contextVerseCount,
+    onOpenResult: openSearchResultTarget,
+    autoFocusInput: isSidebarActive && studyWorkspaceTab === "search",
+  };
+  const activateSidebar = useCallback(() => setIsSidebarActive(true), []);
+  const leaveSidebar = useCallback(() => {
+    setIsSidebarActive(false);
+    closeRightSidebarForMobile();
+  }, [closeRightSidebarForMobile]);
+  const activateWorkspacePanel = useCallback((leafId: string) => {
+    setIsSidebarActive(false);
+    setActivePanelLeafId(leafId);
+  }, []);
 
   const canGoLeafHistoryBack = useCallback(
     (leafId: string) => (leafHistoryByLeafId[leafId]?.index ?? 0) > 0,
@@ -2227,8 +2248,8 @@ export function KJVReader() {
         onStartTour: startGuidedTour,
         onOpenSearchTab: openSearchTab,
         onOpenStaticPageTab: openStaticPageTab,
-        activePanelLeafId: shortcutPanelLeafId,
-        onActivePanelChange: setActivePanelLeafId,
+        activePanelLeafId: isSidebarActive ? null : shortcutPanelLeafId,
+        onActivePanelChange: activateWorkspacePanel,
       }}
     />
   );
@@ -2324,6 +2345,8 @@ export function KJVReader() {
               accordionValue={concordanceAccordionValue}
               onAccordionValueChange={setConcordanceAccordionValue}
               onActiveTabChange={setStudyWorkspaceTab}
+              onActivate={activateSidebar}
+              onNavigateAway={leaveSidebar}
               onExpandAll={expandAllStudyTools}
               onCollapseAll={collapseAllStudyTools}
               canExpand={!allStudyAccordionsOpen}
@@ -2331,6 +2354,8 @@ export function KJVReader() {
               {...sharedStudyToolsProps}
               topicsProps={topicsSidebarProps}
               notesProps={notesSidebarProps}
+              searchProps={searchSidebarProps}
+              progressProps={progressPanelProps}
               bookmarksProps={bookmarksPanelProps}
             />
           </Suspense>

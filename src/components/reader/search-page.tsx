@@ -3,6 +3,7 @@ import {
   startTransition,
   useDeferredValue,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -435,6 +436,7 @@ export function SearchPage({
   onStateChange,
   onOpenResult,
 }: SearchPageProps) {
+  const inputId = useId();
   const [isBookFilterOpen, setIsBookFilterOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchProgress, setSearchProgress] = useState<{
@@ -1339,7 +1341,7 @@ export function SearchPage({
     <div className="flex h-full min-h-0 flex-col gap-1.5 p-2">
       <div className="workspace-panel-elevated flex flex-col gap-2 rounded-2xl border p-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div className="flex min-w-0 flex-[1_1_9rem] flex-col gap-1 break-words">
             <div className="flex items-center gap-2">
               <h2 className="workspace-heading text-xl font-semibold">Search</h2>
               <Popover>
@@ -1512,7 +1514,7 @@ export function SearchPage({
         <>
           {searchMode === "contains-any" || searchMode === "contains-all" ? (
             <div className="workspace-panel flex flex-col gap-2 rounded-2xl border p-3">
-              <Label htmlFor="search-chip-input">Words</Label>
+              <Label htmlFor={`${inputId}-words`}>Words</Label>
               <div className="rounded-2xl border border-subtle-divider/80 bg-workspace-panel-elevated p-2">
                 <div className="mb-2 flex flex-wrap gap-2">
                   {selectedWords.map((word) => (
@@ -1531,7 +1533,7 @@ export function SearchPage({
                 </div>
                 <Input
                   autoFocus={autoFocusInput}
-                  id="search-chip-input"
+                  id={`${inputId}-words`}
                   value={chipInputDraft}
                   onChange={(event) =>
                     setChipInputDraft(event.currentTarget.value)
@@ -1579,7 +1581,7 @@ export function SearchPage({
             </div>
           ) : (
             <div className="workspace-panel flex flex-col gap-2 rounded-2xl border p-3">
-              <Label htmlFor="search-phrase-input">
+              <Label htmlFor={`${inputId}-phrase`}>
                 {searchMode === "regex"
                   ? "Regular expression"
                   : searchMode === "smart"
@@ -1588,7 +1590,7 @@ export function SearchPage({
               </Label>
               <Input
                 autoFocus={autoFocusInput}
-                id="search-phrase-input"
+                id={`${inputId}-phrase`}
                 value={phraseInputDraft}
                 onChange={(event) =>
                   setPhraseInputDraft(event.currentTarget.value)

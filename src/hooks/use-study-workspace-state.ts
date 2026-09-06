@@ -2,7 +2,7 @@ import { startTransition, useCallback, useState } from "react";
 
 import type { StudyWorkspaceTab, StudyWorkspaceTool } from "@/types/reader";
 
-const STUDY_WORKSPACE_TABS: StudyWorkspaceTab[] = ["tools", "topics", "notes", "bookmarks"];
+const STUDY_WORKSPACE_TABS: StudyWorkspaceTab[] = ["home", "tools", "topics", "notes", "bookmarks", "search", "progress"];
 const STUDY_WORKSPACE_TOOLS: StudyWorkspaceTool[] = [
   "cross-refs",
   "concordance",
@@ -22,7 +22,7 @@ export function normalizeStudyWorkspaceTab(
 ): StudyWorkspaceTab {
   return STUDY_WORKSPACE_TABS.includes(value as StudyWorkspaceTab)
     ? (value as StudyWorkspaceTab)
-    : "tools";
+    : "home";
 }
 
 export function normalizeStudyWorkspaceTool(
@@ -43,7 +43,7 @@ export type UseStudyWorkspaceStateArgs = {
 export function useStudyWorkspaceState({
   initialAccordionValue,
 }: UseStudyWorkspaceStateArgs) {
-  const [activeTab, setActiveTab] = useState<StudyWorkspaceTab>("tools");
+  const [activeTab, setActiveTab] = useState<StudyWorkspaceTab>("home");
   const [activeTool, setActiveTool] = useState<StudyWorkspaceTool>("concordance");
   const [accordionValue, setAccordionValue] = useState<string[]>(
     initialAccordionValue,

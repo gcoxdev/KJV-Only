@@ -321,7 +321,7 @@ const HELP_SECTIONS: HelpSection[] = [
     title: "Study and Read Mode",
     icon: SidebarIcon,
     summary:
-      "The application can emphasize reading or studying, and the sidebar organizes tools, topics, notes, and bookmarks around the current context.",
+      "The application can emphasize reading or studying, and sidebar Home offers reading progress, tools, topics, notes, bookmarks, and search alongside the Bible.",
     keywords: ["sidebar", "study mode", "read mode", "tools", "topics", "notes", "bookmarks", "accordion"],
     items: [
       {
@@ -331,10 +331,10 @@ const HELP_SECTIONS: HelpSection[] = [
         keywords: ["study mode", "read mode", "toggle sidebar"],
       },
       {
-        label: "What the sidebar tabs are for",
+        label: "How to use sidebar Home",
         body:
-          "The sidebar is organized into Tools, Topics, Notes, and Bookmarks. Tools follow word and verse selections; Topics can be browsed by letter or filtered by name; Notes can follow the active context; and Bookmarks reopen saved passages.",
-        keywords: ["sidebar tabs", "tools tab", "topics tab", "notes tab", "bookmarks tab"],
+          "Sidebar Home has the same study options as Panel Home, without a book and chapter selector. Choose Reading Progress, Tools, Topics, Notes, Bookmarks, or Search. Use the Home button beside the title to return. Notes includes the full list and editor, so you can create and edit notes directly in the sidebar.",
+        keywords: ["sidebar home", "tools", "topics", "notes", "bookmarks", "search", "reading progress"],
       },
       {
         label: "How tool accordions behave",

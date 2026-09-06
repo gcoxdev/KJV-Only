@@ -77,7 +77,7 @@ import type {
 } from "@/lib/smart-search-worker";
 import type { BookmarkScope } from "@/types/bookmarks";
 import { BookChapterPicker } from "@/components/reader/book-chapter-picker";
-import { ReadingContinuationCard } from "@/components/reader/reading-continuation-card";
+import { PanelHome } from "@/components/reader/panel-home";
 import { StaticPage } from "@/components/reader/static-page";
 import type { SettingsPanelContentProps } from "@/components/reader/settings-dialog";
 import type { ProgressPanelContentProps } from "@/components/reader/progress-dialog";
@@ -121,7 +121,7 @@ import type {
   NotesTabState,
   ReaderNote,
 } from "@/types/notes";
-import { loadSearchPage, preloadSearchPage } from "@/lib/search-page-loader";
+import { loadSearchPage } from "@/lib/search-page-loader";
 
 type ExistingTabTarget = {
   id: string;
@@ -1763,82 +1763,19 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
         ) : (
           <CardContent className="min-h-0 flex-1 overflow-auto p-2">
             <div className="flex flex-col gap-3">
-              <ReadingContinuationCard
+              <PanelHome
                 readingContinuation={progressPanelProps.readingContinuation}
                 isReadingProgressReady={progressPanelProps.isReadingProgressReady}
                 onContinueReading={(bookIndex, chapterIndex) =>
                   updateLeafLocation(leaf.id, {
-                    view: "reader",
-                    bookIndex,
-                    chapterIndex,
-                    pickerTestament: null,
-                    pickerBookIndex: null,
+                    view: "reader", bookIndex, chapterIndex,
+                    pickerTestament: null, pickerBookIndex: null,
                   })
                 }
-                onOpenProgress={() =>
-                  updateLeafLocation(leaf.id, {
-                    view: "page",
-                    pageId: "progress",
-                  })
-                }
+                onOpen={(destination) => updateLeafLocation(leaf.id,
+                  destination === "progress" ? { view: "page", pageId: "progress" } : { view: destination })}
                 className="bg-card/70"
               />
-              <div className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr))]">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="justify-center"
-                  onClick={() => updateLeafLocation(leaf.id, { view: "tools" })}
-                >
-                  <ToolboxIcon />
-                  Tools
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="justify-center"
-                  onClick={() => updateLeafLocation(leaf.id, { view: "topics" })}
-                >
-                  <BookTextIcon />
-                  Topics
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="justify-center"
-                  onClick={() => updateLeafLocation(leaf.id, { view: "notes" })}
-                >
-                  <NotebookPenIcon />
-                  Notes
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="justify-center"
-                  onClick={() =>
-                    updateLeafLocation(leaf.id, { view: "bookmarks" })
-                  }
-                >
-                  <BookMarkedIcon />
-                  Bookmarks
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="justify-center"
-                  onMouseEnter={preloadSearchPage}
-                  onFocus={preloadSearchPage}
-                  onClick={() => updateLeafLocation(leaf.id, { view: "search" })}
-                >
-                  <SearchIcon />
-                  Search
-                </Button>
-              </div>
               <p className="text-sm text-muted-foreground">
                 Choose a book and chapter
               </p>

@@ -11,8 +11,11 @@ import {
 
 describe("study workspace normalization", () => {
   it("normalizes standalone values", () => {
+    expect(normalizeStudyWorkspaceTab("home")).toBe("home");
+    expect(normalizeStudyWorkspaceTab("search")).toBe("search");
+    expect(normalizeStudyWorkspaceTab("progress")).toBe("progress");
     expect(normalizeStudyWorkspaceTab("notes")).toBe("notes");
-    expect(normalizeStudyWorkspaceTab("bad")).toBe("tools");
+    expect(normalizeStudyWorkspaceTab("bad")).toBe("home");
     expect(normalizeStudyWorkspaceTool("maps")).toBe("maps");
     expect(normalizeStudyWorkspaceTool("bad")).toBe("concordance");
   });
