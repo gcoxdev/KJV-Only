@@ -1,6 +1,5 @@
 import {
   useCallback,
-  type ComponentProps,
   type Dispatch,
   type SetStateAction,
 } from "react";
@@ -9,7 +8,6 @@ import type { ProgressPanelContentProps } from "@/components/reader/progress-dia
 import type { ReaderStudyToolsContentProps } from "@/components/reader/reader-study-tools-content";
 import type { SettingsPanelContentProps } from "@/components/reader/settings-dialog";
 import type { BookmarksToolProps } from "@/components/reader/study-tools/bookmarks-tool";
-import type { NotesTool } from "@/components/reader/study-tools/notes-tool";
 import {
   STUDY_ACCORDION_ITEMS,
   deriveStudySidebarState,
@@ -18,8 +16,6 @@ import {
   defaultHighlightColor,
   normalizeHighlightColor,
 } from "@/lib/highlight-color";
-import type { Book } from "@/types/bible";
-import type { NotesContext, ReaderNote } from "@/types/notes";
 
 type StudyToolKey = keyof ReaderStudyToolsContentProps;
 type StudyToolInput<Key extends StudyToolKey> = Omit<
@@ -314,77 +310,4 @@ export function useBookmarksViewModel(props: BookmarksToolProps) {
 
 export function useProgressViewModel(props: ProgressPanelContentProps) {
   return props;
-}
-
-type NotesSidebarProps = ComponentProps<typeof NotesTool>;
-
-type UseNotesSidebarViewModelParams = {
-  books: Book[];
-  generalNotes: ReaderNote[];
-  contextNotes: ReaderNote[];
-  notesContext: NotesContext | null;
-  openNotesTab: (noteId?: string | null) => void;
-  closeRightSidebarForMobile: () => void;
-  createGeneralNote: () => string;
-  createContextNote: (context: NotesContext | null) => string | null;
-  setNotesContext: Dispatch<SetStateAction<NotesContext | null>>;
-};
-
-export function useNotesSidebarViewModel({
-  books,
-  generalNotes,
-  contextNotes,
-  notesContext,
-  openNotesTab,
-  closeRightSidebarForMobile,
-  createGeneralNote,
-  createContextNote,
-  setNotesContext,
-}: UseNotesSidebarViewModelParams) {
-  const onOpenNotesTab = useCallback(
-    (noteId?: string | null) => {
-      openNotesTab(noteId);
-      closeRightSidebarForMobile();
-    },
-    [closeRightSidebarForMobile, openNotesTab],
-  );
-  const onCreateGeneralNote = useCallback(() => {
-    const noteId = createGeneralNote();
-    openNotesTab(noteId);
-    closeRightSidebarForMobile();
-  }, [closeRightSidebarForMobile, createGeneralNote, openNotesTab]);
-  const onCreateContextNote = useCallback(() => {
-    const noteId = createContextNote(notesContext);
-    if (noteId) {
-      openNotesTab(noteId);
-      closeRightSidebarForMobile();
-    }
-  }, [
-    closeRightSidebarForMobile,
-    createContextNote,
-    notesContext,
-    openNotesTab,
-  ]);
-  const onSetChapterContext = useCallback(() => {
-    setNotesContext((current) => {
-      if (!current) {
-        return current;
-      }
-      return {
-        bookIndex: current.bookIndex,
-        chapterIndex: current.chapterIndex,
-      };
-    });
-  }, [setNotesContext]);
-
-  return {
-    books,
-    generalNotes,
-    contextNotes,
-    context: notesContext,
-    onOpenNotesTab,
-    onCreateGeneralNote,
-    onCreateContextNote,
-    onSetChapterContext,
-  } satisfies NotesSidebarProps;
 }

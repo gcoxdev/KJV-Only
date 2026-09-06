@@ -19,7 +19,6 @@ vi.mock("react", () => ({
 import { useReaderDerivedState } from "@/hooks/use-reader-derived-state";
 import {
   useBookmarksViewModel,
-  useNotesSidebarViewModel,
   useProgressViewModel,
   useSettingsViewModel,
   useStudyToolsViewModel,
@@ -287,50 +286,6 @@ describe("reader view-model adapters", () => {
       lightHighlightColor: "#abcdef",
       darkHighlightColor: "#123456",
     });
-  });
-
-  it("coordinates note creation, opening, and chapter context", () => {
-    const openNotesTab = vi.fn();
-    const closeRightSidebarForMobile = vi.fn();
-    const createGeneralNote = vi.fn(() => "general-note");
-    const createContextNote = vi
-      .fn()
-      .mockReturnValueOnce("context-note")
-      .mockReturnValueOnce(null);
-    const setNotesContext = vi.fn();
-    const notesContext = { bookIndex: 1, chapterIndex: 2, verseNumber: 3 };
-    const generalNotes = [{ id: "general-note" }];
-    const contextNotes = [{ id: "context-note" }];
-    const model = useNotesSidebarViewModel({
-      books: [book("Genesis", 1)],
-      generalNotes,
-      contextNotes,
-      notesContext,
-      openNotesTab,
-      closeRightSidebarForMobile,
-      createGeneralNote,
-      createContextNote,
-      setNotesContext,
-    } as unknown as Parameters<typeof useNotesSidebarViewModel>[0]);
-
-    model.onOpenNotesTab("existing-note");
-    model.onCreateGeneralNote();
-    model.onCreateContextNote();
-    model.onCreateContextNote();
-    model.onSetChapterContext();
-
-    expect(openNotesTab).toHaveBeenNthCalledWith(1, "existing-note");
-    expect(openNotesTab).toHaveBeenNthCalledWith(2, "general-note");
-    expect(openNotesTab).toHaveBeenNthCalledWith(3, "context-note");
-    expect(closeRightSidebarForMobile).toHaveBeenCalledTimes(3);
-    expect(createContextNote).toHaveBeenCalledWith(notesContext);
-    const contextUpdater = setNotesContext.mock.calls[0][0];
-    expect(contextUpdater(null)).toBeNull();
-    expect(contextUpdater(notesContext)).toEqual({
-      bookIndex: 1,
-      chapterIndex: 2,
-    });
-    expect(model).toMatchObject({ generalNotes, contextNotes, context: notesContext });
   });
 
   it("keeps identity-only bookmark and progress adapters transparent", () => {

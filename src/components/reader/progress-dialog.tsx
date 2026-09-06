@@ -97,7 +97,7 @@ export function ProgressPanelContent({
         </Progress>
 
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border/70 bg-card/70 p-3">
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-[1_1_12rem] break-words">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               Up next
             </p>

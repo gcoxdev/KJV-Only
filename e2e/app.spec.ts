@@ -1098,7 +1098,7 @@ test("continues reading from Welcome Home and Reading Progress", async ({
     page.getByRole("button", { name: "Genesis 1", exact: true }),
   ).toBeVisible()
 
-  const homeContinue = page.getByRole("button", {
+  const homeContinue = page.getByRole("region", { name: "Welcome Home panel", exact: true }).getByRole("button", {
     name: "Continue reading at Genesis 2",
     exact: true,
   })
@@ -1110,7 +1110,7 @@ test("continues reading from Welcome Home and Reading Progress", async ({
 
   await page.getByLabel("Open menu").click()
   await page.getByRole("menuitem", { name: "Welcome Home", exact: true }).click()
-  await page
+  await page.getByRole("region", { name: "Welcome Home panel", exact: true })
     .getByRole("button", { name: "Reading Progress", exact: true })
     .click()
 
@@ -1189,7 +1189,8 @@ test("keeps Tools and Topics accordion expansion scoped to each surface", async 
     .getByRole("button", { name: "Tools", exact: true })
     .click()
 
-  const sidebar = page.locator('[data-tour="sidebar"]')
+  const sidebar = page.getByRole("region", { name: "Study sidebar", exact: true })
+  await sidebar.getByRole("button", { name: "Tools", exact: true }).click()
   const panelConcordance = auxiliaryPanel.getByRole("button", {
     name: "Concordance",
     exact: true,
@@ -1243,6 +1244,7 @@ test("keeps Tools and Topics accordion expansion scoped to each surface", async 
   await auxiliaryPanel
     .getByRole("button", { name: "Topics", exact: true })
     .click()
+  await sidebar.getByRole("button", { name: "Sidebar Home", exact: true }).click()
   await sidebar
     .getByRole("button", { name: "Topics", exact: true })
     .click()
