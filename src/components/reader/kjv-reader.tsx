@@ -61,6 +61,7 @@ import type {
 } from "@/types/reader";
 import type { BookmarkScope } from "@/types/bookmarks";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarActivitySync } from "@/components/reader/sidebar-activity-sync";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { SidebarOpenRequestSync } from "@/components/reader/sidebar-open-request-sync";
@@ -2027,6 +2028,7 @@ export function KJVReader() {
     autoFocusInput: isSidebarActive && studyWorkspaceTab === "search",
   };
   const activateSidebar = useCallback(() => setIsSidebarActive(true), []);
+  const deactivateSidebar = useCallback(() => setIsSidebarActive(false), []);
   const leaveSidebar = useCallback(() => {
     setIsSidebarActive(false);
     closeRightSidebarForMobile();
@@ -2283,6 +2285,7 @@ export function KJVReader() {
           } as React.CSSProperties
         }
       >
+        <SidebarActivitySync enabled={sidebarAvailable} onDeactivate={deactivateSidebar} />
         <SidebarOpenRequestSync
           requestKey={sidebarOpenRequestKey}
           enabled={sidebarAvailable}

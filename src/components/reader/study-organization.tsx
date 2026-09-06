@@ -61,7 +61,7 @@ export function OrganizationFields({
           onInputValueChange={(value) => onFolderChange(value)}
           onValueChange={(value) => onFolderChange(value ?? "")}
         >
-          <ComboboxInput id={`${id}-folder`} className="w-full" maxLength={80} placeholder="Unfiled" />
+          <ComboboxInput id={`${id}-folder`} className="w-full" maxLength={80} placeholder="Unfiled" triggerLabel="Choose folder" />
           <ComboboxContent>
             <ComboboxEmpty>{folder.trim() ? "New folder — saved with this item." : "Type a name to create a folder."}</ComboboxEmpty>
             <ComboboxList>
