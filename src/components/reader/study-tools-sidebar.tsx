@@ -24,7 +24,7 @@ export function StudyToolsSidebar({ visible, title, icon: Icon, isHome, onHome, 
       <section aria-label="Study sidebar" inert={!(isMobile ? openMobile : open)} className="flex h-full min-h-0 min-w-0 flex-col"
         onFocusCapture={onActivate} onPointerDownCapture={onActivate}>
         <SidebarHeader className="border-b border-sidebar-border/70 p-2">
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex min-h-7 min-w-0 items-center gap-2">
             <Icon className="size-4 shrink-0 text-muted-foreground" />
             <h2 className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{title}</h2>
             {!isHome && (

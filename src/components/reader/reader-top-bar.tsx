@@ -58,16 +58,16 @@ export function ReaderTopBar({
   onImportBookmarks,
 }: ReaderTopBarProps) {
   return (
-    <header className="@container/topbar z-20 flex shrink-0 items-center justify-between border-b border-subtle-divider/80 bg-workspace-chrome/90 px-3 py-2 backdrop-blur">
+    <header className="@container/topbar z-20 flex shrink-0 items-center justify-between border-b border-subtle-divider/80 bg-workspace-chrome/90 p-2 backdrop-blur">
       <h1 className="sr-only">KJV Only Bible Reader</h1>
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="flex min-w-0 items-center gap-2">
         <DropdownMenu>
           <ReaderControlTooltip label="Open menu" side="bottom">
             <DropdownMenuTrigger
               render={
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="icon-sm"
                   aria-label="Open menu"
                   data-tour="main-menu"
                 />
@@ -128,7 +128,7 @@ export function ReaderTopBar({
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 items-center gap-2">
           <img
             src="/icons/app-logo.png"
             alt="KJV Only icon"
@@ -147,7 +147,7 @@ export function ReaderTopBar({
           <Button
             type="button"
             variant="ghost"
-            size="icon"
+            size="icon-sm"
             aria-label="Open reference command"
             onClick={onOpenReferenceCommand}
             data-tour="reference-command-button"
@@ -159,7 +159,7 @@ export function ReaderTopBar({
           <Button
             type="button"
             variant="ghost"
-            size="icon"
+            size="icon-sm"
             aria-label="Open search"
             onMouseEnter={preloadSearchPage}
             onFocus={preloadSearchPage}
