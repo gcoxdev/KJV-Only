@@ -1,9 +1,10 @@
 import { bcv_parser } from "bible-passage-reference-parser/esm/bcv_parser.js";
 import * as bibleReferenceLanguage from "bible-passage-reference-parser/esm/lang/en.js";
 
-import { normalizeBookmarkRanges } from "@/lib/bookmarks";
+import { isBookmarkScopeAvailable, normalizeBookmarkRanges } from "@/lib/bookmarks";
 import { createId, createLeaf } from "@/lib/reader-layout";
 import { BOOK_ICON_CODES } from "@/lib/references";
+import type { BookmarkScope } from "@/types/bookmarks";
 import type { Book } from "@/types/bible";
 import type { PanelNode, ReaderNavigationTarget } from "@/types/reader";
 
@@ -79,6 +80,7 @@ const OSIS_BOOK_CODES = [
 type ParsedEntity = {
   type: string;
   absolute_indices?: [number, number];
+  valid?: { valid: boolean; messages: Record<string, unknown> };
   entities?: ParsedEntity[];
   start?: {
     b?: string;
@@ -350,12 +352,12 @@ function normalizeParsedEntity(
     start: {
       bookIndex: startBookIndex,
       chapterIndex: startChapterIndex,
-      verseNumber: startVerse,
+      verseNumber: startVerseNumber,
     },
     end: {
       bookIndex: endBookIndex,
       chapterIndex: endChapterIndex,
-      verseNumber: endVerse,
+      verseNumber: endVerseNumber,
     },
   };
 
@@ -595,4 +597,32 @@ export function buildReaderTabFromTargets(targets: ReaderNavigationTarget[]) {
     root,
     leafIds,
   };
+}
+
+
+/** Editing a saved destination must not silently discard or repair invalid input. */
+export function parseBookmarkLocation(input: string, books: Book[]): BookmarkScope | null {
+  const text = input.trim();
+  if (!text || text.length > 500) return null;
+  const parser = createReferenceParser();
+  parser.set_options({
+    versification_system: "kjv",
+    invalid_passage_strategy: "include",
+    invalid_sequence_strategy: "include",
+  });
+  const entities = flattenParsedEntities(parser.parse(text).parsed_entities() as ParsedEntity[]);
+  if (!entities.length) return null;
+  let end = 0;
+  for (const entity of entities) {
+    const span = entity.absolute_indices;
+    if (!span || !entity.valid?.valid || Object.keys(entity.valid.messages).length ||
+        !/^[\s,;]*$/.test(text.slice(end, span[0]))) return null;
+    end = span[1];
+  }
+  if (text.slice(end).trim()) return null;
+  const units = entities.map((entity) => normalizeParsedEntity(entity, books));
+  if (units.some((unit) => unit === null)) return null;
+  const targets = mergeReferenceUnits(units as ReferenceUnit[], books);
+  const scope = targets.length === 1 ? targets[0].target : null;
+  return scope && isBookmarkScopeAvailable(scope, books) ? scope : null;
 }

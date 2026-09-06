@@ -181,7 +181,7 @@ export function useReaderNotes({ activeTab }: UseReaderNotesArgs) {
   }, []);
 
   const updateNote = useCallback(
-    (noteId: string, patch: Partial<Pick<ReaderNote, "title" | "body" | "scope">>) => {
+    (noteId: string, patch: Partial<Pick<ReaderNote, "title" | "body" | "scope" | "folder" | "tags">>) => {
       const now = Date.now();
       setReaderNotes((current) =>
         current.map((note) =>

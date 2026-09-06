@@ -1,3 +1,4 @@
+import { sha256, type OfflineInventory } from "@/lib/offline-inventory";
 import type { Book } from "@/types/bible";
 import { bookCodeForIndex } from "@/lib/reader-view";
 
@@ -182,6 +183,7 @@ export async function getCachedOfflineAssetKeys() {
 
 type DownloadOfflineAssetBatchOptions = {
   forceRefresh?: boolean;
+  inventory?: OfflineInventory | null;
 };
 
 export async function downloadOfflineAssetBatch(
@@ -193,6 +195,7 @@ export async function downloadOfflineAssetBatch(
   const cachedKeys = await getCachedOfflineAssetKeys();
   const failures: string[] = [];
   let completed = 0;
+  let verified = 0;
   const total = urls.length;
 
   for (const url of urls) {
@@ -206,11 +209,19 @@ export async function downloadOfflineAssetBatch(
     }
 
     try {
-      const response = await fetch(absoluteUrl, { cache: "no-cache" });
+      const response = await fetch(absoluteUrl, { cache: "reload" });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
+      const expected = options?.inventory?.assets[new URL(absoluteUrl).pathname];
+      if (expected) {
+        const bytes = await response.clone().arrayBuffer();
+        if (bytes.byteLength !== expected.bytes || await sha256(bytes) !== expected.sha256) {
+          throw new Error("The download does not match the current bundle. Reload download information and try again.");
+        }
+      }
       await cache.put(absoluteUrl, response.clone());
+      if (expected) verified += 1;
       cachedKeys.add(normalizedKey);
     } catch {
       failures.push(url);
@@ -220,7 +231,7 @@ export async function downloadOfflineAssetBatch(
     onProgress?.(completed, total, failures);
   }
 
-  return { failures };
+  return { failures, verified };
 }
 
 export async function deleteOfflineAssetBatch(urls: string[]) {

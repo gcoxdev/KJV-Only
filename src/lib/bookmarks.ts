@@ -184,3 +184,18 @@ export function bookmarkBookIndex(scope: BookmarkScope) {
   const normalized = normalizeRangePoints(scope.start, scope.end);
   return normalized.start.bookIndex;
 }
+
+
+export function isBookmarkScopeAvailable(scope: BookmarkScope, books: Book[]) {
+  const hasChapter = (bookIndex: number, chapterIndex: number) =>
+    Number.isInteger(bookIndex) && bookIndex >= 0 && Number.isInteger(chapterIndex) &&
+    chapterIndex >= 0 && Boolean(books[bookIndex]?.chapters[chapterIndex]);
+  const hasVerse = (point: BookmarkPoint) =>
+    hasChapter(point.bookIndex, point.chapterIndex) && Number.isInteger(point.verseNumber) &&
+    point.verseNumber > 0 && point.verseNumber <= books[point.bookIndex].chapters[point.chapterIndex].verses.length;
+  if (scope.type === "chapter") return hasChapter(scope.bookIndex, scope.chapterIndex);
+  if (scope.type === "verse") return hasVerse(scope);
+  if (scope.type === "range") return hasVerse(scope.start) && hasVerse(scope.end) && comparePoint(scope.start, scope.end) <= 0;
+  return scope.ranges.length > 0 && scope.ranges.every((range) =>
+    range.start <= range.end && hasVerse({ ...scope, verseNumber: range.start }) && hasVerse({ ...scope, verseNumber: range.end }));
+}

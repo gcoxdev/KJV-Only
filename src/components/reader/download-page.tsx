@@ -1,3 +1,4 @@
+import { bundleFreshness, describeOfflineBundle, loadOfflineInventory, readSavedOfflineInventory, readBundleReceipt, saveBundleReceipt, type OfflineInventory, type BundleReceipt } from '@/lib/offline-inventory';
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
@@ -55,7 +56,6 @@ type BundleDefinition = {
   description: string;
   icon: typeof HardDriveDownloadIcon;
   urls: string[];
-  sizeLabel: string;
   preparationError?: string | null;
 };
 
@@ -67,10 +67,6 @@ type BundleStatus = {
   error: string | null;
 };
 
-const CORE_SIZE_LABEL = "~93 MB";
-const MAPS_SIZE_LABEL = "~97 MB";
-const OT_AUDIO_SIZE_LABEL = "~559 MB";
-const NT_AUDIO_SIZE_LABEL = "~174 MB";
 
 function bundleCachedPercent(status: BundleStatus) {
   return status.total > 0 ? Math.round((status.cached / status.total) * 100) : 0;
@@ -101,6 +97,32 @@ export function DownloadPage({
   onExportNotes,
   onExportBookmarks,
 }: DownloadPageProps) {
+  const [inventory, setInventory] = useState<OfflineInventory | null>(null);
+  const [inventoryChecked, setInventoryChecked] = useState(false);
+  const [inventoryError, setInventoryError] = useState<string | null>(null);
+  const [inventoryLoading, setInventoryLoading] = useState(false);
+  const [bundleDetails, setBundleDetails] = useState<Record<string, { bytes: number; version: string } | null>>({});
+  const [receipts, setReceipts] = useState<Record<string, BundleReceipt | null>>(() => Object.fromEntries(['core', 'maps', 'audio-ot', 'audio-nt'].map((id) => [id, readBundleReceipt(id)])));
+  const [cacheError, setCacheError] = useState<string | null>(null);
+  const [mapPreparationError, setMapPreparationError] = useState<string | null>(null);
+  const reloadInventory = useCallback(async () => {
+    setInventoryLoading(true);
+    try {
+      const nextInventory = await loadOfflineInventory();
+      const nextCoreUrls = await loadCoreOfflineUrls();
+      setInventory(nextInventory);
+      setCoreUrls(nextCoreUrls);
+      setCorePreparationError(null);
+      setInventoryChecked(true);
+      setInventoryError(null);
+    } catch {
+      const savedInventory = await readSavedOfflineInventory();
+      if (savedInventory) setInventory(savedInventory);
+      setInventoryChecked(false);
+      setInventoryError('Could not check the latest bundle information. Connect to the internet and try again.');
+    } finally { setInventoryLoading(false); }
+  }, []);
+  useEffect(() => { void reloadInventory(); }, [reloadInventory]);
   const [coreUrls, setCoreUrls] = useState<string[] | null>(null);
   const [corePreparationError, setCorePreparationError] = useState<string | null>(
     null,
@@ -154,7 +176,7 @@ export function DownloadPage({
         new Set(entries.map((entry) => `/maps/geometry/${entry.geojson_file}`)),
       );
       setMapUrls(["/maps/data/map.json", ...geometryUrls]);
-    });
+    }).catch(() => { if (!cancelled) { setMapUrls([]); setMapPreparationError("Could not prepare the map download. Reload this page to try again."); } });
 
     return () => {
       cancelled = true;
@@ -177,7 +199,6 @@ export function DownloadPage({
               `/references/strongs-hebrew.compact.min.json?v=${STRONGS_ASSET_VERSION}`,
             ]
           : [],
-        sizeLabel: CORE_SIZE_LABEL,
         preparationError: corePreparationError,
       },
       {
@@ -186,8 +207,8 @@ export function DownloadPage({
         description:
           "Map index plus referenced GeoJSON geometry for offline place and geography lookup.",
         icon: MapIcon,
-        urls: mapUrls ?? [],
-        sizeLabel: MAPS_SIZE_LABEL,
+        urls: inventory?.mapUrls ?? mapUrls ?? [],
+        preparationError: inventory?.mapUrls ? null : mapPreparationError,
       },
       {
         id: "audio-ot",
@@ -195,7 +216,6 @@ export function DownloadPage({
         description: "All Old Testament chapter audio files for offline playback.",
         icon: AudioLinesIcon,
         urls: buildAudioUrls(books, "old"),
-        sizeLabel: OT_AUDIO_SIZE_LABEL,
       },
       {
         id: "audio-nt",
@@ -203,12 +223,20 @@ export function DownloadPage({
         description: "All New Testament chapter audio files for offline playback.",
         icon: AudioLinesIcon,
         urls: buildAudioUrls(books, "new"),
-        sizeLabel: NT_AUDIO_SIZE_LABEL,
       },
     ];
 
     return definitions;
-  }, [books, corePreparationError, coreUrls, mapUrls]);
+  }, [books, corePreparationError, coreUrls, mapUrls, mapPreparationError, inventory]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!inventory) return;
+    void Promise.all(bundleDefinitions.map(async (bundle) => [bundle.id, await describeOfflineBundle(bundle.urls, inventory)] as const))
+      .then((entries) => { if (!cancelled) setBundleDetails(Object.fromEntries(entries)); })
+      .catch(() => { if (!cancelled) setInventoryError('Could not read bundle sizes and versions.'); });
+    return () => { cancelled = true; };
+  }, [bundleDefinitions, inventory]);
 
   const totalCachedFiles = useMemo(
     () =>
@@ -228,7 +256,8 @@ export function DownloadPage({
       return;
     }
 
-    const estimate = await navigator.storage.estimate();
+    const estimate = await navigator.storage.estimate().catch(() => null);
+    if (!estimate) { setStorageEstimate(null); return; }
     setStorageEstimate({
       usage: estimate.usage ?? 0,
       quota: estimate.quota ?? 0,
@@ -236,7 +265,9 @@ export function DownloadPage({
   }, []);
 
   const refreshBundleStatuses = useCallback(async () => {
-    const cachedKeys = await getCachedOfflineAssetKeys();
+    const cachedKeys = await getCachedOfflineAssetKeys().catch(() => null);
+    if (!cachedKeys) { setCacheError("Offline storage is unavailable. Check your browser storage settings and try again."); return; }
+    setCacheError(null);
     setBundleStatuses((current) => {
       const next = { ...current };
       for (const bundle of bundleDefinitions) {
@@ -278,39 +309,50 @@ export function DownloadPage({
         },
       }));
 
-      const { failures } = await downloadOfflineAssetBatch(
-        bundle.urls,
-        { forceRefresh },
-        (completed, total) => {
-          setBundleStatuses((current) => ({
-            ...current,
-            [bundle.id]: {
-              ...current[bundle.id],
-              total,
-              completed,
-              downloading: true,
-              error: null,
-            },
-          }));
-        },
-      );
+      try {
+        const { failures, verified } = await downloadOfflineAssetBatch(
+          bundle.urls,
+          { forceRefresh, inventory },
+          (completed, total) => {
+            setBundleStatuses((current) => ({
+              ...current,
+              [bundle.id]: {
+                ...current[bundle.id],
+                total,
+                completed,
+                downloading: true,
+                error: null,
+              },
+            }));
+          },
+        );
 
-      setBundleStatuses((current) => ({
-        ...current,
-        [bundle.id]: {
-          ...current[bundle.id],
-          downloading: false,
-          error:
-            failures.length > 0
-              ? `${failures.length} file${failures.length === 1 ? "" : "s"} failed.`
-              : null,
-        },
-      }));
-      setActiveBundleId(null);
-      await refreshBundleStatuses();
-      await refreshStorageEstimate();
+        setBundleStatuses((current) => ({
+          ...current,
+          [bundle.id]: {
+            ...current[bundle.id],
+            downloading: false,
+            error:
+              failures.length > 0
+                ? `${failures.length} file${failures.length === 1 ? "" : "s"} failed to download or verify. Check your connection and storage; check for bundle updates before retrying.`
+                : null,
+          },
+        }));
+        const detail = inventory ? await describeOfflineBundle(bundle.urls, inventory) : null;
+        if (!failures.length && detail && verified === bundle.urls.length && inventoryChecked) {
+          const receipt = { version: detail.version, refreshedAt: Date.now() };
+          saveBundleReceipt(bundle.id, receipt);
+          setReceipts((current) => ({ ...current, [bundle.id]: receipt }));
+        }
+      } catch {
+        setBundleStatuses((current) => ({ ...current, [bundle.id]: { ...current[bundle.id], downloading: false, error: 'Download failed. Check your connection and available browser storage, then try again.' } }));
+      } finally {
+        setActiveBundleId(null);
+        await refreshBundleStatuses();
+        await refreshStorageEstimate();
+      }
     },
-    [activeBundleId, clearingBundleId, refreshBundleStatuses, refreshStorageEstimate],
+    [activeBundleId, clearingBundleId, refreshBundleStatuses, refreshStorageEstimate, inventory, inventoryChecked],
   );
 
   const clearBundleCache = useCallback(async (bundle: BundleDefinition) => {
@@ -321,6 +363,8 @@ export function DownloadPage({
     setClearingBundleId(bundle.id);
     try {
       await deleteOfflineAssetBatch(bundle.urls);
+      saveBundleReceipt(bundle.id, null);
+      setReceipts((current) => ({ ...current, [bundle.id]: null }));
       setBundleStatuses((current) => ({
         ...current,
         [bundle.id]: {
@@ -333,6 +377,8 @@ export function DownloadPage({
       }));
       await refreshBundleStatuses();
       await refreshStorageEstimate();
+    } catch {
+      setBundleStatuses((current) => ({ ...current, [bundle.id]: { ...current[bundle.id], error: "Could not clear this bundle. Try again." } }));
     } finally {
       setClearingBundleId(null);
     }
@@ -441,6 +487,12 @@ export function DownloadPage({
         </CardContent>
       </Card>
 
+      <div className="flex flex-wrap items-center gap-3">
+        <Button variant="outline" disabled={inventoryLoading || activeBundleId !== null || clearingBundleId !== null} onClick={() => { void reloadInventory(); void refreshBundleStatuses(); }}> {inventoryLoading ? 'Checking bundle information…' : 'Check for Bundle Updates'} </Button>
+        <p className="text-xs text-muted-foreground">Sizes reflect uncompressed bundle files. Browser storage use and network transfer sizes can differ.</p>
+        {inventoryError && <p role="status" className="text-sm text-muted-foreground">{inventoryError}</p>}
+        {cacheError && <p role="alert" className="text-sm text-destructive">{cacheError}</p>}
+      </div>
       <div className="grid gap-4">
         {bundleDefinitions.map((bundle) => {
           const status = bundleStatuses[bundle.id];
@@ -449,6 +501,8 @@ export function DownloadPage({
           const Icon = bundle.icon;
           const isReady = bundle.urls.length > 0 && !bundle.preparationError;
           const statusLabel = bundleStatusLabel(status);
+          const detail = bundleDetails[bundle.id];
+          const receipt = receipts[bundle.id];
           const isFullyCached = status.cached === status.total && status.total > 0;
 
           return (
@@ -467,7 +521,7 @@ export function DownloadPage({
                       {statusLabel}
                     </Badge>
                     <Badge variant="outline" className="font-normal">
-                      {bundle.sizeLabel}
+                      {detail ? formatOfflineBytes(detail.bytes) : "Size unavailable"}
                     </Badge>
                   </div>
                 </div>
@@ -496,12 +550,12 @@ export function DownloadPage({
                   </div>
                   <div className="rounded-lg border border-border/60 bg-background/50 p-3">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      Refresh Path
+                      Bundle Version
                     </p>
                     <p className="mt-1 text-sm leading-6">
-                      {isFullyCached
-                        ? "Check for missing files to fill gaps or refresh to replace cached copies."
-                        : "Download the bundle first, then use refresh later when you want to replace cached copies."}
+                      {bundleFreshness(detail?.version, receipt, isFullyCached, inventoryChecked)}
+                      <span className="block text-xs">Last verified download: {receipt ? new Date(receipt.refreshedAt).toLocaleString() : 'Not recorded'}</span>
+                      <span className="block text-xs">Refresh Bundle verifies and replaces every file. Checking missing files only fills gaps.</span>
                     </p>
                   </div>
                 </div>

@@ -1,3 +1,4 @@
+import { isValidOrganization } from '@/lib/study-organization';
 import type { ReaderBookmark } from "@/types/bookmarks";
 import type { NoteScope, ReaderNote } from "@/types/notes";
 import { isSafeUrl } from "@/lib/url-policy";
@@ -266,6 +267,7 @@ function isValidNoteScope(scope: unknown): scope is NoteScope {
 export function isValidReaderNote(note: unknown): note is ReaderNote {
   return (
     isRecord(note) &&
+    isValidOrganization(note) &&
     isBoundedString(note.id, READER_TRANSFER_LIMITS.maxIdLength) &&
     isBoundedString(note.title, READER_TRANSFER_LIMITS.maxTitleLength) &&
     isBoundedString(note.body, READER_TRANSFER_LIMITS.maxBodyLength) &&
@@ -331,6 +333,7 @@ function looksLikeLegacyOneBasedNotes(notes: ReaderNote[]) {
 export function isValidReaderBookmark(bookmark: unknown): bookmark is ReaderBookmark {
   if (
     !isRecord(bookmark) ||
+    !isValidOrganization(bookmark) ||
     !isBoundedString(bookmark.id, READER_TRANSFER_LIMITS.maxIdLength) ||
     !isBoundedString(bookmark.label, READER_TRANSFER_LIMITS.maxLabelLength) ||
     !isBoundedString(bookmark.note, READER_TRANSFER_LIMITS.maxBookmarkNoteLength) ||

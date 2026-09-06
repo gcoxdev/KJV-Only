@@ -1,3 +1,5 @@
+import { OrganizationBadges, OrganizationFields, OrganizationFilters } from '@/components/reader/study-organization';
+import { matchesOrganization, organizationError, parseTags } from '@/lib/study-organization';
 import {
   Children,
   useCallback,
@@ -87,7 +89,7 @@ type NotesPageProps = {
   onCreateContextNote: (context: NotesContext | null) => string | null;
   onUpdateNote: (
     noteId: string,
-    patch: Partial<Pick<ReaderNote, "title" | "body" | "scope">>,
+    patch: Partial<Pick<ReaderNote, "title" | "body" | "scope" | "folder" | "tags">>,
   ) => void;
   onDeleteNote: (noteId: string) => void;
   onOpenNoteLink: (target: NoteLinkTarget) => void;
@@ -339,7 +341,12 @@ export function NotesPage({
   const pageContext = context ?? tabState?.context ?? null;
   const pageContextLabel = contextLabel(pageContext, books);
 
-  const filteredNotes = useMemo(() => {
+  const [folderFilter, setFolderFilter] = useState("all");
+  const [tagFilter, setTagFilter] = useState("all");
+  const [draftFolder, setDraftFolder] = useState("");
+  const [draftTags, setDraftTags] = useState("");
+  const organizationValidation = organizationError(draftFolder, draftTags);
+  const scopeFilteredNotes = useMemo(() => {
     if (filter === "general") {
       return notes.filter((note) => note.scope.type === "general");
     }
@@ -350,6 +357,8 @@ export function NotesPage({
     }
     return notes;
   }, [filter, notes, pageContext]);
+
+  const filteredNotes = scopeFilteredNotes.filter((note) => matchesOrganization(note, folderFilter, tagFilter));
 
   const selectedNote =
     filteredNotes.find((note) => note.id === selectedNoteId) ??
@@ -379,6 +388,8 @@ export function NotesPage({
 
     const nextDraftBody = parseSerializedState(selectedNote.body);
     setDraftTitle(selectedNote.title);
+    setDraftFolder(selectedNote.folder ?? "");
+    setDraftTags((selectedNote.tags ?? []).join(", "));
     setDraftBody(nextDraftBody);
     setDraftSourceBody(selectedNote.body);
     setIsEditing(isNewNote(selectedNote));
@@ -419,23 +430,27 @@ export function NotesPage({
   const hasDraftChanges =
     selectedNote !== null &&
     (draftTitle !== selectedNote.title ||
+      draftFolder.trim() !== (selectedNote.folder ?? "") ||
+      JSON.stringify(parseTags(draftTags)) !== JSON.stringify(selectedNote.tags ?? []) ||
       (isSourceMode ? draftSourceBody : serializedDraftBody) !== selectedNote.body);
 
   const sourceModeButtonLabel = isSourceMode ? "Show rich text editor" : "Show note source";
 
   const saveCurrentNote = useCallback(() => {
-    if (!selectedNote) {
+    if (!selectedNote || organizationValidation) {
       return;
     }
 
     const nextBody = isSourceMode ? draftSourceBody : serializedDraftBody;
     onUpdateNote(selectedNote.id, {
       title: draftTitle,
+      folder: draftFolder.trim(),
+      tags: parseTags(draftTags),
       body: nextBody,
     });
     setIsEditing(false);
     setIsSourceMode(false);
-  }, [draftSourceBody, draftTitle, isSourceMode, onUpdateNote, selectedNote, serializedDraftBody]);
+  }, [draftFolder, draftTags, organizationValidation, draftSourceBody, draftTitle, isSourceMode, onUpdateNote, selectedNote, serializedDraftBody]);
 
   useEffect(() => {
     if (!shortcutsActive || !saveShortcut) {
@@ -486,6 +501,8 @@ export function NotesPage({
     }
     const nextDraftBody = parseSerializedState(selectedNote.body);
     setDraftTitle(selectedNote.title);
+    setDraftFolder(selectedNote.folder ?? "");
+    setDraftTags((selectedNote.tags ?? []).join(", "));
     setDraftBody(nextDraftBody);
     setDraftSourceBody(selectedNote.body);
     setIsEditing(false);
@@ -598,10 +615,11 @@ export function NotesPage({
             </div>
           </div>
         </div>
+        <OrganizationFilters items={notes} folder={folderFilter} tag={tagFilter} onFolderChange={setFolderFilter} onTagChange={setTagFilter} />
         <ScrollArea className="min-h-0 flex-1">
           <div className="divide-y">
             {filteredNotes.length === 0 ? (
-              <p className="p-3 text-sm text-muted-foreground">No notes yet.</p>
+              <p className="p-3 text-sm text-muted-foreground">{notes.length ? "No notes match these filters." : "No notes yet."}</p>
             ) : (
               filteredNotes.map((note) => (
                 <button
@@ -629,6 +647,7 @@ export function NotesPage({
                       ? ` • Modified ${formatNoteDateTime(note.updatedAt)}`
                       : ""}
                   </p>
+                  <OrganizationBadges item={note} />
                 </button>
               ))
             )}
@@ -732,7 +751,7 @@ export function NotesPage({
                         variant="outline"
                         size="icon-sm"
                         onClick={saveCurrentNote}
-                        disabled={!hasDraftChanges}
+                        disabled={!hasDraftChanges || Boolean(organizationValidation)}
                         tooltip="Save note"
                       >
                         <SaveIcon />
@@ -889,7 +908,8 @@ export function NotesPage({
                 </p>
               </div>
             </div>
-            <div className="min-h-0 flex-1 p-2">
+            <div className="min-h-0 flex-1 overflow-y-auto p-2">
+              <div className="mb-3">{isEditing ? <OrganizationFields folder={draftFolder} tagsText={draftTags} onFolderChange={setDraftFolder} onTagsChange={setDraftTags} items={notes} /> : <OrganizationBadges item={selectedNote} />}</div>
               {isSourceMode ? (
                 <Textarea
                   className="h-full min-h-full resize-none font-mono text-xs"

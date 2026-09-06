@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { OrganizationBadges, OrganizationFields, OrganizationFilters } from '@/components/reader/study-organization';
+import { matchesOrganization, organizationError, parseTags } from '@/lib/study-organization';
+import { useId, useMemo, useState } from "react";
 import {
   Edit3Icon,
   Trash2Icon,
@@ -10,6 +12,8 @@ import {
   bookmarkScopeLabel,
 } from "@/lib/bookmarks";
 import { Button } from "@/components/ui/button";
+import { parseBookmarkLocation } from "@/lib/reference-command";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -35,7 +39,7 @@ export type BookmarksToolProps = {
   books: Book[];
   bookmarks: ReaderBookmark[];
   onOpenBookmark: (bookmark: ReaderBookmark) => void;
-  onUpdateBookmark: (bookmarkId: string, patch: Partial<Pick<ReaderBookmark, "label" | "note">>) => void;
+  onUpdateBookmark: (bookmarkId: string, patch: Partial<Pick<ReaderBookmark, "label" | "note" | "folder" | "tags" | "scope">>) => void;
   onDeleteBookmark: (bookmarkId: string) => void;
 };
 
@@ -50,7 +54,14 @@ export function BookmarksTool({
     () => [...bookmarks].sort((a, b) => b.updatedAt - a.updatedAt),
     [bookmarks],
   );
+  const fieldId = useId();
+  const [draftLocation, setDraftLocation] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [folderFilter, setFolderFilter] = useState("all");
+  const [tagFilter, setTagFilter] = useState("all");
+  const [draftFolder, setDraftFolder] = useState("");
+  const [draftTags, setDraftTags] = useState("");
+  const filteredBookmarks = sortedBookmarks.filter((item) => matchesOrganization(item, folderFilter, tagFilter));
   const [draftLabel, setDraftLabel] = useState("");
   const [draftNote, setDraftNote] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -60,13 +71,19 @@ export function BookmarksTool({
     [editingId, sortedBookmarks],
   );
 
+  const locationChanged = editingBookmark !== null && draftLocation.trim() !== bookmarkScopeLabel(editingBookmark.scope, books);
+  const nextScope = useMemo(() => locationChanged ? parseBookmarkLocation(draftLocation, books) : editingBookmark?.scope ?? null,
+    [books, draftLocation, editingBookmark, locationChanged]);
+  const locationError = editingBookmark && !nextScope ? "Enter a valid chapter, verse, verse selection, or continuous passage range." : null;
+
   return (
     <div className="flex flex-col gap-3">
-      {sortedBookmarks.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No bookmarks yet.</p>
+      <OrganizationFilters className="px-0" items={bookmarks} folder={folderFilter} tag={tagFilter} onFolderChange={setFolderFilter} onTagChange={setTagFilter} />
+      {filteredBookmarks.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{bookmarks.length ? "No bookmarks match these filters." : "No bookmarks yet."}</p>
       ) : (
         <div className="flex flex-col gap-2">
-          {sortedBookmarks.map((bookmark) => (
+          {filteredBookmarks.map((bookmark) => (
             <div key={bookmark.id} className="rounded-md border p-2">
               <div className="flex items-start gap-2">
                 <button
@@ -75,8 +92,10 @@ export function BookmarksTool({
                   onClick={() => onOpenBookmark(bookmark)}
                 >
                   <p className="truncate text-sm font-medium">
-                    {bookmarkScopeLabel(bookmark.scope, books)}
+                    {bookmark.label.trim() || bookmarkScopeLabel(bookmark.scope, books)}
                   </p>
+                  <p className="text-xs text-muted-foreground">Location: {bookmarkScopeLabel(bookmark.scope, books)}</p>
+                  <OrganizationBadges item={bookmark} />
                   <p className="line-clamp-2 pt-1 text-xs text-muted-foreground">
                     {bookmark.note.trim() || "No note"}
                   </p>
@@ -89,6 +108,9 @@ export function BookmarksTool({
                     onClick={() => {
                       setEditingId(bookmark.id);
                       setDraftLabel(bookmark.label);
+                      setDraftLocation(bookmarkScopeLabel(bookmark.scope, books));
+                      setDraftFolder(bookmark.folder ?? "");
+                      setDraftTags((bookmark.tags ?? []).join(", "));
                       setDraftNote(bookmark.note);
                     }}
                     aria-label={`Edit ${bookmark.label}`}
@@ -119,25 +141,29 @@ export function BookmarksTool({
           }
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Edit Bookmark</DialogTitle>
-            <DialogDescription>Update the bookmark label or note.</DialogDescription>
+            <DialogDescription>Edit the display label and the Bible passage this bookmark opens.</DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col gap-2">
-            <Input
-              value={draftLabel}
-              onChange={(event) => setDraftLabel(event.target.value)}
-              placeholder="Bookmark label"
-              maxLength={120}
-            />
-            <Textarea
-              value={draftNote}
-              onChange={(event) => setDraftNote(event.target.value)}
-              placeholder="Optional note"
-              rows={4}
-            />
-          </div>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor={`${fieldId}-label`}>Bookmark label</FieldLabel>
+              <Input id={`${fieldId}-label`} value={draftLabel} onChange={(event) => setDraftLabel(event.target.value)} placeholder="Bookmark label" maxLength={120} />
+              <FieldDescription>A display name for this bookmark.</FieldDescription>
+            </Field>
+            <Field data-invalid={Boolean(locationError)}>
+              <FieldLabel htmlFor={`${fieldId}-location`}>Bookmark location</FieldLabel>
+              <Input id={`${fieldId}-location`} value={draftLocation} onChange={(event) => setDraftLocation(event.target.value)} maxLength={500} aria-invalid={Boolean(locationError)} aria-describedby={`${fieldId}-location-help`} />
+              {locationError ? <FieldError id={`${fieldId}-location-help`}>{locationError}</FieldError> :
+                <FieldDescription id={`${fieldId}-location-help`}>Opens {nextScope ? bookmarkScopeLabel(nextScope, books) : "the selected passage"}.</FieldDescription>}
+            </Field>
+            <Field>
+              <FieldLabel htmlFor={`${fieldId}-note`}>Note</FieldLabel>
+              <Textarea id={`${fieldId}-note`} value={draftNote} onChange={(event) => setDraftNote(event.target.value)} placeholder="Optional note" rows={4} />
+            </Field>
+          </FieldGroup>
+          <OrganizationFields folder={draftFolder} tagsText={draftTags} onFolderChange={setDraftFolder} onTagsChange={setDraftTags} items={bookmarks} />
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setEditingId(null)}>
               Cancel
@@ -145,7 +171,7 @@ export function BookmarksTool({
             <Button
               type="button"
               onClick={() => {
-                if (!editingBookmark) {
+                if (!editingBookmark || !nextScope) {
                   return;
                 }
                 const nextLabel = draftLabel.trim();
@@ -154,11 +180,14 @@ export function BookmarksTool({
                 }
                 onUpdateBookmark(editingBookmark.id, {
                   label: nextLabel,
+                  ...(locationChanged ? { scope: nextScope } : {}),
                   note: draftNote.trim(),
+                  folder: draftFolder.trim(),
+                  tags: parseTags(draftTags),
                 });
                 setEditingId(null);
               }}
-              disabled={!draftLabel.trim()}
+              disabled={!draftLabel.trim() || !nextScope || Boolean(organizationError(draftFolder, draftTags))}
             >
               Save
             </Button>

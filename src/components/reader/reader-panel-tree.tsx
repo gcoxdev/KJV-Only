@@ -281,7 +281,7 @@ export type ReaderPanelTreeProps = {
   onCreateContextNote: (context: NotesContext | null) => string | null;
   onUpdateNote: (
     noteId: string,
-    patch: Partial<Pick<ReaderNote, "title" | "body" | "scope">>,
+    patch: Partial<Pick<ReaderNote, "title" | "body" | "scope" | "folder" | "tags">>,
   ) => void;
   onDeleteNote: (noteId: string) => void;
   onOpenNoteLink: (target: NoteLinkTarget) => void;
