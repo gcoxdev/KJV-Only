@@ -1,3 +1,4 @@
+import { buildOfflineInventory, writeOfflineInventory } from "./scripts/lib/offline-inventory.ts"
 import path from "path"
 import { constants } from "node:fs"
 import fs from "node:fs/promises"
@@ -124,7 +125,17 @@ function runtimePublicAssets(): Plugin {
       urls.filter((url) => OFFLINE_ICON_ASSET_URL_PATTERN.test(url)).sort(),
     )
 
+    let inventoryPromise: ReturnType<typeof buildOfflineInventory> | undefined
     middlewares.use((request, response, next) => {
+      if (request.url?.split(/[?#]/, 1)[0] === "/offline-inventory.json") {
+        inventoryPromise ??= collectGeneratedAssetUrls(publicDirectory, publicDirectory)
+          .then((urls) => buildOfflineInventory(publicDirectory, urls.filter((url) => isAllowedRuntimeFile(url.slice(1)))))
+        void inventoryPromise.then((inventory) => {
+          response.setHeader("content-type", "application/json")
+          response.end(JSON.stringify(inventory))
+        }).catch((error) => { inventoryPromise = undefined; next(error) })
+        return
+      }
       if (request.url?.split(/[?#]/, 1)[0] !== "/app-shell-assets.json") {
         next()
         return
@@ -273,6 +284,7 @@ function runtimePublicAssets(): Plugin {
     async closeBundle() {
       await copyRuntimeEntries()
       await writeAppShellAssetManifest()
+      await writeOfflineInventory(outputDirectory, (await collectGeneratedAssetUrls(outputDirectory)).filter((url) => url !== "/_headers" && url !== "/offline-inventory.json"))
     },
   }
 }

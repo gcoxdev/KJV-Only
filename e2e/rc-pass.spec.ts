@@ -324,7 +324,7 @@ test("downloads, uses, and clears the core offline package", async ({
   await openMainMenuItem(page, "Download")
 
   const coreCard = page
-    .getByText("Core Bible Data", { exact: true })
+    .getByText("Core Bible Data", { exact: true }).filter({ visible: true })
     .locator('xpath=ancestor::*[@data-slot="card"][1]')
   await expect(coreCard).toBeVisible()
   const downloadButton = coreCard.getByRole("button", {
@@ -336,6 +336,9 @@ test("downloads, uses, and clears the core offline package", async ({
   await expect(coreCard.getByText("Fully cached", { exact: true })).toBeVisible({
     timeout: 240_000,
   })
+
+  await coreCard.getByRole("button", { name: "Refresh Bundle", exact: true }).click()
+  await expect(coreCard.getByText("Up to date", { exact: false })).toBeVisible({ timeout: 240_000 })
 
   const offlineReadiness = await page.evaluate(async () => {
     const config = (
@@ -415,11 +418,16 @@ test("downloads, uses, and clears the core offline package", async ({
     JSON.stringify({ browserErrors, offlineDocument }, null, 2),
   ).toBeGreaterThan(0)
   await expectReaderReady(page)
+  await openMainMenuItem(page, "Download")
+  const offlineCoreCard = page.getByText("Core Bible Data", { exact: true }).filter({ visible: true })
+    .locator('xpath=ancestor::*[@data-slot="card"][1]')
+  await expect(offlineCoreCard.getByText("Matches last known version", { exact: false })).toBeVisible()
+  await expect(offlineCoreCard.getByText("Size unavailable", { exact: true })).toHaveCount(0)
   await context.setOffline(false)
 
   await openMainMenuItem(page, "Download")
   const refreshedCoreCard = page
-    .getByText("Core Bible Data", { exact: true })
+    .getByText("Core Bible Data", { exact: true }).filter({ visible: true })
     .locator('xpath=ancestor::*[@data-slot="card"][1]')
   await refreshedCoreCard.getByRole("button", { name: "Clear Bundle" }).click()
   await expect(refreshedCoreCard.getByText("Not downloaded", { exact: true })).toBeVisible()

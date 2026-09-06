@@ -34,6 +34,7 @@ const OFFLINE_ICON_ASSET_URL_PATTERN =
   /^\/icons\/(?:bw|color)\/[A-Za-z0-9][A-Za-z0-9._-]{0,99}\.png$/
 const LIVE_DATA_PREFIXES = ["/references/", "/data/", "/maps/"]
 const NETWORK_FIRST_PATHS = new Set([
+  "/offline-inventory.json",
   "/app-cache-config.js",
   "/app-shell-assets.json",
 ])
@@ -217,6 +218,12 @@ self.addEventListener("fetch", (event) => {
 
   const requestUrl = new URL(event.request.url)
   if (requestUrl.origin !== self.location.origin) {
+    return
+  }
+
+  // Explicit refreshes must reach the server and must fail when offline.
+  if (event.request.cache === "reload") {
+    event.respondWith(fetch(event.request))
     return
   }
 

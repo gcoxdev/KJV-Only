@@ -1,3 +1,4 @@
+import type { StudyOrganization } from '@/lib/study-organization';
 export type BookmarkRange = {
   start: number;
   end: number;
@@ -35,7 +36,7 @@ export type BookmarkScope =
       ranges: BookmarkRange[];
     };
 
-export type ReaderBookmark = {
+export type ReaderBookmark = StudyOrganization & {
   id: string;
   type: BookmarkType;
   scope: BookmarkScope;

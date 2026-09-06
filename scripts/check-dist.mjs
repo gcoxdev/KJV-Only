@@ -11,6 +11,7 @@ const REQUIRED_PATHS = [
   "sw.js",
   "app-cache-config.js",
   "app-shell-assets.json",
+  "offline-inventory.json",
   "data/kjv-bootstrap.json",
   "data/kjv.json",
   "data/kjv-manifest.json",

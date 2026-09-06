@@ -1,3 +1,4 @@
+import type { StudyOrganization } from '@/lib/study-organization';
 export type NotesContext = {
   bookIndex: number;
   chapterIndex: number;
@@ -67,7 +68,7 @@ export type NoteScope =
       word: string;
     };
 
-export type ReaderNote = {
+export type ReaderNote = StudyOrganization & {
   id: string;
   title: string;
   body: string;

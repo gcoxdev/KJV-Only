@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { bookmarkCanonicalKey, bookmarkScopeLabel, normalizeRangePoints } from "@/lib/bookmarks";
+import { isBookmarkScopeAvailable, bookmarkCanonicalKey, bookmarkScopeLabel, normalizeRangePoints } from "@/lib/bookmarks";
 import {
   READER_STORAGE_KEYS,
   readLocalStorageValue,
@@ -126,14 +126,18 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
   const updateBookmark = useCallback(
     (
       bookmarkId: string,
-      patch: Partial<Pick<ReaderBookmark, "label" | "note">>,
+      patch: Partial<Pick<ReaderBookmark, "label" | "note" | "folder" | "tags" | "scope">>,
     ) => {
+      if (patch.scope && !isBookmarkScopeAvailable(patch.scope, books)) return;
       const now = Date.now();
       setReaderBookmarks((current) =>
         current.map((bookmark) =>
           bookmark.id === bookmarkId
             ? {
                 ...bookmark,
+                ...(patch.scope ? { scope: patch.scope, type: patch.scope.type } : null),
+                ...(patch.folder !== undefined ? { folder: patch.folder.trim() } : null),
+                ...(patch.tags !== undefined ? { tags: patch.tags } : null),
                 ...(patch.label !== undefined
                   ? { label: patch.label.trim() }
                   : null),
@@ -144,7 +148,7 @@ export function useReaderBookmarks({ books }: UseReaderBookmarksArgs) {
         ),
       );
     },
-    [],
+    [books],
   );
 
   const deleteBookmark = useCallback((bookmarkId: string) => {
