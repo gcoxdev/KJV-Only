@@ -29,6 +29,12 @@ const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 
+type SidebarStyle = React.CSSProperties & {
+  "--sidebar-width"?: string;
+  "--sidebar-width-mobile"?: string;
+  "--sidebar-width-icon"?: string;
+};
+
 type SidebarContextProps = {
   state: "expanded" | "collapsed";
   open: boolean;
@@ -36,6 +42,7 @@ type SidebarContextProps = {
   openMobile: boolean;
   setOpenMobile: (open: boolean) => void;
   isMobile: boolean;
+  mobileWidth: string;
   toggleSidebar: () => void;
 };
 
@@ -66,8 +73,10 @@ function SidebarProvider({
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  style?: SidebarStyle;
 }) {
   const isMobile = useIsMobile();
+  const mobileWidth = style?.["--sidebar-width-mobile"] ?? SIDEBAR_WIDTH_MOBILE;
   const [openMobile, setOpenMobile] = React.useState(false);
 
   // This is the internal state of the sidebar.
@@ -104,11 +113,12 @@ function SidebarProvider({
       open,
       setOpen,
       isMobile,
+      mobileWidth,
       openMobile,
       setOpenMobile,
       toggleSidebar,
     }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar],
+    [state, open, setOpen, isMobile, mobileWidth, openMobile, setOpenMobile, toggleSidebar],
   );
 
   return (
@@ -148,7 +158,7 @@ function Sidebar({
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
 }) {
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+  const { isMobile, mobileWidth, state, openMobile, setOpenMobile } = useSidebar();
 
   if (collapsible === "none") {
     return (
@@ -173,10 +183,11 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="data-[side=left]:w-(--sidebar-width)! data-[side=right]:w-(--sidebar-width)! data-[side=left]:max-w-none data-[side=right]:max-w-none bg-sidebar p-0 text-sidebar-foreground [&>[data-slot=sheet-close]]:hidden"
+          className="data-[side=left]:w-(--sidebar-width)! data-[side=right]:w-(--sidebar-width)! data-[side=left]:max-w-none! data-[side=right]:max-w-none! bg-sidebar p-0 text-sidebar-foreground [&>[data-slot=sheet-close]]:hidden"
           style={
             {
-              "--sidebar-width": "var(--sidebar-width-mobile)",
+              // The sheet is portaled outside the provider's DOM subtree.
+              "--sidebar-width": mobileWidth,
             } as React.CSSProperties
           }
           side={side}

@@ -2281,7 +2281,7 @@ export function KJVReader() {
         style={
           {
             "--sidebar-width": "24rem",
-            "--sidebar-width-mobile": "94vw",
+            "--sidebar-width-mobile": "var(--reader-sidebar-width-mobile)",
           } as React.CSSProperties
         }
       >

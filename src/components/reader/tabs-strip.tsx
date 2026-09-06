@@ -410,11 +410,10 @@ export function TabsStrip({
     >
       <div
         className={cn(
-          "p-2.5",
           touchMoveTabId && "touch-none select-none",
           tabsOrientation === "vertical"
-            ? "flex flex-col items-stretch gap-2"
-            : "flex w-max items-center gap-2",
+            ? "flex flex-col items-stretch gap-2 p-2.5"
+            : "flex w-max items-center gap-2 p-2",
         )}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}

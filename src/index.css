@@ -6,6 +6,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+    --reader-sidebar-width-mobile: calc(100dvw - 2rem);
     --workspace-chrome: oklch(0.974 0.013 85.24);
     --workspace-panel: oklch(0.991 0.006 78.41);
     --workspace-panel-elevated: oklch(0.998 0.004 82.22);
@@ -48,6 +49,12 @@
     --sidebar-accent-foreground: oklch(0.272 0.026 39.1);
     --sidebar-border: oklch(0.9 0.015 78.92);
     --sidebar-ring: oklch(0.672 0.066 56.11);
+}
+
+@media (orientation: landscape) {
+    :root {
+        --reader-sidebar-width-mobile: 50dvw;
+    }
 }
 
 .dark {
