@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   isGenealogyCandidateWord,
@@ -57,4 +57,25 @@ describe("isGenealogyCandidateWord", () => {
   it("rejects words that cannot match a genealogy entry", () => {
     expect(isGenealogyCandidateWord(compact, "beginning")).toBe(false);
   });
+});
+
+it("rejects old cached genealogy references and allows a retry with the corrected bundle", async () => {
+  vi.resetModules();
+  const { loadGenealogy, GENEALOGY_ASSET_VERSION } = await import("@/lib/reader-data");
+  const payload = { v: [], w: [], p: [] };
+  const fetchMock = vi.fn()
+    .mockResolvedValueOnce(Response.json({ ...payload, x: "20260824-build-1" }))
+    .mockResolvedValueOnce(Response.json({ ...payload, x: GENEALOGY_ASSET_VERSION }));
+  vi.stubGlobal("fetch", fetchMock);
+  try {
+    await expect(loadGenealogy()).rejects.toThrow("Genealogy data needs an update");
+    await expect(loadGenealogy()).resolves.toEqual([]);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      `/references/genealogy.compact.min.json?v=${GENEALOGY_ASSET_VERSION}`,
+      { cache: "no-cache" },
+    );
+  } finally {
+    vi.unstubAllGlobals();
+  }
 });

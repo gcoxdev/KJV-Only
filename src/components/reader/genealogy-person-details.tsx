@@ -1,3 +1,4 @@
+import { PERSON_REFERENCE_REVIEWS } from "@/lib/person-place-corrections";
 import { Fragment, type ReactNode } from "react";
 import { NetworkIcon } from "lucide-react";
 
@@ -35,6 +36,7 @@ export function GenealogyPersonDetails({
     count > 1 ? `${label} (${count})` : label;
   const primaryName = person.names[0] ?? person.id;
   const byName = person.verses?.byName ?? [];
+  const partialReferenceReview = PERSON_REFERENCE_REVIEWS[person.id]?.excludedReferences;
   const spouses = Array.isArray(person.spouses) ? person.spouses : [];
   const siblings = Array.isArray(person.siblings) ? person.siblings : [];
   const children = Array.isArray(person.children) ? person.children : [];
@@ -95,6 +97,11 @@ export function GenealogyPersonDetails({
                   </span>
                 </AccordionTrigger>
                 <AccordionContent>
+                  {partialReferenceReview ? (
+                    <p className="mb-2 text-xs text-muted-foreground">
+                      Some references may concern the people or territory named after this person.
+                    </p>
+                  ) : null}
                   <ToolReferenceList
                     references={entry.verses}
                     highlightWord={entry.name}
@@ -112,6 +119,9 @@ export function GenealogyPersonDetails({
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Lineage
         </p>
+        {!fatherName && !motherName && spouses.length === 0 && siblings.length === 0 && children.length === 0 ? (
+          <p className="text-muted-foreground">Family not recorded.</p>
+        ) : null}
         {fatherName ? (
           <p>
             <span className="font-semibold">Father:</span>{" "}

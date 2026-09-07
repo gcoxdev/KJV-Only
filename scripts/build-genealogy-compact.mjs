@@ -11,11 +11,10 @@ function resolveInputPath(...candidates) {
 }
 
 const inputPath = resolveInputPath(
-  "public/references/genealogy.json",
-  "public/delete/public/references/genealogy.json",
+  "data-sources/genealogy.json",
 );
 const outputPath = path.resolve("public/references/genealogy.compact.min.json");
-const reportPath = path.resolve("public/references/genealogy.build-report.json");
+const reportPath = path.resolve(".generated/genealogy.build-report.json");
 const BOOK_ORDER = [
   "GEN",
   "EXO",
@@ -267,6 +266,7 @@ writeJson(outputPath, compact);
 const outputSize = fs.statSync(outputPath).size;
 const inputSize = fs.statSync(inputPath).size;
 
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 writeJson(reportPath, {
   inputPath: path.relative(process.cwd(), inputPath),
   outputPath: path.relative(process.cwd(), outputPath),

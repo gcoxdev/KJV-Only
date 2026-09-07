@@ -36,6 +36,8 @@ export const CORE_OFFLINE_URLS = [
   "/icons/app-logo.png",
   "/icons/app-icon-512.png",
   "/icons/app-icon-maskable.png",
+  "/icons/pwa-icon-192-transparent.png",
+  "/icons/pwa-icon-512-transparent.png",
   "/icons/apple-touch-icon.png",
   "/icons/favicon.png",
   "/data/kjv-manifest.json",

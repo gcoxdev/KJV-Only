@@ -11,14 +11,17 @@ export function genealogyPersonContext(person: GenealogyPerson) {
   if (parts.length < 2) {
     const spouses = relationNames(person.spouses);
     const children = relationNames(person.children);
+    const siblings = relationNames(person.siblings);
     if (spouses) parts.push(`Spouse: ${spouses}`);
     else if (children) parts.push(`Children: ${children}`);
+    else if (siblings) parts.push(`Siblings: ${siblings}`);
   }
+  if (parts.length === 0) parts.push("Family not recorded");
   const firstReference = person.verses?.first ?? person.verses?.byName?.[0]?.verses[0];
   if (firstReference) {
     parts.push(`Name reference: ${firstReference.replace(/^([^.]+)\.(\d+)\.(\d+)$/, "$1 $2:$3")}`);
   }
-  return parts.join(" · ") || "No family or reference details recorded";
+  return parts.join(" · ");
 }
 
 // Preserve different recorded families when deduplicating name/reference matches.

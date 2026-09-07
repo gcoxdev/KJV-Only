@@ -44,8 +44,8 @@ describe("genealogy result context", () => {
     const person = { id: "one", names: ["Person"] };
     expect(genealogyPersonContext({ ...person, spouses: [{ id: "two", name: "Spouse" }] })).toBe("Spouse: Spouse");
     expect(genealogyPersonContext({ ...person, children: [{ id: "two", name: "Child" }] })).toBe("Children: Child");
-    expect(genealogyPersonContext(person)).toBe("No family or reference details recorded");
-    expect(genealogyPersonContext({ ...person, verses: { first: "GEN.1.2" } })).toBe("Name reference: GEN 1:2");
+    expect(genealogyPersonContext(person)).toBe("Family not recorded");
+    expect(genealogyPersonContext({ ...person, verses: { first: "GEN.1.2" } })).toBe("Family not recorded · Name reference: GEN 1:2");
   });
 });
 

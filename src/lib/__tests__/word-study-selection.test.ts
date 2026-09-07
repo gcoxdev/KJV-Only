@@ -155,12 +155,15 @@ describe("word-study payload matching", () => {
     },
   ];
 
-  it("ranks current-reference, verse-backed, then exact-name genealogy matches", () => {
+  it("limits verse selections to supported people and keeps name-only discovery", () => {
     expect(
       findGenealogyMatches(genealogy, "Adam", "GEN.1.1").map(
         (person) => person.id,
       ),
-    ).toEqual(["current", "frequent", "exact"]);
+    ).toEqual(["current"]);
+    expect(findGenealogyMatches(genealogy, "Adam", "GEN.2.7").map(person => person.id)).toEqual(["frequent"]);
+    expect(findGenealogyMatches(genealogy, "Adam", "GEN.9.1")).toEqual([]);
+    expect(findGenealogyMatches(genealogy, "Adam").map(person => person.id)).toEqual(["frequent", "current", "exact"]);
     expect(findGenealogyMatches(genealogy, "nobody")).toEqual([]);
   });
 
@@ -192,7 +195,7 @@ describe("word-study payload matching", () => {
       translations: ["Adam"],
       modern_names: [],
       types: ["person"],
-      verses: [],
+      verses: ["GEN.1.1"],
       geojson_file: "adam.geojson",
     };
 

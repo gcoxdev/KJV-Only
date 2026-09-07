@@ -1,6 +1,8 @@
 import type { MapAreaBounds } from "./map-area.ts";
 
 export type AncientMapEntry = {
+  /** Transient study-selection annotation; never stored in the map corpus. */
+  selectionNote?: string;
   bounds?: MapAreaBounds[];
   verses: string[];
   translations: string[];

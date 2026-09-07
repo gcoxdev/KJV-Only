@@ -1,3 +1,4 @@
+import { applyGenealogyReferenceCorrections } from "./genealogy-reference-corrections.ts";
 import { chapterVerseKey, normalizeConcordanceWord } from "./references.ts";
 import type { Book } from "../types/bible.ts";
 import type {
@@ -9,7 +10,7 @@ import type {
   GenealogyVerseByName,
 } from "../types/reader.ts";
 
-export const GENEALOGY_ENRICHMENT_VERSION = "20260824-build-1";
+export const GENEALOGY_ENRICHMENT_VERSION = "20260907-person-place-2";
 
 function expandDelta(values: number[]) {
   let runningTotal = 0;
@@ -106,10 +107,15 @@ function collapseGenealogyNameVariant(rawName: string) {
   return normalizeConcordanceWord(rawName).toLowerCase().replace(/-/g, "");
 }
 
-type MutableReferenceData = {
-  verses: string[];
-  occurrences: number;
-};
+type MutableReferenceData = Map<string, number>;
+
+function referencesForPerson(data: MutableReferenceData, references: Set<string>) {
+  const verses = [...data.keys()].filter(reference => references.has(reference));
+  return {
+    verses,
+    occurrences: verses.reduce((count, reference) => count + (data.get(reference) ?? 0), 0),
+  };
+}
 
 function collectGenealogyCorpusData(
   books: Book[],
@@ -132,15 +138,13 @@ function collectGenealogyCorpusData(
     string,
     {
       displayForms: Map<string, number>;
-      verses: string[];
-      occurrences: number;
     }
   >();
-  const jesus: MutableReferenceData = { verses: [], occurrences: 0 };
-  const christ: MutableReferenceData = { verses: [], occurrences: 0 };
-  const jesusChrist: MutableReferenceData = { verses: [], occurrences: 0 };
-  const immanuel: MutableReferenceData = { verses: [], occurrences: 0 };
-  const emmanuel: MutableReferenceData = { verses: [], occurrences: 0 };
+  const jesus: MutableReferenceData = new Map();
+  const christ: MutableReferenceData = new Map();
+  const jesusChrist: MutableReferenceData = new Map();
+  const immanuel: MutableReferenceData = new Map();
+  const emmanuel: MutableReferenceData = new Map();
 
   for (let bookIndex = 0; bookIndex < books.length; bookIndex += 1) {
     const book = books[bookIndex];
@@ -170,13 +174,9 @@ function collectGenealogyCorpusData(
               normalizedWord,
               (existing.displayForms.get(normalizedWord) ?? 0) + 1,
             );
-            existing.verses.push(reference);
-            existing.occurrences += 1;
           } else {
             index.set(collapsed, {
               displayForms: new Map([[normalizedWord, 1]]),
-              verses: [reference],
-              occurrences: 1,
             });
           }
         }
@@ -213,8 +213,7 @@ function collectGenealogyCorpusData(
           [emmanuel, emmanuelInVerse],
         ] as Array<[MutableReferenceData, number]>) {
           if (occurrences > 0) {
-            data.occurrences += occurrences;
-            data.verses.push(reference);
+            data.set(reference, occurrences);
           }
         }
       }
@@ -266,15 +265,13 @@ function canonicalizeGenealogyPersonNames(
     const matchingEntries = sourceByName.filter(
       (entry) => collapseGenealogyNameVariant(entry.name) === collapsed,
     );
-    const verses = tokenData
-      ? dedupeReferences(tokenData.verses)
-      : dedupeReferences(matchingEntries.flatMap((entry) => entry.verses));
-    const numOccurrences = tokenData
-      ? tokenData.occurrences
-      : Math.max(
-          ...matchingEntries.map((entry) => entry.numOccurrences ?? entry.verses.length),
-          0,
-        );
+    // Corpus spellings may normalize a name, but a word occurrence is not
+    // evidence that it refers to this person rather than a namesake or place.
+    const verses = dedupeReferences(matchingEntries.flatMap((entry) => entry.verses));
+    const numOccurrences = Math.max(
+      ...matchingEntries.map((entry) => entry.numOccurrences ?? entry.verses.length),
+      verses.length,
+    );
 
     if (verses.length > 0) {
       upsertByNameEntry(canonicalByName, {
@@ -301,7 +298,7 @@ function canonicalizeGenealogyPersonNames(
               0,
             ) || undefined,
           totalVerses: totalVerses.length || undefined,
-          first: totalVerses[0] ?? person.verses.first,
+          first: person.verses.first ?? totalVerses[0],
         }
       : person.verses,
   };
@@ -472,21 +469,24 @@ export function enrichGenealogyPayload(
   people: GenealogyPayload,
   books: Book[],
 ): GenealogyPayload {
-  const {
-    tokenVariantIndex,
-    jesus: jesusData,
-    christ: christData,
-    jesusChrist: jesusChristData,
-    immanuel: immanuelData,
-    emmanuel: emmanuelData,
-  } = collectGenealogyCorpusData(books, people);
+  people = applyGenealogyReferenceCorrections(people, books);
+  const corpusData = collectGenealogyCorpusData(books, people);
 
   return people.map((person) => {
-    const canonicalPerson = canonicalizeGenealogyPersonNames(person, tokenVariantIndex);
+    const canonicalPerson = canonicalizeGenealogyPersonNames(person, corpusData.tokenVariantIndex);
 
     if (!canonicalPerson.names.includes("Jesus Christ")) {
       return canonicalPerson;
     }
+
+    // Split titles/aliases only within this record's supported passages.
+    // Other people named Jesus must not be absorbed into these buckets.
+    const references = new Set((person.verses?.byName ?? []).flatMap(entry => entry.verses));
+    const jesusData = referencesForPerson(corpusData.jesus, references);
+    const christData = referencesForPerson(corpusData.christ, references);
+    const jesusChristData = referencesForPerson(corpusData.jesusChrist, references);
+    const immanuelData = referencesForPerson(corpusData.immanuel, references);
+    const emmanuelData = referencesForPerson(corpusData.emmanuel, references);
 
     const byName = [...(canonicalPerson.verses?.byName ?? [])].filter(
       (entry) => !["Jesus", "Christ", "Jesus Christ"].includes(entry.name),
@@ -528,9 +528,7 @@ export function enrichGenealogyPayload(
       upsertByNameEntry(byName, {
         name: "Immanuel",
         verses,
-        numOccurrences:
-          (existingImmanuelEntry?.numOccurrences ?? 0) + immanuelData.occurrences ||
-          undefined,
+        numOccurrences: Math.max(existingImmanuelEntry?.numOccurrences ?? 0, immanuelData.occurrences) || undefined,
         numVerses: verses.length,
       });
     }
@@ -544,9 +542,7 @@ export function enrichGenealogyPayload(
       upsertByNameEntry(byName, {
         name: "Emmanuel",
         verses,
-        numOccurrences:
-          (existingEmmanuelEntry?.numOccurrences ?? 0) + emmanuelData.occurrences ||
-          undefined,
+        numOccurrences: Math.max(existingEmmanuelEntry?.numOccurrences ?? 0, emmanuelData.occurrences) || undefined,
         numVerses: verses.length,
       });
     }
@@ -562,7 +558,9 @@ export function enrichGenealogyPayload(
       });
     }
 
-    const nextJesusChristEntry = byName.find((entry) => entry.name === "Jesus Christ");
+    const allReferences = dedupeReferences(byName.flatMap(entry => entry.verses));
+    const totalOccurrences = jesusData.occurrences + christData.occurrences +
+      jesusChristData.occurrences + immanuelData.occurrences + emmanuelData.occurrences;
 
     return {
       ...person,
@@ -570,9 +568,9 @@ export function enrichGenealogyPayload(
       verses: {
         byName,
         totalOccurrences:
-          nextJesusChristEntry?.numOccurrences || canonicalPerson.verses?.totalOccurrences || undefined,
-        totalVerses: combinedVerses.length || canonicalPerson.verses?.totalVerses || undefined,
-        first: combinedVerses[0] ?? canonicalPerson.verses?.first,
+          totalOccurrences || canonicalPerson.verses?.totalOccurrences || undefined,
+        totalVerses: allReferences.length || undefined,
+        first: canonicalPerson.verses?.first ?? allReferences[0],
       },
     };
   });

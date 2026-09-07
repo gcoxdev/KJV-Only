@@ -22,6 +22,7 @@ type MapsDisplayEntry = {
 };
 
 type MapsToolProps = {
+  selectionNotice?: string | null;
   hasInfo: boolean;
   isOpen: boolean;
   isLoading: boolean;
@@ -82,6 +83,7 @@ function buildReferences(entries: MapsDisplayEntry[]) {
 }
 
 export function MapsTool({
+  selectionNotice,
   hasInfo,
   isOpen,
   isLoading,
@@ -126,6 +128,9 @@ export function MapsTool({
               allowReset
               onSearch={onSearch}
             />
+            {!searchTerm.trim() && !isLoading && !isSearching && !error && resultsLength > 0 && selectionNotice ? (
+              <p className="text-sm text-muted-foreground">{selectionNotice}</p>
+            ) : null}
             {isLoading || isSearching ? (
               <p className="flex items-center gap-2 text-sm text-muted-foreground">
                 <LoaderCircleIcon className="size-4 animate-spin" />
@@ -160,6 +165,9 @@ export function MapsTool({
                           Open Map
                         </Button>
                         <span className="font-medium">{title}</span>
+                        {entry.selectionNote ? (
+                          <p className="w-full text-xs text-muted-foreground">{entry.selectionNote}</p>
+                        ) : null}
                         {entry.types.length > 0 ? (
                           <span className="text-xs text-muted-foreground">
                             {entry.types.join(", ")}

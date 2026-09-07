@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { StudySearchForm } from "@/components/reader/study-search-form";
 
 type GenealogyToolProps = {
+  selectionNotice?: string | null;
   hasInfo: boolean;
   isOpen: boolean;
   isLoading: boolean;
@@ -26,6 +27,7 @@ type GenealogyToolProps = {
 };
 
 export function GenealogyTool({
+  selectionNotice,
   hasInfo,
   isOpen,
   isLoading,
@@ -62,6 +64,9 @@ export function GenealogyTool({
               allowReset
               onSearch={onSearch}
             />
+            {!searchTerm.trim() && !isLoading && !isSearching && !error && results.length > 0 && selectionNotice ? (
+              <p className="text-sm text-muted-foreground">{selectionNotice}</p>
+            ) : null}
             {isLoading || isSearching ? (
               <p className="flex items-center gap-2 text-sm text-muted-foreground">
                 <LoaderCircleIcon className="size-4 animate-spin" />

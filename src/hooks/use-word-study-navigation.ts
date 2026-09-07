@@ -5,7 +5,7 @@ import {
   normalizeConcordanceWord,
   resolveTokenStrongsCodes,
 } from "@/lib/references";
-import { resolveWordTokenAtLocation } from "@/lib/word-study-selection";
+import { resolveWordTokenAtLocation, type TokenAccordionOptions } from "@/lib/word-study-selection";
 import type {
   CrossRefsPayload,
   StudyToolsDestination,
@@ -78,12 +78,7 @@ type UseWordStudyNavigationParams = {
   setActiveReaderWordHighlight: (value: ReaderWordHighlight | null) => void;
   syncTokenAccordionState: (
     rawWord: string,
-    options?: {
-      verseNumber?: number | null;
-      bookIndex?: number;
-      chapterIndex?: number;
-      strongCodes?: string[];
-    },
+    options?: TokenAccordionOptions,
   ) => void;
   openWordInStudyTools: (args: {
     rawWord: string;
@@ -275,6 +270,8 @@ export function useWordStudyNavigation({
             bookIndex: target.bookIndex,
             chapterIndex: target.chapterIndex,
             verseNumber: target.verseNumber,
+            tokenIndex: matchedToken?.tokenIndex ?? null,
+            verseTokens: books[target.bookIndex]?.chapters[target.chapterIndex]?.verses.find(verse => verse.verse === target.verseNumber)?.tokens,
             strongCodes,
           });
         }

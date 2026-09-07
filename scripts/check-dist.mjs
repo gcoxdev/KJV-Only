@@ -20,6 +20,8 @@ const REQUIRED_PATHS = [
   "icons/app-logo.png",
   "icons/app-icon-512.png",
   "icons/app-icon-maskable.png",
+  "icons/pwa-icon-192-transparent.png",
+  "icons/pwa-icon-512-transparent.png",
   "icons/apple-touch-icon.png",
   "icons/favicon.png",
   "topics/daily-scripture-topics.json",

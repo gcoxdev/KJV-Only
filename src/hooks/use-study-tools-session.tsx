@@ -578,7 +578,7 @@ export function useStudyToolsSession({
     ],
   );
 
-  const { openWordInStudyTools } = useWordStudyCoordinator({
+  const { openWordInStudyTools, personPlaceNotice } = useWordStudyCoordinator({
     books,
     concordance,
     websters,
@@ -686,7 +686,7 @@ export function useStudyToolsSession({
       oldEnglishSearchResults.length +
       phrasesSearchResults.length +
       unitsSearchResults.length,
-    mapsCount: mapsSearchResults.length,
+    mapsCount: mapsSearchResults.filter(entry => !entry.selectionNote).length,
     hitchcocksCount: hitchcocksSearchResults.length,
     genealogyCount: genealogySearchResults.length,
   });
@@ -803,6 +803,7 @@ export function useStudyToolsSession({
       onSearch: applyBibleWordBookSearch,
     },
     mapsProps: {
+      selectionNotice: personPlaceNotice,
       hasInfo: sidebarState.hasMapsInfo,
       isOpen: sidebarState.isMapsSectionOpen,
       isLoading: isMapsLoading,
@@ -818,6 +819,7 @@ export function useStudyToolsSession({
       onCloseSidebar,
     },
     genealogyProps: {
+      selectionNotice: personPlaceNotice,
       hasInfo: sidebarState.hasGenealogyInfo,
       isOpen: sidebarState.isGenealogySectionOpen,
       isLoading: isGenealogyLoading,

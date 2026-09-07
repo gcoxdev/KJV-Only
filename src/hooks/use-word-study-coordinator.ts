@@ -1,4 +1,5 @@
-import { useRef, type RefObject } from "react";
+import { resolvePersonPlaceContext, AMBIGUOUS_PERSON_PLACE_NOTICE } from "@/lib/person-place-context";
+import { useRef, useState, type RefObject } from "react";
 
 import { STUDY_ACCORDION_ITEMS } from "@/hooks/use-study-sidebar-state";
 import type { AncientMapEntry, AncientMapPayload } from "@/lib/maps";
@@ -221,6 +222,7 @@ export function useWordStudyCoordinator({
   strongsSearchInputRef,
 }: WordStudyCoordinatorParams) {
   const requestIdRef = useRef(0);
+  const [personPlaceNotice, setPersonPlaceNotice] = useState<string | null>(null);
 
   function openWordInStudyTools(selection: OpenWordInStudyToolsArgs) {
     const {
@@ -245,6 +247,7 @@ export function useWordStudyCoordinator({
       return selectionTarget;
     }
 
+    setPersonPlaceNotice(null);
     const requestId = ++requestIdRef.current;
     const isCurrentRequest = () => requestIdRef.current === requestId;
     const finishConcordanceMeasure = beginPerformanceMeasure(
@@ -521,24 +524,23 @@ export function useWordStudyCoordinator({
       }
     });
 
-    void genealogyPromise.then((data) => {
-      if (!data || !isCurrentRequest()) return;
-      const referenceKey =
-        verseNumber !== null
-          ? chapterVerseKey(bookIndex, chapterIndex, verseNumber)
-          : null;
-      const matches = findGenealogyMatches(data, rawWord, referenceKey);
-      setSelectedGenealogyIds(matches.map((person) => person.id));
-      updateAccordionMatch("genealogy", matches.length > 0);
-      if (matches.length > 0) finishFirstToolsMeasure();
-    });
-
-    void ancientMapsPromise.then((data) => {
-      if (!data || !isCurrentRequest()) return;
-      const matches = findMapMatches(data, rawWord);
-      setSelectedMapsEntries(matches);
-      updateAccordionMatch("maps", matches.length > 0);
-      if (matches.length > 0) finishFirstToolsMeasure();
+    void Promise.all([genealogyPromise, ancientMapsPromise]).then(([people, maps]) => {
+      if (!isCurrentRequest()) return;
+      const referenceKey = verseNumber !== null
+        ? chapterVerseKey(bookIndex, chapterIndex, verseNumber) : null;
+      const tokens = verseNumber !== null
+        ? books[bookIndex]?.chapters[chapterIndex]?.verses.find(verse => verse.verse === verseNumber)?.tokens : null;
+      const context = resolvePersonPlaceContext(rawWord, referenceKey, normalizedStrongCodes, tokens, tokenIndex);
+      const personMatches = findGenealogyMatches(people, rawWord, referenceKey, context);
+      const mapMatches = findMapMatches(maps, rawWord, context, personMatches);
+      const supportedMaps = mapMatches.filter(entry => !entry.selectionNote);
+      const ambiguous = personMatches.length > 0 && (context.ambiguous || (!context.sense && supportedMaps.length > 0));
+      setPersonPlaceNotice(referenceKey && ambiguous ? AMBIGUOUS_PERSON_PLACE_NOTICE : null);
+      setSelectedGenealogyIds(personMatches.map(person => person.id));
+      setSelectedMapsEntries(mapMatches);
+      updateAccordionMatch("genealogy", personMatches.length > 0);
+      updateAccordionMatch("maps", supportedMaps.length > 0);
+      if (personMatches.length || supportedMaps.length) finishFirstToolsMeasure();
     });
 
     if (normalizedStrongCodes.length > 0 && strongsPromise) {
@@ -570,5 +572,5 @@ export function useWordStudyCoordinator({
     return selectionTarget ?? undefined;
   }
 
-  return { openWordInStudyTools };
+  return { openWordInStudyTools, personPlaceNotice };
 }

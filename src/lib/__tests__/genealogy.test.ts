@@ -224,9 +224,9 @@ describe("decodeGenealogyPayload", () => {
     ]);
   });
 
-  it("adds Christ-only token references to Jesus Christ labels", () => {
+  it("adds Christ-only labels within the person’s supported references", () => {
     const compact: GenealogyCompactPayload = {
-      v: ["MAT.1.1"],
+      v: ["GEN.1.8"],
       w: ["Jesus Christ", "Jesus"],
       p: [
         [
@@ -272,7 +272,7 @@ describe("decodeGenealogyPayload", () => {
       ]),
     );
     expect(decoded.verses?.byName?.find((entry) => entry.name === "Jesus Christ")).toBeUndefined();
-    expect(decoded.verses?.first).toBe("MAT.1.1");
+    expect(decoded.verses?.first).toBe("GEN.1.8");
   });
 
   it("canonicalizes Bath-sheba and Bath-shua from the Bible text", () => {
@@ -345,17 +345,10 @@ describe("decodeGenealogyPayload", () => {
         verses: [
           "2SA.11.3",
           "2SA.12.24",
-          "1KI.1.11",
-          "1KI.1.15",
-          "1KI.1.16",
-          "1KI.1.28",
-          "1KI.1.31",
-          "1KI.2.13",
-          "1KI.2.18",
-          "1KI.2.19",
+          "1CH.3.5",
         ],
-        numOccurrences: 10,
-        numVerses: 10,
+        numOccurrences: 11,
+        numVerses: 3,
       },
       {
         name: "Bath-shua",
@@ -368,7 +361,7 @@ describe("decodeGenealogyPayload", () => {
 
   it("keeps Jesus, Christ, and Jesus Christ references in separate buckets", () => {
     const compact: GenealogyCompactPayload = {
-      v: ["MAT.1.1"],
+      v: ["GEN.1.8", "GEN.1.9", "GEN.1.10"],
       w: ["Jesus Christ", "Jesus"],
       p: [
         [
@@ -376,7 +369,7 @@ describe("decodeGenealogyPayload", () => {
           [0],
           "male",
           [
-            [[1, [0], 1, 1]],
+            [[1, [0, 1, 1], 3, 3]],
             1,
             1,
             0,

@@ -1,3 +1,4 @@
+import { resolvePersonPlaceContext, type PersonPlaceContext } from "@/lib/person-place-context";
 import type { Book, VerseToken } from "@/types/bible";
 import type { AncientMapEntry, AncientMapPayload } from "@/lib/maps";
 import {
@@ -51,6 +52,8 @@ export type TokenAccordionOptions = {
   bookIndex?: number;
   chapterIndex?: number;
   strongCodes?: string[];
+  verseTokens?: VerseToken[] | null;
+  tokenIndex?: number | null;
   concordanceData?: ConcordancePayload | null;
   webstersData?: WebstersPayload | null;
   aiDictionaryData?: AIDictionaryPayload | null;
@@ -256,8 +259,9 @@ export function findGenealogyMatches(
   people: GenealogyPayload | null | undefined,
   rawWord: string,
   referenceKey?: string | null,
+  context?: PersonPlaceContext,
 ): GenealogyPerson[] {
-  if (!people) {
+  if (!people || context?.sense === "place" || context?.sense === "people") {
     return [];
   }
 
@@ -279,6 +283,10 @@ export function findGenealogyMatches(
       byNameMatches.some((entry) =>
         entry.verses.includes(referenceKey ?? ""),
       );
+
+    // A study-word click supplies a verse. Name-only discovery remains available
+    // without that context, but must not imply that every namesake is in it.
+    if (referenceKey && !currentReferenceMatch) continue;
 
     let rank = 0;
     if (currentReferenceMatch) {
@@ -328,6 +336,8 @@ export function findGenealogyMatches(
 export function findMapMatches(
   entries: AncientMapPayload | null | undefined,
   rawWord: string,
+  context?: PersonPlaceContext,
+  personMatches: GenealogyPerson[] = [],
 ): AncientMapEntry[] {
   if (!entries) {
     return [];
@@ -336,7 +346,19 @@ export function findMapMatches(
   if (!targetWord) {
     return [];
   }
-  return [...(mapEntriesByTranslation(entries).get(targetWord) ?? [])];
+  const matches = mapEntriesByTranslation(entries).get(targetWord) ?? [];
+  if (!context?.referenceKey) return [...matches];
+  if (context.sense === "person") return [];
+  const supported = matches.filter(entry => context.mapIds
+    ? context.mapIds.includes(entry.geojson_file)
+    : entry.verses.includes(context.referenceKey!));
+  if (supported.length) return supported;
+  // A supported person with no place evidence must not turn into a city. For
+  // unresolved ancestral/group names keep a clearly labeled name-only fallback.
+  if (personMatches.length && !context.ambiguous && !context.sense) return [];
+  return matches.map(entry => ({ ...entry,
+    selectionNote: "Same name; location not verified for this verse.",
+  }));
 }
 
 export function deriveTokenAccordionState(
@@ -398,7 +420,13 @@ export function deriveTokenAccordionState(
     }
   }
 
-  if (findMapMatches(options.ancientMapsData, rawWord).length > 0) {
+  const referenceKey =
+    (options.verseNumber ?? null) !== null
+      ? chapterVerseKey(options.bookIndex ?? 0, options.chapterIndex ?? 0, options.verseNumber ?? 1)
+      : null;
+  const context = resolvePersonPlaceContext(rawWord, referenceKey, options.strongCodes, options.verseTokens, options.tokenIndex);
+  const people = findGenealogyMatches(options.genealogyData, rawWord, referenceKey, context);
+  if (findMapMatches(options.ancientMapsData, rawWord, context, people).some(entry => !entry.selectionNote)) {
     nextAccordion.push("maps");
   }
 
@@ -418,18 +446,7 @@ export function deriveTokenAccordionState(
     nextAccordion.push("kjv-words-phrases");
   }
 
-  const referenceKey =
-    (options.verseNumber ?? null) !== null
-      ? chapterVerseKey(
-          options.bookIndex ?? 0,
-          options.chapterIndex ?? 0,
-          options.verseNumber ?? 1,
-        )
-      : null;
-  if (
-    findGenealogyMatches(options.genealogyData, rawWord, referenceKey).length >
-    0
-  ) {
+  if (people.length > 0) {
     nextAccordion.push("genealogy");
   }
 

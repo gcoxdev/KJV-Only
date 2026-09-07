@@ -15,6 +15,38 @@ async function expandTool(page: Page, name: string) {
 test.use({ serviceWorkers: "block" });
 
 for (const width of [375, 1280]) {
+  test(`keeps Eden's garden and person references distinct at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await page.getByRole("button", { name: "Genesis 1", exact: true }).click();
+    await page.getByLabel("Next chapter").first().click();
+    await page.getByRole("button", { name: "Details for Eden", exact: true }).first().click();
+    await expandTool(page, "Genealogy");
+    const genealogy = page.getByRole("button", { name: "Genealogy", exact: true })
+      .filter({ visible: true }).locator('xpath=ancestor::*[@data-slot="accordion-item"][1]');
+    await expect(genealogy.getByText("Click a name in the text or search genealogy.")).toBeVisible();
+    await expect(genealogy.getByRole("button", { name: "View Tree", exact: true })).toHaveCount(0);
+    const search = genealogy.getByRole("textbox", { name: "Search genealogy" });
+    await search.fill("Eden");
+    await search.press("Enter");
+    const sonOfJoah = genealogy.getByRole("button", { name: /^Eden Father: Joah · Name reference: 2CH 29:12/ });
+    const unrecordedFamily = genealogy.getByRole("button", { name: /^Eden Family not recorded · Name reference: 2CH 31:15/ });
+    await expect(sonOfJoah).toBeVisible();
+    await expect(unrecordedFamily).toBeVisible();
+    await expect(genealogy.getByText(/GEN 2:8/)).toHaveCount(0);
+    await unrecordedFamily.click();
+    await expect(genealogy.getByText("Family not recorded.", { exact: true })).toBeVisible();
+    await genealogy.getByRole("button", { name: "Eden 1", exact: true }).click();
+    await genealogy.getByRole("button", { name: "2CH.31.15", exact: true }).click();
+    if (width < 768) await page.getByRole("button", { name: "Close Sidebar", exact: true }).click();
+    await page.getByRole("button", { name: "Details for Eden", exact: true }).filter({ visible: true }).first().click();
+    await expandTool(page, "Genealogy");
+    await expect(genealogy.getByRole("button", { name: "View Tree", exact: true })).toHaveCount(1);
+    await expect(genealogy.getByText("Family not recorded.", { exact: true })).toBeVisible();
+    await expect(genealogy.getByRole("button", { name: "Joah", exact: true })).toHaveCount(0);
+    await expect(search).toHaveValue("");
+  });
+
   test(`explains topic aliases and distinguishes same-name people at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await openStudyTools(page);

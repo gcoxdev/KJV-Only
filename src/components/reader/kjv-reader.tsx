@@ -1371,7 +1371,7 @@ export function KJVReader() {
     ],
   );
 
-  const { openWordInStudyTools } = useWordStudyCoordinator({
+  const { openWordInStudyTools, personPlaceNotice } = useWordStudyCoordinator({
     books,
     concordance,
     websters,
@@ -1771,7 +1771,7 @@ export function KJVReader() {
         oldEnglishSearchResults.length +
         phrasesSearchResults.length +
         unitsSearchResults.length,
-      maps: mapsSearchResults.length,
+      maps: mapsSearchResults.filter(entry => !entry.selectionNote).length,
       hitchcocks: hitchcocksSearchResults.length,
       genealogy: genealogySearchResults.length,
     },
@@ -1874,6 +1874,7 @@ export function KJVReader() {
       onSearch: applyBibleWordBookSearch,
     },
     mapsProps: {
+      selectionNotice: personPlaceNotice,
       isLoading: isMapsLoading,
       isSearching: isMapsSearching,
       error: mapsError,
@@ -1887,6 +1888,7 @@ export function KJVReader() {
       onCloseSidebar: closeRightSidebarForMobile,
     },
     genealogyProps: {
+      selectionNotice: personPlaceNotice,
       isLoading: isGenealogyLoading,
       isSearching: isGenealogySearching,
       error: genealogyError,

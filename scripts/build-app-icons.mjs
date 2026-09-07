@@ -28,10 +28,18 @@ for (const [name, size] of [
 }
 
 // Keep the complete book inside the maskable icon's central safe area.
-execFileSync("magick", [...crop, "-resize", "320x320", "-background", "#F5F2EC", "-gravity", "center", "-extent", "512x512", "-alpha", "remove", "-alpha", "off", "-strip", fileURLToPath(new URL("app-icon-maskable.png", output))]);
+execFileSync("magick", [...crop, "-resize", "320x320", "-background", "none", "-gravity", "center", "-extent", "512x512", "-strip", fileURLToPath(new URL("app-icon-maskable.png", output))]);
+
+// Dedicated launcher exports also protect browsers that select purpose="any".
+// At 60% height the entire book fits comfortably inside the central 80%-diameter
+// safe circle. Keep the padding transparent for PWA splash screens as well.
+for (const size of [192, 512]) {
+  const artworkSize = Math.round(size * 0.6);
+  execFileSync("magick", [...crop, "-resize", `${artworkSize}x${artworkSize}`, "-background", "none", "-gravity", "center", "-extent", `${size}x${size}`, "-strip", fileURLToPath(new URL(`pwa-icon-${size}-transparent.png`, output))]);
+}
 
 // Preserve the established SVG URL for older callers and the offline fallback.
 // This is a self-contained raster wrapper, not a vector tracing of the artwork.
 const png = await readFile(new URL("app-icon.png", output));
 await writeFile(new URL("app-icon.svg", output), `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="KJV Only — Leather Classic Bible logo">\n  <image width="192" height="192" href="data:image/png;base64,${png.toString("base64")}" />\n</svg>\n`);
-console.log("Exported Leather Classic app, browser, Apple, and maskable icons.");
+console.log("Exported Leather Classic app, browser, Apple, and padded PWA icons.");

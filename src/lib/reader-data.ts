@@ -409,7 +409,11 @@ function loadGenealogyCompact() {
         if (!response.ok) {
           throw new Error("Could not load /references/genealogy.compact.min.json");
         }
-        return response.json() as Promise<GenealogyCompactPayload>;
+        const compact = await response.json() as GenealogyCompactPayload;
+        if (compact?.x !== GENEALOGY_ENRICHMENT_VERSION) {
+          throw new Error("Genealogy data needs an update. Connect to the internet and refresh the Core Bible Data bundle in Downloads.");
+        }
+        return compact;
       })
       .catch((error) => {
         genealogyCompactPromise = null;

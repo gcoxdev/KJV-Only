@@ -95,6 +95,9 @@ async function main() {
 
   if (options.genealogy) {
     const compact = await readJson<GenealogyCompactPayload>(GENEALOGY_PATH);
+    if (compact.x && compact.x !== GENEALOGY_ENRICHMENT_VERSION) {
+      throw new Error("Outdated genealogy enrichment cannot be repaired from generated references. Run npm run build:genealogy to rebuild from data-sources/genealogy.json.");
+    }
     const decoded = decodeGenealogyPayload(compact);
     const startedAt = performance.now();
     const enriched = compact.x
