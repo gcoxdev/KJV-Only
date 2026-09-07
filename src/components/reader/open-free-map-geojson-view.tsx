@@ -1,9 +1,10 @@
-import type { MapAreaBounds } from "@/lib/map-area";
 import { useEffect, useRef, useState } from "react";
 import {
   GPUInitializationError,
   Map as MapLibreMap,
   NavigationControl,
+  Marker,
+  Popup,
   setWorkerUrl,
   type ErrorEvent as MapLibreErrorEvent,
   type GeoJSONSourceSpecification,
@@ -23,6 +24,8 @@ import {
   ENGLISH_MAP_NAME_EXPRESSION,
   normalizeOpenFreeMapStyle,
 } from "@/lib/map-renderers";
+
+import { MAPLIBRE_TRACKPAD_RATE, MAPLIBRE_WHEEL_RATE, MAP_PADDING, PLACE_ZOOM, rasterBasemap, rendererZoom, type MapViewProps, type MapViewRequest } from "@/lib/map-view";
 
 const OPEN_FREE_MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/bright";
 const GEOJSON_SOURCE_ID = "kjv-map-geometry";
@@ -44,7 +47,7 @@ function mapErrorMessage(error: unknown) {
     return "Background maps require a connection. The downloaded Maps bundle keeps place data and geometry available offline, but not provider tiles.";
   }
 
-  return "The English map could not be loaded. Choose Leaflet above to try the fallback map.";
+  return "The map could not be loaded. Try another map style or choose Leaflet.";
 }
 
 function applyEnglishLabels(map: MapLibreMap) {
@@ -133,134 +136,146 @@ function fitGeoJsonBounds(map: MapLibreMap, geojson: MapGeoJsonPayload) {
       [bounds[0][1], bounds[0][0]],
       [bounds[1][1], bounds[1][0]],
     ],
-    { animate: false, maxZoom: 12, padding: 24 },
+    { animate: false, maxZoom: rendererZoom(PLACE_ZOOM, "open-free-map"), padding: MAP_PADDING },
   );
 }
 
-export function OpenFreeMapGeoJsonView({
-  geojson,
-  className,
-  onBoundsChange,
-}: {
-  geojson: MapGeoJsonPayload;
-  className?: string;
-  onBoundsChange?: (bounds: MapAreaBounds) => void;
-}) {
+function applyViewRequest(map: MapLibreMap, geojson: MapGeoJsonPayload, request: MapViewRequest) {
+  const target = request.target;
+  if (target?.bounds) {
+    const [west, south, east, north] = target.bounds;
+    map.fitBounds([[west, south], [east, north]], { animate: false, padding: MAP_PADDING, maxZoom: rendererZoom(PLACE_ZOOM, "open-free-map") });
+  } else if (target) map.jumpTo({ center: target.center, zoom: rendererZoom(PLACE_ZOOM, "open-free-map") });
+  else fitGeoJsonBounds(map, geojson);
+}
+
+function setAreasVisible(map: MapLibreMap, visible: boolean) {
+  for (const id of [GEOJSON_LINE_LAYER_ID, "kjv-map-geometry-points"]) {
+    if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");
+  }
+}
+
+export function OpenFreeMapGeoJsonView({ geojson, className, onBoundsChange, onCameraChange, initialCamera,
+  mapStyle = "regular", showAreas = true, viewRequest }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<MapLibreMap | null>(null);
+  const cameraRef = useRef(initialCamera);
+  const controlsRef = useRef({ showAreas, viewRequest });
+  const appliedRequestRef = useRef(initialCamera ? viewRequest?.id : undefined);
+  const markerRef = useRef<Marker | null>(null);
   const [status, setStatus] = useState<MapStatus>({ state: "loading" });
+  const [tileError, setTileError] = useState<string | null>(null);
+
+  useEffect(() => {
+    controlsRef.current = { showAreas, viewRequest };
+    const map = mapRef.current;
+    if (!map?.getSource(GEOJSON_SOURCE_ID)) return;
+    setAreasVisible(map, showAreas);
+    if (viewRequest && appliedRequestRef.current !== viewRequest.id) {
+      appliedRequestRef.current = viewRequest.id;
+      applyViewRequest(map, mapGeoJsonForDisplay(geojson), viewRequest);
+    }
+    markerRef.current?.remove();
+    markerRef.current = viewRequest?.target
+      ? new Marker({ color: "#b91c1c" }).setLngLat(viewRequest.target.center)
+          .setPopup(new Popup().setText(viewRequest.target.label)).addTo(map) : null;
+  }, [showAreas, viewRequest, geojson]);
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) {
-      return;
-    }
-
+    if (!container) return;
+    setStatus({ state: "loading" });
+    setTileError(null);
     let disposed = false;
     let styleLoaded = false;
     let map: MapLibreMap | null = null;
     let resizeObserver: ResizeObserver | null = null;
     const abortController = new AbortController();
     const displayGeoJson = mapGeoJsonForDisplay(geojson);
-
     const reportFailure = (error: unknown) => {
-      if (disposed || styleLoaded) {
-        return;
-      }
+      if (disposed) return;
+      if (styleLoaded) { setTileError(mapStyle); return; }
       setStatus({ state: "error", message: mapErrorMessage(error) });
     };
+    const tiles = rasterBasemap(mapStyle);
+    const stylePromise: Promise<StyleSpecification> = mapStyle === "regular"
+      ? loadOpenFreeMapStyle(abortController.signal)
+      : Promise.resolve({ version: 8, sources: { basemap: {
+          type: "raster", tiles: [tiles.url], tileSize: 256, maxzoom: tiles.maxNativeZoom, attribution: tiles.attribution,
+        } }, layers: [{ id: "basemap", type: "raster", source: "basemap" }] });
 
-    void loadOpenFreeMapStyle(abortController.signal)
-      .then((style) => {
-        if (disposed) {
-          return;
-        }
-
-        map = new MapLibreMap({
-          attributionControl: { compact: true },
-          center: [35, 31.5],
-          container,
-          dragRotate: false,
-          pitchWithRotate: false,
-          style,
-          touchPitch: false,
-          zoom: 6,
-        });
-
-        map.touchZoomRotate.disableRotation();
-        map.addControl(
-          new NavigationControl({ showCompass: false }),
-          "top-left",
-        );
-
-        const canvas = map.getCanvas();
-        canvas.setAttribute("aria-label", "Interactive English map");
-
-        map.on("error", (event: MapLibreErrorEvent) => {
-          reportFailure(event.error);
-        });
-
-        map.once("load", () => {
-          if (disposed || !map) {
-            return;
+    void stylePromise.then(style => {
+      if (disposed) return;
+      map = new MapLibreMap({ attributionControl: { compact: true }, center: [35, 31.5], container,
+        dragRotate: false, pitchWithRotate: false, style, touchPitch: false, zoom: 5, maxZoom: 19 });
+      mapRef.current = map;
+      map.scrollZoom.setWheelZoomRate(MAPLIBRE_WHEEL_RATE);
+      map.scrollZoom.setZoomRate(MAPLIBRE_TRACKPAD_RATE);
+      map.touchZoomRotate.disableRotation();
+      map.addControl(new NavigationControl({ showCompass: false }), "top-left");
+      map.getCanvas().setAttribute("aria-label", "Interactive map");
+      map.on("error", (event: MapLibreErrorEvent) => reportFailure(event.error));
+      map.once("style.load", () => {
+        if (disposed || !map) return;
+        try {
+          const reportBounds = () => {
+            if (!map || disposed) return;
+            const bounds = map.getBounds();
+            const center = map.getCenter();
+            const camera = { center: [center.lng, center.lat] as [number, number], zoom: map.getZoom() + 1 };
+            cameraRef.current = camera;
+            container.dataset.mapZoom = String(camera.zoom);
+            container.dataset.mapCenter = JSON.stringify(camera.center);
+            onBoundsChange?.([bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()]);
+            onCameraChange?.(camera);
+          };
+          map.on("moveend", reportBounds);
+          if (mapStyle === "regular") applyEnglishLabels(map);
+          addGeoJsonLayers(map, displayGeoJson);
+          setAreasVisible(map, controlsRef.current.showAreas);
+          if (cameraRef.current) map.jumpTo({ center: cameraRef.current.center, zoom: rendererZoom(cameraRef.current.zoom, "open-free-map") });
+          else fitGeoJsonBounds(map, displayGeoJson);
+          const request = controlsRef.current.viewRequest;
+          if (request && appliedRequestRef.current !== request.id) {
+            appliedRequestRef.current = request.id;
+            applyViewRequest(map, displayGeoJson, request);
           }
-
-          try {
-            const reportBounds = () => {
-              if (!map || disposed) return;
-              const bounds = map.getBounds();
-              onBoundsChange?.([bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()]);
-            };
-            map.on("moveend", reportBounds);
-            applyEnglishLabels(map);
-            addGeoJsonLayers(map, displayGeoJson);
-            fitGeoJsonBounds(map, displayGeoJson);
-            resizeObserver = new ResizeObserver(() => {
-              if (!map || disposed) return;
-              map.resize();
-              fitGeoJsonBounds(map, displayGeoJson);
-            });
-            resizeObserver.observe(container);
-            reportBounds();
-            styleLoaded = true;
-            setStatus({ state: "ready" });
-          } catch (error) {
-            reportFailure(error);
-          }
-        });
-      })
-      .catch((error: unknown) => {
-        if (
-          error instanceof DOMException &&
-          error.name === "AbortError"
-        ) {
-          return;
-        }
-        reportFailure(error);
-        container.replaceChildren();
+          if (request?.target) markerRef.current = new Marker({ color: "#b91c1c" }).setLngLat(request.target.center)
+            .setPopup(new Popup().setText(request.target.label)).addTo(map);
+          resizeObserver = new ResizeObserver(() => { if (!disposed) map?.resize(); });
+          resizeObserver.observe(container);
+          reportBounds();
+          styleLoaded = true;
+          setStatus({ state: "ready" });
+        } catch (error) { reportFailure(error); }
       });
-
+    }).catch((error: unknown) => {
+      if (abortController.signal.aborted) return;
+      reportFailure(error);
+    });
     return () => {
       disposed = true;
       abortController.abort();
       resizeObserver?.disconnect();
+      markerRef.current?.remove();
+      markerRef.current = null;
+      mapRef.current = null;
       map?.remove();
     };
-  }, [geojson, onBoundsChange]);
+  }, [geojson, mapStyle, onBoundsChange, onCameraChange]);
 
   return (
-    <div
-      className={cn("relative overflow-hidden", className)}
-      data-map-renderer="open-free-map"
-    >
+    <div className={cn("relative overflow-hidden", className)} data-map-renderer="open-free-map">
       <div ref={containerRef} className="h-full w-full" />
       {status.state !== "ready" ? (
-        <div
-          className="absolute inset-0 flex items-center justify-center bg-background/90 p-6 text-center text-sm text-muted-foreground"
-          role={status.state === "error" ? "alert" : "status"}
-        >
-          {status.state === "error" ? status.message : "Loading English map..."}
+        <div className="absolute inset-0 flex items-center justify-center bg-background/90 p-6 text-center text-sm text-muted-foreground"
+          role={status.state === "error" ? "alert" : "status"}>
+          {status.state === "error" ? status.message : "Loading map..."}
         </div>
       ) : null}
+      {status.state === "ready" && tileError === mapStyle ? <p role="status" className="absolute top-2 right-2 max-w-60 rounded-md border bg-background p-2 text-xs">
+        Some background tiles could not load. Try another map style or check your connection.
+      </p> : null}
     </div>
   );
 }

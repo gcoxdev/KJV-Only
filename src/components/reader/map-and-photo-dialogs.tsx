@@ -3,16 +3,21 @@ import {
   lazy,
   Suspense,
   useCallback,
+  useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
-import { LoaderCircleIcon } from "lucide-react";
+import { LocateFixedIcon, LayersIcon, LoaderCircleIcon } from "lucide-react";
 
 import type { AncientMapEntry, MapGeoJsonPayload } from "@/lib/maps";
 import { mapEntryLabel } from "@/lib/maps";
 import { loadAncientMap } from "@/lib/reader-data";
 import { findMapsInArea, mapAreaKey, type MapAreaBounds } from "@/lib/map-area";
 import { Button } from "@/components/ui/button";
+import { MapPlaceSearch } from "@/components/reader/map-place-search";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { MapCamera, MapStyle, MapViewRequest } from "@/lib/map-view";
 import { MapAreaResults } from "@/components/reader/map-area-results";
 import {
   DEFAULT_MAP_RENDERER,
@@ -102,6 +107,17 @@ export function MapAndPhotoDialogs({
       ? DEFAULT_MAP_RENDERER
       : readSessionMapRenderer(),
   );
+  const [mapStyle, setMapStyle] = useState<MapStyle>("regular");
+  const [showAreas, setShowAreas] = useState(true);
+  const [camera, setCamera] = useState<{ entry: string; value: MapCamera } | null>(null);
+  const entryKey = activeMapDialogEntry?.geojson_file ?? "";
+  const onCameraChange = useCallback((value: MapCamera) => setCamera({ entry: entryKey, value }), [entryKey]);
+  const [viewCommand, setViewCommand] = useState<{ entry: string; request: MapViewRequest } | null>(null);
+  const viewRequest = viewCommand?.entry === entryKey ? viewCommand.request : undefined;
+  const requestView = (target: MapViewRequest["target"]) => {
+    setShowAreaResults(false);
+    setViewCommand(previous => ({ entry: entryKey, request: { id: (previous?.request.id ?? 0) + 1, target } }));
+  };
   const MapView =
     mapRenderer === "open-free-map"
       ? LazyOpenFreeMapGeoJsonView
@@ -115,29 +131,44 @@ export function MapAndPhotoDialogs({
   const [showAreaResults, setShowAreaResults] = useState(false);
   const [areaBusy, setAreaBusy] = useState(false);
   const [areaError, setAreaError] = useState<string | null>(null);
+  const areaRequest = useRef(0);
+  useEffect(() => {
+    if (isMapDialogOpen) return;
+    areaRequest.current += 1;
+    setCamera(null);
+    setViewCommand(null);
+    setViewport(null);
+    setAreaSearch(null);
+    setShowAreaResults(false);
+    setAreaBusy(false);
+    setAreaError(null);
+  }, [isMapDialogOpen]);
   const currentBounds = viewport?.key === viewKey ? viewport.bounds : null;
   const searchArea = async () => {
     if (!currentBounds || areaBusy) return;
+    const requestId = ++areaRequest.current;
     setAreaBusy(true);
     setAreaError(null);
     try {
       const entries = await loadAncientMap();
+      if (areaRequest.current !== requestId) return;
       if (!entries.some(entry => entry.bounds?.length)) {
         throw new Error("Area search data is unavailable. Reload the app to update it.");
       }
       setAreaSearch({ bounds: currentBounds, entries: findMapsInArea(entries, currentBounds) });
       setShowAreaResults(true);
     } catch (error) {
+      if (areaRequest.current !== requestId) return;
       setAreaError(error instanceof Error ? error.message : "Could not search this area. Try again.");
     } finally {
-      setAreaBusy(false);
+      if (areaRequest.current === requestId) setAreaBusy(false);
     }
   };
 
   return (
     <AlertDialog open={isMapDialogOpen} onOpenChange={onMapDialogOpenChange}>
-      <AlertDialogContent className="flex h-[min(86vh,900px)] w-[min(98vw,1700px)]! max-w-none! flex-col">
-        <div className="flex min-w-0 shrink-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <AlertDialogContent className="flex h-[min(94dvh,900px)] w-[min(98vw,1700px)]! max-w-none! flex-col gap-2 p-3">
+        <div className="flex min-w-0 shrink-0 items-start justify-between gap-2">
           <AlertDialogHeader className="min-w-0 flex-1 sm:place-items-start sm:text-left">
             <AlertDialogTitle>
               {activeMapDialogEntry
@@ -151,9 +182,6 @@ export function MapAndPhotoDialogs({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex shrink-0 flex-col items-end gap-1">
-            <span className="text-xs font-medium text-muted-foreground">
-              Map
-            </span>
             <ToggleGroup
               aria-label="Map renderer"
               value={[mapRenderer]}
@@ -183,6 +211,23 @@ export function MapAndPhotoDialogs({
             </ToggleGroup>
           </div>
         </div>
+        <div className="relative z-20 flex shrink-0 flex-wrap items-center gap-2">
+          <MapPlaceSearch key={entryKey || "closed"} onSelect={result => requestView(result)} />
+          <Select items={[{ value: "regular", label: "Regular" }, { value: "topographic", label: "Topographic" }]}
+            value={mapStyle} onValueChange={value => { if (value === "regular" || value === "topographic") setMapStyle(value); }}>
+            <SelectTrigger aria-label="Map style" className="w-36"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectGroup>
+              <SelectItem value="regular">Regular</SelectItem>
+              <SelectItem value="topographic">Topographic</SelectItem>
+            </SelectGroup></SelectContent>
+          </Select>
+          <Button variant="outline" size="sm" onClick={() => requestView(null)} disabled={!mapDialogGeoJson || isMapDialogLoading}>
+            <LocateFixedIcon data-icon="inline-start" /> Recenter
+          </Button>
+          <Button variant="outline" size="sm" aria-pressed={showAreas} onClick={() => setShowAreas(visible => !visible)}>
+            <LayersIcon data-icon="inline-start" /> {showAreas ? "Hide areas" : "Show areas"}
+          </Button>
+        </div>
         <div className="relative isolate min-h-0 flex-1">
           {isMapDialogLoading ? (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -207,6 +252,11 @@ export function MapAndPhotoDialogs({
                 <MapView
                   key={activeMapDialogEntry?.geojson_file}
                   geojson={mapDialogGeoJson}
+                  mapStyle={mapStyle}
+                  showAreas={showAreas}
+                  viewRequest={viewRequest}
+                  initialCamera={camera?.entry === entryKey ? camera.value : undefined}
+                  onCameraChange={onCameraChange}
                   onBoundsChange={onBoundsChange}
                   className="relative z-0 h-full w-full rounded-md border"
                 />
@@ -228,7 +278,7 @@ export function MapAndPhotoDialogs({
           ) : null}
         </div>
         {areaError ? <p role="alert" className="text-sm text-destructive">{areaError}</p> : null}
-        <AlertDialogFooter className="shrink-0 flex-row flex-wrap items-center justify-end py-3 sm:flex sm:justify-end">
+        <AlertDialogFooter className="-mx-3 -mb-3 shrink-0 flex-row flex-wrap items-center justify-end px-3 py-2 sm:flex sm:justify-end">
           <Button variant="outline" size="sm" onClick={() => void searchArea()} disabled={areaBusy || isMapDialogLoading || !!mapDialogError || !currentBounds}>
             {areaBusy ? "Searching area..." : "Search this area"}
           </Button>

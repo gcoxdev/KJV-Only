@@ -95,7 +95,7 @@ for (const width of [375, 1280]) {
       await page.route("https://tiles.openfreemap.org/styles/bright", route => route.fulfill({
         json: { version: 8, sources: {}, layers: [{ id: "background", type: "background", paint: { "background-color": "#f5f2ec" } }] },
       }));
-      await page.route("https://*.tile.openstreetmap.org/**", route => route.abort());
+      await page.route("https://{*.tile,tile}.openstreetmap.org/**", route => route.abort());
       await page.route("**/maps/data/map.json", route => route.fulfill({ json: [
         { geojson_file: "selected.geojson", translations: ["Selected"], types: ["region"], verses: ["GEN.1.1"], modern_names: [], bounds: [[34, 31, 36, 33]] },
         { geojson_file: "nearby.geojson", translations: ["Nearby"], types: ["city", "settlement"], verses: ["GEN.1.2"], modern_names: ["Closeby"], bounds: [[35, 32, 35, 32]] },

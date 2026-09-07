@@ -15,7 +15,12 @@ declare module "react-leaflet" {
   export const MapContainer: ComponentType<Record<string, unknown>>;
   export const TileLayer: ComponentType<Record<string, unknown>>;
   export const GeoJSON: ComponentType<Record<string, unknown>>;
+  export const CircleMarker: ComponentType<Record<string, unknown>>;
+  export const Tooltip: ComponentType<Record<string, unknown>>;
   export function useMap(): {
+    getCenter: () => { lat: number; lng: number };
+    getZoom: () => number;
+    setView: (center: [number, number], zoom: number, options?: unknown) => void;
     fitBounds: (bounds: unknown, options?: unknown) => void;
     invalidateSize: (options?: { pan?: boolean }) => void;
     getContainer: () => HTMLElement;

@@ -55,7 +55,7 @@ test.describe("map display", () => {
         contentType: "application/json",
         body: JSON.stringify({ version: 8, sources: {}, layers: [{ id: "background", type: "background", paint: { "background-color": "#f5f2ec" } }] }),
       }));
-      await page.route("https://*.tile.openstreetmap.org/**", (route) => route.abort());
+      await page.route("https://{*.tile,tile}.openstreetmap.org/**", (route) => route.abort());
       await page.route("**/maps/data/map.json", (route) => route.fulfill({
         contentType: "application/json",
         body: JSON.stringify([{ geojson_file: "overlap.geojson", translations: ["Overlap"], types: ["region"], verses: ["GEN.1.1"], modern_names: [] }]),
@@ -76,10 +76,14 @@ test.describe("map display", () => {
       const dialog = page.getByRole("alertdialog");
       await expect(dialog.locator("summary")).toHaveCount(0);
       const openFreeMap = page.locator('[data-map-renderer="open-free-map"]');
-      await expect(page.getByText("Loading English map...")).toBeHidden();
+      await expect(page.getByText("Loading map...", { exact: true })).toBeHidden();
       const canvas = openFreeMap.locator("canvas");
       await expect.poll(async () => (await polygonPixels(page, canvas)).blueEdges).toBeGreaterThan(100);
       expect((await polygonPixels(page, canvas)).center).toEqual([245, 242, 236]);
+      await dialog.getByRole("button", { name: "Hide areas", exact: true }).click();
+      await expect.poll(async () => (await polygonPixels(page, canvas)).blueEdges).toBe(0);
+      await dialog.getByRole("button", { name: "Show areas", exact: true }).click();
+      await expect.poll(async () => (await polygonPixels(page, canvas)).blueEdges).toBeGreaterThan(100);
       await expectMapFillsDialog(dialog, openFreeMap);
       await dialog.screenshot({ path: testInfo.outputPath("open-free-map.png") });
 
@@ -95,6 +99,8 @@ test.describe("map display", () => {
 
       await page.setViewportSize({ width, height: 700 });
       await expectMapFillsDialog(dialog, leaflet);
+      // Resize preserves the camera; Recenter fits the outlines to the new size.
+      await dialog.getByRole("button", { name: "Recenter", exact: true }).click();
       await expect.poll(async () => {
         const mapBounds = await leaflet.boundingBox();
         const outlineBounds = await paths.first().boundingBox();
