@@ -3,6 +3,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { boundsForGeoJson, mapGeoJsonForDisplay } from "../src/lib/maps.ts";
+import { buildMapIdentifications } from "./lib/map-identifications.ts";
 
 const DEFAULT_GEOMETRY_PATH = "public/maps/geometry";
 const DEFAULT_ANCIENT_PATH = "public/maps/data/ancient.jsonl";
@@ -232,6 +233,7 @@ async function main() {
   const ancientEntries = parseJsonl(ancientText);
   const modernEntries = parseJsonl(modernText);
   const modernById = new Map(modernEntries.map((entry) => [entry.id, entry]));
+  const ancientByFile = new Map(ancientEntries.map(entry => [entry.geojson_file, entry]));
 
   const compactEntries = ancientEntries
     .filter(
@@ -259,6 +261,7 @@ async function main() {
 
   for (const entry of compactEntries) {
     const geometry = JSON.parse(await fs.readFile(path.join(options.geometryPath, entry.geojson_file), "utf8"));
+    Object.assign(entry, buildMapIdentifications(ancientByFile.get(entry.geojson_file), geometry));
     const uniqueBounds = new Map();
     for (const feature of mapGeoJsonForDisplay(geometry).features ?? []) {
       const bounds = boundsForGeoJson({ features: [feature] });
@@ -290,6 +293,8 @@ async function main() {
       modernEntries: modernEntries.length,
       compactEntries: compactEntries.length,
       entriesWithBounds: compactEntries.filter(entry => entry.bounds.length > 0).length,
+      entriesWithAlternatives: compactEntries.filter(entry => entry.identifications?.length > 1).length,
+      entriesWithConfidence: compactEntries.filter(entry => entry.identifications?.some(candidate => candidate.confidence !== undefined)).length,
     },
     size: {
       outputBytes: outputStat?.size ?? null,

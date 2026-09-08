@@ -11,11 +11,12 @@ import {
 import { LocateFixedIcon, LayersIcon, LoaderCircleIcon } from "lucide-react";
 
 import type { AncientMapEntry, MapGeoJsonPayload } from "@/lib/maps";
-import { mapEntryLabel } from "@/lib/maps";
+import { mapConfidenceSummary, mapEntryLabel } from "@/lib/maps";
 import { loadAncientMap } from "@/lib/reader-data";
 import { findMapsInArea, mapAreaKey, type MapAreaBounds } from "@/lib/map-area";
 import { Button } from "@/components/ui/button";
 import { MapPlaceSearch } from "@/components/reader/map-place-search";
+import { MapProposedLocations } from "@/components/reader/map-proposed-locations";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { MapCamera, MapStyle, MapViewRequest } from "@/lib/map-view";
 import { MapAreaResults } from "@/components/reader/map-area-results";
@@ -112,11 +113,11 @@ export function MapAndPhotoDialogs({
   const [camera, setCamera] = useState<{ entry: string; value: MapCamera } | null>(null);
   const entryKey = activeMapDialogEntry?.geojson_file ?? "";
   const onCameraChange = useCallback((value: MapCamera) => setCamera({ entry: entryKey, value }), [entryKey]);
-  const [viewCommand, setViewCommand] = useState<{ entry: string; request: MapViewRequest } | null>(null);
+  const [viewCommand, setViewCommand] = useState<{ entry: string; request: MapViewRequest; identificationId?: string } | null>(null);
   const viewRequest = viewCommand?.entry === entryKey ? viewCommand.request : undefined;
-  const requestView = (target: MapViewRequest["target"]) => {
+  const requestView = (target: MapViewRequest["target"], identificationId?: string) => {
     setShowAreaResults(false);
-    setViewCommand(previous => ({ entry: entryKey, request: { id: (previous?.request.id ?? 0) + 1, target } }));
+    setViewCommand(previous => ({ entry: entryKey, identificationId, request: { id: (previous?.request.id ?? 0) + 1, target } }));
   };
   const MapView =
     mapRenderer === "open-free-map"
@@ -227,6 +228,14 @@ export function MapAndPhotoDialogs({
           <Button variant="outline" size="sm" aria-pressed={showAreas} onClick={() => setShowAreas(visible => !visible)}>
             <LayersIcon data-icon="inline-start" /> {showAreas ? "Hide areas" : "Show areas"}
           </Button>
+          {activeMapDialogEntry ? <MapProposedLocations key={`${entryKey}:${isMapDialogOpen}`}
+            entry={activeMapDialogEntry} geojson={mapDialogGeoJson}
+            selectedId={viewCommand?.entry === entryKey ? viewCommand.identificationId : undefined}
+            disabled={isMapDialogLoading || !!mapDialogError}
+            onSelect={(target, identificationId) => {
+              setShowAreas(true);
+              requestView(target, identificationId);
+            }} /> : null}
         </div>
         <div className="relative isolate min-h-0 flex-1">
           {isMapDialogLoading ? (
@@ -279,6 +288,13 @@ export function MapAndPhotoDialogs({
         </div>
         {areaError ? <p role="alert" className="text-sm text-destructive">{areaError}</p> : null}
         <AlertDialogFooter className="-mx-3 -mb-3 shrink-0 flex-row flex-wrap items-center justify-end px-3 py-2 sm:flex sm:justify-end">
+          <p role="status" aria-label="Location confidence"
+            title="Estimated confidence in the location identification, not coordinate precision."
+            className="mr-auto min-w-0 basis-full text-left text-xs text-muted-foreground sm:basis-auto sm:flex-1">
+            {isMapDialogLoading ? "Loading location…" : mapConfidenceSummary(activeMapDialogEntry,
+              viewCommand?.entry === entryKey ? viewCommand.identificationId : undefined,
+              !!viewRequest?.target && !viewCommand?.identificationId)}
+          </p>
           <Button variant="outline" size="sm" onClick={() => void searchArea()} disabled={areaBusy || isMapDialogLoading || !!mapDialogError || !currentBounds}>
             {areaBusy ? "Searching area..." : "Search this area"}
           </Button>

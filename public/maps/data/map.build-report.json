@@ -3,12 +3,14 @@
     "ancientEntries": 1342,
     "modernEntries": 1596,
     "compactEntries": 1285,
-    "entriesWithBounds": 1278
+    "entriesWithBounds": 1278,
+    "entriesWithAlternatives": 703,
+    "entriesWithConfidence": 1278
   },
   "size": {
-    "outputBytes": 1050254,
+    "outputBytes": 1741837,
     "legacyBytes": 1163993,
-    "bytesSaved": 113739
+    "bytesSaved": -577844
   },
   "sample": {
     "geojson_file": "aea17b7.geojson",
@@ -24,6 +26,18 @@
     ],
     "modern_names": [
       "Barada River"
+    ],
+    "identifications": [
+      {
+        "id": "identification-1",
+        "label": "Barada River",
+        "confidence": 1000,
+        "geometry_ids": [
+          "g3513e7.geometry",
+          "m39ac0b.point",
+          "g3513e7.simplified"
+        ]
+      }
     ],
     "bounds": [
       [

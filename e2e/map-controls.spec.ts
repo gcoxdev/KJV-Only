@@ -21,6 +21,8 @@ for (const renderer of ["OpenFreeMap", "Leaflet"]) {
     const dialog = await openDanMap(page);
     await dialog.getByRole("button", { name: renderer, exact: true }).click();
     const camera = dialog.locator("[data-map-zoom]");
+    await expect(dialog.getByRole("button", { name: /^Proposed locations/ })).toHaveCount(0);
+    await expect(dialog.getByRole("status", { name: "Location confidence" })).toHaveText("Tel Dan · Confidence: Very high");
     await expect(camera).toHaveAttribute("data-map-zoom", "15");
     const originalCenter = JSON.parse((await camera.getAttribute("data-map-center"))!) as number[];
     await dialog.getByRole("button", { name: "Hide areas", exact: true }).click();
@@ -85,11 +87,13 @@ test("searches places on submit, marks the result, and recenters on Dan", async 
   expect(queries).toBe(0);
   await search.press("Enter");
   await dialog.getByRole("region", { name: "Place search results" }).getByRole("button", { name: "Jerusalem", exact: true }).click();
+  await expect(dialog.getByRole("status", { name: "Location confidence" })).toHaveText("Search result · Confidence not rated");
   await expect.poll(async () => JSON.parse((await camera.getAttribute("data-map-center"))!)[1] as number).toBeLessThan(32);
   await expect(dialog.locator(".maplibregl-marker")).toHaveCount(1);
   await dialog.getByRole("button", { name: "Leaflet", exact: true }).click();
   await expect.poll(async () => JSON.parse((await camera.getAttribute("data-map-center"))!)[1] as number).toBeLessThan(32);
   await dialog.getByRole("button", { name: "Recenter", exact: true }).click();
+  await expect(dialog.getByRole("status", { name: "Location confidence" })).toHaveText("Tel Dan · Confidence: Very high");
   await expect(camera).toHaveAttribute("data-map-zoom", "15");
   await expect.poll(async () => JSON.parse((await camera.getAttribute("data-map-center"))!)[1] as number).toBeGreaterThan(33);
   await search.press("Enter");

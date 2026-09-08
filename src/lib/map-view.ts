@@ -16,7 +16,7 @@ export function rendererZoom(zoom: number, renderer: MapRenderer) {
 export type MapCamera = { center: [number, number]; zoom: number };
 export type MapViewRequest = {
   id: number;
-  target: { center: [number, number]; bounds?: MapAreaBounds; label: string } | null;
+  target: { center: [number, number]; bounds?: MapAreaBounds; label: string; showMarker?: boolean } | null;
 };
 export type MapViewProps = {
   geojson: MapGeoJsonPayload;

@@ -65,7 +65,7 @@ export function MapGeoJsonView({ geojson, className, onBoundsChange, onCameraCha
           pointToLayer={(_feature: unknown, latlng: { lat: number; lng: number }) => L.circleMarker([latlng.lat, latlng.lng], {
             radius: 5, color: "#1d4ed8", weight: 2, fillColor: "#60a5fa", fillOpacity: 0.8,
           })} /> : null}
-        {target ? <CircleMarker center={[target.center[1], target.center[0]]} radius={7}
+        {target && target.showMarker !== false ? <CircleMarker center={[target.center[1], target.center[0]]} radius={7}
           pathOptions={{ color: "#b91c1c", fillColor: "#ef4444", fillOpacity: 0.9, weight: 2 }}>
           <Tooltip>{target.label}</Tooltip>
         </CircleMarker> : null}

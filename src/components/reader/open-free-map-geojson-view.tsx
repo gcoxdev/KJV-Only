@@ -176,7 +176,7 @@ export function OpenFreeMapGeoJsonView({ geojson, className, onBoundsChange, onC
       applyViewRequest(map, mapGeoJsonForDisplay(geojson), viewRequest);
     }
     markerRef.current?.remove();
-    markerRef.current = viewRequest?.target
+    markerRef.current = viewRequest?.target && viewRequest.target.showMarker !== false
       ? new Marker({ color: "#b91c1c" }).setLngLat(viewRequest.target.center)
           .setPopup(new Popup().setText(viewRequest.target.label)).addTo(map) : null;
   }, [showAreas, viewRequest, geojson]);
@@ -240,7 +240,7 @@ export function OpenFreeMapGeoJsonView({ geojson, className, onBoundsChange, onC
             appliedRequestRef.current = request.id;
             applyViewRequest(map, displayGeoJson, request);
           }
-          if (request?.target) markerRef.current = new Marker({ color: "#b91c1c" }).setLngLat(request.target.center)
+          if (request?.target && request.target.showMarker !== false) markerRef.current = new Marker({ color: "#b91c1c" }).setLngLat(request.target.center)
             .setPopup(new Popup().setText(request.target.label)).addTo(map);
           resizeObserver = new ResizeObserver(() => { if (!disposed) map?.resize(); });
           resizeObserver.observe(container);
