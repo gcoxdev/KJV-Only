@@ -1,0 +1,209 @@
+[
+  {
+    "id": "enan_422",
+    "names": [
+      "Enan"
+    ],
+    "gender": "M",
+    "verses": {
+      "byName": [
+        {
+          "name": "Enan",
+          "verses": [
+            "NUM.1.15",
+            "NUM.2.29",
+            "NUM.7.78",
+            "NUM.7.83",
+            "NUM.10.27"
+          ],
+          "numOccurrences": 5,
+          "numVerses": 5
+        }
+      ],
+      "totalOccurrences": 5,
+      "totalVerses": 5,
+      "first": "NUM.1.15"
+    },
+    "children": [
+      {
+        "id": "ahira_421",
+        "name": "Ahira",
+        "verse": "NUM.1.15"
+      }
+    ]
+  },
+  {
+    "id": "peulthai_1826",
+    "names": [
+      "Peulthai"
+    ],
+    "gender": "M",
+    "verses": {
+      "byName": [
+        {
+          "name": "Peulthai",
+          "verses": [
+            "1CH.26.5"
+          ],
+          "numOccurrences": 1,
+          "numVerses": 1
+        }
+      ],
+      "totalOccurrences": 1,
+      "totalVerses": 1,
+      "first": "1CH.26.5"
+    },
+    "father": {
+      "id": "obededom_687",
+      "name": "Obededom"
+    },
+    "siblings": [
+      {
+        "id": "jehozabad_1820",
+        "name": "Jehozabad",
+        "verse": "1CH.26.4"
+      },
+      {
+        "id": "joah_1821",
+        "name": "Joah",
+        "verse": "1CH.26.4"
+      },
+      {
+        "id": "nethaneel_1823",
+        "name": "Nethaneel",
+        "verse": "1CH.26.4"
+      },
+      {
+        "id": "sacar_1822",
+        "name": "Sacar",
+        "verse": "1CH.26.4"
+      },
+      {
+        "id": "shemaiah_1819",
+        "name": "Shemaiah",
+        "verse": "1CH.26.4"
+      },
+      {
+        "id": "ammiel_1824",
+        "name": "Ammiel",
+        "verse": "1CH.26.5"
+      },
+      {
+        "id": "issachar_1825",
+        "name": "Issachar",
+        "verse": "1CH.26.5"
+      }
+    ]
+  },
+  {
+    "id": "baladan_968",
+    "names": [
+      "Baladan"
+    ],
+    "gender": "M",
+    "verses": {
+      "byName": [
+        {
+          "name": "Baladan",
+          "verses": [
+            "2KI.20.12",
+            "ISA.39.1"
+          ],
+          "numOccurrences": 2,
+          "numVerses": 2
+        }
+      ],
+      "totalOccurrences": 2,
+      "totalVerses": 2,
+      "first": "2KI.20.12"
+    },
+    "children": [
+      {
+        "id": "berodachbaladan_967",
+        "name": "Berodachbaladan",
+        "verse": "2KI.20.12"
+      }
+    ]
+  },
+  {
+    "id": "malchiah_2752",
+    "names": [
+      "Malchiah"
+    ],
+    "gender": "M",
+    "verses": {
+      "byName": [
+        {
+          "name": "Malchiah",
+          "verses": [
+            "JER.38.6"
+          ],
+          "numOccurrences": 1,
+          "numVerses": 1
+        }
+      ],
+      "totalOccurrences": 1,
+      "totalVerses": 1,
+      "first": "JER.38.6"
+    },
+    "father": {
+      "id": "hammelech_2736",
+      "name": "Hammelech"
+    },
+    "siblings": [
+      {
+        "id": "jerahmeel_2735",
+        "name": "Jerahmeel",
+        "verse": "JER.36.26"
+      }
+    ]
+  },
+  {
+    "id": "hanan_2720",
+    "names": [
+      "Hanan"
+    ],
+    "gender": "M",
+    "verses": {
+      "byName": [
+        {
+          "name": "Hanan",
+          "verses": [
+            "JER.35.4"
+          ],
+          "numOccurrences": 1,
+          "numVerses": 1
+        }
+      ],
+      "totalOccurrences": 1,
+      "totalVerses": 1,
+      "first": "JER.35.4"
+    },
+    "father": {
+      "id": "igdaliah_2721",
+      "name": "Igdaliah"
+    }
+  },
+  {
+    "id": "cyrenius_luk_2_2",
+    "names": [
+      "Cyrenius"
+    ],
+    "gender": "M",
+    "verses": {
+      "byName": [
+        {
+          "name": "Cyrenius",
+          "verses": [
+            "LUK.2.2"
+          ],
+          "numOccurrences": 1,
+          "numVerses": 1
+        }
+      ],
+      "totalOccurrences": 1,
+      "totalVerses": 1,
+      "first": "LUK.2.2"
+    }
+  }
+]

@@ -126,7 +126,16 @@ test("refreshes manifests and keeps the complete app shell usable offline", asyn
   const offlineIcons = await page.evaluate(async () => {
     const cachedBookIcon = await fetch("/icons/bw/LEV.png")
     const missingBookIcon = await fetch("/icons/bw/MISSING.png")
+    const pwaManifest = await (await fetch("/manifest.webmanifest")).json()
+    const launcherIcons = pwaManifest.icons.filter(
+      (icon: { purpose: string }) => icon.purpose === "maskable",
+    ) as { src: string }[]
+    const launchers = await Promise.all(launcherIcons.map(async ({ src }) => {
+      const response = await fetch(src)
+      return { src, ok: response.ok, contentType: response.headers.get("content-type") }
+    }))
     return {
+      launchers,
       cached: {
         ok: cachedBookIcon.ok,
         contentType: cachedBookIcon.headers.get("content-type"),
@@ -141,6 +150,10 @@ test("refreshes manifests and keeps the complete app shell usable offline", asyn
   expect(offlineIcons.cached.contentType).toBe("image/png")
   expect(offlineIcons.fallback.ok).toBe(true)
   expect(offlineIcons.fallback.contentType).toBe("image/svg+xml")
+  expect(offlineIcons.launchers).toEqual([
+    { src: "/icons/pwa-icon-192-maskable-v2.png", ok: true, contentType: "image/png" },
+    { src: "/icons/pwa-icon-512-maskable-v2.png", ok: true, contentType: "image/png" },
+  ])
 
   await page.reload()
   await expect(page.getByRole("button", { name: "Genesis 1", exact: true })).toBeVisible()

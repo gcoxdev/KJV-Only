@@ -7,12 +7,62 @@ import { findGenealogyMatches } from "../src/lib/word-study-selection.ts";
 import type { GenealogyCompactPayload, GenealogyPayload, GenealogyPerson } from "../src/types/reader.ts";
 import type { Book } from "../src/types/bible.ts";
 
-const source: GenealogyPayload = JSON.parse(readFileSync("data-sources/genealogy.json", "utf8"));
+const source: GenealogyPayload = [
+  ...JSON.parse(readFileSync("data-sources/genealogy.json", "utf8")),
+  ...JSON.parse(readFileSync("data-sources/genealogy-additions.json", "utf8")),
+];
 const compact: GenealogyCompactPayload = JSON.parse(readFileSync("public/references/genealogy.compact.min.json", "utf8"));
 const shipped = decodeGenealogyPayload(compact);
 const references = (person: GenealogyPerson) => [...new Set((person.verses?.byName ?? []).flatMap(entry => entry.verses))];
 
 describe("genealogy identity boundaries", () => {
+  it("resolves every shipped family link to a complete person record", () => {
+    const ids = new Set(shipped.map(person => person.id));
+    expect(ids.size).toBe(shipped.length);
+    const missing = shipped.flatMap(person => [
+      person.father, person.mother, ...(person.spouses ?? []),
+      ...(person.siblings ?? []), ...(person.children ?? []),
+    ].filter(relation => relation && !ids.has(relation.id))
+      .map(relation => `${person.id} -> ${relation!.id}`));
+    expect(missing).toEqual([]);
+  });
+
+  it.each([
+    ["Enan", "enan_422", ["NUM.1.15", "NUM.2.29", "NUM.7.78", "NUM.7.83", "NUM.10.27"]],
+    ["Peulthai", "peulthai_1826", ["1CH.26.5"]],
+    ["Baladan", "baladan_968", ["2KI.20.12", "ISA.39.1"]],
+    ["Malchiah", "malchiah_2752", ["JER.38.6"]],
+    ["Hanan", "hanan_2720", ["JER.35.4"]],
+    ["Cyrenius", "cyrenius_luk_2_2", ["LUK.2.2"]],
+  ] as const)("finds the reviewed %s record in its own passages", (name, id, refs) => {
+    const person = shipped.find(person => person.id === id)!;
+    expect(person).toBeDefined();
+    expect(references(person)).toEqual([...refs]);
+    expect(person.verses?.totalOccurrences).toBe(refs.length);
+    for (const ref of refs) {
+      expect(findGenealogyMatches(shipped, name, ref).map(match => match.id)).toEqual([id]);
+    }
+  });
+
+  it("restores reciprocal family navigation without absorbing namesakes", () => {
+    const person = (id: string) => shipped.find(entry => entry.id === id)!;
+    for (const [parentId, childId] of [
+      ["enan_422", "ahira_421"], ["baladan_968", "berodachbaladan_967"],
+      ["obededom_687", "peulthai_1826"], ["hammelech_2736", "malchiah_2752"],
+      ["igdaliah_2721", "hanan_2720"],
+    ]) {
+      expect(person(parentId).children?.some(child => child.id === childId)).toBe(true);
+      expect(person(childId).father?.id).toBe(parentId);
+    }
+    expect(person("peulthai_1826").siblings).toHaveLength(7);
+    for (const sibling of person("peulthai_1826").siblings ?? []) {
+      expect(person(sibling.id).siblings?.some(entry => entry.id === "peulthai_1826")).toBe(true);
+    }
+    expect(findGenealogyMatches(shipped, "Hanan", "1CH.8.23").map(p => p.id)).toEqual(["hanan_1519"]);
+    expect(findGenealogyMatches(shipped, "Malchiah", "JER.38.1").map(p => p.id)).toEqual(["melchiah_2693"]);
+    expect(person("cyrenius_luk_2_2").father).toBeUndefined();
+  });
+
   it("ships the current enrichment without inventing person references anywhere in the dataset", () => {
     expect(compact.x).toBe(GENEALOGY_ENRICHMENT_VERSION);
     expect(shipped.map(person => person.id).sort()).toEqual(source.map(person => person.id).sort());

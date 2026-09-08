@@ -13,6 +13,7 @@ function resolveInputPath(...candidates) {
 const inputPath = resolveInputPath(
   "data-sources/genealogy.json",
 );
+const additionsPath = resolveInputPath("data-sources/genealogy-additions.json");
 const outputPath = path.resolve("public/references/genealogy.compact.min.json");
 const reportPath = path.resolve(".generated/genealogy.build-report.json");
 const BOOK_ORDER = [
@@ -162,7 +163,18 @@ function compareReferences(left, right) {
   return left.localeCompare(right);
 }
 
-const input = readJson(inputPath);
+// Keep the recovered upstream snapshot unchanged; reviewed local records have
+// their own rebuild input and provenance in docs/genealogy-additions.md.
+const original = readJson(inputPath);
+const additions = readJson(additionsPath);
+const input = [...original, ...additions];
+const personIds = new Set();
+for (const person of input) {
+  if (personIds.has(person.id)) {
+    throw new Error(`Duplicate genealogy person ID: ${person.id}`);
+  }
+  personIds.add(person.id);
+}
 
 const nameIndexes = new Map();
 const names = [];
@@ -264,16 +276,19 @@ const compact = {
 writeJson(outputPath, compact);
 
 const outputSize = fs.statSync(outputPath).size;
-const inputSize = fs.statSync(inputPath).size;
+const inputSize = fs.statSync(inputPath).size + fs.statSync(additionsPath).size;
 
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 writeJson(reportPath, {
   inputPath: path.relative(process.cwd(), inputPath),
+  additionsPath: path.relative(process.cwd(), additionsPath),
   outputPath: path.relative(process.cwd(), outputPath),
   inputSize,
   outputSize,
   savedBytes: inputSize - outputSize,
   personCount: input.length,
+  originalPersonCount: original.length,
+  addedPersonCount: additions.length,
   verseCount: verses.length,
   nameCount: names.length,
 });

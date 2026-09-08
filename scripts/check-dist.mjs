@@ -22,6 +22,8 @@ const REQUIRED_PATHS = [
   "icons/app-icon-maskable.png",
   "icons/pwa-icon-192-transparent.png",
   "icons/pwa-icon-512-transparent.png",
+  "icons/pwa-icon-192-maskable-v2.png",
+  "icons/pwa-icon-512-maskable-v2.png",
   "icons/apple-touch-icon.png",
   "icons/favicon.png",
   "topics/daily-scripture-topics.json",

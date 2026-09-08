@@ -34,6 +34,8 @@ const EXACT_RUNTIME_ASSETS = new Set([
   "icons/app-icon-maskable.png",
   "icons/pwa-icon-192-transparent.png",
   "icons/pwa-icon-512-transparent.png",
+  "icons/pwa-icon-192-maskable-v2.png",
+  "icons/pwa-icon-512-maskable-v2.png",
   "icons/apple-touch-icon.png",
   "icons/favicon.png",
   "manifest.webmanifest",

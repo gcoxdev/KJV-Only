@@ -10,7 +10,7 @@ import type {
   GenealogyVerseByName,
 } from "../types/reader.ts";
 
-export const GENEALOGY_ENRICHMENT_VERSION = "20260907-person-place-2";
+export const GENEALOGY_ENRICHMENT_VERSION = "20260907-genealogy-additions-1";
 
 function expandDelta(values: number[]) {
   let runningTotal = 0;

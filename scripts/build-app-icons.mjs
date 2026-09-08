@@ -30,12 +30,20 @@ for (const [name, size] of [
 // Keep the complete book inside the maskable icon's central safe area.
 execFileSync("magick", [...crop, "-resize", "320x320", "-background", "none", "-gravity", "center", "-extent", "512x512", "-strip", fileURLToPath(new URL("app-icon-maskable.png", output))]);
 
-// Dedicated launcher exports also protect browsers that select purpose="any".
-// At 60% height the entire book fits comfortably inside the central 80%-diameter
-// safe circle. Keep the padding transparent for PWA splash screens as well.
+// General-purpose installation/splash icons retain their existing size.
 for (const size of [192, 512]) {
   const artworkSize = Math.round(size * 0.6);
   execFileSync("magick", [...crop, "-resize", `${artworkSize}x${artworkSize}`, "-background", "none", "-gravity", "center", "-extent", `${size}x${size}`, "-strip", fileURLToPath(new URL(`pwa-icon-${size}-transparent.png`, output))]);
+}
+
+// Separate adaptive launcher exports: 48% height leaves 26% padding per side.
+// Keep the whole portrait book inside Android's 66/108 safe-circle diameter,
+// as well as the PWA's 80% safe circle. Grid/app-size changes scale the icon;
+// they do not require stacking another crop on top of both safe-area checks.
+// An opaque light background prevents Android choosing a black mask background.
+for (const size of [192, 512]) {
+  const artworkSize = Math.round(size * 0.48);
+  execFileSync("magick", [...crop, "-resize", `${artworkSize}x${artworkSize}`, "-background", "#f5f5f4", "-gravity", "center", "-extent", `${size}x${size}`, "-alpha", "remove", "-alpha", "off", "-strip", fileURLToPath(new URL(`pwa-icon-${size}-maskable-v2.png`, output))]);
 }
 
 // Preserve the established SVG URL for older callers and the offline fallback.
