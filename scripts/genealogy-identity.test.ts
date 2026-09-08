@@ -2,6 +2,7 @@ import { PERSON_REFERENCE_REVIEWS } from "../src/lib/person-place-corrections.ts
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { decodeGenealogyPayload, enrichGenealogyPayload, GENEALOGY_ENRICHMENT_VERSION } from "../src/lib/genealogy.ts";
+import { encodeGenealogyPayload } from "../src/lib/genealogy-compact.ts";
 import { genealogyPersonContext } from "../src/lib/genealogy-result-context.ts";
 import { findGenealogyMatches } from "../src/lib/word-study-selection.ts";
 import type { GenealogyCompactPayload, GenealogyPayload, GenealogyPerson } from "../src/types/reader.ts";
@@ -16,6 +17,37 @@ const shipped = decodeGenealogyPayload(compact);
 const references = (person: GenealogyPerson) => [...new Set((person.verses?.byName ?? []).flatMap(entry => entry.verses))];
 
 describe("genealogy identity boundaries", () => {
+  it("restores Kore's two verse-backed sons and preserves other family assignments", () => {
+    const kore = shipped.find(person => person.id === "kore_1619")!;
+    expect(kore.children).toEqual([
+      { id: "meshelemiah_1621", name: "Meshelemiah", verse: "1CH.26.1" },
+      { id: "shallum_1615", name: "Shallum", verse: "1CH.9.19" },
+    ]);
+    for (const [name, id, ref] of [
+      ["Meshelemiah", "meshelemiah_1621", "1CH.26.1"],
+      ["Shallum", "shallum_1615", "1CH.9.19"],
+    ]) {
+      const matches = findGenealogyMatches(shipped, name, ref);
+      expect(matches.map(person => person.id)).toEqual([id]);
+      expect(matches[0].father).toEqual({ id: "kore_1619", name: "Kore" });
+    }
+    // Apply the existing decoder's legacy ID repairs to the baseline too.
+    const baseline = decodeGenealogyPayload(encodeGenealogyPayload(source));
+    const sourceById = new Map(baseline.map(person => [person.id, person]));
+    for (const person of shipped) {
+      const original = sourceById.get(person.id)!;
+      if (!["meshelemiah_1621", "shallum_1615"].includes(person.id)) {
+        expect(person.father?.id ?? "", person.id).toBe(original.father?.id ?? "");
+      }
+      if (person.id !== "kore_1619") {
+        expect(person.children?.map(child => child.id) ?? [], person.id)
+          .toEqual(original.children?.map(child => child.id) ?? []);
+      }
+      expect(person.siblings?.map(sibling => sibling.id) ?? [], person.id)
+        .toEqual(original.siblings?.map(sibling => sibling.id) ?? []);
+    }
+  });
+
   it("resolves every shipped family link to a complete person record", () => {
     const ids = new Set(shipped.map(person => person.id));
     expect(ids.size).toBe(shipped.length);

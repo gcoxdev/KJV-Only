@@ -716,3 +716,42 @@
         opacity: 0;
     }
 }
+
+/* Timeline geometry is owned by vis-timeline; colors and uncertain ends by us. */
+.bible-timeline .vis-timeline { border: 0; font: inherit; }
+.bible-timeline .vis-panel, .bible-timeline .vis-labelset .vis-label,
+.bible-timeline .vis-foreground .vis-group { border-color: var(--border); }
+.bible-timeline .vis-labelset .vis-label, .bible-timeline .vis-time-axis .vis-text { color: var(--foreground); }
+.bible-timeline .vis-labelset .vis-label .vis-inner { width: 120px; white-space: normal; font-size: 12px; }
+.bible-timeline .vis-time-axis .vis-grid.vis-minor { border-color: var(--border); }
+.bible-timeline .vis-time-axis .vis-grid.vis-major { border-color: var(--muted-foreground); }
+.bible-timeline .vis-item.bible-time-item { background: var(--accent); color: var(--accent-foreground); border: 1px solid var(--primary); border-radius: 4px; font-size: 12px; }
+.bible-timeline .vis-item.bible-time-date-window { background: repeating-linear-gradient(135deg, var(--accent), var(--accent) 5px, var(--muted) 5px, var(--muted) 8px); }
+.bible-timeline .bible-time-label { position: relative; display: inline-block; width: max-content; max-width: var(--bible-time-label-width, 260px); white-space: normal; overflow-wrap: anywhere; padding: 1px 4px; border-radius: 2px; background: var(--accent); color: var(--accent-foreground); }
+.bible-timeline .vis-range .vis-item-overflow { overflow: visible; }
+.bible-timeline .vis-item.vis-point.bible-time-event { background: transparent; border: 0; }
+.bible-timeline .vis-point.bible-time-event .bible-time-label { background: var(--background); color: var(--foreground); }
+.bible-timeline .vis-item.vis-point.bible-time-event.vis-selected { outline: none; }
+.bible-timeline .vis-point.bible-time-event.vis-selected .bible-time-label { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.bible-time-key { display: inline-block; width: 24px; height: 10px; flex-shrink: 0; border: 1px solid var(--primary); border-radius: 2px; background: var(--accent); }
+/* Clip the shape without overriding the library's positioning transforms. */
+.bible-time-key-point,
+.bible-timeline .vis-point.bible-time-event > .vis-dot {
+    width: 10px; height: 10px; border: 0; border-radius: 0; background: var(--primary);
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+.bible-time-key-point { margin-inline: 4px; }
+.bible-time-key-window { background: repeating-linear-gradient(135deg, var(--accent), var(--accent) 3px, var(--muted) 3px, var(--muted) 6px); }
+.bible-timeline .vis-item.bible-time-open-start { border-left: 3px dashed var(--primary); border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.bible-timeline .vis-item.bible-time-open-end { border-right: 3px dashed var(--primary); border-top-right-radius: 0; border-bottom-right-radius: 0; }
+/* Incomplete lifespans stay in their rows, without connectors or dots on the axis. */
+.bible-timeline .vis-line.bible-time-open-start,
+.bible-timeline .vis-line.bible-time-open-end,
+.bible-timeline .vis-dot.bible-time-open-start,
+.bible-timeline .vis-dot.bible-time-open-end { visibility: hidden; }
+.bible-timeline .vis-item.vis-selected { outline: 2px solid var(--primary); outline-offset: 2px; }
+.bible-timeline .vis-item .vis-item-content { padding: 5px 9px; }
+.bible-timeline .vis-panel.vis-background { background: var(--background); }
+@media (max-width: 639px) {
+  .bible-timeline .vis-labelset .vis-label .vis-inner { width: 86px; }
+}

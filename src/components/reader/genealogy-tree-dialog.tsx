@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, type ReactNode, useEffect, useRef, useState } from "react";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -31,6 +31,9 @@ import {
 import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+
+const GenealogyTimeline = lazy(() => import("./genealogy-timeline"));
 
 type GenealogyTreeDialogProps = {
   open: boolean;
@@ -291,6 +294,8 @@ export function GenealogyTreeDialog({
   onCloseSidebar,
 }: GenealogyTreeDialogProps) {
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
+  const [view, setView] = useState("tree");
+  const [expanded, setExpanded] = useState(false);
   const primaryName = person?.names[0] ?? "";
   const aliases = person?.names.slice(1) ?? [];
   const father = resolveParent(person?.father, genealogyById);
@@ -310,24 +315,34 @@ export function GenealogyTreeDialog({
       "[data-slot='scroll-area-viewport']",
     );
     viewport?.scrollTo({ top: 0 });
-  }, [person?.id]);
+  }, [person?.id, expanded]);
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent
-        className="flex h-[min(94vh,900px)] max-h-[calc(100vh-1rem)] w-[min(96vw,1120px)]! max-w-none! flex-col overflow-hidden p-0"
+        className={cn("flex h-[min(94vh,900px)] max-h-[calc(100dvh-1rem)] w-[min(96vw,1120px)]! max-w-none! flex-col overflow-hidden p-0", expanded && "h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)]! gap-0")}
       >
-        <AlertDialogHeader className="gap-1 px-4 pt-4 sm:place-items-start sm:text-left">
-          <AlertDialogTitle>Genealogy Tree</AlertDialogTitle>
+        <AlertDialogHeader className={cn("gap-1 px-4 pt-4 sm:place-items-start sm:text-left", expanded && "sr-only")}>
+          <AlertDialogTitle>{view === "tree" ? "Genealogy Tree" : "Genealogy Timeline"}</AlertDialogTitle>
           <AlertDialogDescription>
-            {person
+            {view === "timeline" ? "Explore Adam to Jesus, family lifespans, and the evidence behind their dates." : person
               ? `Focused on ${primaryName}. Click any person in the tree to recenter the graph.`
               : "No genealogy person selected."}
           </AlertDialogDescription>
+          <ToggleGroup className={expanded ? "hidden" : undefined} value={[view]} onValueChange={values => { if (values[0]) setView(values[0]); }} variant="outline" size="sm" aria-label="Genealogy view">
+            <ToggleGroupItem value="tree">Tree</ToggleGroupItem><ToggleGroupItem value="timeline">Timeline</ToggleGroupItem>
+          </ToggleGroup>
         </AlertDialogHeader>
-        <Separator />
+        {!expanded ? <Separator /> : null}
         <div className="min-h-0 flex-1 overflow-hidden">
-          <ScrollArea ref={scrollAreaRef} className="h-full">
+          <ScrollArea ref={scrollAreaRef} className={cn("h-full", expanded && "[&_[data-slot=scroll-area-viewport]>div]:h-full")}>
+            {view === "timeline" ? <Suspense fallback={<p role="status" className="p-4">Loading timeline…</p>}>
+              <GenealogyTimeline person={person} genealogyById={genealogyById} expanded={expanded} onExpandedChange={setExpanded} onClose={() => onOpenChange(false)}
+                onSelectPerson={id => { onSelectPerson(id); setExpanded(false); setView("tree"); }}
+                renderReferencePreview={renderReferencePreview}
+                onOpenReference={reference => { onOpenReference(reference); onOpenChange(false); }}
+                onCloseSidebar={onCloseSidebar} />
+            </Suspense> :
             <div className="flex flex-col gap-5 px-3 py-3 sm:px-4 sm:py-4">
               {person ? (
                 <>
@@ -446,9 +461,10 @@ export function GenealogyTreeDialog({
                 </div>
               )}
             </div>
+            }
           </ScrollArea>
         </div>
-        <AlertDialogFooter className="mx-0 mb-0 shrink-0 rounded-none border-t px-4 py-4 sm:flex sm:justify-end">
+        <AlertDialogFooter className={cn("mx-0 mb-0 shrink-0 rounded-none border-t px-4 py-4 sm:flex sm:justify-end", expanded && "hidden sm:hidden")}>
           <AlertDialogAction onClick={() => onOpenChange(false)} className="w-auto">
             Close
           </AlertDialogAction>

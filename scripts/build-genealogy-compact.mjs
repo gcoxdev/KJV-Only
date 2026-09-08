@@ -14,6 +14,7 @@ const inputPath = resolveInputPath(
   "data-sources/genealogy.json",
 );
 const additionsPath = resolveInputPath("data-sources/genealogy-additions.json");
+const familyLinksPath = resolveInputPath("data-sources/genealogy-family-links.json");
 const outputPath = path.resolve("public/references/genealogy.compact.min.json");
 const reportPath = path.resolve(".generated/genealogy.build-report.json");
 const BOOK_ORDER = [
@@ -176,6 +177,25 @@ for (const person of input) {
   personIds.add(person.id);
 }
 
+// Reviewed father/son links; preserve the source snapshot and reject conflicts.
+const familyLinks = readJson(familyLinksPath);
+const peopleById = new Map(input.map(person => [person.id, person]));
+for (const { childId, fatherId, verse } of familyLinks) {
+  const child = peopleById.get(childId);
+  const father = peopleById.get(fatherId);
+  if (!child || !father || childId === fatherId || !verse) {
+    throw new Error(`Invalid reviewed genealogy link: ${childId} -> ${fatherId}`);
+  }
+  if (child.father?.id && child.father.id !== fatherId) {
+    throw new Error(`Conflicting reviewed father for ${childId}: ${child.father.id}`);
+  }
+  child.father = { id: fatherId, name: father.names[0] };
+  father.children ??= [];
+  if (!father.children.some(relation => relation.id === childId)) {
+    father.children.push({ id: childId, name: child.names[0], verse });
+  }
+}
+
 const nameIndexes = new Map();
 const names = [];
 
@@ -276,12 +296,13 @@ const compact = {
 writeJson(outputPath, compact);
 
 const outputSize = fs.statSync(outputPath).size;
-const inputSize = fs.statSync(inputPath).size + fs.statSync(additionsPath).size;
+const inputSize = fs.statSync(inputPath).size + fs.statSync(additionsPath).size + fs.statSync(familyLinksPath).size;
 
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 writeJson(reportPath, {
   inputPath: path.relative(process.cwd(), inputPath),
   additionsPath: path.relative(process.cwd(), additionsPath),
+  familyLinksPath: path.relative(process.cwd(), familyLinksPath),
   outputPath: path.relative(process.cwd(), outputPath),
   inputSize,
   outputSize,
@@ -289,6 +310,7 @@ writeJson(reportPath, {
   personCount: input.length,
   originalPersonCount: original.length,
   addedPersonCount: additions.length,
+  reviewedFamilyLinkCount: familyLinks.length,
   verseCount: verses.length,
   nameCount: names.length,
 });
