@@ -30,7 +30,9 @@ for (const [name, size] of [
 // Keep the complete book inside the maskable icon's central safe area.
 execFileSync("magick", [...crop, "-resize", "320x320", "-background", "none", "-gravity", "center", "-extent", "512x512", "-strip", fileURLToPath(new URL("app-icon-maskable.png", output))]);
 
-// General-purpose installation/splash icons retain their existing size.
+// Legacy padded exports retained for older cached manifests. The current
+// manifest uses app-icon.png/app-icon-512.png for desktop installation so the
+// book fills the taskbar icon; Android keeps the separate maskable exports.
 for (const size of [192, 512]) {
   const artworkSize = Math.round(size * 0.6);
   execFileSync("magick", [...crop, "-resize", `${artworkSize}x${artworkSize}`, "-background", "none", "-gravity", "center", "-extent", `${size}x${size}`, "-strip", fileURLToPath(new URL(`pwa-icon-${size}-transparent.png`, output))]);
