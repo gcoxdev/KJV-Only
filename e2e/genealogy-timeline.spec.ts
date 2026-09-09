@@ -63,9 +63,11 @@ for (const width of [375, 1200]) {
       return text.left >= viewport.left && text.right <= viewport.right;
     })).toBe(true);
     await page.screenshot({ path: `design/genealogy-estimate-${width}.png` });
+    if (width < 768) await dialog.getByRole("button", { name: "Collapse chart", exact: true }).click();
     await dialog.getByRole("textbox", { name: "Filter timeline" }).clear();
     await dialog.getByRole("combobox", { name: "Jesus lineage branch" }).click();
     await page.getByRole("option", { name: "Mary (Luke interpretation)", exact: true }).click();
+    if (width < 768) await dialog.getByRole("button", { name: "Expand chart", exact: true }).click();
     await expect(labels).toHaveCount(76);
     await expect(dialog.getByRole("group", { name: "Timeline entries", includeHidden: true }).locator("button")).toHaveCount(76);
     await expect(labels).toContainText(["David", "Nathan", "Mattatha", "Menan"]);
@@ -127,9 +129,14 @@ for (const width of [375, 1200]) {
     await expect(entries).not.toContainText("Nathan ·");
     await dialog.getByRole("button", { name: "Chart", exact: true }).click();
     await dialog.getByRole("button", { name: "Expand chart", exact: true }).click();
+    if (width < 768) {
+      await expect(branch).toBeHidden();
+      await dialog.getByRole("button", { name: "Collapse chart", exact: true }).click();
+    }
     await branch.click();
     await page.getByRole("option", { name: "Mary (Luke interpretation)", exact: true }).click();
     await expect(branch).toContainText("Mary (Luke interpretation)");
+    if (width < 768) await dialog.getByRole("button", { name: "Expand chart", exact: true }).click();
     const chart = dialog.getByRole("region", { name: "Genealogy timeline chart" });
     expect(await chart.evaluate(el => el.clientHeight)).toBeGreaterThan(250);
     expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
@@ -427,11 +434,13 @@ for (const viewport of [{ width: 375, height: 812 }, { width: 812, height: 375 }
     await page.screenshot({ path: `design/genealogy-timeline-expanded-${viewport.width}.png` });
     const axe = await new AxeBuilder({ page }).include('[role="alertdialog"]').analyze();
     expect(axe.violations.filter(v => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
+    await dialog.getByRole("button", { name: "Collapse chart", exact: true }).click();
     await filter.fill("no matching timeline entry");
+    await dialog.getByRole("button", { name: "Expand chart", exact: true }).click();
     await expect(dialog.getByText(/No supported calendar placements/)).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Collapse chart", exact: true })).toBeVisible();
-    await filter.fill("Jesus");
     await dialog.getByRole("button", { name: "Collapse chart", exact: true }).click();
+    await filter.fill("Jesus");
     await expect(dialog.getByRole("article", { name: "Timeline evidence" })).toContainText("Uncertain event date");
     await expect.poll(() => chart.evaluate(el => el.clientHeight)).toBe(318);
   });
@@ -463,4 +472,43 @@ test("selecting Jesus in the reader and repeatedly opening the timeline produces
     await dialog.getByRole("button", { name: "Close", exact: true }).click();
     await expect(dialog).not.toBeVisible();
   }
+});
+
+
+test.describe("expanded mobile chart", () => {
+  test.use({ hasTouch: true });
+
+  test("keeps room for the chart in portrait and landscape and restores filters", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    const dialog = await openTimeline(page);
+    const filter = dialog.getByRole("textbox", { name: "Filter timeline" });
+    await filter.fill("Jesus");
+    await dialog.getByRole("button", { name: "Expand chart", exact: true }).click();
+    const chart = dialog.getByRole("region", { name: "Genealogy timeline chart" });
+    for (const viewport of [{ width: 375, height: 812 }, { width: 812, height: 375 }]) {
+      await page.setViewportSize(viewport);
+      await expect(filter).toBeHidden();
+      await expect(dialog.getByRole("group", { name: "Timeline scope" })).toBeHidden();
+      await expect(dialog.getByRole("group", { name: "Timeline content" })).toBeHidden();
+      await expect(dialog.getByRole("combobox", { name: "Timeline period" })).toBeHidden();
+      await expect(dialog.getByLabel("Timeline legend")).toBeHidden();
+      for (const name of ["Zoom in", "Zoom out", "Fit selection"]) {
+        const button = dialog.getByRole("button", { name, exact: true });
+        await expect(button).toHaveText("");
+        await expect(button.locator("svg")).toBeVisible();
+        await button.click();
+      }
+      await expect.poll(() => chart.evaluate(el => el.clientHeight)).toBeGreaterThan(viewport.height * 0.7);
+      expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      await page.screenshot({ path: `design/genealogy-mobile-compact-${viewport.width}.png` });
+    }
+    await dialog.getByRole("button", { name: "Collapse chart", exact: true }).click();
+    await expect(filter).toBeVisible();
+    await expect(filter).toHaveValue("Jesus");
+    await expect(dialog.getByLabel("Timeline legend")).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Zoom in", exact: true })).toHaveText("Zoom in");
+    await dialog.getByRole("button", { name: "Expand chart", exact: true }).click();
+    await dialog.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(dialog).toBeHidden();
+  });
 });

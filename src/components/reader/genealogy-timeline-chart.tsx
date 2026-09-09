@@ -4,7 +4,8 @@ import { Timeline } from "vis-timeline/peer";
 import type { DataItem, TimelineOptions } from "vis-timeline";
 import "vis-timeline/styles/vis-timeline-graph2d.css";
 import { Button } from "@/components/ui/button";
-import { MaximizeIcon, MinimizeIcon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { MaximizeIcon, MinimizeIcon, ScanIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatTimelineYear, hasUnknownEnd, hasUnknownStart, timelineDate, timelinePlotBounds, type TimelineRecord } from "@/lib/bible-timeline";
 
@@ -15,9 +16,10 @@ function textNode(text: string, className?: string) {
   return element;
 }
 
-export default function GenealogyTimelineChart({ records, selectedId, onSelect, expanded, onExpandedChange, onClose }: {
+export default function GenealogyTimelineChart({ records, selectedId, onSelect, expanded, compact, onExpandedChange, onClose }: {
   records: TimelineRecord[]; selectedId?: string; onSelect: (id: string) => void;
   expanded: boolean; onExpandedChange: (expanded: boolean) => void;
+  compact: boolean;
   onClose: () => void;
 }) {
   const container = useRef<HTMLDivElement>(null);
@@ -167,9 +169,16 @@ export default function GenealogyTimelineChart({ records, selectedId, onSelect, 
   return (
     <div className={cn("flex min-w-0 flex-col gap-2", expanded && "min-h-0 flex-1")}>
       <div className="flex shrink-0 flex-wrap items-center gap-2" role="group" aria-label="Timeline navigation">
-        <Button size="sm" variant="outline" onClick={() => timeline.current?.zoomIn(0.4, { animation: false })}>Zoom in</Button>
-        <Button size="sm" variant="outline" onClick={() => timeline.current?.zoomOut(0.4, { animation: false })}>Zoom out</Button>
-        <Button size="sm" variant="outline" onClick={() => fitSelection.current?.()}>Fit selection</Button>
+        {[
+          { label: "Zoom in", icon: ZoomInIcon, action: () => timeline.current?.zoomIn(0.4, { animation: false }) },
+          { label: "Zoom out", icon: ZoomOutIcon, action: () => timeline.current?.zoomOut(0.4, { animation: false }) },
+          { label: "Fit selection", icon: ScanIcon, action: () => fitSelection.current?.() },
+        ].map(({ label, icon: Icon, action }) => <Tooltip key={label}>
+          <TooltipTrigger render={<Button size={compact ? "icon" : "sm"} variant="outline" aria-label={label} onClick={action} />}>
+            {compact ? <Icon /> : label}
+          </TooltipTrigger>
+          <TooltipContent>{label}</TooltipContent>
+        </Tooltip>)}
         <Button size="sm" variant="outline" aria-expanded={expanded} onClick={() => onExpandedChange(!expanded)}>
           {expanded ? <MinimizeIcon data-icon="inline-start" /> : <MaximizeIcon data-icon="inline-start" />}{expanded ? "Collapse chart" : "Expand chart"}
         </Button>
@@ -179,7 +188,7 @@ export default function GenealogyTimelineChart({ records, selectedId, onSelect, 
       {error ? <p role="alert">The chart could not load. Use the timeline list below.</p> : null}
       {!hasDates ? <p className="text-sm text-muted-foreground">No supported calendar placements in this selection. {expanded ? "Collapse the chart to see the undated entries." : "People and evidence remain in the list below."}</p> : null}
       <div ref={container} className={cn("bible-timeline min-w-0 overflow-hidden rounded-lg border", expanded ? "min-h-0 flex-1" : "h-80", !hasDates && "hidden")} role="region" aria-label="Genealogy timeline chart" />
-      <div className="flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground" aria-label="Timeline legend">
+      <div className={cn("flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground", compact && "hidden")} aria-label="Timeline legend">
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key bible-time-key-point" />Single date</span>
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key" />Span of time</span>
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key bible-time-key-window" />Uncertain event date (not duration)</span>

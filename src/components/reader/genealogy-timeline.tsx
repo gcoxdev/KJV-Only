@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useMemo, useState, type ReactNode } from "
 import { TIMELINE_METHOD, TIMELINE_SOURCES, type SojournModel } from "@/data/bible-timeline";
 import { TIMELINE_ERAS, buildLineageTimeline, jesusLineage, timelineEntryCategory, timelineDateSummary, timelineKindLabel, timelinePlotBounds, type JesusLineageBranch, type TimelineContent, type TimelineEra, type TimelineRecord } from "@/lib/bible-timeline";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { GenealogyPerson } from "@/types/reader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,8 @@ export default function GenealogyTimeline({ person, genealogyById, onSelectPerso
   onExpandedChange: (expanded: boolean) => void;
   onClose: () => void;
 }) {
+  const isMobile = useIsMobile();
+  const compact = expanded && isMobile;
   const [era, setEra] = useState<TimelineEra | "all">("all");
   const [scope, setScope] = useState("overview");
   const [content, setContent] = useState<TimelineContent>("all");
@@ -81,7 +84,7 @@ export default function GenealogyTimeline({ person, genealogyById, onSelectPerso
   return (
     <section aria-label="Adam to Jesus timeline" className={cn("flex min-w-0 flex-col gap-3 p-3 sm:p-4", expanded && "h-full min-h-0 gap-2 overflow-hidden p-2 sm:p-2")}>
       {!expanded ? <p className="text-sm text-muted-foreground">Adam to Jesus · KJV ages and passages, with a provisional historical calendar. Select a person or event to see the evidence.</p> : null}
-      <div className="flex shrink-0 flex-wrap items-center gap-2">
+      <div className={cn("flex shrink-0 flex-wrap items-center gap-2", compact && "hidden")}>
         <ToggleGroup value={[scope]} onValueChange={values => { if (values[0]) { setScope(values[0]); if (values[0] === "lineage") setContent("people"); } }} variant="outline" size="sm" aria-label="Timeline scope">
           <ToggleGroupItem value="overview">Overview</ToggleGroupItem><ToggleGroupItem value="family" disabled={!person}>Family</ToggleGroupItem>
           <ToggleGroupItem value="lineage" disabled={!lineage.members.length}>Jesus' lineage</ToggleGroupItem>
@@ -129,7 +132,7 @@ export default function GenealogyTimeline({ person, genealogyById, onSelectPerso
         </AccordionItem>
       </Accordion>
       {display === "chart" ? <Suspense fallback={<p role="status">Loading timeline chart…</p>}>
-        <TimelineChart records={visible} selectedId={selected?.id} onSelect={select} expanded={expanded} onExpandedChange={onExpandedChange} onClose={onClose} />
+        <TimelineChart records={visible} selectedId={selected?.id} onSelect={select} expanded={expanded} compact={compact} onExpandedChange={onExpandedChange} onClose={onClose} />
       </Suspense> : null}
       {expanded && selected ? <p className="shrink-0 text-xs" aria-live="polite">{selected.label} · {selected.placement ? "" : `${timelineKindLabel(selected)} · `}{timelineDateSummary(selected)}</p> : null}
       <div className={expanded ? "hidden" : "contents"}>
