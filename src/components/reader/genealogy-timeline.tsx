@@ -14,7 +14,7 @@ import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 
 const TimelineChart = lazy(() => import("./genealogy-timeline-chart"));
 
-export default function GenealogyTimeline({ person, genealogyById, onSelectPerson, onOpenReference, renderReferencePreview, onCloseSidebar, expanded, onExpandedChange, onClose, records, model, onModelChange }: {
+export default function GenealogyTimeline({ person, genealogyById, onSelectPerson, onOpenReference, renderReferencePreview, onCloseSidebar, expanded, onExpandedChange, records, model, onModelChange }: {
   records: TimelineRecord[];
   model: SojournModel;
   onModelChange: (model: SojournModel) => void;
@@ -26,7 +26,6 @@ export default function GenealogyTimeline({ person, genealogyById, onSelectPerso
   onCloseSidebar: () => void;
   expanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
-  onClose: () => void;
 }) {
   const isMobile = useIsMobile();
   const compact = expanded && isMobile;
@@ -84,7 +83,7 @@ export default function GenealogyTimeline({ person, genealogyById, onSelectPerso
   return (
     <section aria-label="Adam to Jesus timeline" className={cn("flex min-w-0 flex-col gap-3 p-3 sm:p-4", expanded && "h-full min-h-0 gap-2 overflow-hidden p-2 sm:p-2")}>
       {!expanded ? <p className="text-sm text-muted-foreground">Adam to Jesus · KJV ages and passages, with a provisional historical calendar. Select a person or event to see the evidence.</p> : null}
-      <div className={cn("flex shrink-0 flex-wrap items-center gap-2", compact && "hidden")}>
+      <div className={cn("flex shrink-0 flex-wrap items-center gap-2", expanded && "pr-10", compact && "hidden")}>
         <ToggleGroup value={[scope]} onValueChange={values => { if (values[0]) { setScope(values[0]); if (values[0] === "lineage") setContent("people"); } }} variant="outline" size="sm" aria-label="Timeline scope">
           <ToggleGroupItem value="overview">Overview</ToggleGroupItem><ToggleGroupItem value="family" disabled={!person}>Family</ToggleGroupItem>
           <ToggleGroupItem value="lineage" disabled={!lineage.members.length}>Jesus' lineage</ToggleGroupItem>
@@ -132,7 +131,7 @@ export default function GenealogyTimeline({ person, genealogyById, onSelectPerso
         </AccordionItem>
       </Accordion>
       {display === "chart" ? <Suspense fallback={<p role="status">Loading timeline chart…</p>}>
-        <TimelineChart records={visible} selectedId={selected?.id} onSelect={select} expanded={expanded} compact={compact} onExpandedChange={onExpandedChange} onClose={onClose} />
+        <TimelineChart records={visible} selectedId={selected?.id} onSelect={select} expanded={expanded} compact={compact} onExpandedChange={onExpandedChange} />
       </Suspense> : null}
       {expanded && selected ? <p className="shrink-0 text-xs" aria-live="polite">{selected.label} · {selected.placement ? "" : `${timelineKindLabel(selected)} · `}{timelineDateSummary(selected)}</p> : null}
       <div className={expanded ? "hidden" : "contents"}>

@@ -84,8 +84,8 @@ export function ReaderImportControls({
               ) : null}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={onCloseImportSummary}>
+          <AlertDialogFooter className="group-data-[size=sm]/alert-dialog-content:flex flex-row justify-end px-3 py-2">
+            <AlertDialogAction size="sm" onClick={onCloseImportSummary}>
               OK
             </AlertDialogAction>
           </AlertDialogFooter>

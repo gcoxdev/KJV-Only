@@ -11,15 +11,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { BookOpenCheckIcon, BookOpenIcon } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { bookCodeForIndex, iconPath } from "@/lib/reader-view";
 import type { ReadingContinuation } from "@/lib/reading-progress";
 
@@ -61,11 +52,6 @@ export type ProgressPanelContentProps = {
   onContinueReading: (bookIndex: number, chapterIndex: number) => void;
   onToggleChapterRead: (bookIndex: number, chapterIndex: number) => void;
   onResetAllProgress: () => void;
-};
-
-type ProgressDialogProps = ProgressPanelContentProps & {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
 };
 
 export function ProgressPanelContent({
@@ -296,30 +282,5 @@ export function ProgressPanelContent({
         </Button>
       </div>
     </div>
-  );
-}
-
-export function ProgressDialog({
-  open,
-  onOpenChange,
-  ...props
-}: ProgressDialogProps) {
-  return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Reading Progress</AlertDialogTitle>
-          <AlertDialogDescription>
-            Track chapter completion across the whole Bible.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <ProgressPanelContent {...props} />
-        <AlertDialogFooter>
-          <AlertDialogAction onClick={() => onOpenChange(false)}>
-            Close
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
   );
 }

@@ -2044,8 +2044,8 @@ export function SearchPage({
               </div>
             </ScrollArea>
           </div>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setIsBookFilterOpen(false)}>
+          <AlertDialogFooter className="flex-row justify-end px-3 py-2">
+            <AlertDialogAction size="sm" onClick={() => setIsBookFilterOpen(false)}>
               OK
             </AlertDialogAction>
           </AlertDialogFooter>

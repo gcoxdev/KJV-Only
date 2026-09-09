@@ -40,15 +40,6 @@ import type {
   WordVerseSelectionTarget,
 } from "@/types/reader";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
   Tabs,
   TabsContent,
   TabsList,
@@ -118,11 +109,6 @@ export type SettingsPanelContentProps = {
   ) => void;
   onResetShortcutBinding: (actionId: ShortcutActionId) => void;
   onResetAllShortcutBindings: () => void;
-};
-
-type SettingsDialogProps = SettingsPanelContentProps & {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
 };
 
 export function SettingsPanelContent({
@@ -741,33 +727,5 @@ export function SettingsPanelContent({
         </div>
       </TabsContent>
     </Tabs>
-  );
-}
-
-export function SettingsDialog({
-  open,
-  onOpenChange,
-  ...props
-}: SettingsDialogProps) {
-  return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent
-        size="sm"
-        className="flex max-h-[calc(100vh-1.5rem)] flex-col gap-2 overflow-hidden"
-      >
-        <AlertDialogHeader>
-          <AlertDialogTitle>Settings</AlertDialogTitle>
-          <AlertDialogDescription>
-            Reader preferences for this device.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <SettingsPanelContent {...props} />
-        <AlertDialogFooter className="group-data-[size=sm]/alert-dialog-content:flex group-data-[size=sm]/alert-dialog-content:flex-row group-data-[size=sm]/alert-dialog-content:justify-end justify-end sm:flex sm:justify-end">
-          <AlertDialogAction onClick={() => onOpenChange(false)} className="w-auto">
-            Close
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
   );
 }

@@ -15,14 +15,13 @@ import { indexTimelinePersonDates, timelineDateSummary, type TimelineRecord } fr
 import type { GenealogyPerson, GenealogyRelation } from "@/types/reader";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { DialogDismissButton } from "@/components/reader/dialog-dismiss-button";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -335,7 +334,7 @@ export function GenealogyTreeDialog({
       <AlertDialogContent
         className={cn("flex h-[min(94vh,900px)] max-h-[calc(100dvh-1rem)] w-[min(96vw,1120px)]! max-w-none! flex-col overflow-hidden p-0", expanded && "h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)]! gap-0")}
       >
-        <AlertDialogHeader className={cn("gap-1 px-4 pt-4 sm:place-items-start sm:text-left", expanded && "sr-only")}>
+        <AlertDialogHeader className={cn("gap-1 pl-4 pr-12 pt-4 sm:place-items-start sm:text-left", expanded && "sr-only")}>
           <AlertDialogTitle>{view === "tree" ? "Genealogy Tree" : "Genealogy Timeline"}</AlertDialogTitle>
           <AlertDialogDescription>
             {view === "timeline" ? "Explore Adam to Jesus, family lifespans, and the evidence behind their dates." : person
@@ -350,7 +349,7 @@ export function GenealogyTreeDialog({
         <div className="min-h-0 flex-1 overflow-hidden">
           <ScrollArea ref={scrollAreaRef} className={cn("h-full", expanded && "[&_[data-slot=scroll-area-viewport]>div]:h-full")}>
             {view === "timeline" ? <Suspense fallback={<p role="status" className="p-4">Loading timeline…</p>}>
-              <GenealogyTimeline person={person} genealogyById={genealogyById} expanded={expanded} onExpandedChange={setExpanded} onClose={() => onOpenChange(false)}
+              <GenealogyTimeline person={person} genealogyById={genealogyById} expanded={expanded} onExpandedChange={setExpanded}
                 records={records} model={model} onModelChange={setModel}
                 onSelectPerson={id => { onSelectPerson(id); setExpanded(false); setView("tree"); }}
                 renderReferencePreview={renderReferencePreview}
@@ -485,11 +484,7 @@ export function GenealogyTreeDialog({
             }
           </ScrollArea>
         </div>
-        <AlertDialogFooter className={cn("mx-0 mb-0 shrink-0 rounded-none border-t px-4 py-4 sm:flex sm:justify-end", expanded && "hidden sm:hidden")}>
-          <AlertDialogAction onClick={() => onOpenChange(false)} className="w-auto">
-            Close
-          </AlertDialogAction>
-        </AlertDialogFooter>
+        <DialogDismissButton onClose={() => onOpenChange(false)} />
       </AlertDialogContent>
     </AlertDialog>
   );

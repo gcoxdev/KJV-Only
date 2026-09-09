@@ -15,6 +15,7 @@ import { mapConfidenceSummary, mapEntryLabel } from "@/lib/maps";
 import { loadAncientMap } from "@/lib/reader-data";
 import { findMapsInArea, mapAreaKey, type MapAreaBounds } from "@/lib/map-area";
 import { Button } from "@/components/ui/button";
+import { DialogDismissButton } from "@/components/reader/dialog-dismiss-button";
 import { MapPlaceSearch } from "@/components/reader/map-place-search";
 import { MapProposedLocations } from "@/components/reader/map-proposed-locations";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -29,7 +30,6 @@ import {
 } from "@/lib/map-renderers";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -169,7 +169,8 @@ export function MapAndPhotoDialogs({
   return (
     <AlertDialog open={isMapDialogOpen} onOpenChange={onMapDialogOpenChange}>
       <AlertDialogContent className="flex h-[min(94dvh,900px)] w-[min(98vw,1700px)]! max-w-none! flex-col gap-2 p-3">
-        <div className="flex min-w-0 shrink-0 items-start justify-between gap-2">
+        <DialogDismissButton onClose={onCloseMapDialog} />
+        <div className="flex min-w-0 shrink-0 items-start justify-between gap-2 pr-9">
           <AlertDialogHeader className="min-w-0 flex-1 sm:place-items-start sm:text-left">
             <AlertDialogTitle>
               {activeMapDialogEntry
@@ -299,9 +300,6 @@ export function MapAndPhotoDialogs({
             {areaBusy ? "Searching area..." : "Search this area"}
           </Button>
           {areaSearch && !showAreaResults ? <Button variant="ghost" size="sm" onClick={() => setShowAreaResults(true)}>Results ({areaSearch.entries.length})</Button> : null}
-          <AlertDialogAction onClick={onCloseMapDialog} className="w-auto">
-            Close
-          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

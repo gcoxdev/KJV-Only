@@ -101,7 +101,7 @@ export function CompletionCelebration({
               <p className="text-sm text-foreground">{verse.text}</p>
             </div>
           </AlertDialogHeader>
-          <AlertDialogFooter className="group-data-[size=sm]/alert-dialog-content:flex group-data-[size=sm]/alert-dialog-content:grid-cols-none justify-end sm:justify-end">
+          <AlertDialogFooter className="group-data-[size=sm]/alert-dialog-content:flex group-data-[size=sm]/alert-dialog-content:grid-cols-none justify-end px-3 py-2 sm:justify-end">
             <AlertDialogAction className="w-auto self-auto" onClick={() => onOpenChange(false)}>
               Amen
             </AlertDialogAction>
