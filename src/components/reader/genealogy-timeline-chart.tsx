@@ -60,9 +60,10 @@ export default function GenealogyTimelineChart({ records, selectedId, onSelect, 
           align: "left" as const, limitSize: false,
         } : {}),
         // Point items keep their marker in the row; boxes also create an axis dot.
-        type: record.kind === "event" ? "point" : end > start ? "range" : "box",
+        type: record.kind === "event" || record.placement ? "point" : end > start ? "range" : "box",
         className: ["bible-time-item", `bible-time-${record.kind}`,
-          hasUnknownStart(record) ? "bible-time-open-start" : "", hasUnknownEnd(record) ? "bible-time-open-end" : ""].filter(Boolean).join(" "),
+          record.placement ? "bible-time-estimate" : "",
+          !record.placement && hasUnknownStart(record) ? "bible-time-open-start" : "", !record.placement && hasUnknownEnd(record) ? "bible-time-open-end" : ""].filter(Boolean).join(" "),
       };
     });
     const options: TimelineOptions = {
@@ -102,11 +103,12 @@ export default function GenealogyTimelineChart({ records, selectedId, onSelect, 
           const content = label?.closest<HTMLElement>(".vis-item-content");
           const labelWidth = content?.offsetWidth ?? 0;
           const boxWidth = item?.offsetWidth ?? labelWidth;
-          const isBox = record.kind !== "event" && start === end;
+          const isPoint = record.kind === "event" || !!record.placement;
+          const isBox = !isPoint && start === end;
           return [{
             date: timelineDate(start).getTime(),
-            left: isBox ? boxWidth / 2 : record.kind === "event" ? 6 : 0,
-            right: isBox ? boxWidth / 2 : record.kind === "event" ? boxWidth : labelWidth + 2,
+            left: isBox ? boxWidth / 2 : isPoint ? 6 : 0,
+            right: isBox ? boxWidth / 2 : isPoint ? boxWidth : labelWidth + 2,
           }, ...(end > start ? [{ date: timelineDate(end).getTime(), left: 0, right: 0 }] : [])];
         });
         // Find a scale at which every pair of date anchors and their text fits.
@@ -181,6 +183,7 @@ export default function GenealogyTimelineChart({ records, selectedId, onSelect, 
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key bible-time-key-point" />Single date</span>
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key" />Span of time</span>
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key bible-time-key-window" />Uncertain event date (not duration)</span>
+        {records.some(record => record.placement) ? <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key bible-time-key-estimate" />Estimated placement (not lifespan)</span> : null}
         <span>Broken ends: birth/death unknown · All calendar dates approximate</span>
       </div>
     </div>

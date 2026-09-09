@@ -1,4 +1,5 @@
 import { resolvePersonPlaceContext, type PersonPlaceContext } from "@/lib/person-place-context";
+import { genealogyNamesAtToken } from "@/lib/genealogy-names";
 import type { Book, VerseToken } from "@/types/bible";
 import type { AncientMapEntry, AncientMapPayload } from "@/lib/maps";
 import {
@@ -260,6 +261,7 @@ export function findGenealogyMatches(
   rawWord: string,
   referenceKey?: string | null,
   context?: PersonPlaceContext,
+  selection?: Pick<TokenAccordionOptions, "verseTokens" | "tokenIndex">,
 ): GenealogyPerson[] {
   if (!people || context?.sense === "place" || context?.sense === "people") {
     return [];
@@ -270,13 +272,17 @@ export function findGenealogyMatches(
     return [];
   }
 
+  const phrases = genealogyNamesAtToken(rawWord, selection?.verseTokens, selection?.tokenIndex);
+  const names = phrases.size ? phrases : new Set([targetWord]);
+  const byName = genealogyPeopleByName(people);
+  const candidates = new Set([...names].flatMap(name => byName.get(name) ?? []));
   const rankedMatches: RankedGenealogyMatch[] = [];
-  for (const person of genealogyPeopleByName(people).get(targetWord) ?? []) {
+  for (const person of candidates) {
     const exactNameMatch = person.names.some(
-      (name) => normalizedWord(name) === targetWord,
+      (name) => names.has(normalizedWord(name)),
     );
     const byNameMatches = (person.verses?.byName ?? []).filter(
-      (entry) => normalizedWord(entry.name) === targetWord,
+      (entry) => names.has(normalizedWord(entry.name)),
     );
     const currentReferenceMatch =
       Boolean(referenceKey) &&
@@ -425,7 +431,7 @@ export function deriveTokenAccordionState(
       ? chapterVerseKey(options.bookIndex ?? 0, options.chapterIndex ?? 0, options.verseNumber ?? 1)
       : null;
   const context = resolvePersonPlaceContext(rawWord, referenceKey, options.strongCodes, options.verseTokens, options.tokenIndex);
-  const people = findGenealogyMatches(options.genealogyData, rawWord, referenceKey, context);
+  const people = findGenealogyMatches(options.genealogyData, rawWord, referenceKey, context, options);
   if (findMapMatches(options.ancientMapsData, rawWord, context, people).some(entry => !entry.selectionNote)) {
     nextAccordion.push("maps");
   }

@@ -1,4 +1,5 @@
 import type { Book } from "@/types/bible";
+import { GENEALOGY_COMPOUND_WORDS } from "@/lib/genealogy-names";
 import {
   type AncientMapPayload,
   type MapGeoJsonPayload,
@@ -57,6 +58,7 @@ const mapGeoJsonPromiseCache = new Map<string, Promise<MapGeoJsonPayload>>();
 export const GENEALOGY_ASSET_VERSION = GENEALOGY_ENRICHMENT_VERSION;
 export const STRONGS_ASSET_VERSION = "20260313-derivation-links-2";
 const GENEALOGY_ENRICHED_CANDIDATE_WORDS = new Set([
+  ...GENEALOGY_COMPOUND_WORDS,
   "jesus",
   "christ",
   "immanuel",

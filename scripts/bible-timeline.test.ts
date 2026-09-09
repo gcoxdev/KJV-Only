@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { buildBibleTimeline, TIMELINE_METHOD, TIMELINE_SOURCES } from "../src/data/bible-timeline";
-import { formatTimelineYear, hasUnknownEnd, hasUnknownStart, timelineDate, timelineDateSummary, timelinePlotBounds } from "../src/lib/bible-timeline";
+import { buildLineageTimeline, formatTimelineYear, hasUnknownEnd, hasUnknownStart, indexTimelinePersonDates, jesusLineage, timelineEntryCategory, timelineDate, timelineDateSummary, timelinePlotBounds } from "../src/lib/bible-timeline";
 import { decodeGenealogyPayload } from "../src/lib/genealogy";
 import type { Book } from "../src/types/bible";
 
@@ -9,6 +9,110 @@ const records = buildBibleTimeline();
 const record = (id: string) => records.find(item => item.id === id)!;
 
 describe("KJV timeline evidence", () => {
+  it("plots every ancestor in both lineages without changing any reviewed dates or inventing lifespans", () => {
+    const people = new Map(decodeGenealogyPayload(JSON.parse(readFileSync("public/references/genealogy.compact.min.json", "utf8"))).map(person => [person.id, person]));
+    const original = structuredClone(records);
+    for (const branch of ["mary", "joseph"] as const) for (const model of ["egypt430", "promise430"] as const) {
+      const source = buildBibleTimeline(model);
+      const members = jesusLineage(people, branch).members;
+      const plotted = buildLineageTimeline(members, source);
+      expect(plotted).toHaveLength(members.length);
+      expect(plotted.every(row => timelinePlotBounds(row))).toBe(true);
+      expect(plotted.map(row => members.find(p => row.personIds?.includes(p.id))!.id)).toEqual([...members].reverse().map(p => p.id));
+      const lookup = (id: string) => plotted.find(row => row.personIds?.includes(id))!;
+      for (const row of plotted.filter(row => !row.placement)) expect(row).toBe(source.find(r => r.id === row.id));
+      for (const row of plotted.filter(row => row.placement)) {
+        expect(row.start).toBeUndefined(); expect(row.end).toBeUndefined();
+        expect(timelineDateSummary(row)).toContain("Estimated placement:");
+        expect(timelineDateSummary(row)).toContain("Birth: Unknown · Death: Unknown");
+        expect(row.placement!.anchorIds.length).toBeGreaterThan(0);
+        expect(row.references.length).toBeGreaterThan(0);
+        expect(indexTimelinePersonDates(plotted).has(row.personIds![0])).toBe(false);
+      }
+      expect(lookup("boaz_590").placement!.year).toBeGreaterThan(lookup("nahshon_379").start!);
+      expect(lookup("boaz_590").placement!.year).toBeLessThan(lookup("david_593").start!);
+      expect(lookup("ram_594").placement!.explanation).toContain("20-year generation would not span");
+      expect(lookup("cainan_2923").placement!.explanation).toContain("does not resolve");
+      expect(lookup("judah_197").start).toBe(source.find(r => r.id === "egypt-entry")!.start);
+      expect(lookup("nahshon_379").start).toBe(source.find(r => r.id === "exodus")!.start! + 1);
+      if (branch === "mary") expect(lookup("nathan_676").placement!.method).toBe("context");
+    }
+    expect(records).toEqual(original);
+    const members = jesusLineage(people, "mary").members;
+    const before = buildLineageTimeline(members, records);
+    const shifted = buildLineageTimeline(members, buildBibleTimeline("promise430"));
+    const estimate = (rows: typeof before, id: string) => rows.find(r => r.personIds?.includes(id))!.placement!.year;
+    expect(estimate(shifted, "ram_594")).toBeGreaterThan(estimate(before, "ram_594"));
+    expect(estimate(shifted, "heli_2883")).toBe(estimate(before, "heli_2883"));
+  });
+
+  it("uses twenty years only with one anchor and preserves unanchored or contradictory gaps", () => {
+    const member = (id: string) => ({ id, names: [id] });
+    const chain = [member("child"), member("middle"), member("parent")];
+    const parent = { ...record("david_593"), id: "parent", personIds: ["parent"], start: -100, end: undefined };
+    const child = { ...parent, id: "child", personIds: ["child"], start: 0 };
+    const rows = buildLineageTimeline(chain, [parent]);
+    expect(rows[1].placement!.year).toBe(-79); // nearest five calendar years: 80 BC
+    expect(rows[1].placement!.method).toBe("generation");
+    expect(rows[1].placement!.explanation).toContain("Assumes 20 years");
+    expect(buildLineageTimeline(chain, [child])[1].placement!.method).toBe("generation");
+    expect(buildLineageTimeline(chain, []).every(row => !timelinePlotBounds(row))).toBe(true);
+    expect(buildLineageTimeline(chain, [parent, { ...child, start: -200 }])[1].placement).toBeUndefined();
+  });
+
+  it("separates people's lives and activity from events and historical periods", () => {
+    for (const id of ["adam_2", "miriam_390", "daniel_2774", "jesus-earthly", "mary_2828"]) expect(timelineEntryCategory(record(id))).toBe("people");
+    for (const id of ["exodus", "egypt-sojourn", "jesus-birth", "john-ministry", "resurrection"]) expect(timelineEntryCategory(record(id))).toBe("events");
+    expect(timelineEntryCategory({ ...record("resurrection"), personIds: ["jesus_christ_2683"] })).toBe("events");
+  });
+
+  it("keeps the two saved Jesus lineages separate and includes their undated ancestors", () => {
+    const people = new Map(decodeGenealogyPayload(JSON.parse(readFileSync("public/references/genealogy.compact.min.json", "utf8"))).map(person => [person.id, person]));
+    for (const root of ["jesus_christ_2683", "jesus_christ_2684"]) {
+      const joseph = jesusLineage(people, "joseph", root);
+      const mary = jesusLineage(people, "mary", root);
+      expect(joseph.complete).toBe(true);
+      expect(mary.complete).toBe(true);
+      expect(joseph.members[0].id).toBe(root);
+      expect(mary.members[0].id).toBe(root);
+      expect(joseph.members[1].id).toBe(people.get(root)!.father!.id);
+      expect(mary.members[1].id).toBe(people.get(root)!.mother!.id);
+      expect(joseph.members.some(p => p.id === "solomon_677")).toBe(true);
+      expect(joseph.members.some(p => p.id === "nathan_676")).toBe(false);
+      expect(mary.members.some(p => p.id === "nathan_676")).toBe(true);
+      expect(mary.members.some(p => p.id === "solomon_677")).toBe(false);
+      for (const branch of [joseph, mary]) {
+        expect(branch.members.at(-1)!.id).toBe("adam_2");
+        expect(branch.members.some(p => p.id === "god_1")).toBe(false);
+        expect(new Set(branch.members.map(p => p.id)).size).toBe(branch.members.length);
+      }
+    }
+    const root = people.get("jesus_christ_2683")!;
+    const parent = people.get(root.father!.id)!;
+    const cyclic = new Map([[root.id, root], [parent.id, { ...parent, father: { id: root.id, name: "Jesus" } }]]);
+    expect(jesusLineage(cyclic, "joseph").members).toHaveLength(2);
+    expect(jesusLineage(cyclic, "joseph").complete).toBe(false);
+    expect(jesusLineage(new Map(), "mary")).toEqual({ members: [], complete: false });
+  });
+
+  it("shares reviewed life dates by person identity without treating activity as birth or death", () => {
+    const dates = indexTimelinePersonDates(records);
+    expect(dates.get("seth_17")).toBe(record("seth_17"));
+    expect(dates.has("seth-namesake")).toBe(false);
+    expect(dates.has("eve_3")).toBe(false);
+    expect(dates.has("joshua_391")).toBe(false);
+    expect(dates.has("daniel_2774")).toBe(false);
+    expect(dates.has("mary_2828")).toBe(false);
+    expect(timelineDateSummary(dates.get("miriam_390")!)).toBe("Birth: Unknown · Death: c. 1406 BC");
+    expect(timelineDateSummary(dates.get("caleb_435")!)).toBe("Birth: c. 1485 BC · Death: Unknown");
+    expect(timelineDateSummary(dates.get("enoch_22")!)).toContain("Taken by God:");
+    for (const id of ["jesus_christ_2683", "jesus_christ_2684"]) {
+      expect(timelineDateSummary(dates.get(id)!)).toBe("Birth: c. 5 BC · Resurrection: c. AD 30");
+    }
+    const alternate = indexTimelinePersonDates(buildBibleTimeline("promise430"));
+    expect(alternate.get("seth_17")!.start! - dates.get("seth_17")!.start!).toBe(215);
+  });
+
   it("preserves the Genesis fatherhood intervals and stated lifespans", () => {
     const relative = (id: string) => record(id).start! - record("adam_2").start!;
     expect(relative("seth_17")).toBe(130);

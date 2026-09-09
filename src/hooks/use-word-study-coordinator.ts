@@ -531,7 +531,7 @@ export function useWordStudyCoordinator({
       const tokens = verseNumber !== null
         ? books[bookIndex]?.chapters[chapterIndex]?.verses.find(verse => verse.verse === verseNumber)?.tokens : null;
       const context = resolvePersonPlaceContext(rawWord, referenceKey, normalizedStrongCodes, tokens, tokenIndex);
-      const personMatches = findGenealogyMatches(people, rawWord, referenceKey, context);
+      const personMatches = findGenealogyMatches(people, rawWord, referenceKey, context, { verseTokens: tokens, tokenIndex });
       const mapMatches = findMapMatches(maps, rawWord, context, personMatches);
       const supportedMaps = mapMatches.filter(entry => !entry.selectionNote);
       const ambiguous = personMatches.length > 0 && (context.ambiguous || (!context.sense && supportedMaps.length > 0));

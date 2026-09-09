@@ -1,4 +1,4 @@
-import { lazy, Suspense, type ReactNode, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { buildBibleTimeline, type SojournModel } from "@/data/bible-timeline";
+import { indexTimelinePersonDates, timelineDateSummary, type TimelineRecord } from "@/lib/bible-timeline";
 import type { GenealogyPerson, GenealogyRelation } from "@/types/reader";
 import {
   AlertDialog,
@@ -96,6 +98,7 @@ function resolveParent(
 }
 
 function GenealogyNode({
+  dates,
   label,
   title,
   subtitle,
@@ -108,6 +111,7 @@ function GenealogyNode({
   onOpenReference,
   onCloseSidebar,
 }: {
+  dates?: TimelineRecord;
   label?: string;
   title: string;
   subtitle?: string;
@@ -126,6 +130,8 @@ function GenealogyNode({
 
   return (
     <Card
+      role="group"
+      aria-label={`${title} family tree entry`}
       size="sm"
       className={cn(
         "min-h-20 border bg-card text-left transition-colors",
@@ -188,6 +194,7 @@ function GenealogyNode({
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-2 pt-0 text-xs text-muted-foreground">
+        {dates ? <p className="leading-relaxed" data-slot="life-dates">{timelineDateSummary(dates)}</p> : null}
         {aliases.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {aliases.map((alias) => (
@@ -236,6 +243,7 @@ function GenealogyNode({
 }
 
 function GenealogyRelationGrid({
+  datedPeople,
   title,
   icon,
   relations,
@@ -245,6 +253,7 @@ function GenealogyRelationGrid({
   onOpenReference,
   onCloseSidebar,
 }: {
+  datedPeople: ReadonlyMap<string, TimelineRecord>;
   title: string;
   icon: ReactNode;
   relations: ResolvedRelation[];
@@ -269,6 +278,7 @@ function GenealogyRelationGrid({
       <div className={cn("grid gap-3", gridClassName)}>
         {relations.map((relation) => (
           <GenealogyNode
+            dates={datedPeople.get(relation.id)}
             key={`${displayTitle}-${relation.id}`}
             title={relation.name}
             person={relation.person}
@@ -296,6 +306,9 @@ export function GenealogyTreeDialog({
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const [view, setView] = useState("tree");
   const [expanded, setExpanded] = useState(false);
+  const [model, setModel] = useState<SojournModel>("egypt430");
+  const records = useMemo(() => buildBibleTimeline(model), [model]);
+  const datedPeople = useMemo(() => indexTimelinePersonDates(records), [records]);
   const primaryName = person?.names[0] ?? "";
   const aliases = person?.names.slice(1) ?? [];
   const father = resolveParent(person?.father, genealogyById);
@@ -338,12 +351,14 @@ export function GenealogyTreeDialog({
           <ScrollArea ref={scrollAreaRef} className={cn("h-full", expanded && "[&_[data-slot=scroll-area-viewport]>div]:h-full")}>
             {view === "timeline" ? <Suspense fallback={<p role="status" className="p-4">Loading timeline…</p>}>
               <GenealogyTimeline person={person} genealogyById={genealogyById} expanded={expanded} onExpandedChange={setExpanded} onClose={() => onOpenChange(false)}
+                records={records} model={model} onModelChange={setModel}
                 onSelectPerson={id => { onSelectPerson(id); setExpanded(false); setView("tree"); }}
                 renderReferencePreview={renderReferencePreview}
                 onOpenReference={reference => { onOpenReference(reference); onOpenChange(false); }}
                 onCloseSidebar={onCloseSidebar} />
             </Suspense> :
             <div className="flex flex-col gap-5 px-3 py-3 sm:px-4 sm:py-4">
+              <p className="text-xs text-muted-foreground">Life dates are approximate (c.). See Timeline for sources and chronology options.</p>
               {person ? (
                 <>
                   {(father || mother) ? (
@@ -356,6 +371,7 @@ export function GenealogyTreeDialog({
                         {father ? (
                           <GenealogyNode
                             label="Father"
+                            dates={datedPeople.get(father.id)}
                             title={father.name}
                             person={father.person}
                             onSelectPerson={onSelectPerson}
@@ -372,6 +388,7 @@ export function GenealogyTreeDialog({
                         {mother ? (
                           <GenealogyNode
                             label="Mother"
+                            dates={datedPeople.get(mother.id)}
                             title={mother.name}
                             person={mother.person}
                             onSelectPerson={onSelectPerson}
@@ -398,6 +415,7 @@ export function GenealogyTreeDialog({
                       {siblings.length > 0 ? (
                         <GenealogyRelationGrid
                           title="Siblings"
+                          datedPeople={datedPeople}
                           icon={<UsersIcon className="size-4" />}
                           relations={siblings}
                           onSelectPerson={onSelectPerson}
@@ -412,6 +430,7 @@ export function GenealogyTreeDialog({
                     <div className="flex flex-col gap-3">
                       <GenealogyNode
                         label="Focus"
+                        dates={person ? datedPeople.get(person.id) : undefined}
                         title={primaryName}
                         aliases={aliases}
                         person={person}
@@ -427,6 +446,7 @@ export function GenealogyTreeDialog({
                       {spouses.length > 0 ? (
                         <GenealogyRelationGrid
                           title="Spouses"
+                          datedPeople={datedPeople}
                           icon={<HeartIcon className="size-4" />}
                           relations={spouses}
                           onSelectPerson={onSelectPerson}
@@ -444,6 +464,7 @@ export function GenealogyTreeDialog({
                       <div className="mx-auto h-8 w-px bg-border" aria-hidden="true" />
                       <GenealogyRelationGrid
                         title="Children"
+                        datedPeople={datedPeople}
                         icon={<NetworkIcon className="size-4" />}
                         relations={children}
                         onSelectPerson={onSelectPerson}

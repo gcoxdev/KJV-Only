@@ -729,10 +729,10 @@
 .bible-timeline .vis-item.bible-time-date-window { background: repeating-linear-gradient(135deg, var(--accent), var(--accent) 5px, var(--muted) 5px, var(--muted) 8px); }
 .bible-timeline .bible-time-label { position: relative; display: inline-block; width: max-content; max-width: var(--bible-time-label-width, 260px); white-space: normal; overflow-wrap: anywhere; padding: 1px 4px; border-radius: 2px; background: var(--accent); color: var(--accent-foreground); }
 .bible-timeline .vis-range .vis-item-overflow { overflow: visible; }
-.bible-timeline .vis-item.vis-point.bible-time-event { background: transparent; border: 0; }
-.bible-timeline .vis-point.bible-time-event .bible-time-label { background: var(--background); color: var(--foreground); }
-.bible-timeline .vis-item.vis-point.bible-time-event.vis-selected { outline: none; }
-.bible-timeline .vis-point.bible-time-event.vis-selected .bible-time-label { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.bible-timeline .vis-item.vis-point:is(.bible-time-event, .bible-time-estimate) { background: transparent; border: 0; }
+.bible-timeline .vis-point:is(.bible-time-event, .bible-time-estimate) .bible-time-label { background: var(--background); color: var(--foreground); }
+.bible-timeline .vis-item.vis-point:is(.bible-time-event, .bible-time-estimate).vis-selected { outline: none; }
+.bible-timeline .vis-point:is(.bible-time-event, .bible-time-estimate).vis-selected .bible-time-label { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .bible-time-key { display: inline-block; width: 24px; height: 10px; flex-shrink: 0; border: 1px solid var(--primary); border-radius: 2px; background: var(--accent); }
 /* Clip the shape without overriding the library's positioning transforms. */
 .bible-time-key-point,
@@ -741,6 +741,11 @@
     clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
 }
 .bible-time-key-point { margin-inline: 4px; }
+.bible-time-key-estimate,
+.bible-timeline .vis-point.bible-time-estimate > .vis-dot {
+    width: 10px; height: 10px; border: 2px solid var(--primary); border-radius: 50%; background: var(--background);
+}
+.bible-time-key-estimate { margin-inline: 4px; }
 .bible-time-key-window { background: repeating-linear-gradient(135deg, var(--accent), var(--accent) 3px, var(--muted) 3px, var(--muted) 6px); }
 .bible-timeline .vis-item.bible-time-open-start { border-left: 3px dashed var(--primary); border-top-left-radius: 0; border-bottom-left-radius: 0; }
 .bible-timeline .vis-item.bible-time-open-end { border-right: 3px dashed var(--primary); border-top-right-radius: 0; border-bottom-right-radius: 0; }
