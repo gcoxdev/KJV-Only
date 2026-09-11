@@ -1,10 +1,11 @@
+import { buildAnchoredContext, type AnchoredEpisode, type TimelineAnchor } from "./contextual-timeline-anchors";
 import type { TimelineEra, TimelineRecord } from "../lib/bible-timeline";
 import type { ChapterMapping, ContextTimelineRecord } from "./contextual-timeline";
 
 // Offsets use astronomical years from the existing KJV chronology. They are
 // independent of filters and never borrow schematic genealogy placements.
-type Anchor = [id: string, offset?: number, endpoint?: "start" | "end"];
-type Episode = { id: string; label: string; era: TimelineEra; references: string[]; note: string; at?: Anchor; until?: Anchor; kind?: TimelineRecord["kind"] };
+type Anchor = TimelineAnchor;
+type Episode = AnchoredEpisode;
 const episodes: Episode[] = [];
 function add(id: string, label: string, era: TimelineEra, references: string[], note: string, at?: Anchor, until?: Anchor, kind?: TimelineRecord["kind"]) {
   episodes.push({ id, label, era, references, note, at, until, kind });
@@ -129,32 +130,7 @@ journey("ot-ruth-threshing", "Ruth and Boaz at the threshing floor", ["RUT.3.2",
 journey("ot-ruth-redemption", "Boaz redeems; Obed is born", ["RUT.4.9", "RUT.4.13", "RUT.4.17", "RUT.4.22"], "The marriage and Obed's birth lead into the genealogy to David. The list does not give all generation lengths, and no uniform twenty-year rule is treated as measured history.");
 
 export function buildOldTestamentContext(chronology: TimelineRecord[]): ContextTimelineRecord[] {
-  const anchors = new Map(chronology.map(record => [record.id, record]));
-  return episodes.map(episode => {
-    const used: TimelineRecord[] = [];
-    const resolve = (anchor?: Anchor) => {
-      if (!anchor) return undefined;
-      const [id, offset = 0, endpoint = "start"] = anchor;
-      const record = anchors.get(id);
-      const year = record?.[endpoint];
-      if (!record || year === undefined) throw new Error(`Missing chronology anchor ${id}.${endpoint} for ${episode.id}`);
-      used.push(record);
-      return year + offset;
-    };
-    const start = resolve(episode.at);
-    const end = resolve(episode.until);
-    const record: ContextTimelineRecord = {
-      id: episode.id, label: episode.label, era: episode.era, track: "biblical",
-      kind: episode.kind ?? "event", start, end,
-      startStatus: start === undefined ? "unknown" : "approximate",
-      endStatus: end === undefined ? "unknown" : "approximate",
-      references: [...new Set([...episode.references, ...used.flatMap(anchor => anchor.references)])],
-      sources: [...new Set(["ot", ...used.flatMap(anchor => anchor.sources)])],
-      note: episode.note + (start !== undefined ? " BC labels use the shared provisional KJV chronology and selected sojourn model; relative ages and intervals take priority over the calendar projection." : ""),
-    };
-    anchors.set(record.id, record);
-    return record;
-  });
+  return buildAnchoredContext(episodes, chronology);
 }
 
 // Explicit chapter topics and citations: supporting references on an anchor do

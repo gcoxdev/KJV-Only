@@ -285,3 +285,98 @@ for (const width of [390, 1280]) {
     expect(errors).toEqual([]);
   });
 }
+
+for (const width of [390, 1280]) {
+  test(`Samuel and Kings chronology and namesakes at ${width}px`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.setViewportSize({ width, height: 844 });
+    const dialog = await openTimeline(page, width < 768);
+    const entries = dialog.getByRole("group", { name: "Historical timeline entries" });
+    const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+    const content = dialog.getByRole("group", { name: "Historical timeline content" });
+    const choose = async (book: string, chapter: number) => {
+      await dialog.getByRole("combobox", { name: "Timeline book", exact: true }).click();
+      await page.getByRole("option", { name: book, exact: true }).click();
+      await dialog.getByRole("combobox", { name: "Timeline chapter", exact: true }).click();
+      await page.getByRole("option", { name: `Chapter ${chapter}`, exact: true }).click();
+    };
+    await choose("1 Samuel", 17);
+    await expect(evidence).toContainText("does not give an age");
+    await expect(evidence).toContainText("Dates unknown");
+    await expect(entries).toContainText("Saul · reign");
+    await choose("2 Samuel", 15);
+    await expect(dialog.getByRole("status")).toContainText("forty years");
+    await expect(evidence).toContainText("not silently changed to four years");
+    await choose("2 Samuel", 24);
+    await expect(evidence).toContainText("nine months and twenty days");
+    await choose("1 Kings", 8);
+    await expect(evidence).toContainText("seventh month");
+    await expect(evidence).toContainText("Dates unknown");
+    await expect(entries).toContainText("Solomon completes the temple");
+    await choose("2 Kings", 8);
+    await entries.getByRole("button", { name: /Jehoram son of Jehoshaphat and Ahaziah/ }).click();
+    await expect(evidence).toContainText("distinct from the northern Jehoram");
+    await choose("2 Kings", 12);
+    await entries.getByRole("button", { name: /reorganizes temple repairs/ }).click();
+    await expect(evidence).toContainText("twenty-third year");
+    await choose("2 Kings", 13);
+    await expect(evidence).toContainText("Jehoahaz son of Jehu");
+    await entries.getByRole("button", { name: /Elisha's final prophecy/ }).click();
+    await expect(evidence).toContainText("later incident");
+    await choose("2 Kings", 9);
+    await expect(entries).toContainText("Jehu's tribute recorded by Assyria");
+    await content.getByRole("button", { name: "Historical context", exact: true }).click();
+    await expect(entries.getByRole("button", { name: /Jehu's coup/ })).toHaveCount(0);
+    await entries.getByRole("button", { name: /Jehu's tribute/ }).click();
+    await expect(evidence).toContainText("not proof that Jehu was Omri's biological son");
+    await page.screenshot({ path: `design/contextual-timeline-jehu-${width}.png` });
+    await content.getByRole("button", { name: "All", exact: true }).click();
+    await choose("2 Kings", 20);
+    await entries.getByRole("button", { name: /Hezekiah's illness/ }).click();
+    await expect(evidence).toContainText("701 BC");
+    await choose("2 Kings", 23);
+    await entries.getByRole("button", { name: /Josiah removes the altar/ }).click();
+    await expect(evidence).toContainText("centuries-earlier prophecy");
+    await entries.getByRole("button", { name: /Jeroboam's altars/ }).click();
+    await expect(evidence).toContainText("Background or an earlier event");
+    await choose("2 Kings", 25);
+    await entries.getByRole("button", { name: /Gedaliah appointed/ }).click();
+    await expect(evidence).toContainText("Dates unknown");
+    await expect(evidence.getByRole("button", { name: "2KI.25.25", exact: true })).toBeVisible();
+    await page.screenshot({ path: `design/contextual-timeline-kings-${width}.png` });
+    expect(errors).toEqual([]);
+  });
+}
+
+test("late sidebar loading preserves a panel's first pointer click", async ({ page }) => {
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  let releaseSidebar!: () => void;
+  const sidebarReady = new Promise<void>(resolve => { releaseSidebar = resolve; });
+  await page.route(/reader-study-sidebar[^/]*\.(?:tsx|js)(?:\?|$)/, async route => {
+    await sidebarReady;
+    await route.continue();
+  });
+  try {
+    await page.goto("/#tab=0&tabs=h&layout=Study:h40(EZR.6;h50(LUK.3;tools))");
+    const luke = page.getByLabel("Luke 3 panel", { exact: true });
+    await expect(luke).toBeVisible();
+    await luke.focus();
+    await expect(page.getByRole("status").filter({ hasText: "Loading sidebar…" })).toBeVisible();
+    const tools = page.getByLabel("Tools panel", { exact: true });
+    const trigger = tools.getByRole("button", { name: "Timeline", exact: true });
+    await expect(trigger).toBeVisible();
+    const before = (await trigger.boundingBox())!;
+    await trigger.hover();
+    await page.mouse.down();
+    releaseSidebar();
+    await expect(page.getByRole("region", { name: "Study sidebar", exact: true })).toBeVisible();
+    const after = (await trigger.boundingBox())!;
+    expect(Math.abs(after.x - before.x)).toBeLessThan(1);
+    expect(Math.abs(after.width - before.width)).toBeLessThan(1);
+    await page.mouse.up();
+    await expect(tools.getByRole("region", { name: "Timeline", exact: true })).toContainText("Luke 3");
+  } finally {
+    releaseSidebar();
+  }
+});

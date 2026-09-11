@@ -61,7 +61,7 @@ import type {
   PendingReaderScrollTarget,
 } from "@/types/reader";
 import type { BookmarkScope } from "@/types/bookmarks";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Sidebar, SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { SidebarActivitySync } from "@/components/reader/sidebar-activity-sync";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
@@ -2348,7 +2348,15 @@ export function KJVReader() {
         </SidebarInset>
 
         {sidebarAvailable ? (
-          <Suspense fallback={null}>
+          // Reserve the responsive sidebar gap while its content loads. Without
+          // it, a late import can move panel controls during the first click.
+          <Suspense fallback={
+            <div data-tour="sidebar">
+              <Sidebar side="right">
+                <p role="status" className="p-3 text-sm text-muted-foreground">Loading sidebar…</p>
+              </Sidebar>
+            </div>
+          }>
             <LazyReaderStudySidebar
               visible={sidebarAvailable}
               activeTab={studyWorkspaceTab}

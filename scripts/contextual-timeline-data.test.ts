@@ -28,7 +28,7 @@ it("validates the reviewed ranges and Old and New Testament chapter references a
     }
     for (const chapter of book.chapters) for (const verse of chapter.verses) expect(covered.has(`${chapter.chapter}:${verse.verse}`), `${book.name} ${chapter.chapter}:${verse.verse}`).toBe(true);
   }
-  for (const book of [...books.slice(0, 8), ...books.slice(39)]) {
+  for (const book of [...books.slice(0, 12), ...books.slice(39)]) {
     expect(Object.keys(CHAPTER_TIMELINE_MAP[book.name]), book.name).toHaveLength(book.chapters.length);
     for (const chapter of book.chapters) {
       const selection = selectContextTimeline(records, book.name, chapter.chapter, "chapter", "biblical");
