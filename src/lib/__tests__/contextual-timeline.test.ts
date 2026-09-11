@@ -22,8 +22,8 @@ describe("contextual history", () => {
     }
   });
   it("extends the initial chapters without replacing their mappings", () => {
-    expect(CONTEXT_TIMELINE_COVERAGE.chapters).toBe(291);
-    expect(CONTEXT_TIMELINE_COVERAGE.books).toHaveLength(33);
+    expect(CONTEXT_TIMELINE_COVERAGE.chapters).toBe(527);
+    expect(CONTEXT_TIMELINE_COVERAGE.books).toHaveLength(41);
     expect(Object.keys(CHAPTER_TIMELINE_MAP.Ezra)).toHaveLength(10);
     expect(CHAPTER_TIMELINE_MAP["2 Kings"][24].ids).toContain("jerusalem-597");
     expect(CHAPTER_TIMELINE_MAP.Acts[18].ids).toContain("paul-gallio");
@@ -203,6 +203,80 @@ describe("contextual history", () => {
     expect(vision.records[0].note).toContain("no single date or interval joining them");
     expect(selectContextTimeline(records, "Revelation", 1, "book", "biblical").records).toHaveLength(1);
     expect(selectContextTimeline(records, "Hebrews", 11, "chapter", "biblical").note).toContain("earlier generations");
+  });
+
+  it("covers every chapter from Genesis through Ruth with chapter-specific evidence", () => {
+    for (const [book, count] of Object.entries({ Genesis: 50, Exodus: 40, Leviticus: 27, Numbers: 36, Deuteronomy: 34, Joshua: 24, Judges: 21, Ruth: 4 })) {
+      expect(Object.keys(CHAPTER_TIMELINE_MAP[book]), book).toHaveLength(count);
+      for (let chapter = 1; chapter <= count; chapter++) {
+        const selection = selectContextTimeline(records, book, chapter, "chapter", "biblical");
+        expect(selection.mapped).toBe(true);
+        expect(selection.records.some(record => record.emphasized), `${book} ${chapter}`).toBe(true);
+        expect(CHAPTER_TIMELINE_MAP[book][chapter].references?.length).toBeGreaterThan(0);
+      }
+    }
+  });
+  it("uses KJV ages over narrative chapter order and keeps the sojourn choice consistent", () => {
+    const get = (id: string) => records.find(record => record.id === id)!;
+    const alternate = new Map(buildContextTimeline("promise430").map(record => [record.id, record]));
+    expect(get("ot-isaac-death").start! - get("joseph-sold").start!).toBe(12);
+    expect(get("ot-ishmael-death").start!).toBeGreaterThan(get("ot-twins-birth").start!);
+    expect(get("ot-jacob-marriages").start! - get("ot-jacob-haran").start!).toBe(7);
+    expect(get("ot-laban-service").end! - get("ot-laban-service").start!).toBe(20);
+    expect(get("ot-joseph-revealed").start).toBe(get("egypt-entry").start);
+    expect(get("ot-plenty").end! - get("ot-plenty").start!).toBe(7);
+    expect(get("ot-famine").end! - get("ot-famine").start!).toBe(7);
+    expect(get("ot-prison-dreams").start! + 2).toBe(get("joseph-appointed").start);
+    for (const record of records.filter(record => record.id.startsWith("ot-") && record.start !== undefined)) {
+      const shift = ["beginnings", "patriarchs"].includes(record.era) ? 215 : 0;
+      expect(alternate.get(record.id)?.start, record.id).toBe(record.start! + shift);
+      if (record.end !== undefined) expect(alternate.get(record.id)?.end, record.id).toBe(record.end + shift);
+    }
+    for (const id of ["ot-isaac-offering", "ot-babel", "ot-bethel-rachel"]) expect(timelinePlotBounds(get(id)), id).toBeNull();
+  });
+  it("preserves the wilderness year markers and distinguishes commands from observances", () => {
+    const get = (id: string) => records.find(record => record.id === id)!;
+    const exodus = get("exodus").start!;
+    expect(get("ot-moses-birth").start).toBe(exodus - 80);
+    expect(get("ot-moses-midian").start).toBe(exodus - 40);
+    for (const id of ["ot-tabernacle-raised", "ot-dedication", "ot-first-census", "ot-second-passover", "ot-sinai-departure", "ot-spies"]) expect(get(id).start, id).toBe(exodus + 1);
+    expect(get("ot-dedication").note).toContain("earlier than the second-month census");
+    expect(get("ot-second-passover").note).toContain("first-month Passover precedes");
+    expect(get("ot-final-wilderness").kind).toBe("date-window");
+    expect(timelinePlotBounds(get("ot-final-wilderness"))).toEqual([exodus + 39, exodus + 40]);
+    expect(get("ot-moses-death").start).toBe(get("jordan").start);
+    expect(get("ot-conquest").end).toBe(get("caleb-hebron").start);
+    const atonement = selectContextTimeline(records, "Leviticus", 16, "chapter", "biblical");
+    expect(atonement.note).toContain("does not narrate an immediate observance");
+    expect(atonement.records.find(record => record.id === "ot-nadab-abihu")?.emphasized).toBe(false);
+    expect(CHAPTER_TIMELINE_MAP.Leviticus[25].note).toContain("no first jubilee observance");
+    expect(CHAPTER_TIMELINE_MAP.Numbers[33].ids).toContain("wilderness");
+  });
+  it("retains Judges durations and Ruth's seasons without invented absolute dates", () => {
+    const get = (id: string) => records.find(record => record.id === id)!;
+    for (const book of ["Judges", "Ruth"]) {
+      const selection = selectContextTimeline(records, book, 1, "book", "biblical");
+      expect(selection.records.length).toBeGreaterThan(0);
+      for (const record of selection.records) expect(timelinePlotBounds(record), record.id).toBeNull();
+      expect(selectContextTimeline(records, book, 1, "book", "historical").records).toEqual([]);
+    }
+    expect(get("ot-samson").note).toContain("within Philistine domination");
+    expect(get("ot-jephthah").references).toContain("JDG.11.26");
+    expect(get("ot-jephthah").note).toContain("three hundred years");
+    expect(get("ot-benjamin-war").note).toContain("earlier generation");
+    expect(get("ot-ruth-gleaning").note).toContain("barley and wheat harvest");
+  });
+  it("adds recalled Old Testament episodes without redating the New Testament writing context", () => {
+    const corinth = selectContextTimeline(records, "1 Corinthians", 10, "chapter", "all");
+    const writing = corinth.records.find(record => record.emphasized)!;
+    expect(writing.id).toBe("writing-1co");
+    expect(timelinePlotBounds(writing)).toEqual(timelinePlotBounds(records.find(record => record.id === writing.id)!));
+    for (const id of ["ot-sea", "wilderness", "ot-calf", "ot-peor"]) expect(corinth.records.find(record => record.id === id)?.emphasized, id).toBe(false);
+    const hebrews = selectContextTimeline(records, "Hebrews", 11, "chapter", "all");
+    expect(timelinePlotBounds(hebrews.records.find(record => record.emphasized)!)).toBeNull();
+    expect(hebrews.records.find(record => record.id === "ot-jericho")?.emphasized).toBe(false);
+    expect(hebrews.records.find(record => record.id === "ot-isaac-offering")?.start).toBeUndefined();
+    expect(selectContextTimeline(records, "Hebrews", 11, "chapter", "historical").records).toEqual([]);
   });
 
 });

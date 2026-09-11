@@ -227,3 +227,61 @@ for (const width of [390, 1280]) {
     expect(errors).toEqual([]);
   });
 }
+
+for (const width of [390, 1280]) {
+  test(`Genesis through Ruth and recalled events at ${width}px`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.setViewportSize({ width, height: 844 });
+    const dialog = await openTimeline(page, width < 768);
+    const entries = dialog.getByRole("group", { name: "Historical timeline entries" });
+    const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+    const chart = dialog.getByRole("region", { name: "Historical timeline chart" });
+    const choose = async (book: string, chapter: number) => {
+      await dialog.getByRole("combobox", { name: "Timeline book", exact: true }).click();
+      await page.getByRole("option", { name: book, exact: true }).click();
+      await dialog.getByRole("combobox", { name: "Timeline chapter", exact: true }).click();
+      await page.getByRole("option", { name: `Chapter ${chapter}`, exact: true }).click();
+    };
+    await choose("Genesis", 35);
+    await entries.getByRole("button", { name: /The death of Isaac/ }).click();
+    await expect(evidence).toContainText("later than Joseph's sale");
+    await expect(evidence.getByRole("button", { name: "GEN.35.28", exact: true })).toBeVisible();
+    await entries.getByRole("button", { name: /Return to Bethel/ }).click();
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("Genesis", 41);
+    await expect(entries).toContainText("Seven plentiful years");
+    await expect(chart.locator(".vis-timeline")).toBeVisible();
+    await page.screenshot({ path: `design/contextual-timeline-genesis-${width}.png` });
+    await choose("Exodus", 40);
+    await expect(evidence).toContainText("second year, first month, first day");
+    await choose("Numbers", 9);
+    await expect(dialog.getByRole("status")).toContainText("earlier than the second-month census");
+    await expect(evidence).toContainText("first-month Passover precedes");
+    await choose("Leviticus", 16);
+    await expect(dialog.getByRole("status")).toContainText("does not narrate an immediate observance");
+    await choose("Deuteronomy", 34);
+    await expect(evidence).toContainText("Thirty days of mourning");
+    await choose("Joshua", 14);
+    await expect(entries).toContainText("Caleb");
+    await choose("Judges", 11);
+    await expect(evidence).toContainText("three hundred years");
+    await expect(evidence).toContainText("Dates unknown");
+    await expect(chart).not.toBeVisible();
+    await page.screenshot({ path: `design/contextual-timeline-judges-${width}.png` });
+    await choose("Ruth", 2);
+    await expect(evidence).toContainText("barley and wheat harvest");
+    await expect(chart).not.toBeVisible();
+    await choose("1 Corinthians", 10);
+    await expect(evidence).toContainText("1 Corinthians");
+    await entries.getByRole("button", { name: /The sea crossing/ }).click();
+    await expect(evidence).toContainText("Background or an earlier event");
+    await choose("Hebrews", 11);
+    await expect(evidence).toContainText("Dates unknown");
+    await expect(entries).toContainText("The fall of Jericho");
+    await entries.getByRole("button", { name: /The fall of Jericho/ }).click();
+    await expect(evidence).toContainText("Background or an earlier event");
+    await expect(evidence.getByRole("button", { name: "JOS.6.20", exact: true })).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+}
