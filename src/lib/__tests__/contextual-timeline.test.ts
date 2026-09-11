@@ -13,7 +13,7 @@ describe("contextual history", () => {
       for (const id of [...mapping.ids, ...(mapping.contextIds ?? [])]) expect(ids.has(id), id).toBe(true);
     }
     for (const [book, chapters] of Object.entries(CHAPTER_TIMELINE_MAP)) for (const chapter of Object.keys(chapters)) {
-      expect(selectContextTimeline(records, book, Number(chapter), "chapter", "historical").records.length, `${book} ${chapter} historical context`).toBeGreaterThan(0);
+      expect(selectContextTimeline(records, book, Number(chapter), "chapter", "biblical").records.length, `${book} ${chapter} biblical context`).toBeGreaterThan(0);
     }
     for (const record of records) {
       expect(record.sources.length, record.id).toBeGreaterThan(0);
@@ -22,8 +22,8 @@ describe("contextual history", () => {
     }
   });
   it("extends the initial chapters without replacing their mappings", () => {
-    expect(CONTEXT_TIMELINE_COVERAGE.chapters).toBe(148);
-    expect(CONTEXT_TIMELINE_COVERAGE.books).toHaveLength(11);
+    expect(CONTEXT_TIMELINE_COVERAGE.chapters).toBe(291);
+    expect(CONTEXT_TIMELINE_COVERAGE.books).toHaveLength(33);
     expect(Object.keys(CHAPTER_TIMELINE_MAP.Ezra)).toHaveLength(10);
     expect(CHAPTER_TIMELINE_MAP["2 Kings"][24].ids).toContain("jerusalem-597");
     expect(CHAPTER_TIMELINE_MAP.Acts[18].ids).toContain("paul-gallio");
@@ -151,6 +151,58 @@ describe("contextual history", () => {
     expect(athens.some(record => record.id === "claudius-reign")).toBe(true);
     const plans = selectContextTimeline(records, "Acts", 17, "paul", "historical", "", "Later letters and plans");
     expect(plans.records).toEqual([]);
+  });
+
+  it("separates distinct Gospel episodes while retaining clear parallels", () => {
+    const get = (id: string) => records.find(record => record.id === id)!;
+    expect(get("gospel-centurion-servant").narrative!.passages.map(p => p.book)).toEqual(["Matthew", "Luke"]);
+    expect(get("gospel-nain").narrative!.passages.map(p => p.reference)).toEqual(["LUK.7.11"]);
+    expect(get("gospel-walking-water").narrative!.passages).toHaveLength(3);
+    expect(get("gospel-bread-life").narrative!.passages.map(p => p.reference)).toEqual(["JHN.6.22"]);
+    expect(get("gospel-widow-offering").narrative!.passages.map(p => p.book)).toEqual(["Mark", "Luke"]);
+    expect(get("gospel-thomas").note).toContain("after eight days");
+    expect(get("gospel-first-evening").note).toContain("Thomas was absent");
+    expect(get("gospel-emmaus").narrative!.passages.map(p => p.reference)).toEqual(["MRK.16.12", "LUK.24.13"]);
+    expect(get("gospel-galilee-commission").narrative!.passages).toHaveLength(1);
+    expect(get("gospel-lakeside-appearance").narrative!.passages.map(p => p.reference)).toEqual(["JHN.21.1"]);
+    for (const id of ["gospel-john-purpose", "gospel-john-witness"]) expect(timelinePlotBounds(get(id))).toBeNull();
+  });
+  it("gives each letter chapter its own cited context without redating its subject matter", () => {
+    const romans = selectContextTimeline(records, "Romans", 5, "chapter", "biblical");
+    expect(romans.records.map(record => record.id)).toEqual(["writing-rom"]);
+    expect(romans.note).toContain("Adam and Christ");
+    expect(romans.records[0].references[0]).toBe("ROM.5.1");
+    expect(romans.records[0].relevance).toContain("Earlier examples");
+    expect(timelinePlotBounds(romans.records[0])).toEqual([57, 58]);
+    expect(selectContextTimeline(records, "Romans", 5, "chapter", "biblical", "Adam").records).toHaveLength(1);
+    expect(selectContextTimeline(records, "Romans", 5, "chapter", "biblical", "ROM.5.1").records).toHaveLength(1);
+    const eight = selectContextTimeline(records, "Romans", 8, "chapter", "biblical").records[0];
+    expect(eight.references).toContain("ROM.8.1");
+    expect(eight.references).not.toContain("ROM.5.1");
+    expect(records.find(record => record.id === "writing-rom")!.references).not.toContain("ROM.5.1");
+    const letter = selectContextTimeline(records, "Philippians", 2, "chapter", "biblical").records[0];
+    expect(letter.kind).toBe("date-window");
+    expect(timelinePlotBounds(letter)).toEqual([61, 63]);
+    expect(letter.note).toContain("hopes, not completed journeys");
+    const book = selectContextTimeline(records, "Romans", 1, "book", "biblical").records;
+    expect(book).toHaveLength(1);
+    expect(book[0].references).toEqual(expect.arrayContaining(["ROM.5.1", "ROM.8.1", "ROM.16.1"]));
+    expect(selectContextTimeline(records, "1 John", 3, "chapter", "historical").records.map(record => record.id)).toEqual(["domitian-reign"]);
+  });
+  it("preserves undated correspondence and does not turn Revelation into a dated fulfillment scheme", () => {
+    for (const book of ["Galatians", "1 Timothy", "2 Timothy", "Titus", "Hebrews", "James", "Jude", "Revelation"]) {
+      const selection = selectContextTimeline(records, book, 1, "chapter", "biblical");
+      expect(selection.mapped).toBe(true);
+      expect(selection.records).toHaveLength(1);
+      expect(timelinePlotBounds(selection.records[0]), book).toBeNull();
+      expect(selectContextTimeline(records, book, 1, "chapter", "historical").records, book).toEqual([]);
+    }
+    const vision = selectContextTimeline(records, "Revelation", 20, "chapter", "biblical");
+    expect(vision.note).toContain("thousand years");
+    expect(vision.records[0].references).toContain("REV.20.1");
+    expect(vision.records[0].note).toContain("no single date or interval joining them");
+    expect(selectContextTimeline(records, "Revelation", 1, "book", "biblical").records).toHaveLength(1);
+    expect(selectContextTimeline(records, "Hebrews", 11, "chapter", "biblical").note).toContain("earlier generations");
   });
 
 });

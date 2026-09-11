@@ -166,15 +166,16 @@ export default function BibleTimelineChart({ records, selectedId, onSelect, expa
   }, [records, tracks]);
   useEffect(() => { timeline.current?.setSelection(selectedId ? [selectedId] : []); }, [selectedId, records]);
   const hasDates = records.some(record => timelinePlotBounds(record));
+  const emptyContext = !!tracks && !hasDates;
   return (
     <div className={cn("flex min-w-0 flex-col gap-2", expanded && "min-h-0 flex-1")}>
-      <div className={cn("flex shrink-0 flex-wrap items-center gap-2", compact && "pr-10")} role="group" aria-label="Timeline navigation">
+      <div className={cn("flex shrink-0 flex-wrap items-center gap-2", compact && "pr-10", emptyContext && !expanded && "hidden")} role="group" aria-label="Timeline navigation">
         {[
           { label: "Zoom in", icon: ZoomInIcon, action: () => timeline.current?.zoomIn(0.4, { animation: false }) },
           { label: "Zoom out", icon: ZoomOutIcon, action: () => timeline.current?.zoomOut(0.4, { animation: false }) },
           { label: "Fit selection", icon: ScanIcon, action: () => fitSelection.current?.() },
         ].map(({ label, icon: Icon, action }) => <Tooltip key={label}>
-          <TooltipTrigger render={<Button size={compact ? "icon" : "sm"} variant="outline" aria-label={label} onClick={action} />}>
+          <TooltipTrigger render={<Button size={compact ? "icon" : "sm"} variant="outline" aria-label={label} disabled={emptyContext} onClick={action} />}>
             {compact ? <Icon /> : label}
           </TooltipTrigger>
           <TooltipContent>{label}</TooltipContent>
@@ -182,12 +183,12 @@ export default function BibleTimelineChart({ records, selectedId, onSelect, expa
         <Button size="sm" variant="outline" aria-expanded={expanded} onClick={() => onExpandedChange(!expanded)}>
           {expanded ? <MinimizeIcon data-icon="inline-start" /> : <MaximizeIcon data-icon="inline-start" />}{expanded ? "Collapse chart" : "Expand chart"}
         </Button>
-        {!expanded ? <span className="text-xs text-muted-foreground">Drag to pan · Ctrl + scroll or pinch to zoom</span> : null}
+        {!expanded && !emptyContext ? <span className="text-xs text-muted-foreground">Drag to pan · Ctrl + scroll or pinch to zoom</span> : null}
       </div>
       {error ? <p role="alert">The chart could not load. Use the timeline list below.</p> : null}
-      {!hasDates ? <p className="text-sm text-muted-foreground">No supported calendar placements in this selection. {expanded ? "Collapse the chart to see the undated entries." : "People and evidence remain in the list below."}</p> : null}
+      {!hasDates ? <p className="text-sm text-muted-foreground">No supported calendar placements in this selection. {expanded ? "Collapse the chart to see the undated entries." : "Entries and evidence remain in the list below."}</p> : null}
       <div ref={container} className={cn("bible-timeline min-w-0 overflow-hidden rounded-lg border", expanded ? "min-h-0 flex-1" : "h-80", !hasDates && "hidden")} role="region" aria-label={chartLabel} />
-      <div className={cn("flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground", compact && "hidden")} aria-label="Timeline legend">
+      <div className={cn("flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground", (compact || emptyContext) && "hidden")} aria-label="Timeline legend">
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key bible-time-key-point" />Single date</span>
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key" />Span of time</span>
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key bible-time-key-window" />Uncertain event date (not duration)</span>

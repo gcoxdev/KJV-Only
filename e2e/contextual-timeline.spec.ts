@@ -179,3 +179,51 @@ for (const width of [390, 1280]) {
     expect(errors).toEqual([]);
   });
 }
+
+for (const width of [390, 1280]) {
+  test(`refined harmony and remaining New Testament chapter context at ${width}px`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.setViewportSize({ width, height: 844 });
+    const dialog = await openTimeline(page, width < 768);
+    const entries = dialog.getByRole("group", { name: "Historical timeline entries" });
+    const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+    const choose = async (book: string, chapter: number) => {
+      await dialog.getByRole("combobox", { name: "Timeline book", exact: true }).click();
+      await page.getByRole("option", { name: book, exact: true }).click();
+      await dialog.getByRole("combobox", { name: "Timeline chapter", exact: true }).click();
+      await page.getByRole("option", { name: `Chapter ${chapter}`, exact: true }).click();
+    };
+    await choose("John", 20);
+    await entries.getByRole("button", { name: /Jesus appears with Thomas present/ }).click();
+    await expect(evidence).toContainText("after eight days");
+    await expect(evidence.getByLabel("Narrative passages")).toContainText("John 20:24–29");
+    await entries.getByRole("button", { name: /John's stated purpose/ }).click();
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("Romans", 5);
+    await expect(dialog.getByRole("status")).toContainText("Adam and Christ");
+    await entries.getByRole("button", { name: /Romans · letter setting/ }).click();
+    await expect(evidence).toContainText("Jerusalem");
+    await expect(evidence.getByRole("button", { name: "ROM.5.1", exact: true })).toBeVisible();
+    await dialog.getByRole("textbox", { name: "Find timeline entries" }).fill("Adam");
+    await expect(entries.getByRole("button")).toHaveCount(1);
+    await dialog.getByRole("textbox", { name: "Find timeline entries" }).clear();
+    await choose("1 John", 3);
+    await expect(entries).toContainText("Domitian");
+    await entries.getByRole("button", { name: /1 John · letter setting/ }).click();
+    await expect(evidence).toContainText("85");
+    await choose("Hebrews", 11);
+    await expect(dialog.getByRole("status")).toContainText("earlier generations");
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("Revelation", 20);
+    await expect(dialog.getByRole("status")).toContainText("thousand years");
+    await expect(evidence).toContainText("no single date or interval joining them");
+    await expect(evidence.getByRole("button", { name: "REV.20.1", exact: true })).toBeVisible();
+    await expect(dialog.getByRole("region", { name: "Historical timeline chart" })).not.toBeVisible();
+    await expect(entries.getByRole("button")).toHaveCount(1);
+    await expect(dialog.getByRole("group", { name: "Timeline navigation" })).not.toBeVisible();
+    await expect(dialog.getByLabel("Timeline legend")).not.toBeVisible();
+    await page.screenshot({ path: `design/contextual-timeline-revelation-${width}.png` });
+    expect(errors).toEqual([]);
+  });
+}

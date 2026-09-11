@@ -1,3 +1,4 @@
+import { WRITING_CHAPTER_TIMELINE_MAP, WRITING_TIMELINE_RECORDS, WRITING_TIMELINE_SOURCES } from "./contextual-timeline-writings";
 import { NT_CHAPTER_TIMELINE_MAP, NT_NARRATIVE_DETAILS, NT_TIMELINE_RECORDS, type NarrativeDetails } from "./contextual-timeline-nt";
 import { EXPANDED_CHAPTER_TIMELINE_MAP, EXPANDED_TIMELINE_RECORDS, EXPANDED_TIMELINE_SOURCES } from "./contextual-timeline-expansion";
 import { buildBibleTimeline, TIMELINE_SOURCES, type SojournModel } from "./bible-timeline";
@@ -10,6 +11,8 @@ export type TimelineFilter = "all" | "biblical" | "historical";
 export const CONTEXT_TIMELINE_SOURCES: Record<string, { title: string; url: string; use: string }> = {
   ...TIMELINE_SOURCES,
   ...EXPANDED_TIMELINE_SOURCES,
+  ...WRITING_TIMELINE_SOURCES,
+  nt: { ...TIMELINE_SOURCES.nt, use: "Calendar proposals for Jesus, Paul, and the apostolic period. KJV passage details and relative order control the reconstruction." },
   cyrus: { ...TIMELINE_SOURCES.cyrus, use: "Reign from accession in Anshan, c. 559–530 BC; conquest of Babylon in 539 BC. Ezra supplies the return decree; the external chronology does not override that account." },
   nebuchadnezzar: { title: "Livius: Nebuchadnezzar II", url: "https://www.livius.org/articles/person/nebuchadnezzar-ii/", use: "Conventional reign, 605–562 BC; not birth and death dates." },
   darius: { title: "Livius: Darius the Great", url: "https://www.livius.org/articles/person/darius-the-great/", use: "Reign of Darius I, 522–486 BC; distinct from Darius the Mede." },
@@ -49,7 +52,7 @@ const PILOT_RECORDS = [
   { ...biblical("jesus-baptism", "Baptism of Jesus", 27, 29, "date-window", ["LUK.3.21", "LUK.3.22", "LUK.3.23"], "Placed with John's ministry and Jesus being about thirty. c. AD 27–29 follows the shared provisional Gospel chronology, not an exact date supplied by Luke.", ["nt"]), era: "gospels" as const },
 ];
 
-export type ChapterMapping = { ids: string[]; contextIds?: string[]; note: string };
+export type ChapterMapping = { ids: string[]; contextIds?: string[]; references?: string[]; note: string };
 const INITIAL_CHAPTER_TIMELINE_MAP: Record<string, Record<number, ChapterMapping>> = {
   "2 Kings": {
     24: { ids: ["jerusalem-597"], contextIds: ["nebuchadnezzar-reign"], note: "Focuses on the capture and deportation in verses 10–17. Earlier reigns and the chapter's closing transition are not all assigned to 597 BC." },
@@ -70,7 +73,7 @@ const INITIAL_CHAPTER_TIMELINE_MAP: Record<string, Record<number, ChapterMapping
 };
 
 export const CHAPTER_TIMELINE_MAP: Record<string, Record<number, ChapterMapping>> = {};
-for (const source of [INITIAL_CHAPTER_TIMELINE_MAP, EXPANDED_CHAPTER_TIMELINE_MAP, NT_CHAPTER_TIMELINE_MAP]) {
+for (const source of [INITIAL_CHAPTER_TIMELINE_MAP, EXPANDED_CHAPTER_TIMELINE_MAP, NT_CHAPTER_TIMELINE_MAP, WRITING_CHAPTER_TIMELINE_MAP]) {
   for (const [book, chapters] of Object.entries(source)) {
     const target = CHAPTER_TIMELINE_MAP[book] ??= {};
     for (const [chapter, mapping] of Object.entries(chapters)) {
@@ -78,6 +81,7 @@ for (const source of [INITIAL_CHAPTER_TIMELINE_MAP, EXPANDED_CHAPTER_TIMELINE_MA
       target[Number(chapter)] = previous ? {
         ids: [...new Set([...previous.ids, ...mapping.ids])],
         contextIds: [...new Set([...(previous.contextIds ?? []), ...(mapping.contextIds ?? [])])],
+        references: [...new Set([...(previous.references ?? []), ...(mapping.references ?? [])])],
         note: previous.note === mapping.note ? mapping.note : `${previous.note} ${mapping.note}`,
       } : mapping;
     }
@@ -92,7 +96,7 @@ export function buildContextTimeline(model: SojournModel = "egypt430"): ContextT
   // Reuse the reviewed event chronology, not schematic genealogy placements.
   const shared = buildBibleTimeline(model).filter(record => !record.placement && record.kind !== "life" && record.kind !== "activity")
     .map(record => ({ ...record, sources: [...record.sources, ...(["samaria", "sennacherib"].includes(record.id) ? ["assyria"] : record.id === "wall" ? ["artaxerxes"] : [])], track: ["alexander", "antiochus", "herod"].includes(record.id) ? "historical" : "biblical" } as ContextTimelineRecord));
-  return [...shared, ...PILOT_RECORDS, ...HISTORICAL_RECORDS, ...EXPANDED_TIMELINE_RECORDS, ...NT_TIMELINE_RECORDS].map(record => {
+  return [...shared, ...PILOT_RECORDS, ...HISTORICAL_RECORDS, ...EXPANDED_TIMELINE_RECORDS, ...NT_TIMELINE_RECORDS, ...WRITING_TIMELINE_RECORDS].map(record => {
     const narrative = NT_NARRATIVE_DETAILS[record.id];
     return narrative ? { ...record, narrative, references: [...new Set([...record.references, ...narrative.passages.map(passage => passage.reference)])] } : record;
   });
@@ -111,15 +115,17 @@ export function selectContextTimeline(records: ContextTimelineRecord[], book: st
   });
   const overview = scope === "world" || (!collection && !mappings.length);
   const text = query.trim().toLowerCase();
+  const passageReferences = !collection && !overview ? mappings.flatMap(item => item.references ?? []) : [];
+  const passageNotes = !collection && !overview ? mappings.map(item => item.note).join(" ") : "";
   const visible = records.filter(record => {
     if (filter !== "all" && record.track !== filter) return false;
-    if (text && !`${record.label} ${record.note} ${record.references.join(" ")} ${record.narrative?.phase ?? ""} ${record.narrative?.passages.map(passage => passage.label).join(" ") ?? ""}`.toLowerCase().includes(text)) return false;
+    if (text && !`${record.label} ${record.note} ${record.references.join(" ")} ${focusIds.has(record.id) ? passageNotes : ""} ${focusIds.has(record.id) ? passageReferences.join(" ") : ""} ${record.narrative?.phase ?? ""} ${record.narrative?.passages.map(passage => passage.label).join(" ") ?? ""}`.toLowerCase().includes(text)) return false;
     if (overview || focusIds.has(record.id) || contextIds.has(record.id)) return true;
     const bounds = timelinePlotBounds(record);
     // Familiar contemporaries are context, never evidence of a meeting or influence.
     return record.track === "historical" && bounds && windows.some(([start, end]) => bounds[0] <= end && bounds[1] >= start);
-  }).map(record => ({ ...record, emphasized: !overview && focusIds.has(record.id), relevance: overview ? "Broader historical overview; no chapter-specific association implied." :
-    focusIds.has(record.id) ? (collection ? "Part of this collection’s reading sequence. Consult the passage links and date explanation; the order is not a claim of exact calendar placement." : scope === "book" ? "Part of this book's reviewed episodes." : mapping!.note) :
+  }).map(record => ({ ...record, references: focusIds.has(record.id) && passageReferences.length ? [...new Set([...passageReferences, ...record.references])] : record.references, emphasized: !overview && focusIds.has(record.id), relevance: overview ? "Broader historical overview; no chapter-specific association implied." :
+    focusIds.has(record.id) ? (collection ? "Part of this collection’s reading sequence. Consult the passage links and date explanation; the order is not a claim of exact calendar placement." : scope === "book" ? "Part of this book's reviewed context. Consult the entry to distinguish a narrative event from a letter or vision setting." : mapping!.note) :
     contextIds.has(record.id) ? "Background or an earlier event mentioned in this passage. See the entry's sources and date explanation." : "A historical contemporary whose dates overlap a reviewed episode’s window. This does not establish personal contact or influence." }))
     .sort((a, b) => collection
       ? Number(b.emphasized) - Number(a.emphasized) || (a.narrative?.order ?? Infinity) - (b.narrative?.order ?? Infinity) || (timelinePlotBounds(a)?.[0] ?? Infinity) - (timelinePlotBounds(b)?.[0] ?? Infinity)
@@ -128,5 +134,5 @@ export function selectContextTimeline(records: ContextTimelineRecord[], book: st
     collection === "paul" ? "Paul’s missions · recorded routes in narrative order, with uncertain calendar windows. Later letters and travel plans remain separate and unplaced; Spain is an intention, not a confirmed journey." :
     scope === "world" ? "Selected biblical events and historical figures within the ancient biblical and authorship eras." :
     !mappings.length ? "Chapter-specific context is not yet available here. Showing the broader overview; this is not a date assigned to the passage." :
-    scope === "book" ? "Reviewed episodes in this book. Coverage provides narrative context, not an exhaustive account of every verse or a composition date." : mapping!.note };
+    scope === "book" ? "Reviewed context in this book. Entries distinguish narrated events from proposed letter or vision settings; this is not an exhaustive chronology of every verse." : mapping!.note };
 }
