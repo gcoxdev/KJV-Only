@@ -760,3 +760,6 @@
 @media (max-width: 639px) {
   .bible-timeline .vis-labelset .vis-label .vis-inner { width: 86px; }
 }
+
+/* Keep passage relevance visible in both duration and single-date items. */
+.bible-timeline .bible-time-emphasized .bible-time-label { font-weight: 700; }

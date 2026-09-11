@@ -1,3 +1,4 @@
+import { useTimelineModel } from "@/hooks/use-timeline-model";
 import { lazy, Suspense, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronDownIcon,
@@ -10,7 +11,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { buildBibleTimeline, type SojournModel } from "@/data/bible-timeline";
+import { buildBibleTimeline } from "@/data/bible-timeline";
 import { indexTimelinePersonDates, timelineDateSummary, type TimelineRecord } from "@/lib/bible-timeline";
 import type { GenealogyPerson, GenealogyRelation } from "@/types/reader";
 import {
@@ -305,7 +306,7 @@ export function GenealogyTreeDialog({
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const [view, setView] = useState("tree");
   const [expanded, setExpanded] = useState(false);
-  const [model, setModel] = useState<SojournModel>("egypt430");
+  const [model, setModel] = useTimelineModel();
   const records = useMemo(() => buildBibleTimeline(model), [model]);
   const datedPeople = useMemo(() => indexTimelinePersonDates(records), [records]);
   const primaryName = person?.names[0] ?? "";

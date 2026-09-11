@@ -10,6 +10,7 @@ import {
 } from "@/components/reader/reader-study-tools-content";
 import { STUDY_ACCORDION_ITEMS } from "@/hooks/use-study-sidebar-state";
 import { useStudyToolsSession } from "@/hooks/use-study-tools-session";
+import type { TimelineReaderContext } from "@/hooks/use-timeline-reader-context";
 import type { AncientMapEntry } from "@/lib/maps";
 import type { Book } from "@/types/bible";
 import type { NotesContext } from "@/types/notes";
@@ -22,6 +23,7 @@ const LazyGenealogyTreeDialog = lazy(async () => {
 
 export type StudyToolsPanelProps = {
   books: Book[];
+  timelineContext: TimelineReaderContext | null;
   selectionCommand?: StudyToolsSelectionCommand;
   renderPreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
@@ -32,6 +34,7 @@ export type StudyToolsPanelProps = {
 
 export function StudyToolsPanel({
   books,
+  timelineContext,
   selectionCommand,
   renderPreview,
   onOpenReference,
@@ -44,6 +47,7 @@ export function StudyToolsPanel({
     accordionValue,
     setAccordionValue,
     books,
+    timelineContext,
     selectionCommand,
     renderPreview,
     onOpenReference,

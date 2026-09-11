@@ -15,6 +15,7 @@ const STUDY_WORKSPACE_TOOLS: StudyWorkspaceTool[] = [
   "ai-dictionary",
   "genealogy",
   "maps",
+  "timeline",
 ];
 
 export function normalizeStudyWorkspaceTab(

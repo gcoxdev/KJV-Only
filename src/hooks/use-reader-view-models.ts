@@ -53,6 +53,7 @@ type UseStudyToolsViewModelParams = {
   onPhrasesSearch: (term: string) => void;
   onUnitsSearch: (term: string) => void;
   bibleWordBookProps: StudyToolInput<"bibleWordBookProps">;
+  timelineProps: StudyToolInput<"timelineProps">;
   mapsProps: StudyToolInput<"mapsProps">;
   genealogyProps: StudyToolInput<"genealogyProps">;
   hitchcocksProps: StudyToolInput<"hitchcocksProps">;
@@ -73,6 +74,7 @@ export function useStudyToolsViewModel({
   onUnitsSearch,
   bibleWordBookProps,
   mapsProps,
+  timelineProps,
   genealogyProps,
   hitchcocksProps,
 }: UseStudyToolsViewModelParams) {
@@ -106,6 +108,7 @@ export function useStudyToolsViewModel({
   }, [onAccordionValueChange]);
 
   const sharedStudyToolsProps: ReaderStudyToolsContentProps = {
+    timelineProps: { ...timelineProps, isOpen: accordionValue.includes("timeline") },
     crossRefsProps: {
       hasInfo: sidebarState.hasCrossRefsInfo,
       isOpen: sidebarState.isCrossRefsSectionOpen,

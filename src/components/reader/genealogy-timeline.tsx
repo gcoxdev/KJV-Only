@@ -12,7 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 
-const TimelineChart = lazy(() => import("./genealogy-timeline-chart"));
+const TimelineChart = lazy(() => import("./bible-timeline-chart"));
 
 export default function GenealogyTimeline({ person, genealogyById, onSelectPerson, onOpenReference, renderReferencePreview, onCloseSidebar, expanded, onExpandedChange, records, model, onModelChange }: {
   records: TimelineRecord[];
@@ -97,7 +97,7 @@ export default function GenealogyTimeline({ person, genealogyById, onSelectPerso
         </Select> : <Select value={era} onValueChange={value => { if (value) setEra(value as TimelineEra | "all"); }} disabled={scope === "family"}>
           <SelectTrigger className="min-w-40" aria-label="Timeline period"><SelectValue>{era === "all" ? "All periods" : TIMELINE_ERAS[era]}</SelectValue></SelectTrigger>
           <SelectContent><SelectGroup><SelectItem value="all">All periods</SelectItem>
-            {Object.entries(TIMELINE_ERAS).map(([id, label]) => <SelectItem key={id} value={id}>{label}</SelectItem>)}
+            {Object.entries(TIMELINE_ERAS).filter(([id]) => records.some(record => record.era === id)).map(([id, label]) => <SelectItem key={id} value={id}>{label}</SelectItem>)}
           </SelectGroup></SelectContent>
         </Select>}
         <ToggleGroup className={expanded ? "hidden" : undefined} value={[display]} onValueChange={values => { if (values[0]) setDisplay(values[0]); }} variant="outline" size="sm" aria-label="Timeline display">

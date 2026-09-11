@@ -1,3 +1,4 @@
+import { useTimelineReaderContext } from "@/hooks/use-timeline-reader-context";
 import {
   lazy,
   Suspense,
@@ -424,6 +425,8 @@ export function KJVReader() {
     activeTabId,
     readChapters,
   });
+
+  const timelineContext = useTimelineReaderContext(activeTab, activePanelLeafId);
 
   const completionCelebrationProps = useCompletionCelebration({
     totalChapters: isCorpusLoaded ? progressByTestament.total.total : 0,
@@ -1758,6 +1761,7 @@ export function KJVReader() {
     onExpandAll: expandAllStudyTools,
     onCollapseAll: collapseAllStudyTools,
   } = useStudyToolsViewModel({
+    timelineProps: { context: timelineContext, books, renderPreview: referencePreviewContent, onOpenReference: openConcordanceReference, onCloseSidebar: closeRightSidebarForMobile },
     accordionValue: concordanceAccordionValue,
     onAccordionValueChange: setConcordanceAccordionValue,
     infoCounts: {
@@ -1908,6 +1912,7 @@ export function KJVReader() {
   });
 
   const studyToolsPanelProps: StudyToolsPanelProps = {
+    timelineContext,
     books,
     renderPreview: referencePreviewContent,
     onOpenReference: openConcordanceReference,

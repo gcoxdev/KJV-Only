@@ -9,6 +9,7 @@ import {
   type SetStateAction,
 } from "react";
 
+import type { TimelineReaderContext } from "@/hooks/use-timeline-reader-context";
 import { GenealogyPersonDetails } from "@/components/reader/genealogy-person-details";
 import type { ReaderStudyToolsContentProps } from "@/components/reader/reader-study-tools-content";
 import { useConcordanceCrossRefsTool } from "@/hooks/use-concordance-crossrefs-tool";
@@ -107,6 +108,7 @@ type UseStudyToolsSessionParams = {
   accordionValue: string[];
   setAccordionValue: Dispatch<SetStateAction<string[]>>;
   books: Book[];
+  timelineContext: TimelineReaderContext | null;
   selectionCommand?: StudyToolsSelectionCommand;
   renderPreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
@@ -119,6 +121,7 @@ export function useStudyToolsSession({
   accordionValue,
   setAccordionValue,
   books,
+  timelineContext,
   selectionCommand,
   renderPreview,
   onOpenReference,
@@ -692,6 +695,7 @@ export function useStudyToolsSession({
   });
 
   const toolsProps: ReaderStudyToolsContentProps = {
+    timelineProps: { isOpen: accordionValue.includes("timeline"), context: timelineContext, books, renderPreview, onOpenReference, onCloseSidebar },
     crossRefsProps: {
       hasInfo: sidebarState.hasCrossRefsInfo,
       isOpen: sidebarState.isCrossRefsSectionOpen,

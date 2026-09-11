@@ -237,6 +237,7 @@ export type StudyWorkspaceTool =
   | "kjv-words-phrases"
   | "bible-word-book"
   | "maps"
+  | "timeline"
   | "genealogy"
   | "hitchcocks";
 export type StudyToolsDestination =

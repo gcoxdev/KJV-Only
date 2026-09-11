@@ -16,8 +16,9 @@ function textNode(text: string, className?: string) {
   return element;
 }
 
-export default function GenealogyTimelineChart({ records, selectedId, onSelect, expanded, compact, onExpandedChange }: {
-  records: TimelineRecord[]; selectedId?: string; onSelect: (id: string) => void;
+export default function BibleTimelineChart({ records, selectedId, onSelect, expanded, compact, onExpandedChange, tracks, chartLabel = "Genealogy timeline chart" }: {
+  records: (TimelineRecord & { track?: string; emphasized?: boolean })[];
+  tracks?: Record<string, string>; chartLabel?: string; selectedId?: string; onSelect: (id: string) => void;
   expanded: boolean; onExpandedChange: (expanded: boolean) => void;
   compact: boolean;
 }) {
@@ -30,7 +31,7 @@ export default function GenealogyTimelineChart({ records, selectedId, onSelect, 
     if (!container.current) return;
     const plotted = records.filter(record => timelinePlotBounds(record));
     if (!plotted.length) return;
-    const groups = plotted.map((record, order) => ({ id: record.id, content: record.label, order }));
+    const groups = tracks ? Object.entries(tracks).filter(([id]) => plotted.some(record => record.track === id)).map(([id, content], order) => ({ id, content, order })) : plotted.map((record, order) => ({ id: record.id, content: record.label, order }));
     const bounds = plotted.map(record => timelinePlotBounds(record)!);
     const firstYear = Math.min(...bounds.map(([start]) => start));
     const lastYear = Math.max(...bounds.map(([, end]) => end));
@@ -53,7 +54,7 @@ export default function GenealogyTimelineChart({ records, selectedId, onSelect, 
     const items: DataItem[] = plotted.map(record => {
       const [start, end] = timelinePlotBounds(record)!;
       return {
-        id: record.id, group: record.id, content: record.label,
+        id: record.id, group: tracks ? record.track : record.id, content: record.label,
         start: timelineDate(start), ...(end > start ? {
           end: timelineDate(end),
           // Keep labels and endpoints tied to dates while panning. The library's
@@ -63,12 +64,12 @@ export default function GenealogyTimelineChart({ records, selectedId, onSelect, 
         // Point items keep their marker in the row; boxes also create an axis dot.
         type: record.kind === "event" || record.placement ? "point" : end > start ? "range" : "box",
         className: ["bible-time-item", `bible-time-${record.kind}`,
-          record.placement ? "bible-time-estimate" : "",
+          record.placement ? "bible-time-estimate" : "", record.emphasized ? "bible-time-emphasized" : "",
           !record.placement && hasUnknownStart(record) ? "bible-time-open-start" : "", !record.placement && hasUnknownEnd(record) ? "bible-time-open-end" : ""].filter(Boolean).join(" "),
       };
     });
     const options: TimelineOptions = {
-      height: "100%", stack: false, groupOrder: "order", groupHeightMode: "fixed",
+      height: "100%", stack: !!tracks, groupOrder: "order", groupHeightMode: tracks ? "auto" : "fixed",
       margin: { item: 10, axis: 12 }, orientation: "top", showCurrentTime: false,
       showMajorLabels: false,
       editable: false, selectable: true, multiselect: false, verticalScroll: true,
@@ -162,7 +163,7 @@ export default function GenealogyTimelineChart({ records, selectedId, onSelect, 
     });
     observer.observe(container.current);
     return () => { disposed = true; observer.disconnect(); cancelAnimationFrame(resizeFrame); instance.destroy(); timeline.current = null; fitSelection.current = null; };
-  }, [records]);
+  }, [records, tracks]);
   useEffect(() => { timeline.current?.setSelection(selectedId ? [selectedId] : []); }, [selectedId, records]);
   const hasDates = records.some(record => timelinePlotBounds(record));
   return (
@@ -185,7 +186,7 @@ export default function GenealogyTimelineChart({ records, selectedId, onSelect, 
       </div>
       {error ? <p role="alert">The chart could not load. Use the timeline list below.</p> : null}
       {!hasDates ? <p className="text-sm text-muted-foreground">No supported calendar placements in this selection. {expanded ? "Collapse the chart to see the undated entries." : "People and evidence remain in the list below."}</p> : null}
-      <div ref={container} className={cn("bible-timeline min-w-0 overflow-hidden rounded-lg border", expanded ? "min-h-0 flex-1" : "h-80", !hasDates && "hidden")} role="region" aria-label="Genealogy timeline chart" />
+      <div ref={container} className={cn("bible-timeline min-w-0 overflow-hidden rounded-lg border", expanded ? "min-h-0 flex-1" : "h-80", !hasDates && "hidden")} role="region" aria-label={chartLabel} />
       <div className={cn("flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground", compact && "hidden")} aria-label="Timeline legend">
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key bible-time-key-point" />Single date</span>
         <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="bible-time-key" />Span of time</span>

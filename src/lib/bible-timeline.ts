@@ -1,6 +1,6 @@
 import type { GenealogyPerson } from "../types/reader";
 
-export type TimelineEra = "beginnings" | "patriarchs" | "exodus" | "kingdom" | "exile" | "gospels";
+export type TimelineEra = "beginnings" | "patriarchs" | "exodus" | "kingdom" | "exile" | "gospels" | "history";
 export type JesusLineageBranch = "mary" | "joseph";
 export type TimelineContent = "all" | "people" | "events";
 export type EndpointStatus = "derived" | "approximate" | "unknown";
@@ -35,7 +35,7 @@ export type TimelineRecord = {
 export const TIMELINE_ERAS: Record<TimelineEra, string> = {
   beginnings: "Adam to the patriarchs", patriarchs: "Abraham to Egypt",
   exodus: "Exodus and Judges", kingdom: "Kings and prophets",
-  exile: "Exile and return", gospels: "Toward Jesus",
+  exile: "Exile and return", gospels: "Toward Jesus", history: "Wider history",
 };
 
 export function timelineEntryCategory(record: TimelineRecord): Exclude<TimelineContent, "all"> {

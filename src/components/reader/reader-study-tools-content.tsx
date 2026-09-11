@@ -7,6 +7,7 @@ import { AIDictionaryTool } from "@/components/reader/study-tools/ai-dictionary-
 import { StrongsTool } from "@/components/reader/study-tools/strongs-tool";
 import { KJVWordsPhrasesTool } from "@/components/reader/study-tools/kjv-words-phrases-tool";
 import { BibleWordBookTool } from "@/components/reader/study-tools/bible-word-book-tool";
+import { TimelineTool } from "@/components/reader/study-tools/timeline-tool";
 import { MapsTool } from "@/components/reader/study-tools/maps-tool";
 import { GenealogyTool } from "@/components/reader/study-tools/genealogy-tool";
 import { HitchcocksTool } from "@/components/reader/study-tools/hitchcocks-tool";
@@ -19,6 +20,7 @@ export type ReaderStudyToolsContentProps = {
   strongsProps: ComponentProps<typeof StrongsTool>;
   kjvWordsPhrasesProps: ComponentProps<typeof KJVWordsPhrasesTool>;
   bibleWordBookProps: ComponentProps<typeof BibleWordBookTool>;
+  timelineProps: ComponentProps<typeof TimelineTool>;
   mapsProps: ComponentProps<typeof MapsTool>;
   genealogyProps: ComponentProps<typeof GenealogyTool>;
   hitchcocksProps: ComponentProps<typeof HitchcocksTool>;
@@ -37,6 +39,7 @@ export function ReaderStudyToolsContent({
   kjvWordsPhrasesProps,
   bibleWordBookProps,
   mapsProps,
+  timelineProps,
   genealogyProps,
   hitchcocksProps,
   openSections,
@@ -95,6 +98,7 @@ export function ReaderStudyToolsContent({
         {...mapsProps}
         isOpen={isSectionOpen("maps", mapsProps.isOpen)}
       />
+      <TimelineTool {...timelineProps} isOpen={isSectionOpen("timeline", timelineProps.isOpen)} />
     </>
   );
 }

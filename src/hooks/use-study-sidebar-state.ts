@@ -9,6 +9,7 @@ export const STUDY_ACCORDION_ITEMS = [
   "ai-dictionary",
   "genealogy",
   "maps",
+  "timeline",
 ] as const;
 
 type UseStudySidebarStateArgs = {
