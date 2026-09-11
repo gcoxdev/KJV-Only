@@ -1,3 +1,4 @@
+import { buildChroniclesContext, CHRONICLES_CHAPTER_TIMELINE_MAP, withChroniclesParallels } from "./contextual-timeline-chronicles";
 import { buildKingsContext, KINGS_CHAPTER_TIMELINE_MAP, KINGS_HISTORICAL_RECORDS, KINGS_TIMELINE_SOURCES } from "./contextual-timeline-kings";
 import { buildOldTestamentContext, OT_CHAPTER_TIMELINE_MAP } from "./contextual-timeline-ot";
 import { WRITING_CHAPTER_TIMELINE_MAP, WRITING_TIMELINE_RECORDS, WRITING_TIMELINE_SOURCES } from "./contextual-timeline-writings";
@@ -76,7 +77,7 @@ const INITIAL_CHAPTER_TIMELINE_MAP: Record<string, Record<number, ChapterMapping
 };
 
 export const CHAPTER_TIMELINE_MAP: Record<string, Record<number, ChapterMapping>> = {};
-for (const source of [INITIAL_CHAPTER_TIMELINE_MAP, EXPANDED_CHAPTER_TIMELINE_MAP, NT_CHAPTER_TIMELINE_MAP, WRITING_CHAPTER_TIMELINE_MAP, OT_CHAPTER_TIMELINE_MAP, KINGS_CHAPTER_TIMELINE_MAP]) {
+for (const source of [INITIAL_CHAPTER_TIMELINE_MAP, EXPANDED_CHAPTER_TIMELINE_MAP, NT_CHAPTER_TIMELINE_MAP, WRITING_CHAPTER_TIMELINE_MAP, OT_CHAPTER_TIMELINE_MAP, KINGS_CHAPTER_TIMELINE_MAP, CHRONICLES_CHAPTER_TIMELINE_MAP]) {
   for (const [book, chapters] of Object.entries(source)) {
     const target = CHAPTER_TIMELINE_MAP[book] ??= {};
     for (const [chapter, mapping] of Object.entries(chapters)) {
@@ -98,9 +99,11 @@ export const CONTEXT_TIMELINE_COVERAGE = {
 export function buildContextTimeline(model: SojournModel = "egypt430"): ContextTimelineRecord[] {
   // Reuse the reviewed event chronology, not schematic genealogy placements.
   const chronology = buildBibleTimeline(model);
+  const kings = buildKingsContext(chronology);
+  const chronicles = buildChroniclesContext([...chronology, ...kings]);
   const shared = chronology.filter(record => !record.placement && record.kind !== "life" && record.kind !== "activity")
     .map(record => ({ ...record, sources: [...record.sources, ...(["samaria", "sennacherib"].includes(record.id) ? ["assyria"] : record.id === "wall" ? ["artaxerxes"] : [])], track: ["alexander", "antiochus", "herod"].includes(record.id) ? "historical" : "biblical" } as ContextTimelineRecord));
-  return [...shared, ...PILOT_RECORDS, ...HISTORICAL_RECORDS, ...EXPANDED_TIMELINE_RECORDS, ...NT_TIMELINE_RECORDS, ...WRITING_TIMELINE_RECORDS, ...buildOldTestamentContext(chronology), ...buildKingsContext(chronology), ...KINGS_HISTORICAL_RECORDS].map(record => {
+  return [...shared, ...PILOT_RECORDS, ...HISTORICAL_RECORDS, ...EXPANDED_TIMELINE_RECORDS, ...NT_TIMELINE_RECORDS, ...WRITING_TIMELINE_RECORDS, ...buildOldTestamentContext(chronology), ...kings, ...chronicles, ...KINGS_HISTORICAL_RECORDS].map(withChroniclesParallels).map(record => {
     const narrative = NT_NARRATIVE_DETAILS[record.id];
     return narrative ? { ...record, narrative, references: [...new Set([...record.references, ...narrative.passages.map(passage => passage.reference)])] } : record;
   });

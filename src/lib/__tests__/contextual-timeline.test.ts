@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildContextTimeline, CHAPTER_TIMELINE_MAP, CONTEXT_TIMELINE_COVERAGE, CONTEXT_TIMELINE_SOURCES, selectContextTimeline } from "@/data/contextual-timeline";
 import { NT_NARRATIVE_DETAILS, TIMELINE_PHASES } from "@/data/contextual-timeline-nt";
 import { buildAnchoredContext } from "@/data/contextual-timeline-anchors";
+import { buildChroniclesContext, withChroniclesParallels } from "@/data/contextual-timeline-chronicles";
 import { buildKingsContext } from "@/data/contextual-timeline-kings";
 import { buildBibleTimeline } from "@/data/bible-timeline";
 import { formatTimelineYear, timelinePlotBounds } from "@/lib/bible-timeline";
@@ -24,8 +25,8 @@ describe("contextual history", () => {
     }
   });
   it("extends the initial chapters without replacing their mappings", () => {
-    expect(CONTEXT_TIMELINE_COVERAGE.chapters).toBe(624);
-    expect(CONTEXT_TIMELINE_COVERAGE.books).toHaveLength(44);
+    expect(CONTEXT_TIMELINE_COVERAGE.chapters).toBe(689);
+    expect(CONTEXT_TIMELINE_COVERAGE.books).toHaveLength(46);
     expect(Object.keys(CHAPTER_TIMELINE_MAP.Ezra)).toHaveLength(10);
     expect(CHAPTER_TIMELINE_MAP["2 Kings"][24].ids).toContain("jerusalem-597");
     expect(CHAPTER_TIMELINE_MAP.Acts[18].ids).toContain("paul-gallio");
@@ -366,6 +367,101 @@ describe("contextual history", () => {
     expect(selectContextTimeline(records, "2 Kings", 9, "chapter", "biblical").records.some(record => record.id === "jehu-tribute")).toBe(false);
     expect(get("jehu-tribute").note).toContain("not proof that Jehu was Omri's biological son");
     expect(selectContextTimeline(records, "2 Kings", 16, "chapter", "historical").records.map(record => record.id)).toContain("tiglath-reign");
+  });
+  it("covers Chronicles and reuses parallel events without mutating source data", () => {
+    for (const [book, count] of Object.entries({ "1 Chronicles": 29, "2 Chronicles": 36 })) {
+      expect(Object.keys(CHAPTER_TIMELINE_MAP[book])).toHaveLength(count);
+      for (let chapter = 1; chapter <= count; chapter++) {
+        const selected = selectContextTimeline(records, book, chapter, "chapter", "biblical");
+        expect(selected.mapped).toBe(true);
+        expect(selected.records.some(record => record.emphasized), `${book} ${chapter}`).toBe(true);
+      }
+    }
+    for (const [book, chapter, parallelBook, parallelChapter, id] of [
+      ["1 Chronicles", 10, "1 Samuel", 31, "saul-final"],
+      ["1 Chronicles", 17, "2 Samuel", 7, "david-covenant"],
+      ["2 Chronicles", 18, "1 Kings", 22, "ahab-death"],
+      ["2 Chronicles", 23, "2 Kings", 11, "joash-judah-crowned"],
+      ["2 Chronicles", 35, "2 Kings", 23, "josiah-death"],
+    ] as const) {
+      expect(CHAPTER_TIMELINE_MAP[book][chapter].ids).toContain(id);
+      expect(CHAPTER_TIMELINE_MAP[parallelBook][parallelChapter].ids).toContain(id);
+      expect(records.filter(record => record.id === id)).toHaveLength(1);
+    }
+    const source = buildBibleTimeline();
+    const original = structuredClone(source);
+    const kings = buildKingsContext(source);
+    const beforeKings = structuredClone(kings);
+    const added = buildChroniclesContext([...source, ...kings]);
+    const alternative = buildBibleTimeline("promise430");
+    expect(added).toEqual(buildChroniclesContext([...alternative, ...buildKingsContext(alternative)]));
+    const census = kings.find(record => record.id === "david-census")!;
+    expect(withChroniclesParallels(census).references).toContain("1CH.21.12");
+    expect(kings).toEqual(beforeKings);
+    expect(source).toEqual(original);
+    const saved = structuredClone(records);
+    selectContextTimeline(records, "1 Chronicles", 21, "chapter", "biblical");
+    expect(records).toEqual(saved);
+  });
+  it("keeps retrospective genealogies and mixed-era collections off a fabricated common date", () => {
+    for (const chapter of [1, 2, 3, 6, 7, 8, 9]) {
+      const selected = selectContextTimeline(records, "1 Chronicles", chapter, "chapter", "biblical");
+      for (const record of selected.records) expect(timelinePlotBounds(record), record.id).toBeNull();
+      expect(selectContextTimeline(records, "1 Chronicles", chapter, "chapter", "historical").records).toEqual([]);
+    }
+    const transjordan = selectContextTimeline(records, "1 Chronicles", 5, "chapter", "biblical").records;
+    expect(transjordan.find(record => record.id === "tiglath-north")?.emphasized).toBe(false);
+    const saul = records.find(record => record.id === "royal-saul")!;
+    expect(timelinePlotBounds(transjordan.find(record => record.id === "hagarites-saul")!)).toEqual(timelinePlotBounds(saul));
+    expect(transjordan.find(record => record.id === "hagarites-saul")?.kind).toBe("date-window");
+    expect(timelinePlotBounds(transjordan.find(record => record.id === "chron-transjordan")!)).toBeNull();
+  });
+  it("derives explicit Chronicles regnal windows while retaining their limits", () => {
+    const get = (id: string) => records.find(record => record.id === id)!;
+    const lastDavidYear = get("royal-david-jerusalem").end!;
+    expect(timelinePlotBounds(get("david-fortieth-officers"))).toEqual([lastDavidYear - 1, lastDavidYear]);
+    const accession = get("royal-josiah").start!;
+    expect(timelinePlotBounds(get("josiah-seeks"))).toEqual([accession + 7, accession + 8]);
+    expect(timelinePlotBounds(get("josiah-purge"))).toEqual([accession + 11, accession + 12]);
+    expect(timelinePlotBounds(get("josiah-law"))).toEqual([accession + 17, accession + 18]);
+    expect(get("josiah-law").end!).toBeLessThan(get("josiah-death").start!);
+    const hezekiah = get("royal-hezekiah").start!;
+    expect(timelinePlotBounds(get("hezekiah-temple-cleansed"))).toEqual([hezekiah, hezekiah + 1]);
+    expect(get("hezekiah-temple-cleansed").note).toContain("day sixteen");
+    expect(get("hezekiah-temple-cleansed").note).toContain("shared-reign reckoning");
+    expect(timelinePlotBounds(get("hezekiah-passover"))).toBeNull();
+    expect(get("hezekiah-passover").note).toContain("second month");
+    expect(timelinePlotBounds(get("hezekiah-provisions"))).toBeNull();
+  });
+  it("preserves KJV parallel readings and separates royal and prophetic namesakes", () => {
+    const get = (id: string) => records.find(record => record.id === id)!;
+    for (const [id, words] of [
+      ["asa-ramah", ["thirty-sixth", "twenty-sixth", "not silently changed"]],
+      ["judah-jehoram-ahaziah", ["forty-two", "twenty-two"]],
+      ["jerusalem-597", ["eight at accession", "eighteen"]],
+      ["david-census", ["three years in Chronicles", "seven in Samuel", "fifty shekels of silver", "six hundred shekels of gold"]],
+      ["abijah-judah-war", ["Abijam", "not Jeroboam's son"]],
+      ["jehoiada-zechariah", ["130", "son of Jehoiada", "not the later prophet"]],
+      ["jehoram-judah-warning", ["Jehoshaphat's son", "Ahab's son", "Elijah's writing"]],
+      ["solomon-accession", ["second time", "no extra intervening years"]],
+    ] as const) for (const word of words) expect(get(id).note, id).toContain(word);
+    for (const id of ["asa-ramah", "asa-final-years", "abijah-judah-war", "jehoiada-zechariah", "jehoram-judah-warning", "david-census"]) expect(timelinePlotBounds(get(id)), id).toBeNull();
+    expect(get("asa-ramah").references).toEqual(expect.arrayContaining(["2CH.16.1", "1KI.16.8"]));
+    expect(get("jerusalem-597").references).toEqual(expect.arrayContaining(["2CH.36.9", "2KI.24.8"]));
+  });
+  it("does not confuse Manasseh's Assyrian captivity with Judah's exile or shorten seventy years", () => {
+    const get = (id: string) => records.find(record => record.id === id)!;
+    const manasseh = selectContextTimeline(records, "2 Chronicles", 33, "chapter", "biblical");
+    expect(manasseh.records.map(record => record.id)).toEqual(expect.arrayContaining(["manasseh-captivity", "manasseh-amon"]));
+    expect(manasseh.records.some(record => ["jerusalem-597", "temple-destroyed", "return-decree"].includes(record.id))).toBe(false);
+    expect(timelinePlotBounds(get("manasseh-captivity"))).toBeNull();
+    expect(get("manasseh-captivity").note).toContain("king of Assyria");
+    expect(get("jehoiakim-bound").note).toContain("does not itself narrate a completed journey");
+    const ending = selectContextTimeline(records, "2 Chronicles", 36, "chapter", "biblical").records;
+    expect(ending.filter(record => record.emphasized).map(record => record.id)).toEqual(expect.arrayContaining(["jerusalem-597", "temple-destroyed", "return-decree", "chron-seventy-years"]));
+    expect(timelinePlotBounds(get("chron-seventy-years"))).toBeNull();
+    expect(get("chron-seventy-years").note).toContain("not seventy years apart");
+    expect(get("return-decree").start! - get("temple-destroyed").start!).toBe(48);
   });
   it("rejects missing, schematic, duplicate, and reversed chronology anchors", () => {
     const episode = { id: "check", label: "Check", era: "kingdom" as const, references: ["2SA.5.4"], note: "Check", at: ["missing"] as [string] };

@@ -380,3 +380,49 @@ test("late sidebar loading preserves a panel's first pointer click", async ({ pa
     releaseSidebar();
   }
 });
+
+for (const width of [390, 1280]) {
+  test(`Chronicles parallels, reform stages, and uncertain dates at ${width}px`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.setViewportSize({ width, height: 844 });
+    const dialog = await openTimeline(page, width < 768);
+    const entries = dialog.getByRole("group", { name: "Historical timeline entries" });
+    const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+    const choose = async (book: string, chapter: number) => {
+      await dialog.getByRole("combobox", { name: "Timeline book", exact: true }).click();
+      await page.getByRole("option", { name: book, exact: true }).click();
+      await dialog.getByRole("combobox", { name: "Timeline chapter", exact: true }).click();
+      await page.getByRole("option", { name: `Chapter ${chapter}`, exact: true }).click();
+    };
+    await choose("1 Chronicles", 3);
+    await expect(evidence).toContainText("extends beyond the exile");
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("1 Chronicles", 21);
+    await expect(evidence).toContainText("three years in Chronicles");
+    await expect(evidence.getByRole("button", { name: "2SA.24.13", exact: true })).toBeVisible();
+    await expect(evidence.getByRole("button", { name: "1CH.21.12", exact: true })).toBeVisible();
+    await choose("1 Chronicles", 26);
+    await entries.getByRole("button", { name: /Hebronite officers sought/ }).click();
+    await expect(evidence).toContainText("Explicit fortieth regnal year");
+    await choose("2 Chronicles", 16);
+    await entries.getByRole("button", { name: /Baasha's Ramah blockade/ }).click();
+    await expect(evidence).toContainText("not silently changed to sixteen");
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("2 Chronicles", 34);
+    await expect(entries.getByRole("button", { name: /eighth year/ })).toBeVisible();
+    await expect(entries.getByRole("button", { name: /twelfth year/ })).toBeVisible();
+    await entries.getByRole("button", { name: /twelfth year/ }).click();
+    await expect(evidence).toContainText("six regnal years before");
+    await page.screenshot({ path: `design/contextual-timeline-chronicles-${width}.png` });
+    await choose("2 Chronicles", 33);
+    await entries.getByRole("button", { name: /Manasseh taken to Babylon/ }).click();
+    await expect(evidence).toContainText("king of Assyria");
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("2 Chronicles", 36);
+    await entries.getByRole("button", { name: /desolation and Jeremiah's seventy years/ }).click();
+    await expect(evidence).toContainText("not seventy years apart");
+    await expect(evidence.getByRole("button", { name: "JER.25.11", exact: true })).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+}
