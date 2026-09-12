@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { buildBibleTimeline } from "@/data/bible-timeline";
+import { getTimelineCatalog } from "@/data/timeline-catalog";
 import { indexTimelinePersonDates, timelineDateSummary, type TimelineRecord } from "@/lib/bible-timeline";
 import type { GenealogyPerson, GenealogyRelation } from "@/types/reader";
 import {
@@ -314,7 +314,8 @@ export function GenealogyTreeDialog({
   const setView = (view: string) => patchView({ view: view === "timeline" ? "timeline" : "tree" });
   const [expanded, setExpanded] = useState(false);
   const [model, setModel] = useTimelineModel();
-  const records = useMemo(() => buildBibleTimeline(model), [model]);
+  const catalog = useMemo(() => getTimelineCatalog(model), [model]);
+  const records = catalog.genealogyRecords;
   const datedPeople = useMemo(() => indexTimelinePersonDates(records), [records]);
   const primaryName = person?.names[0] ?? "";
   const aliases = person?.names.slice(1) ?? [];
@@ -361,7 +362,7 @@ export function GenealogyTreeDialog({
           <ScrollArea ref={scrollAreaRef} className={cn("h-full", expanded && "[&_[data-slot=scroll-area-viewport]>div]:h-full")}>
             {view === "timeline" ? <Suspense fallback={<p role="status" className="p-4">Loading timeline…</p>}>
               <GenealogyTimeline onNavigateAway={embedded ? undefined : () => onOpenChange(false)} viewState={viewState} onViewStateChange={patchView} person={person} genealogyById={genealogyById} expanded={expanded} onExpandedChange={setExpanded}
-                records={records} model={model} onModelChange={setModel}
+                catalog={catalog} model={model} onModelChange={setModel}
                 onSelectPerson={id => {
                   setExpanded(false);
                   if (onViewStateChange) onSelectPerson(id, { ...viewState, view: "tree" });

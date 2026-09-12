@@ -1,3 +1,4 @@
+import { canonicalTimelineId } from "./timeline-identities";
 /** Versioned, bounded presentation state. No calendar evidence is stored here. */
 export type TimelineWindow = { start: number; end: number; key: string };
 export type TimelineViewState = {
@@ -11,6 +12,8 @@ export type TimelineViewState = {
   display: "chart" | "list";
   view: "tree" | "timeline";
   query: string;
+  showPeople: boolean;
+  includeContext: boolean;
   selectedId?: string;
   window?: TimelineWindow;
 };
@@ -46,7 +49,9 @@ export function parseTimelineViewState(value: unknown, kind: TimelineViewKind): 
     display: pick("display", ["chart", "list"], "chart"),
     view: pick("view", ["tree", "timeline"], "tree"),
     query: text("query", 200),
-    selectedId: text("selectedId", 200) || undefined,
+    showPeople: input.showPeople === true,
+    includeContext: input.includeContext === true,
+    selectedId: text("selectedId", 200) ? canonicalTimelineId(text("selectedId", 200)) : undefined,
     window: parseTimelineWindow(input.window),
   };
 }

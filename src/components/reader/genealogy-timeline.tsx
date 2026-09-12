@@ -3,7 +3,8 @@ import { timelineRelatedTools } from "@/data/timeline-related-tools";
 import type { TimelineViewState } from "@/lib/timeline-view-state";
 import { lazy, Suspense, useCallback, useMemo, useState, type ReactNode } from "react";
 import { TIMELINE_METHOD, type SojournModel } from "@/data/bible-timeline";
-import { TIMELINE_ERAS, buildLineageTimeline, jesusLineage, timelineEntryCategory, timelineDateSummary, timelineKindLabel, timelinePlotBounds, type JesusLineageBranch, type TimelineContent, type TimelineEra, type TimelineRecord } from "@/lib/bible-timeline";
+import { matchingTimelinePeople, relatedTimelineEntries, type TimelineCatalog } from "@/data/timeline-catalog";
+import { TIMELINE_ERAS, jesusLineage, timelineEntryCategory, timelineDateSummary, timelineKindLabel, timelinePlotBounds, type JesusLineageBranch, type TimelineContent, type TimelineEra, type TimelineRecord } from "@/lib/bible-timeline";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { GenealogyPerson } from "@/types/reader";
@@ -13,15 +14,16 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 
 const TimelineChart = lazy(() => import("./bible-timeline-chart"));
 
-export default function GenealogyTimeline({ onNavigateAway, viewState, onViewStateChange: patchView, person, genealogyById, onSelectPerson, onOpenReference, renderReferencePreview, onCloseSidebar, expanded, onExpandedChange, records, model, onModelChange }: {
+export default function GenealogyTimeline({ onNavigateAway, viewState, onViewStateChange: patchView, person, genealogyById, onSelectPerson, onOpenReference, renderReferencePreview, onCloseSidebar, expanded, onExpandedChange, catalog, model, onModelChange }: {
   onNavigateAway?: () => void;
   viewState: TimelineViewState;
   onViewStateChange: (patch: Partial<TimelineViewState>) => void;
-  records: TimelineRecord[];
+  catalog: TimelineCatalog;
   model: SojournModel;
   onModelChange: (model: SojournModel) => void;
   person: GenealogyPerson | null;
@@ -35,7 +37,8 @@ export default function GenealogyTimeline({ onNavigateAway, viewState, onViewSta
 }) {
   const isMobile = useIsMobile();
   const compact = expanded && isMobile;
-  const { scope, content, branch, display, query, selectedId } = viewState;
+  const { scope, content, branch, display, query, selectedId, includeContext } = viewState;
+  const records = catalog.genealogyRecords;
   const era = viewState.era as TimelineEra | "all";
   const setEra = (era: TimelineEra | "all") => patchView({ era });
   const setScope = (scope: string) => patchView({ scope });
@@ -62,31 +65,28 @@ export default function GenealogyTimeline({ onNavigateAway, viewState, onViewSta
   const relatedPeople = useMemo(() => scope === "lineage" ?
     new Map(lineage.members.map((relative, index) => [relative.id, { person: relative, relation: index === 0 ? "Jesus" : `${branch === "mary" ? "Mary's" : "Joseph's"} line` }])) : family,
   [scope, lineage, branch, family]);
+  const relatedIds = useMemo(() => new Set(relatedPeople.keys()), [relatedPeople]);
   const available = useMemo(() => {
     if (scope === "overview") return records;
-    if (scope === "lineage") return buildLineageTimeline(lineage.members, records);
-    const matching = records.filter(record => record.personIds?.some(id => relatedPeople.has(id)));
-    const represented = new Set(matching.flatMap(record => record.personIds ?? []));
-    for (const { person: relative } of relatedPeople.values()) {
-      if (!represented.has(relative.id)) matching.push({
-        id: `undated-${relative.id}`, label: relative.names[0], personIds: [relative.id], kind: "life", era: "beginnings",
-        references: relative.verses?.first ? [relative.verses.first] : [], sources: [],
-        note: "This person has no reviewed timeline dates. The reference identifies the person; it does not supply a lifespan or calendar position.",
-      });
-    }
-    return matching;
-  }, [records, scope, relatedPeople, lineage]);
+    return relatedTimelineEntries(catalog, [...relatedPeople.values()].map(relative => relative.person), scope === "lineage", includeContext);
+  }, [catalog, records, scope, relatedPeople, includeContext]);
   const visible = useMemo(() => available.filter(record =>
     (scope !== "overview" || era === "all" || record.era === era) &&
     (content === "all" || timelineEntryCategory(record) === content) &&
     `${record.label} ${record.references.join(" ")}`.toLowerCase().includes(query.trim().toLowerCase()),
-  ).sort((a, b) => scope === "lineage" ? 0 : (timelinePlotBounds(a)?.[0] ?? Infinity) - (timelinePlotBounds(b)?.[0] ?? Infinity)), [available, era, scope, content, query]);
+  ).sort((a, b) => scope === "lineage" && content === "people" ? 0 : (timelinePlotBounds(a)?.[0] ?? Infinity) - (timelinePlotBounds(b)?.[0] ?? Infinity)), [available, era, scope, content, query]);
   const selected = visible.find(record => record.id === selectedId) ?? visible.find(record => record.personIds?.includes(person?.id ?? "")) ?? visible[0];
   const evidenceReferences = selected ? [...new Set([...selected.references, ...timelineRelatedTools(selected).map(link => link.reference).filter(Boolean)])] : [];
   const select = useCallback((selectedId: string) => patchView({ selectedId }), [patchView]);
   const refs = (references: string[], word = "") => <ToolReferenceList references={references} highlightWord={word}
     renderPreview={renderReferencePreview} onOpenReference={onOpenReference} onCloseSidebar={onCloseSidebar} />;
   const relation = (record: TimelineRecord) => record.personIds?.map(id => relatedPeople.get(id)?.relation).filter(Boolean).join(" / ");
+  const connections = (record: TimelineRecord) => scope === "overview" ? [] : matchingTimelinePeople(record, relatedIds, includeContext).filter(link => link.role !== "subject");
+  const contextOnly = (record: TimelineRecord) => connections(record).length > 0 && connections(record).every(link => link.role === "context");
+  const chartRecords = useMemo(() => visible.map(record => {
+    const links = scope === "overview" ? [] : matchingTimelinePeople(record, relatedIds, includeContext);
+    return links.length && links.every(link => link.role === "context") ? { ...record, label: `${record.label} · Contextual mention` } : record;
+  }), [visible, scope, relatedIds, includeContext]);
   const treeTarget = selected?.personIds?.find(id => id === person?.id) ?? selected?.personIds?.find(id => genealogyById.has(id));
   return (
     <section aria-label="Adam to Jesus timeline" className={cn("flex min-w-0 flex-col gap-3 p-3 sm:p-4", expanded && "h-full min-h-0 gap-2 overflow-hidden p-2 sm:p-2")}>
@@ -99,6 +99,7 @@ export default function GenealogyTimeline({ onNavigateAway, viewState, onViewSta
         <ToggleGroup value={[content]} onValueChange={values => { if (values[0]) setContent(values[0] as TimelineContent); }} variant="outline" size="sm" aria-label="Timeline content">
           <ToggleGroupItem value="all">All</ToggleGroupItem><ToggleGroupItem value="people">People</ToggleGroupItem><ToggleGroupItem value="events">Events</ToggleGroupItem>
         </ToggleGroup>
+        {scope !== "overview" ? <label className="flex items-center gap-2 text-xs"><Checkbox checked={includeContext} onCheckedChange={checked => patchView({ includeContext: checked === true })} />Include contextual mentions</label> : null}
         {scope === "lineage" ? <Select value={branch} onValueChange={value => { if (value === "mary" || value === "joseph") setBranch(value); }}>
           <SelectTrigger aria-label="Jesus lineage branch"><SelectValue>{branch === "mary" ? "Mary (Luke interpretation)" : "Joseph"}</SelectValue></SelectTrigger>
           <SelectContent><SelectGroup><SelectItem value="joseph">Joseph</SelectItem><SelectItem value="mary">Mary (Luke interpretation)</SelectItem></SelectGroup></SelectContent>
@@ -114,7 +115,7 @@ export default function GenealogyTimeline({ onNavigateAway, viewState, onViewSta
         <Input aria-label="Filter timeline" placeholder="Find a person or event…" value={query} onChange={event => setQuery(event.target.value)} className="min-w-36 flex-1" />
       </div>
       {scope === "lineage" && !expanded ? <div className="rounded-lg border p-3 text-xs text-muted-foreground" role="note" aria-label="Lineage sources">
-        <p>Every ancestor appears in lineage order, including generations beyond Matthew's shorter list. Hollow circles mark estimated placements between dated anchors; select one for the calculation. These estimates are not known birth years or lifespans. Mary's connection to Heli is an interpretation of Luke's genealogy; Luke 3:23 names Joseph.</p>
+        <p>People view shows every ancestor in lineage order, including generations beyond Matthew's shorter list. Choose All or Events to include reviewed related events. Hollow circles mark estimated placements between dated anchors; select one for the calculation. These estimates are not known birth years or lifespans. Mary's connection to Heli is an interpretation of Luke's genealogy; Luke 3:23 names Joseph.</p>
         {refs(branch === "mary" ? ["LUK.3.23", "LUK.3.31", "LUK.3.38"] : ["MAT.1.6", "MAT.1.12", "MAT.1.16", "1CH.3.19"])}
         {!lineage.complete ? <p>This branch stops where a parent link is missing or repeats.</p> : null}
       </div> : null}
@@ -139,7 +140,7 @@ export default function GenealogyTimeline({ onNavigateAway, viewState, onViewSta
         </AccordionItem>
       </Accordion>
       {display === "chart" ? <Suspense fallback={<p role="status">Loading timeline chart…</p>}>
-        <TimelineChart savedWindow={viewState.window} onWindowChange={window => patchView({ window })} records={visible} selectedId={selected?.id} onSelect={select} expanded={expanded} compact={compact} onExpandedChange={onExpandedChange} />
+        <TimelineChart savedWindow={viewState.window} onWindowChange={window => patchView({ window })} records={chartRecords} selectedId={selected?.id} onSelect={select} expanded={expanded} compact={compact} onExpandedChange={onExpandedChange} />
       </Suspense> : null}
       {expanded && selected ? <p className="shrink-0 text-xs" aria-live="polite">{selected.label} · {selected.placement ? "" : `${timelineKindLabel(selected)} · `}{timelineDateSummary(selected)}</p> : null}
       <div className={expanded ? "hidden" : "contents"}>
@@ -156,6 +157,10 @@ export default function GenealogyTimeline({ onNavigateAway, viewState, onViewSta
         </div> : null}
         {selected.kind === "activity" ? <p className="text-sm">Birth and death dates unknown; this bar does not show a complete lifespan.</p> : null}
         {relation(selected) ? <p className="text-sm">Family relationship: {relation(selected)}</p> : null}
+        {connections(selected).length ? <div className="flex flex-col gap-1 text-xs" aria-label="Person connections">
+          {connections(selected).map(link => <p key={link.personId}><strong>{link.role === "context" ? "Contextual mention" : "Related event"}: {genealogyById.get(link.personId)?.names[0]}</strong> · {link.reference}{link.evidence ? ` · ${link.evidence}` : ""}</p>)}
+          {contextOnly(selected) ? <p>A supporting passage or historical context mentions this person; this does not establish participation in the event.</p> : null}
+        </div> : null}
         <TimelineRelatedTools key={selected.id} record={selected} includePeople={!treeTarget} onNavigate={onNavigateAway} />
         {treeTarget ? <Button size="sm" variant="outline" className="self-start" onClick={() => onSelectPerson(treeTarget)}>View {genealogyById.get(treeTarget)?.names[0]} in tree</Button> : null}
         {evidenceReferences.length ? <><h4 className="text-sm font-semibold">KJV passages</h4>{refs(evidenceReferences, selected.label)}</> : <p className="text-sm text-muted-foreground">Historical context; no KJV passage dates this entry.</p>}
@@ -163,7 +168,7 @@ export default function GenealogyTimeline({ onNavigateAway, viewState, onViewSta
       </article> : <p>No entries match. Change the people/events filter, clear the search, or choose another scope or period.</p>}
       <div className="flex max-h-80 flex-col gap-1 overflow-y-auto overscroll-contain" role="group" aria-label="Timeline entries">
         {visible.map(record => <Button key={record.id} variant={selected?.id === record.id ? "secondary" : "ghost"} className="h-auto w-full justify-start whitespace-normal py-2 text-left" aria-pressed={selected?.id === record.id} onClick={() => select(record.id)}>
-          <span className="flex min-w-0 flex-col gap-1"><span>{record.label}{scope !== "overview" && relation(record) ? ` · ${relation(record)}` : ""}</span><span className="text-xs text-muted-foreground">{timelineDateSummary(record)}</span></span>
+          <span className="flex min-w-0 flex-col gap-1"><span>{record.label}{scope !== "overview" && relation(record) ? ` · ${relation(record)}` : ""}{contextOnly(record) ? " · Contextual mention" : ""}</span><span className="text-xs text-muted-foreground">{timelineDateSummary(record)}</span></span>
         </Button>)}
       </div>
       </div>

@@ -144,6 +144,7 @@ export function timelineRelatedTools(record: TimelineRecord, includePeople = tru
   const heading = TIMELINE_HEADING_CONNECTIONS[record.id];
   if (heading) for (const [id, label] of heading.people) contextual.push({ ...person(id, label, heading.reference), association: "context", referenceLabel: heading.label, evidence: heading.text });
   const passage = (TIMELINE_PASSAGE_CONNECTIONS[record.id] ?? []).map(([kind, id, label, reference]): TimelineRelatedTool => ({ ...(kind === "maps" ? place(id, label, reference) : person(id, label, reference)), association: "passage" }));
-  const links = [...new Map([...direct, ...contextual, ...passage].reverse().map(link => [timelineToolKey(link), link])).values()].reverse();
+  const aliased = (record.aliases ?? []).filter(id => id !== record.id).flatMap(id => timelineRelatedTools({ ...record, id, aliases: undefined }));
+  const links = [...new Map([...direct, ...aliased, ...contextual, ...passage].reverse().map(link => [timelineToolKey(link), link])).values()].reverse();
   return includePeople ? links : links.filter(link => link.request.kind !== "genealogy");
 }

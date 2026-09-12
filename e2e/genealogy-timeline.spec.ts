@@ -25,6 +25,25 @@ async function openTimeline(page: Page) {
   return dialog;
 }
 
+test("family related events distinguish opt-in contextual mentions", async ({ page }) => {
+  const dialog = await openTimeline(page);
+  const entries = dialog.getByRole("group", { name: "Timeline entries" });
+  await dialog.getByRole("textbox", { name: "Filter timeline" }).fill("Solomon");
+  await entries.getByRole("button", { name: /^Solomon/ }).first().click();
+  await dialog.getByRole("button", { name: /View Solomon.*tree/ }).click();
+  await dialog.getByRole("button", { name: "Timeline", exact: true }).click();
+  await dialog.getByRole("textbox", { name: "Filter timeline" }).clear();
+  await dialog.getByRole("button", { name: "Family", exact: true }).click();
+  await dialog.getByRole("group", { name: "Timeline content" }).getByRole("button", { name: "Events", exact: true }).click();
+  await expect(entries).toContainText("temple");
+  await dialog.getByRole("textbox", { name: "Filter timeline" }).fill("Song of Solomon");
+  await expect(dialog.getByText(/No entries match/)).toBeVisible();
+  await dialog.getByRole("checkbox", { name: "Include contextual mentions", exact: true }).check();
+  await expect(entries).toContainText("Contextual mention");
+  await entries.getByRole("button").first().click();
+  await expect(dialog.getByRole("article").getByLabel("Person connections")).toContainText("Contextual mention: Solomon");
+});
+
 for (const width of [375, 1200]) {
   test(`complete lineages show distinct estimated placements at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 812 });
@@ -115,7 +134,9 @@ for (const width of [375, 1200]) {
     await expect(dialog.getByLabel("Lineage sources")).toContainText("Luke 3:23 names Joseph");
     await expect(dialog.getByLabel("Lineage sources").getByRole("button", { name: "LUK.3.23", exact: true })).toBeVisible();
     await content.getByRole("button", { name: "Events", exact: true }).click();
-    await expect(dialog.getByText(/No entries match/)).toBeVisible();
+    await expect(entries).toContainText("Birth of Jesus");
+    await expect(entries).toContainText("Flood");
+    await expect(entries).not.toContainText("Nathan · Mary's line");
     await content.getByRole("button", { name: "People", exact: true }).click();
     await expect(entries).toContainText("Nathan · Mary's line");
     const axe = await new AxeBuilder({ page }).include('[role="alertdialog"]').analyze();
@@ -337,7 +358,8 @@ test("timeline cites the KJV, changes assumptions, filters families, and returns
   const evidence = dialog.getByRole("article", { name: "Timeline evidence" });
   await expect(evidence).toContainText("912 years (KJV)");
   await expect(evidence).toContainText("Birth: year 130 from Adam");
-  await expect(evidence.getByRole("link", { name: /Old Testament chronology/ })).toHaveAttribute("href", /Chronology-Old-Testament/);
+  await expect(evidence.locator('a[href^="http"]')).toHaveCount(0);
+  await expect(evidence).toContainText("External sources and citation details are listed on the Credits page");
   await dialog.getByRole("button", { name: "Family", exact: true }).click();
   await expect(dialog.getByRole("group", { name: "Timeline entries" })).toContainText("Eve");
   await expect(dialog.getByRole("group", { name: "Timeline entries" })).toContainText("Death: Unknown");

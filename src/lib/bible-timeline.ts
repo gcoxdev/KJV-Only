@@ -4,12 +4,22 @@ export type TimelineEra = "beginnings" | "patriarchs" | "exodus" | "kingdom" | "
 export type JesusLineageBranch = "mary" | "joseph";
 export type TimelineContent = "all" | "people" | "events";
 export type EndpointStatus = "derived" | "approximate" | "unknown";
+export type TimelinePersonAssociation = {
+  personId: string;
+  role: "subject" | "participant" | "context";
+  reference: string;
+  evidence?: string;
+};
 export type TimelineRecord = {
   id: string;
   label: string;
   era: TimelineEra;
   kind: "life" | "activity" | "event" | "period" | "date-window";
+  /** Record subjects only. Event participation is kept in personAssociations. */
   personIds?: string[];
+  personAssociations?: TimelinePersonAssociation[];
+  aliases?: string[];
+  activityType?: "reign";
   /** Astronomical years: 0 = 1 BC. Activity dates are not lifespan endpoints. */
   start?: number;
   end?: number;
@@ -66,8 +76,10 @@ export function jesusLineage(people: ReadonlyMap<string, GenealogyPerson>, branc
 /** One row per ancestor, oldest first. Estimates never become lifespan endpoints. */
 export function buildLineageTimeline(members: GenealogyPerson[], records: TimelineRecord[]): TimelineRecord[] {
   const byPerson = new Map<string, TimelineRecord>();
-  for (const record of records) for (const id of record.personIds ?? []) {
-    if (!byPerson.has(id) || (!timelinePlotBounds(byPerson.get(id)!) && timelinePlotBounds(record))) byPerson.set(id, record);
+  const rank = (record: TimelineRecord) => (record.kind === "life" || record.startLabel === "Birth") && (record.start !== undefined || record.end !== undefined) ? 3 :
+    timelinePlotBounds(record) ? 2 : 1;
+  for (const record of records.filter(record => timelineEntryCategory(record) === "people")) for (const id of record.personIds ?? []) {
+    if (!byPerson.has(id) || rank(record) > rank(byPerson.get(id)!)) byPerson.set(id, record);
   }
   const rows: TimelineRecord[] = [...members].reverse().map(person => byPerson.get(person.id) ?? {
     id: `undated-${person.id}`, label: person.names[0], personIds: [person.id], kind: "life", era: "beginnings",
@@ -80,7 +92,7 @@ export function buildLineageTimeline(members: GenealogyPerson[], records: Timeli
     const year = record.start ?? record.end ?? record.placement?.year;
     return year === undefined ? [] : [{ record, index, year }];
   });
-  const describe = (anchor: typeof anchors[number]) => `${anchor.record.label} (${formatTimelineYear(anchor.year)}; ${anchor.record.placement ? "context estimate" : anchor.record.kind === "activity" ? "recorded activity" : anchor.record.start === undefined ? "known endpoint" : "birth anchor"})`;
+  const describe = (anchor: typeof anchors[number]) => `${anchor.record.label} (${formatTimelineYear(anchor.year)}; ${anchor.record.placement ? "context estimate" : anchor.record.activityType === "reign" ? "reign anchor" : anchor.record.kind === "activity" ? "recorded activity" : anchor.record.start === undefined ? "known endpoint" : "birth anchor"})`;
   const reversedAnchors = [...anchors].reverse();
   return rows.map((record, index) => {
     if (timelinePlotBounds(record)) return record;
@@ -138,7 +150,7 @@ export function timelineDateSummary(record: TimelineRecord) {
     return `${record.placement ? `Estimated placement: c. ${formatTimelineYear(record.placement.year)} · ` : ""}Birth: ${start} · ${record.endLabel ?? "Death"}: ${end}${record.age === undefined ? "" : ` · ${record.age} years (KJV)`}`;
   }
   if (record.start === undefined) return "Dates unknown";
-  return `${record.kind === "date-window" ? "Possible event date: " : record.kind === "activity" ? "Recorded activity: " : ""}${start}${record.end === undefined || record.end === record.start ? "" : ` – ${end}`}`;
+  return `${record.activityType === "reign" ? "Reign: " : record.kind === "date-window" ? "Possible event date: " : record.kind === "activity" ? "Recorded activity: " : ""}${start}${record.end === undefined || record.end === record.start ? "" : ` – ${end}`}`;
 }
 
 /** Use reviewed person identities and explicit life endpoints, never activity dates. */
@@ -154,6 +166,7 @@ export function indexTimelinePersonDates(records: TimelineRecord[]) {
 
 export function timelineKindLabel(record: TimelineRecord) {
   if (record.placement) return "Estimated placement";
+  if (record.activityType === "reign") return "Reign";
   return { life: "Lifespan evidence", activity: "Recorded activity", event: "Single-date event", period: "Span of time", "date-window": "Uncertain event date" }[record.kind];
 }
 

@@ -3,7 +3,8 @@ import { lazy, Suspense, useMemo, useState, type ReactNode } from "react";
 import { HistoryIcon } from "lucide-react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { buildContextTimeline, CHAPTER_TIMELINE_MAP, CONTEXT_TIMELINE_COVERAGE, selectContextTimeline } from "@/data/contextual-timeline";
+import { CHAPTER_TIMELINE_MAP, CONTEXT_TIMELINE_COVERAGE } from "@/data/contextual-timeline";
+import { getTimelineCatalog, selectCatalogHistory } from "@/data/timeline-catalog";
 import { timelineDateSummary } from "@/lib/bible-timeline";
 import { useTimelineModel } from "@/hooks/use-timeline-model";
 import type { TimelineReaderContext } from "@/hooks/use-timeline-reader-context";
@@ -24,11 +25,11 @@ export function TimelineTool({ isOpen, context, books, ...referenceProps }: Time
   const openVisualTool = useVisualToolTarget();
   const [open, setOpen] = useState(false);
   const [model] = useTimelineModel();
-  const records = useMemo(() => buildContextTimeline(model), [model]);
+  const catalog = useMemo(() => getTimelineCatalog(model), [model]);
   const book = context ? books[context.bookIndex]?.name ?? "" : "";
   const chapter = context ? context.chapterIndex + 1 : 1;
   const mapped = !!CHAPTER_TIMELINE_MAP[book]?.[chapter];
-  const preview = useMemo(() => selectContextTimeline(records, book, chapter, "chapter", "biblical"), [records, book, chapter]);
+  const preview = useMemo(() => selectCatalogHistory(catalog, book, chapter, "chapter", "biblical"), [catalog, book, chapter]);
   return <AccordionItem value="timeline">
     <AccordionTrigger className={mapped ? "text-success" : undefined}><HistoryIcon />Timeline</AccordionTrigger>
     <AccordionContent className="flex flex-col gap-2 overflow-visible">

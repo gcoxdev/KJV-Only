@@ -5,6 +5,11 @@ import { routeVisualTool } from "../visual-tool-routing";
 import { buildLeafHistoryEntry, reconcileLeafHistoryState } from "@/hooks/use-leaf-history";
 
 describe("remembered timeline views", () => {
+  it("migrates reign selections and defaults new people/context options conservatively", () => {
+    expect(parseTimelineViewState({ selectedId: "royal-solomon" }, "historical")).toMatchObject({ selectedId: "solomon_677", showPeople: false, includeContext: false });
+    expect(parseTimelineViewState({ showPeople: "true", includeContext: 1 }, "historical")).toMatchObject({ showPeople: false, includeContext: false });
+    expect(parseTimelineViewState({ showPeople: true, includeContext: true }, "genealogy")).toMatchObject({ showPeople: true, includeContext: true });
+  });
   it("bounds untrusted saved values and rejects invalid chart ranges", () => {
     expect(parseTimelineViewState({ scope: "wrong", filter: true, pinned: { bookIndex: 66, chapterIndex: 1 }, query: "x".repeat(300) }, "historical"))
       .toMatchObject({ scope: "chapter", filter: "all", pinned: null, query: "x".repeat(200) });
@@ -12,7 +17,7 @@ describe("remembered timeline views", () => {
     for (const value of [null, { start: NaN, end: 3, key: "a" }, { start: 4, end: 3, key: "a" }, { start: 0, end: 9e15, key: "a" }]) expect(parseTimelineWindow(value)).toBeUndefined();
   });
   it("round trips independent panel preferences, including layout delimiters", () => {
-    const viewState = parseTimelineViewState({ scope: "gospels", phase: "Birth and childhood", pinned: { bookIndex: 39, chapterIndex: 1 }, filter: "biblical", query: "a);b*|c&d", selectedId: "jesus-birth", window: { start: -60000000000000, end: -59900000000000, key: "test" } }, "historical");
+    const viewState = parseTimelineViewState({ scope: "gospels", phase: "Birth and childhood", showPeople: true, includeContext: true, pinned: { bookIndex: 39, chapterIndex: 1 }, filter: "biblical", query: "a);b*|c&d", selectedId: "jesus-birth", window: { start: -60000000000000, end: -59900000000000, key: "test" } }, "historical");
     const first = routeVisualTool([], null, null, { kind: "timeline", context: null, viewState }, "new-tab")!;
     const second = routeVisualTool(first.tabs, first.tabId, null, { kind: "timeline", context: null }, "new-tab")!;
     const hash = serializeLayoutHash({ tabs: second.tabs, activeTabId: second.tabId, tabsOrientation: "horizontal", targetedPanelLeafId: null, highlightedVerseRangesByLeafId: {} });

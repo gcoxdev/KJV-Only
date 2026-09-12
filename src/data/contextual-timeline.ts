@@ -151,8 +151,10 @@ export function selectContextTimeline(records: ContextTimelineRecord[], book: st
   const mappings = scope === "book" ? Object.values(CHAPTER_TIMELINE_MAP[book] ?? {}) : mapping ? [mapping] : [];
   const collection = scope === "gospels" || scope === "paul" ? scope : undefined;
   const collectionRecords = collection ? records.filter(record => record.narrative?.collection === collection && (phase === "all" || record.narrative.phase === phase)) : [];
-  const focusIds = new Set(collection ? collectionRecords.map(record => record.id) : mappings.flatMap(item => item.ids));
-  const contextIds = new Set(collection ? [] : mappings.flatMap(item => item.contextIds ?? []));
+  const aliases = new Map(records.flatMap(record => (record.aliases ?? []).map(id => [id, record.id] as const)));
+  const resolveId = (id: string) => aliases.get(id) ?? id;
+  const focusIds = new Set(collection ? collectionRecords.map(record => record.id) : mappings.flatMap(item => item.ids).map(resolveId));
+  const contextIds = new Set(collection ? [] : mappings.flatMap(item => item.contextIds ?? []).map(resolveId));
   const windows = records.filter(record => focusIds.has(record.id)).flatMap(record => {
     const bounds = timelinePlotBounds(record);
     return bounds ? [bounds] : [];

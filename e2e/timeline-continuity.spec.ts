@@ -29,6 +29,33 @@ async function windowOf(viewer: Locator) {
   return viewer.locator("[data-window-start]").evaluate(el => [el.getAttribute("data-window-start"), el.getAttribute("data-window-end")]);
 }
 
+test("optional biblical people share life evidence and persist in a timeline panel", async ({ page }) => {
+  const panel = await start(page, { timelineOpenTarget: "new-tab" });
+  await choose(page, panel, "Timeline collection", "Wider history");
+  await panel.getByRole("textbox", { name: "Find timeline entries" }).fill("Adam");
+  const entries = panel.getByRole("group", { name: "Historical timeline entries" });
+  await expect(entries.getByRole("button", { name: /^Adam\s/ })).toHaveCount(0);
+  await panel.getByRole("checkbox", { name: "Include biblical people", exact: true }).check();
+  await entries.getByRole("button", { name: /^Adam/ }).first().click();
+  await expect(panel.getByRole("article", { name: "Historical timeline evidence" })).toContainText("930");
+  await expect(panel.getByRole("article").locator('a[href^="http"]')).toHaveCount(0);
+  await expect.poll(() => page.url()).toContain("showPeople");
+  await page.reload();
+  await expect(panel.getByRole("checkbox", { name: "Include biblical people", exact: true })).toBeChecked();
+  await expect(panel.getByRole("article")).toContainText("930");
+  await panel.getByRole("checkbox", { name: "Include biblical people", exact: true }).uncheck();
+  await expect(entries.getByRole("button", { name: /^Adam\s/ })).toHaveCount(0);
+});
+
+test("legacy reign selection resolves to one shared record", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("kjv-timeline-view-historical-v1", JSON.stringify({ scope: "world", query: "Solomon", selectedId: "royal-solomon", showPeople: true })));
+  const dialog = await start(page);
+  const entries = dialog.getByRole("group", { name: "Historical timeline entries" });
+  await expect(entries.getByRole("button", { name: /^Solomon · reign/ })).toHaveCount(1);
+  await expect(dialog.getByRole("article")).toContainText("Solomon · reign");
+  await expect(dialog.getByRole("article")).toContainText("Reign:");
+});
+
 test("historical panel restores pinned context, collection, filter, selection and zoom", async ({ page }) => {
   const panel = await start(page, { timelineOpenTarget: "new-tab" });
   await choose(page, panel, "Timeline book", "Matthew");

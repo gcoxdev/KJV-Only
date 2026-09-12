@@ -478,6 +478,12 @@ const HELP_SECTIONS: HelpSection[] = [
         keywords: ["sources", "method", "KJV", "evidence", "related tools", "connections", "Credits", "encyclopedia"],
       },
       {
+        label: "How people and events connect across timelines",
+        body:
+          "Include biblical people adds relevant lifespans and activity to Historical Timeline. In Genealogy, choose Family or Jesus' lineage, then All or Events for reviewed related events. Include contextual mentions also shows entries that reference those people without establishing participation; these are labeled Contextual mention. Both tools share chronology records. Reigns and estimated lineage positions never supply unknown birth or death dates.",
+        keywords: ["biblical people", "lifespans", "family events", "lineage", "contextual mentions", "reigns"],
+      },
+      {
         label: "How timeline views are remembered",
         body:
           "Timeline and genealogy timeline views remember their filters, selection, and chart window. Panel views travel with the panel and its shared layout URL; dialog views are remembered locally. The chronology model is shared between the viewers. Sources & method offers 430 years in Egypt or 430 years from the promise; this changes the early chronology proposal without settling every later date question.",

@@ -7,26 +7,30 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } fr
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 import type { TimelineToolProps } from "./study-tools/timeline-tool";
-import { buildContextTimeline, CONTEXT_TIMELINE_COVERAGE, selectContextTimeline, type TimelineFilter, type TimelineScope } from "@/data/contextual-timeline";
+import { CONTEXT_TIMELINE_COVERAGE, type ContextTimelineRecord, type TimelineFilter, type TimelineScope } from "@/data/contextual-timeline";
+import { getTimelineCatalog, selectCatalogHistory } from "@/data/timeline-catalog";
 import { TIMELINE_COLLECTIONS, TIMELINE_PHASES } from "@/data/contextual-timeline-nt";
 import { TIMELINE_METHOD } from "@/data/bible-timeline";
-import { timelineDateSummary, timelineKindLabel } from "@/lib/bible-timeline";
+import { timelineDateSummary, timelineEntryCategory, timelineKindLabel } from "@/lib/bible-timeline";
 import { useTimelineModel } from "@/hooks/use-timeline-model";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 const TimelineChart = lazy(() => import("./bible-timeline-chart"));
 const TRACKS = { biblical: "Biblical events", historical: "Historical context" };
+const PEOPLE_TRACKS = { ...TRACKS, people: "People and reigns" };
+const sourceLabel = (record: ContextTimelineRecord) => record.track === "biblical" && timelineEntryCategory(record) === "people" ? "Biblical people" : TRACKS[record.track];
 
 export default function ContextualTimelineDialog({ initialViewState, onViewStateChange, embedded = false, open, onOpenChange, context, books, renderPreview, onOpenReference, onCloseSidebar }: Omit<TimelineToolProps, "isOpen"> & TimelineViewProps & { embedded?: boolean; open: boolean; onOpenChange: (open: boolean) => void }) {
   const [viewState, patchView] = useTimelineViewState("historical", { initialViewState, onViewStateChange });
-  const { pinned, filter, query, selectedId } = viewState;
+  const { pinned, filter, query, selectedId, showPeople } = viewState;
   const setPinned = (pinned: typeof context) => patchView({ pinned });
   const scope = viewState.scope === "chapter" && !pinned && !context ? "world" : viewState.scope as TimelineScope;
   const setScope = (scope: TimelineScope) => patchView({ scope });
@@ -43,8 +47,9 @@ export default function ContextualTimelineDialog({ initialViewState, onViewState
   const [expanded, setExpanded] = useState(false);
   const [model, setModel] = useTimelineModel();
   const compact = useIsMobile() && expanded;
-  const allRecords = useMemo(() => buildContextTimeline(model), [model]);
-  const selection = useMemo(() => selectContextTimeline(allRecords, book?.name ?? "", chapterIndex + 1, scope, filter, query, phase), [allRecords, book?.name, chapterIndex, scope, filter, query, phase]);
+  const catalog = useMemo(() => getTimelineCatalog(model), [model]);
+  const selection = useMemo(() => selectCatalogHistory(catalog, book?.name ?? "", chapterIndex + 1, scope, filter, query, phase, showPeople), [catalog, book?.name, chapterIndex, scope, filter, query, phase, showPeople]);
+  const chartRecords = useMemo(() => showPeople ? selection.records.map(record => ({ ...record, track: timelineEntryCategory(record) === "people" ? "people" : record.track })) : selection.records, [selection.records, showPeople]);
   const selected = selection.records.find(record => record.id === selectedId) ?? selection.records.find(record => record.emphasized) ?? selection.records[0];
   const evidenceReferences = selected ? [...new Set([...selected.references, ...timelineRelatedTools(selected).map(link => link.reference).filter(Boolean)])] : [];
   const openReference = (ref: string) => { if (!embedded) onOpenChange(false); onOpenReference(ref); };
@@ -82,6 +87,7 @@ export default function ContextualTimelineDialog({ initialViewState, onViewState
             <ToggleGroup value={[filter]} variant="outline" size="sm" aria-label="Historical timeline content" onValueChange={values => { if (values[0]) setFilter(values[0] as TimelineFilter); }}>
               <ToggleGroupItem value="all">All</ToggleGroupItem><ToggleGroupItem value="biblical">Biblical</ToggleGroupItem><ToggleGroupItem value="historical">Historical context</ToggleGroupItem>
             </ToggleGroup>
+            <label className="flex items-center gap-2 text-xs"><Checkbox checked={showPeople} onCheckedChange={checked => patchView({ showPeople: checked === true })} />Include biblical people</label>
             <Input className="min-w-36 flex-1" aria-label="Find timeline entries" placeholder="Find a person or event…" value={query} onChange={event => setQuery(event.target.value)} />
           </div>
           {!expanded ? <>
@@ -97,15 +103,15 @@ export default function ContextualTimelineDialog({ initialViewState, onViewState
             </AccordionContent></AccordionItem></Accordion>
           </> : null}
         </div>
-        <Suspense fallback={<p role="status">Loading chart…</p>}><TimelineChart savedWindow={viewState.window} onWindowChange={window => patchView({ window })} records={selection.records} tracks={TRACKS} chartLabel="Historical timeline chart" selectedId={selected?.id} onSelect={setSelectedId} expanded={expanded} compact={compact} onExpandedChange={setExpanded} /></Suspense>
+        <Suspense fallback={<p role="status">Loading chart…</p>}><TimelineChart savedWindow={viewState.window} onWindowChange={window => patchView({ window })} records={chartRecords} tracks={showPeople ? PEOPLE_TRACKS : TRACKS} chartLabel="Historical timeline chart" selectedId={selected?.id} onSelect={setSelectedId} expanded={expanded} compact={compact} onExpandedChange={setExpanded} /></Suspense>
         {!expanded ? <div className={cn("grid gap-3", embedded ? "@2xl/history:grid-cols-2" : "sm:grid-cols-2")}>
           <div role="group" aria-label="Historical timeline entries" className="flex max-h-72 flex-col gap-1 overflow-y-auto rounded-lg border p-1">
-            {selection.records.length ? selection.records.map(record => <Button key={record.id} variant={record.id === selected?.id ? "secondary" : "ghost"} aria-pressed={record.id === selected?.id} className="h-auto justify-start whitespace-normal p-2 text-left" onClick={() => setSelectedId(record.id)}><span className="flex flex-col gap-1"><span className={record.emphasized ? "font-semibold" : ""}>{record.label}{record.emphasized ? (collection ? "" : " · Passage context") : ""}</span><span className="text-xs text-muted-foreground">{record.narrative?.phase ?? TRACKS[record.track]} · {timelineDateSummary(record)}</span></span></Button>) : <p className="p-2 text-sm">No entries match this view. Clear the search, change the filter, or choose Wider history.</p>}
+            {selection.records.length ? selection.records.map(record => <Button key={record.id} variant={record.id === selected?.id ? "secondary" : "ghost"} aria-pressed={record.id === selected?.id} className="h-auto justify-start whitespace-normal p-2 text-left" onClick={() => setSelectedId(record.id)}><span className="flex flex-col gap-1"><span className={record.emphasized ? "font-semibold" : ""}>{record.label}{record.emphasized ? (collection ? "" : " · Passage context") : ""}</span><span className="text-xs text-muted-foreground">{record.narrative?.phase ?? sourceLabel(record)} · {timelineDateSummary(record)}</span></span></Button>) : <p className="p-2 text-sm">No entries match this view. Clear the search, change the filter, or choose Wider history.</p>}
           </div>
           {selected ? <article aria-label="Historical timeline evidence" className="flex max-h-72 flex-col gap-2 overflow-y-auto rounded-lg border p-3 text-sm">
             <h3 className="font-semibold">{selected.label}</h3>
             <TimelineRelatedTools key={selected.id} record={selected} onNavigate={embedded ? undefined : () => onOpenChange(false)} />
-            <div className="flex flex-wrap gap-1"><Badge variant="secondary">{TRACKS[selected.track]}</Badge><Badge variant="outline">{timelineKindLabel(selected)}</Badge></div>
+            <div className="flex flex-wrap gap-1"><Badge variant="secondary">{sourceLabel(selected)}</Badge><Badge variant="outline">{timelineKindLabel(selected)}</Badge></div>
             {selected.narrative ? <Badge variant="outline" className="self-start">{selected.narrative.phase}</Badge> : null}
             <p>{timelineDateSummary(selected)}</p><p>{selected.note}</p><p className="text-muted-foreground">{selected.relevance}</p>
             {selected.narrative ? <div className="flex flex-col gap-2" aria-label="Narrative passages">
