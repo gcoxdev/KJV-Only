@@ -1,3 +1,4 @@
+import { buildRefinedContext, REFINED_CHAPTER_TIMELINE_MAP } from "./contextual-timeline-refinements";
 import { BROAD_CHAPTER_TIMELINE_MAP, BROAD_HISTORICAL_RECORDS, BROAD_TIMELINE_SOURCES, buildBroadContext } from "./contextual-timeline-coverage";
 import { buildChroniclesContext, CHRONICLES_CHAPTER_TIMELINE_MAP, withChroniclesParallels } from "./contextual-timeline-chronicles";
 import { buildKingsContext, KINGS_CHAPTER_TIMELINE_MAP, KINGS_HISTORICAL_RECORDS, KINGS_TIMELINE_SOURCES } from "./contextual-timeline-kings";
@@ -93,10 +94,26 @@ for (const source of [INITIAL_CHAPTER_TIMELINE_MAP, EXPANDED_CHAPTER_TIMELINE_MA
     }
   }
 }
+// Track refinement of the original broad pass separately from chapter coverage.
+// A refined chapter has reviewed passage evidence and episode/setting distinctions;
+// this does not claim exhaustive dating or completion of every interpretive issue.
+export const CONTEXT_TIMELINE_REFINEMENT = {
+  baseline: 0, refined: 0, remaining: 0,
+  byBook: {} as Record<string, { baseline: number; refined: number; remaining: number }>,
+};
 // Broad coverage fills gaps; existing episode-level mappings retain precedence.
 for (const [book, chapters] of Object.entries(BROAD_CHAPTER_TIMELINE_MAP)) {
   const target = CHAPTER_TIMELINE_MAP[book] ??= {};
-  for (const [chapter, mapping] of Object.entries(chapters)) target[Number(chapter)] ??= mapping;
+  for (const [chapter, mapping] of Object.entries(chapters)) {
+    if (target[Number(chapter)]) continue;
+    const refinement = REFINED_CHAPTER_TIMELINE_MAP[book]?.[Number(chapter)];
+    target[Number(chapter)] = refinement ?? mapping;
+    const progress = CONTEXT_TIMELINE_REFINEMENT.byBook[book] ??= { baseline: 0, refined: 0, remaining: 0 };
+    progress.baseline++;
+    CONTEXT_TIMELINE_REFINEMENT.baseline++;
+    if (refinement) { progress.refined++; CONTEXT_TIMELINE_REFINEMENT.refined++; }
+    else { progress.remaining++; CONTEXT_TIMELINE_REFINEMENT.remaining++; }
+  }
 }
 
 export const CONTEXT_TIMELINE_COVERAGE = {
@@ -110,9 +127,10 @@ export function buildContextTimeline(model: SojournModel = "egypt430"): ContextT
   const kings = buildKingsContext(chronology);
   const chronicles = buildChroniclesContext([...chronology, ...kings]);
   const broad = buildBroadContext([...chronology, ...kings, ...EXPANDED_TIMELINE_RECORDS, ...HISTORICAL_RECORDS]);
+  const refined = buildRefinedContext([...chronology, ...kings, ...EXPANDED_TIMELINE_RECORDS, ...HISTORICAL_RECORDS, ...broad]);
   const shared = chronology.filter(record => !record.placement && record.kind !== "life" && record.kind !== "activity")
     .map(record => ({ ...record, sources: [...record.sources, ...(["samaria", "sennacherib"].includes(record.id) ? ["assyria"] : record.id === "wall" ? ["artaxerxes"] : [])], track: ["alexander", "antiochus", "herod"].includes(record.id) ? "historical" : "biblical" } as ContextTimelineRecord));
-  return [...shared, ...PILOT_RECORDS, ...HISTORICAL_RECORDS, ...EXPANDED_TIMELINE_RECORDS, ...NT_TIMELINE_RECORDS, ...WRITING_TIMELINE_RECORDS, ...buildOldTestamentContext(chronology), ...kings, ...chronicles, ...KINGS_HISTORICAL_RECORDS, ...broad, ...BROAD_HISTORICAL_RECORDS].map(withChroniclesParallels).map(record => {
+  return [...shared, ...PILOT_RECORDS, ...HISTORICAL_RECORDS, ...EXPANDED_TIMELINE_RECORDS, ...NT_TIMELINE_RECORDS, ...WRITING_TIMELINE_RECORDS, ...buildOldTestamentContext(chronology), ...kings, ...chronicles, ...KINGS_HISTORICAL_RECORDS, ...broad, ...BROAD_HISTORICAL_RECORDS, ...refined].map(withChroniclesParallels).map(record => {
     const narrative = NT_NARRATIVE_DETAILS[record.id];
     return narrative ? { ...record, narrative, references: [...new Set([...record.references, ...narrative.passages.map(passage => passage.reference)])] } : record;
   });

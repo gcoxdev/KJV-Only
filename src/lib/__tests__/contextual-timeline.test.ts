@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildContextTimeline, CHAPTER_TIMELINE_MAP, CONTEXT_TIMELINE_COVERAGE, CONTEXT_TIMELINE_SOURCES, selectContextTimeline } from "@/data/contextual-timeline";
+import { buildContextTimeline, CHAPTER_TIMELINE_MAP, CONTEXT_TIMELINE_COVERAGE, CONTEXT_TIMELINE_REFINEMENT, CONTEXT_TIMELINE_SOURCES, selectContextTimeline } from "@/data/contextual-timeline";
 import { NT_NARRATIVE_DETAILS, TIMELINE_PHASES } from "@/data/contextual-timeline-nt";
 import { buildAnchoredContext } from "@/data/contextual-timeline-anchors";
 import { buildChroniclesContext, withChroniclesParallels } from "@/data/contextual-timeline-chronicles";
+import { buildRefinedContext, REFINED_CHAPTER_TIMELINE_MAP } from "@/data/contextual-timeline-refinements";
 import { BROAD_CHAPTER_TIMELINE_MAP, buildBroadContext } from "@/data/contextual-timeline-coverage";
 import { EXPANDED_CHAPTER_TIMELINE_MAP } from "@/data/contextual-timeline-expansion";
 import { buildKingsContext } from "@/data/contextual-timeline-kings";
@@ -510,7 +511,7 @@ describe("contextual history", () => {
     expect(get("jer-yokes").note).toContain("not silently changed to Zedekiah");
     expect(timelinePlotBounds(get("jer-yokes"))).toBeNull();
     expect(CHAPTER_TIMELINE_MAP.Jeremiah[45].ids).toEqual(["jer-jehoiakim-fourth"]);
-    expect(CHAPTER_TIMELINE_MAP.Jeremiah[43].ids).toEqual(["jer-after-fall"]);
+    expect(CHAPTER_TIMELINE_MAP.Jeremiah[43].ids).toEqual(["jer-egypt-decision"]);
     expect(CHAPTER_TIMELINE_MAP.Jeremiah[52].ids).toContain("jehoiachin-released");
     expect(CHAPTER_TIMELINE_MAP.Daniel[7].ids).toEqual(["daniel-belshazzar-first"]);
     expect(CHAPTER_TIMELINE_MAP.Daniel[8].ids).toEqual(["daniel-belshazzar-third"]);
@@ -547,6 +548,95 @@ describe("contextual history", () => {
     expect(normal).toEqual(alternative);
     expect(anchors).toEqual(original);
     expect(normal.every(record => !record.personIds && !record.placement)).toBe(true);
+  });
+  it("tracks the broad-pass refinement queue independently from complete chapter coverage", () => {
+    expect(CONTEXT_TIMELINE_COVERAGE.chapters).toBe(1189);
+    expect(CONTEXT_TIMELINE_REFINEMENT).toMatchObject({ baseline: 500, refined: 123, remaining: 377 });
+    for (const [book, count] of Object.entries({ Jeremiah: 52, Ezekiel: 48, Esther: 10, Nehemiah: 6, Daniel: 7 })) {
+      expect(CONTEXT_TIMELINE_REFINEMENT.byBook[book]).toEqual({ baseline: count, refined: count, remaining: 0 });
+      expect(Object.keys(REFINED_CHAPTER_TIMELINE_MAP[book])).toHaveLength(count);
+      for (const [chapter, mapping] of Object.entries(REFINED_CHAPTER_TIMELINE_MAP[book])) {
+        expect(CHAPTER_TIMELINE_MAP[book][Number(chapter)]).toEqual(mapping);
+        expect(mapping.references!.length).toBeGreaterThanOrEqual(3);
+        expect(mapping.note).not.toContain("Broad chapter context");
+        expect(selectContextTimeline(records, book, Number(chapter), "chapter", "biblical").records.some(r => r.emphasized)).toBe(true);
+      }
+    }
+    expect(CONTEXT_TIMELINE_REFINEMENT.byBook.Psalms).toEqual({ baseline: 150, refined: 0, remaining: 150 });
+    expect(CHAPTER_TIMELINE_MAP.Daniel[9]).toEqual(EXPANDED_CHAPTER_TIMELINE_MAP.Daniel[9]);
+    expect(CHAPTER_TIMELINE_MAP.Nehemiah[8]).toEqual(EXPANDED_CHAPTER_TIMELINE_MAP.Nehemiah[8]);
+    expect(Object.values(CONTEXT_TIMELINE_REFINEMENT.byBook).reduce((total, book) => total + book.remaining, 0)).toBe(377);
+  });
+  it("separates Ezekiel's dated messages and retains explicit KJV quantities", () => {
+    const get = (id: string) => records.find(r => r.id === id)!;
+    const early = get("ezekiel-egypt-tenth");
+    const late = get("ezekiel-egypt-twenty-seventh");
+    expect(late.start! - early.start!).toBe(17);
+    expect(late.end! - early.end!).toBe(17);
+    expect(CHAPTER_TIMELINE_MAP.Ezekiel[29].ids).toEqual([early.id, late.id]);
+    expect(CHAPTER_TIMELINE_MAP.Ezekiel[30].ids).toEqual(["ezekiel-egypt-lament", "ezekiel-pharaoh-arms"]);
+    expect(timelinePlotBounds(get("ezekiel-egypt-lament"))).toBeNull();
+    expect(get("ezekiel-pharaoh-arms").start).toBe(early.start! + 1);
+    expect(get("ezekiel-fugitive").start).toBe(get("jerusalem-597").start! + 11);
+    expect(get("ezekiel-fugitive").note).toContain("rather than changed to an eleventh-year reading");
+    expect(get("ezekiel-pharaoh-laments").note).toContain("without repeating a month number");
+    expect(get("ezekiel-siege-signs").note).toContain("390 days for Israel and 40 for Judah");
+    expect(get("ezekiel-siege-signs").note).toContain("day for a year");
+    expect(timelinePlotBounds(get("ezekiel-siege-signs"))).toBeNull();
+    expect(get("ezekiel-gog").note).toContain("seven years burning weapons");
+    expect(get("ezekiel-gog").note).toContain("seven months burying");
+    expect(timelinePlotBounds(get("ezekiel-gog"))).toBeNull();
+    expect(CHAPTER_TIMELINE_MAP.Ezekiel[48].ids).toEqual(["ezekiel-temple-vision"]);
+  });
+  it("distinguishes Jeremiah's reign notices, recollections, and scroll stages", () => {
+    const get = (id: string) => records.find(r => r.id === id)!;
+    expect(timelinePlotBounds(get("jer-call"))).toEqual([get("royal-josiah").start! + 12, get("royal-josiah").start! + 13]);
+    expect(get("jer-scroll-reading").start).toBe(get("jer-jehoiakim-fourth").start! + 1);
+    expect(get("jer-scroll-reading").end).toBe(get("jer-jehoiakim-fourth").end! + 1);
+    expect(CHAPTER_TIMELINE_MAP.Jeremiah[36].ids).toEqual(["jer-jehoiakim-fourth", "jer-scroll-reading"]);
+    expect(CHAPTER_TIMELINE_MAP.Jeremiah[45].ids).toEqual(["jer-jehoiakim-fourth"]);
+    expect(get("jer-seraiah").start).toBe(get("jer-hananiah").start);
+    expect(get("jer-field").start).toBe(get("jer-hananiah").start! + 6);
+    expect(get("jer-hananiah").note).toContain("false prediction");
+    expect(CHAPTER_TIMELINE_MAP.Jeremiah[27].ids).toEqual(["jer-yokes"]);
+    expect(get("jer-girdle").note).toContain("Euphrates");
+    expect(get("jer-potter").note).toContain("not automatically the Pashur son of Melchiah");
+    expect(get("jer-egypt-decision").note).toContain("After ten days");
+    expect(CHAPTER_TIMELINE_MAP.Jeremiah[49].ids).toContain("jer-elam");
+    expect(CHAPTER_TIMELINE_MAP.Jeremiah[52].ids).toContain("jehoiachin-released");
+    for (const id of ["jer-warnings", "jer-restoration", "jer-egypt-decision", "jer-babylon-oracles"]) expect(timelinePlotBounds(get(id)), id).toBeNull();
+  });
+  it("distinguishes Esther's decrees and deliverance without inflating day intervals", () => {
+    const get = (id: string) => records.find(r => r.id === id)!;
+    expect(get("esther-decree").start).toBe(get("esther-counterdecree").start);
+    expect(get("esther-adar").start).toBe(get("esther-decree").start! + 1);
+    expect(get("esther-intercedes").kind).toBe("date-window");
+    expect(get("esther-intercedes").note).toContain("three-day fast");
+    expect(CHAPTER_TIMELINE_MAP.Esther[9].ids).toEqual(["esther-adar", "esther-purim-letters"]);
+    expect(get("esther-adar").note).toContain("Shushan's additional Adar 14");
+    expect(timelinePlotBounds(get("esther-purim-letters"))).toBeNull();
+    expect(timelinePlotBounds(get("esther-gate-plot"))).toBeNull();
+    for (const id of ["esther-decree", "esther-counterdecree", "esther-adar", "esther-intercedes"]) {
+      expect(get(id).sources).toContain("estherContext");
+      expect(get(id).note).toContain("assumes Ahasuerus is Xerxes");
+    }
+    expect(get("neh-priest-register").note).toContain("Darius the Persian without a number");
+    expect(timelinePlotBounds(get("neh-wall-dedication"))).toBeNull();
+    expect(get("daniel-tree").note).toContain("Twelve months");
+    expect(get("daniel-furnace").note).toContain("Son of God");
+    expect(timelinePlotBounds(get("daniel-tree"))).toBeNull();
+    expect(CHAPTER_TIMELINE_MAP.Daniel[8].note).toContain("2,300 days");
+    expect(CHAPTER_TIMELINE_MAP.Daniel[12].note).toContain("1,290 and 1,335 days");
+  });
+  it("keeps the refinement's real anchor dates stable across sojourn choices", () => {
+    const ids = new Set(["royal-josiah", "zedekiah-appointed", "jerusalem-597", "temple-destroyed", "esther-deliverance", "jer-jehoiakim-fourth"]);
+    const anchors = records.filter(r => ids.has(r.id));
+    const original = structuredClone(anchors);
+    const refined = buildRefinedContext(anchors);
+    const alternate = buildContextTimeline("promise430");
+    expect(refined).toEqual(buildRefinedContext(alternate.filter(r => ids.has(r.id))));
+    expect(anchors).toEqual(original);
+    expect(refined.every(r => !r.personIds && !r.placement)).toBe(true);
   });
   it("rejects missing, schematic, duplicate, and reversed chronology anchors", () => {
     const episode = { id: "check", label: "Check", era: "kingdom" as const, references: ["2SA.5.4"], note: "Check", at: ["missing"] as [string] };

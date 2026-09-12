@@ -513,3 +513,55 @@ for (const width of [390, 1280]) {
     expect(errors).toEqual([]);
   });
 }
+
+for (const width of [390, 1280]) {
+  test(`refined prophetic dates and Esther's sequence at ${width}px`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.setViewportSize({ width, height: 844 });
+    const dialog = await openTimeline(page, width < 768);
+    const entries = dialog.getByRole("group", { name: "Historical timeline entries" });
+    const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+    const choose = async (book: string, chapter: number) => {
+      await dialog.getByRole("combobox", { name: "Timeline book", exact: true }).click();
+      await page.getByRole("option", { name: book, exact: true }).click();
+      await dialog.getByRole("combobox", { name: "Timeline chapter", exact: true }).click();
+      await page.getByRole("option", { name: `Chapter ${chapter}`, exact: true }).click();
+    };
+    await choose("Ezekiel", 29);
+    await entries.getByRole("button", { name: /tenth-year message/ }).click();
+    await expect(evidence).toContainText("forty-year desolation is a prediction");
+    await expect(evidence.getByRole("button", { name: "EZK.29.1", exact: true })).toBeVisible();
+    await entries.getByRole("button", { name: /twenty-seventh-year message/ }).click();
+    await expect(evidence).toContainText("seventeen regnal years after");
+    await page.screenshot({ path: `design/contextual-timeline-ezekiel-dates-${width}.png` });
+    await choose("Ezekiel", 33);
+    await entries.getByRole("button", { name: /fugitive reports/ }).click();
+    await expect(evidence).toContainText("rather than changed to an eleventh-year reading");
+    await choose("Ezekiel", 4);
+    await expect(evidence).toContainText("390 days for Israel and 40 for Judah");
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("Jeremiah", 36);
+    await entries.getByRole("button", { name: /scroll read and burned/ }).click();
+    await expect(evidence).toContainText("fifth year, after preparation in the fourth");
+    await choose("Jeremiah", 28);
+    await expect(evidence).toContainText("false prediction");
+    await choose("Jeremiah", 51);
+    await entries.getByRole("button", { name: /Seraiah takes/ }).click();
+    await expect(evidence).toContainText("does not date that fall to the journey");
+    await choose("Esther", 9);
+    await entries.getByRole("button", { name: /Adar deliverance/ }).click();
+    await expect(evidence).toContainText("Shushan's additional Adar 14");
+    await entries.getByRole("button", { name: /Purim established/ }).click();
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("Nehemiah", 12);
+    await entries.getByRole("button", { name: /Priestly generations/ }).click();
+    await expect(evidence).toContainText("Darius the Persian without a number");
+    await entries.getByRole("button", { name: /two thanksgiving companies/ }).click();
+    await expect(evidence).toContainText("no regnal year dates this celebration");
+    await choose("Daniel", 4);
+    await expect(evidence).toContainText("Twelve months pass");
+    await expect(evidence).toContainText("Dates unknown");
+    expect(errors).toEqual([]);
+  });
+}
