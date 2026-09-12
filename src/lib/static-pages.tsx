@@ -15,8 +15,7 @@ import {
 } from "lucide-react";
 
 import type { StaticPageId } from "@/types/reader";
-import { KJV_COMPARISON_CREDITS } from "@/data/kjv-comparison-credits";
-import { TIMELINE_SOURCE_CREDITS } from "@/data/timeline-source-credits";
+import { TIMELINE_WEBSITE_CREDITS } from "@/data/timeline-source-credits";
 
 export type StaticPageDefinition = {
   id: StaticPageId;
@@ -194,82 +193,69 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
       paragraphs: [
         "This project uses Bible text, reference data, dictionaries, maps, genealogy data, and open-source libraries that each deserve clear attribution.",
         "Additional attribution, licenses, and source links should continue to be documented here as data sources are added or updated.",
-        "All external timeline and historical/comparative sources are credited below. The KJV remains primary; external chronology supplies provisional calendar comparisons.",
+        "Timeline sources are grouped by website below. The KJV remains primary; external chronology supplies provisional calendar comparisons.",
       ],
       links: [
         {
           label: "The SWORD Project",
           href: "https://www.crosswire.org/sword/modules/index.jsp",
           description:
-            "Primary module source and provenance reference for multiple datasets used in this app. Current SWORD-backed modules in use include the KJV text, Strong's Greek Dictionary, Strong's Hebrew Dictionary, and Hitchcock's Bible Names.",
+            "Bible text, Strong's dictionaries, and Hitchcock's Bible Names.",
         },
         {
           label: "OpenBible.info",
           href: "https://www.openbible.info/geo/",
           description:
-            "Map and place data, topic data, cross-reference vote data, and the Bible reference parser used in this app.",
+            "Place, topic, cross-reference, and Bible reference-parser data.",
         },
         {
           label: "Complete Bible Genealogy",
           href: "https://www.complete-bible-genealogy.com/",
           description:
-            "Genealogy source and reference model for people, family relationships, and verse-linked genealogy data.",
+            "People, family relationships, and verse references.",
         },
         {
           label: "Northside Baptist Church",
           href: "https://www.northsidebaptistchurch.org.au/kjv-dictionary/",
           description:
-            "KJV Archaic Word Dictionary by Scott Childs, used for the old-English / archaic-word lookup data.",
+            "Scott Childs's KJV archaic-word dictionary.",
         },
         {
           label: "PreservedWords.com",
           href: "https://www.preservedwords.com/wordlist.txt",
           description:
-            "Supplemental KJV word and phrase definitions used to expand the old-English dictionary and phrase lookup data.",
+            "Supplemental KJV word and phrase definitions.",
         },
         {
           label: "The Bible Word-Book",
           href: "https://archive.org/details/biblewordbookglo00wrigiala",
           description:
-            "Public-domain source for the separate Bible Word-Book tool, based on William Aldis Wright's glossary of archaic Bible and prayer-book words and phrases.",
+            "William Aldis Wright's public-domain Bible Word-Book.",
         },
         {
           label: "3Bible.com Audio Bible",
           href: "https://3bible.com/AudioBible.php",
           description:
-            "Audio Bible source used in the app. The speaker is Stephen Johnston.",
+            "Audio Bible narrated by Stephen Johnston.",
         },
         {
           label: "Webster's 1828 Dictionary",
           href: "https://github.com/CrossCrusaders/Websters1828API",
           description:
-            "Source used for the Webster's 1828 dictionary data in this app.",
+            "Webster's 1828 dictionary data.",
         },
         {
           label: "OverviewBible Free Bible Icons",
           href: "https://overviewbible.com/free-bible-icons/",
           description:
-            "Source used for the Bible book icons in the app.",
+            "Bible book icons.",
         },
         {
           label: "Biblical Units",
           description:
-            "Units data is currently project-curated from Scripture references and standard historical approximations for biblical measures, weights, volumes, currency, and time. A single verified upstream source has not yet been documented for this dataset.",
+            "Project-curated biblical measures; no single upstream source.",
         },
-        {
-          label: "Encyclopedia of the Bible",
-          href: "https://www.biblegateway.com/resources/encyclopedia-of-the-bible/toc",
-          description: "Biblical chronology, people, and book settings used for provisional timeline context.",
-        },
-        {
-          label: "Stanford Encyclopedia of Philosophy",
-          href: "https://plato.stanford.edu/",
-          description: "Historical context for Socrates, Plato, Aristotle, and Seneca in the timeline.",
-        },
-        ...KJV_COMPARISON_CREDITS,
-        ...TIMELINE_SOURCE_CREDITS
-          .filter(source => !source.title.startsWith("Encyclopedia of the Bible:") && !source.title.startsWith("Stanford Encyclopedia of Philosophy:"))
-          .map(source => ({ label: source.title, href: source.url, description: `Timeline: ${source.use}` })),
+        ...TIMELINE_WEBSITE_CREDITS,
       ],
     },
   },

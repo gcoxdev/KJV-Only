@@ -361,3 +361,50 @@ export const TIMELINE_SOURCE_CREDITS = [
     "use": "Life, 384–322 BC, and association with Plato's Academy."
   }
 ];
+export const TIMELINE_WEBSITE_CREDITS = [
+  {
+    "label": "Bible Hub",
+    "href": "https://biblehub.com/",
+    "description": "Comparison references for KJV Psalm headings."
+  },
+  {
+    "label": "British Museum",
+    "href": "https://www.britishmuseum.org/",
+    "description": "Artifacts and records supporting historical date comparisons."
+  },
+  {
+    "label": "Encyclopaedia Iranica",
+    "href": "https://www.iranicaonline.org/",
+    "description": "Persian rulers and historical background."
+  },
+  {
+    "label": "Encyclopedia of the Bible",
+    "href": "https://www.biblegateway.com/resources/encyclopedia-of-the-bible/toc",
+    "description": "Biblical chronology, people, and book backgrounds."
+  },
+  {
+    "label": "LacusCurtius — University of Chicago",
+    "href": "https://penelope.uchicago.edu/",
+    "description": "Ancient historical texts, including Josephus and Tacitus."
+  },
+  {
+    "label": "Livius",
+    "href": "https://www.livius.org/",
+    "description": "Ancient history, rulers, and translated historical texts."
+  },
+  {
+    "label": "Nature",
+    "href": "https://www.nature.com/",
+    "description": "Research comparing proposed crucifixion dates."
+  },
+  {
+    "label": "ORACC",
+    "href": "https://oracc.museum.upenn.edu/",
+    "description": "Assyrian inscriptions and historical records."
+  },
+  {
+    "label": "Stanford Encyclopedia of Philosophy",
+    "href": "https://plato.stanford.edu/",
+    "description": "Philosophers and their historical context."
+  }
+];

@@ -74,11 +74,18 @@ it("preserves canonical Psalm headings as separate evidence", async () => {
   expect(link).toMatchObject({ association: "context", referenceLabel: "Psalm 23 heading", evidence: "A Psalm of David." });
 });
 
-it("keeps every external timeline source and usage note on Credits", async () => {
+it("retains article provenance while listing each timeline website once", async () => {
   const { CONTEXT_TIMELINE_SOURCES } = await import("../src/data/contextual-timeline");
-  const { TIMELINE_SOURCE_CREDITS } = await import("../src/data/timeline-source-credits");
+  const { TIMELINE_SOURCE_CREDITS, TIMELINE_WEBSITE_CREDITS } = await import("../src/data/timeline-source-credits");
   const sources = Object.entries(CONTEXT_TIMELINE_SOURCES).map(([id,source]) => ({ id, ...source }));
   expect(TIMELINE_SOURCE_CREDITS).toEqual(sources);
   expect(sources.some(source => source.id === "cambyses")).toBe(true);
   expect(sources.some(source => source.id === "crucifixionStudy")).toBe(true);
+  const host = (url: string) => new URL(url).hostname.replace(/^www\./, "");
+  const websites = TIMELINE_WEBSITE_CREDITS.map(credit => host(credit.href));
+  expect(websites.length).toBe(new Set(websites).size);
+  expect([...websites].sort()).toEqual([...new Set(sources.map(source => host(source.url)))].sort());
+  expect(TIMELINE_WEBSITE_CREDITS.filter(credit => host(credit.href) === "livius.org")).toEqual([
+    { label: "Livius", href: "https://www.livius.org/", description: "Ancient history, rulers, and translated historical texts." },
+  ]);
 });

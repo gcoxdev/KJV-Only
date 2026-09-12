@@ -1,7 +1,7 @@
 import type { TimelineEra, TimelineRecord } from "../lib/bible-timeline";
 import { CHRONOLOGY_REVIEWS } from "./timeline-chronology-review";
 
-export const TIMELINE_REVISION = "2026-09-12.2";
+export const TIMELINE_REVISION = "2026-09-12.3";
 export const TIMELINE_SOURCES: Record<string, { title: string; url: string; use: string }> = {
   crucifixionStudy: { title: "Humphreys & Waddington: Dating the Crucifixion (1983)", url: "https://www.nature.com/articles/306743a0", use: "Published AD 33 proposal using reconstructed calendars and a proposed lunar-eclipse association. Its interpretation is not a KJV statement or an adopted exact date; the chart retains the provisional AD 30 framework." },
   ot: { title: "Encyclopedia of the Bible: Old Testament chronology", url: "https://www.biblegateway.com/resources/encyclopedia-of-the-bible/Chronology-Old-Testament", use: "Comparison of calendar anchors and chronological interpretations. Its alternative textual readings are not substituted for the KJV." },
@@ -25,6 +25,7 @@ export const TIMELINE_METHOD = [
   { title: "Cainan in Luke's ancestry", references: ["GEN.11.12", "GEN.11.13", "LUK.3.35", "LUK.3.36"], text: "The KJV of Luke names Cainan between Arphaxad and Sala; Genesis gives Arphaxad's age of 35 when he begat Salah without naming that intervening person. The calculation uses the numerical interval in Genesis. It does not delete Luke's Cainan or invent extra years for him. Reconciling the genealogical wording remains an explicit open question; family links and a calculated age sequence must not be mistaken for an independently dated, complete pedigree." },
   { title: "Jotham, Pekah and Manasseh", references: [] as string[], text: "Regnal totals and overlapping authority need separate treatment from elapsed calendar years." },
   { title: "Exile and the seventy years", references: [] as string[], text: "Stated biblical intervals control the review; calendar differences alone do not determine their intended endpoints." },
+  { title: "Paul, Festus and the journey to Rome", references: [] as string[], text: "Narrated durations and proposed calendar anchors are separate kinds of evidence." },
 ].map(method => {
   const review = CHRONOLOGY_REVIEWS.find(review => review.methodTitle === method.title);
   return review ? { ...method, text: `${method.text} ${review.text}`, references: [...new Set([...method.references, ...review.references])] } : method;

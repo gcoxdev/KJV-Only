@@ -121,6 +121,42 @@ it("retains exile constraints without inventing a seventy-year bar or Persian ki
   }
 });
 
+it("keeps Luke's narrated settings and the separate Passion hearings intact", () => {
+  const ids = (book: string, chapter: number) => selectContextTimeline(records, book, chapter, "chapter", "biblical").records.filter(record => record.emphasized).map(record => record.id);
+  expect(ids("Luke", 14)).toEqual(expect.arrayContaining(["gospel-table-discipleship", "gospel-lowest-room", "gospel-great-supper", "gospel-cost-discipleship"]));
+  expect(ids("Luke", 14)).not.toContain("gospel-luke-pharisee-meal");
+  expect(ids("Luke", 15)).toEqual(expect.arrayContaining(["gospel-lost-found", "gospel-lost-coin", "gospel-lost-son"]));
+  expect(ids("Luke", 17)).toContain("gospel-ten-lepers");
+  expect(ids("Luke", 18)).not.toContain("gospel-ten-lepers");
+  expect(ids("Luke", 18)).toEqual(expect.arrayContaining(["gospel-persistent-widow", "gospel-pharisee-publican"]));
+  expect(ids("Luke", 23)).toContain("gospel-herod-hearing");
+  expect(ids("Matthew", 27)).not.toContain("gospel-herod-hearing");
+  expect(ids("John", 13)).toEqual(expect.arrayContaining(["gospel-foot-washing", "gospel-judas-departs", "gospel-new-commandment", "gospel-peter-warning"]));
+  expect(ids("John", 13)).not.toContain("gospel-supper-greatness");
+  expect(records.find(record => record.id === "gospel-rich-man-lazarus")!.personIds).toBeUndefined();
+});
+
+it("preserves the KJV custody intervals and keeps the Festus alternative conditional", () => {
+  const { books } = JSON.parse(readFileSync("public/data/kjv.json", "utf8")) as { books: Book[] };
+  const acts = books.find(book => book.name === "Acts")!;
+  const text = (chapter: number, verse: number) => acts.chapters[chapter - 1].verses[verse - 1].tokens.map(token => token.text).join(" ");
+  expect(text(24, 27)).toContain("after two years");
+  expect(text(25, 6)).toContain("more than ten days");
+  expect(text(28, 11)).toContain("after three months");
+  expect(text(28, 30)).toContain("two whole years");
+  const get = (id: string) => records.find(record => record.id === id)!;
+  expect(get("paul-caesarea").end! - get("paul-caesarea").start!).toBe(2);
+  expect(get("paul-rome").end! - get("paul-rome").start!).toBe(2);
+  expect(get("paul-rome").start).toBe(61);
+  const review = CHRONOLOGY_REVIEWS.find(review => review.methodTitle === "Paul, Festus and the journey to Rome")!;
+  for (const ref of review.references) {
+    const [code, chapter, verse] = ref.split(".");
+    expect(code).toBe("ACT");
+    expect(acts.chapters[+chapter - 1]?.verses[+verse - 1], ref).toBeDefined();
+  }
+  expect(review.text).toContain("conditional comparison");
+});
+
 it("keeps Roman history separate from biblical fulfillment and person identity", () => {
   const seneca = records.find(record => record.id === "seneca")!;
   expect(seneca.track).toBe("historical");

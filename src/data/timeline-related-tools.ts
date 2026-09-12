@@ -7,6 +7,7 @@ export type TimelineRelatedTool = { label: string; reference: string; request: V
 const person = (personId: string, label: string, reference: string): TimelineRelatedTool => ({ label, reference, request: { kind: "genealogy", personId } });
 const place = (geojsonFile: string, label: string, reference: string): TimelineRelatedTool => ({ label, reference, request: { kind: "maps", geojsonFile } });
 const jesus = (reference: string) => person("jesus_christ_2683", "Jesus Christ", reference);
+const jesusTeaching = (reference: string, context: string): TimelineRelatedTool => ({ ...jesus(reference), evidence: `${context} This identifies Jesus as the narrative speaker; it does not identify a character in his teaching as a historical person.` });
 const paul = (reference: string) => person("saul_2959", "Paul", reference);
 const jerusalem = (reference: string) => place("a15257a.geojson", "Jerusalem", reference);
 const egypt = (reference: string) => place("af301ca.geojson", "Egypt", reference);
@@ -52,6 +53,20 @@ export const TIMELINE_RELATED_TOOLS: Record<string, TimelineRelatedTool[]> = {
   "gospel-matthew-lost-sheep": [{ ...jesus("MAT.18.2"), evidence: "Jesus is the speaker introduced in Matthew 18:2. This links the teacher, not a historical identity for the shepherd in the illustration." }],
   "gospel-brother-trespass": [{ ...jesus("MAT.18.2"), evidence: "The instruction continues Jesus's discourse introduced in Matthew 18:2. No identity is assigned to the hypothetical brother." }],
   "gospel-vineyard-labourers": [{ ...jesus("MAT.19.28"), evidence: "Jesus's answer to the disciples in Matthew 19:28 continues into the vineyard parable. This links the teacher, not a historical employer or labourer." }],
+  "gospel-watchfulness": [jesusTeaching("LUK.12.1", "Luke introduces the continuing address to the disciples before the crowd.")],
+  "gospel-rich-fool": [jesusTeaching("LUK.12.16", "The inheritance question leads to Jesus telling the parable.")],
+  "gospel-ready-servants": [jesusTeaching("LUK.12.42", "The Lord answers Peter's question with the steward teaching.")],
+  "gospel-division-discernment": [jesusTeaching("LUK.12.54", "Jesus's discourse turns from the disciples to the people.")],
+  "gospel-luke-mustard-leaven": [jesusTeaching("LUK.13.18", "The kingdom comparisons continue Jesus's teaching after the Sabbath healing.")],
+  "gospel-lowest-room": [jesusTeaching("LUK.14.3", "Jesus is named at the start of this meal; the instructions to guests and host follow.")],
+  "gospel-great-supper": [jesusTeaching("LUK.14.3", "Jesus is named in the meal scene that introduces the guest's remark and this parable.")],
+  "gospel-cost-discipleship": [jesusTeaching("LUK.14.25", "Jesus turns to the multitudes travelling with him.")],
+  "gospel-lost-coin": [jesusTeaching("LUK.15.3", "The introduction to Jesus's parable sequence establishes the speaker for the following illustration.")],
+  "gospel-lost-son": [jesusTeaching("LUK.15.3", "Jesus's parable sequence continues with the father and two sons.")],
+  "gospel-forgiveness-faith": [jesusTeaching("LUK.17.1", "Luke introduces Jesus addressing the disciples; the apostles' request follows.")],
+  "gospel-persistent-widow": [jesusTeaching("LUK.18.1", "Luke introduces Jesus telling a parable about praying without fainting.")],
+  "gospel-pharisee-publican": [jesusTeaching("LUK.18.9", "Luke introduces another parable to those trusting in their own righteousness.")],
+  "gospel-supper-greatness": [jesusTeaching("LUK.22.15", "Jesus's supper address continues with a response to the dispute about greatness.")],
   "gospel-guard-report": [jesus("MAT.28.9"), jerusalem("MAT.27.53")],
   "ot-eden": [person("adam_2", "Adam", "GEN.3.17"), person("eve_3", "Eve", "GEN.3.20"), place("af3daeb.geojson", "Garden of Eden", "GEN.2.8")],
   "context-sng": [person("solomon_677", "Solomon", "SNG.1.1")],
