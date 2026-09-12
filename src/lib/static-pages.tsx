@@ -263,7 +263,7 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
         {
           label: "Stanford Encyclopedia of Philosophy",
           href: "https://plato.stanford.edu/",
-          description: "Historical context for Socrates, Plato, and Aristotle in the timeline.",
+          description: "Historical context for Socrates, Plato, Aristotle, and Seneca in the timeline.",
         },
         ...TIMELINE_ENCYCLOPEDIA_CREDITS
           .filter(source => !source.title.startsWith("Encyclopedia of the Bible:") && !source.title.startsWith("Stanford Encyclopedia of Philosophy:"))

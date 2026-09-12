@@ -6,6 +6,8 @@ import { WRITING_CONTEXTS } from "../src/data/contextual-timeline-writings";
 import { BROAD_BOOK_TOPICS } from "../src/data/contextual-timeline-topics";
 import { NT_NARRATIVE_DETAILS } from "../src/data/contextual-timeline-nt";
 import { buildContextTimeline, CHAPTER_TIMELINE_MAP, selectContextTimeline } from "../src/data/contextual-timeline";
+import { JUDGES_INTERVALS, CHRONOLOGY_REVIEWS } from "../src/data/timeline-chronology-review";
+import { formatTimelineYear } from "../src/lib/bible-timeline";
 
 const records = buildContextTimeline();
 it("validates the reviewed ranges and Old and New Testament chapter references against the shipped KJV", () => {
@@ -49,4 +51,47 @@ it("validates the reviewed ranges and Old and New Testament chapter references a
     expect(books[BOOK_ICON_CODES.findIndex(bookCode => bookCode === code)]?.chapters[Number(chapter) - 1]?.verses[Number(verse) - 1], ref).toBeDefined();
   }
   for (const writing of WRITING_CONTEXTS) expect(writing.chapters, writing.book).toHaveLength(byName.get(writing.book)!.chapters.length);
+});
+
+it("separates episodes without assigning neighbouring chapters each other's events", () => {
+  const chapterIds = (book: string, chapter: number) => selectContextTimeline(records, book, chapter, "chapter", "biblical").records.filter(record => record.emphasized).map(record => record.id);
+  expect(chapterIds("Luke", 10)).toEqual(expect.arrayContaining(["gospel-seventy", "gospel-good-samaritan", "gospel-martha-mary"]));
+  expect(chapterIds("Luke", 9)).not.toContain("gospel-martha-mary");
+  expect(chapterIds("Matthew", 17)).toContain("gospel-temple-tribute");
+  expect(chapterIds("Mark", 9)).not.toContain("gospel-temple-tribute");
+  expect(chapterIds("Acts", 16)).toEqual(expect.arrayContaining(["paul-philippi", "paul-philippi-prison", "paul-philippi-jailer"]));
+  const paul = selectContextTimeline(records, "Acts", 16, "paul", "biblical").records.map(record => record.id);
+  expect(paul.indexOf("paul-philippi")).toBeLessThan(paul.indexOf("paul-philippi-prison"));
+  expect(paul.indexOf("paul-philippi-prison")).toBeLessThan(paul.indexOf("paul-philippi-jailer"));
+  expect(new Set(records.map(record => record.id)).size).toBe(records.length);
+});
+
+it("keeps Roman history separate from biblical fulfillment and person identity", () => {
+  const seneca = records.find(record => record.id === "seneca")!;
+  expect(seneca.track).toBe("historical");
+  expect(formatTimelineYear(seneca.start!)).toBe("1 BC");
+  expect(seneca.personIds).toBeUndefined();
+  expect(seneca.references).toEqual([]);
+  const laterDestruction = records.find(record => record.id === "jerusalem-70")!;
+  expect(laterDestruction).toMatchObject({ track: "historical", start: 70, kind: "event", references: [] });
+  expect(CHAPTER_TIMELINE_MAP.Matthew[24].ids).not.toContain("jerusalem-70");
+  expect(selectContextTimeline(records, "Acts", 18, "chapter", "historical").records.map(record => record.id)).toContain("seneca");
+  expect(records.find(record => record.id === "gospel-crucifixion")!.sources).toContain("crucifixionStudy");
+});
+
+it("checks the judges review's stated intervals against the KJV without turning their sum into elapsed years", () => {
+  const { books } = JSON.parse(readFileSync("public/data/kjv.json", "utf8")) as { books: Book[] };
+  const numberWords: Record<number, string> = { 3: "three", 6: "six", 7: "seven", 8: "eight", 10: "ten", 18: "eighteen", 20: "twenty", 22: "twenty and two", 23: "twenty and three", 40: "forty", 80: "fourscore" };
+  for (const [, years, ref] of JUDGES_INTERVALS) {
+    const [, chapter, verse] = ref.split(".");
+    const text = books[BOOK_ICON_CODES.indexOf("JDG")].chapters[+chapter - 1].verses[+verse - 1].tokens.map(token => token.text).join(" ").toLowerCase();
+    expect(text, ref).toContain(`${numberWords[years]} years`);
+  }
+  expect(JUDGES_INTERVALS.reduce((sum, [, years]) => sum + years, 0)).toBe(410);
+  expect(CHRONOLOGY_REVIEWS[0].text).toContain("double-counts overlap");
+  expect(CHRONOLOGY_REVIEWS[0].references).toContain("JDG.15.20");
+  for (const id of ["joshua_391", "samson_586"]) {
+    const person = records.find(record => record.id === id);
+    if (person) expect(person.start).toBeUndefined();
+  }
 });

@@ -80,5 +80,5 @@ it("keeps each encyclopedia article and usage note on Credits", async () => {
   const { isTimelineEncyclopedia } = await import("../src/lib/timeline-sources");
   const sources = Object.entries(CONTEXT_TIMELINE_SOURCES).filter(([,source]) => isTimelineEncyclopedia(source)).map(([id,source]) => ({ id, ...source }));
   expect(TIMELINE_ENCYCLOPEDIA_CREDITS).toEqual(sources);
-  expect(sources).toHaveLength(20);
+  expect(sources).toHaveLength(21);
 });

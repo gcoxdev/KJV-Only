@@ -1,3 +1,4 @@
+import { ROMAN_CONTEXT_RECORDS, ROMAN_CONTEXT_SOURCES } from "./contextual-timeline-roman";
 import { POETRY_REFINEMENT_SOURCES } from "./contextual-timeline-poetry";
 import { PROPHET_REFINEMENT_SOURCES } from "./contextual-timeline-prophets";
 import { buildRefinedContext, REFINED_CHAPTER_TIMELINE_MAP } from "./contextual-timeline-refinements";
@@ -23,6 +24,7 @@ export const CONTEXT_TIMELINE_SOURCES: Record<string, { title: string; url: stri
   ...BROAD_TIMELINE_SOURCES,
   ...PROPHET_REFINEMENT_SOURCES,
   ...POETRY_REFINEMENT_SOURCES,
+  ...ROMAN_CONTEXT_SOURCES,
   nt: { ...TIMELINE_SOURCES.nt, use: "Calendar proposals for Jesus, Paul, and the apostolic period. KJV passage details and relative order control the reconstruction." },
   cyrus: { ...TIMELINE_SOURCES.cyrus, use: "Reign from accession in Anshan, c. 559–530 BC; conquest of Babylon in 539 BC. Ezra supplies the return decree; the external chronology does not override that account." },
   nebuchadnezzar: { title: "Livius: Nebuchadnezzar II", url: "https://www.livius.org/articles/person/nebuchadnezzar-ii/", use: "Conventional reign, 605–562 BC; not birth and death dates." },
@@ -134,7 +136,7 @@ export function buildContextTimeline(model: SojournModel = "egypt430"): ContextT
   const refined = buildRefinedContext([...chronology, ...kings, ...EXPANDED_TIMELINE_RECORDS, ...HISTORICAL_RECORDS, ...broad]);
   const shared = chronology.filter(record => !record.placement && record.kind !== "life" && record.kind !== "activity")
     .map(record => ({ ...record, sources: [...record.sources, ...(["samaria", "sennacherib"].includes(record.id) ? ["assyria"] : record.id === "wall" ? ["artaxerxes"] : [])], track: ["alexander", "antiochus", "herod"].includes(record.id) ? "historical" : "biblical" } as ContextTimelineRecord));
-  return [...shared, ...PILOT_RECORDS, ...HISTORICAL_RECORDS, ...EXPANDED_TIMELINE_RECORDS, ...NT_TIMELINE_RECORDS, ...WRITING_TIMELINE_RECORDS, ...buildOldTestamentContext(chronology), ...kings, ...chronicles, ...KINGS_HISTORICAL_RECORDS, ...broad, ...BROAD_HISTORICAL_RECORDS, ...refined].map(withChroniclesParallels).map(record => {
+  return [...shared, ...PILOT_RECORDS, ...HISTORICAL_RECORDS, ...ROMAN_CONTEXT_RECORDS, ...EXPANDED_TIMELINE_RECORDS, ...NT_TIMELINE_RECORDS, ...WRITING_TIMELINE_RECORDS, ...buildOldTestamentContext(chronology), ...kings, ...chronicles, ...KINGS_HISTORICAL_RECORDS, ...broad, ...BROAD_HISTORICAL_RECORDS, ...refined].map(withChroniclesParallels).map(record => {
     const narrative = NT_NARRATIVE_DETAILS[record.id];
     return narrative ? { ...record, narrative, references: [...new Set([...record.references, ...narrative.passages.map(passage => passage.reference)])] } : record;
   });

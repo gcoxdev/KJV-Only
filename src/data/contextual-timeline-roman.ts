@@ -1,0 +1,17 @@
+import type { ContextTimelineRecord } from "./contextual-timeline";
+
+export const ROMAN_CONTEXT_SOURCES = {
+  pilate: { title: "Livius: Pontius Pilate", url: "https://www.livius.org/articles/person/pontius-pilate/", use: "Prefecture AD 26–36 only. The article's judgments about the Gospel accounts are not adopted; the KJV controls the trial narrative." },
+  seneca: { title: "Stanford Encyclopedia of Philosophy: Seneca", url: "https://plato.stanford.edu/entries/seneca/", use: "Life c. 1 BC–AD 65 in this source, Roman education, Stoic philosophy and service under Nero. Other birth estimates differ; no contact with Paul is inferred." },
+  vespasian: { title: "Livius: Vespasian", url: "https://www.livius.org/articles/person/vespasian/", use: "Imperial reign AD 69–79 and political setting of Titus's AD 70 Jerusalem campaign." },
+  romeFire: { title: "Tacitus, Annals 15.38–44: Rome's fire and persecution", url: "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/Annals/15B*.html#38", use: "Ancient account of the AD 64 fire and Nero's punishment of Christians. This hostile source is not adopted as theology or proof of the fire's cause." },
+  jerusalem70: { title: "Livius: Titus' siege of Jerusalem", url: "https://www.livius.org/articles/concept/roman-jewish-wars/roman-jewish-wars-4/", use: "Historical AD 70 siege and destruction of the temple. No inferred date of Gospel composition or automatic identification of every prophecy with this event." },
+};
+
+export const ROMAN_CONTEXT_RECORDS: ContextTimelineRecord[] = [
+  { id: "pilate-prefecture", label: "Pontius Pilate · prefecture", start: 26, end: 36, kind: "period", references: ["LUK.3.1", "MAT.27.2"], sources: ["pilate"], note: "The governor named in the KJV trial accounts. The external dates bound his office, not his lifespan or an exact crucifixion date." },
+  { id: "seneca", label: "Seneca", start: 0, end: 65, kind: "life", references: [], sources: ["seneca"], note: "Roman Stoic philosopher and adviser to Nero, contemporary with the apostolic period. Uses this source's approximate 1 BC birth. Acts names Stoics at Athens but does not name Seneca; no meeting, correspondence, or influence on Paul is asserted." },
+  { id: "rome-fire", label: "Great fire of Rome and persecution under Nero", start: 64, kind: "event", references: [], sources: ["romeFire"], note: "Tacitus describes the fire and subsequent punishment of Christians. AD 64 is a calendar setting for that sequence, not one day's duration. The account does not establish the cause of the fire or dates for Peter's and Paul's deaths." },
+  { id: "vespasian-reign", label: "Vespasian · reign", start: 69, end: 79, kind: "period", references: [], sources: ["vespasian"], note: "Roman emperor during the later first-century authorship era. Titus's capture of Jerusalem falls within this reign. This does not establish a meeting with a biblical author or a date for any book." },
+  { id: "jerusalem-70", label: "Jerusalem and the temple destroyed under Titus", start: 70, kind: "event", references: [], sources: ["jerusalem70"], note: "External historical context: the siege and temple destruction in AD 70. Jesus's earlier warnings remain in their own Gospel setting. This entry neither dates those warnings to AD 70 nor settles all questions of prophetic fulfillment or Gospel composition." },
+].map(record => ({ ...record, track: "historical", era: "history", startStatus: "approximate", endStatus: record.end === undefined ? "unknown" : "approximate" } as ContextTimelineRecord));

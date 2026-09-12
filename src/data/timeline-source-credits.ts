@@ -103,6 +103,12 @@ export const TIMELINE_ENCYCLOPEDIA_CREDITS = [
     "use": "The proposed identification of Ahasuerus as Xerxes I, 486–465 BC, and the third-, seventh-, and twelfth-year sequence. Alternative king identifications would change the BC dates."
   },
   {
+    "id": "seneca",
+    "title": "Stanford Encyclopedia of Philosophy: Seneca",
+    "url": "https://plato.stanford.edu/entries/seneca/",
+    "use": "Life c. 1 BC–AD 65 in this source, Roman education, Stoic philosophy and service under Nero. Other birth estimates differ; no contact with Paul is inferred."
+  },
+  {
     "id": "socrates",
     "title": "Stanford Encyclopedia of Philosophy: Socrates",
     "url": "https://plato.stanford.edu/entries/socrates/",

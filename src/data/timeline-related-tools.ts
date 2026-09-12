@@ -75,6 +75,11 @@ export const TIMELINE_RELATED_TOOLS: Record<string, TimelineRelatedTool[]> = {
   antiochus: [historicalPlace("a15257a.geojson", "Jerusalem", "2CH.3.1", "The linked historical source describes Antiochus IV's intervention in Jerusalem. Chronicles identifies the mapped city, not the later Maccabean events.")],
   "nero-reign": [historicalPlace("afc8e7a.geojson", "Rome", "ACT.28.16", "Rome provides geographic context for Nero's reign and Paul's custody. This does not imply that Paul met Nero.")],
   "domitian-reign": [historicalPlace("afc8e7a.geojson", "Rome", "ACT.28.16", "Rome provides geographic context for Domitian's imperial reign. Acts identifies the city in an earlier period; it does not mention Domitian.")],
+  "pilate-prefecture": [person("pontius_pilate_2860", "Pontius Pilate", "LUK.3.1")],
+  seneca: [historicalPlace("afc8e7a.geojson", "Rome", "ACT.28.16", "Seneca's Roman setting comes from the Stanford source on Credits. Acts identifies the city, not Seneca or a meeting with Paul.")],
+  "rome-fire": [historicalPlace("afc8e7a.geojson", "Rome", "ACT.28.16", "Tacitus supplies the fire and persecution account. Acts identifies Rome in an earlier episode, not the AD 64 fire.")],
+  "vespasian-reign": [historicalPlace("afc8e7a.geojson", "Rome", "ACT.28.16", "Rome is geographic context for the emperor. Acts identifies the city, not Vespasian or his reign dates.")],
+  "jerusalem-70": [historicalPlace("a15257a.geojson", "Jerusalem", "2CH.3.1", "Chronicles identifies the mapped city. The AD 70 event is externally sourced and distinct from the Babylonian destruction.")],
 };
 
 export function timelineToolKey(link: TimelineRelatedTool) {

@@ -193,3 +193,39 @@ test("historical geography is labeled separately from biblical event connections
   await evidence.getByRole("button", { name: "Map: Athens", exact: true }).click();
   await expect(page.getByRole("alertdialog")).toContainText("Athens");
 });
+
+test("expanded event detail appears in chapter views and narrative collections", async ({ page }) => {
+  const dialog = await start(page, {}, "ACT.16");
+  const query = dialog.getByRole("textbox", { name: "Find timeline entries" });
+  const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+  await query.fill("Philippian jailer");
+  await expect(evidence).toContainText("ACT.16.25");
+  await expect(evidence).toContainText("following daylight release");
+  await choose(page, dialog, "Timeline collection", "Paul’s missions");
+  await expect(evidence).toContainText("The Philippian jailer");
+  await query.fill("");
+  await choose(page, dialog, "Timeline collection", "Gospel harmony");
+  await query.fill("good Samaritan");
+  await expect(evidence).toContainText("Luke 10:25–37");
+  await expect(evidence).toContainText("The dated subject is Jesus’s teaching");
+  await query.fill("tribute money");
+  await expect(evidence).toContainText("Matthew 17:24–27");
+});
+
+test("Roman context and chronology review retain historical and biblical distinctions", async ({ page }) => {
+  const dialog = await start(page);
+  await choose(page, dialog, "Timeline collection", "Wider history");
+  const query = dialog.getByRole("textbox", { name: "Find timeline entries" });
+  const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+  await query.fill("Seneca");
+  await expect(evidence).toContainText("Historical context");
+  await expect(evidence).toContainText("1 BC");
+  await expect(evidence).toContainText("no meeting");
+  await query.fill("destroyed under Titus");
+  await expect(evidence).toContainText("AD 70");
+  await expect(evidence).toContainText("External historical context");
+  await dialog.getByRole("button", { name: /Sources & method/ }).click();
+  await expect(dialog).toContainText("double-counts overlap");
+  await expect(dialog).toContainText("twenty-one years apart");
+  await expect(dialog).toContainText("unnamed feast cannot supply an additional year");
+});
