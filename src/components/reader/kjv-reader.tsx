@@ -1,3 +1,7 @@
+import type { AncientMapEntry } from "@/lib/maps";
+import { VisualToolTargetContext } from "@/hooks/use-visual-tool-target";
+import { routeVisualTool } from "@/lib/visual-tool-routing";
+import type { VisualToolRequest } from "@/types/reader";
 import { useTimelineReaderContext } from "@/hooks/use-timeline-reader-context";
 import {
   lazy,
@@ -236,6 +240,12 @@ export function KJVReader() {
       setSearchResultOpenTarget,
       bookmarkOpenTarget,
       setBookmarkOpenTarget,
+      genealogyOpenTarget,
+      setGenealogyOpenTarget,
+      mapsOpenTarget,
+      setMapsOpenTarget,
+      timelineOpenTarget,
+      setTimelineOpenTarget,
       referenceLinkOpenTarget,
       setReferenceLinkOpenTarget,
     },
@@ -335,6 +345,9 @@ export function KJVReader() {
     notesLinkOpenTarget,
     searchResultOpenTarget,
     bookmarkOpenTarget,
+    genealogyOpenTarget,
+    mapsOpenTarget,
+    timelineOpenTarget,
     referenceLinkOpenTarget,
   });
   const {
@@ -345,7 +358,7 @@ export function KJVReader() {
     mapDialogGeoJson,
     onMapDialogOpenChange,
     onCloseMapDialog,
-    openMapDialog,
+    openMapDialog: openMapModal,
     resetMapDialogState,
   } = useMapDialogState({
     loadMapGeoJsonByFile: loadMapGeoJson,
@@ -982,6 +995,7 @@ export function KJVReader() {
         | "view"
         | "pickerTestament"
         | "pickerBookIndex"
+        | "visualTool"
         | "pageId"
       >
     >,
@@ -1019,6 +1033,7 @@ export function KJVReader() {
       applyHistoryEntry: (leafId, entry) => {
         updateLeafLocation(leafId, {
           view: entry.view,
+          visualTool: entry.visualTool,
           bookIndex: entry.bookIndex,
           chapterIndex: entry.chapterIndex,
           pickerTestament: entry.pickerTestament,
@@ -1654,6 +1669,31 @@ export function KJVReader() {
     ],
   );
 
+  const openVisualTool = useCallback((request: VisualToolRequest) => {
+    const destination = request.kind === "genealogy" ? genealogyOpenTarget : request.kind === "maps" ? mapsOpenTarget : timelineOpenTarget;
+    const result = routeVisualTool(tabsRef.current, activeTabId, targetedPanelLeafIdRef.current, request, destination);
+    if (!result) return false;
+    clearLeafHighlights(result.leafId);
+    setSelectedHighlightScope(null);
+    setPendingReaderScrollTargets(current => current.filter(target => target.leafId !== result.leafId));
+    setActiveReaderWordHighlight(current => current?.leafId === result.leafId ? null : current);
+    tabsRef.current = result.tabs;
+    setTabs(result.tabs);
+    targetedPanelLeafIdRef.current = result.targetedLeafId;
+    setTargetedPanelLeafId(result.targetedLeafId);
+    showTabById(result.tabId);
+    setActivePanelLeafId(result.leafId);
+    setIsSidebarActive(false);
+    closeRightSidebarForMobile();
+    return true;
+  }, [genealogyOpenTarget, mapsOpenTarget, timelineOpenTarget, tabsRef, activeTabId, targetedPanelLeafIdRef,
+    clearLeafHighlights, setSelectedHighlightScope, setPendingReaderScrollTargets, setActiveReaderWordHighlight,
+    setTabs, setTargetedPanelLeafId, showTabById, closeRightSidebarForMobile]);
+
+  const openMapDialog = useCallback((entry: AncientMapEntry) => {
+    if (!openVisualTool({ kind: "maps", geojsonFile: entry.geojson_file })) openMapModal(entry);
+  }, [openVisualTool, openMapModal]);
+
   const openGenealogyTree = useCallback((personId: string) => {
     if (!personId) {
       return;
@@ -1661,9 +1701,10 @@ export function KJVReader() {
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
+    if (openVisualTool({ kind: "genealogy", personId })) return;
     setGenealogyTreePersonId(personId);
     setIsGenealogyTreeOpen(true);
-  }, [setGenealogyTreePersonId, setIsGenealogyTreeOpen]);
+  }, [openVisualTool, setGenealogyTreePersonId, setIsGenealogyTreeOpen]);
 
   const renderGenealogyPersonDetails = useCallback(
     (person: GenealogyPerson) => (
@@ -1985,6 +2026,12 @@ export function KJVReader() {
     bookmarkOpenTarget,
     onBookmarkOpenTargetChange: setBookmarkOpenTarget,
     referenceLinkOpenTarget,
+    genealogyOpenTarget,
+    onGenealogyOpenTargetChange: setGenealogyOpenTarget,
+    mapsOpenTarget,
+    onMapsOpenTargetChange: setMapsOpenTarget,
+    timelineOpenTarget,
+    onTimelineOpenTargetChange: setTimelineOpenTarget,
     onReferenceLinkOpenTargetChange: setReferenceLinkOpenTarget,
     showWelcomeHomeAtStartup,
     onShowWelcomeHomeAtStartupChange: setShowWelcomeHomeAtStartup,
@@ -2263,6 +2310,7 @@ export function KJVReader() {
     />
   );
   return (
+    <VisualToolTargetContext.Provider value={openVisualTool}>
     <ToolReferenceDisplayModeProvider
       mode={toolReferenceDisplayMode}
       books={books}
@@ -2394,7 +2442,7 @@ export function KJVReader() {
             mapDialogGeoJson={mapDialogGeoJson}
             onMapDialogOpenChange={onMapDialogOpenChange}
             onCloseMapDialog={onCloseMapDialog}
-            onOpenMap={openMapDialog}
+            onOpenMap={openMapModal}
             onOpenReference={(reference) => {
               onCloseMapDialog();
               openConcordanceReference(reference);
@@ -2444,5 +2492,6 @@ export function KJVReader() {
       ) : null}
       </div>
     </ToolReferenceDisplayModeProvider>
+    </VisualToolTargetContext.Provider>
   );
 }

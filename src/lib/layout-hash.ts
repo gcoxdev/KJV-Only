@@ -1,3 +1,4 @@
+import { parseVisualToolRequest } from "@/lib/visual-tool-routing";
 import { BOOK_ICON_CODES } from "@/lib/references";
 import { createId } from "@/lib/reader-layout";
 import {
@@ -146,6 +147,13 @@ function serializeLeaf(
       ranges.length === 0
         ? chapterValue
         : `${chapterValue}.${serializeVerseRanges(ranges)}`;
+  } else if (node.view === "visual-tool" && node.visualTool) {
+    const request = parseVisualToolRequest(node.visualTool);
+    if (request) {
+      // URLSearchParams removes the outer escaping before the layout grammar runs.
+      const token = encodeURIComponent(JSON.stringify(request)).replace(/[()*']/g, char => `%${char.charCodeAt(0).toString(16)}`);
+      value = `tool.${encodeURIComponent(token)}`;
+    }
   } else if (node.view === "page" && node.pageId) {
     value = `page.${node.pageId}`;
   } else if (node.view === "search") {
@@ -262,6 +270,14 @@ function parseLeafToken(
 ): [LeafNode | null, SerializedVerseRange[], boolean] {
   const isTargeted = token.endsWith("*");
   const normalizedToken = isTargeted ? token.slice(0, -1) : token;
+
+  if (normalizedToken.startsWith("tool.")) {
+    try {
+      const visualTool = parseVisualToolRequest(JSON.parse(decodeURIComponent(normalizedToken.slice(5))));
+      if (visualTool) return [{ ...createReaderLeaf(0, 0, "visual-tool"), visualTool }, [], isTargeted];
+    } catch { /* Invalid shared tool state must not create a broken panel. */ }
+    return [null, [], false];
+  }
 
   if (normalizedToken === "search") {
     return [{ ...createReaderLeaf(0, 0, "search"), pageId: null }, [], isTargeted];

@@ -18,6 +18,9 @@ import {
   BookTextIcon,
   EllipsisVerticalIcon,
   HouseIcon,
+  HistoryIcon,
+  MapIcon,
+  NetworkIcon,
   NotebookPenIcon,
   PencilLineIcon,
   PlusIcon,
@@ -88,6 +91,11 @@ function getTabIcon(tab: ReaderTab) {
     return BlendIcon;
   }
 
+  if (firstLeaf.view === "visual-tool") {
+    const kind = firstLeaf.visualTool?.kind;
+    if (!leaves.every(leaf => leaf.visualTool?.kind === kind)) return BlendIcon;
+    return kind === "genealogy" ? NetworkIcon : kind === "maps" ? MapIcon : HistoryIcon;
+  }
   if (firstLeaf.view === "picker") {
     return HouseIcon;
   }

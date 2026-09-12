@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 const TimelineChart = lazy(() => import("./bible-timeline-chart"));
 const TRACKS = { biblical: "Biblical events", historical: "Historical context" };
 
-export default function ContextualTimelineDialog({ open, onOpenChange, context, books, renderPreview, onOpenReference, onCloseSidebar }: Omit<TimelineToolProps, "isOpen"> & { open: boolean; onOpenChange: (open: boolean) => void }) {
+export default function ContextualTimelineDialog({ embedded = false, open, onOpenChange, context, books, renderPreview, onOpenReference, onCloseSidebar }: Omit<TimelineToolProps, "isOpen"> & { embedded?: boolean; open: boolean; onOpenChange: (open: boolean) => void }) {
   const [pinned, setPinned] = useState<typeof context>(null);
   const current = pinned ?? context;
   const bookIndex = current?.bookIndex ?? 0;
@@ -39,15 +39,17 @@ export default function ContextualTimelineDialog({ open, onOpenChange, context, 
   const allRecords = useMemo(() => buildContextTimeline(model), [model]);
   const selection = useMemo(() => selectContextTimeline(allRecords, book?.name ?? "", chapterIndex + 1, scope, filter, query, phase), [allRecords, book?.name, chapterIndex, scope, filter, query, phase]);
   const selected = selection.records.find(record => record.id === selectedId) ?? selection.records.find(record => record.emphasized) ?? selection.records[0];
-  const openReference = (ref: string) => { onOpenChange(false); onOpenReference(ref); };
-  return <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent showCloseButton={false} className={cn("flex max-h-[94dvh] w-[96vw] max-w-[96vw] flex-col gap-3 overflow-hidden p-3 sm:max-w-6xl", expanded && "h-[96dvh] max-h-[96dvh] gap-2 p-2")}>
-      <div className={cn("shrink-0 pr-10", compact && "sr-only")}>
-        <DialogTitle>Historical timeline{collection ? ` · ${TIMELINE_COLLECTIONS[collection]}` : current && book ? ` · ${book.name} ${chapterIndex + 1}` : ""}</DialogTitle>
-        <DialogDescription className="mt-1">Biblical events and world history · KJV first · provisional calendar dates</DialogDescription>
+  const openReference = (ref: string) => { if (!embedded) onOpenChange(false); onOpenReference(ref); };
+  const Content = embedded ? "section" : DialogContent;
+  const Title = embedded ? "h2" : DialogTitle;
+  const Description = embedded ? "p" : DialogDescription;
+  const content = <Content {...(embedded ? {} : { showCloseButton: false })} className={embedded ? "@container/history flex h-full min-h-0 min-w-0 flex-col gap-3 overflow-hidden p-3" : cn("flex max-h-[94dvh] w-[96vw] max-w-[96vw] flex-col gap-3 overflow-hidden p-3 sm:max-w-6xl", expanded && "h-[96dvh] max-h-[96dvh] gap-2 p-2")}>
+      <div className={cn("shrink-0", !embedded && "pr-10", compact && "sr-only")}>
+        <Title className="font-semibold">Historical timeline{collection ? ` · ${TIMELINE_COLLECTIONS[collection]}` : current && book ? ` · ${book.name} ${chapterIndex + 1}` : ""}</Title>
+        <Description className="mt-1 text-sm text-muted-foreground">Biblical events and world history · KJV first · provisional calendar dates</Description>
       </div>
-      <Tooltip><TooltipTrigger render={<DialogClose render={<Button variant="outline" size="icon-sm" className="absolute top-2 right-2 z-10 rounded-full" aria-label="Close timeline" />} />}><XIcon /></TooltipTrigger><TooltipContent>Close timeline</TooltipContent></Tooltip>
-      <div className={cn("flex min-h-0 flex-col gap-3 overflow-y-auto", expanded && "flex-1 overflow-hidden gap-2")}>
+      {!embedded ? <Tooltip><TooltipTrigger render={<DialogClose render={<Button variant="outline" size="icon-sm" className="absolute top-2 right-2 z-10 rounded-full" aria-label="Close timeline" />} />}><XIcon /></TooltipTrigger><TooltipContent>Close timeline</TooltipContent></Tooltip> : null}
+      <div className={cn("flex min-h-0 flex-col gap-3 overflow-y-auto", embedded && "flex-1", expanded && "flex-1 overflow-hidden gap-2")}>
         <div className={cn("flex shrink-0 flex-col gap-2", compact && "hidden")}>
           <div className="flex flex-wrap items-center gap-2">
             <Select value={String(bookIndex)} onValueChange={value => { if (value !== null) { setPinned({ bookIndex: Number(value), chapterIndex: 0 }); setScope("chapter"); } }}>
@@ -88,7 +90,7 @@ export default function ContextualTimelineDialog({ open, onOpenChange, context, 
           </> : null}
         </div>
         <Suspense fallback={<p role="status">Loading chart…</p>}><TimelineChart records={selection.records} tracks={TRACKS} chartLabel="Historical timeline chart" selectedId={selected?.id} onSelect={setSelectedId} expanded={expanded} compact={compact} onExpandedChange={setExpanded} /></Suspense>
-        {!expanded ? <div className="grid gap-3 sm:grid-cols-2">
+        {!expanded ? <div className={cn("grid gap-3", embedded ? "@2xl/history:grid-cols-2" : "sm:grid-cols-2")}>
           <div role="group" aria-label="Historical timeline entries" className="flex max-h-72 flex-col gap-1 overflow-y-auto rounded-lg border p-1">
             {selection.records.length ? selection.records.map(record => <Button key={record.id} variant={record.id === selected?.id ? "secondary" : "ghost"} aria-pressed={record.id === selected?.id} className="h-auto justify-start whitespace-normal p-2 text-left" onClick={() => setSelectedId(record.id)}><span className="flex flex-col gap-1"><span className={record.emphasized ? "font-semibold" : ""}>{record.label}{record.emphasized ? (collection ? "" : " · Passage context") : ""}</span><span className="text-xs text-muted-foreground">{record.narrative?.phase ?? TRACKS[record.track]} · {timelineDateSummary(record)}</span></span></Button>) : <p className="p-2 text-sm">No entries match this view. Clear the search, change the filter, or choose Wider history.</p>}
           </div>
@@ -107,6 +109,6 @@ export default function ContextualTimelineDialog({ open, onOpenChange, context, 
           </article> : null}
         </div> : null}
       </div>
-    </DialogContent>
-  </Dialog>;
+    </Content>;
+  return embedded ? content : <Dialog open={open} onOpenChange={onOpenChange}>{content}</Dialog>;
 }

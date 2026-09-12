@@ -381,6 +381,7 @@ export function updateLeafNode(
       | "view"
       | "pickerTestament"
       | "pickerBookIndex"
+      | "visualTool"
       | "pageId"
     >
   >,
@@ -389,7 +390,7 @@ export function updateLeafNode(
     if (node.id !== targetLeafId) {
       return node;
     }
-    return { ...node, ...patch };
+    return { ...node, ...patch, visualTool: patch.view && patch.view !== "visual-tool" ? undefined : patch.visualTool ?? node.visualTool };
   }
 
   const nextFirst = updateLeafNode(node.first, targetLeafId, patch);
@@ -549,6 +550,7 @@ export function swapLeafContent(
     pickerTestament: sourceLeaf.pickerTestament,
     pickerBookIndex: sourceLeaf.pickerBookIndex,
     pageId: sourceLeaf.pageId,
+    visualTool: sourceLeaf.visualTool,
   };
   const targetContent = {
     view: targetLeaf.view,
@@ -557,6 +559,7 @@ export function swapLeafContent(
     pickerTestament: targetLeaf.pickerTestament,
     pickerBookIndex: targetLeaf.pickerBookIndex,
     pageId: targetLeaf.pageId,
+    visualTool: targetLeaf.visualTool,
   };
 
   return updateLeafNode(

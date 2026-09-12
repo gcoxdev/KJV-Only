@@ -1,3 +1,4 @@
+import { useVisualToolTarget } from "@/hooks/use-visual-tool-target";
 import { lazy, Suspense, useMemo, useState, type ReactNode } from "react";
 import { HistoryIcon } from "lucide-react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -20,6 +21,7 @@ export type TimelineToolProps = {
 };
 
 export function TimelineTool({ isOpen, context, books, ...referenceProps }: TimelineToolProps) {
+  const openVisualTool = useVisualToolTarget();
   const [open, setOpen] = useState(false);
   const [model] = useTimelineModel();
   const records = useMemo(() => buildContextTimeline(model), [model]);
@@ -34,7 +36,7 @@ export function TimelineTool({ isOpen, context, books, ...referenceProps }: Time
         <p className="text-sm font-medium">{book ? `${book} ${chapter}` : "Explore biblical and world history"}</p>
         <p className="text-xs text-muted-foreground">{mapped ? "Biblical events, historical context, and familiar contemporaries." : `Reviewed context covers ${CONTEXT_TIMELINE_COVERAGE.chapters} chapters across ${CONTEXT_TIMELINE_COVERAGE.books.length} books. This passage shows the broader overview.`}</p>
         {mapped ? <ul className="flex flex-col gap-1 text-xs">{preview.records.filter(record => record.emphasized).slice(0, 3).map(record => <li key={record.id}>{record.label}<span className="block text-muted-foreground">{timelineDateSummary(record)}</span></li>)}</ul> : null}
-        <Button variant="outline" size="sm" onClick={() => setOpen(true)}><HistoryIcon data-icon="inline-start" />Open timeline</Button>
+        <Button variant="outline" size="sm" onClick={() => { if (!openVisualTool({ kind: "timeline", context })) setOpen(true); }}><HistoryIcon data-icon="inline-start" />Open timeline</Button>
       </> : null}
     </AccordionContent>
     {open ? <Suspense fallback={<p role="status" className="p-2 text-sm">Loading timeline…</p>}><TimelineDialog open={open} onOpenChange={setOpen} context={context} books={books} {...referenceProps} /></Suspense> : null}

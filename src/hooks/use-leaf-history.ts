@@ -11,6 +11,7 @@ export type LeafHistoryEntry = {
   pickerTestament: LeafNode["pickerTestament"];
   pickerBookIndex: number | null;
   pageId: LeafNode["pageId"];
+  visualTool?: LeafNode["visualTool"];
 };
 
 type LeafHistoryState = Record<
@@ -29,6 +30,7 @@ export function buildLeafHistoryEntry(leaf: LeafNode): LeafHistoryEntry {
     pickerTestament: leaf.pickerTestament,
     pickerBookIndex: leaf.pickerBookIndex,
     pageId: leaf.pageId,
+    ...(leaf.visualTool ? { visualTool: leaf.visualTool } : {}),
   };
 }
 
@@ -39,7 +41,8 @@ export function leafHistoryEntryEquals(left: LeafHistoryEntry, right: LeafHistor
     left.chapterIndex === right.chapterIndex &&
     left.pickerTestament === right.pickerTestament &&
     left.pickerBookIndex === right.pickerBookIndex &&
-    left.pageId === right.pageId
+    left.pageId === right.pageId &&
+    JSON.stringify(left.visualTool) === JSON.stringify(right.visualTool)
   );
 }
 

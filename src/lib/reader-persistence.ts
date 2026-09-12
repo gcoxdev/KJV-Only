@@ -4,6 +4,7 @@ import {
   MIN_CONTEXT_VERSE_COUNT,
 } from "@/lib/context-verses"
 import type {
+  VisualToolOpenTarget,
   BookmarkOpenTarget,
   NotesLinkOpenTarget,
   ReaderColorTheme,
@@ -34,6 +35,7 @@ const WORD_TARGETS = new Set<WordVerseSelectionTarget>([
 const PANEL_TARGETS = new Set<
   NotesLinkOpenTarget | SearchResultOpenTarget | BookmarkOpenTarget
 >(["new-tab", "new-panel", "targeted-panel"])
+const VISUAL_TOOL_TARGETS = new Set<VisualToolOpenTarget>(["dialog", "new-tab", "new-panel", "targeted-panel"])
 const REFERENCE_TARGETS = new Set<ReferenceLinkOpenTarget>([
   "new-tab",
   "new-panel",
@@ -61,6 +63,9 @@ export type ReaderDisplaySettings = {
   notesLinkOpenTarget: NotesLinkOpenTarget
   searchResultOpenTarget: SearchResultOpenTarget
   bookmarkOpenTarget: BookmarkOpenTarget
+  genealogyOpenTarget: VisualToolOpenTarget
+  mapsOpenTarget: VisualToolOpenTarget
+  timelineOpenTarget: VisualToolOpenTarget
   referenceLinkOpenTarget: ReferenceLinkOpenTarget
 }
 
@@ -112,6 +117,9 @@ export function defaultReaderDisplaySettings(): ReaderDisplaySettings {
     notesLinkOpenTarget: "new-panel",
     searchResultOpenTarget: "new-panel",
     bookmarkOpenTarget: "new-panel",
+    genealogyOpenTarget: "dialog",
+    mapsOpenTarget: "dialog",
+    timelineOpenTarget: "dialog",
     referenceLinkOpenTarget: "new-tab",
   }
 }
@@ -200,6 +208,15 @@ export function parseReaderDisplaySettings(
     bookmarkOpenTarget: isOneOf(value.bookmarkOpenTarget, PANEL_TARGETS)
       ? value.bookmarkOpenTarget
       : defaults.bookmarkOpenTarget,
+    genealogyOpenTarget: isOneOf(value.genealogyOpenTarget, VISUAL_TOOL_TARGETS)
+      ? value.genealogyOpenTarget
+      : defaults.genealogyOpenTarget,
+    mapsOpenTarget: isOneOf(value.mapsOpenTarget, VISUAL_TOOL_TARGETS)
+      ? value.mapsOpenTarget
+      : defaults.mapsOpenTarget,
+    timelineOpenTarget: isOneOf(value.timelineOpenTarget, VISUAL_TOOL_TARGETS)
+      ? value.timelineOpenTarget
+      : defaults.timelineOpenTarget,
     referenceLinkOpenTarget: isOneOf(value.referenceLinkOpenTarget, REFERENCE_TARGETS)
       ? value.referenceLinkOpenTarget
       : defaults.referenceLinkOpenTarget,

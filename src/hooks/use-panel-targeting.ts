@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type SetStateAction 
 
 import { findLeafNode } from "@/lib/reader-layout";
 import type {
+  VisualToolOpenTarget,
   BookmarkOpenTarget,
   NotesLinkOpenTarget,
   ReaderTab,
@@ -16,6 +17,9 @@ type UsePanelTargetingParams = {
   notesLinkOpenTarget: NotesLinkOpenTarget;
   searchResultOpenTarget: SearchResultOpenTarget;
   bookmarkOpenTarget: BookmarkOpenTarget;
+  genealogyOpenTarget: VisualToolOpenTarget;
+  mapsOpenTarget: VisualToolOpenTarget;
+  timelineOpenTarget: VisualToolOpenTarget;
   referenceLinkOpenTarget: ReferenceLinkOpenTarget;
 };
 
@@ -25,6 +29,9 @@ export function usePanelTargeting({
   notesLinkOpenTarget,
   searchResultOpenTarget,
   bookmarkOpenTarget,
+  genealogyOpenTarget,
+  mapsOpenTarget,
+  timelineOpenTarget,
   referenceLinkOpenTarget,
 }: UsePanelTargetingParams) {
   const [targetedPanelLeafId, setTargetedPanelLeafIdState] = useState<string | null>(
@@ -65,10 +72,16 @@ export function usePanelTargeting({
       notesLinkOpenTarget === "targeted-panel" ||
       searchResultOpenTarget === "targeted-panel" ||
       bookmarkOpenTarget === "targeted-panel" ||
+      genealogyOpenTarget === "targeted-panel" ||
+      mapsOpenTarget === "targeted-panel" ||
+      timelineOpenTarget === "targeted-panel" ||
       referenceLinkOpenTarget === "targeted-panel",
     [
       bookmarkOpenTarget,
       notesLinkOpenTarget,
+      genealogyOpenTarget,
+      mapsOpenTarget,
+      timelineOpenTarget,
       referenceLinkOpenTarget,
       searchResultOpenTarget,
       wordVerseSelectionTarget,

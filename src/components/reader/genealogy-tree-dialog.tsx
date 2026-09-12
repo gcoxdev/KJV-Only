@@ -38,6 +38,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 const GenealogyTimeline = lazy(() => import("./genealogy-timeline"));
 
 type GenealogyTreeDialogProps = {
+  embedded?: boolean;
   open: boolean;
   person: GenealogyPerson | null;
   genealogyById: Map<string, GenealogyPerson>;
@@ -294,6 +295,7 @@ function GenealogyRelationGrid({
 }
 
 export function GenealogyTreeDialog({
+  embedded = false,
   open,
   person,
   genealogyById,
@@ -330,22 +332,25 @@ export function GenealogyTreeDialog({
     viewport?.scrollTo({ top: 0 });
   }, [person?.id, expanded]);
 
-  return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent
-        className={cn("flex h-[min(94vh,900px)] max-h-[calc(100dvh-1rem)] w-[min(96vw,1120px)]! max-w-none! flex-col overflow-hidden p-0", expanded && "h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)]! gap-0")}
+  const Content = embedded ? "section" : AlertDialogContent;
+  const Header = embedded ? "header" : AlertDialogHeader;
+  const Title = embedded ? "h2" : AlertDialogTitle;
+  const Description = embedded ? "p" : AlertDialogDescription;
+  const content = (
+      <Content
+        className={embedded ? "@container/genealogy flex h-full min-h-0 min-w-0 flex-col gap-3 overflow-hidden" : cn("flex h-[min(94vh,900px)] max-h-[calc(100dvh-1rem)] w-[min(96vw,1120px)]! max-w-none! flex-col overflow-hidden p-0", expanded && "h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)]! gap-0")}
       >
-        <AlertDialogHeader className={cn("gap-1 pl-4 pr-12 pt-4 sm:place-items-start sm:text-left", expanded && "sr-only")}>
-          <AlertDialogTitle>{view === "tree" ? "Genealogy Tree" : "Genealogy Timeline"}</AlertDialogTitle>
-          <AlertDialogDescription>
+        <Header className={cn("flex shrink-0 flex-col items-start gap-1 p-3 pb-0 text-left", !embedded && "pr-12", expanded && "sr-only")}>
+          <Title className="font-semibold">{view === "tree" ? "Genealogy Tree" : "Genealogy Timeline"}</Title>
+          <Description className="text-sm text-muted-foreground">
             {view === "timeline" ? "Explore Adam to Jesus, family lifespans, and the evidence behind their dates." : person
               ? `Focused on ${primaryName}. Click any person in the tree to recenter the graph.`
               : "No genealogy person selected."}
-          </AlertDialogDescription>
+          </Description>
           <ToggleGroup className={expanded ? "hidden" : undefined} value={[view]} onValueChange={values => { if (values[0]) setView(values[0]); }} variant="outline" size="sm" aria-label="Genealogy view">
             <ToggleGroupItem value="tree">Tree</ToggleGroupItem><ToggleGroupItem value="timeline">Timeline</ToggleGroupItem>
           </ToggleGroup>
-        </AlertDialogHeader>
+        </Header>
         {!expanded ? <Separator /> : null}
         <div className="min-h-0 flex-1 overflow-hidden">
           <ScrollArea ref={scrollAreaRef} className={cn("h-full", expanded && "[&_[data-slot=scroll-area-viewport]>div]:h-full")}>
@@ -354,7 +359,7 @@ export function GenealogyTreeDialog({
                 records={records} model={model} onModelChange={setModel}
                 onSelectPerson={id => { onSelectPerson(id); setExpanded(false); setView("tree"); }}
                 renderReferencePreview={renderReferencePreview}
-                onOpenReference={reference => { onOpenReference(reference); onOpenChange(false); }}
+                onOpenReference={reference => { onOpenReference(reference); if (!embedded) onOpenChange(false); }}
                 onCloseSidebar={onCloseSidebar} />
             </Suspense> :
             <div className="flex flex-col gap-5 px-3 py-3 sm:px-4 sm:py-4">
@@ -367,7 +372,7 @@ export function GenealogyTreeDialog({
                         <NetworkIcon className="size-4" />
                         <span>Parents</span>
                       </div>
-                      <div className="grid gap-3 md:grid-cols-2">
+                      <div className={cn("grid gap-3", embedded ? "@2xl/genealogy:grid-cols-2" : "md:grid-cols-2")}>
                         {father ? (
                           <GenealogyNode
                             label="Father"
@@ -410,7 +415,7 @@ export function GenealogyTreeDialog({
                     <div className="mx-auto h-8 w-px bg-border" aria-hidden="true" />
                   ) : null}
 
-                  <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(240px,300px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1fr)_minmax(260px,320px)_minmax(0,1fr)]">
+                  <div className={cn("grid items-start gap-4", embedded ? "@4xl/genealogy:grid-cols-[minmax(0,1fr)_minmax(240px,300px)_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)_minmax(240px,300px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1fr)_minmax(260px,320px)_minmax(0,1fr)]")}>
                     <div className="flex flex-col gap-3">
                       {siblings.length > 0 ? (
                         <GenealogyRelationGrid
@@ -468,7 +473,7 @@ export function GenealogyTreeDialog({
                         icon={<NetworkIcon className="size-4" />}
                         relations={children}
                         onSelectPerson={onSelectPerson}
-                        gridClassName="sm:grid-cols-2 2xl:grid-cols-3"
+                        gridClassName={embedded ? "@2xl/genealogy:grid-cols-2 @5xl/genealogy:grid-cols-3" : "sm:grid-cols-2 2xl:grid-cols-3"}
                         renderReferencePreview={renderReferencePreview}
                         onOpenReference={onOpenReference}
                         onCloseSidebar={onCloseSidebar}
@@ -485,8 +490,8 @@ export function GenealogyTreeDialog({
             }
           </ScrollArea>
         </div>
-        <DialogDismissButton onClose={() => onOpenChange(false)} />
-      </AlertDialogContent>
-    </AlertDialog>
+        {!embedded ? <DialogDismissButton onClose={() => onOpenChange(false)} /> : null}
+      </Content>
   );
+  return embedded ? content : <AlertDialog open={open} onOpenChange={onOpenChange}>{content}</AlertDialog>;
 }

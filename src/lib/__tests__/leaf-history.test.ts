@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildLeafHistoryEntry,
+  leafHistoryEntryEquals,
   canNavigateLeafHistory,
   reconcileLeafHistoryState,
 } from "@/hooks/use-leaf-history";
@@ -22,6 +23,16 @@ function leaf(overrides: Partial<LeafNode> = {}): LeafNode {
 }
 
 describe("leaf history helpers", () => {
+  it("preserves tool selection and records navigation within a genealogy panel", () => {
+    const first = buildLeafHistoryEntry(leaf({ view: "visual-tool", visualTool: { kind: "genealogy", personId: "JesusChrist" } }));
+    const next = buildLeafHistoryEntry(leaf({ view: "visual-tool", visualTool: { kind: "genealogy", personId: "Joseph" } }));
+    expect(first.visualTool).toEqual({ kind: "genealogy", personId: "JesusChrist" });
+    expect(leafHistoryEntryEquals(first, next)).toBe(false);
+    expect(leafHistoryEntryEquals(first, { ...first, visualTool: { ...first.visualTool! } })).toBe(true);
+    const history = reconcileLeafHistoryState({ "leaf-1": { entries: [first], index: 0 } }, new Map([["leaf-1", next]]), new Set());
+    expect(history["leaf-1"]).toEqual({ entries: [first, next], index: 1 });
+  });
+
   it("clears forward history after back navigation followed by a new view", () => {
     const pickerEntry = buildLeafHistoryEntry(leaf());
     const toolsEntry = buildLeafHistoryEntry(leaf({ view: "tools" }));

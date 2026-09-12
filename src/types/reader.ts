@@ -225,7 +225,7 @@ export type StaticPageId =
   | "contact"
   | "help";
 
-export type PanelHomeDestination = Exclude<LeafNode["view"], "reader" | "picker" | "page"> | "progress";
+export type PanelHomeDestination = Exclude<LeafNode["view"], "reader" | "picker" | "page" | "visual-tool"> | "progress";
 export type StudyWorkspaceTab = "home" | PanelHomeDestination;
 export type StudyWorkspaceTool =
   | "cross-refs"
@@ -321,6 +321,14 @@ export type TabsOrientation = "horizontal" | "vertical";
 export type IconVariant = "bw" | "color";
 export type ToolReferenceDisplayMode = "buttons" | "table";
 
+export type VisualToolOpenTarget = "dialog" | "new-panel" | "new-tab" | "targeted-panel";
+
+export type VisualToolRequest = (
+  | { kind: "genealogy"; personId: string }
+  | { kind: "maps"; geojsonFile: string }
+  | { kind: "timeline"; context: { bookIndex: number; chapterIndex: number } | null }
+) & { requestId?: string };
+
 export type LeafNode = {
   id: string;
   type: "leaf";
@@ -332,12 +340,14 @@ export type LeafNode = {
     | "topics"
     | "page"
     | "tools"
-    | "bookmarks";
+    | "bookmarks"
+    | "visual-tool";
   bookIndex: number;
   chapterIndex: number;
   pickerTestament: "old" | "new" | null;
   pickerBookIndex: number | null;
   pageId: StaticPageId | null;
+  visualTool?: VisualToolRequest;
 };
 
 export type SplitNode = {

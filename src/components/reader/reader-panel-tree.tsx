@@ -1,3 +1,5 @@
+import { VISUAL_TOOL_TITLES } from "@/lib/visual-tool-routing";
+import { HistoryIcon, MapIcon, NetworkIcon } from "lucide-react";
 import { ReaderControlTooltip } from "@/components/reader/reader-control-tooltip";
 import {
   Fragment,
@@ -154,6 +156,8 @@ const LazyBookmarksTool = lazy(async () => {
   return { default: module.BookmarksTool };
 });
 
+const LazyVisualToolPanel = lazy(() => import("@/components/reader/visual-tool-panel"));
+
 const LazySettingsPanelContent = lazy(async () => {
   const module = await import("@/components/reader/settings-dialog");
   return { default: module.SettingsPanelContent };
@@ -186,6 +190,7 @@ type LeafLocationPatch = Partial<
     | "view"
     | "pickerTestament"
     | "pickerBookIndex"
+    | "visualTool"
     | "pageId"
   >
 >;
@@ -755,7 +760,12 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
     });
   };
 
+  const visualToolTitle = leaf.visualTool ? VISUAL_TOOL_TITLES[leaf.visualTool.kind] : "Tool";
+  const VisualToolIcon = leaf.visualTool?.kind === "genealogy" ? NetworkIcon : leaf.visualTool?.kind === "maps" ? MapIcon : HistoryIcon;
   const panelHeaderIcon =
+    leaf.view === "visual-tool" ? (
+      <VisualToolIcon className="size-4 shrink-0 text-muted-foreground" />
+    ) :
     leaf.view === "picker" ? (
       <HouseIcon className="size-4 shrink-0 text-muted-foreground" />
     ) : leaf.view === "tools" ? (
@@ -785,6 +795,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
   const panelAccessibleName =
     leaf.view === "reader"
       ? `${book?.name ?? "Bible"} ${chapter?.chapter ?? leaf.chapterIndex + 1}`
+      : leaf.view === "visual-tool" ? visualToolTitle
       : leaf.view === "picker"
         ? "Panel Home"
         : leaf.view === "page"
@@ -859,7 +870,9 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
             ) : panelHeaderIcon ? (
               <>
                 {panelHeaderIcon}
-                {leaf.view === "picker" ? (
+                {leaf.view === "visual-tool" ? (
+                  <p className="text-sm text-muted-foreground">{visualToolTitle}</p>
+                ) : leaf.view === "picker" ? (
                   <p className="text-sm text-muted-foreground">Panel Home</p>
                 ) : leaf.view === "search" ? (
                   <p className="text-sm text-muted-foreground">Search</p>
@@ -877,6 +890,8 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                   </p>
                 ) : null}
               </>
+            ) : leaf.view === "visual-tool" ? (
+              <p className="text-sm text-muted-foreground">{visualToolTitle}</p>
             ) : leaf.view === "search" ? (
               <p className="text-sm text-muted-foreground">Search</p>
             ) : leaf.view === "topics" ? (
@@ -1670,6 +1685,14 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                 onStateChange={(patch) => onChangeSearchPageState(leaf.id, patch)}
                 onOpenResult={onOpenSearchResult}
               />
+            </Suspense>
+          </CardContent>
+        ) : leaf.view === "visual-tool" ? (
+          <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
+            <Suspense fallback={AUXILIARY_PANEL_FALLBACK}>
+              {leaf.visualTool ? <LazyVisualToolPanel key={`${leaf.visualTool.kind}:${leaf.visualTool.requestId ?? leaf.id}`}
+                request={leaf.visualTool} tools={studyToolsPanelProps}
+                onChange={visualTool => updateLeafLocation(leaf.id, { visualTool })} /> : <p className="p-3">Open a tool from Tools.</p>}
             </Suspense>
           </CardContent>
         ) : leaf.view === "notes" ? (

@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import {
   Component,
   lazy,
@@ -79,6 +80,7 @@ class MapRendererErrorBoundary extends Component<
 }
 
 type MapAndPhotoDialogsProps = {
+  embedded?: boolean;
   isMapDialogOpen: boolean;
   activeMapDialogEntry: AncientMapEntry | null;
   isMapDialogLoading: boolean;
@@ -92,6 +94,7 @@ type MapAndPhotoDialogsProps = {
 };
 
 export function MapAndPhotoDialogs({
+  embedded = false,
   isMapDialogOpen,
   activeMapDialogEntry,
   isMapDialogLoading,
@@ -166,23 +169,27 @@ export function MapAndPhotoDialogs({
     }
   };
 
-  return (
-    <AlertDialog open={isMapDialogOpen} onOpenChange={onMapDialogOpenChange}>
-      <AlertDialogContent className="flex h-[min(94dvh,900px)] w-[min(98vw,1700px)]! max-w-none! flex-col gap-2 p-3">
-        <DialogDismissButton onClose={onCloseMapDialog} />
-        <div className="flex min-w-0 shrink-0 items-start justify-between gap-2 pr-9">
-          <AlertDialogHeader className="min-w-0 flex-1 sm:place-items-start sm:text-left">
-            <AlertDialogTitle>
+  const Content = embedded ? "section" : AlertDialogContent;
+  const Header = embedded ? "header" : AlertDialogHeader;
+  const Title = embedded ? "h2" : AlertDialogTitle;
+  const Description = embedded ? "p" : AlertDialogDescription;
+  const Footer = embedded ? "footer" : AlertDialogFooter;
+  const content = (
+      <Content className={embedded ? "flex h-full min-h-0 min-w-0 flex-col gap-2 overflow-auto p-3" : "flex h-[min(94dvh,900px)] w-[min(98vw,1700px)]! max-w-none! flex-col gap-2 p-3"}>
+        {!embedded ? <DialogDismissButton onClose={onCloseMapDialog} /> : null}
+        <div className={cn("flex min-w-0 shrink-0 flex-wrap items-start justify-between gap-2", !embedded && "pr-9")}>
+          <Header className="min-w-0 flex-1 sm:place-items-start sm:text-left">
+            <Title className="font-semibold">
               {activeMapDialogEntry
                 ? mapEntryLabel(activeMapDialogEntry)
                 : "Map"}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
+            </Title>
+            <Description className="text-sm text-muted-foreground">
               {activeMapDialogEntry?.types.length
                 ? activeMapDialogEntry.types.join(", ")
                 : "Location and geometry from the selected map entry."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+            </Description>
+          </Header>
           <div className="flex shrink-0 flex-col items-end gap-1">
             <ToggleGroup
               aria-label="Map renderer"
@@ -238,7 +245,7 @@ export function MapAndPhotoDialogs({
               requestView(target, identificationId);
             }} /> : null}
         </div>
-        <div className="relative isolate min-h-0 flex-1">
+        <div className={embedded ? "relative isolate min-h-48 flex-1" : "relative isolate min-h-0 flex-1"}>
           {isMapDialogLoading ? (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <LoaderCircleIcon className="size-4 animate-spin" />
@@ -288,7 +295,7 @@ export function MapAndPhotoDialogs({
           ) : null}
         </div>
         {areaError ? <p role="alert" className="text-sm text-destructive">{areaError}</p> : null}
-        <AlertDialogFooter className="-mx-3 -mb-3 shrink-0 flex-row flex-wrap items-center justify-end px-3 py-2 sm:flex sm:justify-end">
+        <Footer className="-mx-3 -mb-3 flex shrink-0 flex-row flex-wrap items-center justify-end gap-2 px-3 py-2 sm:justify-end">
           <p role="status" aria-label="Location confidence"
             title="Estimated confidence in the location identification, not coordinate precision."
             className="mr-auto min-w-0 basis-full text-left text-xs text-muted-foreground sm:basis-auto sm:flex-1">
@@ -300,8 +307,8 @@ export function MapAndPhotoDialogs({
             {areaBusy ? "Searching area..." : "Search this area"}
           </Button>
           {areaSearch && !showAreaResults ? <Button variant="ghost" size="sm" onClick={() => setShowAreaResults(true)}>Results ({areaSearch.entries.length})</Button> : null}
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        </Footer>
+      </Content>
   );
+  return embedded ? content : <AlertDialog open={isMapDialogOpen} onOpenChange={onMapDialogOpenChange}>{content}</AlertDialog>;
 }

@@ -1,3 +1,4 @@
+import { useVisualToolTarget } from "@/hooks/use-visual-tool-target";
 import {
   useCallback,
   useEffect,
@@ -141,6 +142,10 @@ export function useStudyToolsSession({
   const [strongsWordAccordionValue, setStrongsWordAccordionValue] = useState<
     string[]
   >([]);
+  const openVisualTool = useVisualToolTarget();
+  const openGenealogyTree = useCallback((personId: string) => {
+    if (!openVisualTool({ kind: "genealogy", personId })) setGenealogyTreePersonId(personId);
+  }, [openVisualTool]);
   const [genealogyTreePersonId, setGenealogyTreePersonId] = useState<
     string | null
   >(null);
@@ -522,7 +527,7 @@ export function useStudyToolsSession({
         person={person}
         genealogyById={genealogyById}
         onSelectPerson={selectGenealogyPerson}
-        onOpenTree={setGenealogyTreePersonId}
+        onOpenTree={openGenealogyTree}
         renderReferencePreview={renderPreview}
         onOpenReference={onOpenReference}
         onCloseSidebar={onCloseSidebar}
@@ -533,6 +538,7 @@ export function useStudyToolsSession({
       onCloseSidebar,
       onOpenReference,
       renderPreview,
+      openGenealogyTree,
       selectGenealogyPerson,
     ],
   );

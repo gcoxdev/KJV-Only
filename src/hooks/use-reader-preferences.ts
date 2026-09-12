@@ -85,6 +85,9 @@ export function useReaderPreferences({
   const [referenceLinkOpenTarget, setReferenceLinkOpenTarget] = useState(
     initialSettings.referenceLinkOpenTarget,
   )
+  const [genealogyOpenTarget, setGenealogyOpenTarget] = useState(initialSettings.genealogyOpenTarget)
+  const [mapsOpenTarget, setMapsOpenTarget] = useState(initialSettings.mapsOpenTarget)
+  const [timelineOpenTarget, setTimelineOpenTarget] = useState(initialSettings.timelineOpenTarget)
   const didMountSettingsRef = useRef(false)
 
   useEffect(() => {
@@ -124,6 +127,9 @@ export function useReaderPreferences({
       notesLinkOpenTarget,
       searchResultOpenTarget,
       bookmarkOpenTarget,
+      genealogyOpenTarget,
+      mapsOpenTarget,
+      timelineOpenTarget,
       referenceLinkOpenTarget,
     })
   }, [
@@ -143,6 +149,9 @@ export function useReaderPreferences({
     notesLinkOpenTarget,
     searchResultOpenTarget,
     bookmarkOpenTarget,
+    genealogyOpenTarget,
+    mapsOpenTarget,
+    timelineOpenTarget,
     referenceLinkOpenTarget,
   ])
 
@@ -179,7 +188,13 @@ export function useReaderPreferences({
     setSearchResultOpenTarget,
     bookmarkOpenTarget,
     setBookmarkOpenTarget,
+    genealogyOpenTarget,
+    mapsOpenTarget,
+    timelineOpenTarget,
     referenceLinkOpenTarget,
+    setGenealogyOpenTarget,
+    setMapsOpenTarget,
+    setTimelineOpenTarget,
     setReferenceLinkOpenTarget,
   }
 }

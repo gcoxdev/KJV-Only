@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldDescription,
+  FieldLabel,
   FieldTitle,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -37,6 +38,7 @@ import type {
   SearchResultOpenTarget,
   TabsOrientation,
   ToolReferenceDisplayMode,
+  VisualToolOpenTarget,
   WordVerseSelectionTarget,
 } from "@/types/reader";
 import {
@@ -56,6 +58,8 @@ import type {
   ShortcutBinding,
   ShortcutBindings,
 } from "@/lib/keyboard-shortcut-runtime";
+
+const VISUAL_TARGET_LABELS: Record<VisualToolOpenTarget, string> = { dialog: "Dialog", "new-panel": "New Panel", "new-tab": "New Tab", "targeted-panel": "Targeted Panel" };
 
 export type SettingsTab = "visual" | "targeting" | "shortcuts" | "other";
 
@@ -98,6 +102,12 @@ export type SettingsPanelContentProps = {
   onSearchResultOpenTargetChange: (target: SearchResultOpenTarget) => void;
   bookmarkOpenTarget: BookmarkOpenTarget;
   onBookmarkOpenTargetChange: (target: BookmarkOpenTarget) => void;
+  genealogyOpenTarget: VisualToolOpenTarget;
+  onGenealogyOpenTargetChange: (target: VisualToolOpenTarget) => void;
+  mapsOpenTarget: VisualToolOpenTarget;
+  onMapsOpenTargetChange: (target: VisualToolOpenTarget) => void;
+  timelineOpenTarget: VisualToolOpenTarget;
+  onTimelineOpenTargetChange: (target: VisualToolOpenTarget) => void;
   referenceLinkOpenTarget: ReferenceLinkOpenTarget;
   onReferenceLinkOpenTargetChange: (target: ReferenceLinkOpenTarget) => void;
   showWelcomeHomeAtStartup: boolean;
@@ -150,6 +160,12 @@ export function SettingsPanelContent({
   onSearchResultOpenTargetChange,
   bookmarkOpenTarget,
   onBookmarkOpenTargetChange,
+  genealogyOpenTarget,
+  onGenealogyOpenTargetChange,
+  mapsOpenTarget,
+  onMapsOpenTargetChange,
+  timelineOpenTarget,
+  onTimelineOpenTargetChange,
   referenceLinkOpenTarget,
   onReferenceLinkOpenTargetChange,
   showWelcomeHomeAtStartup,
@@ -651,6 +667,22 @@ export function SettingsPanelContent({
                   </SelectContent>
                 </Select>
               </div>
+              {([
+                ["genealogy", "Genealogy", genealogyOpenTarget, onGenealogyOpenTargetChange],
+                ["maps", "Maps", mapsOpenTarget, onMapsOpenTargetChange],
+                ["timeline", "Timeline", timelineOpenTarget, onTimelineOpenTargetChange],
+              ] as const).map(([id, label, value, onChange]) => (
+                <Field key={id} className="border-t pt-3">
+                  <FieldLabel htmlFor={`${id}-target`}>{label} Target</FieldLabel>
+                  <FieldDescription>Where to open the {label.toLowerCase()} viewer.</FieldDescription>
+                  <Select value={value} onValueChange={next => {
+                    if (next === "dialog" || next === "new-panel" || next === "new-tab" || next === "targeted-panel") onChange(next);
+                  }}>
+                    <SelectTrigger id={`${id}-target`} className="w-full"><SelectValue>{VISUAL_TARGET_LABELS[value]}</SelectValue></SelectTrigger>
+                    <SelectContent><SelectGroup>{Object.entries(VISUAL_TARGET_LABELS).map(([target, title]) => <SelectItem key={target} value={target}>{title}</SelectItem>)}</SelectGroup></SelectContent>
+                  </Select>
+                </Field>
+              ))}
         </div>
       </TabsContent>
       <TabsContent
