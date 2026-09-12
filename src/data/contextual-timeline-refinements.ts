@@ -1,3 +1,4 @@
+import { buildPoetryRefinements, POETRY_REFINEMENT_MAP } from "./contextual-timeline-poetry";
 import { buildProphetRefinements, PROPHET_REFINEMENT_MAP } from "./contextual-timeline-prophets";
 import type { TimelineRecord } from "../lib/bible-timeline";
 import type { ChapterMapping, ContextTimelineRecord } from "./contextual-timeline";
@@ -86,11 +87,11 @@ for (const item of episodes) {
 }
 
 export function buildRefinedContext(anchors: TimelineRecord[]): ContextTimelineRecord[] {
-  return [...buildAnchoredContext(episodes, anchors), ...buildProphetRefinements(anchors)];
+  return [...buildAnchoredContext(episodes, anchors), ...buildProphetRefinements(anchors), ...buildPoetryRefinements(anchors)];
 }
 
 type Review = [chapter: number, ids: string, verses: string, note: string, contextIds?: string];
-export const REFINED_CHAPTER_TIMELINE_MAP: Record<string, Record<number, ChapterMapping>> = { ...PROPHET_REFINEMENT_MAP };
+export const REFINED_CHAPTER_TIMELINE_MAP: Record<string, Record<number, ChapterMapping>> = { ...PROPHET_REFINEMENT_MAP, ...POETRY_REFINEMENT_MAP };
 function review(book: string, rows: Review[]) {
   const topics = BROAD_BOOK_TOPICS.find(item => item.book === book)!;
   const target = REFINED_CHAPTER_TIMELINE_MAP[book] ??= {};

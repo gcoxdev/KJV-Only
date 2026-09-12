@@ -614,3 +614,53 @@ for (const width of [390, 1280]) {
     expect(errors).toEqual([]);
   });
 }
+
+for (const width of [390, 1280]) {
+  test(`poetry and wisdom refinement evidence at ${width}px`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.setViewportSize({ width, height: 844 });
+    const dialog = await openTimeline(page, width < 768);
+    const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+    const choose = async (book: string, chapter: number) => {
+      await dialog.getByRole("combobox", { name: "Timeline book", exact: true }).click();
+      await page.getByRole("option", { name: book, exact: true }).click();
+      await dialog.getByRole("combobox", { name: "Timeline chapter", exact: true }).click();
+      await page.getByRole("option", { name: `Chapter ${chapter}`, exact: true }).click();
+    };
+    await choose("Job", 2);
+    await expect(evidence).toContainText("seven days and seven nights");
+    await choose("Job", 8);
+    await expect(evidence).toContainText("a friend's claim");
+    await expect(evidence.getByRole("button", { name: "JOB.42.7", exact: true })).toBeVisible();
+    await choose("Job", 42);
+    await expect(evidence).toContainText("140 years after restoration, not his total age");
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("Psalms", 3);
+    await expect(evidence.getByRole("link", { name: "KJV Psalm 3 heading", exact: true })).toBeVisible();
+    await expect(evidence.getByRole("button", { name: "2SA.15.14", exact: true })).toBeVisible();
+    await choose("Psalms", 51);
+    await expect(evidence).toContainText("Nathan's visit after Bathsheba");
+    await expect(dialog.getByRole("group", { name: "Historical timeline entries" })).toContainText("David");
+    await expect(dialog.getByText("No supported calendar placements in this selection.", { exact: false })).toHaveCount(0);
+    await expect(evidence).toContainText("Dates unknown");
+    await expect(evidence.getByRole("link", { name: "KJV Psalm 51 heading", exact: true })).toBeVisible();
+    await page.screenshot({ path: `design/contextual-timeline-psalm-heading-${width}.png` });
+    await choose("Psalms", 90);
+    await expect(evidence).toContainText("not Moses' own lifespan");
+    await choose("Psalms", 117);
+    await expect(evidence.getByRole("button", { name: "PSA.117.2", exact: true })).toBeVisible();
+    await expect(evidence.getByRole("button", { name: "ROM.15.11", exact: true })).toBeVisible();
+    await choose("Proverbs", 26);
+    await expect(evidence).toContainText("possible copying window");
+    await expect(evidence.getByRole("button", { name: "PRO.25.1", exact: true })).toBeVisible();
+    await choose("Ecclesiastes", 6);
+    await expect(evidence).toContainText("hypothetical comparisons");
+    await choose("Song of Solomon", 6);
+    await expect(evidence).toContainText("sixty queens and eighty concubines");
+    await choose("Lamentations", 4);
+    await expect(evidence).toContainText("Dates unknown");
+    await expect(evidence.getByRole("button", { name: "LAM.4.20", exact: true })).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+}
