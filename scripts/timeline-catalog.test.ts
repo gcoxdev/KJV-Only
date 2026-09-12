@@ -103,4 +103,22 @@ for (const model of ["egypt430", "promise430"] as const) describe(`shared chrono
     expect(buildBibleTimeline(model)).toEqual(core);
     expect(buildContextTimeline(model)).toEqual(history);
   });
+  it("shares event connections across all reviewed alternate profiles without merging their pedigrees", () => {
+    const originalPeople = structuredClone(people);
+    for (const [primary, alternate] of [["jesus_christ_2683", "jesus_christ_2684"], ["mary_2828", "mary_2829"], ["joseph_2827", "joseph_2828"], ["zerubbabel_1118", "zerubbabel_1119"]]) {
+      for (const includeContext of [false, true]) {
+        const related = (id: string) => relatedTimelineEntries(catalog, [people.get(id)!], false, includeContext);
+        expect(ids(related(alternate)), `${alternate}, context=${includeContext}`).toEqual(ids(related(primary)));
+      }
+    }
+    const zerubbabel = relatedTimelineEntries(catalog, [people.get("zerubbabel_1119")!]);
+    expect(ids(zerubbabel)).toEqual(expect.arrayContaining(["temple-foundation", "temple-work-resumed"]));
+    for (const id of ["mary_2829", "joseph_2828"]) {
+      const birth = catalog.byId.get("jesus-birth")!;
+      expect(matchingTimelinePeople(birth, new Set([id]))).toEqual([]);
+      expect(matchingTimelinePeople(birth, new Set([id]), true)).toEqual([expect.objectContaining({ role: "context" })]);
+    }
+    expect(matchingTimelinePeople(catalog.byId.get("temple-foundation")!, new Set(["solomon_677"]))).toEqual([]);
+    expect(people).toEqual(originalPeople);
+  });
 });

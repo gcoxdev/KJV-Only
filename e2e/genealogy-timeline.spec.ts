@@ -44,6 +44,22 @@ test("family related events distinguish opt-in contextual mentions", async ({ pa
   await expect(dialog.getByRole("article").getByLabel("Person connections")).toContainText("Contextual mention: Solomon");
 });
 
+test("alternate Zerubbabel profile retains related temple events after reload", async ({ page }) => {
+  const request = { kind: "genealogy", personId: "zerubbabel_1119", viewState: { view: "timeline", scope: "family", content: "events", query: "temple" } };
+  await page.goto(`/#tab=0&tabs=h&layout=Genealogy:tool.${encodeURIComponent(encodeURIComponent(JSON.stringify(request)))}`);
+  const panel = page.getByRole("region", { name: "Genealogy panel", exact: true });
+  const entries = panel.getByRole("group", { name: "Timeline entries" });
+  await expect(entries).toContainText("Foundation of the second temple");
+  await expect(entries).toContainText("Temple work resumes");
+  await entries.getByRole("button", { name: /^Foundation of the second temple/ }).click();
+  await expect(panel.getByRole("article").getByLabel("Person connections")).toContainText("Related event: Zerubbabel");
+  await expect(panel.getByRole("checkbox", { name: "Include contextual mentions", exact: true })).not.toBeChecked();
+  await page.reload();
+  await expect(entries).toContainText("Foundation of the second temple");
+  await expect(entries).toContainText("Temple work resumes");
+  await expect(page).toHaveURL(/zerubbabel_1119/);
+});
+
 for (const width of [375, 1200]) {
   test(`complete lineages show distinct estimated placements at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 812 });
