@@ -464,6 +464,7 @@ for (const width of [390, 1280]) {
       await choose(book, chapter);
       await expect(evidence).toContainText("Dates unknown");
     }
+    await choose("Malachi", 1);
     await expect(evidence).toContainText("contextual inference");
     await page.screenshot({ path: `design/contextual-timeline-broad-poetry-${width}.png` });
     expect(errors).toEqual([]);
@@ -562,6 +563,54 @@ for (const width of [390, 1280]) {
     await choose("Daniel", 4);
     await expect(evidence).toContainText("Twelve months pass");
     await expect(evidence).toContainText("Dates unknown");
+    expect(errors).toEqual([]);
+  });
+}
+
+for (const width of [390, 1280]) {
+  test(`Isaiah and minor prophet evidence at ${width}px`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.setViewportSize({ width, height: 844 });
+    const dialog = await openTimeline(page, width < 768);
+    const entries = dialog.getByRole("group", { name: "Historical timeline entries" });
+    const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+    const choose = async (book: string, chapter: number) => {
+      await dialog.getByRole("combobox", { name: "Timeline book", exact: true }).click();
+      await page.getByRole("option", { name: book, exact: true }).click();
+      await dialog.getByRole("combobox", { name: "Timeline chapter", exact: true }).click();
+      await page.getByRole("option", { name: `Chapter ${chapter}`, exact: true }).click();
+    };
+    await choose("Isaiah", 6);
+    await expect(evidence).toContainText("740/739 BC");
+    await expect(evidence.getByRole("button", { name: "ISA.6.1", exact: true })).toBeVisible();
+    await choose("Isaiah", 20);
+    await expect(evidence).toContainText("711 BC");
+    await expect(evidence.getByRole("link", { name: /ORACC/ })).toBeVisible();
+    await choose("Isaiah", 53);
+    await expect(evidence).toContainText("Dates unknown");
+    await expect(evidence.getByRole("button", { name: "ACT.8.35", exact: true })).toBeVisible();
+    await choose("Amos", 7);
+    await expect(evidence).toContainText("priest of Bethel, not Judah's king");
+    await choose("Jonah", 3);
+    await expect(evidence).toContainText("forty-day warning");
+    await expect(evidence).toContainText("does not occur");
+    await choose("Nahum", 3);
+    await expect(evidence).toContainText("past defeat and Nineveh's announced fate");
+    await choose("Zechariah", 1);
+    await expect(entries).toContainText("eighth-month call");
+    await expect(entries).toContainText("riders, horns, and carpenters");
+    await entries.getByRole("button", { name: /riders, horns, and carpenters/ }).click();
+    await expect(evidence).toContainText("519 BC");
+    await choose("Zechariah", 6);
+    await entries.getByRole("button", { name: /Joshua's crowns/ }).click();
+    await expect(evidence).toContainText("Dates unknown");
+    await expect(evidence).toContainText("not automatically the same night");
+    await page.screenshot({ path: `design/contextual-timeline-prophet-crowns-${width}.png` });
+    await choose("Zechariah", 14);
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("Malachi", 4);
+    await expect(evidence.getByRole("button", { name: "LUK.1.17", exact: true })).toBeVisible();
     expect(errors).toEqual([]);
   });
 }

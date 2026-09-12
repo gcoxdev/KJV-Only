@@ -1,3 +1,4 @@
+import { PROPHET_REFINEMENT_SOURCES } from "./contextual-timeline-prophets";
 import { buildRefinedContext, REFINED_CHAPTER_TIMELINE_MAP } from "./contextual-timeline-refinements";
 import { BROAD_CHAPTER_TIMELINE_MAP, BROAD_HISTORICAL_RECORDS, BROAD_TIMELINE_SOURCES, buildBroadContext } from "./contextual-timeline-coverage";
 import { buildChroniclesContext, CHRONICLES_CHAPTER_TIMELINE_MAP, withChroniclesParallels } from "./contextual-timeline-chronicles";
@@ -19,6 +20,7 @@ export const CONTEXT_TIMELINE_SOURCES: Record<string, { title: string; url: stri
   ...WRITING_TIMELINE_SOURCES,
   ...KINGS_TIMELINE_SOURCES,
   ...BROAD_TIMELINE_SOURCES,
+  ...PROPHET_REFINEMENT_SOURCES,
   nt: { ...TIMELINE_SOURCES.nt, use: "Calendar proposals for Jesus, Paul, and the apostolic period. KJV passage details and relative order control the reconstruction." },
   cyrus: { ...TIMELINE_SOURCES.cyrus, use: "Reign from accession in Anshan, c. 559–530 BC; conquest of Babylon in 539 BC. Ezra supplies the return decree; the external chronology does not override that account." },
   nebuchadnezzar: { title: "Livius: Nebuchadnezzar II", url: "https://www.livius.org/articles/person/nebuchadnezzar-ii/", use: "Conventional reign, 605–562 BC; not birth and death dates." },

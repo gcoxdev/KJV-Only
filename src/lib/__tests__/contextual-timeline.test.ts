@@ -517,7 +517,7 @@ describe("contextual history", () => {
     expect(CHAPTER_TIMELINE_MAP.Daniel[8].ids).toEqual(["daniel-belshazzar-third"]);
     expect(CHAPTER_TIMELINE_MAP.Daniel[11].ids).toEqual(["daniel-cyrus-third"]);
     expect(CHAPTER_TIMELINE_MAP.Daniel[12].note).toContain("does not reset the reception date");
-    for (let chapter = 9; chapter <= 14; chapter++) expect(CHAPTER_TIMELINE_MAP.Zechariah[chapter].ids).toEqual(["context-zec"]);
+    for (let chapter = 9; chapter <= 14; chapter++) expect(CHAPTER_TIMELINE_MAP.Zechariah[chapter].ids).toEqual([`passage-zec-${chapter}`]);
     expect(get("zechariah-fasting").start).toBe(get("haggai-messages").start! + 2);
     expect(timelinePlotBounds(get("context-zec"))).toBeNull();
     expect(timelinePlotBounds(get("context-zep"))).toEqual(timelinePlotBounds(get("royal-josiah")));
@@ -551,8 +551,8 @@ describe("contextual history", () => {
   });
   it("tracks the broad-pass refinement queue independently from complete chapter coverage", () => {
     expect(CONTEXT_TIMELINE_COVERAGE.chapters).toBe(1189);
-    expect(CONTEXT_TIMELINE_REFINEMENT).toMatchObject({ baseline: 500, refined: 123, remaining: 377 });
-    for (const [book, count] of Object.entries({ Jeremiah: 52, Ezekiel: 48, Esther: 10, Nehemiah: 6, Daniel: 7 })) {
+    expect(CONTEXT_TIMELINE_REFINEMENT).toMatchObject({ baseline: 500, refined: 252, remaining: 248 });
+    for (const [book, count] of Object.entries({ Jeremiah: 52, Ezekiel: 48, Esther: 10, Nehemiah: 6, Daniel: 7, Isaiah: 64, Hosea: 14, Joel: 3, Amos: 9, Obadiah: 1, Jonah: 4, Micah: 7, Nahum: 3, Habakkuk: 3, Zephaniah: 3, Zechariah: 14, Malachi: 4 })) {
       expect(CONTEXT_TIMELINE_REFINEMENT.byBook[book]).toEqual({ baseline: count, refined: count, remaining: 0 });
       expect(Object.keys(REFINED_CHAPTER_TIMELINE_MAP[book])).toHaveLength(count);
       for (const [chapter, mapping] of Object.entries(REFINED_CHAPTER_TIMELINE_MAP[book])) {
@@ -565,7 +565,7 @@ describe("contextual history", () => {
     expect(CONTEXT_TIMELINE_REFINEMENT.byBook.Psalms).toEqual({ baseline: 150, refined: 0, remaining: 150 });
     expect(CHAPTER_TIMELINE_MAP.Daniel[9]).toEqual(EXPANDED_CHAPTER_TIMELINE_MAP.Daniel[9]);
     expect(CHAPTER_TIMELINE_MAP.Nehemiah[8]).toEqual(EXPANDED_CHAPTER_TIMELINE_MAP.Nehemiah[8]);
-    expect(Object.values(CONTEXT_TIMELINE_REFINEMENT.byBook).reduce((total, book) => total + book.remaining, 0)).toBe(377);
+    expect(Object.values(CONTEXT_TIMELINE_REFINEMENT.byBook).reduce((total, book) => total + book.remaining, 0)).toBe(248);
   });
   it("separates Ezekiel's dated messages and retains explicit KJV quantities", () => {
     const get = (id: string) => records.find(r => r.id === id)!;
@@ -629,7 +629,7 @@ describe("contextual history", () => {
     expect(CHAPTER_TIMELINE_MAP.Daniel[12].note).toContain("1,290 and 1,335 days");
   });
   it("keeps the refinement's real anchor dates stable across sojourn choices", () => {
-    const ids = new Set(["royal-josiah", "zedekiah-appointed", "jerusalem-597", "temple-destroyed", "esther-deliverance", "jer-jehoiakim-fourth"]);
+    const ids = new Set(["royal-josiah", "zedekiah-appointed", "jerusalem-597", "temple-destroyed", "esther-deliverance", "jer-jehoiakim-fourth", "context-isa", "haggai-messages"]);
     const anchors = records.filter(r => ids.has(r.id));
     const original = structuredClone(anchors);
     const refined = buildRefinedContext(anchors);
@@ -637,6 +637,56 @@ describe("contextual history", () => {
     expect(refined).toEqual(buildRefinedContext(alternate.filter(r => ids.has(r.id))));
     expect(anchors).toEqual(original);
     expect(refined.every(r => !r.personIds && !r.placement)).toBe(true);
+  });
+  it("separates Isaiah's dated encounters from undated oracles and relative intervals", () => {
+    const get = (id: string) => records.find(r => r.id === id)!;
+    expect(timelinePlotBounds(get("passage-isa-6"))).toEqual([-739, -738]);
+    expect(get("passage-isa-6").sources).toContain("isaiahContext");
+    expect(get("passage-isa-20").start).toBe(-710);
+    expect(get("passage-isa-20").kind).toBe("event");
+    expect(get("passage-isa-20").end).toBeUndefined();
+    expect(get("passage-isa-20").sources).toContain("ashdod");
+    expect(get("passage-isa-20").note).toContain("three-year");
+    for (const chapter of [7, 8, 14, 16, 21, 23, 44, 45, 53, 61, 64, 65, 66]) {
+      expect(timelinePlotBounds(get(`passage-isa-${chapter}`))).toBeNull();
+    }
+    expect(CHAPTER_TIMELINE_MAP.Isaiah[38].ids).toEqual(["hezekiah-recovery"]);
+    expect(CHAPTER_TIMELINE_MAP.Isaiah[39].ids).toEqual(["hezekiah-envoys"]);
+    expect(get("passage-isa-53").references).toContain("ACT.8.35");
+    expect(get("passage-isa-61").references).toContain("LUK.4.21");
+    const selected = selectContextTimeline(records, "Isaiah", 53, "chapter", "biblical");
+    expect(selected.records.find(r => r.id === "context-isa")?.emphasized).toBe(false);
+    expect(selected.records.find(r => r.id === "passage-isa-53")?.emphasized).toBe(true);
+  });
+  it("separates Zechariah's calendar headings and leaves later burdens undated", () => {
+    const get = (id: string) => records.find(r => r.id === id)!;
+    expect(CHAPTER_TIMELINE_MAP.Zechariah[1].ids).toEqual(["zechariah-eighth-month", "zechariah-opening-visions"]);
+    expect(get("zechariah-eighth-month").start).toBe(-519);
+    expect(get("zechariah-opening-visions").start).toBe(-518);
+    for (const chapter of [2, 3, 4, 5]) {
+      expect(get(`passage-zec-${chapter}`).start).toBe(-518);
+      expect(get(`passage-zec-${chapter}`).sources).toContain("zechariahCalendar");
+    }
+    expect(CHAPTER_TIMELINE_MAP.Zechariah[6].ids).toEqual(["zechariah-chariots", "zechariah-crowns"]);
+    expect(get("zechariah-chariots").start).toBe(-518);
+    expect(timelinePlotBounds(get("zechariah-crowns"))).toBeNull();
+    expect(get("passage-zec-8").start).toBe(get("zechariah-fasting").start);
+    for (let chapter = 9; chapter <= 14; chapter++) expect(timelinePlotBounds(get(`passage-zec-${chapter}`))).toBeNull();
+    expect(get("passage-zec-11").note).toContain("three shepherds cut off in one month");
+  });
+  it("retains minor prophets' identities, relative durations, and later citations", () => {
+    const get = (id: string) => records.find(r => r.id === id)!;
+    expect(get("passage-amo-7").note).toContain("priest of Bethel, not Judah's king");
+    expect(get("passage-amo-1").note).toContain("two years before the earthquake");
+    expect(get("passage-jon-1").note).toContain("Three days and three nights");
+    expect(get("passage-jon-3").note).toContain("forty-day warning");
+    expect(get("passage-jon-3").note).toContain("does not occur");
+    expect(get("passage-nam-3").note).toContain("past defeat and Nineveh's announced fate");
+    expect(get("passage-mic-3").references).toContain("JER.26.18");
+    expect(get("passage-jol-2").references).toContain("ACT.2.16");
+    expect(get("passage-amo-9").references).toContain("ACT.15.16");
+    for (const id of ["passage-hos-3", "passage-jol-2", "passage-amo-1", "passage-oba-1", "passage-jon-3", "passage-mic-3", "passage-nam-3", "passage-hab-2", "passage-mal-4"]) expect(timelinePlotBounds(get(id))).toBeNull();
+    for (let chapter = 1; chapter <= 3; chapter++) expect(timelinePlotBounds(get(`passage-zep-${chapter}`))).toEqual(timelinePlotBounds(get("royal-josiah")));
   });
   it("rejects missing, schematic, duplicate, and reversed chronology anchors", () => {
     const episode = { id: "check", label: "Check", era: "kingdom" as const, references: ["2SA.5.4"], note: "Check", at: ["missing"] as [string] };
