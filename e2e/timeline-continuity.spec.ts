@@ -229,3 +229,43 @@ test("Roman context and chronology review retain historical and biblical distinc
   await expect(dialog).toContainText("twenty-one years apart");
   await expect(dialog).toContainText("unnamed feast cannot supply an additional year");
 });
+
+test("custody and voyage detail distinguish a dated episode from the journey", async ({ page }) => {
+  const dialog = await start(page, {}, "ACT.27");
+  const query = dialog.getByRole("textbox", { name: "Find timeline entries" });
+  const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+  await query.fill("ship breaks up");
+  await expect(evidence).toContainText("Acts 27:39–44");
+  await expect(evidence).toContainText("ACT.27.37");
+  await choose(page, dialog, "Timeline chapter", "Chapter 28");
+  await query.fill("viper");
+  await expect(evidence).toContainText("Acts 28:1–10");
+  await expect(evidence).toContainText("ACT.28.11");
+  await expect(evidence).toContainText("does not make the visit two years long");
+  await dialog.getByRole("button", { name: /Sources & method/ }).click();
+  await expect(dialog).toContainText("Jotham, Pekah and Manasseh");
+  await expect(dialog).toContainText("not independent proof of an eleven-year coregency");
+});
+
+test("mobile Help search explains new tools, organization, and download status", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/#tab=0&tabs=h&layout=Help:page.help");
+  const help = page.getByRole("region", { name: "Help panel", exact: true });
+  const search = help.getByRole("textbox", { name: "Search application help" });
+  for (const [query, expected] of [
+    ["Gospel harmony", "Open Tools, expand Timeline below Maps"],
+    ["Mary", "Luke explicitly names Joseph"],
+    ["confidence", "not measured probabilities"],
+    ["Untagged", "including older notes and bookmarks"],
+    ["Bookmark location", "renaming it does not move the bookmark"],
+    ["freshness", "Fully cached describes file availability"],
+    ["Targeting", "Genealogy, Maps, and Timeline each have a separate setting"],
+  ]) {
+    await search.fill(query);
+    await expect(help).toContainText(expected);
+  }
+  await help.getByRole("button", { name: "Clear help search" }).click();
+  await expect(search).toHaveValue("");
+  await expect(help).toContainText("How to open and browse Timeline");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});

@@ -94,7 +94,7 @@ export default function ContextualTimelineDialog({ initialViewState, onViewState
                 <SelectContent><SelectGroup><SelectItem value="egypt430">430 years in Egypt</SelectItem><SelectItem value="promise430">430 years from the promise</SelectItem></SelectGroup></SelectContent>
               </Select>
               <p>This setting is shared with the genealogy timeline. Reviewed context covers {CONTEXT_TIMELINE_COVERAGE.chapters} chapters across {CONTEXT_TIMELINE_COVERAGE.books.length} books: {CONTEXT_TIMELINE_COVERAGE.books.join(", ")}. Book view includes only reviewed episodes.</p>
-              {TIMELINE_METHOD.slice(0, 7).map(method => <div key={method.title}><h4 className="font-semibold">{method.title}</h4><p>{method.text}</p><ToolReferenceList references={method.references} highlightWord="" renderPreview={renderPreview} onOpenReference={openReference} onCloseSidebar={onCloseSidebar} /></div>)}
+              {TIMELINE_METHOD.filter(method => !["Filling the lineage chart", "Cainan in Luke's ancestry"].includes(method.title)).map(method => <div key={method.title}><h4 className="font-semibold">{method.title}</h4><p>{method.text}</p><ToolReferenceList references={method.references} highlightWord="" renderPreview={renderPreview} onOpenReference={openReference} onCloseSidebar={onCloseSidebar} /></div>)}
             </AccordionContent></AccordionItem></Accordion>
           </> : null}
         </div>

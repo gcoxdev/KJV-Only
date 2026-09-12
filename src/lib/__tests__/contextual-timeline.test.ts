@@ -55,7 +55,7 @@ describe("contextual history", () => {
     }
     expect(get("paul-gallio").kind).toBe("date-window");
     expect(get("claudian-famine").note).toContain("not a claim of a thirteen-year famine");
-    expect(selectContextTimeline(records, "Acts", 26, "chapter", "biblical").records.map(record => record.id)).toEqual(["paul-appeal"]);
+    expect(selectContextTimeline(records, "Acts", 26, "chapter", "biblical").records.map(record => record.id)).toEqual(["paul-appeal", "paul-agrippa-hearing"]);
     expect(get("paul-rome").note).toContain("does not state his release");
   });
   it("includes major figures in wider history without stretching chapter context to the Middle Ages", () => {
@@ -148,7 +148,7 @@ describe("contextual history", () => {
     expect(missions.find(record => record.id === "paul-spain-plan")!.note).toContain("not a completed fourth mission");
     expect(missions.find(record => record.id === "paul-voyage")!.note).toContain("Phenice is an intended");
     const hearing = selectContextTimeline(records, "Acts", 26, "chapter", "biblical").records;
-    expect(hearing.map(record => record.id)).toEqual(["paul-appeal"]);
+    expect(hearing.map(record => record.id)).toEqual(["paul-appeal", "paul-agrippa-hearing"]);
     expect(NT_NARRATIVE_DETAILS["paul-conversion"].passages.map(p => p.startChapter)).toEqual([9]);
   });
   it("includes only overlapping historical contemporaries unless explicitly cited as background", () => {
@@ -193,7 +193,7 @@ describe("contextual history", () => {
     const book = selectContextTimeline(records, "Romans", 1, "book", "biblical").records;
     expect(book).toHaveLength(1);
     expect(book[0].references).toEqual(expect.arrayContaining(["ROM.5.1", "ROM.8.1", "ROM.16.1"]));
-    expect(selectContextTimeline(records, "1 John", 3, "chapter", "historical").records.map(record => record.id)).toEqual(["domitian-reign"]);
+    expect(selectContextTimeline(records, "1 John", 3, "chapter", "historical").records.map(record => record.id)).toEqual(["domitian-reign", "josephus-antiquities"]);
   });
   it("preserves undated correspondence and does not turn Revelation into a dated fulfillment scheme", () => {
     for (const book of ["Galatians", "1 Timothy", "2 Timothy", "Titus", "Hebrews", "James", "Jude", "Revelation"]) {

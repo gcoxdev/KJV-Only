@@ -19,9 +19,9 @@ it("validates the reviewed ranges and Old and New Testament chapter references a
     expect(book.chapters[passage.endChapter - 1]?.verses[passage.endVerse - 1], passage.label).toBeDefined();
     expect(passage.startChapter < passage.endChapter || (passage.startChapter === passage.endChapter && passage.startVerse <= passage.endVerse), passage.label).toBe(true);
   }
-  for (const book of books.slice(39, 43)) {
+  for (const book of books.slice(39, 44)) {
     const covered = new Set<string>();
-    for (const narrative of Object.values(NT_NARRATIVE_DETAILS).filter(item => item.collection === "gospels")) {
+    for (const narrative of Object.values(NT_NARRATIVE_DETAILS).filter(item => item.collection === (book.name === "Acts" ? "paul" : "gospels"))) {
       for (const p of narrative.passages.filter(p => p.book === book.name)) {
         for (let chapter = p.startChapter; chapter <= p.endChapter; chapter++) {
           const last = chapter === p.endChapter ? p.endVerse : book.chapters[chapter - 1].verses.length;
@@ -29,7 +29,7 @@ it("validates the reviewed ranges and Old and New Testament chapter references a
         }
       }
     }
-    for (const chapter of book.chapters) for (const verse of chapter.verses) expect(covered.has(`${chapter.chapter}:${verse.verse}`), `${book.name} ${chapter.chapter}:${verse.verse}`).toBe(true);
+    for (const chapter of book.chapters.filter(chapter => book.name !== "Acts" || chapter.chapter >= 13)) for (const verse of chapter.verses) expect(covered.has(`${chapter.chapter}:${verse.verse}`), `${book.name} ${chapter.chapter}:${verse.verse}`).toBe(true);
   }
   for (const book of books) {
     expect(Object.keys(CHAPTER_TIMELINE_MAP[book.name]), book.name).toHaveLength(book.chapters.length);
@@ -66,6 +66,19 @@ it("separates episodes without assigning neighbouring chapters each other's even
   expect(new Set(records.map(record => record.id)).size).toBe(records.length);
 });
 
+it("keeps custody recollections and voyage episodes in their narrated chapters", () => {
+  const ids = (chapter: number) => selectContextTimeline(records, "Acts", chapter, "chapter", "biblical").records.filter(record => record.emphasized).map(record => record.id);
+  expect(ids(22)).toContain("paul-jerusalem-testimony");
+  expect(ids(22)).not.toContain("paul-conversion");
+  expect(ids(23)).toEqual(expect.arrayContaining(["paul-council-testimony", "paul-murder-plot", "paul-transfer"]));
+  expect(ids(27)).toEqual(expect.arrayContaining(["paul-voyage", "paul-euroclydon", "paul-fourteenth-night", "paul-shipwreck"]));
+  expect(ids(27)).not.toContain("paul-melita");
+  expect(ids(28)).toContain("paul-melita");
+  expect(records.find(record => record.id === "paul-voyage")).toMatchObject({ kind: "period", start: 60, end: 61 });
+  expect(records.find(record => record.id === "paul-shipwreck")).toMatchObject({ kind: "event", start: 60 });
+  expect(records.find(record => record.id === "paul-melita")).toMatchObject({ kind: "date-window", start: 60, end: 61 });
+});
+
 it("keeps Roman history separate from biblical fulfillment and person identity", () => {
   const seneca = records.find(record => record.id === "seneca")!;
   expect(seneca.track).toBe("historical");
@@ -77,6 +90,8 @@ it("keeps Roman history separate from biblical fulfillment and person identity",
   expect(CHAPTER_TIMELINE_MAP.Matthew[24].ids).not.toContain("jerusalem-70");
   expect(selectContextTimeline(records, "Acts", 18, "chapter", "historical").records.map(record => record.id)).toContain("seneca");
   expect(records.find(record => record.id === "gospel-crucifixion")!.sources).toContain("crucifixionStudy");
+  expect(records.find(record => record.id === "josephus-antiquities")).toMatchObject({ track: "historical", kind: "date-window", start: 93, end: 94, references: [] });
+  expect(records.find(record => record.id === "pliny-elder")).toMatchObject({ track: "historical", kind: "life", start: 23, end: 79, references: [] });
 });
 
 it("checks the judges review's stated intervals against the KJV without turning their sum into elapsed years", () => {

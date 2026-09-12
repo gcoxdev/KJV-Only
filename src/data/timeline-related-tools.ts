@@ -80,6 +80,8 @@ export const TIMELINE_RELATED_TOOLS: Record<string, TimelineRelatedTool[]> = {
   "rome-fire": [historicalPlace("afc8e7a.geojson", "Rome", "ACT.28.16", "Tacitus supplies the fire and persecution account. Acts identifies Rome in an earlier episode, not the AD 64 fire.")],
   "vespasian-reign": [historicalPlace("afc8e7a.geojson", "Rome", "ACT.28.16", "Rome is geographic context for the emperor. Acts identifies the city, not Vespasian or his reign dates.")],
   "jerusalem-70": [historicalPlace("a15257a.geojson", "Jerusalem", "2CH.3.1", "Chronicles identifies the mapped city. The AD 70 event is externally sourced and distinct from the Babylonian destruction.")],
+  "josephus-antiquities": [historicalPlace("a15257a.geojson", "Jerusalem (historical subject)", "2CH.3.1", "Jerusalem is a subject of Josephus's history. This link does not identify the place or date of publication; Chronicles supplies the mapped city's reference.")],
+  "pliny-elder": [historicalPlace("afc8e7a.geojson", "Rome", "ACT.28.16", "The historical source places Pliny's education in Rome. Acts identifies the city, not Pliny or a meeting with Paul.")],
 };
 
 export function timelineToolKey(link: TimelineRelatedTool) {

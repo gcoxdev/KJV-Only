@@ -1,6 +1,8 @@
 import type { ContextTimelineRecord } from "./contextual-timeline";
 
 export const ROMAN_CONTEXT_SOURCES = {
+  josephusAntiquities: { title: "Josephus, Antiquities 20.11.3: completion notice", url: "https://penelope.uchicago.edu/josephus/ant-20.html", use: "Josephus dates completion to Domitian's thirteenth year, conventionally AD 93–94. This dates his writing, not the earlier biblical events retold in it." },
+  plinyElder: { title: "Livius: Pliny the Elder", url: "https://www.livius.org/articles/person/pliny-the-elder/", use: "Roman author and officer, born AD 23 or 24, died AD 79. The chart uses 23 as the approximate birth anchor. His Roman education supplies geographic context." },
   pilate: { title: "Livius: Pontius Pilate", url: "https://www.livius.org/articles/person/pontius-pilate/", use: "Prefecture AD 26–36 only. The article's judgments about the Gospel accounts are not adopted; the KJV controls the trial narrative." },
   seneca: { title: "Stanford Encyclopedia of Philosophy: Seneca", url: "https://plato.stanford.edu/entries/seneca/", use: "Life c. 1 BC–AD 65 in this source, Roman education, Stoic philosophy and service under Nero. Other birth estimates differ; no contact with Paul is inferred." },
   vespasian: { title: "Livius: Vespasian", url: "https://www.livius.org/articles/person/vespasian/", use: "Imperial reign AD 69–79 and political setting of Titus's AD 70 Jerusalem campaign." },
@@ -9,6 +11,8 @@ export const ROMAN_CONTEXT_SOURCES = {
 };
 
 export const ROMAN_CONTEXT_RECORDS: ContextTimelineRecord[] = [
+  { id: "josephus-antiquities", label: "Josephus completes the Jewish Antiquities", start: 93, end: 94, kind: "date-window", references: [], sources: ["josephusAntiquities"], note: "Josephus's own closing notice gives Domitian's thirteenth year and his age of fifty-six. The AD 93–94 window allows the regnal-year boundary; it is not a two-year writing duration. This is a later historical work, not an added Bible book or a replacement for KJV chronology." },
+  { id: "pliny-elder", label: "Pliny the Elder", start: 23, end: 79, kind: "life", references: [], sources: ["plinyElder"], note: "Roman officer and author of the Natural History, contemporary with the apostolic period. The source allows AD 23 or 24 for his birth. He is distinct from Pliny the Younger; no encounter with Paul or influence on a biblical author is asserted." },
   { id: "pilate-prefecture", label: "Pontius Pilate · prefecture", start: 26, end: 36, kind: "period", references: ["LUK.3.1", "MAT.27.2"], sources: ["pilate"], note: "The governor named in the KJV trial accounts. The external dates bound his office, not his lifespan or an exact crucifixion date." },
   { id: "seneca", label: "Seneca", start: 0, end: 65, kind: "life", references: [], sources: ["seneca"], note: "Roman Stoic philosopher and adviser to Nero, contemporary with the apostolic period. Uses this source's approximate 1 BC birth. Acts names Stoics at Athens but does not name Seneca; no meeting, correspondence, or influence on Paul is asserted." },
   { id: "rome-fire", label: "Great fire of Rome and persecution under Nero", start: 64, kind: "event", references: [], sources: ["romeFire"], note: "Tacitus describes the fire and subsequent punishment of Christians. AD 64 is a calendar setting for that sequence, not one day's duration. The account does not establish the cause of the fire or dates for Peter's and Paul's deaths." },

@@ -5,6 +5,7 @@ import {
   DownloadIcon,
   ExternalLinkIcon,
   FileSearchIcon,
+  HistoryIcon,
   LayoutPanelTopIcon,
   MessageSquareMoreIcon,
   MonitorSmartphoneIcon,
@@ -53,7 +54,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What KJV Only is",
         body:
-          "KJV Only is a Scripture-first workspace built around the King James Bible. It combines reading, searching, study tools, notes, bookmarks, cross references, dictionaries, genealogy, maps, and audio inside one application.",
+          "KJV Only is a Scripture-first workspace built around the King James Bible. It combines reading, searching, study tools, notes, bookmarks, cross references, dictionaries, genealogy, maps, timelines, and audio inside one application.",
         keywords: ["what is this", "what does this app do", "purpose"],
       },
       {
@@ -259,7 +260,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What a shared layout includes",
         body:
-          "A layout link preserves tab names and order, panel structure and destinations, tab orientation, the targeted panel, verse highlight ranges, and each Search panel's query, mode, book scope, case setting, sort, and context setting. Search result lists are not placed in the URL; run the restored search to rebuild them.",
+          "A layout link preserves tab names and order, panel structure and destinations, tab orientation, the targeted panel, verse highlight ranges, and each Search panel's query, mode, book scope, case setting, sort, and context setting. Genealogy, Maps, and Timeline panels also restore their supported context and view state. Search result lists are not placed in the URL; run the restored search to rebuild them.",
         keywords: ["shared layout", "url", "search in url", "layout link", "search criteria"],
       },
     ],
@@ -305,7 +306,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to mark a chapter as read",
         body:
-          "Use the panel bottom bar to update chapter progress, or open the Reading Progress page to review and manage progress across the whole Bible.",
+          "Use the panel bottom bar to update chapter progress, or open Reading Progress to review and manage progress across the whole Bible.",
         keywords: ["mark read", "reading progress", "chapter progress"],
       },
       {
@@ -409,20 +410,78 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How to use Genealogy",
         body:
-          "Genealogy helps track Bible people, aliases, verse references, and family relationships. Clicking a name in the text can load that person into the genealogy tool.",
+          "Click a person's name in the reader or search Genealogy, select the matching person, and choose View Tree. Family cards show birth and death information when supported; reigns and recorded activity are not treated as lifespans. Genealogy opens in a dialog by default, with panel and tab destinations available under Settings > Targeting.",
         keywords: ["genealogy", "family tree", "people"],
+      },
+      {
+        label: "How to explore a genealogy timeline",
+        body:
+          "In the family viewer, choose Timeline, then Overview, Family, or Jesus' lineage. All, People, and Events control what appears. Jesus' lineage offers Joseph and Mary (Luke interpretation): Luke explicitly names Joseph, so the Mary branch is labeled as an interpretation. Estimated ancestor placements are schematic, not known birth years. Missing dates remain unknown; use the evidence and KJV passages to distinguish lifetimes from other activity.",
+        keywords: ["genealogy timeline", "Adam", "Jesus", "Mary", "Joseph", "birth", "death", "lineage", "unknown dates"],
       },
       {
         label: "How to use Maps",
         body:
-          "Maps provide place and geography context. Select or search for a place, open its interactive map, review linked places, and follow its Scripture references. OpenFreeMap is the default English-first view; use the Map selector at the top right to switch to the Leaflet view with local-language OpenStreetMap labels. The Maps download stores the place index and geometry for offline lookup, but both background maps still require a connection.",
-        keywords: ["maps", "places", "geography", "openfreemap", "leaflet", "english labels", "local labels"],
+          "Select or search for a biblical place and open its map. Recenter returns to the opened location; Show areas or Hide areas controls the outlines. Switch between OpenFreeMap and Leaflet, and use Map style for regular or topographic views. Maps can open in a dialog, panel, or tab through Settings > Targeting. The Maps download stores the place index and geometry; background maps require a connection.",
+        keywords: ["maps", "places", "geography", "openfreemap", "leaflet", "recenter", "outlines", "topographic", "map style"],
+      },
+      {
+        label: "How the two map searches differ",
+        body:
+          "Search places or addresses submits an online geographic search using Photon / OpenStreetMap. Search this area finds biblical places in the current map area using the app's place index; move the map and search the area again to refresh those results. A modern search result is not automatically an identified biblical location.",
+        keywords: ["map search", "address", "Photon", "Search this area", "biblical places"],
+      },
+      {
+        label: "How to read location confidence",
+        body:
+          "When a biblical place has several proposed identifications, Locations lists the candidates and their available confidence scores. The map footer also shows confidence for the selected candidate, including when there is only one. If none is selected, choose a candidate to see its score. These are source confidence ratings, not measured probabilities; modern address-search results do not have biblical identification scores.",
+        keywords: ["confidence", "locations", "candidate", "identification", "score"],
       },
       {
         label: "How to browse Topics",
         body:
           "Open Topics in the Study sidebar or Panel Home. Choose one or more starting letters or type in Filter Topics, then expand a topic to preview and open its Scripture references.",
         keywords: ["topics", "topic scriptures", "browse topics", "filter topics"],
+      },
+    ],
+  },
+  {
+    id: "timeline",
+    title: "Historical Timeline",
+    icon: HistoryIcon,
+    summary:
+      "Explore a chapter's biblical setting alongside contemporary history, or follow the Gospel harmony and Paul's missions. Every chapter has context; some events remain undated.",
+    keywords: ["timeline", "history", "chronology", "harmony", "missions"],
+    items: [
+      {
+        label: "How to open and browse Timeline",
+        body:
+          "Open Tools, expand Timeline below Maps, and choose Open timeline. The view follows the reader's book and chapter until you choose another passage or Pin chapter. Follow reader reconnects it. Choose Chapter, Book, Gospel harmony, Paul’s missions, or Wider history; the narrative collections also offer stages. All, Biblical, and Historical context filter the entries, and the search field narrows them further.",
+        keywords: ["open timeline", "book", "chapter", "Pin chapter", "Follow reader", "Gospel harmony", "Paul", "filter", "stages"],
+      },
+      {
+        label: "How to read timeline dates and shapes",
+        body:
+          "A diamond marks a single event, a solid bar represents a duration, and a striped box is a possible date window rather than a claim that an event lasted that long. Broken ends indicate unknown endpoints; a hollow circle marks a schematic lineage placement. Undated entries stay in the list. A displayed year can still be approximate: select the entry to read its explanation, KJV passages, and supporting sources.",
+        keywords: ["diamond", "stripes", "date window", "duration", "broken ends", "approximate", "undated", "legend"],
+      },
+      {
+        label: "How to give the chart more room",
+        body:
+          "Choose Expand chart, then drag horizontally or use the zoom and fit controls. On a narrow mobile screen the expanded chart hides the collection filters and legend to leave more room; collapse it to change those controls. Fit includes the labels as well as the events.",
+        keywords: ["expand chart", "mobile", "zoom", "fit", "pan", "labels", "full screen"],
+      },
+      {
+        label: "How timeline sources and related tools work",
+        body:
+          "Select an entry to inspect its evidence and open available Maps or Genealogy connections. Their labels distinguish the event itself from book context, historical geography, or people and places mentioned in its passages. A recalled story, prophecy, or comparison does not establish participation in the selected event. Sources & method explains the provisional chronology, with the KJV as the primary source. Encyclopedia links are grouped on Credits; other supporting source links remain with the evidence.",
+        keywords: ["sources", "method", "KJV", "evidence", "related tools", "connections", "Credits", "encyclopedia"],
+      },
+      {
+        label: "How timeline views are remembered",
+        body:
+          "Timeline and genealogy timeline views remember their filters, selection, and chart window. Panel views travel with the panel and its shared layout URL; dialog views are remembered locally. The chronology model is shared between the viewers. Sources & method offers 430 years in Egypt or 430 years from the promise; this changes the early chronology proposal without settling every later date question.",
+        keywords: ["remember", "preferences", "share timeline", "chronology model", "430 years", "Egypt", "promise"],
       },
     ],
   },
@@ -541,6 +600,18 @@ const HELP_SECTIONS: HelpSection[] = [
         keywords: ["new bookmark", "selection bookmark"],
       },
       {
+        label: "How to organize notes and bookmarks",
+        body:
+          "While editing, choose or create one folder and add multiple tags separated by commas. The folder and tag filters narrow the list. Unfiled includes items with no folder, and Untagged includes items with no tags, including older notes and bookmarks. Clear a folder or remove tags to return an item to those groups.",
+        keywords: ["folders", "tags", "Unfiled", "Untagged", "organize", "old notes", "old bookmarks"],
+      },
+      {
+        label: "How to change a bookmark's destination",
+        body:
+          "Edit the bookmark and change Bookmark location to the Bible reference you want, then save. Bookmark label is a separate display name: renaming it does not move the bookmark. The location must be a valid reference before the change can be saved.",
+        keywords: ["edit bookmark", "Bookmark label", "Bookmark location", "destination", "rename"],
+      },
+      {
         label: "How internal note links work",
         body:
           "While editing a note, typed Bible references such as John 3:16 are recognized as internal links. Those links can reopen chapters, verses, selections, ranges, and words inside the reader using the destination selected under Settings > Targeting.",
@@ -583,7 +654,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What the Targeting tab controls",
         body:
-          "The Targeting tab controls where actions open. Word and verse selection, note links, search results, bookmarks, and reference links can each use their own destination behavior.",
+          "The Targeting tab controls where actions open. Word and verse selection, note links, search results, bookmarks, and reference links can each use their own destination behavior. Genealogy, Maps, and Timeline each have a separate setting for Dialog, New Panel, New Tab, or Targeted Panel. A targeted panel is marked from its panel options menu.",
         keywords: ["targeting tab", "open target", "new tab", "new panel", "targeted panel"],
       },
       {
@@ -637,6 +708,12 @@ const HELP_SECTIONS: HelpSection[] = [
         body:
           "An update is offered only after the new production shell has been cached completely. Choosing Later leaves the active session alone; choosing Update Now activates the waiting version and reloads all open KJV Only tabs once. Download > App Updates and Recovery can also check manually and show active, configured, and waiting cache versions.",
         keywords: ["app update", "update notice", "waiting version", "cache version", "check for updates"],
+      },
+      {
+        label: "How to tell whether a download is complete and current",
+        body:
+          "Each bundle reports Not downloaded, Partially cached, or Fully cached, together with file and size information. Fully cached describes file availability, not whether the content is the latest version. Read the freshness message separately: Up to date, Update available, Download incomplete, Matches last known version, or Freshness unknown. Last verified download records a completed download check, not every app launch. Refresh Bundle downloads the bundle again; Check for Missing Files fills gaps.",
+        keywords: ["download status", "Fully cached", "freshness", "Update available", "Last verified download", "missing files"],
       },
       {
         label: "How to refresh or clear offline bundles",
@@ -693,7 +770,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "What the static pages are for",
         body:
-          "Welcome Home, How to Get Saved, Why KJV Only?, Resources, Local Churches, Download, Donate, Credits, Contact, Help, Settings, and Reading Progress all open inside the same tab-and-panel workspace. Use the main menu to reach them.",
+          "Welcome Home, How to Get Saved, Why KJV Only?, Resources, Local Churches, Download, Donate, Credits, Contact, Help, Settings, and Reading Progress open inside the tab-and-panel workspace. Reading Progress is also available in the sidebar. Use the main menu to reach these pages.",
         keywords: ["static pages", "help page", "saved page", "kjv only page"],
       },
     ],
