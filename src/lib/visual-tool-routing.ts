@@ -1,25 +1,28 @@
+import { parseTimelineViewState } from "@/lib/timeline-view-state";
 import { createId, createLeaf, findLeafNode, updateLeafNode } from "@/lib/reader-layout";
 import type { ReaderTab, VisualToolOpenTarget, VisualToolRequest } from "@/types/reader";
 
 export const VISUAL_TOOL_TITLES = { genealogy: "Genealogy", maps: "Maps", timeline: "Timeline" } as const;
 
-/** Only identifiers and chapter coordinates belong in layouts, never loaded datasets. */
+/** Layouts store identifiers, chapter coordinates and bounded view preferences. */
 export function parseVisualToolRequest(value: unknown): VisualToolRequest | null {
   if (!value || typeof value !== "object") return null;
   const item = value as Record<string, unknown>;
+  const view = item.viewState && (item.kind === "genealogy" || item.kind === "timeline")
+    ? { viewState: parseTimelineViewState(item.viewState, item.kind === "timeline" ? "historical" : "genealogy") } : {};
   if (item.kind === "genealogy" && typeof item.personId === "string" && item.personId.length > 0 && item.personId.length <= 200) {
-    return { kind: "genealogy", personId: item.personId };
+    return { kind: "genealogy", personId: item.personId, ...view };
   }
   if (item.kind === "maps" && typeof item.geojsonFile === "string" && /^[\w.-]+\.geojson$/.test(item.geojsonFile) && item.geojsonFile.length <= 200) {
     return { kind: "maps", geojsonFile: item.geojsonFile };
   }
   if (item.kind === "timeline") {
-    if (item.context === null) return { kind: "timeline", context: null };
+    if (item.context === null) return { kind: "timeline", context: null, ...view };
     if (item.context && typeof item.context === "object") {
       const { bookIndex, chapterIndex } = item.context as Record<string, unknown>;
       if (typeof bookIndex === "number" && Number.isInteger(bookIndex) && bookIndex >= 0 && bookIndex < 66 &&
         typeof chapterIndex === "number" && Number.isInteger(chapterIndex) && chapterIndex >= 0 && chapterIndex < 150) {
-        return { kind: "timeline", context: { bookIndex, chapterIndex } };
+        return { kind: "timeline", context: { bookIndex, chapterIndex }, ...view };
       }
     }
   }

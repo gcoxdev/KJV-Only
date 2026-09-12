@@ -1,5 +1,5 @@
 import type { AncientMapEntry } from "@/lib/maps";
-import { VisualToolTargetContext } from "@/hooks/use-visual-tool-target";
+import { VisualToolTargetContext, VisualToolNavigateContext } from "@/hooks/use-visual-tool-target";
 import { routeVisualTool } from "@/lib/visual-tool-routing";
 import type { VisualToolRequest } from "@/types/reader";
 import { useTimelineReaderContext } from "@/hooks/use-timeline-reader-context";
@@ -1690,6 +1690,24 @@ export function KJVReader() {
     clearLeafHighlights, setSelectedHighlightScope, setPendingReaderScrollTargets, setActiveReaderWordHighlight,
     setTabs, setTargetedPanelLeafId, showTabById, closeRightSidebarForMobile]);
 
+  const navigateVisualTool = useCallback(async (request: VisualToolRequest, beforeOpen?: () => boolean) => {
+    // Resolve IDs before dismissing the source so failed/offline loads are retryable.
+    const mapEntry = request.kind === "maps"
+      ? (await ensureAncientMapsLoaded()).find(entry => entry.geojson_file === request.geojsonFile) : null;
+    if (request.kind === "maps" && !mapEntry) throw new Error("This map is no longer available.");
+    if (request.kind === "genealogy") {
+      const people = await ensureGenealogyLoaded();
+      if (!people.some(person => person.id === request.personId)) throw new Error("This person is no longer available.");
+    }
+    if (beforeOpen && !beforeOpen()) return;
+    if (openVisualTool(request)) return;
+    if (request.kind === "maps" && mapEntry) openMapModal(mapEntry);
+    if (request.kind === "genealogy") {
+      setGenealogyTreePersonId(request.personId);
+      setIsGenealogyTreeOpen(true);
+    }
+  }, [ensureAncientMapsLoaded, ensureGenealogyLoaded, openVisualTool, openMapModal, setGenealogyTreePersonId, setIsGenealogyTreeOpen]);
+
   const openMapDialog = useCallback((entry: AncientMapEntry) => {
     if (!openVisualTool({ kind: "maps", geojsonFile: entry.geojson_file })) openMapModal(entry);
   }, [openVisualTool, openMapModal]);
@@ -2310,6 +2328,7 @@ export function KJVReader() {
     />
   );
   return (
+    <VisualToolNavigateContext.Provider value={navigateVisualTool}>
     <VisualToolTargetContext.Provider value={openVisualTool}>
     <ToolReferenceDisplayModeProvider
       mode={toolReferenceDisplayMode}
@@ -2493,5 +2512,6 @@ export function KJVReader() {
       </div>
     </ToolReferenceDisplayModeProvider>
     </VisualToolTargetContext.Provider>
+    </VisualToolNavigateContext.Provider>
   );
 }

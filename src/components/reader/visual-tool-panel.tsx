@@ -45,8 +45,8 @@ function GenealogyPanel({ request, tools, onChange }: Props & { request: Extract
   if (!data) return <LoadingState error={error} retry={retry} />;
   const person = genealogyById.get(request.personId);
   if (!person) return <p role="status" className="p-3">This person is no longer available. Open another person from the genealogy tool.</p>;
-  return <Genealogy embedded open person={person} genealogyById={genealogyById} onOpenChange={noop}
-    onSelectPerson={personId => onChange({ ...request, personId })}
+  return <Genealogy embedded open initialViewState={request.viewState} onViewStateChange={viewState => onChange({ ...request, viewState })} person={person} genealogyById={genealogyById} onOpenChange={noop}
+    onSelectPerson={(personId, viewState) => onChange({ ...request, personId, ...(viewState ? { viewState } : {}) })}
     renderReferencePreview={tools.renderPreview} onOpenReference={tools.onOpenReference} onCloseSidebar={noop} />;
 }
 
@@ -84,7 +84,7 @@ export default function VisualToolPanel(props: Props) {
   return <Suspense fallback={<p role="status" className="p-3">Loading tool…</p>}>
     {request.kind === "genealogy" ? <GenealogyPanel {...props} request={request} /> :
       request.kind === "maps" ? <MapPanel {...props} request={request} /> :
-        <Timeline embedded open onOpenChange={noop} context={tools.timelineContext ?? request.context} books={tools.books}
+        <Timeline embedded open initialViewState={request.viewState} onViewStateChange={viewState => props.onChange({ ...request, viewState })} onOpenChange={noop} context={tools.timelineContext ?? request.context} books={tools.books}
           renderPreview={tools.renderPreview} onOpenReference={tools.onOpenReference} onCloseSidebar={noop} />}
   </Suspense>;
 }

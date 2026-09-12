@@ -1,3 +1,4 @@
+import { timelineWindowKey, type TimelineWindow } from "@/lib/timeline-view-state";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import moment, { type MomentInput } from "moment";
 import { Timeline } from "vis-timeline/peer";
@@ -16,7 +17,9 @@ function textNode(text: string, className?: string) {
   return element;
 }
 
-export default function BibleTimelineChart({ records, selectedId, onSelect, expanded, compact, onExpandedChange, tracks, chartLabel = "Genealogy timeline chart" }: {
+export default function BibleTimelineChart({ savedWindow, onWindowChange, records, selectedId, onSelect, expanded, compact, onExpandedChange, tracks, chartLabel = "Genealogy timeline chart" }: {
+  savedWindow?: TimelineWindow;
+  onWindowChange?: (window: TimelineWindow) => void;
   records: (TimelineRecord & { track?: string; emphasized?: boolean })[];
   tracks?: Record<string, string>; chartLabel?: string; selectedId?: string; onSelect: (id: string) => void;
   expanded: boolean; onExpandedChange: (expanded: boolean) => void;
@@ -27,10 +30,16 @@ export default function BibleTimelineChart({ records, selectedId, onSelect, expa
   const fitSelection = useRef<(() => void) | null>(null);
   const [error, setError] = useState(false);
   const select = useEffectEvent(onSelect);
+  const readSavedWindow = useEffectEvent(() => savedWindow);
+  const saveWindow = useEffectEvent((window: TimelineWindow) => onWindowChange?.(window));
+  const rememberWindow = useRef<(() => void) | null>(null);
   useEffect(() => {
     if (!container.current) return;
     const plotted = records.filter(record => timelinePlotBounds(record));
     if (!plotted.length) return;
+    const windowKey = timelineWindowKey(plotted);
+    const remembered = readSavedWindow();
+    const restored = remembered?.key === windowKey ? remembered : undefined;
     const groups = tracks ? Object.entries(tracks).filter(([id]) => plotted.some(record => record.track === id)).map(([id, content], order) => ({ id, content, order })) : plotted.map((record, order) => ({ id: record.id, content: record.label, order }));
     const bounds = plotted.map(record => timelinePlotBounds(record)!);
     const firstYear = Math.min(...bounds.map(([start]) => start));
@@ -69,13 +78,14 @@ export default function BibleTimelineChart({ records, selectedId, onSelect, expa
       };
     });
     const options: TimelineOptions = {
+      ...(restored ? { start: new Date(restored.start), end: new Date(restored.end) } : {}),
       height: "100%", stack: !!tracks, groupOrder: "order", groupHeightMode: tracks ? "auto" : "fixed",
       margin: { item: 10, axis: 12 }, orientation: "top", showCurrentTime: false,
       showMajorLabels: false,
       editable: false, selectable: true, multiselect: false, verticalScroll: true,
       timeAxis: { scale: "year", step: axisStep },
       zoomKey: "ctrlKey", zoomMin: 1000 * 60 * 60 * 24 * 365 * 5,
-      zoomMax: 1000 * 60 * 60 * 24 * 366 * 6000,
+      zoomMax: Math.max(1000 * 60 * 60 * 24 * 366 * 6000, restored ? restored.end - restored.start + 1 : 0),
       moment: (date: MomentInput) => moment.utc(date),
       template: (item: DataItem) => {
         // vis compares template HTML and may retain the previous node.
@@ -85,12 +95,20 @@ export default function BibleTimelineChart({ records, selectedId, onSelect, expa
       },
       groupTemplate: (group: { content: string } | null) => textNode(group?.content ?? ""),
       format: { minorLabels: date => formatTimelineYear(moment.utc(date).year()), majorLabels: () => "" },
-      onInitialDrawComplete: () => { if (!disposed) fitSelection.current?.(); },
+      onInitialDrawComplete: () => { if (!disposed && !restored) fitSelection.current?.(); },
     };
     let instance: Timeline;
     try {
       instance = new Timeline(container.current, items, groups, options);
       timeline.current = instance;
+      const publishWindow = (persist: boolean) => {
+        const { start, end } = instance.getWindow();
+        container.current?.setAttribute("data-window-start", String(start.getTime()));
+        container.current?.setAttribute("data-window-end", String(end.getTime()));
+        if (persist) saveWindow({ start: start.getTime(), end: end.getTime(), key: windowKey });
+      };
+      rememberWindow.current = () => publishWindow(true);
+      publishWindow(false);
       fitSelection.current = () => {
         const width = sizeLabels();
         if (!width) return;
@@ -133,7 +151,8 @@ export default function BibleTimelineChart({ records, selectedId, onSelect, expa
         rows.setAttribute("role", "region");
         rows.setAttribute("aria-label", "Timeline rows");
       }
-      instance.on("rangechanged", ({ start, end }: { start: Date; end: Date }) => {
+      instance.on("rangechanged", ({ start, end, byUser }: { start: Date; end: Date; byUser?: boolean }) => {
+        publishWindow(!!byUser);
         const nextStep = yearStep(start, end);
         if (nextStep !== axisStep) {
           axisStep = nextStep;
@@ -162,7 +181,7 @@ export default function BibleTimelineChart({ records, selectedId, onSelect, expa
       });
     });
     observer.observe(container.current);
-    return () => { disposed = true; observer.disconnect(); cancelAnimationFrame(resizeFrame); instance.destroy(); timeline.current = null; fitSelection.current = null; };
+    return () => { disposed = true; observer.disconnect(); cancelAnimationFrame(resizeFrame); instance.destroy(); timeline.current = null; fitSelection.current = null; rememberWindow.current = null; };
   }, [records, tracks]);
   useEffect(() => { timeline.current?.setSelection(selectedId ? [selectedId] : []); }, [selectedId, records]);
   const hasDates = records.some(record => timelinePlotBounds(record));
@@ -175,7 +194,7 @@ export default function BibleTimelineChart({ records, selectedId, onSelect, expa
           { label: "Zoom out", icon: ZoomOutIcon, action: () => timeline.current?.zoomOut(0.4, { animation: false }) },
           { label: "Fit selection", icon: ScanIcon, action: () => fitSelection.current?.() },
         ].map(({ label, icon: Icon, action }) => <Tooltip key={label}>
-          <TooltipTrigger render={<Button size={compact ? "icon" : "sm"} variant="outline" aria-label={label} disabled={emptyContext} onClick={action} />}>
+          <TooltipTrigger render={<Button size={compact ? "icon" : "sm"} variant="outline" aria-label={label} disabled={emptyContext} onClick={() => { action(); rememberWindow.current?.(); }} />}>
             {compact ? <Icon /> : label}
           </TooltipTrigger>
           <TooltipContent>{label}</TooltipContent>

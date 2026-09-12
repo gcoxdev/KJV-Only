@@ -34,6 +34,12 @@ export function buildLeafHistoryEntry(leaf: LeafNode): LeafHistoryEntry {
   };
 }
 
+function toolIdentity(tool: LeafNode["visualTool"]) {
+  if (!tool) return undefined;
+  const { viewState: _viewState, ...identity } = tool;
+  return identity;
+}
+
 export function leafHistoryEntryEquals(left: LeafHistoryEntry, right: LeafHistoryEntry) {
   return (
     left.view === right.view &&
@@ -42,7 +48,7 @@ export function leafHistoryEntryEquals(left: LeafHistoryEntry, right: LeafHistor
     left.pickerTestament === right.pickerTestament &&
     left.pickerBookIndex === right.pickerBookIndex &&
     left.pageId === right.pageId &&
-    JSON.stringify(left.visualTool) === JSON.stringify(right.visualTool)
+    JSON.stringify(toolIdentity(left.visualTool)) === JSON.stringify(toolIdentity(right.visualTool))
   );
 }
 
@@ -70,7 +76,12 @@ export function reconcileLeafHistoryState(
 
     const currentEntry = existing.entries[existing.index];
     if (currentEntry && leafHistoryEntryEquals(currentEntry, entry)) {
-      next[leafId] = existing;
+      if (JSON.stringify(currentEntry.visualTool) !== JSON.stringify(entry.visualTool)) {
+        const entries = [...existing.entries];
+        entries[existing.index] = entry;
+        next[leafId] = { ...existing, entries };
+        changed = true;
+      } else next[leafId] = existing;
       continue;
     }
 

@@ -1,3 +1,4 @@
+import { useTimelineViewState, type TimelineViewProps } from "@/hooks/use-timeline-view-state";
 import { useTimelineModel } from "@/hooks/use-timeline-model";
 import { lazy, Suspense, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -37,13 +38,13 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const GenealogyTimeline = lazy(() => import("./genealogy-timeline"));
 
-type GenealogyTreeDialogProps = {
+type GenealogyTreeDialogProps = TimelineViewProps & {
   embedded?: boolean;
   open: boolean;
   person: GenealogyPerson | null;
   genealogyById: Map<string, GenealogyPerson>;
   onOpenChange: (open: boolean) => void;
-  onSelectPerson: (personId: string) => void;
+  onSelectPerson: (personId: string, viewState?: TimelineViewProps["initialViewState"]) => void;
   renderReferencePreview: (reference: string, highlightWord: string) => ReactNode;
   onOpenReference: (reference: string) => void;
   onCloseSidebar: () => void;
@@ -295,6 +296,8 @@ function GenealogyRelationGrid({
 }
 
 export function GenealogyTreeDialog({
+  initialViewState,
+  onViewStateChange,
   embedded = false,
   open,
   person,
@@ -306,7 +309,9 @@ export function GenealogyTreeDialog({
   onCloseSidebar,
 }: GenealogyTreeDialogProps) {
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
-  const [view, setView] = useState("tree");
+  const [viewState, patchView] = useTimelineViewState("genealogy", { initialViewState, onViewStateChange });
+  const view = viewState.view;
+  const setView = (view: string) => patchView({ view: view === "timeline" ? "timeline" : "tree" });
   const [expanded, setExpanded] = useState(false);
   const [model, setModel] = useTimelineModel();
   const records = useMemo(() => buildBibleTimeline(model), [model]);
@@ -355,9 +360,13 @@ export function GenealogyTreeDialog({
         <div className="min-h-0 flex-1 overflow-hidden">
           <ScrollArea ref={scrollAreaRef} className={cn("h-full", expanded && "[&_[data-slot=scroll-area-viewport]>div]:h-full")}>
             {view === "timeline" ? <Suspense fallback={<p role="status" className="p-4">Loading timeline…</p>}>
-              <GenealogyTimeline person={person} genealogyById={genealogyById} expanded={expanded} onExpandedChange={setExpanded}
+              <GenealogyTimeline onNavigateAway={embedded ? undefined : () => onOpenChange(false)} viewState={viewState} onViewStateChange={patchView} person={person} genealogyById={genealogyById} expanded={expanded} onExpandedChange={setExpanded}
                 records={records} model={model} onModelChange={setModel}
-                onSelectPerson={id => { onSelectPerson(id); setExpanded(false); setView("tree"); }}
+                onSelectPerson={id => {
+                  setExpanded(false);
+                  if (onViewStateChange) onSelectPerson(id, { ...viewState, view: "tree" });
+                  else { onSelectPerson(id); setView("tree"); }
+                }}
                 renderReferencePreview={renderReferencePreview}
                 onOpenReference={reference => { onOpenReference(reference); if (!embedded) onOpenChange(false); }}
                 onCloseSidebar={onCloseSidebar} />

@@ -1,3 +1,7 @@
+import { TimelineRelatedTools } from "@/components/reader/timeline-related-tools";
+import { timelineRelatedTools } from "@/data/timeline-related-tools";
+import { isTimelineEncyclopedia } from "@/lib/timeline-sources";
+import { useTimelineViewState, type TimelineViewProps } from "@/hooks/use-timeline-view-state";
 import { lazy, Suspense, useMemo, useState } from "react";
 import { PinIcon, PinOffIcon, XIcon } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -21,24 +25,29 @@ import { cn } from "@/lib/utils";
 const TimelineChart = lazy(() => import("./bible-timeline-chart"));
 const TRACKS = { biblical: "Biblical events", historical: "Historical context" };
 
-export default function ContextualTimelineDialog({ embedded = false, open, onOpenChange, context, books, renderPreview, onOpenReference, onCloseSidebar }: Omit<TimelineToolProps, "isOpen"> & { embedded?: boolean; open: boolean; onOpenChange: (open: boolean) => void }) {
-  const [pinned, setPinned] = useState<typeof context>(null);
+export default function ContextualTimelineDialog({ initialViewState, onViewStateChange, embedded = false, open, onOpenChange, context, books, renderPreview, onOpenReference, onCloseSidebar }: Omit<TimelineToolProps, "isOpen"> & TimelineViewProps & { embedded?: boolean; open: boolean; onOpenChange: (open: boolean) => void }) {
+  const [viewState, patchView] = useTimelineViewState("historical", { initialViewState, onViewStateChange });
+  const { pinned, filter, query, selectedId } = viewState;
+  const setPinned = (pinned: typeof context) => patchView({ pinned });
+  const scope = viewState.scope === "chapter" && !pinned && !context ? "world" : viewState.scope as TimelineScope;
+  const setScope = (scope: TimelineScope) => patchView({ scope });
+  const setPhase = (phase: string) => patchView({ phase });
+  const setFilter = (filter: TimelineFilter) => patchView({ filter });
+  const setQuery = (query: string) => patchView({ query });
+  const setSelectedId = (selectedId: string) => patchView({ selectedId });
   const current = pinned ?? context;
   const bookIndex = current?.bookIndex ?? 0;
-  const chapterIndex = current?.chapterIndex ?? 0;
   const book = books[bookIndex];
-  const [scope, setScope] = useState<TimelineScope>(context ? "chapter" : "world");
-  const [phase, setPhase] = useState("all");
+  const chapterIndex = Math.min(current?.chapterIndex ?? 0, Math.max(0, (book?.chapters.length ?? 1) - 1));
   const collection = scope === "gospels" || scope === "paul" ? scope : undefined;
-  const [filter, setFilter] = useState<TimelineFilter>("all");
-  const [query, setQuery] = useState("");
+  const phase = collection && TIMELINE_PHASES[collection].includes(viewState.phase) ? viewState.phase : "all";
   const [expanded, setExpanded] = useState(false);
-  const [selectedId, setSelectedId] = useState<string>();
   const [model, setModel] = useTimelineModel();
   const compact = useIsMobile() && expanded;
   const allRecords = useMemo(() => buildContextTimeline(model), [model]);
   const selection = useMemo(() => selectContextTimeline(allRecords, book?.name ?? "", chapterIndex + 1, scope, filter, query, phase), [allRecords, book?.name, chapterIndex, scope, filter, query, phase]);
   const selected = selection.records.find(record => record.id === selectedId) ?? selection.records.find(record => record.emphasized) ?? selection.records[0];
+  const evidenceReferences = selected ? [...new Set([...selected.references, ...timelineRelatedTools(selected).map(link => link.reference).filter(Boolean)])] : [];
   const openReference = (ref: string) => { if (!embedded) onOpenChange(false); onOpenReference(ref); };
   const Content = embedded ? "section" : DialogContent;
   const Title = embedded ? "h2" : DialogTitle;
@@ -89,13 +98,14 @@ export default function ContextualTimelineDialog({ embedded = false, open, onOpe
             </AccordionContent></AccordionItem></Accordion>
           </> : null}
         </div>
-        <Suspense fallback={<p role="status">Loading chart…</p>}><TimelineChart records={selection.records} tracks={TRACKS} chartLabel="Historical timeline chart" selectedId={selected?.id} onSelect={setSelectedId} expanded={expanded} compact={compact} onExpandedChange={setExpanded} /></Suspense>
+        <Suspense fallback={<p role="status">Loading chart…</p>}><TimelineChart savedWindow={viewState.window} onWindowChange={window => patchView({ window })} records={selection.records} tracks={TRACKS} chartLabel="Historical timeline chart" selectedId={selected?.id} onSelect={setSelectedId} expanded={expanded} compact={compact} onExpandedChange={setExpanded} /></Suspense>
         {!expanded ? <div className={cn("grid gap-3", embedded ? "@2xl/history:grid-cols-2" : "sm:grid-cols-2")}>
           <div role="group" aria-label="Historical timeline entries" className="flex max-h-72 flex-col gap-1 overflow-y-auto rounded-lg border p-1">
             {selection.records.length ? selection.records.map(record => <Button key={record.id} variant={record.id === selected?.id ? "secondary" : "ghost"} aria-pressed={record.id === selected?.id} className="h-auto justify-start whitespace-normal p-2 text-left" onClick={() => setSelectedId(record.id)}><span className="flex flex-col gap-1"><span className={record.emphasized ? "font-semibold" : ""}>{record.label}{record.emphasized ? (collection ? "" : " · Passage context") : ""}</span><span className="text-xs text-muted-foreground">{record.narrative?.phase ?? TRACKS[record.track]} · {timelineDateSummary(record)}</span></span></Button>) : <p className="p-2 text-sm">No entries match this view. Clear the search, change the filter, or choose Wider history.</p>}
           </div>
           {selected ? <article aria-label="Historical timeline evidence" className="flex max-h-72 flex-col gap-2 overflow-y-auto rounded-lg border p-3 text-sm">
             <h3 className="font-semibold">{selected.label}</h3>
+            <TimelineRelatedTools key={selected.id} record={selected} onNavigate={embedded ? undefined : () => onOpenChange(false)} />
             <div className="flex flex-wrap gap-1"><Badge variant="secondary">{TRACKS[selected.track]}</Badge><Badge variant="outline">{timelineKindLabel(selected)}</Badge></div>
             {selected.narrative ? <Badge variant="outline" className="self-start">{selected.narrative.phase}</Badge> : null}
             <p>{timelineDateSummary(selected)}</p><p>{selected.note}</p><p className="text-muted-foreground">{selected.relevance}</p>
@@ -104,8 +114,9 @@ export default function ContextualTimelineDialog({ embedded = false, open, onOpe
               <p className="text-xs text-muted-foreground">Open a passage at its first verse. Grouped sections can contain successive events or related teachings.</p>
               <div className="flex flex-wrap gap-1">{selected.narrative.passages.map(passage => <Button key={passage.label} variant="outline" size="sm" className="h-auto whitespace-normal py-1 text-left" onClick={() => openReference(passage.reference)}>{passage.label}</Button>)}</div>
             </div> : null}
-            {selected.references.length ? <><h4 className="font-semibold">KJV passages</h4><ToolReferenceList references={selected.references} highlightWord="" renderPreview={renderPreview} onOpenReference={openReference} onCloseSidebar={onCloseSidebar} /></> : <p className="text-muted-foreground">Historical comparison; no KJV passage dates this person or event.</p>}
-            {selected.sources.map(id => { const source = CONTEXT_TIMELINE_SOURCES[id]; return <div key={id}><a href={source.url} target="_blank" rel="noreferrer" className="underline underline-offset-4">{source.title}</a><p className="text-xs text-muted-foreground">{source.use}</p></div>; })}
+            {evidenceReferences.length ? <><h4 className="font-semibold">KJV passages</h4><ToolReferenceList references={evidenceReferences} highlightWord="" renderPreview={renderPreview} onOpenReference={openReference} onCloseSidebar={onCloseSidebar} /></> : <p className="text-muted-foreground">Historical comparison; no KJV passage dates this person or event.</p>}
+            {selected.sources.filter(id => !isTimelineEncyclopedia(CONTEXT_TIMELINE_SOURCES[id])).map(id => { const source = CONTEXT_TIMELINE_SOURCES[id]; return <div key={id}><a href={source.url} target="_blank" rel="noreferrer" className="underline underline-offset-4">{source.title}</a><p className="text-xs text-muted-foreground">{source.use}</p></div>; })}
+            {selected.sources.some(id => isTimelineEncyclopedia(CONTEXT_TIMELINE_SOURCES[id])) ? <p className="text-xs text-muted-foreground">Additional calendar source details are listed on the Credits page.</p> : null}
           </article> : null}
         </div> : null}
       </div>

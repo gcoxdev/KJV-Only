@@ -1,3 +1,4 @@
+import type { TimelineViewState } from "@/lib/timeline-view-state";
 import type { Book, VerseToken } from "@/types/bible";
 
 export type ReaderPayload = {
@@ -327,7 +328,7 @@ export type VisualToolRequest = (
   | { kind: "genealogy"; personId: string }
   | { kind: "maps"; geojsonFile: string }
   | { kind: "timeline"; context: { bookIndex: number; chapterIndex: number } | null }
-) & { requestId?: string };
+) & { requestId?: string; viewState?: TimelineViewState };
 
 export type LeafNode = {
   id: string;

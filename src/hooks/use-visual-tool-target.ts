@@ -6,3 +6,9 @@ export const VisualToolTargetContext = createContext<(request: VisualToolRequest
 export function useVisualToolTarget() {
   return useContext(VisualToolTargetContext);
 }
+
+/** Load the destination, then dismiss its source immediately before navigating. */
+export const VisualToolNavigateContext = createContext<((request: VisualToolRequest, beforeOpen?: () => boolean) => Promise<void>) | null>(null);
+export function useVisualToolNavigate() {
+  return useContext(VisualToolNavigateContext);
+}
