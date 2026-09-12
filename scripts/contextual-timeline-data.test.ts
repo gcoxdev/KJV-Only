@@ -8,8 +8,61 @@ import { NT_NARRATIVE_DETAILS } from "../src/data/contextual-timeline-nt";
 import { buildContextTimeline, CHAPTER_TIMELINE_MAP, selectContextTimeline } from "../src/data/contextual-timeline";
 import { JUDGES_INTERVALS, CHRONOLOGY_REVIEWS } from "../src/data/timeline-chronology-review";
 import { formatTimelineYear } from "../src/lib/bible-timeline";
+import { buildBibleTimeline, TIMELINE_METHOD } from "../src/data/bible-timeline";
 
 const records = buildContextTimeline();
+it("retains Assyrian reign and campaign distinctions without assigning prophecy dates or uncertain identities", () => {
+  const get = (id: string) => records.find(record => record.id === id)!;
+  expect(get("esarhaddon-reign")).toMatchObject({ track: "historical", kind: "period", start: -679, end: -668 });
+  expect(get("ashurbanipal-reign")).toMatchObject({ track: "historical", kind: "period", start: -668, end: -630 });
+  const campaign = get("esarhaddon-egypt");
+  expect(campaign).toMatchObject({ track: "historical", kind: "event", references: [], startStatus: "approximate" });
+  expect(campaign.end).toBeUndefined();
+  expect(formatTimelineYear(campaign.start!)).toBe("671 BC");
+  expect(get("ashurbanipal-reign").personIds).toBeUndefined();
+  expect(CHAPTER_TIMELINE_MAP.Ezra[4].ids).not.toContain("ashurbanipal-reign");
+  const widerHistory = selectContextTimeline(records, "2 Kings", 21, "world", "historical").records.map(record => record.id);
+  expect(widerHistory).toEqual(expect.arrayContaining(["esarhaddon-reign", "esarhaddon-egypt", "ashurbanipal-reign"]));
+  expect(get("manasseh-amon").start).toBeUndefined();
+  expect(get("manasseh-amon").end).toBeUndefined();
+});
+
+it("checks the sojourn arithmetic and Samuel intervals against the KJV without turning constraints into new dates", () => {
+  const { books } = JSON.parse(readFileSync("public/data/kjv.json", "utf8")) as { books: Book[] };
+  const verseText = (ref: string) => {
+    const [code, chapter, verse] = ref.split(".");
+    return books[BOOK_ICON_CODES.indexOf(code)]?.chapters[+chapter - 1]?.verses[+verse - 1]?.tokens.map(token => token.text).join(" ");
+  };
+  for (const [ref, words] of [
+    ["GEN.12.4", "seventy and five"], ["GEN.21.5", "an hundred years"],
+    ["GEN.25.26", "threescore years"], ["GEN.47.9", "an hundred and thirty"],
+    ["GEN.46.11", "Kohath"], ["EXO.6.18", "an hundred thirty and three"],
+    ["EXO.6.20", "an hundred and thirty and seven"], ["EXO.7.7", "fourscore years"],
+    ["NUM.26.59", "bare to Levi in Egypt"], ["1SA.4.15", "ninety and eight"],
+    ["1SA.4.18", "forty years"], ["1SA.6.1", "seven months"], ["1SA.7.2", "twenty years"],
+    ["1SA.7.15", "all the days of his life"], ["1CH.13.5", "Kirjath–jearim"],
+  ]) expect(verseText(ref), ref).toContain(words);
+  for (const review of CHRONOLOGY_REVIEWS) {
+    const displayed = TIMELINE_METHOD.find(method => method.title === review.methodTitle)!;
+    expect(displayed.text).toContain(review.text);
+    for (const ref of displayed.references) expect(verseText(ref), ref).toBeDefined();
+  }
+  for (const model of ["egypt430", "promise430"] as const) {
+    const source = buildBibleTimeline(model);
+    const date = (id: string) => source.find(record => record.id === id)!.start!;
+    const toEgypt = (100 - 75) + 60 + 130;
+    expect(date("egypt-entry") - date("abram-canaan")).toBe(toEgypt);
+    expect(date("exodus") - date("egypt-entry")).toBe(model === "egypt430" ? 430 : 430 - toEgypt);
+    expect(date("exodus") - date("abram-canaan")).toBe(model === "egypt430" ? 645 : 430);
+  }
+  for (const id of ["samuel-birth", "ark-captured", "ark-philistines", "samuel-mizpeh", "samuel-death-nabal", "david-ark"]) {
+    const record = records.find(record => record.id === id)!;
+    expect(record, id).toBeDefined();
+    expect(record.start, id).toBeUndefined();
+    expect(record.end, id).toBeUndefined();
+  }
+});
+
 it("validates the reviewed ranges and Old and New Testament chapter references against the shipped KJV", () => {
   const { books } = JSON.parse(readFileSync("public/data/kjv.json", "utf8")) as { books: Book[] };
   const byName = new Map(books.map(book => [book.name, book]));

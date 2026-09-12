@@ -312,6 +312,29 @@ test("Persian context and exile review preserve the KJV chronology constraints",
   await expect(dialog).toContainText("The seventy-year entry remains undated");
 });
 
+test("Assyrian context has supported tool links and the Egypt and Samuel reviews remain visible", async ({ page }) => {
+  const dialog = await start(page);
+  await choose(page, dialog, "Timeline collection", "Wider history");
+  const query = dialog.getByRole("textbox", { name: "Find timeline entries" });
+  const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+  await dialog.getByRole("button", { name: "Historical context", exact: true }).click();
+  await query.fill("Esarhaddon · reign");
+  await expect(evidence).toContainText("680");
+  await expect(evidence.getByRole("button", { name: "Genealogy: Esarhaddon", exact: true })).toBeVisible();
+  await expect(evidence.getByRole("button", { name: "Map: Nineveh", exact: true })).toBeVisible();
+  await query.fill("Egyptian campaign");
+  await expect(evidence).toContainText("671 BC");
+  await expect(evidence.getByRole("button", { name: "Map: Egypt", exact: true })).toBeVisible();
+  await query.fill("Ashurbanipal");
+  await expect(evidence).toContainText("631 or possibly 627");
+  await expect(evidence.getByRole("button", { name: /^Genealogy:/ })).toHaveCount(0);
+  await dialog.getByRole("button", { name: /Sources & method/ }).click();
+  await expect(dialog).toContainText("totals only 350 years");
+  await expect(dialog).toContainText("Samuel, Eli and the ark");
+  await expect(dialog).toContainText("ministry therefore overlaps the monarchy");
+  await expect(dialog.locator('a[href^="http"]')).toHaveCount(0);
+});
+
 test("Luke and Passion additions retain teaching context and Credits-only sources", async ({ page }) => {
   const dialog = await start(page, {}, "LUK.14");
   const query = dialog.getByRole("textbox", { name: "Find timeline entries" });

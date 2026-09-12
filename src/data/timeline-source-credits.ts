@@ -319,6 +319,24 @@ export const TIMELINE_SOURCE_CREDITS = [
     "use": "Reign 530–522 BC and conquest of Egypt in 525 BC. Supplies Persian political context without identifying the kings in Ezra's later correspondence."
   },
   {
+    "id": "esarhaddonChronicle",
+    "title": "Esarhaddon Chronicle (ABC 14), translated from Grayson and Glassner",
+    "url": "https://www.livius.org/sources/content/mesopotamian-chronicles-content/abc-14-esarhaddon-chronicle/",
+    "use": "External numbered reign framework, 680–669 BC, the tenth-year Egyptian campaign, and Ashurbanipal's succession. Calendar conversions come from the edition; the damaged chronicle does not date Manasseh's captivity."
+  },
+  {
+    "id": "esarhaddonPrism",
+    "title": "Esarhaddon's Prism B, translated by A. Leo Oppenheim",
+    "url": "https://www.livius.org/sources/content/anet/291-esarhaddons-prism-b/",
+    "use": "The royal inscription names Manasseh among contributors to construction at Nineveh. It supplies Assyrian geographic context, not an independent date for the captivity in Chronicles; the article's Manasseh reign dates are not adopted."
+  },
+  {
+    "id": "ashurbanipal",
+    "title": "Livius: Ashurbanipal",
+    "url": "https://www.livius.org/articles/person/assurbanipal/",
+    "use": "Assyrian reign beginning 669/668 BC and Nineveh palace/tablet context. The displayed c. 631 BC endpoint is provisional; the source also discusses 627. Neither endpoint establishes a biblical identity or lifespan."
+  },
+  {
     "id": "nebuchadnezzar",
     "title": "Livius: Nebuchadnezzar II",
     "url": "https://www.livius.org/articles/person/nebuchadnezzar-ii/",

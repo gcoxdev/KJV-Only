@@ -104,6 +104,9 @@ export const TIMELINE_RELATED_TOOLS: Record<string, TimelineRelatedTool[]> = {
   "nabonidus-reign": [historicalPlace("a217d18.geojson", "Babylonia", "2KI.24.15", "The chronicle supplies Nabonidus's royal setting. Kings identifies the mapped region in an earlier deportation; it does not name Nabonidus or date his reign.")],
   "cambyses-reign": [historicalPlace("ab9696f.geojson", "Persia", "EZR.1.1", "The historical source supplies Cambyses's reign. Ezra identifies Persia under Cyrus; this does not identify Cambyses with a king in Ezra's correspondence.")],
   "cambyses-egypt": [historicalPlace("af301ca.geojson", "Egypt", "GEN.46.3", "Genesis identifies the mapped country in a much earlier episode. The Persian campaign and its date come from the historical source, not this passage.")],
+  "esarhaddon-reign": [person("esarhaddon_966", "Esarhaddon", "2KI.19.37"), historicalPlace("a70fd5d.geojson", "Nineveh", "2KI.19.36", "The royal inscription supplies Esarhaddon's palace setting. Kings identifies Nineveh in the preceding reign; the external regnal dates do not come from that verse.")],
+  "esarhaddon-egypt": [historicalPlace("af301ca.geojson", "Egypt", "GEN.46.3", "The Assyrian chronicle supplies this campaign and its regnal year. Genesis identifies the mapped country in a much earlier episode; this link does not date a biblical prophecy.")],
+  "ashurbanipal-reign": [historicalPlace("a70fd5d.geojson", "Nineveh", "2KI.19.36", "The historical source places Ashurbanipal's palace and tablet collection at Nineveh. Kings identifies the city in an earlier reign; this link does not identify Ashurbanipal with Asnappar.")],
 };
 
 export function timelineToolKey(link: TimelineRelatedTool) {

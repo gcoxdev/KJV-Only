@@ -1,7 +1,7 @@
 import type { TimelineEra, TimelineRecord } from "../lib/bible-timeline";
 import { CHRONOLOGY_REVIEWS } from "./timeline-chronology-review";
 
-export const TIMELINE_REVISION = "2026-09-12.3";
+export const TIMELINE_REVISION = "2026-09-12.4";
 export const TIMELINE_SOURCES: Record<string, { title: string; url: string; use: string }> = {
   crucifixionStudy: { title: "Humphreys & Waddington: Dating the Crucifixion (1983)", url: "https://www.nature.com/articles/306743a0", use: "Published AD 33 proposal using reconstructed calendars and a proposed lunar-eclipse association. Its interpretation is not a KJV statement or an adopted exact date; the chart retains the provisional AD 30 framework." },
   ot: { title: "Encyclopedia of the Bible: Old Testament chronology", url: "https://www.biblegateway.com/resources/encyclopedia-of-the-bible/Chronology-Old-Testament", use: "Comparison of calendar anchors and chronological interpretations. Its alternative textual readings are not substituted for the KJV." },
@@ -26,6 +26,7 @@ export const TIMELINE_METHOD = [
   { title: "Jotham, Pekah and Manasseh", references: [] as string[], text: "Regnal totals and overlapping authority need separate treatment from elapsed calendar years." },
   { title: "Exile and the seventy years", references: [] as string[], text: "Stated biblical intervals control the review; calendar differences alone do not determine their intended endpoints." },
   { title: "Paul, Festus and the journey to Rome", references: [] as string[], text: "Narrated durations and proposed calendar anchors are separate kinds of evidence." },
+  { title: "Samuel, Eli and the ark", references: [] as string[], text: "Overlapping ministries and separate ark intervals do not supply a continuous calendar chain." },
 ].map(method => {
   const review = CHRONOLOGY_REVIEWS.find(review => review.methodTitle === method.title);
   return review ? { ...method, text: `${method.text} ${review.text}`, references: [...new Set([...method.references, ...review.references])] } : method;
