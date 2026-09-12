@@ -76,7 +76,7 @@ for (const width of [390, 1280]) {
   });
 }
 
-test("manual chapter pin, unknown dates and unsupported coverage", async ({ page }) => {
+test("manual chapter pin and newly covered undated Job setting", async ({ page }) => {
   const dialog = await openTimeline(page, false);
   await dialog.getByRole("combobox", { name: "Timeline chapter", exact: true }).click();
   await page.getByRole("option", { name: "Chapter 4", exact: true }).click();
@@ -87,7 +87,8 @@ test("manual chapter pin, unknown dates and unsupported coverage", async ({ page
   await expect(dialog.getByRole("combobox", { name: "Timeline chapter", exact: true })).toContainText("Chapter 6");
   await dialog.getByRole("combobox", { name: "Timeline book", exact: true }).click();
   await page.getByRole("option", { name: "Job", exact: true }).click();
-  await expect(dialog.getByRole("status")).toContainText("not a date assigned");
+  await expect(dialog.getByRole("status")).toContainText("Job 1:");
+  await expect(dialog.getByRole("article", { name: "Historical timeline evidence" })).toContainText("Dates unknown");
 });
 
 test("Tools panel remembers the active reader and follows chapter navigation", async ({ page }) => {
@@ -423,6 +424,92 @@ for (const width of [390, 1280]) {
     await entries.getByRole("button", { name: /desolation and Jeremiah's seventy years/ }).click();
     await expect(evidence).toContainText("not seventy years apart");
     await expect(evidence.getByRole("button", { name: "JER.25.11", exact: true })).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+}
+
+for (const width of [390, 1280]) {
+  test(`broad poetry and minor prophet coverage at ${width}px`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.setViewportSize({ width, height: 844 });
+    const dialog = await openTimeline(page, width < 768);
+    const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+    const choose = async (book: string, chapter: number) => {
+      await dialog.getByRole("combobox", { name: "Timeline book", exact: true }).click();
+      await page.getByRole("option", { name: book, exact: true }).click();
+      await dialog.getByRole("combobox", { name: "Timeline chapter", exact: true }).click();
+      await page.getByRole("option", { name: `Chapter ${chapter}`, exact: true }).click();
+      await expect(dialog.getByRole("status")).toContainText(`${book} ${chapter}:`);
+    };
+    await choose("Psalms", 23);
+    await expect(dialog.getByRole("status")).toContainText("shepherd");
+    await expect(evidence.getByRole("button", { name: "PSA.23.1", exact: true })).toBeVisible();
+    await choose("Psalms", 137);
+    await expect(evidence).toContainText("not David's contemporary setting");
+    await choose("Psalms", 150);
+    await expect(dialog.getByRole("status")).toContainText("Everything that has breath");
+    await choose("Proverbs", 25);
+    await expect(evidence).toContainText("not the date Solomon first spoke");
+    await choose("Proverbs", 30);
+    await expect(evidence).toContainText("not silently identified as Solomon");
+    await choose("Job", 42);
+    await expect(evidence).toContainText("140 years after restoration");
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("Ecclesiastes", 12);
+    await expect(dialog.getByRole("status")).toContainText("Remembering the Creator");
+    await choose("Song of Solomon", 8);
+    await expect(evidence).toContainText("love poetry");
+    for (const [book, chapter] of [["Hosea", 14], ["Joel", 3], ["Amos", 9], ["Obadiah", 1], ["Jonah", 4], ["Micah", 7], ["Nahum", 3], ["Habakkuk", 3], ["Malachi", 4]] as const) {
+      await choose(book, chapter);
+      await expect(evidence).toContainText("Dates unknown");
+    }
+    await expect(evidence).toContainText("contextual inference");
+    await page.screenshot({ path: `design/contextual-timeline-broad-poetry-${width}.png` });
+    expect(errors).toEqual([]);
+  });
+
+  test(`broad historical and major prophet settings at ${width}px`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.setViewportSize({ width, height: 844 });
+    const dialog = await openTimeline(page, width < 768);
+    const entries = dialog.getByRole("group", { name: "Historical timeline entries" });
+    const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+    const choose = async (book: string, chapter: number) => {
+      await dialog.getByRole("combobox", { name: "Timeline book", exact: true }).click();
+      await page.getByRole("option", { name: book, exact: true }).click();
+      await dialog.getByRole("combobox", { name: "Timeline chapter", exact: true }).click();
+      await page.getByRole("option", { name: `Chapter ${chapter}`, exact: true }).click();
+    };
+    await choose("Nehemiah", 13);
+    await expect(evidence).toContainText("interval until he returns to Jerusalem is unstated");
+    await choose("Esther", 3);
+    await expect(entries).toContainText("Xerxes I");
+    await expect(evidence).toContainText("assumes Ahasuerus is Xerxes");
+    await choose("Esther", 10);
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("Isaiah", 53);
+    await expect(dialog.getByRole("status")).toContainText("servant's suffering");
+    await expect(evidence).toContainText("not a date for its predicted fulfillment");
+    await choose("Jeremiah", 27);
+    await expect(evidence).toContainText("not silently changed to Zedekiah");
+    await choose("Jeremiah", 45);
+    await expect(dialog.getByRole("status")).toContainText("earlier fourth-year message");
+    await choose("Jeremiah", 52);
+    await expect(entries).toContainText("Jehoiachin released from prison");
+    await choose("Lamentations", 5);
+    await expect(evidence).toContainText("Dates unknown");
+    await choose("Ezekiel", 48);
+    await expect(evidence).toContainText("do not assert that the temple was built then");
+    await expect(evidence.getByRole("button", { name: "EZK.48.1", exact: true })).toBeVisible();
+    await page.screenshot({ path: `design/contextual-timeline-broad-vision-${width}.png` });
+    await choose("Daniel", 12);
+    await expect(dialog.getByRole("status")).toContainText("does not reset the reception date");
+    await choose("Zephaniah", 3);
+    await expect(evidence).toContainText("outer possible-date window");
+    await choose("Zechariah", 14);
+    await expect(evidence).toContainText("Dates unknown");
     expect(errors).toEqual([]);
   });
 }

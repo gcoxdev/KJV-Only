@@ -3,6 +3,8 @@ import { buildContextTimeline, CHAPTER_TIMELINE_MAP, CONTEXT_TIMELINE_COVERAGE, 
 import { NT_NARRATIVE_DETAILS, TIMELINE_PHASES } from "@/data/contextual-timeline-nt";
 import { buildAnchoredContext } from "@/data/contextual-timeline-anchors";
 import { buildChroniclesContext, withChroniclesParallels } from "@/data/contextual-timeline-chronicles";
+import { BROAD_CHAPTER_TIMELINE_MAP, buildBroadContext } from "@/data/contextual-timeline-coverage";
+import { EXPANDED_CHAPTER_TIMELINE_MAP } from "@/data/contextual-timeline-expansion";
 import { buildKingsContext } from "@/data/contextual-timeline-kings";
 import { buildBibleTimeline } from "@/data/bible-timeline";
 import { formatTimelineYear, timelinePlotBounds } from "@/lib/bible-timeline";
@@ -25,8 +27,8 @@ describe("contextual history", () => {
     }
   });
   it("extends the initial chapters without replacing their mappings", () => {
-    expect(CONTEXT_TIMELINE_COVERAGE.chapters).toBe(689);
-    expect(CONTEXT_TIMELINE_COVERAGE.books).toHaveLength(46);
+    expect(CONTEXT_TIMELINE_COVERAGE.chapters).toBe(1189);
+    expect(CONTEXT_TIMELINE_COVERAGE.books).toHaveLength(66);
     expect(Object.keys(CHAPTER_TIMELINE_MAP.Ezra)).toHaveLength(10);
     expect(CHAPTER_TIMELINE_MAP["2 Kings"][24].ids).toContain("jerusalem-597");
     expect(CHAPTER_TIMELINE_MAP.Acts[18].ids).toContain("paul-gallio");
@@ -80,7 +82,7 @@ describe("contextual history", () => {
     expect(completion.find(record => record.id === "second-temple")?.emphasized).toBe(true);
   });
   it("discloses fallback coverage and does not silently date an unsupported passage", () => {
-    const unknown = selectContextTimeline(records, "Job", 1, "chapter", "all");
+    const unknown = selectContextTimeline(records, "Job", 43, "chapter", "all");
     expect(unknown.mapped).toBe(false);
     expect(unknown.note).toContain("not a date assigned");
     expect(unknown.records.some(record => record.emphasized)).toBe(false);
@@ -462,6 +464,89 @@ describe("contextual history", () => {
     expect(timelinePlotBounds(get("chron-seventy-years"))).toBeNull();
     expect(get("chron-seventy-years").note).toContain("not seventy years apart");
     expect(get("return-decree").start! - get("temple-destroyed").start!).toBe(48);
+  });
+  it("fills every remaining book without diluting existing episode mappings", () => {
+    expect(Object.keys(CHAPTER_TIMELINE_MAP.Psalms)).toHaveLength(150);
+    expect(Object.keys(CHAPTER_TIMELINE_MAP.Isaiah)).toHaveLength(66);
+    expect(Object.keys(CHAPTER_TIMELINE_MAP.Ezekiel)).toHaveLength(48);
+    expect(CHAPTER_TIMELINE_MAP.Isaiah[36]).toEqual(EXPANDED_CHAPTER_TIMELINE_MAP.Isaiah[36]);
+    expect(CHAPTER_TIMELINE_MAP.Daniel[9]).toEqual(EXPANDED_CHAPTER_TIMELINE_MAP.Daniel[9]);
+    expect(CHAPTER_TIMELINE_MAP.Nehemiah[8]).toEqual(EXPANDED_CHAPTER_TIMELINE_MAP.Nehemiah[8]);
+    expect(CHAPTER_TIMELINE_MAP.Psalms[23]).toEqual(BROAD_CHAPTER_TIMELINE_MAP.Psalms[23]);
+    expect(CHAPTER_TIMELINE_MAP.Psalms[23].note).toContain("shepherd");
+    expect(selectContextTimeline(records, "Psalms", 23, "chapter", "biblical", "shepherd").records.map(r => r.id)).toContain("context-psa");
+    const job = selectContextTimeline(records, "Job", 1, "chapter", "all");
+    expect(job.mapped).toBe(true);
+    expect(job.records.map(record => record.id)).toEqual(["context-job"]);
+    expect(job.records[0].emphasized).toBe(true);
+    expect(timelinePlotBounds(job.records[0])).toBeNull();
+    expect(job.records[0].note).toContain("not his total age");
+  });
+  it("keeps undated wisdom, poetry, and prophetic settings unplaced", () => {
+    const get = (id: string) => records.find(record => record.id === id)!;
+    for (const id of ["context-job", "context-psa", "context-pro", "context-ecc", "context-sng", "context-jol", "context-oba", "context-jon", "context-nam", "context-hab", "context-mal", "context-lam"]) expect(timelinePlotBounds(get(id)), id).toBeNull();
+    expect(selectContextTimeline(records, "Psalms", 137, "chapter", "biblical").records.find(r => r.id === "temple-destroyed")?.emphasized).toBe(false);
+    expect(selectContextTimeline(records, "Obadiah", 1, "chapter", "historical").records).toEqual([]);
+    expect(get("context-amo").note).toContain("priest of Bethel");
+    expect(get("context-jon").note).toContain("does not supply the year");
+    expect(get("context-mal").note).toContain("contextual inference");
+    const proverbs = selectContextTimeline(records, "Proverbs", 25, "chapter", "biblical").records;
+    expect(proverbs.find(r => r.id === "royal-solomon")?.emphasized).toBe(false);
+    expect(proverbs.find(r => r.id === "proverbs-hezekiah-copy")?.kind).toBe("date-window");
+    expect(get("proverbs-hezekiah-copy").note).toContain("not the date Solomon first spoke");
+    expect(CHAPTER_TIMELINE_MAP.Proverbs[30].ids).toEqual(["proverbs-agur"]);
+    expect(CHAPTER_TIMELINE_MAP.Proverbs[31].ids).toEqual(["proverbs-lemuel"]);
+  });
+  it("keeps prophetic reception, literary order, and future fulfillment separate", () => {
+    const get = (id: string) => records.find(record => record.id === id)!;
+    expect(get("context-ezk").start).toBe(get("jerusalem-597").start! + 4);
+    expect(get("context-ezk").end).toBe(get("jerusalem-597").start! + 26);
+    expect(get("context-ezk").note).toContain("not assumed to be his age");
+    for (let chapter = 40; chapter <= 48; chapter++) expect(CHAPTER_TIMELINE_MAP.Ezekiel[chapter].ids).toEqual(["ezekiel-temple-vision"]);
+    expect(get("ezekiel-temple-vision").note).toContain("do not assert that the temple was built then");
+    expect(timelinePlotBounds(get("ezekiel-temple-vision"))).toEqual([get("jerusalem-597").start! + 24, get("jerusalem-597").start! + 25]);
+    expect(CHAPTER_TIMELINE_MAP.Ezekiel[29].note).toContain("separate occasions");
+    expect(get("jer-yokes").references).toContain("JER.27.1");
+    expect(get("jer-yokes").note).toContain("not silently changed to Zedekiah");
+    expect(timelinePlotBounds(get("jer-yokes"))).toBeNull();
+    expect(CHAPTER_TIMELINE_MAP.Jeremiah[45].ids).toEqual(["jer-jehoiakim-fourth"]);
+    expect(CHAPTER_TIMELINE_MAP.Jeremiah[43].ids).toEqual(["jer-after-fall"]);
+    expect(CHAPTER_TIMELINE_MAP.Jeremiah[52].ids).toContain("jehoiachin-released");
+    expect(CHAPTER_TIMELINE_MAP.Daniel[7].ids).toEqual(["daniel-belshazzar-first"]);
+    expect(CHAPTER_TIMELINE_MAP.Daniel[8].ids).toEqual(["daniel-belshazzar-third"]);
+    expect(CHAPTER_TIMELINE_MAP.Daniel[11].ids).toEqual(["daniel-cyrus-third"]);
+    expect(CHAPTER_TIMELINE_MAP.Daniel[12].note).toContain("does not reset the reception date");
+    for (let chapter = 9; chapter <= 14; chapter++) expect(CHAPTER_TIMELINE_MAP.Zechariah[chapter].ids).toEqual(["context-zec"]);
+    expect(get("zechariah-fasting").start).toBe(get("haggai-messages").start! + 2);
+    expect(timelinePlotBounds(get("context-zec"))).toBeNull();
+    expect(timelinePlotBounds(get("context-zep"))).toEqual(timelinePlotBounds(get("royal-josiah")));
+  });
+  it("retains Esther's regnal sequence and Nehemiah's undated later return", () => {
+    const get = (id: string) => records.find(record => record.id === id)!;
+    expect(get("esther-seventh-year").start! - get("esther-third-year").start!).toBe(4);
+    expect(get("esther-deliverance").start! - get("esther-seventh-year").start!).toBe(5);
+    expect(get("esther-deliverance").end! - get("esther-deliverance").start!).toBe(1);
+    expect(CHAPTER_TIMELINE_MAP.Esther[10].ids).toEqual(["context-est"]);
+    expect(timelinePlotBounds(get("context-est"))).toBeNull();
+    expect(selectContextTimeline(records, "Esther", 3, "chapter", "historical").records.map(r => r.id)).toContain("xerxes-reign");
+    expect(selectContextTimeline(records, "Esther", 3, "chapter", "biblical").records.some(r => r.id === "xerxes-reign")).toBe(false);
+    expect(get("esther-third-year").note).toContain("assumes Ahasuerus is Xerxes");
+    expect(get("neh-covenant-assembly").start).toBe(get("law-read-return").start);
+    expect(timelinePlotBounds(get("neh-later-return"))).toBeNull();
+    expect(CHAPTER_TIMELINE_MAP.Nehemiah[13].contextIds).toEqual(["nehemiah-governor"]);
+  });
+  it("builds later broad settings consistently without changing the shared chronology", () => {
+    // Broad anchors are all after the Exodus; the sojourn choice cannot move them.
+    // Select only the actual input anchors rather than the resulting broad records.
+    const needed = new Set(["royal-solomon", "royal-hezekiah", "royal-josiah", "law-read-return", "nebuchadnezzar-reign", "haggai-messages"]);
+    const later = records.filter(record => needed.has(record.id));
+    const anchors = [...buildBibleTimeline(), ...later];
+    const original = structuredClone(anchors);
+    const normal = buildBroadContext(anchors);
+    const alternative = buildBroadContext([...buildBibleTimeline("promise430"), ...later]);
+    expect(normal).toEqual(alternative);
+    expect(anchors).toEqual(original);
+    expect(normal.every(record => !record.personIds && !record.placement)).toBe(true);
   });
   it("rejects missing, schematic, duplicate, and reversed chronology anchors", () => {
     const episode = { id: "check", label: "Check", era: "kingdom" as const, references: ["2SA.5.4"], note: "Check", at: ["missing"] as [string] };

@@ -1,3 +1,4 @@
+import { BROAD_CHAPTER_TIMELINE_MAP, BROAD_HISTORICAL_RECORDS, BROAD_TIMELINE_SOURCES, buildBroadContext } from "./contextual-timeline-coverage";
 import { buildChroniclesContext, CHRONICLES_CHAPTER_TIMELINE_MAP, withChroniclesParallels } from "./contextual-timeline-chronicles";
 import { buildKingsContext, KINGS_CHAPTER_TIMELINE_MAP, KINGS_HISTORICAL_RECORDS, KINGS_TIMELINE_SOURCES } from "./contextual-timeline-kings";
 import { buildOldTestamentContext, OT_CHAPTER_TIMELINE_MAP } from "./contextual-timeline-ot";
@@ -16,6 +17,7 @@ export const CONTEXT_TIMELINE_SOURCES: Record<string, { title: string; url: stri
   ...EXPANDED_TIMELINE_SOURCES,
   ...WRITING_TIMELINE_SOURCES,
   ...KINGS_TIMELINE_SOURCES,
+  ...BROAD_TIMELINE_SOURCES,
   nt: { ...TIMELINE_SOURCES.nt, use: "Calendar proposals for Jesus, Paul, and the apostolic period. KJV passage details and relative order control the reconstruction." },
   cyrus: { ...TIMELINE_SOURCES.cyrus, use: "Reign from accession in Anshan, c. 559–530 BC; conquest of Babylon in 539 BC. Ezra supplies the return decree; the external chronology does not override that account." },
   nebuchadnezzar: { title: "Livius: Nebuchadnezzar II", url: "https://www.livius.org/articles/person/nebuchadnezzar-ii/", use: "Conventional reign, 605–562 BC; not birth and death dates." },
@@ -91,6 +93,12 @@ for (const source of [INITIAL_CHAPTER_TIMELINE_MAP, EXPANDED_CHAPTER_TIMELINE_MA
     }
   }
 }
+// Broad coverage fills gaps; existing episode-level mappings retain precedence.
+for (const [book, chapters] of Object.entries(BROAD_CHAPTER_TIMELINE_MAP)) {
+  const target = CHAPTER_TIMELINE_MAP[book] ??= {};
+  for (const [chapter, mapping] of Object.entries(chapters)) target[Number(chapter)] ??= mapping;
+}
+
 export const CONTEXT_TIMELINE_COVERAGE = {
   chapters: Object.values(CHAPTER_TIMELINE_MAP).reduce((sum, chapters) => sum + Object.keys(chapters).length, 0),
   books: Object.keys(CHAPTER_TIMELINE_MAP),
@@ -101,9 +109,10 @@ export function buildContextTimeline(model: SojournModel = "egypt430"): ContextT
   const chronology = buildBibleTimeline(model);
   const kings = buildKingsContext(chronology);
   const chronicles = buildChroniclesContext([...chronology, ...kings]);
+  const broad = buildBroadContext([...chronology, ...kings, ...EXPANDED_TIMELINE_RECORDS, ...HISTORICAL_RECORDS]);
   const shared = chronology.filter(record => !record.placement && record.kind !== "life" && record.kind !== "activity")
     .map(record => ({ ...record, sources: [...record.sources, ...(["samaria", "sennacherib"].includes(record.id) ? ["assyria"] : record.id === "wall" ? ["artaxerxes"] : [])], track: ["alexander", "antiochus", "herod"].includes(record.id) ? "historical" : "biblical" } as ContextTimelineRecord));
-  return [...shared, ...PILOT_RECORDS, ...HISTORICAL_RECORDS, ...EXPANDED_TIMELINE_RECORDS, ...NT_TIMELINE_RECORDS, ...WRITING_TIMELINE_RECORDS, ...buildOldTestamentContext(chronology), ...kings, ...chronicles, ...KINGS_HISTORICAL_RECORDS].map(withChroniclesParallels).map(record => {
+  return [...shared, ...PILOT_RECORDS, ...HISTORICAL_RECORDS, ...EXPANDED_TIMELINE_RECORDS, ...NT_TIMELINE_RECORDS, ...WRITING_TIMELINE_RECORDS, ...buildOldTestamentContext(chronology), ...kings, ...chronicles, ...KINGS_HISTORICAL_RECORDS, ...broad, ...BROAD_HISTORICAL_RECORDS].map(withChroniclesParallels).map(record => {
     const narrative = NT_NARRATIVE_DETAILS[record.id];
     return narrative ? { ...record, narrative, references: [...new Set([...record.references, ...narrative.passages.map(passage => passage.reference)])] } : record;
   });

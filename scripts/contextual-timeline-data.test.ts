@@ -3,6 +3,7 @@ import { expect, it } from "vitest";
 import type { Book } from "../src/types/bible";
 import { BOOK_ICON_CODES } from "../src/lib/references";
 import { WRITING_CONTEXTS } from "../src/data/contextual-timeline-writings";
+import { BROAD_BOOK_TOPICS } from "../src/data/contextual-timeline-topics";
 import { NT_NARRATIVE_DETAILS } from "../src/data/contextual-timeline-nt";
 import { buildContextTimeline, CHAPTER_TIMELINE_MAP, selectContextTimeline } from "../src/data/contextual-timeline";
 
@@ -28,13 +29,19 @@ it("validates the reviewed ranges and Old and New Testament chapter references a
     }
     for (const chapter of book.chapters) for (const verse of chapter.verses) expect(covered.has(`${chapter.chapter}:${verse.verse}`), `${book.name} ${chapter.chapter}:${verse.verse}`).toBe(true);
   }
-  for (const book of [...books.slice(0, 14), ...books.slice(39)]) {
+  for (const book of books) {
     expect(Object.keys(CHAPTER_TIMELINE_MAP[book.name]), book.name).toHaveLength(book.chapters.length);
     for (const chapter of book.chapters) {
       const selection = selectContextTimeline(records, book.name, chapter.chapter, "chapter", "biblical");
       expect(selection.mapped).toBe(true);
       expect(selection.records.some(record => record.emphasized)).toBe(true);
     }
+  }
+  expect(Object.keys(CHAPTER_TIMELINE_MAP).sort()).toEqual(books.map(book => book.name).sort());
+  for (const book of BROAD_BOOK_TOPICS) {
+    expect(book.topics.length, book.book).toBe(byName.get(book.book)!.chapters.length);
+    expect(new Set(book.topics).size, book.book).toBe(book.topics.length);
+    expect(book.topics.every(topic => topic.length > 10), book.book).toBe(true);
   }
   const citations = [...records.flatMap(record => record.references), ...WRITING_CONTEXTS.flatMap(w => w.references), ...Object.values(CHAPTER_TIMELINE_MAP).flatMap(chapters => Object.values(chapters).flatMap(mapping => mapping.references ?? []))];
   for (const ref of citations) {
