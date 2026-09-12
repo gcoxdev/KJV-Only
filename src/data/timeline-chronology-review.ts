@@ -11,6 +11,14 @@ export const JUDGES_INTERVALS = [
 ] as const;
 const judgesTotal = JUDGES_INTERVALS.reduce((sum, [, years]) => sum + years, 0);
 
+/** Asa's regnal-year labels, not elapsed anniversaries or BC dates. */
+export const ASA_SUCCESSIONS = [
+  { king: "Nadab", startYear: 2, successorYear: 3, statedYears: 2, references: ["1KI.15.25", "1KI.15.28"] },
+  { king: "Baasha", startYear: 3, successorYear: 26, statedYears: 24, references: ["1KI.15.33", "1KI.16.8"] },
+  { king: "Elah", startYear: 26, successorYear: 27, statedYears: 2, references: ["1KI.16.8", "1KI.16.10"] },
+] as const;
+const asaComparison = ASA_SUCCESSIONS.map(row => `${row.king}: Asa ${row.startYear} to ${row.successorYear} crosses ${row.successorYear - row.startYear} year-number steps, while ${row.statedYears} regnal years are stated`).join("; ");
+
 export const CHRONOLOGY_REVIEWS = [
   {
     methodTitle: "Exodus, Judges and the calendar anchor",
@@ -26,6 +34,16 @@ export const CHRONOLOGY_REVIEWS = [
     methodTitle: "Samuel, Eli and the ark",
     references: ["JDG.13.1", "JDG.15.20", "1SA.4.15", "1SA.4.18", "1SA.6.1", "1SA.7.1", "1SA.7.2", "1SA.7.15", "1SA.8.1", "1SA.12.1", "1SA.15.1", "1SA.16.13", "1SA.25.1", "1SA.31.6", "1CH.13.5", "1CH.13.6", "2SA.6.11", "ACT.13.20", "ACT.13.21"],
     text: "Eli dies at ninety-eight after judging forty years; neither number supplies a BC date. The ark spends seven months with the Philistines. The twenty-year notice at Kirjath-jearim leads into Israel's lament and the Mizpeh account; it is not a statement that David brought the ark to Jerusalem exactly twenty years after its return. Chronicles still places the ark at Kirjath-jearim when David fetches it; the later three months at Obed-edom's house are another interval. Samuel judges throughout his life, is old when a king is requested, and continues speaking and anointing during Saul's reign before dying ahead of Saul. His ministry therefore overlaps the monarchy; an extra guessed Samuel period must not be appended before Saul's forty years. Samson's twenty also falls within Philistine domination. These overlaps prevent a simple consecutive sum, but do not by themselves reconcile the KJV's about 450 years in Acts 13:20 with the temple anchor. Samuel's birth, death, and the ark episodes retain unknown calendar dates.",
+  },
+  {
+    methodTitle: "Divided-kingdom year counting",
+    references: [...ASA_SUCCESSIONS.flatMap(row => [...row.references]), "1KI.16.15", "1KI.16.16", "1KI.16.21", "1KI.16.22", "1KI.16.23", "1KI.16.29", "2CH.15.19", "2CH.16.1", "2KI.8.16", "2KI.18.10", "2KI.18.13"],
+    text: `${asaComparison}. Counting the first partial year as year one can explain this repeated one-label difference; it does not prove exact elapsed lengths or a calendar convention for every king. An accession-year system numbers year one from the next new year instead. Spring/fall year boundaries and shared or rival authority must be specified separately; a single global plus-one adjustment cannot reconcile all the synchronisms. Omri is made king in Asa's twenty-seventh year, the divided people follow Omri or Tibni, and another beginning is given in the thirty-first; Ahab succeeds in the thirty-eighth. Counting 27 through 38 inclusively gives twelve year labels, while 31 through 38 gives eight. A divided/sole-rule distinction is a possible explanation, not an explicit date for Tibni's death. Omri's six years at Tirzah describe a location within his reign, not an extra reign to append. Asa's thirty-sixth-year Baasha notice in Chronicles remains ten labels after Elah's twenty-sixth-year succession in Kings; neither ordinary accession counting nor a spring/fall offset alone resolves it. Thirty-six is not changed to sixteen or automatically counted from the kingdom's division. The same policy applies to later reigns: retain stated totals, disclose the convention needed for each proposed anchor, and leave unsupported endpoints unplaced. The earlier Hezekiah, Jotham/Pekah and Manasseh reviews remain unresolved constraints on a unified calendar.`,
+  },
+  {
+    methodTitle: "Gospel calendar assumptions",
+    references: ["LUK.3.1", "LUK.3.21", "LUK.3.23", "JHN.2.13", "JHN.5.1", "JHN.6.4", "JHN.11.55", "MRK.14.12", "MRK.15.42", "MRK.16.1", "MRK.16.9", "LUK.23.54", "LUK.23.56", "LUK.24.1", "LUK.24.21", "JHN.18.28", "JHN.19.14", "JHN.19.31", "MAT.12.40", "MAT.16.21", "MAT.28.1"],
+    text: "The displayed AD 27–30 framework requires an earlier reckoning of Tiberius's fifteenth year than an anniversary count from his August AD 14 accession. On that anniversary count, John's start is August AD 28–29; an ensuing first Passover is no earlier than AD 29, and three successive named Passovers reach no earlier than AD 31. That conditional sequence cannot end in AD 30. AD 33 allows more time but is not proved by this minimum, and John's unnamed feast in chapter 5 cannot itself supply the extra year. The different assumptions must not be silently mixed. Exact Passion dates also require decisions about lunar-month beginnings, an added month, and whether the Passover meal/preparation expressions refer to the same observance. A reconstructed lunar calendar cannot establish all of those decisions by itself. Mark calls preparation the day before the sabbath; John calls that sabbath a high day. Treating it as the weekly sabbath underlies the Friday proposal; proposing a separate festival sabbath requires an account of the spice preparation, rest, and first-day visits in Mark and Luke. Matthew's three days and three nights and the third-day statements are retained together; neither is rewritten as an exact-hour equation or dismissed to force a weekday. The chart therefore assigns no exact weekday, Nisan date, or modern calendar day. AD 30 remains the disclosed display proposal and AD 33 a sourced alternative, with the earlier-start requirement now explicit.",
   },
   {
     methodTitle: "Kings, exile and return",

@@ -6,11 +6,54 @@ import { WRITING_CONTEXTS } from "../src/data/contextual-timeline-writings";
 import { BROAD_BOOK_TOPICS } from "../src/data/contextual-timeline-topics";
 import { NT_NARRATIVE_DETAILS } from "../src/data/contextual-timeline-nt";
 import { buildContextTimeline, CHAPTER_TIMELINE_MAP, selectContextTimeline } from "../src/data/contextual-timeline";
-import { JUDGES_INTERVALS, CHRONOLOGY_REVIEWS } from "../src/data/timeline-chronology-review";
+import { JUDGES_INTERVALS, CHRONOLOGY_REVIEWS, ASA_SUCCESSIONS } from "../src/data/timeline-chronology-review";
 import { formatTimelineYear } from "../src/lib/bible-timeline";
 import { buildBibleTimeline, TIMELINE_METHOD } from "../src/data/bible-timeline";
 
 const records = buildContextTimeline();
+it("checks succession labels against the KJV without treating them as elapsed reigns", () => {
+  const { books } = JSON.parse(readFileSync("public/data/kjv.json", "utf8")) as { books: Book[] };
+  const verse = (book: string, chapter: number, number: number) => books.find(item => item.name === book)!.chapters[chapter - 1].verses[number - 1].tokens.map(token => token.text).join(" ");
+  const labelWords: Record<number, string> = { 2: "second", 3: "third", 26: "twenty and sixth", 27: "twenty and seventh" };
+  for (const row of ASA_SUCCESSIONS) {
+    const [start, end] = row.references.map(ref => ref.split(".").slice(1).map(Number));
+    const startText = verse("1 Kings", start[0], start[1]);
+    const endText = verse("1 Kings", end[0], end[1]);
+    expect(startText).toContain(labelWords[row.startYear]);
+    expect(endText).toContain(labelWords[row.successorYear]);
+    expect(startText).toContain(row.statedYears === 24 ? "twenty and four years" : "two years");
+    expect(row.successorYear - row.startYear + 1).toBe(row.statedYears);
+  }
+  expect(verse("1 Kings", 16, 15)).toContain("seven days");
+  expect(verse("1 Kings", 16, 23)).toContain("thirty and first");
+  expect(verse("1 Kings", 16, 23)).toContain("twelve years");
+  expect(verse("1 Kings", 16, 29)).toContain("thirty and eighth");
+  expect(verse("2 Chronicles", 16, 1)).toContain("six and thirtieth");
+  for (const id of ["early-divided-kings", "omri-succession", "asa-ramah", "manasseh-amon"]) {
+    const record = records.find(record => record.id === id)!;
+    expect(record.start, id).toBeUndefined();
+    expect(record.end, id).toBeUndefined();
+  }
+});
+
+it("exposes the ministry-start dependency without changing the calendar proposal or adding exact Passion days", () => {
+  const { books } = JSON.parse(readFileSync("public/data/kjv.json", "utf8")) as { books: Book[] };
+  const john = books.find(book => book.name === "John")!;
+  for (const [chapter, number] of [[2, 13], [6, 4], [11, 55]]) {
+    expect(john.chapters[chapter - 1].verses[number - 1].tokens.map(token => token.text).join(" ")).toContain("passover");
+  }
+  expect(john.chapters[4].verses[0].tokens.map(token => token.text).join(" ").toLowerCase()).not.toContain("passover");
+  expect(records.find(record => record.id === "john-ministry")).toMatchObject({ start: 27, end: 29, kind: "date-window" });
+  expect(records.find(record => record.id === "john-ministry")!.note).toContain("cannot fit it unchanged");
+  expect(records.find(record => record.id === "resurrection")).toMatchObject({ start: 30, end: undefined, kind: "event" });
+  const review = TIMELINE_METHOD.find(method => method.title === "Gospel calendar assumptions")!;
+  expect(review.text).toContain("no earlier than AD 31");
+  expect(review.references).toEqual(expect.arrayContaining(["MAT.12.40", "LUK.24.21", "MRK.16.9", "JHN.19.31"]));
+  for (const id of ["gospel-early-temple", "gospel-feeding-5000"]) {
+    expect(records.find(record => record.id === id)).toMatchObject({ kind: "date-window", start: 27, end: 30 });
+  }
+});
+
 it("retains Assyrian reign and campaign distinctions without assigning prophecy dates or uncertain identities", () => {
   const get = (id: string) => records.find(record => record.id === id)!;
   expect(get("esarhaddon-reign")).toMatchObject({ track: "historical", kind: "period", start: -679, end: -668 });

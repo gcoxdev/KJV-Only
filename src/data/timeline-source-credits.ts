@@ -145,6 +145,12 @@ export const TIMELINE_SOURCE_CREDITS = [
     "use": "Imperial reign, AD 81–96; background to the proposed late-first-century letter setting, not proof of a specific persecution or meeting."
   },
   {
+    "id": "regnalCounting",
+    "title": "Encyclopedia of the Bible: Books of Kings, chronology",
+    "url": "https://www.biblegateway.com/resources/encyclopedia-of-the-bible/Books-Kings",
+    "use": "Comparison of accession/non-accession numbering, spring/fall calendars, and proposed changes of practice. These conventions are evaluated against KJV synchronisms; no textual emendation or universal offset is adopted."
+  },
+  {
     "id": "omri",
     "title": "Encyclopedia of the Bible: Omri",
     "url": "https://www.biblegateway.com/resources/encyclopedia-of-the-bible/Omri",

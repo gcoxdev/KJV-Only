@@ -335,6 +335,24 @@ test("Assyrian context has supported tool links and the Egypt and Samuel reviews
   await expect(dialog.locator('a[href^="http"]')).toHaveCount(0);
 });
 
+test("royal and Gospel calendar assumptions are accessible from the relevant entries", async ({ page }) => {
+  const dialog = await start(page, {}, "1KI.16");
+  const query = dialog.getByRole("textbox", { name: "Find timeline entries" });
+  const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+  await query.fill("Elah, Zimri");
+  await expect(evidence).toContainText("Counting 27 through 38 inclusively yields twelve labels");
+  await dialog.getByRole("button", { name: /Sources & method/ }).click();
+  await expect(dialog).toContainText("Divided-kingdom year counting");
+  await expect(dialog).toContainText("Baasha: Asa 3 to 26 crosses 23 year-number steps");
+  await expect(dialog).toContainText("Gospel calendar assumptions");
+  await expect(dialog).toContainText("That conditional sequence cannot end in AD 30");
+  await dialog.getByRole("button", { name: /Sources & method/ }).click();
+  await choose(page, dialog, "Timeline collection", "Gospel harmony");
+  await query.fill("John the Baptist's ministry begins");
+  await expect(evidence).toContainText("cannot fit it unchanged");
+  await expect(dialog.locator('a[href^="http"]')).toHaveCount(0);
+});
+
 test("Luke and Passion additions retain teaching context and Credits-only sources", async ({ page }) => {
   const dialog = await start(page, {}, "LUK.14");
   const query = dialog.getByRole("textbox", { name: "Find timeline entries" });
