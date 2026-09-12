@@ -15,7 +15,8 @@ import {
 } from "lucide-react";
 
 import type { StaticPageId } from "@/types/reader";
-import { TIMELINE_ENCYCLOPEDIA_CREDITS } from "@/data/timeline-source-credits";
+import { KJV_COMPARISON_CREDITS } from "@/data/kjv-comparison-credits";
+import { TIMELINE_SOURCE_CREDITS } from "@/data/timeline-source-credits";
 
 export type StaticPageDefinition = {
   id: StaticPageId;
@@ -193,7 +194,7 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
       paragraphs: [
         "This project uses Bible text, reference data, dictionaries, maps, genealogy data, and open-source libraries that each deserve clear attribution.",
         "Additional attribution, licenses, and source links should continue to be documented here as data sources are added or updated.",
-        "Timeline encyclopedia sources are credited below. The KJV remains primary; external chronology supplies provisional calendar comparisons.",
+        "All external timeline and historical/comparative sources are credited below. The KJV remains primary; external chronology supplies provisional calendar comparisons.",
       ],
       links: [
         {
@@ -265,7 +266,8 @@ export const STATIC_PAGES: StaticPageDefinition[] = [
           href: "https://plato.stanford.edu/",
           description: "Historical context for Socrates, Plato, Aristotle, and Seneca in the timeline.",
         },
-        ...TIMELINE_ENCYCLOPEDIA_CREDITS
+        ...KJV_COMPARISON_CREDITS,
+        ...TIMELINE_SOURCE_CREDITS
           .filter(source => !source.title.startsWith("Encyclopedia of the Bible:") && !source.title.startsWith("Stanford Encyclopedia of Philosophy:"))
           .map(source => ({ label: source.title, href: source.url, description: `Timeline: ${source.use}` })),
       ],

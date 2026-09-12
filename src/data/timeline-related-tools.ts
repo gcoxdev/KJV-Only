@@ -48,6 +48,10 @@ export const TIMELINE_RELATED_TOOLS: Record<string, TimelineRelatedTool[]> = {
   "paul-rome": [paul("ACT.28.16"), place("afc8e7a.geojson", "Rome", "ACT.28.16")],
   "gospel-storm": [jesus("MAT.8.22")],
   "gospel-lost-found": [jesus("LUK.14.3")],
+  "gospel-offences": [{ ...jesus("MAT.18.2"), evidence: "Matthew 18:2 introduces Jesus as the speaker; the warnings continue that teaching. The link identifies the teacher, not an unnamed little one." }],
+  "gospel-matthew-lost-sheep": [{ ...jesus("MAT.18.2"), evidence: "Jesus is the speaker introduced in Matthew 18:2. This links the teacher, not a historical identity for the shepherd in the illustration." }],
+  "gospel-brother-trespass": [{ ...jesus("MAT.18.2"), evidence: "The instruction continues Jesus's discourse introduced in Matthew 18:2. No identity is assigned to the hypothetical brother." }],
+  "gospel-vineyard-labourers": [{ ...jesus("MAT.19.28"), evidence: "Jesus's answer to the disciples in Matthew 19:28 continues into the vineyard parable. This links the teacher, not a historical employer or labourer." }],
   "gospel-guard-report": [jesus("MAT.28.9"), jerusalem("MAT.27.53")],
   "ot-eden": [person("adam_2", "Adam", "GEN.3.17"), person("eve_3", "Eve", "GEN.3.20"), place("af3daeb.geojson", "Garden of Eden", "GEN.2.8")],
   "context-sng": [person("solomon_677", "Solomon", "SNG.1.1")],
@@ -82,6 +86,9 @@ export const TIMELINE_RELATED_TOOLS: Record<string, TimelineRelatedTool[]> = {
   "jerusalem-70": [historicalPlace("a15257a.geojson", "Jerusalem", "2CH.3.1", "Chronicles identifies the mapped city. The AD 70 event is externally sourced and distinct from the Babylonian destruction.")],
   "josephus-antiquities": [historicalPlace("a15257a.geojson", "Jerusalem (historical subject)", "2CH.3.1", "Jerusalem is a subject of Josephus's history. This link does not identify the place or date of publication; Chronicles supplies the mapped city's reference.")],
   "pliny-elder": [historicalPlace("afc8e7a.geojson", "Rome", "ACT.28.16", "The historical source places Pliny's education in Rome. Acts identifies the city, not Pliny or a meeting with Paul.")],
+  "nabonidus-reign": [historicalPlace("a217d18.geojson", "Babylonia", "2KI.24.15", "The chronicle supplies Nabonidus's royal setting. Kings identifies the mapped region in an earlier deportation; it does not name Nabonidus or date his reign.")],
+  "cambyses-reign": [historicalPlace("ab9696f.geojson", "Persia", "EZR.1.1", "The historical source supplies Cambyses's reign. Ezra identifies Persia under Cyrus; this does not identify Cambyses with a king in Ezra's correspondence.")],
+  "cambyses-egypt": [historicalPlace("af301ca.geojson", "Egypt", "GEN.46.3", "Genesis identifies the mapped country in a much earlier episode. The Persian campaign and its date come from the historical source, not this passage.")],
 };
 
 export function timelineToolKey(link: TimelineRelatedTool) {

@@ -474,7 +474,7 @@ const HELP_SECTIONS: HelpSection[] = [
       {
         label: "How timeline sources and related tools work",
         body:
-          "Select an entry to inspect its evidence and open available Maps or Genealogy connections. Their labels distinguish the event itself from book context, historical geography, or people and places mentioned in its passages. A recalled story, prophecy, or comparison does not establish participation in the selected event. Sources & method explains the provisional chronology, with the KJV as the primary source. Encyclopedia links are grouped on Credits; other supporting source links remain with the evidence.",
+          "Select an entry to inspect its evidence and open available Maps or Genealogy connections. Their labels distinguish the event itself from book context, historical geography, or people and places mentioned in its passages. A recalled story, prophecy, or comparison does not establish participation in the selected event. Sources & method explains the provisional chronology, with the KJV as the primary source. All external citations and source links are listed on Credits. KJV passage links remain with the evidence.",
         keywords: ["sources", "method", "KJV", "evidence", "related tools", "connections", "Credits", "encyclopedia"],
       },
       {

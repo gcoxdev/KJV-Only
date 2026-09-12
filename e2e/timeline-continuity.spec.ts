@@ -160,12 +160,12 @@ test("long passage connection lists can expand and collapse", async ({ page }) =
   await expect(related.getByRole("button", { name: /^Genealogy:/ })).toHaveCount(before);
 });
 
-test("encyclopedia links appear on Credits and stay out of both timeline viewers", async ({ page }) => {
+test("external citations appear only on Credits across study pages", async ({ page }) => {
   const dialog = await start(page);
   const encyclopediaLinks = 'a[href*="encyclopedia"], a[href*="iranicaonline"], a[href*="plato.stanford"]';
-  await expect(dialog.locator(encyclopediaLinks)).toHaveCount(0);
+  await expect(dialog.locator('a[href^="http"]')).toHaveCount(0);
   await dialog.getByRole("button", { name: /Sources & method/ }).click();
-  await expect(dialog.locator(encyclopediaLinks)).toHaveCount(0);
+  await expect(dialog.locator('a[href^="http"]')).toHaveCount(0);
   await dialog.getByRole("button", { name: "Close timeline", exact: true }).click();
   await page.goto("/#tab=0&tabs=h&layout=Reader:MAT.1");
   await page.getByRole("region", { name: "Matthew 1 panel", exact: true }).locator('[data-verse-number="1"]').last().getByRole("button", { name: "Details for Jesus", exact: true }).first().click();
@@ -173,7 +173,7 @@ test("encyclopedia links appear on Credits and stay out of both timeline viewers
   const genealogy = page.getByRole("alertdialog");
   await genealogy.getByRole("button", { name: "Timeline", exact: true }).click();
   await genealogy.getByRole("button", { name: /Sources & method/ }).click();
-  await expect(genealogy.locator(encyclopediaLinks)).toHaveCount(0);
+  await expect(genealogy.locator('a[href^="http"]')).toHaveCount(0);
   await genealogy.getByRole("button", { name: "Close", exact: true }).click();
   await page.goto("/#tab=0&tabs=h&layout=Credits:page.credits");
   const credits = page.getByRole("region", { name: "Credits panel", exact: true });
@@ -181,6 +181,11 @@ test("encyclopedia links appear on Credits and stay out of both timeline viewers
   await expect(credits.getByRole("link", { name: "Encyclopedia of the Bible", exact: true })).toHaveCount(1);
   await expect(credits.getByRole("link", { name: "Stanford Encyclopedia of Philosophy", exact: true })).toHaveCount(1);
   await expect(credits).toContainText("Encyclopaedia Iranica: Artaxerxes I");
+  await expect(credits.getByRole("link", { name: "Livius: Cambyses II", exact: true })).toHaveAttribute("href", "https://www.livius.org/articles/person/cambyses-ii/");
+  await expect(credits.getByRole("link", { name: "The Translators to the Reader", exact: true })).toBeVisible();
+  await page.goto("/#tab=0&tabs=h&layout=Why:page.kjv-only");
+  await expect(page.getByText("Historical and comparative source details are listed on the Credits page.", { exact: true })).toBeVisible();
+  await expect(page.locator('a[href^="http"]')).toHaveCount(0);
 });
 
 test("historical geography is labeled separately from biblical event connections", async ({ page }) => {
@@ -268,4 +273,36 @@ test("mobile Help search explains new tools, organization, and download status",
   await expect(search).toHaveValue("");
   await expect(help).toContainText("How to open and browse Timeline");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test("new Gospel scenes keep similar healings and parables separate", async ({ page }) => {
+  const dialog = await start(page, {}, "JHN.9");
+  const query = dialog.getByRole("textbox", { name: "Find timeline entries" });
+  const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+  await query.fill("parents are questioned");
+  await expect(evidence).toContainText("John 9:13–34");
+  await choose(page, dialog, "Timeline collection", "Gospel harmony");
+  await query.fill("healed at Bethsaida");
+  await expect(evidence).toContainText("Mark 8:22–26");
+  await expect(evidence).toContainText("distinct from the man born blind");
+  await query.fill("labourers in the vineyard");
+  await expect(evidence).toContainText("Matthew 20:1–16");
+  await expect(evidence).toContainText("not independent historical events");
+});
+
+test("Persian context and exile review preserve the KJV chronology constraints", async ({ page }) => {
+  const dialog = await start(page);
+  await choose(page, dialog, "Timeline collection", "Wider history");
+  const query = dialog.getByRole("textbox", { name: "Find timeline entries" });
+  const evidence = dialog.getByRole("article", { name: "Historical timeline evidence" });
+  await query.fill("Cambyses conquers");
+  await expect(evidence).toContainText("525 BC");
+  await expect(evidence).toContainText("Historical geography");
+  await expect(evidence.locator('a[href^="http"]')).toHaveCount(0);
+  await expect(evidence).toContainText("External sources and citation details are listed on the Credits page");
+  await expect(evidence.getByRole("button", { name: "Map: Egypt", exact: true })).toBeVisible();
+  await dialog.getByRole("button", { name: /Sources & method/ }).click();
+  await expect(dialog).toContainText("Exile and the seventy years");
+  await expect(dialog).toContainText("586 to 538 is 48");
+  await expect(dialog).toContainText("The seventy-year entry remains undated");
 });

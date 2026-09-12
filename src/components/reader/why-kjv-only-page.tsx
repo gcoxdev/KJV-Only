@@ -23,11 +23,6 @@ type KJVOnlySection = {
   references?: ScriptureReference[];
 };
 
-type ExternalSource = {
-  label: string;
-  href: string;
-  description: string;
-};
 
 type WhyKJVOnlyPageProps = {
   renderPreview: (reference: string, highlightWord: string) => ReactNode;
@@ -211,50 +206,6 @@ const KJV_ONLY_SECTIONS: KJVOnlySection[] = [
   },
 ];
 
-const EXTERNAL_SOURCES: ExternalSource[] = [
-  {
-    label: "The Translators to the Reader",
-    href: "https://www.bible-researcher.com/kjvpref.html",
-    description:
-      "The 1611 KJV translators' own preface, useful for their stated view of revision, translation, and the need to make Scripture understood in the vulgar tongue.",
-  },
-  {
-    label: "1611 King James Bible Title Page",
-    href: "https://commons.wikimedia.org/wiki/File:King-James-Version-Bible-first-edition-title-page-1611.png",
-    description:
-      "Primary historical title page showing the wording about translation from the original tongues and diligent comparison with former translations.",
-  },
-  {
-    label: "Richard Bancroft's Translation Rules",
-    href: "https://textus-receptus.com/wiki/Richard_Bancroft%2C_The_Rules_to_be_Observed_in_the_Translation_of_the_Bible",
-    description:
-      "A commonly cited list of rules used to describe the conservative and church-facing translation method behind the KJV project.",
-  },
-  {
-    label: "Archaic Pronoun Paradigms",
-    href: "https://alt-usage-english.org/pronoun_paradigms.html",
-    description:
-      "Useful for showing how thou, thee, ye, and you carried singular and plural distinctions in Early Modern English.",
-  },
-  {
-    label: "Bible Researcher on KJV Style and Italics",
-    href: "https://bible-researcher.com/intro.html",
-    description:
-      "Notes how KJV-style pronouns and italics preserve grammatical distinctions and show supplied English words.",
-  },
-  {
-    label: "King James Bible College: What's Missing?",
-    href: "https://kingjamesbiblecollege.org/the-king-james-bible-vs-modern-translations-whats-missing/",
-    description:
-      "A compiled KJV-only argument focusing on omitted verses, weakened wording, and blood-related phrases in modern versions.",
-  },
-  {
-    label: "Wordproject: Omissions and Contradictions in Bible Translations",
-    href: "https://www.wordproject.org/bibles/resources/why_kjv/omissions.htm",
-    description:
-      "A compact comparison table sampling omissions and wording changes across several modern versions against the KJV.",
-  },
-];
 
 function ReferenceList({
   references,
@@ -380,36 +331,7 @@ export function WhyKJVOnlyPage({
         ))}
       </div>
 
-      <Card className="border-border/70 bg-card/70 shadow-sm">
-        <CardHeader className="gap-2">
-          <CardTitle className="text-base sm:text-lg">Historical and Comparative Source Notes</CardTitle>
-          <CardDescription>
-            These are useful source trails for the historical background,
-            translation process, pronoun distinctions, and manuscript examples
-            often discussed in the KJV-only case.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-3">
-          {EXTERNAL_SOURCES.map((source) => (
-            <div
-              key={source.href}
-              className="rounded-xl border border-border/70 bg-background/70 p-3"
-            >
-              <a
-                href={source.href}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm font-medium text-foreground underline underline-offset-4"
-              >
-                {source.label}
-              </a>
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                {source.description}
-              </p>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <p className="text-sm text-muted-foreground">Historical and comparative source details are listed on the Credits page.</p>
     </div>
   );
 }

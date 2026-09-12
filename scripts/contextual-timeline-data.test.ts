@@ -79,6 +79,48 @@ it("keeps custody recollections and voyage episodes in their narrated chapters",
   expect(records.find(record => record.id === "paul-melita")).toMatchObject({ kind: "date-window", start: 60, end: 61 });
 });
 
+it("separates similar Gospel healings and parables by their actual passages", () => {
+  const ids = (book: string, chapter: number) => selectContextTimeline(records, book, chapter, "chapter", "biblical").records.filter(record => record.emphasized).map(record => record.id);
+  expect(ids("Mark", 8)).toEqual(expect.arrayContaining(["gospel-sign-leaven", "gospel-bethsaida-blind", "gospel-peter-confession", "gospel-first-passion-prediction", "gospel-take-up-cross"]));
+  expect(ids("John", 9)).toEqual(expect.arrayContaining(["gospel-blind-shepherd", "gospel-blind-investigation", "gospel-spiritual-sight"]));
+  expect(ids("John", 9)).not.toContain("gospel-bethsaida-blind");
+  expect(ids("John", 10)).toContain("gospel-good-shepherd");
+  expect(ids("John", 10)).not.toContain("gospel-blind-investigation");
+  expect(ids("Matthew", 18)).toContain("gospel-matthew-lost-sheep");
+  expect(ids("Luke", 15)).not.toContain("gospel-matthew-lost-sheep");
+  expect(ids("Matthew", 20)).toContain("gospel-vineyard-labourers");
+  expect(ids("Luke", 18)).not.toContain("gospel-vineyard-labourers");
+  expect(ids("John", 11)).toEqual(expect.arrayContaining(["gospel-lazarus-news", "gospel-lazarus-raised", "gospel-council-ephraim"]));
+  const scenes = records.filter(record => ["gospel-peter-confession", "gospel-blind-shepherd", "gospel-vineyard-labourers"].includes(record.id));
+  for (const scene of scenes) expect(scene).toMatchObject({ kind: "date-window", start: 27, end: 30 });
+});
+
+it("retains exile constraints without inventing a seventy-year bar or Persian king identity", () => {
+  const get = (id: string) => records.find(record => record.id === id)!;
+  expect(get("return-decree").start! - get("temple-destroyed").start!).toBe(48);
+  expect(get("second-temple").start! - get("temple-destroyed").start!).toBe(70);
+  expect(get("return-decree").start! - get("daniel-babylon").start!).toBe(67);
+  expect(get("chron-seventy-years").start).toBeUndefined();
+  expect(get("chron-seventy-years").end).toBeUndefined();
+  for (const id of ["nabonidus-reign", "cambyses-reign", "cambyses-egypt"]) {
+    expect(get(id).track).toBe("historical");
+    expect(get(id).references).toEqual([]);
+    expect(get(id).personIds).toBeUndefined();
+  }
+  expect(formatTimelineYear(get("cambyses-egypt").start!)).toBe("525 BC");
+  expect(CHAPTER_TIMELINE_MAP.Ezra[4].ids).not.toContain("cambyses-reign");
+  const { books } = JSON.parse(readFileSync("public/data/kjv.json", "utf8")) as { books: Book[] };
+  const review = CHRONOLOGY_REVIEWS.find(review => review.methodTitle === "Exile and the seventy years")!;
+  for (const ref of review.references) {
+    const [code, chapter, verse] = ref.split(".");
+    expect(books[BOOK_ICON_CODES.indexOf(code)]?.chapters[+chapter - 1]?.verses[+verse - 1], ref).toBeDefined();
+  }
+  for (const [book, chapter, verse, wording] of [["Jeremiah", 29, 10, "seventy years"], ["2 Chronicles", 36, 21, "threescore and ten years"], ["Zechariah", 7, 5, "seventy years"]] as const) {
+    const verseText = books.find(item => item.name === book)!.chapters[chapter - 1].verses[verse - 1].tokens.map(token => token.text).join(" ");
+    expect(verseText).toContain(wording);
+  }
+});
+
 it("keeps Roman history separate from biblical fulfillment and person identity", () => {
   const seneca = records.find(record => record.id === "seneca")!;
   expect(seneca.track).toBe("historical");

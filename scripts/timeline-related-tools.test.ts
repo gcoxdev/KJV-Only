@@ -74,11 +74,11 @@ it("preserves canonical Psalm headings as separate evidence", async () => {
   expect(link).toMatchObject({ association: "context", referenceLabel: "Psalm 23 heading", evidence: "A Psalm of David." });
 });
 
-it("keeps each encyclopedia article and usage note on Credits", async () => {
+it("keeps every external timeline source and usage note on Credits", async () => {
   const { CONTEXT_TIMELINE_SOURCES } = await import("../src/data/contextual-timeline");
-  const { TIMELINE_ENCYCLOPEDIA_CREDITS } = await import("../src/data/timeline-source-credits");
-  const { isTimelineEncyclopedia } = await import("../src/lib/timeline-sources");
-  const sources = Object.entries(CONTEXT_TIMELINE_SOURCES).filter(([,source]) => isTimelineEncyclopedia(source)).map(([id,source]) => ({ id, ...source }));
-  expect(TIMELINE_ENCYCLOPEDIA_CREDITS).toEqual(sources);
-  expect(sources).toHaveLength(21);
+  const { TIMELINE_SOURCE_CREDITS } = await import("../src/data/timeline-source-credits");
+  const sources = Object.entries(CONTEXT_TIMELINE_SOURCES).map(([id,source]) => ({ id, ...source }));
+  expect(TIMELINE_SOURCE_CREDITS).toEqual(sources);
+  expect(sources.some(source => source.id === "cambyses")).toBe(true);
+  expect(sources.some(source => source.id === "crucifixionStudy")).toBe(true);
 });

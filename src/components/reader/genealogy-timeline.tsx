@@ -1,9 +1,8 @@
 import { TimelineRelatedTools } from "@/components/reader/timeline-related-tools";
 import { timelineRelatedTools } from "@/data/timeline-related-tools";
-import { isTimelineEncyclopedia } from "@/lib/timeline-sources";
 import type { TimelineViewState } from "@/lib/timeline-view-state";
 import { lazy, Suspense, useCallback, useMemo, useState, type ReactNode } from "react";
-import { TIMELINE_METHOD, TIMELINE_SOURCES, type SojournModel } from "@/data/bible-timeline";
+import { TIMELINE_METHOD, type SojournModel } from "@/data/bible-timeline";
 import { TIMELINE_ERAS, buildLineageTimeline, jesusLineage, timelineEntryCategory, timelineDateSummary, timelineKindLabel, timelinePlotBounds, type JesusLineageBranch, type TimelineContent, type TimelineEra, type TimelineRecord } from "@/lib/bible-timeline";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -134,8 +133,7 @@ export default function GenealogyTimeline({ onNavigateAway, viewState, onViewSta
               <h3 className="text-sm font-semibold">{method.title}</h3><p className="text-sm text-muted-foreground">{method.text}</p>{refs(method.references)}
             </div>)}
             <h3 className="text-sm font-semibold">External calendar and historical sources</h3>
-            {Object.entries(TIMELINE_SOURCES).filter(([, source]) => !isTimelineEncyclopedia(source)).map(([id, source]) => <p key={id} className="text-sm"><a className="underline underline-offset-4" href={source.url} target="_blank" rel="noreferrer">{source.title}</a><span className="block text-muted-foreground">{source.use}</span></p>)}
-            <p className="text-xs text-muted-foreground">Additional calendar source details are listed on the Credits page.</p>
+            <p className="text-xs text-muted-foreground">External sources and citation details are listed on the Credits page.</p>
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -161,8 +159,7 @@ export default function GenealogyTimeline({ onNavigateAway, viewState, onViewSta
         <TimelineRelatedTools key={selected.id} record={selected} includePeople={!treeTarget} onNavigate={onNavigateAway} />
         {treeTarget ? <Button size="sm" variant="outline" className="self-start" onClick={() => onSelectPerson(treeTarget)}>View {genealogyById.get(treeTarget)?.names[0]} in tree</Button> : null}
         {evidenceReferences.length ? <><h4 className="text-sm font-semibold">KJV passages</h4>{refs(evidenceReferences, selected.label)}</> : <p className="text-sm text-muted-foreground">Historical context; no KJV passage dates this entry.</p>}
-        {selected.sources.some(id => !isTimelineEncyclopedia(TIMELINE_SOURCES[id])) ? <div className="flex flex-col gap-1 text-sm"><h4 className="font-semibold">Calendar sources</h4>{selected.sources.filter(id => !isTimelineEncyclopedia(TIMELINE_SOURCES[id])).map(id => <a key={id} className="underline underline-offset-4" href={TIMELINE_SOURCES[id].url} target="_blank" rel="noreferrer">{TIMELINE_SOURCES[id].title}</a>)}</div> : null}
-        {selected.sources.some(id => isTimelineEncyclopedia(TIMELINE_SOURCES[id])) ? <p className="text-xs text-muted-foreground">Additional calendar source details are listed on the Credits page.</p> : null}
+        {selected.sources.length ? <p className="text-xs text-muted-foreground">External sources and citation details are listed on the Credits page.</p> : null}
       </article> : <p>No entries match. Change the people/events filter, clear the search, or choose another scope or period.</p>}
       <div className="flex max-h-80 flex-col gap-1 overflow-y-auto overscroll-contain" role="group" aria-label="Timeline entries">
         {visible.map(record => <Button key={record.id} variant={selected?.id === record.id ? "secondary" : "ghost"} className="h-auto w-full justify-start whitespace-normal py-2 text-left" aria-pressed={selected?.id === record.id} onClick={() => select(record.id)}>

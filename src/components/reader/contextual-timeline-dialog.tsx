@@ -1,6 +1,5 @@
 import { TimelineRelatedTools } from "@/components/reader/timeline-related-tools";
 import { timelineRelatedTools } from "@/data/timeline-related-tools";
-import { isTimelineEncyclopedia } from "@/lib/timeline-sources";
 import { useTimelineViewState, type TimelineViewProps } from "@/hooks/use-timeline-view-state";
 import { lazy, Suspense, useMemo, useState } from "react";
 import { PinIcon, PinOffIcon, XIcon } from "lucide-react";
@@ -14,7 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ToolReferenceList } from "@/components/reader/tool-reference-list";
 import type { TimelineToolProps } from "./study-tools/timeline-tool";
-import { buildContextTimeline, CONTEXT_TIMELINE_COVERAGE, CONTEXT_TIMELINE_SOURCES, selectContextTimeline, type TimelineFilter, type TimelineScope } from "@/data/contextual-timeline";
+import { buildContextTimeline, CONTEXT_TIMELINE_COVERAGE, selectContextTimeline, type TimelineFilter, type TimelineScope } from "@/data/contextual-timeline";
 import { TIMELINE_COLLECTIONS, TIMELINE_PHASES } from "@/data/contextual-timeline-nt";
 import { TIMELINE_METHOD } from "@/data/bible-timeline";
 import { timelineDateSummary, timelineKindLabel } from "@/lib/bible-timeline";
@@ -115,8 +114,7 @@ export default function ContextualTimelineDialog({ initialViewState, onViewState
               <div className="flex flex-wrap gap-1">{selected.narrative.passages.map(passage => <Button key={passage.label} variant="outline" size="sm" className="h-auto whitespace-normal py-1 text-left" onClick={() => openReference(passage.reference)}>{passage.label}</Button>)}</div>
             </div> : null}
             {evidenceReferences.length ? <><h4 className="font-semibold">KJV passages</h4><ToolReferenceList references={evidenceReferences} highlightWord="" renderPreview={renderPreview} onOpenReference={openReference} onCloseSidebar={onCloseSidebar} /></> : <p className="text-muted-foreground">Historical comparison; no KJV passage dates this person or event.</p>}
-            {selected.sources.filter(id => !isTimelineEncyclopedia(CONTEXT_TIMELINE_SOURCES[id])).map(id => { const source = CONTEXT_TIMELINE_SOURCES[id]; return <div key={id}><a href={source.url} target="_blank" rel="noreferrer" className="underline underline-offset-4">{source.title}</a><p className="text-xs text-muted-foreground">{source.use}</p></div>; })}
-            {selected.sources.some(id => isTimelineEncyclopedia(CONTEXT_TIMELINE_SOURCES[id])) ? <p className="text-xs text-muted-foreground">Additional calendar source details are listed on the Credits page.</p> : null}
+            {selected.sources.length ? <p className="text-xs text-muted-foreground">External sources and citation details are listed on the Credits page.</p> : null}
           </article> : null}
         </div> : null}
       </div>

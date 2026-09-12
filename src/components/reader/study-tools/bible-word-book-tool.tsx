@@ -1,7 +1,6 @@
 import {
   BadgeInfoIcon,
   BookMarkedIcon,
-  ExternalLinkIcon,
   LoaderCircleIcon,
 } from "lucide-react";
 
@@ -145,15 +144,7 @@ export function BibleWordBookTool({
                 ))}
               </Accordion>
             )}
-            <a
-              href="https://archive.org/details/biblewordbookglo00wrig/mode/2up"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-            >
-              <ExternalLinkIcon className="size-3.5" />
-              Open scanned book
-            </a>
+            <p className="text-xs text-muted-foreground">Source details and the scanned book are listed on the Credits page.</p>
           </>
         ) : null}
       </AccordionContent>
