@@ -1,5 +1,5 @@
 import { registerHooks } from 'node:module';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, extname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -45,6 +45,7 @@ const summarize = rows => {
     genealogy: links.filter(a => a.some(l => l.request.kind === 'genealogy')).length,
     both: links.filter(a => a.some(l => l.request.kind === 'maps') && a.some(l => l.request.kind === 'genealogy')).length };
 };
+mkdirSync('docs', { recursive: true });
 const coverage = { historical: summarize(historical), combined: summarize(records) };
 const unlinked = records.filter(r => !timelineRelatedTools(r).length);
 const unlinkedReason = record => {

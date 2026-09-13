@@ -1317,6 +1317,7 @@ function main() {
 
   if (options.write) {
     fs.writeFileSync(DICTIONARY_PATH, `${JSON.stringify(dictionary, null, 2)}\n`);
+    fs.mkdirSync(path.dirname(REVIEW_REPORT_PATH), { recursive: true });
     fs.writeFileSync(REVIEW_REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`);
     fs.writeFileSync(
       QUALITY_REPORT_PATH,

@@ -7,6 +7,10 @@ dist/
 # Local app icon design explorations
 /design/
 
+# Local documentation and assessment reports
+/docs/
+/reports/
+
 # logs
 npm-debug.log*
 yarn-debug.log*
@@ -31,7 +35,6 @@ pnpm-debug.log*
 coverage/
 playwright-report/
 test-results/
-reports/
 
 # quarantine for public assets under review
 public/delete/

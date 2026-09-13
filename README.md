@@ -84,4 +84,4 @@ npm run build
 npm run test:e2e
 ```
 
-Maintainer documentation lives in [`docs/architecture.md`](docs/architecture.md), [`docs/data-and-deployment.md`](docs/data-and-deployment.md), and [`docs/release.md`](docs/release.md). Security reports should follow [`SECURITY.md`](SECURITY.md).
+The `docs/` and `reports/` folders contain local maintainer notes and generated assessments and are excluded from version control. Security reports should follow [`SECURITY.md`](SECURITY.md).
