@@ -1,87 +1,59 @@
 # KJV Only
 
-`KJV Only` is a React + Vite Bible reader focused on the King James Bible, study workflow, and offline use.
+KJV Only is an installable King James Bible reader for reading, listening, and study on desktop and mobile, with offline downloads and locally saved study material.
 
-## Current App State
+| Study workspace | Interactive maps |
+| --- | --- |
+| [![Psalms 23 and John 10 in split panels, with two tabs and Strong's Dictionary in the sidebar](assets/screenshots/study-workspace.png)](assets/screenshots/study-workspace.png) | [![Map dialog showing the Sea of Galilee with location outlines and map controls](assets/screenshots/map-dialog.png)](assets/screenshots/map-dialog.png) |
 
-The application currently includes:
+## Features
 
-- Multi-tab, multi-panel Bible reading and study workspace
-- Quick Open command palette for opening books, chapters, verses, and ranges from one input
-- Full search page with multiple search modes
-- Strong's, concordance, cross references, dictionaries, genealogy, maps, topics, and related study data
-- Bible audio support
-- Local-first notes and bookmarks with import/export support
-- Reading progress tracker and related reading workflow features
-- Settings for theme, layout, reading display, and other application behavior
-- Desktop-friendly and mobile-friendly interface
-- Installable PWA behavior and offline download bundles
-
-In Topics, everyday phrases such as `feeling afraid`, `need direction`, and `how to forgive` link to curated existing topics. Related matches are labeled with the phrase that found them; **Clear letter filters** removes letter restrictions while keeping your search. Genealogy search results show recorded family relationships and a name reference; references are name matches and can include different people with the same name.
-
-Map dialogs offer **Search this area** in both renderers. Results use the local geometry bounds and can open a place or linked passage. Filter the results by place name (including alternate names) and recorded place type; **Clear filters** restores all results in the searched area. Hide the results to explore the full map, then search again after moving or zooming. Bounds are approximate and can include areas whose outline extends beyond the view; entries without usable geometry are excluded. Run `npm run build:maps` after updating the map sources or geometry to regenerate the bounds index.
+- Flexible workspace with tabs, split panels, and a study sidebar
+- Quick passage navigation and multiple search modes, including typo-tolerant Smart Search
+- Word study with Strong's, concordance, cross references, dictionaries, and topics
+- Interactive maps, family trees, and biblical and historical timelines linked to passages
+- Rich-text notes and bookmarks organized with folders and tags, plus import/export
+- Chapter audio, reading progress, and customizable themes and reading layouts
+- Offline downloads for reading and study, with installable PWA support
 
 ## Tech Stack
 
-- React 19
-- Vite
-- TypeScript
-- Tailwind CSS 4
-- shadcn/ui + Base UI
-- Lexical
-- Leaflet / React Leaflet
+- React 19, TypeScript 6, and Vite 8
+- Tailwind CSS 4 and shadcn/ui with Base UI
+- Lexical for rich-text editing
+- MapLibre GL and Leaflet / React Leaflet for maps
+- vis-timeline and vis-data for timelines
+- Vitest, Playwright, and axe-core for testing; ESLint for linting
 
 ## Development
 
-Install dependencies:
+Use Node.js 22 (the version pinned in [`.nvmrc`](.nvmrc)) and npm 10.
 
 ```bash
-npm install
-```
-
-Start the dev server:
-
-```bash
+npm ci
 npm run dev
 ```
 
-Build the frontend:
+Bible data is included in the repository for normal development. Data regeneration commands are listed in [`package.json`](package.json); some require Python 3.
+
+Build and preview:
 
 ```bash
 npm run build
-```
-
-Refresh the local runtime corpus manifest/bootstrap from an existing canonical corpus:
-
-```bash
-npm run build:data-manifest
-```
-
-Preview the production build:
-
-```bash
 npm run preview
 ```
 
-Lint:
+## Checks
 
 ```bash
+npm run audit
+npm run check:deps
 npm run lint
-```
-
-Run tests:
-
-```bash
-npm test
-```
-
-Run the complete local verification gates:
-
-```bash
 npm run typecheck
 npm run test:coverage
 npm run build
-npm run test:e2e
+npx playwright install --with-deps chromium
+npm run test:e2e:release
 ```
 
-The `docs/` and `reports/` folders contain local maintainer notes and generated assessments and are excluded from version control. Security reports should follow [`SECURITY.md`](SECURITY.md).
+See [`SECURITY.md`](SECURITY.md) for reporting security issues.
