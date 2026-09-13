@@ -7,7 +7,8 @@ dist/
 # Local app icon design explorations
 /design/
 
-# Local documentation and assessment reports
+# Local planning, documentation, and reports
+/TODO
 /docs/
 /reports/
 
