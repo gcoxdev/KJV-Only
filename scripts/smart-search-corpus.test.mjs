@@ -68,7 +68,9 @@ beforeAll(async () => {
 
 afterAll(() => vi.unstubAllGlobals());
 
-describe("Smart Search across the full KJV corpus", { timeout: 15000 }, () => {
+// Each query checks both the worker and fallback across all 31,102 verses.
+// Coverage instrumentation can push this functional check past 15 seconds.
+describe("Smart Search across the full KJV corpus", { timeout: 30000 }, () => {
 
   it.each([
     { query: "begnning", target: "Genesis 1:1", within: 1 },

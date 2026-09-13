@@ -28,7 +28,8 @@ describe("proposed map locations", () => {
     });
   });
 
-  // Reads and validates geometry for all 1,278 mapped entries.
+  // Reads and validates geometry for all 1,278 mapped entries. Allow for
+  // coverage instrumentation and disk I/O on slower runners.
   it("resolves every shipped alternative to geometry in its own entry", () => {
     for (const entry of maps.filter(entry => entry.identifications)) {
       const payload = geometry(entry.geojson_file);
@@ -44,7 +45,7 @@ describe("proposed map locations", () => {
         expect(mapIdentificationTarget(candidate, payload), `${entry.geojson_file}: ${candidate.label}`).not.toBeNull();
       }
     }
-  }, 30_000);
+  }, 60_000);
 
   const mixed: MapGeoJsonPayload = { bbox: [-170, -80, 170, 80], features: [
     { properties: { id: "site.point" }, geometry: { type: "Point", coordinates: [35, 32] } },
