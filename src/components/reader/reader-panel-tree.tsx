@@ -1479,7 +1479,7 @@ const ReaderLeafPanel = memo(function ReaderLeafPanel({
                                   <SelectValue />
                                 </SelectTrigger>
                               </ReaderControlTooltip>
-                              <SelectContent className="w-20 min-w-0">
+                              <SelectContent className="w-max min-w-0">
                                 <SelectGroup>
                                   {AUDIO_PLAYBACK_RATE_OPTIONS.map((option) => (
                                     <SelectItem
