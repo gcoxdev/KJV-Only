@@ -225,13 +225,15 @@ self.addEventListener("fetch", (event) => {
     return
   }
 
-  // Explicit refreshes must reach the server and must fail when offline.
-  if (event.request.cache === "reload") {
-    event.respondWith(fetch(event.request))
+  // Leave partial media transfers to the browser's native network stack.
+  // Forwarding them with respondWith(fetch(...)) adds an unnecessary worker
+  // boundary; we do not serve or cache partial responses here.
+  if (isRangedRequest(event.request)) {
     return
   }
 
-  if (isRangedRequest(event.request)) {
+  // Explicit refreshes must reach the server and must fail when offline.
+  if (event.request.cache === "reload") {
     event.respondWith(fetch(event.request))
     return
   }

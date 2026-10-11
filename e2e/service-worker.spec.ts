@@ -16,6 +16,47 @@ test.skip(
   "Service-worker upgrade checks require the production preview",
 )
 
+test("leaves audio range transfers to the browser network stack", async ({ page }) => {
+  await page.goto("/")
+  await expect(page.getByRole("button", { name: "Genesis 1", exact: true })).toBeVisible()
+  await page.evaluate(() => navigator.serviceWorker.ready.then(() => undefined))
+  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true)
+
+  const audioUrl = "/audio/GEN.1.mp3"
+  const original = readFileSync(new URL("../public/audio/GEN.1.mp3", import.meta.url))
+  // A complete offline download must not be returned as an incorrect whole
+  // response when the browser requests a later part of the chapter.
+  await page.evaluate(async ({ url, cacheName }) => {
+    const response = await fetch(url, { cache: "reload" })
+    await (await caches.open(cacheName)).put(url, response)
+  }, { url: audioUrl, cacheName: APP_CACHE })
+
+  for (const [start, end] of [[0, 1023], [131072, 132095]]) {
+    const networkResponse = page.waitForResponse((response) =>
+      response.url().endsWith(audioUrl) && response.status() === 206,
+    )
+    const received = await page.evaluate(async ({ url, start, end }) => {
+      const response = await fetch(url, {
+        headers: { Range: `bytes=${start}-${end}` },
+        cache: "reload",
+      })
+      return {
+        range: response.headers.get("content-range"),
+        bytes: Array.from(new Uint8Array(await response.arrayBuffer())),
+      }
+    }, { url: audioUrl, start, end })
+    expect((await networkResponse).fromServiceWorker()).toBe(false)
+    expect(received.range).toBe(`bytes ${start}-${end}/${original.length}`)
+    expect(received.bytes).toEqual(Array.from(original.subarray(start, end + 1)))
+  }
+
+  const iconResponse = page.waitForResponse((response) =>
+    new URL(response.url()).pathname === "/icons/app-icon.svg",
+  )
+  await page.evaluate(() => fetch("/icons/app-icon.svg").then((response) => response.text()))
+  expect((await iconResponse).fromServiceWorker()).toBe(true)
+})
+
 test("shows a recovery screen instead of going blank when a chunk fails", async ({
   page,
 }) => {
